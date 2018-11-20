@@ -158,45 +158,52 @@ Step by step navigation
 						<script type="text/javascript" src="/assets/javascripts/plotlyjs-bundle.js"></script>
 
 
-						<script type="text/javascript" src="/assets/javascripts/figure.js"></script>
+						<script type="text/javascript" src="/assets/javascripts/overall-figure.js"></script>
 
 						<div id="8fc8f42d-6b49-4fce-aeab-8241ca3204f5" style="width: 620px; height: 300px;" class="plotly-graph-div"></div>
-						
+
 						<script type="text/javascript">
-            (function(){
-                window.PLOTLYENV={'BASE_URL': 'https://plot.ly'};
+							(function() {
+								window.PLOTLYENV = {
+									'BASE_URL': 'https://plot.ly'
+								};
 
-                var gd = document.getElementById('8fc8f42d-6b49-4fce-aeab-8241ca3204f5')
-                var resizeDebounce = null;
+								var gd = document.getElementById('8fc8f42d-6b49-4fce-aeab-8241ca3204f5')
+								var resizeDebounce = null;
 
-                function resizePlot() {
-                    var bb = gd.getBoundingClientRect();
-                    Plotly.relayout(gd, {
-                        width: bb.width,
-                        height: bb.height
-                    });
-                }
+								function resizePlot() {
+									var bb = gd.getBoundingClientRect();
+									Plotly.relayout(gd, {
+										width: bb.width,
+										height: bb.height
+									});
+								}
 
-                
-                window.addEventListener('resize', function() {
-                    if (resizeDebounce) {
-                        window.clearTimeout(resizeDebounce);
-                    }
-                    resizeDebounce = window.setTimeout(resizePlot, 100);
-                });
-                
 
-                
-                Plotly.plot(gd,  {
-                    data: figure.data,
-                    layout: figure.layout,
-                    frames: figure.frames,
-                    config: {"mapboxAccessToken": "pk.eyJ1IjoiY2hyaWRkeXAiLCJhIjoiY2lxMnVvdm5iMDA4dnhsbTQ5aHJzcGs0MyJ9.X9o_rzNLNesDxdra4neC_A", "linkText": "Export to plot.ly", "showLink": true}
-                });
-                
-           }());
-        </script>
-						
+								window.addEventListener('resize', function() {
+									if (resizeDebounce) {
+										window.clearTimeout(resizeDebounce);
+									}
+									resizeDebounce = window.setTimeout(resizePlot, 100);
+								});
+
+
+
+								Plotly.plot(gd, {
+									data: figure.data,
+									layout: figure.layout,
+									frames: figure.frames,
+									config: {
+										"mapboxAccessToken": "pk.eyJ1IjoiY2hyaWRkeXAiLCJhIjoiY2lxMnVvdm5iMDA4dnhsbTQ5aHJzcGs0MyJ9.X9o_rzNLNesDxdra4neC_A",
+										"linkText": "Export to plot.ly",
+										"showLink": true
+									}
+								});
+
+							}());
+
+						</script>
+
 
 
 						<h2 class="govuk-heading-m">Overall absence</h2>
@@ -213,6 +220,51 @@ Step by step navigation
 							</div>
 						</details>
 
+						<script type="text/javascript" src="national-figure.js"></script>
+
+						<div id="9344c0dd-d44c-444e-8eef-d65dc9122b30" style="width: 620px; height: 300px;" class="plotly-graph-div"></div>
+						<script type="text/javascript">
+							(function() {
+								window.PLOTLYENV = {
+									'BASE_URL': 'https://plot.ly'
+								};
+
+								var gd = document.getElementById('9344c0dd-d44c-444e-8eef-d65dc9122b30')
+								var resizeDebounce = null;
+
+								function resizePlot() {
+									var bb = gd.getBoundingClientRect();
+									Plotly.relayout(gd, {
+										width: bb.width,
+										height: bb.height
+									});
+								}
+
+
+								window.addEventListener('resize', function() {
+									if (resizeDebounce) {
+										window.clearTimeout(resizeDebounce);
+									}
+									resizeDebounce = window.setTimeout(resizePlot, 100);
+								});
+
+
+
+								Plotly.plot(gd, {
+									data: figure.data,
+									layout: figure.layout,
+									frames: figure.frames,
+									config: {
+										"mapboxAccessToken": "pk.eyJ1IjoiY2hyaWRkeXAiLCJhIjoiY2lxMnVvdm5iMDA4dnhsbTQ5aHJzcGs0MyJ9.X9o_rzNLNesDxdra4neC_A",
+										"linkText": "Export to plot.ly",
+										"showLink": true
+									}
+								});
+
+							}());
+
+						</script>
+
 						<div class="govuk-tabs" data-module="tabs">
 
 
@@ -227,11 +279,7 @@ Step by step navigation
 										Long
 									</a>
 								</li>
-								<li class="govuk-tabs__list-item">
-									<a class="govuk-tabs__tab" href="#overall-video">
-										Video
-									</a>
-								</li>
+
 								<li class="govuk-tabs__list-item">
 									<a class="govuk-tabs__tab" href="#overall-data">
 										Data
@@ -240,7 +288,7 @@ Step by step navigation
 							</ul>
 
 							<section class="govuk-tabs__panel" id="overall-short">
-								<img src="/assets/images/overall-absence-graph-2.png" width="540px">
+
 
 								<p>The overall absence rate across state-funded primary, secondary and special schools increased from 4.6
 									per cent in 2015/16 to 4.7 per cent in 2016/17. In primary schools the overall absence rate stayed the same
@@ -249,7 +297,7 @@ Step by step navigation
 
 							</section>
 							<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="overall-long">
-								<img src="/assets/images/overall-absence-graph-2.png" width="540px">
+
 								<p>The overall absence rate across state-funded primary, secondary and special schools increased from 4.6
 									per cent in 2015/16 to 4.7 per cent in 2016/17. In primary schools the overall absence rate stayed the same
 									at 4 per cent and the rate in secondary schools increased from 5.2 per cent to 5.4 per cent. Absence in
@@ -277,11 +325,70 @@ Step by step navigation
 
 
 							</section>
-							<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="overall-video">
 
-
-							</section>
 							<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="overall-data">
+
+
+								<table class="govuk-table">
+									<thead class="govuk-table__head">
+										<tr class="tableizer-firstrow">
+											<th></th>
+											<th>2012/13</th>
+											<th>2013/14</th>
+											<th>2014/15</th>
+											<th>2015/16</th>
+											<th>2016/17</th>
+										</tr>
+									</thead>
+
+									<tbody class="govuk-table__body">
+										<tr class="govuk-table__row">
+											<th class="govuk-table__header" scope="row">Number of schools</th>
+											<td class="govuk-table__cell">21,130</td>
+											<td class="govuk-table__cell">21,151</td>
+											<td class="govuk-table__cell">21,178</td>
+											<td class="govuk-table__cell">21,163</td>
+											<td class="govuk-table__cell"> 21,247 </td>
+										</tr>
+										<tr class="govuk-table__row">
+											<th class="govuk-table__header" scope="row">Number of pupil enrolments</th>
+											<td class="govuk-table__cell">6,477,725</td>
+											<td class="govuk-table__cell">6,554,005</td>
+											<td class="govuk-table__cell">6,642,755</td>
+											<td class="govuk-table__cell">6,737,190</td>
+											<td class="govuk-table__cell"> 6,899,770 </td>
+										</tr>
+										<tr class="govuk-table__row">
+											<th class="govuk-table__header" colspan="6">Percentage of sessions missed due to:</th>
+										</tr>
+										<tr class="govuk-table__row">
+											<th class="govuk-table__header" scope="row">Overall absence</th>
+											<td class="govuk-table__cell">5.3</td>
+											<td class="govuk-table__cell">4.5</td>
+											<td class="govuk-table__cell">4.6</td>
+											<td class="govuk-table__cell">4.6</td>
+											<td class="govuk-table__cell">4.7</td>
+										</tr>
+										<tr class="govuk-table__row">
+											<th class="govuk-table__header" scope="row">Authorised absence</th>
+											<td class="govuk-table__cell">4.2</td>
+											<td class="govuk-table__cell">3.5</td>
+											<td class="govuk-table__cell">3.5</td>
+											<td class="govuk-table__cell">3.4</td>
+											<td class="govuk-table__cell">3.4</td>
+										</tr>
+										<tr class="govuk-table__row">
+											<th class="govuk-table__header" scope="row">Unauthorised absence</th>
+											<td class="govuk-table__cell">1.1</td>
+											<td class="govuk-table__cell">1.1</td>
+											<td class="govuk-table__cell">1.1</td>
+											<td class="govuk-table__cell">1.1</td>
+											<td class="govuk-table__cell">1.3</td>
+										</tr>
+									</tbody>
+								</table>
+
+
 
 
 							</section>
