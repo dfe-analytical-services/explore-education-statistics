@@ -155,7 +155,48 @@ Step by step navigation
 
 					<div class="app-step-nav__panel js-panel" id="step-panel-check-youre-allowed-to-drive-1">
 
-						<img src="/assets/images/overall-absence-graph.png" width="620px">
+						<script type="text/javascript" src="/assets/javascripts/plotlyjs-bundle.js"></script>
+
+
+						<script type="text/javascript" src="/assets/javascripts/figure.js"></script>
+
+						<div id="8fc8f42d-6b49-4fce-aeab-8241ca3204f5" style="width: 620px; height: 300px;" class="plotly-graph-div"></div>
+						
+						<script type="text/javascript">
+            (function(){
+                window.PLOTLYENV={'BASE_URL': 'https://plot.ly'};
+
+                var gd = document.getElementById('8fc8f42d-6b49-4fce-aeab-8241ca3204f5')
+                var resizeDebounce = null;
+
+                function resizePlot() {
+                    var bb = gd.getBoundingClientRect();
+                    Plotly.relayout(gd, {
+                        width: bb.width,
+                        height: bb.height
+                    });
+                }
+
+                
+                window.addEventListener('resize', function() {
+                    if (resizeDebounce) {
+                        window.clearTimeout(resizeDebounce);
+                    }
+                    resizeDebounce = window.setTimeout(resizePlot, 100);
+                });
+                
+
+                
+                Plotly.plot(gd,  {
+                    data: figure.data,
+                    layout: figure.layout,
+                    frames: figure.frames,
+                    config: {"mapboxAccessToken": "pk.eyJ1IjoiY2hyaWRkeXAiLCJhIjoiY2lxMnVvdm5iMDA4dnhsbTQ5aHJzcGs0MyJ9.X9o_rzNLNesDxdra4neC_A", "linkText": "Export to plot.ly", "showLink": true}
+                });
+                
+           }());
+        </script>
+						
 
 
 						<h2 class="govuk-heading-m">Overall absence</h2>
