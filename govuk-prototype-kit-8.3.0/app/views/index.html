@@ -1,19 +1,21 @@
-
 {% extends "layout.html" %}
 
 {% block pageTitle %}
-  GOV.UK Prototype Kit
+GOV.UK Prototype Kit
 {% endblock %}
 
 {% block content %}
 
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      <h1 class="govuk-heading-xl">
-        The GOV.UK Prototype Kit
-        <span class="govuk-caption-xl">{{releaseVersion}}</span>
-      </h1>{{releaseVersion | log }}
-      <p>
+<div class="govuk-grid-row">
+	<div class="govuk-grid-column-two-thirds">
+		<h1 class="govuk-heading-xl">
+			DfE Data Dissemination
+			<span class="govuk-caption-xl">{{releaseVersion}}</span>
+		</h1>{{releaseVersion | log }}
+		<p><a href="/absence-and-exclusion/">Pupil absence</a></p>
+
+		<!--
+		<p>
         This kit lets you rapidly create HTML prototypes of GOV.UK services.
       </p>
 
@@ -38,7 +40,8 @@
           </a>
         </li>
       </ul>
-    </div>
+-->
+	</div>
 </div>
 
 {% endblock %}

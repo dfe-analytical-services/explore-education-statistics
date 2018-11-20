@@ -1,0 +1,1002 @@
+{% extends "layout.html" %}
+
+{% block pageTitle %}
+Step by step navigation
+{% endblock %}
+
+{% block pageScripts %}
+<script src="/public/javascripts/step-by-step-navigation.js"></script>
+<script type="text/javascript">
+	var $element = $('#step-by-step-navigation')
+	var stepByStepNavigation = new GOVUK.Modules.StepByStepNavigation()
+	stepByStepNavigation.start($element)
+
+</script>
+{% endblock %}
+
+{% block beforeContent %}
+<div class="govuk-breadcrumbs">
+	<ol class="govuk-breadcrumbs__list">
+		<li class="govuk-breadcrumbs__list-item">
+			<a class="govuk-breadcrumbs__link" href="https://www.gov.uk">Home</a>
+		</li>
+		<li class="govuk-breadcrumbs__list-item">
+			<a class="govuk-breadcrumbs__link" href="#">Education, training and skills</a>
+		</li>
+		<li class="govuk-breadcrumbs__list-item">
+			<a class="govuk-breadcrumbs__link" href="#">Pupil wellbeing, behaviour and attendance</a>
+		</li>
+		<li class="govuk-breadcrumbs__list-item">
+			<a class="govuk-breadcrumbs__link" href="#">School attendance and absence</a>
+		</li>
+	</ol>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+
+	<div class="govuk-grid-column-three-thirds">
+
+
+
+	</div>
+	<div class="govuk-grid-column-two-thirds">
+
+		<strong class="govuk-tag">
+			This is the latest data
+		</strong>
+		<h1 class="govuk-heading-l">
+
+			Pupil absence in schools in England
+		</h1>
+
+		<p>
+			Find out the facts and figures for pupil absence in primary and secondary schools across England.
+		</p>
+
+
+
+		<hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+
+		<h2 class="govuk-heading-m">Headlines</h2>
+
+		<ol class="govuk-list govuk-list--number">
+
+			<li>
+				<h2 class="govuk-heading-s">
+					Overall and unauthorised absence rates have increased since last year
+				</h2>
+			</li>
+			<li>
+				<h2 class="govuk-heading-s">
+					The rise in unauthorised absence rates is due to higher rates of unauthorised holidays
+				</h2>
+			</li>
+			<li>
+				<h2 class="govuk-heading-s">
+					One in ten pupils was persistently absent during the academic year 2016/17
+				</h2>
+			</li>
+		</ol>
+
+
+
+		<div class="dash-tiles">
+			<h2 class="govuk-heading-l tile">
+				<a href="#">
+					<span class="govuk-caption-l">Overall absence</span>
+					<span class="trend-icon govuk-caption-increase-negative">4.7%</span>
+					<span class="govuk-caption-m">Increased from 4.6%</span>
+				</a>
+			</h2>
+
+			<h2 class="govuk-heading-l tile">
+				<a href="#">
+					<span class="govuk-caption-l">Authorised absence</span>
+					<span class="trend-icon govuk-caption-static">3.4%</span>
+					<span class="govuk-caption-m">The same as 2015/16</span>
+				</a>
+			</h2>
+
+			<h2 class="govuk-heading-l tile">
+				<a href="#">
+					<span class="govuk-caption-l">Unauthorised absence</span>
+					<span class="trend-icon govuk-caption-increase-negative">1.3%</span>
+					<span class="govuk-caption-m">Increased from 1.1%</span>
+				</a>
+			</h2>
+
+
+			<h2 class="govuk-heading-l tile">
+				<a href="#">
+					<span class="govuk-caption-l">Persistent absence</span>
+					<span class="trend-icon govuk-caption-increase-negative">10.8%</span>
+					<span class="govuk-caption-m">Increased from 10.5%</span>
+				</a>
+			</h2>
+		</div>
+
+		<hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+
+
+		<h2 class="govuk-heading-m">Further information</h2>
+
+
+		<div id="step-by-step-navigation" class="app-step-nav app-step-nav--large app-step-nav--active" data-show-text="Show" data-hide-text="Hide" data-show-all-text="Show all" data-hide-all-text="Hide all">
+			<ol class="app-step-nav__steps">
+				<li class="app-step-nav__step js-step step-is-shown" id="check-youre-allowed-to-drive">
+					<div class="app-step-nav__header js-toggle-panel" data-position="1">
+						<h2 class="app-step-nav__title">
+							<span class="app-step-nav__circle app-step-nav__circle--number">
+								<span class="app-step-nav__circle-inner">
+									<span class="app-step-nav__circle-background">
+										<span class="govuk-visually-hidden">Step</span> 1
+									</span>
+								</span>
+							</span>
+
+							<span class="js-step-title">
+								<button class="app-step-nav__button app-step-nav__button--title js-step-title-button" aria-expanded="true" aria-controls="step-panel-check-youre-allowed-to-drive-1">
+									<span class="js-step-title-text">
+										The national picture
+										<span class="govuk-caption-m">
+											Facts and figures for England as a whole
+										</span>
+									</span>
+									<span class="app-step-nav__toggle-link js-toggle-link" aria-hidden="true">Show</span>
+								</button>
+							</span>
+						</h2>
+					</div>
+
+					<div class="app-step-nav__panel js-panel" id="step-panel-check-youre-allowed-to-drive-1">
+
+						<img src="/assets/images/overall-absence-graph.png" width="620px">
+
+
+						<h2 class="govuk-heading-m">Overall absence</h2>
+
+						<details class="govuk-details">
+							<summary class="govuk-details__summary">
+								<span class="govuk-details__summary-text">
+									Overall absence rate definition
+								</span>
+							</summary>
+							<div class="govuk-details__text">
+								The overall absence rate is the total number of overall absence sessions for all pupils as a percentage of the total number of possible sessions for all pupils, where overall absence is the sum of authorised and unauthorised absence and one session is equal to half a day.
+
+							</div>
+						</details>
+
+						<div class="govuk-tabs" data-module="tabs">
+
+
+							<ul class="govuk-tabs__list">
+								<li class="govuk-tabs__list-item">
+									<a class="govuk-tabs__tab govuk-tabs__tab--selected" href="#overall-short">
+										Short
+									</a>
+								</li>
+								<li class="govuk-tabs__list-item">
+									<a class="govuk-tabs__tab" href="#overall-long">
+										Long
+									</a>
+								</li>
+								<li class="govuk-tabs__list-item">
+									<a class="govuk-tabs__tab" href="#overall-video">
+										Video
+									</a>
+								</li>
+								<li class="govuk-tabs__list-item">
+									<a class="govuk-tabs__tab" href="#overall-data">
+										Data
+									</a>
+								</li>
+							</ul>
+
+							<section class="govuk-tabs__panel" id="overall-short">
+								<img src="/assets/images/overall-absence-graph-2.png" width="540px">
+
+								<p>The overall absence rate across state-funded primary, secondary and special schools increased from 4.6
+									per cent in 2015/16 to 4.7 per cent in 2016/17. In primary schools the overall absence rate stayed the same
+									at 4 per cent and the rate in secondary schools increased from 5.2 per cent to 5.4 per cent. Absence in
+									special schools is much higher at 9.7 per cent in 2016/17</p>
+
+							</section>
+							<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="overall-long">
+								<img src="/assets/images/overall-absence-graph-2.png" width="540px">
+								<p>The overall absence rate across state-funded primary, secondary and special schools increased from 4.6
+									per cent in 2015/16 to 4.7 per cent in 2016/17. In primary schools the overall absence rate stayed the same
+									at 4 per cent and the rate in secondary schools increased from 5.2 per cent to 5.4 per cent. Absence in
+									special schools is much higher at 9.7 per cent in 2016/17</p>
+
+								<p>The increase in overall absence rate has been driven by an increase in the unauthorised absence rate
+									across state-funded primary, secondary and special schools - which increased from 1.1 per cent to 1.3 per
+									cent between 2015/16 and 2016/17.</p>
+
+								<p>Looking at longer-term trends, overall and authorised absence rates have been fairly stable over recent
+									years after decreasing gradually between 2006/07 and 2013/14. Unauthorised absence rates have not
+									varied much since 2006/07, however the unauthorised absence rate is now at its highest since records
+									began, at 1.3 per cent.</p>
+
+								<p>This increase in unauthorised absence is due to an increase in absence due to family holidays that were
+									not agreed by the school. The authorised absence rate has not changed since last year, at 3.4 per cent.
+									Though in primary schools authorised absence rates have been decreasing across recent years.</p>
+								<p>The total number of days missed due to overall absence across state-funded primary, secondary and
+									special schools has increased since last year, from 54.8 million in 2015/16 to 56.7 million in 2016/17. This
+									partly reflects the rise in the total number of pupil enrolments, the average number of days missed per
+									enrolment has increased very slightly from 8.1 days in 2015/16 to 8.2 days in 2016/17.</p>
+								<p>In 2016/17, 91.8 per cent of pupils in state-funded primary, state-funded secondary and special schools
+									missed at least one session during the school year, this is similar to the previous year (91.7 per cent in
+									2015/16).</p>
+
+
+							</section>
+							<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="overall-video">
+
+
+							</section>
+							<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="overall-data">
+
+
+							</section>
+						</div>
+
+
+
+
+						<h2 class="govuk-heading-m">Persistent absence</h2>
+
+						<details class="govuk-details">
+							<summary class="govuk-details__summary">
+								<span class="govuk-details__summary-text">
+									Persistent absence rate definition
+								</span>
+							</summary>
+							<div class="govuk-details__text">
+								A pupil enrolment is identified as a persistent absentee if they miss 10% or more of their possible sessions.
+								Persistent absence rate =
+								Number of enrolments classed as persistent absentees
+								Number of enrolments × 100
+								The persistent absentee measure changed as of the start of the 2015/16 academic year. Time series data in this
+								release has been recalculated using the new methodology but caution should be used when interpreting these series
+								as they may be impacted by the change in the measure itself. For more information on this and on the methodologies
+								used in previous years, please see the "guide to absence statistics".
+
+							</div>
+						</details>
+
+						<div class="govuk-tabs" data-module="tabs">
+
+
+							<ul class="govuk-tabs__list">
+								<li class="govuk-tabs__list-item">
+									<a class="govuk-tabs__tab govuk-tabs__tab--selected" href="#persistent-short">
+										Short
+									</a>
+								</li>
+								<li class="govuk-tabs__list-item">
+									<a class="govuk-tabs__tab" href="#persistent-long">
+										Long
+									</a>
+								</li>
+								<li class="govuk-tabs__list-item">
+									<a class="govuk-tabs__tab" href="#persistent-data">
+										Data
+									</a>
+								</li>
+							</ul>
+
+							<section class="govuk-tabs__panel" id="persistent-short">
+								<img src="/assets/images/persistent-absence-graph.png" width="540px">
+
+
+								<p>The percentage of enrolments in state-funded primary and state-funded secondary schools that were
+									classified as persistent absentees in 2016/17 was 10.8 per cent. This is up from the equivalent figure of
+									10.5 per cent in 2015/16 (see Figure 2).
+								</p>
+
+							</section>
+							<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="persistent-long">
+								<img src="/assets/images/persistent-absence-graph.png" width="540px">
+
+								<p>The percentage of enrolments in state-funded primary and state-funded secondary schools that were
+									classified as persistent absentees in 2016/17 was 10.8 per cent. This is up from the equivalent figure of
+									10.5 per cent in 2015/16 (see Figure 2).
+								</p>
+
+								<p>In 2016/17, persistent absentees accounted for 37.6 per cent of all absence compared to 36.6 per cent in
+									2015/16. Longer term, there has been a decrease in the proportion of absence that persistent absentees
+									account for – down from 43.3 per cent in 2011/12.</p>
+								<p>The overall absence rate for persistent absentees across all schools was 18.1 per cent, nearly four times
+									higher than the rate for all pupils. This is a slight increase from 2015/16, when the overall absence rate for
+									persistent absentees was 17.6 per cent.</p>
+								<p>Persistent absentees account for almost a third, 31.6 per cent, of all authorised absence and more than
+									half, 53.8 per cent of all unauthorised absence. The rate of illness absences is almost four times higher for
+									persistent absentees compared to other pupils, at 7.6 per cent and 2.0 per cent respectively.</p>
+
+
+							</section>
+							<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="persistent-data">
+
+
+							</section>
+						</div>
+
+
+					</div>
+
+				</li>
+
+				<li class="app-step-nav__step js-step" id="get-a-provisional-licence">
+					<div class="app-step-nav__header js-toggle-panel" data-position="2">
+						<h2 class="app-step-nav__title">
+							<span class="app-step-nav__circle app-step-nav__circle--number">
+								<span class="app-step-nav__circle-inner">
+									<span class="app-step-nav__circle-background">
+										<span class="govuk-visually-hidden">Step</span> 2
+									</span>
+								</span>
+							</span>
+
+							<span class="js-step-title">
+								<button class="app-step-nav__button app-step-nav__button--title js-step-title-button" aria-expanded="false" aria-controls="step-panel-get-a-provisional-licence-2">
+									<span class="js-step-title-text">
+										Local Authorities
+										<span class="govuk-caption-m">
+											Compare local authorities and look at specific ones
+										</span>
+									</span>
+									<span class="app-step-nav__toggle-link js-toggle-link" aria-hidden="true">Show</span>
+								</button>
+							</span>
+						</h2>
+					</div>
+
+					<div class="app-step-nav__panel js-panel js-hidden" id="step-panel-get-a-provisional-licence-2">
+
+						<div class="govuk-tabs" data-module="tabs">
+
+
+							<ul class="govuk-tabs__list">
+								<li class="govuk-tabs__list-item">
+									<a class="govuk-tabs__tab govuk-tabs__tab--selected" href="#la-map">
+										Map
+									</a>
+								</li>
+								<li class="govuk-tabs__list-item">
+									<a class="govuk-tabs__tab" href="#la-choose">
+										Choose a local authority
+									</a>
+								</li>
+								<li class="govuk-tabs__list-item">
+									<a class="govuk-tabs__tab" href="#la-find">
+										Find your local authority
+									</a>
+								</li>
+							</ul>
+
+							<section class="govuk-tabs__panel" id="la-map">
+								<img src="/assets/images/map_overall_absence_rates.png" width="540px">
+
+
+							</section>
+							<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="la-choose">
+								<p></p>
+
+								<div class="govuk-form-group">
+									<label class="govuk-label" for="sort">
+										Choose a Local Authority
+									</label>
+									<select class="govuk-select" id="sort" name="sort">
+										<option value="N09000011">Aberdeen City</option>
+										<option value="E06000001">Aberdeenshire</option>
+										<option value="S12000005">Adur</option>
+										<option value="S12000006">Allerdale</option>
+										<option value="S12000008">Amber Valley</option>
+										<option value="E06000002">Angus</option>
+										<option value="E06000003">Antrim and Newtownabbey</option>
+										<option value="S12000010">Ards and North Down</option>
+										<option value="E06000004">Argyll and Bute</option>
+										<option value="E06000005">Armagh City</option>
+										<option value="S12000011">Arun</option>
+										<option value="S12000013">Ashfield</option>
+										<option value="E06000006">Ashford</option>
+										<option value="E06000007">Aylesbury Vale</option>
+										<option value="S12000014">Babergh</option>
+										<option value="E07000004">Barking and Dagenham</option>
+										<option value="S12000015">Barnet</option>
+										<option value="E06000008">Barnsley</option>
+										<option value="E07000005">Barrow-in-Furness</option>
+										<option value="S12000017">Basildon</option>
+										<option value="E06000009">Basingstoke and Deane</option>
+										<option value="E07000006">Bassetlaw</option>
+										<option value="S12000018">Bath and North East Somerset</option>
+										<option value="E06000010">Bedford</option>
+										<option value="E07000007">Belfast</option>
+										<option value="S12000019">Bexley</option>
+										<option value="E06000011">Birmingham</option>
+										<option value="E07000008">Blaby</option>
+										<option value="S12000020">Blackburn with Darwen</option>
+										<option value="E06000012">Blackpool</option>
+										<option value="E07000009">Blaenau Gwent</option>
+										<option value="S12000021">Bolsover</option>
+										<option value="E06000013">Bolton</option>
+										<option value="E07000010">Boston</option>
+										<option value="S12000023">Bournemouth</option>
+										<option value="E06000014">Bracknell Forest</option>
+										<option value="E07000011">Bradford</option>
+										<option value="S12000024">Braintree</option>
+										<option value="E06000015">Breckland</option>
+										<option value="E07000012">Brent</option>
+										<option value="S12000026">Brentwood</option>
+										<option value="E06000016">Bridgend</option>
+										<option value="E07000026">Brighton and Hove</option>
+										<option value="S12000027">Bristol</option>
+										<option value="E06000017">Broadland</option>
+										<option value="E07000027">Bromley</option>
+										<option value="S12000028">Bromsgrove</option>
+										<option value="E06000018">Broxbourne</option>
+										<option value="E07000028">Broxtowe</option>
+										<option value="S12000029">Burnley</option>
+										<option value="E06000019">Bury</option>
+										<option value="E07000029">Caerphilly</option>
+										<option value="S12000030">Calderdale</option>
+										<option value="E06000020">Cambridge</option>
+										<option value="E07000030">Camden</option>
+										<option value="S12000033">Cannock Chase</option>
+										<option value="E06000021">Canterbury</option>
+										<option value="E07000031">Cardiff</option>
+										<option value="S12000034">Carlisle</option>
+										<option value="E06000022">Carmarthenshire</option>
+										<option value="E07000032">Castle Point</option>
+										<option value="S12000035">Causeway Coast and Glens</option>
+										<option value="E06000023">Central Bedfordshire</option>
+										<option value="E07000033">Ceredigion</option>
+										<option value="S12000036">Charnwood</option>
+										<option value="E06000024">Chelmsford</option>
+										<option value="E07000034">Cheltenham</option>
+										<option value="S12000038">Cherwell</option>
+										<option value="E06000025">Cheshire East</option>
+										<option value="E07000035">Cheshire West and Chester</option>
+										<option value="S12000039">Chesterfield</option>
+										<option value="E06000026">Chichester</option>
+										<option value="E07000036">Chiltern</option>
+										<option value="S12000040">Chorley</option>
+										<option value="E06000027">Christchurch</option>
+										<option value="E07000037">City of Edinburgh</option>
+										<option value="S12000041">City of London</option>
+										<option value="E06000028">Clackmannanshire</option>
+										<option value="E07000038">Colchester</option>
+										<option value="S12000042">Conwy</option>
+										<option value="E06000029">Copeland</option>
+										<option value="E07000039">Corby</option>
+										<option value="S12000044">Cornwall</option>
+										<option value="E06000030">Cotswold</option>
+										<option value="E07000040">County Durham</option>
+										<option value="S12000045">Coventry</option>
+										<option value="E06000031">Craven</option>
+										<option value="E07000041">Crawley</option>
+										<option value="S12000046">Croydon</option>
+										<option value="E06000032">Dacorum</option>
+										<option value="E07000042">Darlington</option>
+										<option value="W06000001">Dartford</option>
+										<option value="E06000033">Daventry</option>
+										<option value="E07000043">Denbighshire</option>
+										<option value="W06000002">Derby</option>
+										<option value="E06000034">Derbyshire Dales</option>
+										<option value="E07000044">Derry City and Strabane</option>
+										<option value="W06000003">Doncaster</option>
+										<option value="E06000035">Dover</option>
+										<option value="E07000045">Dudley</option>
+										<option value="W06000004">Dumfries and Galloway</option>
+										<option value="E06000036">Dundee City</option>
+										<option value="E07000046">Ealing</option>
+										<option value="W06000005">East Ayrshire</option>
+										<option value="E06000037">East Cambridgeshire</option>
+										<option value="E07000047">East Devon</option>
+										<option value="W06000006">East Dorset</option>
+										<option value="E06000038">East Dunbartonshire</option>
+										<option value="E07000048">East Hampshire</option>
+										<option value="E07000049">East Hertfordshire</option>
+										<option value="E07000050">East Lindsey</option>
+										<option value="E07000051">East Lothian</option>
+										<option value="E07000052">East Northamptonshire</option>
+										<option value="E07000053">East Renfrewshire</option>
+										<option value="E07000061">East Riding of Yorkshire</option>
+										<option value="E07000062">East Staffordshire</option>
+										<option value="E07000063">Eastbourne</option>
+										<option value="E07000064">Eastleigh</option>
+										<option value="E07000065">Eden</option>
+										<option value="E07000066">Elmbridge</option>
+										<option value="E07000067">Enfield</option>
+										<option value="E07000068">Epping Forest</option>
+										<option value="E07000069">Epsom and Ewell</option>
+										<option value="E07000070">Erewash</option>
+										<option value="E07000071">Exeter</option>
+										<option value="E07000072">Falkirk</option>
+										<option value="E07000073">Fareham</option>
+										<option value="E07000074">Fenland</option>
+										<option value="E07000075">Fermanagh and Omagh</option>
+										<option value="E07000076">Fife</option>
+										<option value="E07000077">Flintshire</option>
+										<option value="E07000078">Forest Heath</option>
+										<option value="E07000079">Forest of Dean</option>
+										<option value="E07000207">Fylde</option>
+										<option value="W06000008">Gateshead</option>
+										<option value="E07000208">Gedling</option>
+										<option value="W06000009">Glasgow City</option>
+										<option value="E07000209">Gloucester</option>
+										<option value="W06000010">Gosport</option>
+										<option value="E06000039">Gravesham</option>
+										<option value="E07000210">Great Yarmouth</option>
+										<option value="W06000011">Greenwich</option>
+										<option value="E06000040">Guildford</option>
+										<option value="E07000211">Gwynedd</option>
+										<option value="W06000012">Hackney</option>
+										<option value="E06000041">Halton</option>
+										<option value="E07000212">Hambleton</option>
+										<option value="W06000013">Hammersmith and Fulham</option>
+										<option value="E06000042">Harborough</option>
+										<option value="E07000213">Haringey</option>
+										<option value="W06000014">Harlow</option>
+										<option value="E06000043">Harrogate</option>
+										<option value="E07000214">Harrow</option>
+										<option value="W06000015">Hart</option>
+										<option value="E06000044">Hartlepool</option>
+										<option value="E07000215">Hastings</option>
+										<option value="W06000016">Havant</option>
+										<option value="E06000045">Havering</option>
+										<option value="E07000216">Herefordshire</option>
+										<option value="W06000018">Hertsmere</option>
+										<option value="E06000046">High Peak</option>
+										<option value="E07000217">Highland</option>
+										<option value="W06000019">Hillingdon</option>
+										<option value="E06000047">Hinckley and Bosworth</option>
+										<option value="E07000218">Horsham</option>
+										<option value="W06000020">Hounslow</option>
+										<option value="E06000049">Huntingdonshire</option>
+										<option value="E07000219">Hyndburn</option>
+										<option value="W06000021">Inverclyde</option>
+										<option value="E06000050">Ipswich</option>
+										<option value="E07000220">Isle of Anglesey</option>
+										<option value="W06000022">Isle of Wight</option>
+										<option value="E06000051">Isles of Scilly</option>
+										<option value="E07000221">Islington</option>
+										<option value="W06000023">Kensington and Chelsea</option>
+										<option value="E06000052">Kettering</option>
+										<option value="E07000222">King's Lynn and West Norfolk</option>
+										<option value="W06000024">Kingston upon Hull</option>
+										<option value="E06000053">Kingston upon Thames</option>
+										<option value="E07000223">Kirklees</option>
+										<option value="E06000054">Knowsley</option>
+										<option value="E07000224">Lambeth</option>
+										<option value="E06000055">Lancaster</option>
+										<option value="E07000225">Leeds</option>
+										<option value="E06000056">Leicester</option>
+										<option value="E07000226">Lewes</option>
+										<option value="E06000057">Lewisham</option>
+										<option value="E07000227">Lichfield</option>
+										<option value="E07000228">Lincoln</option>
+										<option value="E07000229">Lisburn and Castlereagh</option>
+										<option value="E07000234">Liverpool</option>
+										<option value="E07000235">Luton</option>
+										<option value="E07000236">Maidstone</option>
+										<option value="E07000237">Maldon</option>
+										<option value="E07000238">Malvern Hills</option>
+										<option value="E07000239">Manchester</option>
+										<option value="E07000240">Mansfield</option>
+										<option value="E07000241">Medway</option>
+										<option value="E07000242">Melton</option>
+										<option value="E07000243">Mendip</option>
+										<option value="E08000001">Merthyr Tydfil</option>
+										<option value="E08000002">Merton</option>
+										<option value="E08000003">Mid and East Antrim</option>
+										<option value="E08000004">Mid Devon</option>
+										<option value="E08000005">Mid Suffolk</option>
+										<option value="E08000006">Mid Sussex</option>
+										<option value="E08000007">Mid Ulster</option>
+										<option value="E08000008">Middlesbrough</option>
+										<option value="E08000009">Midlothian</option>
+										<option value="E08000010">Milton Keynes</option>
+										<option value="E08000011">Mole Valley</option>
+										<option value="E08000012">Monmouthshire</option>
+										<option value="E08000025">Moray</option>
+										<option value="E08000013">Na h-Eileanan Siar</option>
+										<option value="E08000014">Neath Port Talbot</option>
+										<option value="E08000015">New Forest</option>
+										<option value="E08000016">Newark and Sherwood</option>
+										<option value="E08000017">Newcastle upon Tyne</option>
+										<option value="E08000018">Newcastle-under-Lyme</option>
+										<option value="E08000019">Newham</option>
+										<option value="E08000021">Newport</option>
+										<option value="E08000022">Newry</option>
+										<option value="E08000023">North Ayrshire</option>
+										<option value="E08000024">North Devon</option>
+										<option value="E07000080">North Dorset</option>
+										<option value="E08000026">North East Derbyshire</option>
+										<option value="E07000081">North East Lincolnshire</option>
+										<option value="E08000027">North Hertfordshire</option>
+										<option value="E07000082">North Kesteven</option>
+										<option value="E08000028">North Lanarkshire</option>
+										<option value="E07000083">North Lincolnshire</option>
+										<option value="E08000029">North Norfolk</option>
+										<option value="E07000084">North Somerset</option>
+										<option value="E08000030">North Tyneside</option>
+										<option value="E07000085">North Warwickshire</option>
+										<option value="E08000031">North West Leicestershire</option>
+										<option value="E07000086">Northampton</option>
+										<option value="E08000032">Northumberland</option>
+										<option value="E07000087">Norwich</option>
+										<option value="E08000033">Nottingham</option>
+										<option value="E07000088">Nuneaton and Bedworth</option>
+										<option value="E08000034">Oadby and Wigston</option>
+										<option value="E07000089">Oldham</option>
+										<option value="E08000035">Orkney Islands</option>
+										<option value="E07000090">Oxford</option>
+										<option value="E08000036">Pembrokeshire</option>
+										<option value="E07000091">Pendle</option>
+										<option value="E08000037">Perth and Kinross</option>
+										<option value="E07000092">Peterborough</option>
+										<option value="E09000001">Plymouth</option>
+										<option value="E07000093">Poole</option>
+										<option value="E09000002">Portsmouth</option>
+										<option value="E07000094">Powys</option>
+										<option value="E09000003">Preston</option>
+										<option value="E07000095">Purbeck</option>
+										<option value="E09000004">Reading</option>
+										<option value="E07000096">Redbridge</option>
+										<option value="E09000005">Redcar and Cleveland</option>
+										<option value="E07000098">Redditch</option>
+										<option value="E09000006">Reigate and Banstead</option>
+										<option value="E07000099">Renfrewshire</option>
+										<option value="E09000007">Rhondda Cynon Taf</option>
+										<option value="E07000102">Ribble Valley</option>
+										<option value="E09000008">Richmond upon Thames</option>
+										<option value="E07000103">Richmondshire</option>
+										<option value="E09000009">Rochdale</option>
+										<option value="E07000105">Rochford</option>
+										<option value="E09000010">Rossendale</option>
+										<option value="E07000106">Rother</option>
+										<option value="E09000011">Rotherham</option>
+										<option value="E07000107">Rugby</option>
+										<option value="E09000012">Runnymede</option>
+										<option value="E07000108">Rushcliffe</option>
+										<option value="E09000013">Rushmoor</option>
+										<option value="E07000109">Rutland</option>
+										<option value="E09000014">Ryedale</option>
+										<option value="E07000110">Salford</option>
+										<option value="E09000015">Sandwell</option>
+										<option value="E07000111">Scarborough</option>
+										<option value="E09000016">Scottish Borders</option>
+										<option value="E07000112">Sedgemoor</option>
+										<option value="E09000017">Sefton</option>
+										<option value="E07000113">Selby</option>
+										<option value="E09000018">Sevenoaks</option>
+										<option value="E07000114">Sheffield</option>
+										<option value="E09000019">Shepway</option>
+										<option value="E07000115">Shetland Islands</option>
+										<option value="E07000116">Shropshire</option>
+										<option value="E09000020">Slough</option>
+										<option value="E07000117">Solihull</option>
+										<option value="E09000021">South Ayrshire</option>
+										<option value="E07000118">South Bucks</option>
+										<option value="E09000022">South Cambridgeshire</option>
+										<option value="E07000119">South Derbyshire</option>
+										<option value="E09000023">South Gloucestershire</option>
+										<option value="E07000120">South Hams</option>
+										<option value="E09000024">South Holland</option>
+										<option value="E07000121">South Kesteven</option>
+										<option value="E09000025">South Lakeland</option>
+										<option value="E07000122">South Lanarkshire</option>
+										<option value="E09000026">South Norfolk</option>
+										<option value="E07000123">South Northamptonshire</option>
+										<option value="E09000027">South Oxfordshire</option>
+										<option value="E07000124">South Ribble</option>
+										<option value="E09000028">South Somerset</option>
+										<option value="E07000125">South Staffordshire</option>
+										<option value="E09000029">South Tyneside</option>
+										<option value="E07000126">Southampton</option>
+										<option value="E09000030">Southend-on-Sea</option>
+										<option value="E07000127">Southwark</option>
+										<option value="E09000031">Spelthorne</option>
+										<option value="E07000128">St Albans</option>
+										<option value="E09000032">St Edmundsbury</option>
+										<option value="E07000129">St. Helens</option>
+										<option value="E09000033">Stafford</option>
+										<option value="E07000130">Staffordshire Moorlands</option>
+										<option value="N09000001">Stevenage</option>
+										<option value="E07000131">Stirling</option>
+										<option value="N09000002">Stockport</option>
+										<option value="E07000132">Stockton-on-Tees</option>
+										<option value="N09000003">Stoke-on-Trent</option>
+										<option value="E07000133">Stratford-on-Avon</option>
+										<option value="N09000004">Stroud</option>
+										<option value="E07000134">Suffolk Coastal</option>
+										<option value="N09000005">Sunderland</option>
+										<option value="E07000135">Surrey Heath</option>
+										<option value="N09000006">Sutton</option>
+										<option value="N09000007">Swale</option>
+										<option value="N09000008">Swansea</option>
+										<option value="N09000009">Swindon</option>
+										<option value="N09000010">Tameside</option>
+										<option value="E07000136">Tamworth</option>
+										<option value="E07000137">Tandridge</option>
+										<option value="E07000138">Taunton Deane</option>
+										<option value="E07000139">Teignbridge</option>
+										<option value="E07000140">Telford and Wrekin</option>
+										<option value="E07000141">Tendring</option>
+										<option value="E07000142">Test Valley</option>
+										<option value="E07000143">Tewkesbury</option>
+										<option value="E07000144">Thanet</option>
+										<option value="E07000145">Three Rivers</option>
+										<option value="E07000146">Thurrock</option>
+										<option value="E07000147">Tonbridge and Malling</option>
+										<option value="E07000148">Torbay</option>
+										<option value="E07000149">Torfaen</option>
+										<option value="E07000150">Torridge</option>
+										<option value="E07000151">Tower Hamlets</option>
+										<option value="E07000152">Trafford</option>
+										<option value="E07000153">Tunbridge Wells</option>
+										<option value="E07000154">Uttlesford</option>
+										<option value="E07000155">Vale of Glamorgan</option>
+										<option value="E07000156">Vale of White Horse</option>
+										<option value="E07000163">Wakefield</option>
+										<option value="E07000164">Walsall</option>
+										<option value="E07000165">Waltham Forest</option>
+										<option value="E07000166">Wandsworth</option>
+										<option value="E07000167">Warrington</option>
+										<option value="E07000168">Warwick</option>
+										<option value="E07000169">Watford</option>
+										<option value="E07000170">Waveney</option>
+										<option value="E07000171">Waverley</option>
+										<option value="E07000172">Wealden</option>
+										<option value="E07000173">Wellingborough</option>
+										<option value="E07000174">Welwyn Hatfield</option>
+										<option value="E07000175">West Berkshire</option>
+										<option value="E07000176">West Devon</option>
+										<option value="E07000177">West Dorset</option>
+										<option value="E07000178">West Dunbartonshire</option>
+										<option value="E07000179">West Lancashire</option>
+										<option value="E07000180">West Lindsey</option>
+										<option value="E07000181">West Lothian</option>
+										<option value="E07000187">West Oxfordshire</option>
+										<option value="E07000188">West Somerset</option>
+										<option value="E07000189">Westminster</option>
+										<option value="E07000190">Weymouth and Portland</option>
+										<option value="E07000191">Wigan</option>
+										<option value="E07000192">Wiltshire</option>
+										<option value="E07000193">Winchester</option>
+										<option value="E07000194">Windsor and Maidenhead</option>
+										<option value="E07000195">Wirral</option>
+										<option value="E07000196">Woking</option>
+										<option value="E07000197">Wokingham</option>
+										<option value="E07000198">Wolverhampton</option>
+										<option value="E07000199">Worcester</option>
+										<option value="E07000200">Worthing</option>
+										<option value="E07000201">Wrexham</option>
+										<option value="E07000202">Wychavon</option>
+										<option value="E07000203">Wycombe</option>
+										<option value="E07000204">Wyre</option>
+										<option value="E07000205">Wyre Forest</option>
+										<option value="E07000206">York</option>
+									</select>
+
+									<button type="submit" class="govuk-button">
+										Choose
+									</button>
+								</div>
+
+							</section>
+							<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="la-find">
+								<div class="govuk-form-group">
+									<label class="govuk-label" for="town">
+										Enter postcode, town or city
+									</label>
+									<input class="govuk-input" id="town" name="town" type="text" style="width: 35%;">
+
+									<button type="submit" class="govuk-button">
+										Search
+									</button>
+								</div>
+
+							</section>
+						</div>
+
+
+
+
+
+
+
+					</div>
+
+				</li>
+
+				<li class="app-step-nav__step js-step" id="driving-lessons-and-practice">
+					<div class="app-step-nav__header js-toggle-panel" data-position="3">
+						<h2 class="app-step-nav__title">
+							<span class="app-step-nav__circle app-step-nav__circle--number">
+								<span class="app-step-nav__circle-inner">
+									<span class="app-step-nav__circle-background">
+										<span class="govuk-visually-hidden">Step</span> 3
+									</span>
+								</span>
+							</span>
+
+							<span class="js-step-title">
+								<button class="app-step-nav__button app-step-nav__button--title js-step-title-button" aria-expanded="false" aria-controls="step-panel-driving-lessons-and-practice-3">
+									<span class="js-step-title-text">
+										Pupil characteristics
+										<span class="govuk-caption-m">
+											Figures for age, gender, ethnicity, and more
+										</span>
+									</span>
+									<span class="app-step-nav__toggle-link js-toggle-link" aria-hidden="true">Show</span>
+								</button>
+							</span>
+						</h2>
+					</div>
+
+					<div class="app-step-nav__panel js-panel js-hidden" id="step-panel-driving-lessons-and-practice-3">
+						<p class="app-step-nav__paragraph">You need a provisional driving licence to take lessons or practice.</p>
+
+
+					</div>
+
+				</li>
+
+				<li class="app-step-nav__step js-step" id="prepare-for-your-theory-test">
+					<div class="app-step-nav__header js-toggle-panel" data-position="4">
+						<h2 class="app-step-nav__title">
+							<span class="app-step-nav__circle app-step-nav__circle--number">
+								<span class="app-step-nav__circle-inner">
+									<span class="app-step-nav__circle-background">
+										<span class="govuk-visually-hidden">Step</span> 4
+									</span>
+								</span>
+							</span>
+
+							<span class="js-step-title">
+								<button class="app-step-nav__button app-step-nav__button--title js-step-title-button" aria-expanded="false" aria-controls="step-panel-prepare-for-your-theory-test-4">
+									<span class="js-step-title-text">
+										Types of school
+										<span class="govuk-caption-m">
+											Figures for different types of state school
+										</span>
+									</span>
+									<span class="app-step-nav__toggle-link js-toggle-link" aria-hidden="true">Show</span>
+								</button>
+							</span>
+						</h2>
+					</div>
+
+					<div class="app-step-nav__panel js-panel js-hidden" id="step-panel-prepare-for-your-theory-test-4">
+						<ol class="app-step-nav__list " data-length="3">
+							<li class="app-step-nav__list-item js-list-item ">
+								<a data-position="4.1" class="app-step-nav__link js-link" href="#">Theory test revision and practice </a>
+							</li>
+							<li class="app-step-nav__list-item js-list-item ">
+								<a data-position="4.2" class="app-step-nav__link js-link" href="#">Take a practice theory test </a>
+							</li>
+							<li class="app-step-nav__list-item js-list-item ">
+								<a rel="external" data-position="4.3" class="app-step-nav__link js-link" href="#">Theory and hazard perception test app </a>
+							</li>
+						</ol>
+					</div>
+
+				</li>
+
+				<li class="app-step-nav__step js-step" id="book-and-manage-your-theory-test">
+					<div class="app-step-nav__header js-toggle-panel" data-position="5">
+						<h2 class="app-step-nav__title">
+							<span class="app-step-nav__circle app-step-nav__circle--number">
+								<span class="app-step-nav__circle-inner">
+									<span class="app-step-nav__circle-background">
+										<span class="govuk-visually-hidden">Step</span> 4
+									</span>
+								</span>
+							</span>
+
+							<span class="js-step-title">
+								<button class="app-step-nav__button app-step-nav__button--title js-step-title-button" aria-expanded="false" aria-controls="step-panel-book-and-manage-your-theory-test-5">
+									<span class="js-step-title-text">
+										Where does this data come from?
+										<span class="govuk-caption-m">
+											How we collect and process the data
+										</span>
+									</span>
+									<span class="app-step-nav__toggle-link js-toggle-link" aria-hidden="true">Show</span>
+								</button>
+							</span>
+						</h2>
+					</div>
+
+					<div class="app-step-nav__panel js-panel js-hidden" id="step-panel-book-and-manage-your-theory-test-5">
+						<ul class="govuk-list">
+							<li><a href="#" class="govuk-link">How do we collect it?</a></li>
+							<li><a href="#" class="govuk-link">What do we do with it?</a></li>
+							<li><a href="#" class="govuk-link">Related policies</a></li>
+						</ul>
+					</div>
+
+				</li>
+
+				<li class="app-step-nav__step js-step" id="book-and-manage-your-driving-test">
+					<div class="app-step-nav__header js-toggle-panel" data-position="6">
+						<h2 class="app-step-nav__title">
+							<span class="app-step-nav__circle app-step-nav__circle--number">
+								<span class="app-step-nav__circle-inner">
+									<span class="app-step-nav__circle-background">
+										<span class="govuk-visually-hidden">Step</span> 5
+									</span>
+								</span>
+							</span>
+
+							<span class="js-step-title">
+								<button class="app-step-nav__button app-step-nav__button--title js-step-title-button" aria-expanded="false" aria-controls="step-panel-book-and-manage-your-driving-test-6">
+									<span class="js-step-title-text">
+										Feedback and questions
+									</span>
+									<span class="app-step-nav__toggle-link js-toggle-link" aria-hidden="true">Show</span>
+								</button>
+							</span>
+						</h2>
+					</div>
+
+					<div class="app-step-nav__panel js-panel js-hidden" id="step-panel-book-and-manage-your-driving-test-6">
+						<ul class="govuk-list">
+							<li><a href="#" class="govuk-link">Feedback on this page</a></li>
+							<li><a href="#" class="govuk-link">Make a suggestion</a></li>
+							<li><a href="#" class="govuk-link">Ask a question</a></li>
+						</ul>
+					</div>
+
+				</li>
+
+
+			</ol>
+		</div>
+
+	</div>
+	<div class="govuk-grid-column-one-third">
+		<aside class="app-related-items">
+			<h2 class="govuk-heading-m" id="subsection-title">
+				About this data
+			</h2>
+
+
+			<h2 class="govuk-heading-s"><span class="govuk-caption-m">For school year: </span>2016-2017<span class="govuk-caption-m"><a href="#">Previous years</a></span></h2>
+
+			<h2 class="govuk-heading-s"><span class="govuk-caption-m">Published: </span>22 March 2018 </h2>
+			<h2 class="govuk-heading-s"><span class="govuk-caption-m">Last updated: </span>20 June 2018<span class="govuk-caption-m"><a href="#">See all updates</a></span></h2>
+			<h2 class="govuk-heading-s"><span class="govuk-caption-m">Next update: </span>22 March 2019<span class="govuk-caption-m"><a href="#">Notify me</a></span></h2>
+
+			<hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+			<h2 class="govuk-heading-m" id="subsection-title">
+				Getting the data
+			</h2>
+
+			<ul class="govuk-list">
+				<li><a href="#" class="govuk-link">View by graphs and charts</a></li>
+				<li><a href="#" class="govuk-link">View by tables and numbers</a></li>
+				<li><a href="#" class="govuk-link">Create your own tables and charts</a></li>
+				<li><a href="#" class="govuk-link">Download Excel files</a></li>
+				<li><a href="#" class="govuk-link">Download .csv files</a></li>
+				<li><a href="#" class="govuk-link">Access API</a></li>
+			</ul>
+
+
+
+
+
+		</aside>
+	</div>
+
+</div>
+
+{% endblock %}

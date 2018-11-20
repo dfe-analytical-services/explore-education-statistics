@@ -1,0 +1,64 @@
+//Dashboard tiles
+
+.dash-tiles {
+	display: flex;
+	flex-wrap: wrap;
+
+	.tile {
+			width: 50%;
+		a {
+			padding: 20px;
+			display: block;
+			text-decoration: none;
+
+			.govuk-caption-l {
+				font-weight: bold;
+				text-decoration: underline;
+				color: $govuk-link-colour;
+			}
+
+
+
+			.trend-icon {
+				padding-right: 60px;
+				background-size: 50px;
+				background-position: 100% 50%;
+				background-repeat: no-repeat;
+				color: black;
+
+				&.govuk-caption-increase-negative {
+					background-image: url(/assets/images/baseline_trending_up_red_48dp.png);
+				}
+
+				&.govuk-caption-increase-positive {
+					background-image: url(/assets/images/baseline_trending_up_green_48dp.png);
+				}
+
+				&.govuk-caption-decrease-negative {
+					background-image: url(/assets/images/baseline_trending_down_red_48dp.png);
+				}
+
+				&.govuk-caption-decrease-positive {
+					background-image: url(/assets/images/baseline_trending_down_green_48dp.png);
+				}
+
+				&.govuk-caption-static {
+					background-image: url(/assets/images/baseline_trending_flat_blue_48dp.png);
+				}
+			}
+
+		}
+
+
+
+	}
+}
+
+
+//Step by step process
+#step-by-step-navigation {
+	.govuk-tabs__panel {
+		border: none;
+		padding: 20px 0;
+	}
+}
