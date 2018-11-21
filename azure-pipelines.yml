@@ -17,6 +17,7 @@ steps:
     npm install
   displayName: 'npm install'
   
- - task: PublishBuildArtifacts@1
-   inputs:
+- task: PublishBuildArtifacts@1
+  inputs:
+    artifactName: 'prototype'
     PathtoPublish: '$(System.DefaultWorkingDirectory)'/govuk-prototype-kit-8.3.0
