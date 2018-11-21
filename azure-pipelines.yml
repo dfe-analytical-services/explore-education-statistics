@@ -15,5 +15,4 @@ steps:
 - script: |
     cd govuk-prototype-kit-8.3.0
     npm install
-    npm run build
-  displayName: 'npm install and build'
+  displayName: 'npm install'
