@@ -7,5 +7,6 @@ usage-data-config.json
 .port.tmp
 public
 node_modules/*
+!node_modules/govuk-frontend/assets
 .tmuxp.*
 package-lock.json

@@ -2,6 +2,10 @@
 
 table.govuk-table {
 	font-size: 0.9rem;
+	.govuk-table__header, 
+	.govuk-table__cell {
+		padding: 8px 20px 8px 0
+	}
 }
 
 
