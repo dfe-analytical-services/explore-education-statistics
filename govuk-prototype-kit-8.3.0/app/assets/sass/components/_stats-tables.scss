@@ -8,7 +8,8 @@ table.govuk-table {
 .plotly-graph-div {
 	margin-bottom: 40px;
 	
-	.modebar {
+	.modebar,
+	.js-plot-link-container{
 		display: none;
 	}
 }

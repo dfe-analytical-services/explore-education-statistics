@@ -220,9 +220,9 @@ Step by step navigation
 							</div>
 						</details>
 
-						<script type="text/javascript" src="national-figure.js"></script>
+						<script type="text/javascript" src="/assets/javascripts/national-figure.js"></script>
 
-						<div id="9344c0dd-d44c-444e-8eef-d65dc9122b30" style="width: 620px; height: 300px;" class="plotly-graph-div"></div>
+						<div id="9344c0dd-d44c-444e-8eef-d65dc9122b30" style="width: 620px; height: 250px;" class="plotly-graph-div"></div>
 						<script type="text/javascript">
 							(function() {
 								window.PLOTLYENV = {
@@ -418,6 +418,51 @@ Step by step navigation
 							</div>
 						</details>
 
+						<script type="text/javascript" src="/assets/javascripts/persistent-figure.js"></script>
+
+						<div id="776bf1dd-5808-40fc-af42-b94d8e3e49d4" style="width: 620px; height: 250px;" class="plotly-graph-div"></div>
+						<script type="text/javascript">
+							(function() {
+								window.PLOTLYENV = {
+									'BASE_URL': 'https://plot.ly'
+								};
+
+								var gd = document.getElementById('776bf1dd-5808-40fc-af42-b94d8e3e49d4')
+								var resizeDebounce = null;
+
+								function resizePlot() {
+									var bb = gd.getBoundingClientRect();
+									Plotly.relayout(gd, {
+										width: bb.width,
+										height: bb.height
+									});
+								}
+
+
+								window.addEventListener('resize', function() {
+									if (resizeDebounce) {
+										window.clearTimeout(resizeDebounce);
+									}
+									resizeDebounce = window.setTimeout(resizePlot, 100);
+								});
+
+
+
+								Plotly.plot(gd, {
+									data: figure.data,
+									layout: figure.layout,
+									frames: figure.frames,
+									config: {
+										"mapboxAccessToken": "pk.eyJ1IjoiY2hyaWRkeXAiLCJhIjoiY2lxMnVvdm5iMDA4dnhsbTQ5aHJzcGs0MyJ9.X9o_rzNLNesDxdra4neC_A",
+										"linkText": "Export to plot.ly",
+										"showLink": true
+									}
+								});
+
+							}());
+
+						</script>
+
 						<div class="govuk-tabs" data-module="tabs">
 
 
@@ -440,7 +485,6 @@ Step by step navigation
 							</ul>
 
 							<section class="govuk-tabs__panel" id="persistent-short">
-								<img src="/assets/images/persistent-absence-graph.png" width="540px">
 
 
 								<p>The percentage of enrolments in state-funded primary and state-funded secondary schools that were
@@ -450,7 +494,6 @@ Step by step navigation
 
 							</section>
 							<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="persistent-long">
-								<img src="/assets/images/persistent-absence-graph.png" width="540px">
 
 								<p>The percentage of enrolments in state-funded primary and state-funded secondary schools that were
 									classified as persistent absentees in 2016/17 was 10.8 per cent. This is up from the equivalent figure of
