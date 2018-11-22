@@ -1,0 +1,13 @@
+.govuk-caption-inline {
+	display: inline;
+}
+
+.no-close {
+	.app-step-nav__toggle-link {
+		display: none;
+	}
+}
+
+.app-step-nav__controls {
+	display: none;
+}
