@@ -17,3 +17,22 @@ $govuk-global-styles: true;
 // Add extra styles here, or re-organise the Sass files in whichever way makes most sense to you
 
 @import "dfe-data-prototype.scss";
+
+.govuk-caption-inline {
+	display: inline;
+}
+
+.no-close {
+	.app-step-nav__toggle-link {
+		display: none;
+	}
+}
+
+.app-step-nav__controls {
+	display: none;
+}
+
+.app-step-nav--large .app-step-nav__header {
+	padding: 30px 0 10px 0;
+}
+
