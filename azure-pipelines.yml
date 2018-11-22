@@ -7,12 +7,32 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '8.x'
-  displayName: 'Install Node.js'
-
-- script: |
-    cd govuk-prototype-kit-8.3.0
-    npm install
+- task: Npm@0
   displayName: 'npm install'
+  inputs:
+    cwd: 'govuk-prototype-kit-8.3.0'
+    arguments: '--force'
+
+
+- task: ArchiveFiles@1
+  displayName: 'Archive files '
+  inputs:
+    rootFolder: 'govuk-prototype-kit-8.3.0'
+
+    includeRootFolder: false
+
+
+- task: CopyFiles@2
+  displayName: 'Copy File to: $(TargetFolder)'
+  inputs:
+    SourceFolder: '$(Build.ArtifactStagingDirectory)'
+
+    Contents: '$(Build.BuildId).zip'
+
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\ArtifactsToBePublished'
+
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\ArtifactsToBePublished'

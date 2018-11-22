@@ -51,8 +51,8 @@ documentationApp.use(handleCookies)
 
 // Set up configuration variables
 var releaseVersion = packageJson.version
-var username = process.env.USERNAME
-var password = process.env.PASSWORD
+var username = process.env.PROTO_USERNAME
+var password = process.env.PROTO_PASSWORD
 var env = process.env.NODE_ENV || 'development'
 var useAuth = process.env.USE_AUTH || config.useAuth
 var useAutoStoreData = process.env.USE_AUTO_STORE_DATA || config.useAutoStoreData
@@ -350,25 +350,31 @@ app.use(function (err, req, res, next) {
 console.log('\nGOV.UK Prototype Kit v' + releaseVersion)
 console.log('\nNOTICE: the kit is for building prototypes, do not use it for production services.')
 
-// Find a free port and start the server
-utils.findAvailablePort(app, function (port) {
-  console.log('Listening on port ' + port + '   url: http://localhost:' + port)
-  if (env === 'production' || useBrowserSync === 'false') {
-    app.listen(port)
-  } else {
-    app.listen(port - 50, function () {
-      browserSync({
-        proxy: 'localhost:' + (port - 50),
-        port: port,
-        ui: false,
-        files: ['public/**/*.*', 'app/views/**/*.*'],
-        ghostmode: false,
-        open: false,
-        notify: false,
-        logLevel: 'error'
+if (env === 'production')
+{
+  app.listen(process.env.port);
+}
+else {
+  // Find a free port and start the server
+  utils.findAvailablePort(app, function (port) {
+    console.log('Listening on port ' + port + '   url: http://localhost:' + port)
+    if (env === 'production' || useBrowserSync === 'false') {
+      app.listen(port)
+    } else {
+      app.listen(port - 50, function () {
+        browserSync({
+          proxy: 'localhost:' + (port - 50),
+          port: port,
+          ui: false,
+          files: ['public/**/*.*', 'app/views/**/*.*'],
+          ghostmode: false,
+          open: false,
+          notify: false,
+          logLevel: 'error'
+        })
       })
-    })
-  }
-})
+    }
+  })
+}
 
 module.exports = app
