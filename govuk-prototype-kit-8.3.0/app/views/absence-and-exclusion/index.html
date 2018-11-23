@@ -6,6 +6,12 @@ Pupil absence in schools in England
 
 {% block pageScripts %}
 <script src="/public/javascripts/step-by-step-navigation.js"></script>
+<!-- Plotly -->
+<script type="text/javascript" src="/public/javascripts/absence-and-exclusion/plotlyjs-bundle.js"></script>
+<script type="text/javascript" src="/public/javascripts/absence-and-exclusion/national-figure.js"></script>
+<script type="text/javascript" src="/public/javascripts/absence-and-exclusion/overall-figure.js"></script>
+<script type="text/javascript" src="/public/javascripts/absence-and-exclusion/persistent-figure.js"></script>
+
 <script type="text/javascript">
 	var $element = $('#step-by-step-navigation')
 	var stepByStepNavigation = new GOVUK.Modules.StepByStepNavigation()
@@ -155,60 +161,9 @@ Pupil absence in schools in England
 					</div>
 
 					<div class="app-step-nav__panel js-panel" id="step-panel-check-youre-allowed-to-drive-1">
-
-						<script type="text/javascript" src="/assets/javascripts/plotlyjs-bundle.js"></script>
-
-
-						<script type="text/javascript" src="/assets/javascripts/national-figure.js"></script>
-
 						<div id="da7c10ac-eab3-4a0d-b7ee-2dc75bf614ba" style="width: 600px; height: 350px;" class="plotly-graph-div"></div>
-						<script type="text/javascript">
-							(function() {
-								window.PLOTLYENV = {
-									'BASE_URL': 'https://plot.ly'
-								};
-
-								var gd = document.getElementById('da7c10ac-eab3-4a0d-b7ee-2dc75bf614ba')
-								var resizeDebounce = null;
-
-								function resizePlot() {
-									var bb = gd.getBoundingClientRect();
-									Plotly.relayout(gd, {
-										width: bb.width,
-										height: bb.height
-									});
-								}
-
-
-								window.addEventListener('resize', function() {
-									if (resizeDebounce) {
-										window.clearTimeout(resizeDebounce);
-									}
-									resizeDebounce = window.setTimeout(resizePlot, 100);
-								});
-
-
-
-								Plotly.plot(gd, {
-									data: figure.data,
-									layout: figure.layout,
-									frames: figure.frames,
-									config: {
-										"mapboxAccessToken": "pk.eyJ1IjoiY2hyaWRkeXAiLCJhIjoiY2lxMnVvdm5iMDA4dnhsbTQ5aHJzcGs0MyJ9.X9o_rzNLNesDxdra4neC_A",
-										"linkText": "Export to plot.ly",
-										"showLink": true
-									}
-								});
-
-							}());
-
-						</script>
-
 						<hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
-
-
 						<h2 class="govuk-heading-m">Overall absence</h2>
-
 						<details class="govuk-details">
 							<summary class="govuk-details__summary">
 								<span class="govuk-details__summary-text">
@@ -217,55 +172,11 @@ Pupil absence in schools in England
 							</summary>
 							<div class="govuk-details__text">
 								The overall absence rate is the total number of overall absence sessions for all pupils as a percentage of the total number of possible sessions for all pupils, where overall absence is the sum of authorised and unauthorised absence and one session is equal to half a day.
-
 							</div>
 						</details>
 
-						<script type="text/javascript" src="/assets/javascripts/overall-figure.js"></script>
 
 						<div id="8c843b8c-4ee3-4936-9744-66b739909982" style="width: 600px; height: 350px;" class="plotly-graph-div"></div>
-						<script type="text/javascript">
-							(function() {
-								window.PLOTLYENV = {
-									'BASE_URL': 'https://plot.ly'
-								};
-
-								var gd = document.getElementById('8c843b8c-4ee3-4936-9744-66b739909982')
-								var resizeDebounce = null;
-
-								function resizePlot() {
-									var bb = gd.getBoundingClientRect();
-									Plotly.relayout(gd, {
-										width: bb.width,
-										height: bb.height
-									});
-								}
-
-
-								window.addEventListener('resize', function() {
-									if (resizeDebounce) {
-										window.clearTimeout(resizeDebounce);
-									}
-									resizeDebounce = window.setTimeout(resizePlot, 100);
-								});
-
-
-
-								Plotly.plot(gd, {
-									data: figure.data,
-									layout: figure.layout,
-									frames: figure.frames,
-									config: {
-										"mapboxAccessToken": "pk.eyJ1IjoiY2hyaWRkeXAiLCJhIjoiY2lxMnVvdm5iMDA4dnhsbTQ5aHJzcGs0MyJ9.X9o_rzNLNesDxdra4neC_A",
-										"linkText": "Export to plot.ly",
-										"showLink": true
-									}
-								});
-
-							}());
-
-						</script>
-
 						<div class="govuk-tabs" data-module="tabs">
 
 							<ul class="govuk-tabs__list">
@@ -432,51 +343,8 @@ Pupil absence in schools in England
 							</div>
 						</details>
 
-						<script type="text/javascript" src="/assets/javascripts/persistent-figure.js"></script>
 
 						<div id="c6a3e1ef-d491-4c64-8096-cdec12565a75" style="width: 600px; height: 350px;" class="plotly-graph-div"></div>
-						<script type="text/javascript">
-							(function() {
-								window.PLOTLYENV = {
-									'BASE_URL': 'https://plot.ly'
-								};
-
-								var gd = document.getElementById('c6a3e1ef-d491-4c64-8096-cdec12565a75')
-								var resizeDebounce = null;
-
-								function resizePlot() {
-									var bb = gd.getBoundingClientRect();
-									Plotly.relayout(gd, {
-										width: bb.width,
-										height: bb.height
-									});
-								}
-
-
-								window.addEventListener('resize', function() {
-									if (resizeDebounce) {
-										window.clearTimeout(resizeDebounce);
-									}
-									resizeDebounce = window.setTimeout(resizePlot, 100);
-								});
-
-
-
-								Plotly.plot(gd, {
-									data: figure.data,
-									layout: figure.layout,
-									frames: figure.frames,
-									config: {
-										"mapboxAccessToken": "pk.eyJ1IjoiY2hyaWRkeXAiLCJhIjoiY2lxMnVvdm5iMDA4dnhsbTQ5aHJzcGs0MyJ9.X9o_rzNLNesDxdra4neC_A",
-										"linkText": "Export to plot.ly",
-										"showLink": true
-									}
-								});
-
-							}());
-
-						</script>
-
 						<div class="govuk-tabs" data-module="tabs">
 
 
@@ -966,7 +834,7 @@ Pupil absence in schools in England
 							</ul>
 
 							<section class="govuk-tabs__panel" id="la-map">
-								<img src="/assets/images/map_overall_absence_rates.png" width="540px">
+								<img src="/public/images/absence-and-exclusion/map_overall_absence_rates.png" width="540px">
 
 
 							</section>
