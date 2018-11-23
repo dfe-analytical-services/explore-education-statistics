@@ -1,4 +1,4 @@
-var figure = {
+var nationalFigure = {
     "frames": [], 
     "layout": {
         "autosize": true, 
@@ -130,3 +130,40 @@ var figure = {
         }
     ]
 }
+
+
+window.PLOTLYENV = {
+    'BASE_URL': 'https://plot.ly'
+};
+
+var gd = document.getElementById('da7c10ac-eab3-4a0d-b7ee-2dc75bf614ba')
+var resizeDebounce = null;
+
+function resizePlot() {
+    var bb = gd.getBoundingClientRect();
+    Plotly.relayout(gd, {
+        width: bb.width,
+        height: bb.height
+    });
+}
+
+
+window.addEventListener('resize', function() {
+    if (resizeDebounce) {
+        window.clearTimeout(resizeDebounce);
+    }
+    resizeDebounce = window.setTimeout(resizePlot, 100);
+});
+
+
+
+Plotly.plot(gd, {
+    data: nationalFigure.data,
+    layout: nationalFigure.layout,
+    frames: nationalFigure.frames,
+    config: {
+        "mapboxAccessToken": "pk.eyJ1IjoiY2hyaWRkeXAiLCJhIjoiY2lxMnVvdm5iMDA4dnhsbTQ5aHJzcGs0MyJ9.X9o_rzNLNesDxdra4neC_A",
+        "linkText": "Export to plot.ly",
+        "showLink": true
+    }
+});
