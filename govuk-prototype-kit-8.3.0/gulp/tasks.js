@@ -39,6 +39,6 @@ gulp.task('test', function () {
 gulp.task('mocha', function () {
   return gulp.src(['test/**/*.js'], { read: false })
     .pipe(mocha({ reporter: 'spec', exit: true }))
-    .pipe(mocha({ reporter: 'mocha-junit-reporter', reporterOptions: {mochaFile: '../.test_output/test-results.xml'}, exit: true }))
+    .pipe(mocha({ reporter: 'mocha-junit-reporter', reporterOptions: {mochaFile: './.test_output/test-results.xml'}, exit: true }))
     .on('error', console.error)
 })
