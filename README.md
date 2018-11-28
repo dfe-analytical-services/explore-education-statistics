@@ -1,5 +1,7 @@
 # dfe-data-dissemination
 
+[![Build Status](https://dev.azure.com/dfe-data-dissemination/DfE%20Data%20Dissemination/_apis/build/status/Prototype%20Build)](https://dev.azure.com/dfe-data-dissemination/DfE%20Data%20Dissemination/_build/latest?definitionId=6)
+
 &nbsp;
 
 #### 1. Install `node.js` onto your laptop, by clicking this link [here](https://nodejs.org/en/download/) and download version 10.13.0.
