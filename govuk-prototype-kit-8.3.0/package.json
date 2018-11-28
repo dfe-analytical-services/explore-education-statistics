@@ -51,6 +51,11 @@
       "nunjucks"
     ]
   },
+  "standard": {
+    "ignore": [
+      "/app/assets/javascripts/absence-and-exclusion/*.js"
+    ]
+  },
   "devDependencies": {
     "standard": "^11.0.1",
     "supertest": "^3.0.0"
