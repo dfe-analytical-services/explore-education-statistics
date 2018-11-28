@@ -350,11 +350,9 @@ app.use(function (err, req, res, next) {
 console.log('\nGOV.UK Prototype Kit v' + releaseVersion)
 console.log('\nNOTICE: the kit is for building prototypes, do not use it for production services.')
 
-if (env === 'production')
-{
-  app.listen(process.env.port);
-}
-else {
+if (env === 'production') {
+  app.listen(process.env.port)
+} else {
   // Find a free port and start the server
   utils.findAvailablePort(app, function (port) {
     console.log('Listening on port ' + port + '   url: http://localhost:' + port)
