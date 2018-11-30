@@ -1,5 +1,12 @@
 $govuk-page-width: 1240px !default;
 
+.govuk-width-container {
+    max-width: 1020px;
+}
+
+.govuk-width-container-wide {
+    max-width: 1200px;
+}
 
 .govuk-caption-inline {
 	display: inline;
