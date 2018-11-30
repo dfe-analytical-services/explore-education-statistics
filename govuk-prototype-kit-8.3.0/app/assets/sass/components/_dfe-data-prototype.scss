@@ -29,3 +29,7 @@ $govuk-page-width: 1240px !default;
 .govuk-tag {
 	margin-bottom: 5px;
 }
+
+.govuk-grid-column-one-third .govuk-select {
+	max-width: 70%;
+} 
