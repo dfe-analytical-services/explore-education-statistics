@@ -1,0 +1,184 @@
+{% extends "layout.html" %}
+
+{% block pageTitle %}
+Pupil absence in schools in England
+{% endblock %}
+
+{% block pageScripts %}
+<script src="/public/javascripts/step-by-step-navigation.js"></script>
+<!-- Plotly -->
+<script type="text/javascript" src="/public/javascripts/absence-and-exclusion/plotlyjs-bundle.js"></script>
+<script type="text/javascript" src="/public/javascripts/absence-and-exclusion/national-figure.js"></script>
+<script type="text/javascript" src="/public/javascripts/absence-and-exclusion/overall-figure.js"></script>
+<script type="text/javascript" src="/public/javascripts/absence-and-exclusion/persistent-figure.js"></script>
+
+<script type="text/javascript">
+	var $element = $('#step-by-step-navigation')
+	var stepByStepNavigation = new GOVUK.Modules.StepByStepNavigation()
+	stepByStepNavigation.start($element)
+
+</script>
+{% endblock %}
+
+{% block beforeContent %}
+<div class="govuk-breadcrumbs">
+	<ol class="govuk-breadcrumbs__list">
+		<li class="govuk-breadcrumbs__list-item">
+			<a class="govuk-breadcrumbs__link" href="https://www.gov.uk">Home</a>
+		</li>
+		<li class="govuk-breadcrumbs__list-item">
+			<a class="govuk-breadcrumbs__link" href="#">Education, training and skills</a>
+		</li>
+		<li class="govuk-breadcrumbs__list-item">
+			<a class="govuk-breadcrumbs__link" href="#">Local authorities</a>
+		</li>
+	</ol>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+
+	<div class="govuk-grid-column-three-thirds">
+
+		<!--
+		<strong class="govuk-tag">
+			This is the latest data
+		</strong>
+-->
+		<h1 class="govuk-heading-l">
+
+			Sheffield
+		</h1>
+
+		<p>
+			Find out the facts and figures for pupil absence in primary and secondary schools across England.
+		</p>
+
+
+
+
+
+		<div class="dash-tiles">
+			<h2 class="govuk-heading-l tile">
+				<a href="#">
+					<span class="govuk-caption-l">Overall absence</span>
+					<span class="trend-icon govuk-caption-increase-negative">4.7%</span>
+					<span class="govuk-caption-m">Increased from 4.6% since 2015/16</span>
+				</a>
+			</h2>
+
+			<h2 class="govuk-heading-l tile">
+				<a href="#">
+					<span class="govuk-caption-l">Authorised absence</span>
+					<span class="trend-icon govuk-caption-static">3.4%</span>
+					<span class="govuk-caption-m">The same as 2015/16</span>
+				</a>
+			</h2>
+
+			<h2 class="govuk-heading-l tile">
+				<a href="#">
+					<span class="govuk-caption-l">Unauthorised absence</span>
+					<span class="trend-icon govuk-caption-increase-negative">1.3%</span>
+					<span class="govuk-caption-m">Increased from 1.1% since 2015/16</span>
+				</a>
+			</h2>
+
+
+			<h2 class="govuk-heading-l tile">
+				<a href="#">
+					<span class="govuk-caption-l">Persistent absence</span>
+					<span class="trend-icon govuk-caption-increase-negative">10.8%</span>
+					<span class="govuk-caption-m">Increased from 10.5% since 2015/16</span>
+				</a>
+			</h2>
+		</div>
+
+		<!--		List start point-->
+
+
+	</div>
+	
+
+</div>
+<div class="govuk-grid-row">
+
+	<div class="govuk-grid-column-two-thirds">
+
+		<!--
+		<strong class="govuk-tag">
+			This is the latest data
+		</strong>
+-->
+		<h1 class="govuk-heading-l">
+
+			Sheffield
+		</h1>
+
+		<p>
+			Find out the facts and figures for pupil absence in primary and secondary schools across England.
+		</p>
+
+		<ul class="govuk-list govuk-list--bullet">
+
+			<li>
+				On average in 2016/17, <strong>pupils missed 8.2 school days</strong>
+			</li>
+			<li>
+				Overall and unauthorised absence rates have <strong>increased</strong> since last year
+			</li>
+			<li>
+				The rise in unauthorised absence rates is due to higher rates of unauthorised holidays
+			</li>
+			<li>
+				<strong>One in ten pupils</strong> was persistently absent during the academic year 2016/17
+			</li>
+		</ul>
+
+
+
+		
+
+		<!--		List start point-->
+
+
+	</div>
+	<div class="govuk-grid-column-one-third">
+		<aside class="app-related-items">
+			<h2 class="govuk-heading-m" id="subsection-title">
+				About this data
+			</h2>
+
+
+			<h2 class="govuk-heading-s"><span class="govuk-caption-m">For school year: </span>2016-2017 <span class="govuk-caption-m govuk-caption-inline">(latest data)</span><span class="govuk-caption-m"><a href="#">See previous 10 years</a></span></h2>
+
+			<h2 class="govuk-heading-s"><span class="govuk-caption-m">Published: </span>22 March 2018 </h2>
+			<h2 class="govuk-heading-s"><span class="govuk-caption-m">Last updated: </span>20 June 2018<span class="govuk-caption-m"><a href="#">See all 4 updates</a></span></h2>
+			<h2 class="govuk-heading-s"><span class="govuk-caption-m">Next update: </span>22 March 2019<span class="govuk-caption-m"><a href="#">Notify me</a></span></h2>
+
+			<hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+			<h2 class="govuk-heading-m" id="subsection-title">
+				Getting the data
+			</h2>
+
+			<ul class="govuk-list">
+				<li><a href="#" class="govuk-link">View by graphs and charts</a></li>
+				<li><a href="#" class="govuk-link">View by tables and numbers</a></li>
+				<li><a href="#" class="govuk-link">Create your own tables and charts</a></li>
+				<li><a href="#" class="govuk-link">Download pdf files</a></li>
+				<li><a href="#" class="govuk-link">Download Excel files</a></li>
+				<li><a href="#" class="govuk-link">Download .csv files</a></li>
+				<li><a href="#" class="govuk-link">Access API</a></li>
+			</ul>
+
+
+
+
+
+		</aside>
+	</div>
+
+</div>
+
+{% endblock %}
