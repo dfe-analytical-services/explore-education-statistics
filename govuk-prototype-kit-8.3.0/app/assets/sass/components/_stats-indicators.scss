@@ -44,7 +44,7 @@
 
 			.govuk-caption-l {
 				font-weight: bold;
-//				text-decoration: underline;
+				text-decoration: underline;
 				color: $govuk-link-colour;
 				min-height: 2.5em;
 			}
@@ -77,13 +77,13 @@
 							content: "\25B2";
 						}
 
-//						&.good:after {
-//							color: #006435;
-//						}
-//
-//						&.bad:after {
-//							color: #b10e1e;
-//						}
+						&.good:after {
+							color: #006435;
+						}
+
+						&.bad:after {
+							color: #b10e1e;
+						}
 					}
 
 				}
