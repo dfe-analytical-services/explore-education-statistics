@@ -13,7 +13,7 @@ namespace GovUk.Education.DataDissemination.Meta.Api.Models
         [Required]
         public string Title { get; set; }
         
-        public int TopicId { get; set; }
+        public Guid TopicId { get; set; }
         public Topic Topic { get; set; }  
     }
 }

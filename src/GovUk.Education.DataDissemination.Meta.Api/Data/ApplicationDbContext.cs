@@ -39,6 +39,10 @@ namespace GovUk.Education.DataDissemination.Meta.Api.Data
                 new Topic() { Id = new Guid("4c658598-450b-4493-b972-8812acd154a7"), Title = "Higher Education", ThemeId = new Guid("bc08839f-2970-4f34-af2d-29608a48082f") }
 
             );
+
+            modelBuilder.Entity<Publication>().HasData(
+                new Publication() { Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Title = "Pupil absence in schools in England", TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852") }
+            );
         }
     }
 }

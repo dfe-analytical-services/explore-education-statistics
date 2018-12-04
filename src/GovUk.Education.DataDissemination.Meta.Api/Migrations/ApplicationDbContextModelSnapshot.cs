@@ -24,15 +24,17 @@ namespace GovUk.Education.DataDissemination.Meta.Api.Migrations
                     b.Property<string>("Title")
                         .IsRequired();
 
-                    b.Property<int>("TopicId");
-
-                    b.Property<Guid?>("TopicId1");
+                    b.Property<Guid>("TopicId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TopicId1");
+                    b.HasIndex("TopicId");
 
                     b.ToTable("Publications");
+
+                    b.HasData(
+                        new { Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Title = "Pupil absence in schools in England", TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852") }
+                    );
                 });
 
             modelBuilder.Entity("GovUk.Education.DataDissemination.Meta.Api.Models.Theme", b =>
@@ -88,7 +90,8 @@ namespace GovUk.Education.DataDissemination.Meta.Api.Migrations
                 {
                     b.HasOne("GovUk.Education.DataDissemination.Meta.Api.Models.Topic", "Topic")
                         .WithMany("Publications")
-                        .HasForeignKey("TopicId1");
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.DataDissemination.Meta.Api.Models.Topic", b =>
