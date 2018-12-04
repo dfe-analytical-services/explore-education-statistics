@@ -31,5 +31,12 @@ namespace GovUk.Education.DataDissemination.Meta.Api.Controllers
         {
             return _context.Themes.FirstOrDefault(t => t.Id == id);
         }
+        
+        // GET api/theme/5/topic
+        [HttpGet("{id}/topics")]
+        public ActionResult<List<Topic>> GetTopics(Guid id)
+        {
+            return _context.Topics.Where(t => t.ThemeId == id).ToList();
+        }
     }
 }
