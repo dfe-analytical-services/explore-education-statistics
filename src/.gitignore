@@ -1,0 +1,8 @@
+bin
+obj
+node_modules
+*.tmp
+.vs
+.idea
+
+dfe-meta.db
