@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.DataDissemination.Meta.Api.Data;
 using GovUk.Education.DataDissemination.Meta.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,25 +12,25 @@ namespace GovUk.Education.DataDissemination.Meta.Api.Controllers
     [ApiController]
     public class PublicationController : ControllerBase
     {
-        private readonly List<Publication> _publications = new List<Publication>
+        private readonly ApplicationDbContext _context;
+
+        public PublicationController(ApplicationDbContext context)
         {
-            new Publication() {Id = Guid.NewGuid(), Title = "Pupil absence in schools in England"},
-            new Publication() {Id = Guid.NewGuid(), Title = "Pupil absence in schools in England: autumn term"},
-            new Publication() {Id = Guid.NewGuid(), Title = "Pupil absence in schools in England: autumn and spring"}
-        };
+            _context = context;    
+        }
 
         // GET api/publication
         [HttpGet]
         public ActionResult<List<Publication>> Get()
         {
-            return _publications;
+            return _context.Publications.ToList();
         }
 
         // GET api/publication/5
         [HttpGet("{id}")]
         public ActionResult<Publication> Get(Guid id)
         {
-            return _publications.FirstOrDefault();
+            return _context.Publications.FirstOrDefault(t => t.Id == id);
         }
     }
 }

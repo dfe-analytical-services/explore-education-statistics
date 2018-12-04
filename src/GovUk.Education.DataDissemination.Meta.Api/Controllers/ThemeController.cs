@@ -13,7 +13,6 @@ namespace GovUk.Education.DataDissemination.Meta.Api.Controllers
     public class ThemeController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-
         public ThemeController(ApplicationDbContext context)
         {
             _context = context;    
@@ -32,13 +31,5 @@ namespace GovUk.Education.DataDissemination.Meta.Api.Controllers
         {
             return _context.Themes.FirstOrDefault(t => t.Id == id);
         }
-        
-        // GET api/theme/5
-//        [HttpGet("{id}")]
-//        [Route("{id}/topics")]
-//        public ActionResult<List<Topic>> Topics()
-//        {
-//            return _topics;
-//        }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GovUk.Education.DataDissemination.Meta.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using GovUk.Education.DataDissemination.Meta.Api.Data;
 
 namespace GovUk.Education.DataDissemination.Meta.Api.Controllers
 {
@@ -10,26 +11,25 @@ namespace GovUk.Education.DataDissemination.Meta.Api.Controllers
     [ApiController]
     public class TopicController : ControllerBase
     {
-        private readonly List<Topic> _topics = new List<Topic>
-        {
-            new Topic() {Id = Guid.NewGuid(), Title = "Pupil absence in schools in England"},
-
-            new Topic() {Id = Guid.NewGuid(), Title = "Pupil absence in schools in England: autumn term"},
-            new Topic() {Id = Guid.NewGuid(), Title = "Pupil absence in schools in England: autumn and spring"}
-        };
+        private readonly ApplicationDbContext _context;
         
+        public TopicController(ApplicationDbContext context)
+        {
+            _context = context;    
+        }
+
         // GET api/topic
         [HttpGet]
         public ActionResult<List<Topic>> Get()
         {
-            return _topics;
+            return _context.Topics.ToList();
         }
 
         // GET api/topic/5
         [HttpGet("{id}")]
         public ActionResult<Topic> Get(Guid id)
         {
-            return _topics.FirstOrDefault();
+            return _context.Topics.FirstOrDefault(t => t.Id == id);
         }
     }
 }
