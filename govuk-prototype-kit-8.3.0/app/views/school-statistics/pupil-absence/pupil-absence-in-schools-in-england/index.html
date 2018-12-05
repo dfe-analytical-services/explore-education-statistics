@@ -49,13 +49,65 @@ Pupil absence in schools in England
 			This is the latest data
 		</strong>
 		<h1 class="govuk-heading-l">
-
-			Pupil absence in schools in England
+			Get pupil absence data and statistics for schools in England
 		</h1>
+		<p> This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools.</p>
 
-		<p>
-			Find out the facts and figures for pupil absence in primary and secondary schools across England.
-		</p>
+		<details class="govuk-details">
+			<summary class="govuk-details__summary">
+				<span class="govuk-details__summary-text">
+					Further details
+				</span>
+			</summary>
+			<div class="govuk-details__text">
+				<p>It allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:</p>
+
+				<ul class="govuk-list govuk-list--bullet">
+					<li><a href="">for England as a whole</a></li>
+					<li><a href="">for individual local authorities</a></li>
+					<li><a href="">by pupil characteristics - including by pupil age, ethnicity, gender and special educational need</a></li>
+					<li><a href="">by school type - including primary, secondary and special school and pupil referral unit information</a></li>
+				</ul>
+
+				<p>To help you analyse and understand the data and statistics under the above each one is split into the following tabs:</p>
+
+				<ul class="govuk-list govuk-list--bullet">
+					<li>Summary - includes the latest headline statistical insights and breakdowns</li>
+					<li>Further details - includes more detailed explanations, facts and figures </li>
+					<li>Data and downloads - includes relevant data tables and download links to data files</li>
+				</ul>
+
+				<div class="govuk-inset-text">
+					<a href="">Find out more about our pupil absence data and statistics methodology and terminology</a>
+				</div>
+			</div>
+		</details>
+
+
+		<!--<div class="govuk-tabs" data-module="tabs">
+
+			<ul class="govuk-tabs__list">
+				<li class="govuk-tabs__list-item">
+					<a class="govuk-tabs__tab govuk-tabs__tab--selected" href="#intro-short">
+						Summary
+					</a>
+				</li>
+				<li class="govuk-tabs__list-item">
+					<a class="govuk-tabs__tab" href="#intro-long">
+						Further details
+					</a>
+				</li>
+			</ul>
+
+			<section class="govuk-tabs__panel" id="intro-short">
+
+			</section>
+			<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="intro-long">
+
+
+			</section>
+
+		</div>-->
 
 		<!--		List start point-->
 		<div id="step-by-step-navigation" class="app-step-nav app-step-nav--large app-step-nav--active" data-show-text="Show" data-hide-text="Hide" data-show-all-text="Show all" data-hide-all-text="Hide all">
@@ -67,7 +119,7 @@ Pupil absence in schools in England
 							<span class="app-step-nav__circle app-step-nav__circle--number">
 								<span class="app-step-nav__circle-inner">
 									<span class="app-step-nav__circle-background">
-										<span class="govuk-visually-hidden">Step</span> 1
+										<span class="govuk-visually-hidden">Step</span>
 									</span>
 								</span>
 							</span>
@@ -75,7 +127,7 @@ Pupil absence in schools in England
 							<span class="js-step-title no-close">
 								<button class="app-step-nav__button app-step-nav__button--title js-step-title-button" aria-expanded="false" aria-controls="step-panel-book-and-manage-your-driving-test-6">
 									<span class="js-step-title-text govuk-heading-m ">
-										Absence headlines<span class="govuk-caption-m">England 2016 - 2017 </span>
+										Headline pupil absence facts and figures for 2016/17
 									</span>
 									<span class="app-step-nav__toggle-link js-toggle-link" aria-hidden="true">Show</span>
 								</button>
@@ -85,55 +137,74 @@ Pupil absence in schools in England
 					<ul class="govuk-list govuk-list--bullet">
 
 						<li>
-							On average in 2016/17, <strong>pupils missed 8.2 school days</strong>
+							Pupils missed on average 8.2 school days
 						</li>
 						<li>
-							Overall and unauthorised absence rates have <strong>increased</strong> since last year
+							Overall and unauthorised absence rates up on previous year
 						</li>
 						<li>
-							The rise in unauthorised absence rates is due to higher rates of unauthorised holidays
+							Unauthorised rise due to higher rates of unauthorised holidays
 						</li>
 						<li>
-							<strong>One in ten pupils</strong> was persistently absent during the academic year 2016/17
+							10% of pupils persistently absent during 2016/17
 						</li>
 					</ul>
 
+					<h3 class="govuk-heading-s">Chart showing the change in different types of absence over time</h3>
 
+					<div id="da7c10ac-eab3-4a0d-b7ee-2dc75bf614ba" style="width: 600px; height: 350px;" class="plotly-graph-div"></div>
 
-					<div class="dash-tiles">
+					<div class="dash-tiles simple">
 						<h2 class="govuk-heading-l tile">
 							<a href="#">
+								<span class="govuk-caption-m date-range govuk-tag">2016/17</span>
+								<span class="govuk-caption-m date-range help-icon" title="Explanation of this figure"><em>What does this mean</em>?</span>
+
 								<span class="govuk-caption-l">Overall absence</span>
 								<span class="trend-icon govuk-caption-increase-negative">4.7%</span>
-								<span class="govuk-caption-m">Increased from 4.6% since 2015/16</span>
+
+								<span class="govuk-caption-m date-range trend"><strong class="increase bad">+0.4<abbr aria-label="Percentage points" title="Percentage points">ppt</abbr></strong> more than 2015/16 </span>
 							</a>
 						</h2>
 
 						<h2 class="govuk-heading-l tile">
 							<a href="#">
+								<span class="govuk-caption-m date-range govuk-tag">2016/17</span>
+								<span class="govuk-caption-m date-range help-icon" title="Explanation of this figure"><em>What does this mean</em>?</span>
+
 								<span class="govuk-caption-l">Authorised absence</span>
 								<span class="trend-icon govuk-caption-static">3.4%</span>
-								<span class="govuk-caption-m">The same as 2015/16</span>
+
+								<span class="govuk-caption-m date-range trend"><strong class="level">0<abbr aria-label="Percentage points" title="Percentage points">ppt</abbr></strong> The same as 2015/16</span>
 							</a>
 						</h2>
 
 						<h2 class="govuk-heading-l tile">
 							<a href="#">
+								<span class="govuk-caption-m date-range govuk-tag">2016/17</span>
+								<span class="govuk-caption-m date-range help-icon" title="Explanation of this figure"><em>What does this mean</em>?</span>
+
 								<span class="govuk-caption-l">Unauthorised absence</span>
 								<span class="trend-icon govuk-caption-increase-negative">1.3%</span>
-								<span class="govuk-caption-m">Increased from 1.1% since 2015/16</span>
+
+								<span class="govuk-caption-m date-range trend"><strong class="increase bad">+0.2<abbr aria-label="Percentage points" title="Percentage points">ppt</abbr></strong> more than 2015/16 </span>
 							</a>
 						</h2>
 
 
 						<h2 class="govuk-heading-l tile">
 							<a href="#">
+								<span class="govuk-caption-m date-range govuk-tag">2016/17</span>
+								<span class="govuk-caption-m date-range help-icon" title="Explanation of this figure"><em>What does this mean</em>?</span>
 								<span class="govuk-caption-l">Persistent absence</span>
 								<span class="trend-icon govuk-caption-increase-negative">10.8%</span>
-								<span class="govuk-caption-m">Increased from 10.5% since 2015/16</span>
+
+								<span class="govuk-caption-m date-range trend"><strong class="increase bad">+0.3<abbr aria-label="Percentage points" title="Percentage points">ppt</abbr></strong> more than 2015/16 </span>
 							</a>
 						</h2>
 					</div>
+
+
 				</li>
 				<li class="app-step-nav__step js-step step-is-shown" id="check-youre-allowed-to-drive">
 					<div class="app-step-nav__header js-toggle-panel" data-position="1">
@@ -141,7 +212,7 @@ Pupil absence in schools in England
 							<span class="app-step-nav__circle app-step-nav__circle--number">
 								<span class="app-step-nav__circle-inner">
 									<span class="app-step-nav__circle-background">
-										<span class="govuk-visually-hidden">Step</span> 2
+										<span class="govuk-visually-hidden">Step</span>
 									</span>
 								</span>
 							</span>
@@ -149,9 +220,9 @@ Pupil absence in schools in England
 							<span class="js-step-title">
 								<button class="app-step-nav__button app-step-nav__button--title js-step-title-button" aria-expanded="true" aria-controls="step-panel-check-youre-allowed-to-drive-1">
 									<span class="js-step-title-text">
-										The national picture
+										Get pupil absence data and statistics on a national level
 										<span class="govuk-caption-m">
-											Facts and figures for England as a whole
+											Find out the main absence facts and figures for state-funded primary and secondary schools across England as a whole.
 										</span>
 									</span>
 									<span class="app-step-nav__toggle-link js-toggle-link" aria-hidden="true">Show</span>
@@ -160,10 +231,48 @@ Pupil absence in schools in England
 						</h2>
 					</div>
 
+
+
+
+
 					<div class="app-step-nav__panel js-panel" id="step-panel-check-youre-allowed-to-drive-1">
-						<div id="da7c10ac-eab3-4a0d-b7ee-2dc75bf614ba" style="width: 600px; height: 350px;" class="plotly-graph-div"></div>
 						<hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
-						<h2 class="govuk-heading-m">Overall absence</h2>
+						<p>You’ll find the following information and graphs for England going back as far as 2006/07 within this section</p>
+
+
+						<ul class="govuk-list govuk-list--bullet">
+							<li><a href="#overall-absence">overall, authorised and unauthorised national-level pupil absence rates</a></li>
+							<li><a href="#persistent-absence">overall national-level absence rates - including those for all schools and broken down by primary, secondary and special school</a></li>
+							<li><a href="">persistent national-level absence rates - including those for all schools and broken down by primary, secondary and special school</a></li>
+						</ul>
+
+						<details class="govuk-details">
+							<summary class="govuk-details__summary">
+								<span class="govuk-details__summary-text">
+									Further details
+								</span>
+							</summary>
+							<div class="govuk-details__text">
+
+
+								<p>To help you analyse and understand the data and statistics under the above each one is split into the following tabs:</p>
+
+								<ul class="govuk-list govuk-list--bullet">
+									<li>Summary - includes the latest headline statistical insights and breakdowns</li>
+									<li>Further details - includes more detailed explanations, facts and figures </li>
+									<li>Data and downloads - includes relevant data tables and download links to data files</li>
+								</ul>
+
+
+								<div class="govuk-inset-text">
+									<a href="">Find out more about our pupil absence data and statistics methodology and terminology</a>
+								</div>
+							</div>
+						</details>
+
+
+						<hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+						<h2 class="govuk-heading-m" id="overall-absence">Overall absence</h2>
 						<details class="govuk-details">
 							<summary class="govuk-details__summary">
 								<span class="govuk-details__summary-text">
@@ -176,7 +285,7 @@ Pupil absence in schools in England
 						</details>
 
 
-						<div id="8c843b8c-4ee3-4936-9744-66b739909982" style="width: 600px; height: 350px;" class="plotly-graph-div"></div>
+
 						<div class="govuk-tabs" data-module="tabs">
 
 							<ul class="govuk-tabs__list">
@@ -187,24 +296,35 @@ Pupil absence in schools in England
 								</li>
 								<li class="govuk-tabs__list-item">
 									<a class="govuk-tabs__tab" href="#overall-long">
-										Detail
+										Further details
 									</a>
 								</li>
 
 								<li class="govuk-tabs__list-item">
 									<a class="govuk-tabs__tab" href="#overall-data">
-										Data
+										Data tables
+									</a>
+								</li>
+
+								<li class="govuk-tabs__list-item">
+									<a class="govuk-tabs__tab" href="#overall-download">
+										Data downloads
 									</a>
 								</li>
 							</ul>
-
+							<div id="8c843b8c-4ee3-4936-9744-66b739909982" style="width: 600px; height: 350px;" class="plotly-graph-div"></div>
 							<section class="govuk-tabs__panel" id="overall-short">
 
-								<p>The overall absence rate across state-funded primary, secondary and special schools increased from <strong>4.6%</strong> in 2015/16 to <strong>4.7%</strong> in 2016/17. </p>
+								<h3 class="govuk-heading-s">Overall absence headlines 2016/17</h3>
+								
+								
 
-								<p>In primary schools the overall absence rate stayed the same at <strong>4%</strong> and the rate in secondary schools increased from <strong>5.2%</strong> to <strong>5.4%</strong>. </p>
-
-								<p>Absence in special schools is much higher at <strong>9.7%</strong> in 2016/17.</p>
+								<ul class="govuk-list govuk-list--bullet">
+									<li>Rate across primary, secondary and special schools <strong>up to 4.7%</strong> from 4.6% for 2015/16 </li>
+									<li>Rate for primary schools <strong>stable at 4% </strong></li>
+									<li class="govuk-tabs__list-item">Rate for secondary schools <strong>up to 5.4%</strong> from 5.2% for 2015/16</li>
+									<li>Rate for special schools <strong>much higher at 9.7%</strong></li>
+								</ul>
 
 							</section>
 							<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="overall-long">
@@ -234,8 +354,9 @@ Pupil absence in schools in England
 
 							<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="overall-data">
 
-								<h2 class="govuk-heading-s">Overall absence data</h2>
+								<h2 class="govuk-heading-m">Overall absence data</h2>
 
+								
 								<table class="govuk-table">
 									<thead class="govuk-table__head">
 										<tr class="tableizer-firstrow">
@@ -294,7 +415,14 @@ Pupil absence in schools in England
 										</tr>
 									</tbody>
 								</table>
-								<h2 class="govuk-heading-s">Access overall absence data</h2>
+
+								
+
+							</section>
+							
+							<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="overall-download">
+
+								<h2 class="govuk-heading-s">Download overall absence data files</h2>
 
 								<ul class="govuk-list">
 									<li>
@@ -310,10 +438,7 @@ Pupil absence in schools in England
 										<a class="govuk-link" href="#">API</a>
 									</li>
 								</ul>
-
-
-
-
+								
 							</section>
 						</div>
 
@@ -321,7 +446,7 @@ Pupil absence in schools in England
 						<hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
 
 
-						<h2 class="govuk-heading-m">Persistent absence</h2>
+						<h2 class="govuk-heading-m" id="persistent-absence">Persistent absence</h2>
 
 						<details class="govuk-details">
 							<summary class="govuk-details__summary">
@@ -356,21 +481,26 @@ Pupil absence in schools in England
 								</li>
 								<li class="govuk-tabs__list-item">
 									<a class="govuk-tabs__tab" href="#persistent-long">
-										Detail
+										Further details
 									</a>
 								</li>
+
 								<li class="govuk-tabs__list-item">
 									<a class="govuk-tabs__tab" href="#persistent-data">
-										Data
+										Data tables
 									</a>
+								</li>
+
+								<li class="govuk-tabs__list-item">
+									<a class="govuk-tabs__tab" href="#persistent-download">Data downloads</a>
 								</li>
 							</ul>
 
 							<section class="govuk-tabs__panel" id="persistent-short">
-
-
-								<p>The percentage of enrolments in state-funded primary and state-funded secondary schools that were
-									classified as persistent absentees in 2016/17 was <strong>10.8%</strong>. This is up from the equivalent figure of <strong>10.5%</strong> in 2015/16.</p>
+								<ul class="govuk-list govuk-list--bullet">
+									<li>Rate for primary and secondary schools <strong>up to 10.8%</strong> from 10.5% for 2015/16</li>
+								</ul>
+								
 
 							</section>
 							<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="persistent-long">
@@ -388,7 +518,7 @@ Pupil absence in schools in England
 
 							</section>
 							<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="persistent-data">
-								<h2 class="govuk-heading-s">Pseristent absence data</h2>
+								<h2 class="govuk-heading-s">Persistent absence data</h2>
 
 								<table class="govuk-table">
 									<thead class="govuk-table__head">
@@ -760,6 +890,9 @@ Pupil absence in schools in England
 										</tr>
 									</tbody>
 								</table>
+								
+							</section>
+							<section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="persistent-download">
 								<h2 class="govuk-heading-s">Access persistent absence data</h2>
 
 								<ul class="govuk-list">
@@ -791,7 +924,7 @@ Pupil absence in schools in England
 							<span class="app-step-nav__circle app-step-nav__circle--number">
 								<span class="app-step-nav__circle-inner">
 									<span class="app-step-nav__circle-background">
-										<span class="govuk-visually-hidden">Step</span> 3
+										<span class="govuk-visually-hidden">Step</span>
 									</span>
 								</span>
 							</span>
@@ -846,21 +979,13 @@ Pupil absence in schools in England
 										Choose a Local Authority
 									</label>
 									<select class="govuk-select" id="sort" name="sort">
-										<option value="N09000011">Aberdeen City</option>
-										<option value="E06000001">Aberdeenshire</option>
-										<option value="S12000005">Adur</option>
 										<option value="S12000006">Allerdale</option>
 										<option value="S12000008">Amber Valley</option>
 										<option value="E06000002">Angus</option>
-										<option value="E06000003">Antrim and Newtownabbey</option>
 										<option value="S12000010">Ards and North Down</option>
-										<option value="E06000004">Argyll and Bute</option>
-										<option value="E06000005">Armagh City</option>
-										<option value="S12000011">Arun</option>
 										<option value="S12000013">Ashfield</option>
 										<option value="E06000006">Ashford</option>
 										<option value="E06000007">Aylesbury Vale</option>
-										<option value="S12000014">Babergh</option>
 										<option value="E07000004">Barking and Dagenham</option>
 										<option value="S12000015">Barnet</option>
 										<option value="E06000008">Barnsley</option>
@@ -1269,7 +1394,7 @@ Pupil absence in schools in England
 							<span class="app-step-nav__circle app-step-nav__circle--number">
 								<span class="app-step-nav__circle-inner">
 									<span class="app-step-nav__circle-background">
-										<span class="govuk-visually-hidden">Step</span> 4
+										<span class="govuk-visually-hidden">Step</span>
 									</span>
 								</span>
 							</span>
@@ -1301,7 +1426,7 @@ Pupil absence in schools in England
 							<span class="app-step-nav__circle app-step-nav__circle--number">
 								<span class="app-step-nav__circle-inner">
 									<span class="app-step-nav__circle-background">
-										<span class="govuk-visually-hidden">Step</span> 5
+										<span class="govuk-visually-hidden">Step</span>
 									</span>
 								</span>
 							</span>
@@ -1333,7 +1458,7 @@ Pupil absence in schools in England
 							<span class="app-step-nav__circle app-step-nav__circle--number">
 								<span class="app-step-nav__circle-inner">
 									<span class="app-step-nav__circle-background">
-										<span class="govuk-visually-hidden">Step</span> 6
+										<span class="govuk-visually-hidden">Step</span>
 									</span>
 								</span>
 							</span>
@@ -1368,7 +1493,7 @@ Pupil absence in schools in England
 							<span class="app-step-nav__circle app-step-nav__circle--number">
 								<span class="app-step-nav__circle-inner">
 									<span class="app-step-nav__circle-background">
-										<span class="govuk-visually-hidden">Step</span> 7
+										<span class="govuk-visually-hidden">Step</span>
 									</span>
 								</span>
 							</span>
