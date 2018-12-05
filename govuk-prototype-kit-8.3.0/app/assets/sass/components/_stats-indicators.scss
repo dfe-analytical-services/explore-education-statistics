@@ -8,8 +8,8 @@
 
 	.tile {
 		background: #f8f8f8;
-//		border-bottom: 1px solid $govuk-border-colour;
-		border-top: 1px solid  $govuk-border-colour;
+		//		border-bottom: 1px solid $govuk-border-colour;
+		border-top: 1px solid $govuk-border-colour;
 		flex-basis: 23%;
 		margin: 2% 1% 1%;
 		position: relative;
@@ -19,7 +19,7 @@
 			border-color: #005ea5;
 
 			.govuk-tag {
-				background:  $govuk-link-colour;
+				background: $govuk-link-colour;
 				color: white;
 				font-weight: bold;
 				padding-left: 8px;
@@ -38,7 +38,7 @@
 		}
 
 		a {
-			padding: 20px ;
+			padding: 20px;
 			display: block;
 			text-decoration: none;
 
@@ -55,7 +55,7 @@
 				}
 
 				&.trend {
-//					margin-top: 5px;
+					//					margin-top: 5px;
 
 					strong {
 						font-size: 1.3rem;
@@ -63,7 +63,8 @@
 						color: black;
 
 						&.decrease:after,
-						&.increase:after {
+						&.increase:after,
+						&.level:after {
 							display: inline-block;
 							padding-right: 0.2em;
 							color: #bfc1c3;
@@ -77,13 +78,20 @@
 							content: "\25B2";
 						}
 
-						&.good:after {
-							color: #006435;
+						&.level:after {
+							content: "\25CF";
+							color: #bfc1c3;
+							margin-right: 5px;
+							margin-left: 2px;
 						}
 
-						&.bad:after {
-							color: #b10e1e;
-						}
+						//						&.good:after {
+						//							color: #006435;
+						//						}
+						//
+						//						&.bad:after {
+						//							color: #b10e1e;
+						//						}
 					}
 
 				}
@@ -121,22 +129,44 @@
 				//				}
 			}
 
+			.help-icon {
+
+				position: absolute;
+				right: 0;
+				top: -1px;
+				cursor: help;
+				border: 1px solid $govuk-border-colour;
+				margin-bottom: 0;
+				background: none;
+				color: #6f777b;
+				font-weight: normal;
+				padding: 3px 5px;
+
+				em {
+					display: none;
+				}
+			}
+
 		}
 
 	}
 
 	&.simple {
+		padding-top: 2rem;
+		border-top: 1px solid $govuk-border-colour;
+		margin-top: 2rem;
+
 		.tile {
-			flex-basis: 48%;
+			flex-basis: 46%;
+			margin: 2% 2% 4% 2%;
 		}
 	}
 }
 
 
 //Step by step process
-#step-by-step-navigation {
-	.govuk-tabs__panel {
+	.govuk-template  .govuk-tabs__panel {
 		border: none;
 		padding: 20px 0;
 	}
-}
+

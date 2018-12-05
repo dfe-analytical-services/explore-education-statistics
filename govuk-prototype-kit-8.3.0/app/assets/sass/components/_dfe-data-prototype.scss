@@ -6,6 +6,7 @@ $govuk-page-width: 1240px !default;
 
 .govuk-width-container-wide {
     max-width: 1200px;
+	margin: 0 auto;
 }
 
 .govuk-caption-inline {
@@ -33,3 +34,5 @@ $govuk-page-width: 1240px !default;
 .govuk-grid-column-one-third .govuk-select {
 	max-width: 70%;
 } 
+
+.app-step-nav__toggle-link {padding-top: 10px;}
