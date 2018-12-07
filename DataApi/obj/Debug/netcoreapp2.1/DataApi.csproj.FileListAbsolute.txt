@@ -1,0 +1,15 @@
+/home/ben/development/dfe/DataApi/bin/Debug/netcoreapp2.1/DataApi.deps.json
+/home/ben/development/dfe/DataApi/bin/Debug/netcoreapp2.1/DataApi.runtimeconfig.json
+/home/ben/development/dfe/DataApi/bin/Debug/netcoreapp2.1/DataApi.runtimeconfig.dev.json
+/home/ben/development/dfe/DataApi/bin/Debug/netcoreapp2.1/DataApi.dll
+/home/ben/development/dfe/DataApi/bin/Debug/netcoreapp2.1/DataApi.pdb
+/home/ben/development/dfe/DataApi/obj/Debug/netcoreapp2.1/DataApi.csprojAssemblyReference.cache
+/home/ben/development/dfe/DataApi/obj/Debug/netcoreapp2.1/DataApi.csproj.CoreCompileInputs.cache
+/home/ben/development/dfe/DataApi/obj/Debug/netcoreapp2.1/DataApi.RazorAssemblyInfo.cache
+/home/ben/development/dfe/DataApi/obj/Debug/netcoreapp2.1/DataApi.RazorAssemblyInfo.cs
+/home/ben/development/dfe/DataApi/obj/Debug/netcoreapp2.1/DataApi.AssemblyInfoInputs.cache
+/home/ben/development/dfe/DataApi/obj/Debug/netcoreapp2.1/DataApi.AssemblyInfo.cs
+/home/ben/development/dfe/DataApi/obj/Debug/netcoreapp2.1/DataApi.RazorTargetAssemblyInfo.cache
+/home/ben/development/dfe/DataApi/obj/Debug/netcoreapp2.1/DataApi.dll
+/home/ben/development/dfe/DataApi/obj/Debug/netcoreapp2.1/DataApi.pdb
+/home/ben/development/dfe/DataApi/bin/Debug/netcoreapp2.1/DataApi.xml
