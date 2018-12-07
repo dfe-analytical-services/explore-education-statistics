@@ -40,7 +40,10 @@ namespace DataApi.Controllers
                     Code = "E09000001",
                     Old_Code = "201"
                 },
-                laestab = "2013614",
+                School = new School
+                {
+                    laestab = 2013614,   
+                },
                 SchoolType = SchoolType.Primary,
                 Attributes = new Dictionary<string, int>()
             };

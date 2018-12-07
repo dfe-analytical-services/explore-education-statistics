@@ -8,14 +8,14 @@ namespace DataApi.Models
         {
         }
 
-        public GeographicModel(int year, Level level, Country country, Region region, LocalAuthority localAuthority, string laestab, SchoolType schoolType, Dictionary<string, int> attributes)
+        public GeographicModel(int year, Level level, Country country, Region region, LocalAuthority localAuthority, School school, SchoolType schoolType, Dictionary<string, int> attributes)
         {
             Year = year;
             Level = level;
             Country = country;
             Region = region;
             LocalAuthority = localAuthority;
-            this.laestab = laestab;
+            School = school;
             SchoolType = schoolType;
             Attributes = attributes;
         }
@@ -30,7 +30,7 @@ namespace DataApi.Models
 
         public LocalAuthority LocalAuthority { get; set; }
 
-        public string laestab { get; set; }
+        public School School { get; set; }
 
         public SchoolType SchoolType { get; set; }
         
