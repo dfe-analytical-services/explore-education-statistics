@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using DataApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DataApi.Controllers
@@ -10,8 +8,10 @@ namespace DataApi.Controllers
     [ApiController]
     public class SchoolController : ControllerBase
     {
-        [HttpGet()]
-        public ActionResult<string> List(int releaseId)
+        [HttpGet]
+        public ActionResult<string> List(int releaseId,
+            [FromQuery(Name = "school-type")] SchoolType schoolType,
+            [FromQuery(Name = "attributes")] List<string> attributes)
         {
             return "value";
         }
