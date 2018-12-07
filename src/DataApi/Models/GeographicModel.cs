@@ -15,7 +15,7 @@ namespace DataApi.Models
 
         public int Year { get; set; }
         
-        public string Level { get; set; }
+        public Level Level { get; set; }
         
         public Country Country { get; set; }
 
