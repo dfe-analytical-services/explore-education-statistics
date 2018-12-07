@@ -14,7 +14,7 @@ namespace DataApi.Controllers
             [FromQuery(Name = "school-type")] SchoolType schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return Enumerable.Empty<GeographicModel>().ToList();
+            return new CsvReader().GeoLevels().Where(x => x.Year == 201617 && string.IsNullOrWhiteSpace(x.LocalAuthority.Code)).ToList();
         }
 
         [HttpGet("{regionId}")]
