@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace GovUk.Education.DataDissemination.Meta.Api.Migrations
+namespace GovUk.Education.DataDissemination.Content.Api.Migrations
 {
     public partial class InitialCreate : Migration
     {

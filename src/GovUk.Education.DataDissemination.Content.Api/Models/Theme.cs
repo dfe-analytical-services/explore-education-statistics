@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace GovUk.Education.DataDissemination.Meta.Api.Models
+namespace GovUk.Education.DataDissemination.Content.Api.Models
 {
     public class Theme
     {

@@ -1,8 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 
-namespace GovUk.Education.DataDissemination.Meta.Api.Models
+namespace GovUk.Education.DataDissemination.Content.Api.Models
 {
     public class Publication
     {

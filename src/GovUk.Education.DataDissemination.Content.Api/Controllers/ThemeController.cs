@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.DataDissemination.Meta.Api.Data;
-using GovUk.Education.DataDissemination.Meta.Api.Models;
+using GovUk.Education.DataDissemination.Content.Api.Data;
+using GovUk.Education.DataDissemination.Content.Api.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.DataDissemination.Meta.Api.Controllers
+namespace GovUk.Education.DataDissemination.Content.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

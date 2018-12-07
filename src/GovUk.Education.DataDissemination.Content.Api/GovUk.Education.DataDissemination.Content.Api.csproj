@@ -2,6 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp2.1</TargetFramework>
+        <AssemblyName>GovUk.Education.DataDissemination.Content.Api</AssemblyName>
+        <RootNamespace>GovUk.Education.DataDissemination.Content.Api</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

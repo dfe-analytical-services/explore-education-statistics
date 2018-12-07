@@ -1,9 +1,8 @@
 using System;
+using GovUk.Education.DataDissemination.Content.Api.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using GovUk.Education.DataDissemination.Meta.Api.Models;
 
-namespace GovUk.Education.DataDissemination.Meta.Api.Data
+namespace GovUk.Education.DataDissemination.Content.Api.Data
 {
     public class ApplicationDbContext : DbContext
     {
