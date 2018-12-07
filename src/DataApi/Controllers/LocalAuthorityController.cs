@@ -11,7 +11,7 @@ namespace DataApi.Controllers
     {
         [HttpGet]
         public ActionResult<List<GeographicModel>> List(int releaseId,
-            [FromQuery(Name = "schoolType")] SchoolType schoolType,
+            [FromQuery(Name = "schoolType")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
             return Enumerable.Empty<GeographicModel>().ToList();
@@ -19,13 +19,13 @@ namespace DataApi.Controllers
 
         [HttpGet("{localAuthorityId}")]
         public ActionResult<GeographicModel> Get(int releaseId, int localAuthorityId,
-            [FromQuery(Name = "schoolType")] SchoolType schoolType,
+            [FromQuery(Name = "schoolType")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
             return new GeographicModel
             {
                 Year = 201617,
-                Level = Level.National,
+                Level = "National",
                 Country = new Country
                 {
                     Code = "E92000001",
@@ -44,16 +44,16 @@ namespace DataApi.Controllers
                 },
                 School = new School
                 {
-                    laestab = 2013614,   
+                    laestab = 2013614
                 },
-                SchoolType = SchoolType.Total,
+                SchoolType = "Total",
                 Attributes = new Dictionary<string, int>()
             };
         }
 
         [HttpGet("{localAuthorityId}/schools")]
         public ActionResult<List<GeographicModel>> GetSchools(int releaseId, int localAuthorityId,
-            [FromQuery(Name = "schoolType")] SchoolType schoolType,
+            [FromQuery(Name = "schoolType")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
             return Enumerable.Empty<GeographicModel>().ToList();

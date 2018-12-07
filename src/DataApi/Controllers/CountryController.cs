@@ -11,21 +11,22 @@ namespace DataApi.Controllers
     {
         [HttpGet]
         public ActionResult<List<GeographicModel>> List(int releaseId,
-            [FromQuery(Name = "schoolType")] SchoolType schoolType,
+            [FromQuery(Name = "schoolType")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return new CsvReader().GeoLevels().Where(x => x.Year == 201617 && string.IsNullOrWhiteSpace(x.Region.Code)).ToList();
+            return new CsvReader().GeoLevels().Where(x => x.Year == 201617 && string.IsNullOrWhiteSpace(x.Region.Code))
+                .ToList();
         }
 
         [HttpGet("{countryId}")]
         public ActionResult<GeographicModel> Get(int releaseId, int countryId,
-            [FromQuery(Name = "schoolType")] SchoolType schoolType,
+            [FromQuery(Name = "schoolType")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
             return new GeographicModel
             {
                 Year = 201617,
-                Level = Level.National,
+                Level = "National",
                 Country = new Country
                 {
                     Code = "E92000001",
@@ -35,16 +36,16 @@ namespace DataApi.Controllers
                 LocalAuthority = null,
                 School = new School
                 {
-                    laestab = 2013614,   
+                    laestab = 2013614
                 },
-                SchoolType = SchoolType.Total,
+                SchoolType = "Total",
                 Attributes = new Dictionary<string, int>()
             };
         }
 
         [HttpGet("{countryId}/regions")]
         public ActionResult<List<GeographicModel>> GetRegions(int releaseId, int countryId,
-            [FromQuery(Name = "schoolType")] SchoolType schoolType,
+            [FromQuery(Name = "schoolType")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
             return Enumerable.Empty<GeographicModel>().ToList();
@@ -52,7 +53,7 @@ namespace DataApi.Controllers
 
         [HttpGet("{countryId}/local-authorities")]
         public ActionResult<List<GeographicModel>> GetLocalAuthorities(int releaseId, int countryId,
-            [FromQuery(Name = "schoolType")] SchoolType schoolType,
+            [FromQuery(Name = "schoolType")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
             return Enumerable.Empty<GeographicModel>().ToList();
@@ -60,11 +61,10 @@ namespace DataApi.Controllers
 
         [HttpGet("{countryId}/schools")]
         public ActionResult<List<GeographicModel>> getSchools(int releaseId, int countryId,
-            [FromQuery(Name = "schoolType")] SchoolType schoolType,
+            [FromQuery(Name = "schoolType")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
             return Enumerable.Empty<GeographicModel>().ToList();
-
         }
     }
 }

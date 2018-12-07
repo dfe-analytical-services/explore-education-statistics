@@ -8,7 +8,7 @@ namespace DataApi.Models
         {
         }
 
-        public GeographicModel(int year, Level level, Country country, Region region, LocalAuthority localAuthority, School school, SchoolType schoolType, Dictionary<string, int> attributes)
+        public GeographicModel(int year, string level, Country country, Region region, LocalAuthority localAuthority, School school, string schoolType, Dictionary<string, int> attributes)
         {
             Year = year;
             Level = level;
@@ -22,7 +22,7 @@ namespace DataApi.Models
 
         public int Year { get; set; }
 
-        public Level Level { get; set; }
+        public string Level { get; set; }
 
         public Country Country { get; set; }
 
@@ -32,7 +32,7 @@ namespace DataApi.Models
 
         public School School { get; set; }
 
-        public SchoolType SchoolType { get; set; }
+        public string SchoolType { get; set; }
         
         public Dictionary<string, int> Attributes { get; set; }
      }
