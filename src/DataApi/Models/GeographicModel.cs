@@ -2,7 +2,12 @@ namespace DataApi.Models
 {
     public class GeographicModel
     {
-        public GeographicModel(int year, Level level, Country country, Region region, LocalAuthority localAuthority, string laestab, SchoolType schoolType)
+        public GeographicModel()
+        {
+        }
+
+        public GeographicModel(int year, Level level, Country country, Region region, LocalAuthority localAuthority,
+            string laestab, SchoolType schoolType)
         {
             Year = year;
             Level = level;
@@ -14,9 +19,9 @@ namespace DataApi.Models
         }
 
         public int Year { get; set; }
-        
+
         public Level Level { get; set; }
-        
+
         public Country Country { get; set; }
 
         public Region Region { get; set; }
