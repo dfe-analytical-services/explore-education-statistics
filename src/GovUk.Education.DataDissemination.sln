@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.DataDissemination.Meta.Api", "GovUk.Education.DataDissemination.Meta.Api\GovUk.Education.DataDissemination.Meta.Api.csproj", "{505A1B91-5452-4EE9-B84D-4DEEB35786C6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataApi", "DataApi\DataApi.csproj", "{15519CD7-84C9-467D-9A1F-12AC044F3328}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,17 @@ Global
 		{505A1B91-5452-4EE9-B84D-4DEEB35786C6}.Release|x64.Build.0 = Release|Any CPU
 		{505A1B91-5452-4EE9-B84D-4DEEB35786C6}.Release|x86.ActiveCfg = Release|Any CPU
 		{505A1B91-5452-4EE9-B84D-4DEEB35786C6}.Release|x86.Build.0 = Release|Any CPU
+		{15519CD7-84C9-467D-9A1F-12AC044F3328}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15519CD7-84C9-467D-9A1F-12AC044F3328}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15519CD7-84C9-467D-9A1F-12AC044F3328}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{15519CD7-84C9-467D-9A1F-12AC044F3328}.Debug|x64.Build.0 = Debug|Any CPU
+		{15519CD7-84C9-467D-9A1F-12AC044F3328}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{15519CD7-84C9-467D-9A1F-12AC044F3328}.Debug|x86.Build.0 = Debug|Any CPU
+		{15519CD7-84C9-467D-9A1F-12AC044F3328}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15519CD7-84C9-467D-9A1F-12AC044F3328}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15519CD7-84C9-467D-9A1F-12AC044F3328}.Release|x64.ActiveCfg = Release|Any CPU
+		{15519CD7-84C9-467D-9A1F-12AC044F3328}.Release|x64.Build.0 = Release|Any CPU
+		{15519CD7-84C9-467D-9A1F-12AC044F3328}.Release|x86.ActiveCfg = Release|Any CPU
+		{15519CD7-84C9-467D-9A1F-12AC044F3328}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
