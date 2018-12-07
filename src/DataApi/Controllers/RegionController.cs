@@ -22,7 +22,7 @@ namespace DataApi.Controllers
             [FromQuery(Name = "school-type")] SchoolType schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return new GeographicModel(201617, "National", new Country("E92000001", "England"), new Region("E12000001", "North East"), null, null, SchoolType.Total);
+            return new GeographicModel(201617, Level.National, new Country("E92000001", "England"), new Region("E12000001", "North East"), null, null, SchoolType.Total);
         }
 
         [HttpGet("{regionId}/local-authorities")]

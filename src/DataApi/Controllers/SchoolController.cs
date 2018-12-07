@@ -20,7 +20,7 @@ namespace DataApi.Controllers
         [HttpGet("{schoolId}")]
         public ActionResult<GeographicModel> Get(int releaseId, int schoolId)
         {
-            return new GeographicModel(201617, "National", new Country("E92000001", "England"), new Region("E13000001", "Inner London"), new LocalAuthority("City of London", "E09000001", "201"), "2013614", SchoolType.Primary);
+            return new GeographicModel(201617, Level.National, new Country("E92000001", "England"), new Region("E13000001", "Inner London"), new LocalAuthority("City of London", "E09000001", "201"), "2013614", SchoolType.Primary);
         }
     }
 }
