@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DataApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +9,9 @@ namespace DataApi.Controllers
     public class SchoolController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<string> List(int releaseId, [FromQuery(Name = "school-type")] SchoolType schoolType)
+        public ActionResult<string> List(int releaseId,
+            [FromQuery(Name = "school-type")] SchoolType schoolType,
+            [FromQuery(Name = "attributes")] List<string> attributes)
         {
             return "value";
         }
