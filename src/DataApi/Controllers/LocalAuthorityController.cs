@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using DataApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,27 +10,27 @@ namespace DataApi.Controllers
     public class LocalAuthorityController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<string> List(int releaseId,
+        public ActionResult<List<GeographicModel>> List(int releaseId,
             [FromQuery(Name = "schoolType")] SchoolType schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return "value";
+            return Enumerable.Empty<GeographicModel>().ToList();
         }
 
         [HttpGet("{localAuthorityId}")]
-        public ActionResult<string> Get(int releaseId, int localAuthorityId,
+        public ActionResult<GeographicModel> Get(int releaseId, int localAuthorityId,
             [FromQuery(Name = "schoolType")] SchoolType schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return "value";
+            return new GeographicModel(201617, "National", new Country("E92000001", "England"), new Region("E13000001", "Inner London"), new LocalAuthority("City of London", "E09000001", "201"), null, SchoolType.Total);
         }
 
         [HttpGet("{localAuthorityId}/schools")]
-        public ActionResult<string> GetSchools(int releaseId, int localAuthorityId,
+        public ActionResult<List<GeographicModel>> GetSchools(int releaseId, int localAuthorityId,
             [FromQuery(Name = "schoolType")] SchoolType schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return "value";
+            return Enumerable.Empty<GeographicModel>().ToList();
         }
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using DataApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,43 +10,44 @@ namespace DataApi.Controllers
     public class CountryController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<string> List(int releaseId,
+        public ActionResult<List<GeographicModel>> List(int releaseId,
             [FromQuery(Name = "schoolType")] SchoolType schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return "value";
+            return Enumerable.Empty<GeographicModel>().ToList();
         }
 
         [HttpGet("{countryId}")]
-        public ActionResult<string> Get(int releaseId, int countryId,
+        public ActionResult<GeographicModel> Get(int releaseId, int countryId,
             [FromQuery(Name = "schoolType")] SchoolType schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return "value";
+            return new GeographicModel(201617, "National", new Country("E92000001", "England"), null, null, null, SchoolType.Total);
         }
 
         [HttpGet("{countryId}/regions")]
-        public ActionResult<string> GetRegions(int releaseId, int countryId,
+        public ActionResult<List<GeographicModel>> GetRegions(int releaseId, int countryId,
             [FromQuery(Name = "schoolType")] SchoolType schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return "value";
+            return Enumerable.Empty<GeographicModel>().ToList();
         }
 
         [HttpGet("{countryId}/local-authorities")]
-        public ActionResult<string> GetLocalAuthorities(int releaseId, int countryId,
+        public ActionResult<List<GeographicModel>> GetLocalAuthorities(int releaseId, int countryId,
             [FromQuery(Name = "schoolType")] SchoolType schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return "value";
+            return Enumerable.Empty<GeographicModel>().ToList();
         }
 
         [HttpGet("{countryId}/schools")]
-        public ActionResult<string> getSchools(int releaseId, int countryId,
+        public ActionResult<List<GeographicModel>> getSchools(int releaseId, int countryId,
             [FromQuery(Name = "schoolType")] SchoolType schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return "value";
+            return Enumerable.Empty<GeographicModel>().ToList();
+
         }
     }
 }

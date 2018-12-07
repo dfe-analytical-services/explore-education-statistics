@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using DataApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DataApi.Controllers
@@ -7,9 +10,9 @@ namespace DataApi.Controllers
     public class ReleaseController : ControllerBase
     {
         [HttpGet("{releaseId}")]
-        public ActionResult<string> Get(int releaseId)
+        public ActionResult<List<GeographicModel>> Get(int releaseId)
         {
-            return "value";
+            return Enumerable.Empty<GeographicModel>().ToList();
         }
     }
 }
