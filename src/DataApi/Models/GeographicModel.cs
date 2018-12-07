@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace DataApi.Models
 {
     public class GeographicModel
@@ -6,8 +8,7 @@ namespace DataApi.Models
         {
         }
 
-        public GeographicModel(int year, Level level, Country country, Region region, LocalAuthority localAuthority,
-            string laestab, SchoolType schoolType)
+        public GeographicModel(int year, Level level, Country country, Region region, LocalAuthority localAuthority, string laestab, SchoolType schoolType, Dictionary<string, int> attributes)
         {
             Year = year;
             Level = level;
@@ -16,6 +17,7 @@ namespace DataApi.Models
             LocalAuthority = localAuthority;
             this.laestab = laestab;
             SchoolType = schoolType;
+            Attributes = attributes;
         }
 
         public int Year { get; set; }
@@ -31,5 +33,7 @@ namespace DataApi.Models
         public string laestab { get; set; }
 
         public SchoolType SchoolType { get; set; }
-    }
+        
+        public Dictionary<string, int> Attributes { get; set; }
+     }
 }
