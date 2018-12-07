@@ -38,7 +38,8 @@ namespace DataApi.Controllers
                 },
                 LocalAuthority = null,
                 laestab = null,
-                SchoolType = SchoolType.Total
+                SchoolType = SchoolType.Total,
+                Attributes = new Dictionary<string, int>()
             };
         }
 
