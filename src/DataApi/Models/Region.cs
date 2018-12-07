@@ -2,6 +2,10 @@ namespace DataApi.Models
 {
     public class Region
     {
+        public Region()
+        {
+        }
+
         public Region(string name, string code)
         {
             Name = name;
@@ -10,6 +14,6 @@ namespace DataApi.Models
 
         public string Name { get; set; }
         
-        private string Code { get; set; }
+        public string Code { get; set; }
     }
 }
