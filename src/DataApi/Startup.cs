@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace DataApi
@@ -37,7 +31,7 @@ namespace DataApi
             {
                 c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
 
-                var filePath = Path.Combine(System.AppContext.BaseDirectory, "DataApi.xml");
+                var filePath = Path.Combine(AppContext.BaseDirectory, "DataApi.xml");
                 c.IncludeXmlComments(filePath);
             });
         }

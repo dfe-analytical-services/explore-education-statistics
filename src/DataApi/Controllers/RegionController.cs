@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DataApi.Controllers
@@ -10,7 +6,7 @@ namespace DataApi.Controllers
     [ApiController]
     public class RegionController : ControllerBase
     {
-        [HttpGet()]
+        [HttpGet]
         public ActionResult<string> List(int releaseId)
         {
             return "value";
