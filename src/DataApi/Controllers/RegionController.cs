@@ -1,66 +1,46 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.Xml;
 using DataApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DataApi.Controllers
 {
-    [Route("data/{releaseId}/geo-levels/region")]
+    [Route("data/{publication}/geo-levels/region")]
     [ApiController]
     public class RegionController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<List<GeographicModel>> List(int releaseId,
+        public ActionResult<List<GeographicModel>> List(string publication,
             [FromQuery(Name = "school-type")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return new CsvReader().GeoLevels()
-                .Where(x => x.Year == 201617 && string.IsNullOrWhiteSpace(x.LocalAuthority.Code)).ToList();
+            return new CsvReader().GeoLevels(publication + "_geoglevels").Where(x => x.Level.ToLower() == "region").ToList();
         }
 
         [HttpGet("{regionId}")]
-        public ActionResult<GeographicModel> Get(int releaseId, int regionId,
+        public ActionResult<GeographicModel> Get(string publication, string regionId,
             [FromQuery(Name = "school-type")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return new GeographicModel
-            {
-                Year = 201617,
-                Level = "National",
-                Country = new Country
-                {
-                    Code = "E92000001",
-                    Name = "England"
-                },
-                Region = new Region
-                {
-                    Code = "E13000001",
-                    Name = "Inner London"
-                },
-                LocalAuthority = null,
-                School = new School
-                {
-                    laestab = 2013614
-                },
-                SchoolType = "Total",
-                Attributes = new Dictionary<string, int>()
-            };
+            return new CsvReader().GeoLevels(publication + "_geoglevels").FirstOrDefault(x => x.Region.Code == regionId);
+
         }
 
         [HttpGet("{regionId}/local-authorities")]
-        public ActionResult<List<GeographicModel>> GetLocalAuthorities(int releaseId, int regionId,
+        public ActionResult<List<GeographicModel>> GetLocalAuthorities(string publication, string regionId,
             [FromQuery(Name = "school-type")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return Enumerable.Empty<GeographicModel>().ToList();
+            return new CsvReader().GeoLevels(publication + "_geoglevels").Where(x => x.Region.Code == regionId && x.Level.ToLower() == "local authority").ToList();
         }
 
         [HttpGet("{regionId}/schools")]
-        public ActionResult<List<GeographicModel>> GetSchools(int releaseId, int regionId,
+        public ActionResult<List<GeographicModel>> GetSchools(string publication, string regionId,
             [FromQuery(Name = "school-type")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return Enumerable.Empty<GeographicModel>().ToList();
+            return new CsvReader().GeoLevels(publication + "_geoglevels").Where(x => x.Region.Code == regionId && x.Level.ToLower() == "school").ToList();
         }
     }
 }

@@ -6,7 +6,7 @@ namespace DataApi.Models
         {
         }
 
-        public School(int estab, int laestab, string acadType, string acadOpend)
+        public School(string estab, string laestab, string acadType, string acadOpend)
         {
             this.estab = estab;
             this.laestab = laestab;
@@ -14,9 +14,9 @@ namespace DataApi.Models
             acad_opend = acadOpend;
         }
 
-        public int estab { get; set; }
+        public string estab { get; set; }
         
-        public int laestab { get; set; }
+        public string laestab { get; set; }
         
         public string acad_type { get; set; }
         

@@ -1,70 +1,56 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DataApi.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Razor.Language;
+using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
 
 namespace DataApi.Controllers
 {
-    [Route("data/{releaseId}/geo-levels/country")]
+    [Route("data/{publication}/geo-levels/country")]
     [ApiController]
     public class CountryController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<List<GeographicModel>> List(int releaseId,
+        public ActionResult<List<GeographicModel>> List(string publication,
             [FromQuery(Name = "schoolType")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return new CsvReader().GeoLevels().Where(x => x.Year == 201617 && string.IsNullOrWhiteSpace(x.Region.Code))
-                .ToList();
+            return new CsvReader().GeoLevels(publication + "_geoglevels").Where(x => x.Level.ToLower() == "national").ToList();
         }
 
         [HttpGet("{countryId}")]
-        public ActionResult<GeographicModel> Get(int releaseId, int countryId,
+        public ActionResult<GeographicModel> Get(string publication, int releaseId, string countryId,
             [FromQuery(Name = "schoolType")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return new GeographicModel
-            {
-                Year = 201617,
-                Level = "National",
-                Country = new Country
-                {
-                    Code = "E92000001",
-                    Name = "England"
-                },
-                Region = null,
-                LocalAuthority = null,
-                School = new School
-                {
-                    laestab = 2013614
-                },
-                SchoolType = "Total",
-                Attributes = new Dictionary<string, int>()
-            };
+            return new CsvReader().GeoLevels(publication + "_geoglevels").FirstOrDefault(x => x.Country.Code == countryId && x.Level.ToLower() == "national");
         }
 
         [HttpGet("{countryId}/regions")]
-        public ActionResult<List<GeographicModel>> GetRegions(int releaseId, int countryId,
+        public ActionResult<List<GeographicModel>> GetRegions(string publication,  string countryId,
             [FromQuery(Name = "schoolType")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return Enumerable.Empty<GeographicModel>().ToList();
+            return new CsvReader().GeoLevels(publication + "_geoglevels").Where(x => x.Country.Code == countryId && x.Level.ToLower() == "region").ToList();
         }
 
         [HttpGet("{countryId}/local-authorities")]
-        public ActionResult<List<GeographicModel>> GetLocalAuthorities(int releaseId, int countryId,
+        public ActionResult<List<GeographicModel>> GetLocalAuthorities(string publication, string countryId,
             [FromQuery(Name = "schoolType")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return Enumerable.Empty<GeographicModel>().ToList();
+            return new CsvReader().GeoLevels(publication + "_geoglevels").Where(x => x.Country.Code == countryId && x.Level.ToLower() == "local authority")
+                .ToList();
         }
 
         [HttpGet("{countryId}/schools")]
-        public ActionResult<List<GeographicModel>> getSchools(int releaseId, int countryId,
+        public ActionResult<List<GeographicModel>> getSchools(string publication, string countryId,
             [FromQuery(Name = "schoolType")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return Enumerable.Empty<GeographicModel>().ToList();
+            return new CsvReader().GeoLevels(publication + "_geoglevels").Where(x => x.Country.Code == countryId && x.Level.ToLower() == "school").ToList();
         }
     }
 }
