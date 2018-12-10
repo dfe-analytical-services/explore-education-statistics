@@ -23,7 +23,7 @@ namespace DataApi.Controllers
             [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return _csvReader.GeoLevels(publication + "_geoglevels")
+            return _csvReader.GeoLevels(publication + "_geoglevels", attributes)
                 .Where(x =>
                     (string.IsNullOrEmpty(schoolType) ||
                      string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
@@ -38,7 +38,7 @@ namespace DataApi.Controllers
             [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return _csvReader.GeoLevels(publication + "_geoglevels")
+            return _csvReader.GeoLevels(publication + "_geoglevels", attributes)
                 .FirstOrDefault(x =>
                     (string.IsNullOrEmpty(schoolType) ||
                      string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
@@ -48,9 +48,10 @@ namespace DataApi.Controllers
         }
 
         [HttpGet("{localAuthorityId}/characteristics")]
-        public ActionResult<List<LaCharacteristicModel>> GetCharacteristics(string publication, string localAuthorityId)
+        public ActionResult<List<LaCharacteristicModel>> GetCharacteristics(string publication, string localAuthorityId,
+            [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return _csvReader.LaCharacteristics(publication + "_lacharacteristics")
+            return _csvReader.LaCharacteristics(publication + "_lacharacteristics", attributes)
                 .Where(x =>
                     x.LocalAuthority.Code == localAuthorityId || x.LocalAuthority.Old_Code == localAuthorityId)
                 .ToList();
@@ -62,7 +63,7 @@ namespace DataApi.Controllers
             [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return _csvReader.GeoLevels(publication + "_geoglevels")
+            return _csvReader.GeoLevels(publication + "_geoglevels", attributes)
                 .Where(x =>
                     (string.IsNullOrEmpty(schoolType) ||
                      string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&

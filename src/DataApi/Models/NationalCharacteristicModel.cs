@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace DataApi.Models
 {
-    public class NationalCharacteristicModel : DataModel
+    public class NationalCharacteristicModel : DataModel<NationalCharacteristicModel>
     {
         public NationalCharacteristicModel()
         {

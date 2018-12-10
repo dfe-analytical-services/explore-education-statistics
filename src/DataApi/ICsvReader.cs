@@ -5,10 +5,10 @@ namespace DataApi
 {
     public interface ICsvReader
     {
-        IEnumerable<GeographicModel> GeoLevels(string publication);
+        IEnumerable<GeographicModel> GeoLevels(string publication, List<string> attributes);
 
-        IEnumerable<LaCharacteristicModel> LaCharacteristics(string publication);
+        IEnumerable<LaCharacteristicModel> LaCharacteristics(string publication, List<string> attributes);
 
-        IEnumerable<NationalCharacteristicModel> NationalCharacteristics(string publication);
+        IEnumerable<NationalCharacteristicModel> NationalCharacteristics(string publication, List<string> attributes);
     }
 }

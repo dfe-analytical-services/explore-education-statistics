@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace DataApi.Models
 {
-    public class LaCharacteristicModel : DataModel
+    public class LaCharacteristicModel : DataModel<LaCharacteristicModel>
     {
         public LaCharacteristicModel()
         {

@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DataApi.Models
 {
-    public class GeographicModel : DataModel
+    public class GeographicModel : DataModel<GeographicModel>
     {
         public GeographicModel()
         {
@@ -23,14 +22,5 @@ namespace DataApi.Models
         public LocalAuthority LocalAuthority { get; set; }
 
         public School School { get; set; }
-
-        public Dictionary<string, string> FilteredAttributes(List<string> attributes)
-        {
-            var filtered = from kvp in Attributes
-                where attributes.Contains(kvp.Value)
-                select kvp;
-
-            return filtered.ToDictionary(pair => pair.Key, pair => pair.Value);
-        }
     }
 }

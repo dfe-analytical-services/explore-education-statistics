@@ -9,7 +9,7 @@ namespace DataApi
     public class CsvReader : ICsvReader
     {
         
-        public IEnumerable<GeographicModel> GeoLevels(string publication)
+        public IEnumerable<GeographicModel> GeoLevels(string publication, List<string> attributes)
         {
             var directory = Directory.GetCurrentDirectory() + "/data/";
             var file = publication + ".csv";
@@ -22,12 +22,17 @@ namespace DataApi
             var data = File.ReadAllLines(path)
                 .Skip(1)
                 .Select(x => GeographicFromCsv(x, headers)).ToList();
-
+            
+            if (attributes.Count > 0)
+            {
+                data = data.Select(x => x.WithFilteredAttributes(attributes)).ToList();
+            }
+            
             Console.WriteLine(data.Count() +" rows");
             return data;
         }
         
-        public IEnumerable<LaCharacteristicModel> LaCharacteristics(string publication)
+        public IEnumerable<LaCharacteristicModel> LaCharacteristics(string publication, List<string> attributes)
         {
             var directory = Directory.GetCurrentDirectory() + "/data/";
             var file = publication + ".csv";
@@ -41,11 +46,17 @@ namespace DataApi
                 .Skip(1)
                 .Select(x => LaCharacteristicFromCsv(x, headers)).ToList();
 
+
+            if (attributes.Count > 0)
+            {
+                data = data.Select(x => x.WithFilteredAttributes(attributes)).ToList();
+            }
+
             Console.WriteLine(data.Count() +" rows");
             return data;
         }
         
-        public IEnumerable<NationalCharacteristicModel> NationalCharacteristics(string publication)
+        public IEnumerable<NationalCharacteristicModel> NationalCharacteristics(string publication, List<string> attributes)
         {
             var directory = Directory.GetCurrentDirectory() + "/data/";
             var file = publication + ".csv";
@@ -59,6 +70,11 @@ namespace DataApi
                 .Skip(1)
                 .Select(x => NationalCharacteristicFromCsv(x, headers)).ToList();
 
+            if (attributes.Count > 0)
+            {
+                data = data.Select(x => x.WithFilteredAttributes(attributes)).ToList();
+            }
+            
             Console.WriteLine(data.Count() +" rows");
             return data;
         }

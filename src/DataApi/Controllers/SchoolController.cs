@@ -23,7 +23,7 @@ namespace DataApi.Controllers
             [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return _csvReader.GeoLevels(publication + "_geoglevels")
+            return _csvReader.GeoLevels(publication + "_geoglevels", attributes)
                 .Where(x =>
                     (string.IsNullOrEmpty(schoolType) ||
                      string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
@@ -34,9 +34,10 @@ namespace DataApi.Controllers
 
         [HttpGet("{schoolId}")]
         public ActionResult<GeographicModel> Get(string publication, string schoolId,
-            [FromQuery(Name = "year")] int? year)
+            [FromQuery(Name = "year")] int? year,
+            [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return _csvReader.GeoLevels(publication + "_geoglevels")
+            return _csvReader.GeoLevels(publication + "_geoglevels", attributes)
                 .FirstOrDefault(x =>
                     (!year.HasValue || x.Year == year) &&
                     x.School.laestab == schoolId
