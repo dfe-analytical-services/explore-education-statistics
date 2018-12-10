@@ -12,7 +12,7 @@ namespace DataApi.Tests.Controller
         
         public CountryControllerTests()
         {
-            var reader = new CsvReader("../../../../../");
+            var reader = new CsvReader("../../../../../src/DataApi");
             _controller = new CountryController(reader);
         }
         

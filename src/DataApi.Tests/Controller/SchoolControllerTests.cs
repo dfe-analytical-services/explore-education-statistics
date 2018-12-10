@@ -12,7 +12,7 @@ namespace DataApi.Tests.Controller
         
         public SchoolControllerTests()
         {
-            var reader = new CsvReader("../../../../../");
+            var reader = new CsvReader("../../../../../src/DataApi/");
             _controller = new SchoolController(reader);
         }
         

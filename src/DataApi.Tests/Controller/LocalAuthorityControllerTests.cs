@@ -12,7 +12,7 @@ namespace DataApi.Tests.Controller
         
         public LocalAuthorityControllerTests()
         {
-            var reader = new CsvReader("../../../../../");
+            var reader = new CsvReader("../../../../../src/DataApi");
             _controller = new LocalAuthorityController(reader);
         }
         
