@@ -1,5 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DataApi.Controllers;
+using DataApi.Models;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
@@ -7,31 +11,30 @@ namespace DataApi.Tests.Controller
 {
     public class CountryControllerTests
     {
+        private CountryController _controller;
+        
+        public CountryControllerTests()
+        {
+            var reader = new CsvReader("../../../../../");
+            _controller = new CountryController(reader);
+        }
+        
         [Fact]
         public void List_Countries()
         {
-            // Arrange
-            var reader = new CsvReader();
-            var controller = new CountryController(reader);
-
-            // Act
-            var result =  controller.List("schoolpupnum", null, null);
+            var result =  _controller.List("schpupnum", null, null, null);
             
-            Assert.IsAssignableFrom<ActionResult>(result);
+            var items = Assert.IsType<List<GeographicModel>>(result.Value);
+            Assert.True(items.Count() > 1);
         }
         
         [Fact]
         public void Get_Country()
         {
-            // Arrange
-            var reader = new CsvReader();
-            var controller = new CountryController(reader);
-
-            // Act
-            var result = controller.Get("schoolpupnum", 0, "E92000001", null, null);
+            var result = _controller.Get("schpupnum","E92000001", null, null, null);
             
-            Assert.IsAssignableFrom<ActionResult>(result);
-        }
-        
+            var item = Assert.IsType<GeographicModel>(result.Value);
+            Assert.Equal("England", item.Country.Name);
+        }  
     }
 }

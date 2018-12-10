@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DataApi.Controllers;
 using DataApi.Models;
@@ -8,34 +10,31 @@ namespace DataApi.Tests.Controller
 {
     public class RegionControllerTests
     {
+        private readonly RegionController _controller;
+        
+        public RegionControllerTests()
+        {
+            var reader = new CsvReader("../../../../../");
+            _controller = new RegionController(reader);
+        }
+        
         [Fact]
         public void List_Regions()
         {
-            // Arrange
-            var reader = new CsvReader();
-            var controller = new RegionController(reader);
-
-            // Act
-            var result =  controller.List("schoolpupnum", null, null);
+            var result =  _controller.List("schpupnum", null, null, null);
             
-            Assert.IsAssignableFrom<ActionResult>(result);
-            
-            // expect more than one result
+            var items = Assert.IsType<List<GeographicModel>>(result.Value);
+            Assert.True(items.Count() > 1);
         }
         
         [Fact]
         public void Get_Region()
         {
-            // Arrange
-            var reader = new CsvReader();
-            var controller = new RegionController(reader);
-
-            // Act
-            var result = controller.Get("schoolpupnum", "E12000001", null, null);
+            var result = _controller.Get("schpupnum", "E12000001", null, null, null);
             
-            Assert.IsAssignableFrom<ActionResult>(result);
-            
-            // expect region name to be "North East"
+            var item = Assert.IsType<GeographicModel>(result.Value);
+            Assert.Equal("England", item.Country.Name);
+            Assert.Equal("North East", item.Region.Name);
         }
         
     }

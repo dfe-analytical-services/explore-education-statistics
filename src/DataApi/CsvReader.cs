@@ -3,17 +3,26 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using DataApi.Models;
+using Microsoft.AspNetCore.Identity.UI.Pages.Internal.Account;
 
 namespace DataApi
 {
     public class CsvReader : ICsvReader
     {
+        private readonly string _path;
+        
+        public CsvReader(string path = "")
+        {
+            _path = path;
+        }
         
         public IEnumerable<GeographicModel> GeoLevels(string publication)
         {
-            var directory = Directory.GetCurrentDirectory() + "/data/";
             var file = publication + ".csv";
-            var path = directory + file;
+            var directory = Directory.GetCurrentDirectory();
+            var newPath = Path.GetFullPath(Path.Combine(directory, _path));
+            
+            var path = newPath + "/data/" + file;
             
             Console.WriteLine("Reading data from:" + directory + file);
 
