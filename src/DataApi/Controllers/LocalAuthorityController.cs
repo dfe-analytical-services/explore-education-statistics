@@ -37,7 +37,7 @@ namespace DataApi.Controllers
         [HttpGet("{localAuthorityId}/characteristics")]
         public ActionResult<List<LaCharacteristicModel>> GetCharacteristics(string publication, string localAuthorityId)
         {
-            return new CsvReader().LaCharacteristics(publication + "_lacharacteristics").Where(x =>
+            return _csvReader.LaCharacteristics(publication + "_lacharacteristics").Where(x =>
                 (x.LocalAuthority.Code == localAuthorityId || x.LocalAuthority.Old_Code == localAuthorityId)).ToList();
         }
 

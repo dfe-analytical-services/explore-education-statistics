@@ -37,8 +37,8 @@ namespace DataApi.Controllers
         [HttpGet("{countryId}/characteristics")]
         public ActionResult<List<NationalCharacteristicModel>> GetCharacteristics(string publication, string countryId)
         {
-            return new CsvReader().NationalCharacteristics(publication + "_natcharacteristics").Where(x =>
-                (x.Country.Code == countryId)).ToList();
+            return _csvReader.NationalCharacteristics(publication + "_natcharacteristics").Where(x =>
+                x.Country.Code == countryId).ToList();
         }
 
         [HttpGet("{countryId}/regions")]
@@ -61,7 +61,7 @@ namespace DataApi.Controllers
         }
 
         [HttpGet("{countryId}/schools")]
-        public ActionResult<List<GeographicModel>> getSchools(string publication, string countryId,
+        public ActionResult<List<GeographicModel>> GetSchools(string publication, string countryId,
             [FromQuery(Name = "schoolType")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {

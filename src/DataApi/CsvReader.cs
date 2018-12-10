@@ -6,7 +6,7 @@ using DataApi.Models;
 
 namespace DataApi
 {
-    public class CsvReader
+    public class CsvReader : ICsvReader
     {
         
         public IEnumerable<GeographicModel> GeoLevels(string publication)
