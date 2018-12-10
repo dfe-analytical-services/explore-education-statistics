@@ -2,24 +2,25 @@ using System.Collections.Generic;
 
 namespace DataApi.Models
 {
-    public class LaCharacteristicModel
+    public class LaCharacteristicModel : DataModel
     {
         public LaCharacteristicModel()
         {
         }
 
-        public int Year { get; set; }
-
-        public string Level { get; set; }
-
-        public Country Country { get; set; }
+        public LaCharacteristicModel(int year, string level, Country country, string schoolType, Region region,
+            LocalAuthority localAuthority, Dictionary<string, string> characteristics) :
+            base(year, level, country, schoolType)
+        {
+            Region = region;
+            LocalAuthority = localAuthority;
+            Characteristics = characteristics;
+        }
 
         public Region Region { get; set; }
 
         public LocalAuthority LocalAuthority { get; set; }
 
-        public string SchoolType { get; set; }
-        
         public Dictionary<string, string> Characteristics { get; set; }
-     }
+    }
 }

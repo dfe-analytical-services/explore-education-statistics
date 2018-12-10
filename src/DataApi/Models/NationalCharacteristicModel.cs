@@ -2,20 +2,18 @@ using System.Collections.Generic;
 
 namespace DataApi.Models
 {
-    public class NationalCharacteristicModel
+    public class NationalCharacteristicModel : DataModel
     {
         public NationalCharacteristicModel()
         {
         }
 
-        public int Year { get; set; }
+        public NationalCharacteristicModel(int year, string level, Country country, string schoolType,
+            Dictionary<string, string> characteristics) : base(year, level, country, schoolType)
+        {
+            Characteristics = characteristics;
+        }
 
-        public string Level { get; set; }
-
-        public Country Country { get; set; }
-
-        public string SchoolType { get; set; }
-        
         public Dictionary<string, string> Characteristics { get; set; }
-     }
+    }
 }

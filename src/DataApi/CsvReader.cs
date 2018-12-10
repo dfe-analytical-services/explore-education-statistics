@@ -114,7 +114,7 @@ namespace DataApi
         {
             var headerValues = new string[] {"year","level","country_code","country_name","region_code","region_name","old_la_code","new_la_code","la_name","school_type"};
             var values = csvLine.Split(',');
-            var model = new LaCharacteristicModel()
+            var model = new LaCharacteristicModel
             {
                 Year = int.Parse(values[headers.FindIndex(h => h.Contains("year"))]),
                 Level = values[headers.FindIndex(h => h.Contains("level"))],
@@ -154,7 +154,7 @@ namespace DataApi
         {
             var headerValues = new string[] {"year","level","country_code","country_name","region_code","region_name","old_la_code","new_la_code","la_name","school_type"};
             var values = csvLine.Split(',');
-            var model = new NationalCharacteristicModel()
+            var model = new NationalCharacteristicModel
             {
                 Year = int.Parse(values[headers.FindIndex(h => h.Contains("year"))]),
                 Level = values[headers.FindIndex(h => h.Contains("level"))],

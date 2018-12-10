@@ -2,29 +2,21 @@ using System.Collections.Generic;
 
 namespace DataApi.Models
 {
-    public class GeographicModel
+    public class GeographicModel : DataModel
     {
         public GeographicModel()
         {
         }
 
-        public GeographicModel(int year, string level, Country country, Region region, LocalAuthority localAuthority, School school, string schoolType, Dictionary<string, string> attributes)
+        public GeographicModel(int year, string level, Country country, string schoolType, Region region,
+            LocalAuthority localAuthority, School school, Dictionary<string, string> attributes) :
+            base(year, level, country, schoolType)
         {
-            Year = year;
-            Level = level;
-            Country = country;
             Region = region;
             LocalAuthority = localAuthority;
             School = school;
-            SchoolType = schoolType;
             Attributes = attributes;
         }
-
-        public int Year { get; set; }
-
-        public string Level { get; set; }
-
-        public Country Country { get; set; }
 
         public Region Region { get; set; }
 
@@ -32,8 +24,6 @@ namespace DataApi.Models
 
         public School School { get; set; }
 
-        public string SchoolType { get; set; }
-        
         public Dictionary<string, string> Attributes { get; set; }
-     }
+    }
 }
