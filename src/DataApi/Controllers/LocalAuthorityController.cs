@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DataApi.Models;
@@ -19,36 +20,56 @@ namespace DataApi.Controllers
         [HttpGet]
         public ActionResult<List<GeographicModel>> List(string publication,
             [FromQuery(Name = "schoolType")] string schoolType,
+            [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
             return _csvReader.GeoLevels(publication + "_geoglevels")
-                .Where(x => x.Year == 201617 && x.Level.ToLower() == "local authority").ToList();
+                .Where(x =>
+                    (string.IsNullOrEmpty(schoolType) ||
+                     string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
+                    (!year.HasValue || x.Year == year) &&
+                    x.Level.ToLower() == "local authority"
+                ).ToList();
         }
 
         [HttpGet("{localAuthorityId}")]
         public ActionResult<GeographicModel> Get(string publication, string localAuthorityId,
             [FromQuery(Name = "schoolType")] string schoolType,
+            [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return _csvReader.GeoLevels(publication + "_geoglevels").FirstOrDefault(x =>
-                (x.LocalAuthority.Code == localAuthorityId || x.LocalAuthority.Old_Code == localAuthorityId));
+            return _csvReader.GeoLevels(publication + "_geoglevels")
+                .FirstOrDefault(x =>
+                    (string.IsNullOrEmpty(schoolType) ||
+                     string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
+                    (!year.HasValue || x.Year == year) &&
+                    (x.LocalAuthority.Code == localAuthorityId || x.LocalAuthority.Old_Code == localAuthorityId)
+                );
         }
-        
+
         [HttpGet("{localAuthorityId}/characteristics")]
         public ActionResult<List<LaCharacteristicModel>> GetCharacteristics(string publication, string localAuthorityId)
         {
-            return _csvReader.LaCharacteristics(publication + "_lacharacteristics").Where(x =>
-                (x.LocalAuthority.Code == localAuthorityId || x.LocalAuthority.Old_Code == localAuthorityId)).ToList();
+            return _csvReader.LaCharacteristics(publication + "_lacharacteristics")
+                .Where(x =>
+                    x.LocalAuthority.Code == localAuthorityId || x.LocalAuthority.Old_Code == localAuthorityId)
+                .ToList();
         }
 
         [HttpGet("{localAuthorityId}/schools")]
         public ActionResult<List<GeographicModel>> GetSchools(string publication, string localAuthorityId,
             [FromQuery(Name = "schoolType")] string schoolType,
+            [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return _csvReader.GeoLevels(publication + "_geoglevels").Where(x =>
-                (x.LocalAuthority.Code == localAuthorityId || x.LocalAuthority.Old_Code == localAuthorityId) &&
-                x.Level.ToLower() == "school").ToList();
+            return _csvReader.GeoLevels(publication + "_geoglevels")
+                .Where(x =>
+                    (string.IsNullOrEmpty(schoolType) ||
+                     string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
+                    (!year.HasValue || x.Year == year) &&
+                    (x.LocalAuthority.Code == localAuthorityId || x.LocalAuthority.Old_Code == localAuthorityId) &&
+                    x.Level.ToLower() == "school"
+                ).ToList();
         }
     }
 }
