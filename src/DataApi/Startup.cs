@@ -34,6 +34,8 @@ namespace DataApi
                 var filePath = Path.Combine(AppContext.BaseDirectory, "DataApi.xml");
                 c.IncludeXmlComments(filePath);
             });
+            
+            services.AddSingleton<ICsvReader, CsvReader>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

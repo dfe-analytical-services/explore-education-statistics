@@ -9,6 +9,13 @@ namespace DataApi.Controllers
     [ApiController]
     public class PublicationController : ControllerBase
     {
+        private readonly ICsvReader _csvReader;
+
+        public PublicationController(ICsvReader csvReader)
+        {
+            _csvReader = csvReader;
+        }
+        
         [HttpGet("{publicationId}")]
         public ActionResult<List<GeographicModel>> Get(int publicationId)
         {

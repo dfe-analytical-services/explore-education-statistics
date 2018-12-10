@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.Xml;
 using DataApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,12 +9,19 @@ namespace DataApi.Controllers
     [ApiController]
     public class RegionController : ControllerBase
     {
+        private readonly ICsvReader _csvReader;
+
+        public RegionController(ICsvReader csvReader)
+        {
+            _csvReader = csvReader;
+        }
+
         [HttpGet]
         public ActionResult<List<GeographicModel>> List(string publication,
             [FromQuery(Name = "school-type")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return new CsvReader().GeoLevels(publication + "_geoglevels").Where(x => x.Level.ToLower() == "region").ToList();
+            return _csvReader.GeoLevels(publication + "_geoglevels").Where(x => x.Level.ToLower() == "region").ToList();
         }
 
         [HttpGet("{regionId}")]
@@ -23,8 +29,7 @@ namespace DataApi.Controllers
             [FromQuery(Name = "school-type")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return new CsvReader().GeoLevels(publication + "_geoglevels").FirstOrDefault(x => x.Region.Code == regionId);
-
+            return _csvReader.GeoLevels(publication + "_geoglevels").FirstOrDefault(x => x.Region.Code == regionId);
         }
 
         [HttpGet("{regionId}/local-authorities")]
@@ -32,7 +37,8 @@ namespace DataApi.Controllers
             [FromQuery(Name = "school-type")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return new CsvReader().GeoLevels(publication + "_geoglevels").Where(x => x.Region.Code == regionId && x.Level.ToLower() == "local authority").ToList();
+            return _csvReader.GeoLevels(publication + "_geoglevels")
+                .Where(x => x.Region.Code == regionId && x.Level.ToLower() == "local authority").ToList();
         }
 
         [HttpGet("{regionId}/schools")]
@@ -40,7 +46,8 @@ namespace DataApi.Controllers
             [FromQuery(Name = "school-type")] string schoolType,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return new CsvReader().GeoLevels(publication + "_geoglevels").Where(x => x.Region.Code == regionId && x.Level.ToLower() == "school").ToList();
+            return _csvReader.GeoLevels(publication + "_geoglevels")
+                .Where(x => x.Region.Code == regionId && x.Level.ToLower() == "school").ToList();
         }
     }
 }

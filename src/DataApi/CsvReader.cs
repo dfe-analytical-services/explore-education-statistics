@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using DataApi.Models;
-using Microsoft.EntityFrameworkCore.Internal;
-using Remotion.Linq.Clauses;
 
 namespace DataApi
 {
