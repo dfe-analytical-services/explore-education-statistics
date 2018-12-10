@@ -51,8 +51,10 @@ namespace DataApi.Controllers
         [HttpGet("{countryId}/characteristics")]
         public ActionResult<List<NationalCharacteristicModel>> GetCharacteristics(string publication, string countryId)
         {
-            return _csvReader.NationalCharacteristics(publication + "_natcharacteristics").Where(x =>
-                x.Country.Code == countryId).ToList();
+            return _csvReader.NationalCharacteristics(publication + "_natcharacteristics")
+                .Where(x =>
+                    x.Country.Code == countryId
+                ).ToList();
         }
 
         [HttpGet("{countryId}/regions")]
@@ -98,7 +100,8 @@ namespace DataApi.Controllers
                     (string.IsNullOrEmpty(schoolType) ||
                      string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
                     (!year.HasValue || x.Year == year) &&
-                    x.Country.Code == countryId && x.Level.ToLower() == "school"
+                    x.Country.Code == countryId
+                    && x.Level.ToLower() == "school"
                 ).ToList();
         }
     }
