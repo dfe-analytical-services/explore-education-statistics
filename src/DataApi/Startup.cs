@@ -25,7 +25,10 @@ namespace DataApi
                 config.RespectBrowserAcceptHeader = true;
                 config.ReturnHttpNotAcceptable = true;
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
+            
+            // Adds Brotli and Gzip compressing
+            services.AddResponseCompression();
+            
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
@@ -49,7 +52,9 @@ namespace DataApi
             {
                 app.UseHsts();
             }
-
+            // Adds Brotli and Gzip compressing
+            app.UseResponseCompression();
+            
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
