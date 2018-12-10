@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using DataApi.Controllers;
 using DataApi.Models;
-using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 namespace DataApi.Tests.Controller
@@ -21,7 +19,7 @@ namespace DataApi.Tests.Controller
         [Fact]
         public void List_Schools()
         {
-            var result =  _controller.List("schpupnum", null, null, null);
+            var result =  _controller.List("schpupnum", null, null, new List<string>());
             
             var items = Assert.IsType<List<GeographicModel>>(result.Value);
             Assert.True(items.Count() > 1);
@@ -30,7 +28,7 @@ namespace DataApi.Tests.Controller
         [Fact]
         public void Get_School()
         {
-            var result = _controller.Get("schpupnum", "2013614", null);
+            var result = _controller.Get("schpupnum", "2013614", null, new List<string>());
             
             var item = Assert.IsType<GeographicModel>(result.Value);
             Assert.Equal("England", item.Country.Name);
