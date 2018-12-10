@@ -27,6 +27,13 @@ namespace DataApi.Controllers
         {
             return new CsvReader().GeoLevels(publication + "_geoglevels").FirstOrDefault(x => x.Country.Code == countryId && x.Level.ToLower() == "national");
         }
+        
+        [HttpGet("{countryId}/characteristics")]
+        public ActionResult<List<NationalCharacteristicModel>> GetCharacteristics(string publication, string countryId)
+        {
+            return new CsvReader().NationalCharacteristics(publication + "_natcharacteristics").Where(x =>
+                (x.Country.Code == countryId)).ToList();
+        }
 
         [HttpGet("{countryId}/regions")]
         public ActionResult<List<GeographicModel>> GetRegions(string publication,  string countryId,

@@ -25,6 +25,13 @@ namespace DataApi.Controllers
             return new CsvReader().GeoLevels(publication + "_geoglevels").FirstOrDefault(x => (x.LocalAuthority.Code == localAuthorityId || x.LocalAuthority.Old_Code == localAuthorityId));
 
         }
+        
+        [HttpGet("{localAuthorityId}/characteristics")]
+        public ActionResult<List<LaCharacteristicModel>> GetCharacteristics(string publication, string localAuthorityId)
+        {
+            return new CsvReader().LaCharacteristics(publication + "_lacharacteristics").Where(x =>
+                (x.LocalAuthority.Code == localAuthorityId || x.LocalAuthority.Old_Code == localAuthorityId)).ToList();
+        }
 
         [HttpGet("{localAuthorityId}/schools")]
         public ActionResult<List<GeographicModel>> GetSchools(string publication, string localAuthorityId,
