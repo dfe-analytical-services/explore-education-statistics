@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DataApi.Models
 {
@@ -8,14 +9,13 @@ namespace DataApi.Models
         {
         }
 
-        public GeographicModel(int year, string level, Country country, string schoolType, Region region,
-            LocalAuthority localAuthority, School school, Dictionary<string, string> attributes) :
-            base(year, level, country, schoolType)
+        public GeographicModel(int year, string level, Country country, string schoolType,
+            Dictionary<string, string> attributes, Region region, LocalAuthority localAuthority, School school) :
+            base(year, level, country, schoolType, attributes)
         {
             Region = region;
             LocalAuthority = localAuthority;
             School = school;
-            Attributes = attributes;
         }
 
         public Region Region { get; set; }
@@ -24,6 +24,13 @@ namespace DataApi.Models
 
         public School School { get; set; }
 
-        public Dictionary<string, string> Attributes { get; set; }
+        public Dictionary<string, string> FilteredAttributes(List<string> attributes)
+        {
+            var filtered = from kvp in Attributes
+                where attributes.Contains(kvp.Value)
+                select kvp;
+
+            return filtered.ToDictionary(pair => pair.Key, pair => pair.Value);
+        }
     }
 }

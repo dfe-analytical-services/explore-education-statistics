@@ -134,9 +134,9 @@ namespace DataApi
                     Code = values[headers.FindIndex(h => h.Contains("new_la_code"))], 
                     Name = values[headers.FindIndex(h => h.Contains("la_name"))]
                 },
-                SchoolType = values[headers.FindIndex(h => h.Contains("school_type"))], 
+                SchoolType = values[headers.FindIndex(h => h.Contains("school_type"))],
+                Attributes = new Dictionary<string, string>(),
                 Characteristics = new Dictionary<string, string>()
-               
             };
 
             for (var i = 0; i < values.Count(); i++) 
@@ -163,9 +163,9 @@ namespace DataApi
                     Code = values[headers.FindIndex(h => h.Contains("country_code"))],                    
                     Name = values[headers.FindIndex(h => h.Contains("country_name"))]
                 },
-                SchoolType = values[headers.FindIndex(h => h.Contains("school_type"))], 
+                SchoolType = values[headers.FindIndex(h => h.Contains("school_type"))],
+                Attributes = new Dictionary<string, string>(),
                 Characteristics = new Dictionary<string, string>()
-               
             };
 
             for (var i = 0; i < values.Count(); i++) 
