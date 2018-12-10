@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DataApi.Models;
@@ -19,21 +20,34 @@ namespace DataApi.Controllers
         [HttpGet]
         public ActionResult<List<GeographicModel>> List(string publication,
             [FromQuery(Name = "schoolType")] string schoolType,
-            [FromQuery(Name = "attributes")] List<string> attributes)
-        {
-            return _csvReader.GeoLevels(publication + "_geoglevels").Where(x => x.Level.ToLower() == "national")
-                .ToList();
-        }
-
-        [HttpGet("{countryId}")]
-        public ActionResult<GeographicModel> Get(string publication, int releaseId, string countryId,
-            [FromQuery(Name = "schoolType")] string schoolType,
+            [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
             return _csvReader.GeoLevels(publication + "_geoglevels")
-                .FirstOrDefault(x => x.Country.Code == countryId && x.Level.ToLower() == "national");
+                .Where(x =>
+                    (string.IsNullOrEmpty(schoolType) ||
+                     string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
+                    (!year.HasValue || x.Year == year) &&
+                    x.Level.ToLower() == "national"
+                ).ToList();
         }
-        
+
+        [HttpGet("{countryId}")]
+        public ActionResult<GeographicModel> Get(string publication, string countryId,
+            [FromQuery(Name = "schoolType")] string schoolType,
+            [FromQuery(Name = "year")] int? year,
+            [FromQuery(Name = "attributes")] List<string> attributes)
+        {
+            return _csvReader.GeoLevels(publication + "_geoglevels")
+                .FirstOrDefault(x =>
+                    (string.IsNullOrEmpty(schoolType) ||
+                     string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
+                    (!year.HasValue || x.Year == year) &&
+                    x.Country.Code == countryId &&
+                    x.Level.ToLower() == "national"
+                );
+        }
+
         [HttpGet("{countryId}/characteristics")]
         public ActionResult<List<NationalCharacteristicModel>> GetCharacteristics(string publication, string countryId)
         {
@@ -44,29 +58,48 @@ namespace DataApi.Controllers
         [HttpGet("{countryId}/regions")]
         public ActionResult<List<GeographicModel>> GetRegions(string publication, string countryId,
             [FromQuery(Name = "schoolType")] string schoolType,
+            [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
             return _csvReader.GeoLevels(publication + "_geoglevels")
-                .Where(x => x.Country.Code == countryId && x.Level.ToLower() == "region").ToList();
+                .Where(x =>
+                    (string.IsNullOrEmpty(schoolType) ||
+                     string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
+                    (!year.HasValue || x.Year == year) &&
+                    x.Country.Code == countryId &&
+                    x.Level.ToLower() == "region"
+                ).ToList();
         }
 
         [HttpGet("{countryId}/local-authorities")]
         public ActionResult<List<GeographicModel>> GetLocalAuthorities(string publication, string countryId,
             [FromQuery(Name = "schoolType")] string schoolType,
+            [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return _csvReader.GeoLevels(publication + "_geoglevels").Where(x =>
-                    x.Country.Code == countryId && x.Level.ToLower() == "local authority")
-                .ToList();
+            return _csvReader.GeoLevels(publication + "_geoglevels")
+                .Where(x =>
+                    (string.IsNullOrEmpty(schoolType) ||
+                     string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
+                    (!year.HasValue || x.Year == year) &&
+                    x.Country.Code == countryId &&
+                    x.Level.ToLower() == "local authority"
+                ).ToList();
         }
 
         [HttpGet("{countryId}/schools")]
         public ActionResult<List<GeographicModel>> GetSchools(string publication, string countryId,
             [FromQuery(Name = "schoolType")] string schoolType,
+            [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
             return _csvReader.GeoLevels(publication + "_geoglevels")
-                .Where(x => x.Country.Code == countryId && x.Level.ToLower() == "school").ToList();
+                .Where(x =>
+                    (string.IsNullOrEmpty(schoolType) ||
+                     string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
+                    (!year.HasValue || x.Year == year) &&
+                    x.Country.Code == countryId && x.Level.ToLower() == "school"
+                ).ToList();
         }
     }
 }
