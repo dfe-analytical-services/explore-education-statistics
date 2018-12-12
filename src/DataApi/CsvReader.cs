@@ -42,11 +42,13 @@ namespace DataApi
         
         public IEnumerable<LaCharacteristicModel> LaCharacteristics(string publication, List<string> attributes)
         {
-            var directory = Directory.GetCurrentDirectory() + "/data/";
             var file = publication + ".csv";
-            var path = directory + file;
+            var directory = Directory.GetCurrentDirectory();
+            var newPath = Path.GetFullPath(Path.Combine(directory, _path));
             
-            Console.WriteLine("Reading data from:" + directory + file);
+            var path = newPath + "/wwwroot/data/" + file;
+            
+            Console.WriteLine("Reading data from:" + path);
 
             var headers = File.ReadLines(path).First().Split(',').ToList();
             
@@ -66,11 +68,11 @@ namespace DataApi
         
         public IEnumerable<NationalCharacteristicModel> NationalCharacteristics(string publication, List<string> attributes)
         {
-            var directory = Directory.GetCurrentDirectory() + "/data/";
             var file = publication + ".csv";
-            var path = directory + file;
+            var directory = Directory.GetCurrentDirectory();
+            var newPath = Path.GetFullPath(Path.Combine(directory, _path));
             
-            Console.WriteLine("Reading data from:" + directory + file);
+            var path = newPath + "/wwwroot/data/" + file;
 
             var headers = File.ReadLines(path).First().Split(',').ToList();
             
