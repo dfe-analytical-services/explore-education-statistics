@@ -23,7 +23,7 @@ namespace DataApi
             
             var path = newPath + "/data/" + file;
             
-            Console.WriteLine("Reading data from:" + directory + file);
+            Console.WriteLine("Reading data from:" + path);
 
             var headers = File.ReadLines(path).First().Split(',').ToList();
             
