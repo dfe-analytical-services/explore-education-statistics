@@ -21,7 +21,7 @@ namespace DataApi
             var directory = Directory.GetCurrentDirectory();
             var newPath = Path.GetFullPath(Path.Combine(directory, _path));
             
-            var path = newPath + "/data/" + file;
+            var path = newPath + "/wwwroot/data/" + file;
             
             Console.WriteLine("Reading data from:" + path);
 
