@@ -1,4 +1,4 @@
-year,level,country_code,country,school_type,characteristic_desc,characteristic_1,characteristic_2,headcount,perm_excl,perm_excl_rate,fixed_excl,fixed_excl_rate,one_plus_fixed,one_plus_fixed_rate
+year,level,country_code,country_name,school_type,characteristic_desc,characteristic_1,characteristic_2,headcount,perm_excl,perm_excl_rate,fixed_excl,fixed_excl_rate,one_plus_fixed,one_plus_fixed_rate
 201617,NATIONAL,E92000001,England,Total,Total,Total,Total,8025075,7720,0.1,381865,4.76,183475,2.29
 201617,NATIONAL,E92000001,England,Total,Gender,Gender_male,Total,4090410,6035,0.15,282485,6.91,133810,3.27
 201617,NATIONAL,E92000001,England,Total,Gender,Gender_female,Total,3934665,1685,0.04,99380,2.53,49665,1.26

@@ -9,12 +9,12 @@ namespace DataApi.Models
         }
 
         public NationalCharacteristicModel(int year, string level, Country country, string schoolType,
-            Dictionary<string, string> attributes, Dictionary<string, string> characteristics) :
+            Dictionary<string, string> attributes, Characteristic characteristic) :
             base(year, level, country, schoolType, attributes)
         {
-            Characteristics = characteristics;
+            Characteristic = characteristic;
         }
 
-        public Dictionary<string, string> Characteristics { get; set; }
+        public Characteristic Characteristic { get; set; }
     }
 }

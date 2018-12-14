@@ -95,39 +95,39 @@ namespace DataApi
             var values = csvLine.Split(',');
             var model = new GeographicModel
             {
-                Year = int.Parse(values[headers.FindIndex(h => h.Contains("year"))]),
-                Level = values[headers.FindIndex(h => h.Contains("level"))],
+                Year = int.Parse(values[headers.FindIndex(h => h.Equals("year"))]),
+                Level = values[headers.FindIndex(h => h.Equals("level"))],
                 Country = new Country
                 {
-                    Code = values[headers.FindIndex(h => h.Contains("country_code"))],                    
-                    Name = values[headers.FindIndex(h => h.Contains("country_name"))]
+                    Code = values[headers.FindIndex(h => h.Equals("country_code"))],                    
+                    Name = values[headers.FindIndex(h => h.Equals("country_name"))]
                 },
                 Region = new Region
                 {
-                    Code = values[headers.FindIndex(h => h.Contains("region_code"))], 
-                    Name = values[headers.FindIndex(h => h.Contains("region_name"))]
+                    Code = values[headers.FindIndex(h => h.Equals("region_code"))], 
+                    Name = values[headers.FindIndex(h => h.Equals("region_name"))]
                 },
                 LocalAuthority = new LocalAuthority
                 {
-                    Old_Code = values[headers.FindIndex(h => h.Contains("old_la_code"))], 
-                    Code = values[headers.FindIndex(h => h.Contains("new_la_code"))], 
-                    Name = values[headers.FindIndex(h => h.Contains("la_name"))]
+                    Old_Code = values[headers.FindIndex(h => h.Equals("old_la_code"))], 
+                    Code = values[headers.FindIndex(h => h.Equals("new_la_code"))], 
+                    Name = values[headers.FindIndex(h => h.Equals("la_name"))]
                 },
                 School = new School
                 {
-                    estab = values[headers.FindIndex(h => h.Contains("estab"))], 
-                    laestab = values[headers.FindIndex(h => h.Contains("laestab"))],
-                    acad_type = values[headers.FindIndex(h => h.Contains("acad_type") || h.Contains("academy_type"))], 
-                    acad_opend = values[headers.FindIndex(h => h.Contains("acad_opendate") || h.Contains("academy_open_date"))],
+                    estab = values[headers.FindIndex(h => h.Equals("estab"))], 
+                    laestab = values[headers.FindIndex(h => h.Equals("laestab"))],
+                    acad_type = values[headers.FindIndex(h => h.Equals("acad_type") || h.Equals("academy_type"))], 
+                    acad_opend = values[headers.FindIndex(h => h.Equals("acad_opendate") || h.Equals("academy_open_date"))],
                 },
-                SchoolType = values[headers.FindIndex(h => h.Contains("school_type"))], 
+                SchoolType = values[headers.FindIndex(h => h.Equals("school_type"))], 
                 Attributes = new Dictionary<string, string>()
                
             };
 
-            for (var i = 0; i < values.Count(); i++) 
+            for (var i = 0; i < values.Length; i++) 
             {
-                if (headerValues.Contains(headers[i]) == false)
+                if (!headerValues.Contains(headers[i]))
                 {
                     model.Attributes.Add(headers[i], values[i]);
                 }
@@ -138,38 +138,42 @@ namespace DataApi
         
         private LaCharacteristicModel LaCharacteristicFromCsv(string csvLine, List<string> headers)
         {
-            var headerValues = new string[] {"year","level","country_code","country_name","region_code","region_name","old_la_code","new_la_code","la_name","school_type"};
+            var headerValues = new string[] {"year","level","country_code","country_name","region_code","region_name","old_la_code","new_la_code","la_name","school_type","characteristic_desc","characteristic"};
             var values = csvLine.Split(',');
             var model = new LaCharacteristicModel
             {
-                Year = int.Parse(values[headers.FindIndex(h => h.Contains("year"))]),
-                Level = values[headers.FindIndex(h => h.Contains("level"))],
+                Year = int.Parse(values[headers.FindIndex(h => h.Equals("year"))]),
+                Level = values[headers.FindIndex(h => h.Equals("level"))],
                 Country = new Country
                 {
-                    Code = values[headers.FindIndex(h => h.Contains("country_code"))],                    
-                    Name = values[headers.FindIndex(h => h.Contains("country_name"))]
+                    Code = values[headers.FindIndex(h => h.Equals("country_code"))],                    
+                    Name = values[headers.FindIndex(h => h.Equals("country_name"))]
                 },
                 Region = new Region
                 {
-                    Code = values[headers.FindIndex(h => h.Contains("region_code"))], 
-                    Name = values[headers.FindIndex(h => h.Contains("region_name"))]
+                    Code = values[headers.FindIndex(h => h.Equals("region_code"))], 
+                    Name = values[headers.FindIndex(h => h.Equals("region_name"))]
                 },
                 LocalAuthority = new LocalAuthority
                 {
-                    Old_Code = values[headers.FindIndex(h => h.Contains("old_la_code"))], 
-                    Code = values[headers.FindIndex(h => h.Contains("new_la_code"))], 
-                    Name = values[headers.FindIndex(h => h.Contains("la_name"))]
+                    Old_Code = values[headers.FindIndex(h => h.Equals("old_la_code"))], 
+                    Code = values[headers.FindIndex(h => h.Equals("new_la_code"))], 
+                    Name = values[headers.FindIndex(h => h.Equals("la_name"))]
                 },
-                SchoolType = values[headers.FindIndex(h => h.Contains("school_type"))],
+                SchoolType = values[headers.FindIndex(h => h.Equals("school_type"))],
                 Attributes = new Dictionary<string, string>(),
-                Characteristics = new Dictionary<string, string>()
+                Characteristic = new Characteristic
+                {
+                    Name = values[headers.FindIndex(h => h.Equals("characteristic"))],
+                    Description = values[headers.FindIndex(h => h.Equals("characteristic_desc"))]
+                }
             };
 
-            for (var i = 0; i < values.Count(); i++) 
+            for (var i = 0; i < values.Length; i++) 
             {
-                if (headerValues.Contains(headers[i]) == false)
+                if (!headerValues.Contains(headers[i]))
                 {
-                    model.Characteristics.Add(headers[i], values[i]);
+                    model.Attributes.Add(headers[i], values[i]);
                 }
             }
 
@@ -178,27 +182,32 @@ namespace DataApi
         
         private NationalCharacteristicModel NationalCharacteristicFromCsv(string csvLine, List<string> headers)
         {
-            var headerValues = new string[] {"year","level","country_code","country_name","region_code","region_name","old_la_code","new_la_code","la_name","school_type"};
+            var headerValues = new string[] {"year","level","country_code","country_name","school_type","characteristic_desc","characteristic_1","characteristic_2"};
             var values = csvLine.Split(',');
             var model = new NationalCharacteristicModel
             {
-                Year = int.Parse(values[headers.FindIndex(h => h.Contains("year"))]),
-                Level = values[headers.FindIndex(h => h.Contains("level"))],
+                Year = int.Parse(values[headers.FindIndex(h => h.Equals("year"))]),
+                Level = values[headers.FindIndex(h => h.Equals("level"))],
                 Country = new Country
                 {
-                    Code = values[headers.FindIndex(h => h.Contains("country_code"))],                    
-                    Name = values[headers.FindIndex(h => h.Contains("country_name"))]
+                    Code = values[headers.FindIndex(h => h.Equals("country_code"))],                    
+                    Name = values[headers.FindIndex(h => h.Equals("country_name"))]
                 },
-                SchoolType = values[headers.FindIndex(h => h.Contains("school_type"))],
+                SchoolType = values[headers.FindIndex(h => h.Equals("school_type"))],
                 Attributes = new Dictionary<string, string>(),
-                Characteristics = new Dictionary<string, string>()
-            };
-
-            for (var i = 0; i < values.Count(); i++) 
-            {
-                if (headerValues.Contains(headers[i]) == false)
+                Characteristic = new Characteristic
                 {
-                    model.Characteristics.Add(headers[i], values[i]);
+                    Name = values[headers.FindIndex(h => h.Equals("characteristic_1"))],
+                    Name2 = values[headers.FindIndex(h => h.Equals("characteristic_2"))],
+                    Description = values[headers.FindIndex(h => h.Equals("characteristic_desc"))]
+                }
+            };
+            
+            for (var i = 0; i < values.Length; i++) 
+            {
+                if (!headerValues.Contains(headers[i]))
+                {
+                    model.Attributes.Add(headers[i], values[i]);
                 }
             }
 

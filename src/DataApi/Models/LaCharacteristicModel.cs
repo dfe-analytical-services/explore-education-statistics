@@ -9,19 +9,18 @@ namespace DataApi.Models
         }
 
         public LaCharacteristicModel(int year, string level, Country country, string schoolType,
-            Dictionary<string, string> attributes, Region region, LocalAuthority localAuthority,
-            Dictionary<string, string> characteristics) :
+            Dictionary<string, string> attributes, Region region, LocalAuthority localAuthority, Characteristic characteristic) :
             base(year, level, country, schoolType, attributes)
         {
             Region = region;
             LocalAuthority = localAuthority;
-            Characteristics = characteristics;
+            Characteristic = characteristic;
         }
 
         public Region Region { get; set; }
 
         public LocalAuthority LocalAuthority { get; set; }
 
-        public Dictionary<string, string> Characteristics { get; set; }
+        public Characteristic Characteristic { get; set; }
     }
 }
