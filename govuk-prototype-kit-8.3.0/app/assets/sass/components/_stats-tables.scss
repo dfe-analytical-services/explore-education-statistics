@@ -1,0 +1,19 @@
+// simple table
+
+table.govuk-table {
+	font-size: 0.9rem;
+	.govuk-table__header, 
+	.govuk-table__cell {
+		padding: 8px 20px 8px 0
+	}
+}
+
+
+.plotly-graph-div {
+//	margin-bottom: 40px;
+	
+	.modebar,
+	.js-plot-link-container{
+		display: none;
+	}
+}
