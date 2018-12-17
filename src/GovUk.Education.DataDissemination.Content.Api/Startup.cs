@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,7 +36,7 @@ namespace GovUk.Education.DataDissemination.Content.Api
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(swag =>
             {
-                swag.SwaggerDoc("v1", new Info { Title = "DfE Data Dissemination API", Version = "v1" });
+                swag.SwaggerDoc("v1", new Info { Title = "Explore education statistics - Content API", Version = "v1" });
             });
 
         }
@@ -61,12 +62,16 @@ namespace GovUk.Education.DataDissemination.Content.Api
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Meta API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Content API V1");
                 c.RoutePrefix = "docs";
             });
 
             app.UseHttpsRedirection();
             app.UseMvc();
+            
+            var option = new RewriteOptions();
+            option.AddRedirect("^$", "docs");
+            app.UseRewriter(option);
         }
 
         private static void UpdateDatabase(IApplicationBuilder app)
