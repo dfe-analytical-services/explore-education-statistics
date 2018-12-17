@@ -1,2 +1,9 @@
-*.~lock*
+bin
+obj
+node_modules
+*.tmp
+.vs
+.idea
 .vscode
+dfe-meta.db
+*.~lock*
