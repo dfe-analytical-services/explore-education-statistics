@@ -10,6 +10,7 @@
     "react-scripts": "2.1.1"
   },
   "scripts": {
+    "copy-assets": "ncp node_modules/govuk-frontend/assets public",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -23,5 +24,8 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "ncp": "^2.0.0"
+  }
 }
