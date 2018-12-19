@@ -1,0 +1,12 @@
+version: "3"
+services:
+  data-api:
+    build: GovUk.Education.ExploreEducationStatistics.Data.Api
+    ports:
+    - "5000:5000"
+    - "5001:5001"
+  content-api:
+    build: GovUk.Education.ExploreEducationStatistics.Content.Api
+    ports:
+    - "5010:5000"
+    - "5011:5001"
