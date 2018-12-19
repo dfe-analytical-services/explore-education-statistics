@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+
+        <IsPackable>false</IsPackable>
+
+        <AssemblyName>GovUk.Education.ExploreEducationStatistics.Data.Api.Tests</AssemblyName>
+
+        <RootNamespace>GovUk.Education.ExploreEducationStatistics.Data.Api.Tests</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+        <PackageReference Include="xunit" Version="2.3.1" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Api\GovUk.Education.ExploreEducationStatistics.Data.Api.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="System.Collections, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+        <HintPath>..\..\..\..\..\..\..\usr\share\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.1.0\ref\netcoreapp2.1\System.Collections.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>
