@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "axios": "^0.18.0",
     "govuk-frontend": "^2.4.1",
     "node-sass": "^4.11.0",
     "react": "^16.6.3",
@@ -11,10 +12,11 @@
     "react-scripts": "2.1.1"
   },
   "scripts": {
-    "prebuild": "npm-run-all clean copy-assets",
+    "prebuild": "npm run assets",
+    "assets": "npm-run-all clean copy-assets",
     "clean": "rimraf public/assets",
-    "copy-assets": "ncp node_modules/govuk-frontend/assets public/assets",
-    "start": "react-scripts start",
+    "copy-assets": "ncp node_modules/govuk-frontend/assets public/assets && ncp node_modules/govuk-frontend/all.js public/all.js",
+    "start": "npm run assets && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
