@@ -39,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 swag.SwaggerDoc("v1", new Info { Title = "Explore education statistics - Content API", Version = "v1" });
             });
 
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,6 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             app.UseHttpsRedirection();
+            app.UseCors(options => options.WithOrigins("http://localhost:3000").AllowAnyMethod());
             app.UseMvc();
             
             var option = new RewriteOptions();
