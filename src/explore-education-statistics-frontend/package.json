@@ -11,7 +11,8 @@
     "react-scripts": "2.1.1"
   },
   "scripts": {
-    "copy-assets": "ncp node_modules/govuk-frontend/assets public",
+    "prebuild": "npm run copy-assets",
+    "copy-assets": "ncp node_modules/govuk-frontend/assets public/assets",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
