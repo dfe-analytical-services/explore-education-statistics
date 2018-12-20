@@ -14,7 +14,7 @@
     "prebuild": "npm run assets",
     "assets": "npm-run-all clean copy-assets",
     "clean": "rimraf public/assets",
-    "copy-assets": "ncp node_modules/govuk-frontend/assets public/assets",
+    "copy-assets": "ncp node_modules/govuk-frontend/assets public/assets && ncp node_modules/govuk-frontend/all.js public/all.js",
     "start": "npm run assets && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
