@@ -16,8 +16,8 @@ services:
     container_name: ees-frontend
     build: explore-education-statistics-frontend
     volumes:
-      - '.:/usr/src/app'
-        #      - '/usr/src/app/node_modules'
+      - './explore-education-statistics-frontend:/usr/src/app'
+      - '/usr/src/app/node_modules'
     ports:
       - '3000:3000'
     environment:
