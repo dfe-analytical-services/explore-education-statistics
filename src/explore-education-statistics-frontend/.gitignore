@@ -1,5 +1,3 @@
-public/assets
-
 # dependencies
 /node_modules
 /.pnp
@@ -10,6 +8,10 @@ public/assets
 
 # production
 /build
+
+#govuk-toolkit assets
+/public/assets
+/public/all.js
 
 # misc
 .DS_Store
