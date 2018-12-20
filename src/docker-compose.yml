@@ -11,7 +11,7 @@ services:
     build: GovUk.Education.ExploreEducationStatistics.Content.Api
     ports:
     - "5010:5000"
-    - "5011:5001"
+    - "5011:5011"
   frontend:
     container_name: ees-frontend
     build: explore-education-statistics-frontend
@@ -22,3 +22,6 @@ services:
       - '3000:3000'
     environment:
       - NODE_ENV=development
+    depends_on:
+      - data-api
+      - content-api
