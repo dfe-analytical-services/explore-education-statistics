@@ -11,10 +11,11 @@
     "react-scripts": "2.1.1"
   },
   "scripts": {
-    "prebuild": "npm-run-all clean copy-assets",
+    "prebuild": "npm run assets",
+    "assets": "npm-run-all clean copy-assets",
     "clean": "rimraf public/assets",
     "copy-assets": "ncp node_modules/govuk-frontend/assets public/assets",
-    "start": "react-scripts start",
+    "start": "npm run assets && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
