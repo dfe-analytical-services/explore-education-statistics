@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             return _context.Themes.FirstOrDefault(t => t.Id == id);
         }
         
-        // GET api/theme/5/topic
+        // GET api/theme/5/topics
         [HttpGet("{id}/topics")]
         public ActionResult<List<Topic>> GetTopics(Guid id)
         {

@@ -5,11 +5,17 @@ import { Link } from 'react-router-dom'
 class DataList extends Component {
     render() {
         return (
-            <ul>
-                {this.props.data.map(elem => (
-                    <li key={elem.id}><Link to={`/${this.props.linkIdentifier}/${elem.id}`}>{elem.title}</Link></li>
-                ))}
-            </ul>
+            <div>
+                {this.props.data.length > 0 ? (
+                    <ul>
+                    {this.props.data.map(elem => (
+                        <li key={elem.id}><Link to={`/${this.props.linkIdentifier}/${elem.id}`}>{elem.title}</Link></li>
+                    ))}
+                    </ul>
+                ) : (
+                    <p>None</p>
+                )}
+            </div>
         );
     }
 }

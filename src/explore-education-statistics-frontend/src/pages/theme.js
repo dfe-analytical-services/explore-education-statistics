@@ -8,23 +8,24 @@ class Theme extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            data: []
+            data: [],
+            topics: []
         }
     }
 
     componentDidMount() {
         const { handle } = this.props.match.params;
-        axios.get(`http://localhost:5010/api/Theme/${handle}`)
+        axios.get(`http://localhost:5010/api/theme/${handle}`)
             .then(json => this.setState({ data: json.data }))
             .catch(error => alert(error))
+        axios.get(`http://localhost:5010/api/theme/${handle}/topics`)
+        .then(json => this.setState({ topics: json.data }))
+        .catch(error => alert(error))
     }
 
     render() {
         const { data } = this.state;
-        const topics = [{
-            id: "1003fa5c-b60a-4036-a178-e3a69a81b852",
-            title: "Absence and Exclusions"
-        }];
+        const { topics } = this.state;
         return (
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">

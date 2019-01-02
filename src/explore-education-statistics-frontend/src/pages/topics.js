@@ -13,7 +13,7 @@ class Topics extends Component {
     }
 
     componentDidMount() {
-        axios.get('http://localhost:5010/api/Topic')
+        axios.get('http://localhost:5010/api/topic')
             .then(json => this.setState({ data: json.data }))
             .catch(error => alert(error))
     }

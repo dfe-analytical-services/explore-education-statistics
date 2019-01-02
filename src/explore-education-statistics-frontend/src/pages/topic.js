@@ -8,23 +8,24 @@ class Topic extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            data: []
+            data: [],
+            publications: []
         }
     }
 
     componentDidMount() {
         const { handle } = this.props.match.params;
-        axios.get(`http://localhost:5010/api/Topic/${handle}`)
+        axios.get(`http://localhost:5010/api/topic/${handle}`)
             .then(json => this.setState({ data: json.data }))
             .catch(error => alert(error))
+        axios.get(`http://localhost:5010/api/topic/${handle}/publications`)
+        .then(json => this.setState({ publications: json.data }))
+        .catch(error => alert(error))
     }
 
     render() {
         const { data } = this.state;
-        const publications = [{
-            id: "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
-            title: "Pupil absence in schools in England"
-        }];
+        const { publications } = this.state;
         return (
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">

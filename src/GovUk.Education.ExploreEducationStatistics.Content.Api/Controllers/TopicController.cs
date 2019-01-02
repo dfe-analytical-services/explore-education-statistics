@@ -31,5 +31,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         {
             return _context.Topics.FirstOrDefault(t => t.Id == id);
         }
+        
+        
+        // GET api/topic/5/publications
+        [HttpGet("{id}/publications")]
+        public ActionResult<List<Publication>> GetPublications(Guid id)
+        {
+            return _context.Publications.Where(t => t.TopicId == id).ToList();
+        }
     }
 }

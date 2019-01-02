@@ -13,7 +13,7 @@ class Themes extends Component {
     }
 
     componentDidMount() {
-        axios.get('http://localhost:5010/api/Theme')
+        axios.get('http://localhost:5010/api/theme')
             .then(json => this.setState({ data: json.data }))
             .catch(error => alert(error))
     }

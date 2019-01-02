@@ -13,7 +13,7 @@ class Publication extends Component {
 
     componentDidMount() {
         const { handle } = this.props.match.params;
-        axios.get(`http://localhost:5010/api/Publication/${handle}`)
+        axios.get(`http://localhost:5010/api/publication/${handle}`)
             .then(json => this.setState({ data: json.data }))
             .catch(error => alert(error))
     }
