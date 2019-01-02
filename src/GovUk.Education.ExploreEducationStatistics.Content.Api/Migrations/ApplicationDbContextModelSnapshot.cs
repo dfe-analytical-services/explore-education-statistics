@@ -23,6 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 
                     b.Property<string>("Description");
 
+                    b.Property<DateTime?>("NextUpdate");
+
                     b.Property<string>("Slug");
 
                     b.Property<string>("Title")
@@ -48,6 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 
                     b.Property<Guid>("PublicationId");
 
+                    b.Property<DateTime?>("Published");
+
                     b.Property<string>("Title")
                         .IsRequired();
 
@@ -56,6 +60,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                     b.HasIndex("PublicationId");
 
                     b.ToTable("Releases");
+
+                    b.HasData(
+                        new { Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"), PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Published = new DateTime(2018, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), Title = "2016-17" }
+                    );
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Theme", b =>

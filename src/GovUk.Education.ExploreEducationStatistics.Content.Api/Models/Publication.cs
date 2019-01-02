@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
 {
@@ -16,11 +17,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
         public string Title { get; set; }
 
         public string Description { get; set; }
-
+        
+        public DateTime? NextUpdate { get; set; }
+        
+        public List<Release> Releases { get; set; }
+        
+        //public List<Link> LegacyReleases { get; set; }
+        
         public Guid TopicId { get; set; }
         
         public Topic Topic { get; set; }
-        
-        public List<Release> Releases { get; set; }
     }
 }

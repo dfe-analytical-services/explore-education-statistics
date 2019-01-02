@@ -1,6 +1,7 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
 {
@@ -43,6 +44,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
 
             modelBuilder.Entity<Publication>().HasData(
                 new Publication() { Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Title = "Pupil absence in schools in England", TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Slug = "pupil-absence-in-schools-in-england" }
+            );
+
+            modelBuilder.Entity<Release>().HasData(
+                new Release() { Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"), Title = "2016-17", PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Published = new DateTime(2018,3,22)}
             );
         }
     }
