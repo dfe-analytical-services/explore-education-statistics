@@ -43,7 +43,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
             );
 
             modelBuilder.Entity<Publication>().HasData(
-                new Publication() { Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Title = "Pupil absence in schools in England", TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Slug = "pupil-absence-in-schools-in-england" }
+                new Publication() { Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Title = "Pupil absence in schools in England", TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Slug = "pupil-absence-in-schools-in-england" },
+                new Publication() { Id = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"), Title = "Permanent and fixed period exclusions", TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Slug = "permanent-and-fixed-period-exclusions" }
+
             );
 
             modelBuilder.Entity<Release>().HasData(
