@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import DataList from '../components/datalist';
 import Title from '../components/title';
+import API from '../api';
 
 class Topics extends Component {
 
@@ -13,7 +13,7 @@ class Topics extends Component {
     }
 
     componentDidMount() {
-        axios.get('http://localhost:5010/api/topic')
+        API.get('topic')
             .then(json => this.setState({ data: json.data }))
             .catch(error => alert(error))
     }

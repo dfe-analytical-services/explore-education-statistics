@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import DataList from '../components/datalist';
 import Title from '../components/title';
+import API from '../api';
 
 class Theme extends Component {
 
@@ -15,12 +15,12 @@ class Theme extends Component {
 
     componentDidMount() {
         const { handle } = this.props.match.params;
-        axios.get(`http://localhost:5010/api/theme/${handle}`)
+        API.get(`theme/${handle}`)
             .then(json => this.setState({ data: json.data }))
             .catch(error => alert(error))
-        axios.get(`http://localhost:5010/api/theme/${handle}/topics`)
-        .then(json => this.setState({ topics: json.data }))
-        .catch(error => alert(error))
+        API.get(`theme/${handle}/topics`)
+            .then(json => this.setState({ topics: json.data }))
+            .catch(error => alert(error))
     }
 
     render() {
