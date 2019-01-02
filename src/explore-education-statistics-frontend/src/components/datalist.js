@@ -7,9 +7,9 @@ class DataList extends Component {
         return (
             <div>
                 {this.props.data.length > 0 ? (
-                    <ul>
+                    <ul class="govuk-list">
                     {this.props.data.map(elem => (
-                        <li key={elem.id}><Link to={`/${this.props.linkIdentifier}/${elem.id}`}>{elem.title}</Link></li>
+                        <li key={elem.id}><Link className="govuk-link" to={`/${this.props.linkIdentifier}/${elem.id}`}>{elem.title}</Link></li>
                     ))}
                     </ul>
                 ) : (

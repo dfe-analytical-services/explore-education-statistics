@@ -30,7 +30,7 @@ class Topic extends Component {
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
                     <Title label={data.title} />
-                    <h2>Publications</h2>
+                    <h2 className="govuk-heading-l">Publications</h2>
                     <DataList data={publications} linkIdentifier="publication" />
                 </div>
             </div>
