@@ -24,7 +24,7 @@ class Themes extends Component {
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
                     <Title label='Themes' />
-                    <DataList data={data} linkIdentifier='theme' />
+                    <DataList data={data} linkIdentifier={window.location.pathname} />
                 </div>
             </div>
         );

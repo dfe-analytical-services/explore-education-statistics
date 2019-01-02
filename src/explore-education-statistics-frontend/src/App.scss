@@ -1,1 +1,6 @@
 @import "node_modules/govuk-frontend/all";
+
+// Patterns that aren't in Frontend
+@import "sass/patterns/step-by-step-navigation";
+@import "sass/patterns/task-list";
+@import "sass/patterns/related-items";

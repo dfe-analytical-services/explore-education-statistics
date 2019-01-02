@@ -7,13 +7,20 @@ class DataList extends Component {
         return (
             <div>
                 {this.props.data.length > 0 ? (
-                    <ul class="govuk-list">
+                    <div className="govuk-grid-row">
                     {this.props.data.map(elem => (
-                        <li key={elem.id}><Link className="govuk-link" to={`/${this.props.linkIdentifier}/${elem.id}`}>{elem.title}</Link></li>
+                        <div className="govuk-grid-column-one-half" key={elem.id}>
+                            <h4 className="govuk-heading-s">
+                                <Link className="govuk-link" to={`${this.props.linkIdentifier}/${elem.id}`}>{elem.title}</Link>
+                            </h4>
+                            <p className="govuk-body">link description</p>
+                        </div>
                     ))}
-                    </ul>
+                    </div>
                 ) : (
-                    <p>None</p>
+                    <div class="govuk-inset-text">
+                        None currently published.
+                    </div>
                 )}
             </div>
         );
