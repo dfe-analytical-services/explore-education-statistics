@@ -14,9 +14,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
         public string Title { get; set; }
 
         public string Slug { get; set; }
+        
+        public string Description { get; set; }
 
         public Guid ThemeId { get; set; }
-
+        
         public Theme Theme { get; set; }
 
         public List<Publication> Publications { get; set; }

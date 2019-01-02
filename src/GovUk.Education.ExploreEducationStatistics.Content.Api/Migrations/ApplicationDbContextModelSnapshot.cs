@@ -21,6 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<string>("Description");
+
                     b.Property<string>("Slug");
 
                     b.Property<string>("Title")
@@ -37,6 +39,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                     b.HasData(
                         new { Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Slug = "pupil-absence-in-schools-in-england", Title = "Pupil absence in schools in England", TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852") }
                     );
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Release", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<Guid>("PublicationId");
+
+                    b.Property<string>("Title")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PublicationId");
+
+                    b.ToTable("Releases");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Theme", b =>
@@ -64,6 +83,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Description");
 
                     b.Property<string>("Slug");
 
@@ -97,6 +118,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Topic", "Topic")
                         .WithMany("Publications")
                         .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Release", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Publication", "Publication")
+                        .WithMany("Releases")
+                        .HasForeignKey("PublicationId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

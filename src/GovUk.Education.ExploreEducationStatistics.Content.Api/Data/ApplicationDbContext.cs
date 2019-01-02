@@ -14,6 +14,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
         public DbSet<Theme> Themes { get; set; }
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Publication> Publications { get; set; }
+        public DbSet<Release> Releases { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
