@@ -51,7 +51,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new { Id = new Guid("8b2c1269-3495-4f89-83eb-524fc0b6effc"), Slug = "school-workforce", Title = "School workforce", TopicId = new Guid("d5288137-e703-43a1-b634-d50fc9785cb9") },
                         new { Id = new Guid("fe94b33d-0419-4fac-bf73-28299d5e4247"), Slug = "initial-teacher-training-performance-profiles", Title = "Initial teacher training performance profiles", TopicId = new Guid("d5288137-e703-43a1-b634-d50fc9785cb9") },
                         new { Id = new Guid("bd781dc5-cfc7-4543-b8d7-a3a7b3606b3d"), Slug = "children-in-need", Title = "Children in need", TopicId = new Guid("0b920c62-ff67-4cf1-89ec-0c74a364e6b4") },
-                        new { Id = new Guid("143c672b-18d7-478b-a6e7-b843c9b3fd42"), Slug = "looked-after-children", Title = "Looked after children", TopicId = new Guid("0b920c62-ff67-4cf1-89ec-0c74a364e6b4") }
+                        new { Id = new Guid("143c672b-18d7-478b-a6e7-b843c9b3fd42"), Slug = "looked-after-children", Title = "Looked after children", TopicId = new Guid("0b920c62-ff67-4cf1-89ec-0c74a364e6b4") },
+                        new { Id = new Guid("70902b3c-0bb4-457d-b40a-2a959cdc7d00"), Slug = "16-to-18-school-performance", Title = "16 to 18 school performance", TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860") },
+                        new { Id = new Guid("d0e56978-c944-4b12-9156-bfe50c94c2a0"), Slug = "destination-of-leavers", Title = "Destination of leavers", TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860") },
+                        new { Id = new Guid("ad81ebdd-2bbc-47e8-a32c-f396d6e2bb72"), Slug = "further-education-and-skills", Title = "Further education and skills", TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860") },
+                        new { Id = new Guid("201cb72d-ef35-4680-ade7-b09a8dca9cc1"), Slug = "apprenticeship-and-levy-statistics", Title = "Apprenticeship and levy statistics", TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860") },
+                        new { Id = new Guid("7bd128a3-ae7f-4e1b-984e-d1b795c61630"), Slug = "apprenticeships-and-traineeships", Title = "Apprenticeships and traineeships", TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860") }
                     );
                 });
 

@@ -66,7 +66,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                 
                 // Number of Children
                 new Publication() { Id = new Guid("bd781dc5-cfc7-4543-b8d7-a3a7b3606b3d"), Title = "Children in need", TopicId = new Guid("0b920c62-ff67-4cf1-89ec-0c74a364e6b4"), Slug = "children-in-need" },
-                new Publication() { Id = new Guid("143c672b-18d7-478b-a6e7-b843c9b3fd42"), Title = "Looked after children", TopicId = new Guid("0b920c62-ff67-4cf1-89ec-0c74a364e6b4"), Slug = "looked-after-children" }
+                new Publication() { Id = new Guid("143c672b-18d7-478b-a6e7-b843c9b3fd42"), Title = "Looked after children", TopicId = new Guid("0b920c62-ff67-4cf1-89ec-0c74a364e6b4"), Slug = "looked-after-children" },
+                
+                // Further Education 
+                new Publication() { Id = new Guid("70902b3c-0bb4-457d-b40a-2a959cdc7d00"), Title = "16 to 18 school performance", TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"), Slug = "16-to-18-school-performance" },
+                new Publication() { Id = new Guid("d0e56978-c944-4b12-9156-bfe50c94c2a0"), Title = "Destination of leavers", TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"), Slug = "destination-of-leavers" },
+                new Publication() { Id = new Guid("ad81ebdd-2bbc-47e8-a32c-f396d6e2bb72"), Title = "Further education and skills", TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"), Slug = "further-education-and-skills" },
+                new Publication() { Id = new Guid("201cb72d-ef35-4680-ade7-b09a8dca9cc1"), Title = "Apprenticeship and levy statistics", TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"), Slug = "apprenticeship-and-levy-statistics" },
+                new Publication() { Id = new Guid("7bd128a3-ae7f-4e1b-984e-d1b795c61630"), Title = "Apprenticeships and traineeships", TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"), Slug = "apprenticeships-and-traineeships" }
             );
 
             modelBuilder.Entity<Release>().HasData(
