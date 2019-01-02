@@ -14,6 +14,9 @@
         "sku": {
             "type": "string",
             "defaultValue": "Standard S1"
+        },
+        "storageAccountName": {
+            "type": "string"
         }
     },
     "variables": {
@@ -168,6 +171,21 @@
                 "applicationId": "[variables('contentAppName')]",
                 "Request_Source": "AzureTfsExtensionAzureProject"
             }
+        },
+        {
+            "name": "[parameters('storageAccountName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2018-07-01",
+            "location": "westeurope",
+            "properties": {
+                "accessTier": "Hot",
+                "supportsHttpsTrafficOnly": true
+            },
+            "dependsOn": [],
+            "sku": {
+                "name": "Standard_RAGRS"
+            },
+            "kind": "StorageV2"
         }
     ]
 }
