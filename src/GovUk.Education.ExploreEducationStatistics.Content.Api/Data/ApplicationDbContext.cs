@@ -43,9 +43,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
             );
 
             modelBuilder.Entity<Publication>().HasData(
+                // Absence and exclusions
                 new Publication() { Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Title = "Pupil absence in schools in England", TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Slug = "pupil-absence-in-schools-in-england" },
-                new Publication() { Id = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"), Title = "Permanent and fixed period exclusions", TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Slug = "permanent-and-fixed-period-exclusions" }
+                new Publication() { Id = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"), Title = "Permanent and fixed period exclusions", TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Slug = "permanent-and-fixed-period-exclusions" },
+                
+                // School and pupil numbers
+                new Publication() { Id = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"), Title = "Schools, pupils and their characteristics", TopicId = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"), Slug = "schools-pupils-and-their-characteristics" },
 
+                // Capacity Admissions
+                new Publication() { Id = new Guid("d04142bd-f448-456b-97bc-03863143836b"), Title = "School capacity", TopicId = new Guid("734820b7-f80e-45c3-bb92-960edcc6faa5"), Slug = "school-capacity" },
+                new Publication() { Id = new Guid("a20ea465-d2d0-4fc1-96ee-6b2ca4e0520e"), Title = "Admission appeals in England", TopicId = new Guid("734820b7-f80e-45c3-bb92-960edcc6faa5"), Slug = "admission-appeals-in-England" },
+                
+                // Results
+                new Publication() { Id = new Guid("526dea0e-abf3-476e-9ca4-9dbd9b101bc8"), Title = "Early years foundation stage profile results", TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"), Slug = "early-years-foundation-stage-profile-results" },
+                new Publication() { Id = new Guid("9674ac24-649a-400c-8a2c-871793d9cd7a"), Title = "Phonics screening check and KS1 assessments", TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"), Slug = "phonics-screening-check-and-ks1-assessments" },
+                new Publication() { Id = new Guid("a4b22113-47d3-48fc-b2da-5336c801a31f"), Title = "KS2 statistics", TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"), Slug = "ks2-statistics" },
+                new Publication() { Id = new Guid("bfdcaae1-ce6b-4f63-9b2b-0a1f3942887f"), Title = "KS4 statistics", TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"), Slug = "ks4-statistics" },
+                
+                // Teacher Numbers
+                new Publication() { Id = new Guid("8b2c1269-3495-4f89-83eb-524fc0b6effc"), Title = "School workforce", TopicId = new Guid("d5288137-e703-43a1-b634-d50fc9785cb9"), Slug = "school-workforce" },
+                new Publication() { Id = new Guid("fe94b33d-0419-4fac-bf73-28299d5e4247"), Title = "Initial teacher training performance profiles", TopicId = new Guid("d5288137-e703-43a1-b634-d50fc9785cb9"), Slug = "initial-teacher-training-performance-profiles" },
+                
+                // Number of Children
+                new Publication() { Id = new Guid("bd781dc5-cfc7-4543-b8d7-a3a7b3606b3d"), Title = "Children in need", TopicId = new Guid("0b920c62-ff67-4cf1-89ec-0c74a364e6b4"), Slug = "children-in-need" },
+                new Publication() { Id = new Guid("143c672b-18d7-478b-a6e7-b843c9b3fd42"), Title = "Looked after children", TopicId = new Guid("0b920c62-ff67-4cf1-89ec-0c74a364e6b4"), Slug = "looked-after-children" }
             );
 
             modelBuilder.Entity<Release>().HasData(
