@@ -1,52 +1,34 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types'
 import axios from 'axios';
+import DataList from '../components/datalist';
+import Title from '../components/title';
 
 class Themes extends Component {
 
     constructor(props) {
         super(props)
         this.state = {
-            store: []
+            data: []
         }
     }
 
     componentDidMount() {
         axios.get('http://localhost:5010/api/Theme')
-            .then(json => this.setState({ store: json.data }))
+            .then(json => this.setState({ data: json.data }))
             .catch(error => alert(error))
     }
 
     render() {
-        const data = this.state.store;
-        const dataItems = data.map((item, index) =>
-            <Theme key={item.id} label={item.title}></Theme>
-        );
+        const { data } = this.state;
         return (
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
-                    <h1 className="govuk-heading-xl">Themes</h1>
-                    {dataItems}
+                    <Title label='Themes' />
+                    <DataList data={data} linkIdentifier='theme' />
                 </div>
             </div>
         );
     }
-}
-
-class Theme extends Component {
-    render() {
-        return (
-            <h2>{this.props.label}</h2>
-        );
-    }
-}
-
-Theme.propTypes = {
-    label: PropTypes.string
-}
-
-Theme.defaultProps = {
-    label: ''
 }
 
 export default Themes;

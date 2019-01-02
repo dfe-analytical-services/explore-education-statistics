@@ -4,9 +4,12 @@ import './App.scss';
 import Cookies from './pages/cookies'
 import Privacy from './pages/privacy'
 import Publication from './pages/publication';
+import Theme from './pages/theme';
 import Themes from './pages/themes';
+import Topic from './pages/topic'
 import Topics from './pages/topics'
 import NotFound from './pages/notfound'
+import { Link } from 'react-router-dom'
 
 class App extends Component {
   render() {
@@ -18,7 +21,9 @@ class App extends Component {
             <Route exact path="/cookies" component={Cookies} />
             <Route exact path="/privacy-policy" component={Privacy} />
             <Route exact path="/publication/:handle" component={Publication} />
+            <Route exact path="/theme/:handle" component={Theme} />
             <Route exact path="/themes" component={Themes} />
+            <Route exact path="/topic/:handle" component={Topic} />
             <Route exact path="/topics" component={Topics} />
             <Route component={NotFound} />
           </Switch>
@@ -33,6 +38,10 @@ class Home extends Component {
     return (
       <div>
         <h1 className="govuk-heading-xl">Explore education statistics</h1>
+        <ul>
+          <li><Link to={'/themes/'}>Themes</Link></li>
+          <li><Link to={'/topics/'}>Topics</Link></li>
+        </ul>
       </div>
     );
   }
