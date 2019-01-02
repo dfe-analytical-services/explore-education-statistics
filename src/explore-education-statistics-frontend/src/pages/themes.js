@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import DataList from '../components/datalist';
 import Title from '../components/title';
+import API from '../api';
 
 class Themes extends Component {
 
@@ -13,7 +13,7 @@ class Themes extends Component {
     }
 
     componentDidMount() {
-        axios.get('http://localhost:5010/api/theme')
+        API.get('theme')
             .then(json => this.setState({ data: json.data }))
             .catch(error => alert(error))
     }

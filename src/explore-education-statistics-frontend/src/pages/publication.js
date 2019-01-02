@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import Title from '../components/title';
+import API from '../api';
 
 class Publication extends Component {
 
@@ -13,7 +13,7 @@ class Publication extends Component {
 
     componentDidMount() {
         const { handle } = this.props.match.params;
-        axios.get(`http://localhost:5010/api/publication/${handle}`)
+        API.get(`publication/${handle}`)
             .then(json => this.setState({ data: json.data }))
             .catch(error => alert(error))
     }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import DataList from '../components/datalist';
 import Title from '../components/title';
+import API from '../api';
 
 class Topic extends Component {
 
@@ -15,10 +15,10 @@ class Topic extends Component {
 
     componentDidMount() {
         const { handle } = this.props.match.params;
-        axios.get(`http://localhost:5010/api/topic/${handle}`)
+        API.get(`topic/${handle}`)
             .then(json => this.setState({ data: json.data }))
             .catch(error => alert(error))
-        axios.get(`http://localhost:5010/api/topic/${handle}/publications`)
+        API.get(`topic/${handle}/publications`)
         .then(json => this.setState({ publications: json.data }))
         .catch(error => alert(error))
     }
