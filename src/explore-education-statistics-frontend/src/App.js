@@ -4,6 +4,7 @@ import './App.scss';
 import Cookies from './pages/cookies'
 import Privacy from './pages/privacy'
 import Publication from './pages/publication';
+import Publications from './pages/publications';
 import Theme from './pages/theme';
 import Themes from './pages/themes';
 import Topic from './pages/topic'
@@ -28,11 +29,12 @@ class App extends Component {
             <Route exact path="/themes/:theme/:topic" component={Topic} />
             <Route exact path="/themes/:theme/:topic/:publication" component={Publication} />
 
-            
-            <Route exact path="/topic/:topic" component={Topic} />
-            <Route exact path="/theme/:theme" component={Theme} />
             <Route exact path="/topics" component={Topics} />
-            <Route exact path="/publication/:publication" component={Publication} />
+            <Route exact path="/topics/:topic" component={Topic} />
+            <Route exact path="/topics/:topic/:publication" component={Publication} />
+
+            <Route exact path="/publications/" component={Publications} />
+            <Route exact path="/publications/:publication" component={Publication} />
 
             <Route component={NotFound} />
           </Switch>
@@ -47,9 +49,11 @@ class Home extends Component {
     return (
       <div>
         <h1 className="govuk-heading-xl">Explore education statistics</h1>
-        <ul>
-          <li><Link to={'/themes/'}>Themes</Link></li>
-          <li><Link to={'/topics/'}>Topics</Link></li>
+        <ul className="govuk-list">
+          <li><Link to={'/themes'} className="govuk-link">Themes</Link></li>
+          <li><Link to={'/topics'} className="govuk-link">Topics</Link></li>
+          <li><Link to={'/publications'} className="govuk-link">Publications</Link></li>
+
         </ul>
       </div>
     );

@@ -3,7 +3,7 @@ import DataList from '../components/datalist';
 import Title from '../components/title';
 import API from '../api';
 
-class Topics extends Component {
+class Publications extends Component {
 
     constructor(props) {
         super(props)
@@ -13,7 +13,7 @@ class Topics extends Component {
     }
 
     componentDidMount() {
-        API.get('topic')
+        API.get('publication')
             .then(json => this.setState({ data: json.data }))
             .catch(error => alert(error))
     }
@@ -23,7 +23,7 @@ class Topics extends Component {
         return (
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
-                    <Title label='Topics' />
+                    <Title label='Publications' />
                     <DataList data={data} linkIdentifier={window.location.pathname} />
                 </div>
             </div>
@@ -31,4 +31,4 @@ class Topics extends Component {
     }
 }
 
-export default Topics;
+export default Publications;
