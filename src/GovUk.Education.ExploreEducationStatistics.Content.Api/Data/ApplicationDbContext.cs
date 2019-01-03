@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
         {
             modelBuilder.Entity<Theme>().HasData(
                 new Theme() { Id = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Title = "Schools", Summary = "Lorem ipsum dolor sit amet.", Slug = "schools" },
-                new Theme() { Id = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"), Title = "Social Care", Summary = "Lorem ipsum dolor sit amet.", Slug = "schools" },
+                new Theme() { Id = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"), Title = "Social Care", Summary = "Lorem ipsum dolor sit amet.", Slug = "social-care" },
                 new Theme() { Id = new Guid("bc08839f-2970-4f34-af2d-29608a48082f"), Title = "16+", Summary = "Lorem ipsum dolor sit amet.", Slug = "16+" }
                 );
 
