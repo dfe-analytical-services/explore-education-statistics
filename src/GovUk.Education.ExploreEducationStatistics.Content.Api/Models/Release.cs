@@ -12,10 +12,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
         [Required]
         public string Title { get; set; }
         
-        public DateTime? Published { get; set; }
-
-        public Guid PublicationId { get; set; }
+        public string ReleaseName { get; set; }
         
-        public Publication Publication { get; set; }
+        public DateTime? Published { get; set; }
+        
+        public string Summary { get; set; }
+        
+        public Guid PublicationId { get; set; }
     }
 }

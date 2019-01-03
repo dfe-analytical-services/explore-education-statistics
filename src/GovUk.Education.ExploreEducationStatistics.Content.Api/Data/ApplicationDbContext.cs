@@ -39,7 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                 
                 new Topic() { Id = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"), Title = "Further Education", Summary = "Lorem ipsum dolor sit amet.", ThemeId = new Guid("bc08839f-2970-4f34-af2d-29608a48082f"), Slug = "further-education" },
                 new Topic() { Id = new Guid("4c658598-450b-4493-b972-8812acd154a7"), Title = "Higher Education", Summary = "Lorem ipsum dolor sit amet.", ThemeId = new Guid("bc08839f-2970-4f34-af2d-29608a48082f"), Slug = "higher-education" }
-
             );
 
             modelBuilder.Entity<Publication>().HasData(
@@ -77,7 +76,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
             );
 
             modelBuilder.Entity<Release>().HasData(
-                new Release() { Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"), Title = "2016-17", PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Published = new DateTime(2018,3,22)}
+                new Release()
+                {
+                    Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"), 
+                    Title = "Pupil absence data and statistics for schools in England", 
+                    ReleaseName = "2016-17",
+                    PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), 
+                    Published = new DateTime(2018,3,22),
+                    Summary = "<p class=\"govuk-body\"> This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools.</p><p class=\"govuk-body\">It allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:</p>"
+                }
             );
         }
     }
