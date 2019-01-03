@@ -12,9 +12,14 @@ interface Props {
   }>;
 }
 
+interface LegacyRelease {
+  description: string;
+  url: string;
+}
+
 interface Publication {
   nextUpdate: string;
-  legacyReleases: any[];
+  legacyReleases: LegacyRelease[];
 }
 
 interface State {
@@ -31,7 +36,12 @@ class PublicationPage extends Component<Props, State> {
   public state = {
     data: {
       publication: {
-        legacyReleases: [],
+        legacyReleases: [
+          {
+            description: '',
+            url: '',
+          },
+        ],
         nextUpdate: '',
       },
       published: '',
@@ -73,11 +83,25 @@ class PublicationPage extends Component<Props, State> {
               <h3 className="govuk-heading-s">
                 <span className="govuk-caption-m">Release name: </span>
                 {data.releaseName} (latest data)
-                <span className="govuk-caption-m">
-                  <Glink>
-                    See previous {data.publication.legacyReleases.length} years
-                  </Glink>
-                </span>
+                <details className="govuk-details">
+                  <summary className="govuk-details__summary">
+                    <span className="govuk-details__summary-text">
+                      See previous {data.publication.legacyReleases.length}{' '}
+                      releases
+                    </span>
+                  </summary>
+                  <div className="govuk-details__text">
+                    <ul className="govuk-list">
+                      {data.publication.legacyReleases.map(elem => (
+                        <li>
+                          <a className="govuk-link" href={elem.url}>
+                            {elem.description}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </details>
               </h3>
 
               <h3 className="govuk-heading-s">
@@ -88,9 +112,27 @@ class PublicationPage extends Component<Props, State> {
               <h2 className="govuk-heading-s">
                 <span className="govuk-caption-m">Last updated: </span>
                 <Date value="1970-01-01T00:00:00" />
-                <span className="govuk-caption-m">
-                  <Glink>See all 999 updates</Glink>
-                </span>
+                <details className="govuk-details">
+                  <summary className="govuk-details__summary">
+                    <span className="govuk-details__summary-text">
+                      See all 999 updates
+                    </span>
+                  </summary>
+                  <div className="govuk-details__text">
+                    <p className="govuk-body govuk-!-font-weight-bold">
+                      19 April 2017
+                    </p>
+                    <p className="govuk-body">
+                      Underlying data file updated to include absence data by
+                      pupil residency and school location, andupdated metadata
+                      document.
+                    </p>
+                    <p className="govuk-body govuk-!-font-weight-bold">
+                      23 March 2017
+                    </p>
+                    <p className="govuk-body">First published.</p>
+                  </div>
+                </details>
               </h2>
 
               <h2 className="govuk-heading-s">
