@@ -26,16 +26,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 
         // GET api/theme/5
         [HttpGet("{id}")]
-        public ActionResult<Theme> Get(Guid id)
+        public ActionResult<Theme> Get(string id)
         {
-            return _context.Themes.FirstOrDefault(t => t.Id == id);
+            return Guid.TryParse(id, out var newGuid) ? 
+                _context.Themes.FirstOrDefault(t => t.Id == newGuid) : 
+                _context.Themes.FirstOrDefault(t => t.Slug == id);
         }
         
         // GET api/theme/5/topics
         [HttpGet("{id}/topics")]
-        public ActionResult<List<Topic>> GetTopics(Guid id)
-        {
-            return _context.Topics.Where(t => t.ThemeId == id).ToList();
+        public ActionResult<List<Topic>> GetTopics(string id)
+        {   
+            return Guid.TryParse(id, out var newGuid) ? 
+                _context.Topics.Where(t => t.ThemeId == newGuid).ToList() : 
+                _context.Topics.Where(t => t.Theme.Slug == id).ToList();
         }
     }
 }
