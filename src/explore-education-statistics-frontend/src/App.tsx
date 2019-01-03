@@ -24,7 +24,7 @@ class App extends Component {
   public render() {
     return (
       <div className="App">
-        <HashRouter>
+        <Router>
           <div>
             <div className="govuk-phase-banner">
               <p className="govuk-phase-banner__content">
@@ -40,7 +40,7 @@ class App extends Component {
                 </span>
               </p>
             </div>
-            <Breadcrumbs current={'page'} />
+            <Breadcrumbs current={'current page'} />
             <main
               className="govuk-main-wrapper app-main-class"
               id="main-content"
@@ -88,7 +88,7 @@ class App extends Component {
               </Switch>
             </main>
           </div>
-        </HashRouter>
+        </Router>
       </div>
     );
   }

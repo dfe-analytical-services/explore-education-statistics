@@ -25,7 +25,7 @@ class ThemesPage extends Component<{}, State> {
     return (
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <Title label="Themes" />
+          <h1 className="govuk-heading-xl">Themes</h1>
           <DataList data={data} linkIdentifier={window.location.pathname} />
         </div>
       </div>

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { match } from 'react-router';
 import api from '../api';
-import Breadcrumbs from '../components/Breadcrumbs';
 import DataList from '../components/DataList';
 import Glink from '../components/Glink';
 import Title from '../components/Title';
@@ -45,7 +44,6 @@ class ThemePage extends Component<Props, State> {
 
     return (
       <div>
-        <Breadcrumbs current={data.title} />
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <Title label={data.title} />

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { match } from 'react-router';
 import api from '../api';
-import Breadcrumbs from '../components/Breadcrumbs';
 import Date from '../components/Date';
 import Glink from '../components/Glink';
 
@@ -65,7 +64,6 @@ class PublicationPage extends Component<Props, State> {
 
     return (
       <div>
-        <Breadcrumbs current={data.title} />
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <strong className="govuk-tag">This is the latest data</strong>
