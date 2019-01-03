@@ -9,6 +9,20 @@
     "noEmit": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "jsx": "preserve"
-  }
+    "jsx": "preserve",
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
+  },
+  "include": [
+    "src"
+  ]
 }
