@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     ReleaseName = "2016-17",
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), 
                     Published = new DateTime(2018,3,22),
-                    Summary = "<p class=\"govuk-body\"> This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools.</p><p class=\"govuk-body\">It allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:</p>"
+                    Summary = "This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools.\n\nIt allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:"
                 }
             );
             

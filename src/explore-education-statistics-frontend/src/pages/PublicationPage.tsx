@@ -4,6 +4,7 @@ import api from '../api';
 import Breadcrumbs from '../components/Breadcrumbs';
 import Date from '../components/Date';
 import Glink from '../components/Glink';
+import ReactMarkdown from 'react-markdown';
 
 interface Props {
   match: match<{
@@ -20,6 +21,7 @@ interface State {
   data: {
     title: string;
     published: string;
+    summary: string;
     releaseName: string;
     publication: Publication;
   };
@@ -30,6 +32,7 @@ class PublicationPage extends Component<Props, State> {
     data: {
       published: '',
       releaseName: '',
+      summary: '',
       title: '',
       publication: {
         legacyReleases: [],
@@ -58,6 +61,8 @@ class PublicationPage extends Component<Props, State> {
             <strong className="govuk-tag">This is the latest data</strong>
 
             <h1 className="govuk-heading-l">{data.title}</h1>
+
+            <ReactMarkdown className="govuk-body" source={data.summary} />
           </div>
           <div className="govuk-grid-column-one-third">
             <aside className="app-related-items">
