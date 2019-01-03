@@ -30,14 +30,14 @@ interface State {
 class PublicationPage extends Component<Props, State> {
   public state = {
     data: {
-      published: '',
-      releaseName: '',
-      summary: '',
-      title: '',
       publication: {
         legacyReleases: [],
         nextUpdate: '',
       },
+      published: '',
+      releaseName: '',
+      summary: '',
+      title: '',
     },
   };
 

@@ -1,3 +1,8 @@
+@import '~govuk-frontend/helpers/all';
+@import '~govuk-frontend/settings/all';
+
+/* stylelint-disable */
+
 // Based on https://github.com/alphagov/govuk_publishing_components/blob/v9.3.6/app/assets/stylesheets/govuk_publishing_components/components/_step-by-step-nav.scss
 // Note - this code for prototype purposes only. It is not production code,
 // nor an example of the best way to use GOV.UK Frontend
@@ -14,7 +19,8 @@
 }
 
 .app-step-nav-header__part-of {
-  @include govuk-font(16, $weight: bold) display: block;
+  @include govuk-font(16, $weight: bold);
+  display: block;
   padding-bottom: 0.2em;
 }
 
@@ -28,12 +34,14 @@
 }
 
 .app-step-nav-related__heading {
-  @include govuk-font(19, $weight: bold) margin-top: 15px;
+  @include govuk-font(19, $weight: bold);
+  margin-top: 15px;
   margin-bottom: 10px;
 }
 
 .app-step-nav-related__links {
-  @include govuk-font(16, $weight: bold) margin: 0;
+  @include govuk-font(16, $weight: bold);
+  margin: 0;
   padding: 0;
 }
 
@@ -41,7 +49,8 @@
   margin-bottom: 13px;
 
   .app-step-nav-related__heading {
-    @include govuk-font(19, $weight: bold) margin-top: 20px;
+    @include govuk-font(19, $weight: bold);
+    margin-top: 20px;
   }
 
   .app-step-nav-related__pretitle {
@@ -71,6 +80,7 @@
 .app-step-nav {
   @include govuk-font(19);
   margin-bottom: 30px;
+
   &.app-step-nav--large {
     @include govuk-media-query($from: tablet) {
       margin-bottom: 60px;
@@ -98,7 +108,8 @@
 }
 
 .app-step-nav__button--title {
-  @include govuk-font(19, $weight: bold) display: inline-block;
+  @include govuk-font(19, $weight: bold);
+  display: inline-block;
   padding: 0;
   text-align: left;
   color: govuk-colour('black');
@@ -109,7 +120,8 @@
 }
 
 .app-step-nav__button--controls {
-  @include govuk-font(14) position: relative;
+  @include govuk-font(14);
+  position: relative;
   z-index: 1; // this and relative position stops focus outline underlap with border of accordion
   padding: 0.5em 0;
   text-decoration: underline;
@@ -226,7 +238,8 @@
 }
 
 .app-step-nav__circle--number {
-  @include govuk-font(16, $weight: bold) line-height: 23px;
+  @include govuk-font(16, $weight: bold);
+  line-height: 23px;
   border: solid 2px $govuk-border-colour;
 }
 
@@ -238,7 +251,8 @@
 }
 
 .app-step-nav--large .app-step-nav__circle--number {
-  @include govuk-font(16, $weight: bold) line-height: 23px;
+  @include govuk-font(16, $weight: bold);
+  line-height: 23px;
 }
 
 @include govuk-media-query($from: tablet) {
@@ -255,8 +269,10 @@
 }
 
 .app-step-nav__circle--logic {
-  @include govuk-font(16, $weight: bold) line-height: 28px;
+  @include govuk-font(16, $weight: bold);
+  line-height: 28px;
 }
+
 @include govuk-media-query($from: tablet) {
   .app-step-nav__circle--logic {
     font-size: 16px;
@@ -265,7 +281,8 @@
 }
 
 .app-step-nav--large .app-step-nav__circle--logic {
-  @include govuk-font(16, $weight: bold) line-height: 28px;
+  @include govuk-font(16, $weight: bold);
+  line-height: 28px;
 }
 
 @include govuk-media-query($from: tablet) {
@@ -309,7 +326,8 @@
 }
 
 .app-step-nav__title {
-  @include govuk-font(19, $weight: bold) line-height: 1.4;
+  @include govuk-font(19, $weight: bold);
+  line-height: 1.4;
   margin: 0;
 }
 
@@ -321,7 +339,8 @@
 }
 
 .app-step-nav--large .app-step-nav__title {
-  @include govuk-font(19, $weight: bold) line-height: 1.4;
+  @include govuk-font(19, $weight: bold);
+  line-height: 1.4;
 }
 
 @include govuk-media-query($from: tablet) {
@@ -332,13 +351,15 @@
 }
 
 .app-step-nav__toggle-link {
-  @include govuk-font(16) line-height: 1.2;
+  @include govuk-font(16);
+  line-height: 1.2;
   display: block;
   color: $govuk-link-colour;
 }
 
 .app-step-nav--large .app-step-nav__toggle-link {
-  @include govuk-font(16) line-height: 1.2;
+  @include govuk-font(16);
+  line-height: 1.2;
 }
 
 @include govuk-media-query($from: tablet) {
@@ -349,7 +370,9 @@
 }
 
 .app-step-nav__panel {
-  @include govuk-font(16) line-height: 1.25;
+  @include govuk-font(16);
+  line-height: 1.25;
+
   .js-enabled &.js-hidden {
     display: none;
   }
@@ -398,6 +421,7 @@
 .app-step-nav__list {
   padding: 0 0 10px;
 }
+
 @include govuk-media-query($from: tablet) {
   .app-step-nav--large .app-step-nav__list {
     padding-bottom: 20px;
@@ -412,6 +436,7 @@
 .app-step-nav__list--choice .app-step-nav__list-item--active:before {
   left: -45px;
 }
+
 @include govuk-media-query($from: tablet) {
   .app-step-nav--large
     .app-step-nav__list--choice
@@ -446,6 +471,7 @@
   border: solid 2px #fff;
   border-radius: 100px;
 }
+
 @include govuk-media-query($from: tablet) {
   .app-step-nav--large .app-step-nav__list-item--active:before {
     left: -60px;
