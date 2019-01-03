@@ -19,5 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
         public string Summary { get; set; }
         
         public Guid PublicationId { get; set; }
+        
+        public Publication Publication { get; set; }
     }
 }
