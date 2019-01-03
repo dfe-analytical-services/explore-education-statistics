@@ -1,7 +1,9 @@
 import React from 'react';
+// tslint:disable-next-line:import-name
 import ReactDOM from 'react-dom';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+
 import './index.scss';
 
 ReactDOM.render(<App />, document.getElementById('main-content'));

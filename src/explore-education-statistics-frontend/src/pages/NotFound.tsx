@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 class NotFound extends Component {
-  render() {
+  public render() {
     return (
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">

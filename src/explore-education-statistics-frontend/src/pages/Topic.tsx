@@ -1,43 +1,46 @@
 import React, { Component } from 'react';
 import { match } from 'react-router';
-import DataList from '../components/DataList';
-import API from '../api';
+import api from '../api';
 import Breadcrumbs from '../components/Breadcrumbs';
-import Title from '../components/Title';
+import DataList from '../components/DataList';
 import Glink from '../components/Glink';
+import Title from '../components/Title';
 
 interface Props {
   match: match<{
-    topic: string,
-  }>,
+    topic: string;
+  }>;
 }
 
 interface State {
   data: {
-    title: string,
-  },
-  publications: Array<{}>,
+    title: string;
+  };
+  publications: object[];
 }
 
 class Topic extends Component<Props, State> {
-  state = {
+  public state = {
     data: {
       title: '',
     },
     publications: [],
   };
 
-  componentDidMount() {
+  public componentDidMount() {
     const { topic } = this.props.match.params;
-    API.get(`topic/${topic}`)
+
+    api
+      .get(`topic/${topic}`)
       .then(json => this.setState({ data: json.data }))
       .catch(error => alert(error));
-    API.get(`topic/${topic}/publications`)
+    api
+      .get(`topic/${topic}/publications`)
       .then(json => this.setState({ publications: json.data }))
       .catch(error => alert(error));
   }
 
-  render() {
+  public render() {
     const { data, publications } = this.state;
 
     return (
@@ -48,18 +51,23 @@ class Topic extends Component<Props, State> {
             <Title label={data.title} />
 
             <p className="govuk-body">
-              Here you can find DfE stats for {(data.title || '').toLowerCase()}, and access
-              them as reports, customise and download as excel files or csv files, and access
-              them via an API. <Glink>(Find out more)</Glink>
+              Here you can find DfE stats for {(data.title || '').toLowerCase()}
+              , and access them as reports, customise and download as excel
+              files or csv files, and access them via an API.{' '}
+              <Glink>(Find out more)</Glink>
             </p>
             <p className="govuk-body">
               You can also see our statistics for 16+ education and social care.
             </p>
 
             <h3 className="govuk-heading-m">
-              The following publications are available in {(data.title || '').toLowerCase()}
+              The following publications are available in{' '}
+              {(data.title || '').toLowerCase()}
             </h3>
-            <DataList data={publications} linkIdentifier={window.location.pathname} />
+            <DataList
+              data={publications}
+              linkIdentifier={window.location.pathname}
+            />
           </div>
         </div>
         <hr className="govuk-section-break govuk-section-break--xl govuk-section-break--visible" />
@@ -70,9 +78,11 @@ class Topic extends Component<Props, State> {
           </h2>
           <p className="govuk-body">
             These are the latest official statistics with figures in
-            {(data.title || '').toLowerCase()}. You can access the report and commentary, and
-            also get the data for use in Excel and other tools. You can now customise the data to
-            your requirements, and get a variety of formats.</p>
+            {(data.title || '').toLowerCase()}. You can access the report and
+            commentary, and also get the data for use in Excel and other tools.
+            You can now customise the data to your requirements, and get a
+            variety of formats.
+          </p>
           <hr className="govuk-section-break govuk-section-break--xl govuk-section-break--visible" />
         </section>
 
@@ -81,8 +91,8 @@ class Topic extends Component<Props, State> {
             Key indicators for {(data.title || '').toLowerCase()}
           </h2>
           <p className="govuk-body">
-            These are some key indicators for {(data.title || '').toLowerCase()}.
-            You can change what you see here according to your requirements.
+            These are some key indicators for {(data.title || '').toLowerCase()}
+            . You can change what you see here according to your requirements.
           </p>
           <hr className="govuk-section-break govuk-section-break--xl govuk-section-break--visible" />
         </section>
@@ -95,11 +105,14 @@ class Topic extends Component<Props, State> {
           <ul className="govuk-list govuk-list--bullet">
             <li>
               You can explore all the DfE statistics available for
-              {(data.title || '').toLowerCase()} here. You can use our step by step guide, or
-              dive straight in.
+              {(data.title || '').toLowerCase()} here. You can use our step by
+              step guide, or dive straight in.
             </li>
             {/* <li>Once you've chosen your data you can view it by ###.</li> */}
-            <li>You can also dowload it, visualise it or copy and paste it as you need.</li>
+            <li>
+              You can also download it, visualise it or copy and paste it as you
+              need.
+            </li>
           </ul>
         </section>
       </div>

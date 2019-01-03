@@ -1,27 +1,25 @@
 import React, { Component } from 'react';
+import api from '../api';
 import DataList from '../components/DataList';
 import Title from '../components/Title';
-import API from '../api';
-
-interface Props {
-}
 
 interface State {
-  data: any[]
+  data: any[];
 }
 
-class Publications extends Component<Props, State> {
-  state = {
+class Publications extends Component<{}, State> {
+  public state = {
     data: [],
   };
 
-  componentDidMount() {
-    API.get('publication')
+  public componentDidMount() {
+    api
+      .get('publication')
       .then(({ data }) => this.setState({ data }))
       .catch(error => alert(error));
   }
 
-  render() {
+  public render() {
     const { data } = this.state;
 
     return (

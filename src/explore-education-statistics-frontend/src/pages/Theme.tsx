@@ -1,43 +1,46 @@
 import React, { Component } from 'react';
 import { match } from 'react-router';
-import DataList from '../components/DataList';
-import Title from '../components/Title';
-import API from '../api';
+import api from '../api';
 import Breadcrumbs from '../components/Breadcrumbs';
+import DataList from '../components/DataList';
 import Glink from '../components/Glink';
+import Title from '../components/Title';
 
 interface Props {
   match: match<{
-    theme: string,
-  }>
+    theme: string;
+  }>;
 }
 
 interface State {
   data: {
-    title: string,
-  },
-  topics: any[],
+    title: string;
+  };
+  topics: any[];
 }
 
 class Theme extends Component<Props, State> {
-  state = {
+  public state = {
     data: {
       title: '',
     },
     topics: [],
   };
 
-  componentDidMount() {
+  public componentDidMount() {
     const { theme } = this.props.match.params;
-    API.get(`theme/${theme}`)
+
+    api
+      .get(`theme/${theme}`)
       .then(({ data }) => this.setState({ data }))
       .catch(error => alert(error));
-    API.get(`theme/${theme}/topics`)
+    api
+      .get(`theme/${theme}/topics`)
       .then(({ data }) => this.setState({ topics: data }))
       .catch(error => alert(error));
   }
 
-  render() {
+  public render() {
     const { data, topics } = this.state;
 
     return (
@@ -49,12 +52,11 @@ class Theme extends Component<Props, State> {
 
             <p className="govuk-body">
               Here you can find DfE stats for Schools, and access them as
-              reports, customise and download as excel files or csv files, and access them via an
-              API. <Glink>(Find out more)</Glink>
+              reports, customise and download as excel files or csv files, and
+              access them via an API. <Glink>(Find out more)</Glink>
             </p>
             <p className="govuk-body">
-              You can also see our statistics for 16+ education and social
-              care.
+              You can also see our statistics for 16+ education and social care.
             </p>
 
             <div className="govuk-form-group">
@@ -75,12 +77,13 @@ class Theme extends Component<Props, State> {
                 Find
               </button>
             </div>
-            <h3 className="govuk-heading-m">What sort of stats are you looking for?</h3>
+            <h3 className="govuk-heading-m">
+              What sort of stats are you looking for?
+            </h3>
             <DataList data={topics} linkIdentifier={window.location.pathname} />
           </div>
         </div>
         <hr className="govuk-section-break--l govuk-section-break--visible" />
-
 
         <section id="latest-publications">
           <h2 className="govuk-heading-l">
@@ -88,10 +91,11 @@ class Theme extends Component<Props, State> {
           </h2>
 
           <p className="govuk-body">
-            These are the latest official statistics with figures
-            in {(data.title || '').toLowerCase()}. You can access the report and commentary, and
-            also get the data for use in Excel and other tools. You can now customise the data to
-            your requirements, and get a variety of formats.
+            These are the latest official statistics with figures in{' '}
+            {(data.title || '').toLowerCase()}. You can access the report and
+            commentary, and also get the data for use in Excel and other tools.
+            You can now customise the data to your requirements, and get a
+            variety of formats.
           </p>
 
           <hr className="govuk-section-break govuk-section-break--xl govuk-section-break--visible" />
@@ -103,8 +107,8 @@ class Theme extends Component<Props, State> {
           </h2>
 
           <p className="govuk-body">
-            These are some key indicators for {(data.title || '').toLowerCase()}.
-            You can change what you see here according to your requirements.
+            These are some key indicators for {(data.title || '').toLowerCase()}
+            . You can change what you see here according to your requirements.
           </p>
           <hr className="govuk-section-break govuk-section-break--xl govuk-section-break--visible" />
         </section>
@@ -114,14 +118,17 @@ class Theme extends Component<Props, State> {
             Explore {(data.title || '').toLowerCase()} statistics
           </h2>
           <ul className="govuk-list govuk-list--bullet">
-            <li>You can explore all the DfE statistics available
-              for {(data.title || '').toLowerCase()} here. You can use our step by step guide, or
-              dive straight in.
+            <li>
+              You can explore all the DfE statistics available for{' '}
+              {(data.title || '').toLowerCase()} here. You can use our step by
+              step guide, or dive straight in.
             </li>
             {/* <li>Once you've chosen your data you can view it by ###.</li> */}
-            <li>You can also dowload it, visualise it or copy and paste it as you need.</li>
+            <li>
+              You can also dowload it, visualise it or copy and paste it as you
+              need.
+            </li>
           </ul>
-
 
           {/* <div className="govuk-form-group">
                         <fieldset className="govuk-fieldset">
