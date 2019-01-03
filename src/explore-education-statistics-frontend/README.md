@@ -18,7 +18,7 @@ Formats the entire codebase using Prettier.
 
 ### `npm run lint`
 
-Lints the entire codebase using TSLint.
+Lints the entire codebase using TSLint and StyleLint.
 
 ### `npm test`
 
