@@ -11,22 +11,30 @@ interface Props {
   }>;
 }
 
+interface Publication {
+  nextUpdate: string;
+  legacyReleases: any[];
+}
+
 interface State {
   data: {
     title: string;
-    nextUpdate: string;
     published: string;
     releaseName: string;
+    publication: Publication;
   };
 }
 
-class Publication extends Component<Props, State> {
+class PublicationPage extends Component<Props, State> {
   public state = {
     data: {
-      nextUpdate: '',
       published: '',
       releaseName: '',
       title: '',
+      publication: {
+        legacyReleases: [],
+        nextUpdate: '',
+      },
     },
   };
 
@@ -34,7 +42,7 @@ class Publication extends Component<Props, State> {
     const { publication } = this.props.match.params;
 
     api
-      .get(`publication/${publication}`)
+      .get(`publication/${publication}/latest`)
       .then(({ data }) => this.setState({ data }))
       .catch(error => alert(error));
   }
@@ -61,7 +69,9 @@ class Publication extends Component<Props, State> {
                 <span className="govuk-caption-m">Release name: </span>
                 {data.releaseName} (latest data)
                 <span className="govuk-caption-m">
-                  <Glink>See previous years</Glink>
+                  <Glink>
+                    See previous {data.publication.legacyReleases.length} years
+                  </Glink>
                 </span>
               </h3>
 
@@ -72,7 +82,7 @@ class Publication extends Component<Props, State> {
 
               <h2 className="govuk-heading-s">
                 <span className="govuk-caption-m">Next update: </span>
-                <Date value={data.nextUpdate} />
+                <Date value={data.publication.nextUpdate} />
 
                 <span className="govuk-caption-m">
                   <a href="#notify">Notify me</a>
@@ -110,4 +120,4 @@ class Publication extends Component<Props, State> {
   }
 }
 
-export default Publication;
+export default PublicationPage;

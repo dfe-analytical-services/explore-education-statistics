@@ -5,7 +5,7 @@ import Feedback from './pages/Feedback';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import Privacy from './pages/Privacy';
-import Publication from './pages/Publication';
+import PublicationPage from './pages/PublicationPage';
 import Publications from './pages/Publications';
 import Theme from './pages/Theme';
 import Themes from './pages/Themes';
@@ -31,7 +31,7 @@ class App extends Component {
             <Route
               exact
               path="/themes/:theme/:topic/:publication"
-              component={Publication}
+              component={PublicationPage}
             />
 
             <Route exact path="/topics" component={Topics} />
@@ -39,14 +39,14 @@ class App extends Component {
             <Route
               exact
               path="/topics/:topic/:publication"
-              component={Publication}
+              component={PublicationPage}
             />
 
             <Route exact path="/publications/" component={Publications} />
             <Route
               exact
               path="/publications/:publication"
-              component={Publication}
+              component={PublicationPage}
             />
 
             <Route component={NotFound} />
