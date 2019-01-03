@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { match } from 'react-router';
 import api from '../api';
 import Breadcrumbs from '../components/Breadcrumbs';
 import Date from '../components/Date';
 import Glink from '../components/Glink';
-import ReactMarkdown from 'react-markdown';
 
 interface Props {
   match: match<{
