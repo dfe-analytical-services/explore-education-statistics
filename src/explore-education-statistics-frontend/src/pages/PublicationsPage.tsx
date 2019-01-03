@@ -7,7 +7,7 @@ interface State {
   data: any[];
 }
 
-class Publications extends Component<{}, State> {
+class PublicationsPage extends Component<{}, State> {
   public state = {
     data: [],
   };
@@ -33,4 +33,4 @@ class Publications extends Component<{}, State> {
   }
 }
 
-export default Publications;
+export default PublicationsPage;

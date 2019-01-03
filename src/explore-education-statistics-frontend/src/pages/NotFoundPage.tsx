@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-class NotFound extends Component {
+class NotFoundPage extends Component {
   public render() {
     return (
       <div className="govuk-grid-row">
@@ -18,4 +18,4 @@ class NotFound extends Component {
   }
 }
 
-export default NotFound;
+export default NotFoundPage;

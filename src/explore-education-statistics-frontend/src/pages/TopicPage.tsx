@@ -19,7 +19,7 @@ interface State {
   publications: object[];
 }
 
-class Topic extends Component<Props, State> {
+class TopicPage extends Component<Props, State> {
   public state = {
     data: {
       title: '',
@@ -120,4 +120,4 @@ class Topic extends Component<Props, State> {
   }
 }
 
-export default Topic;
+export default TopicPage;

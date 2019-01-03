@@ -19,7 +19,7 @@ interface State {
   topics: any[];
 }
 
-class Theme extends Component<Props, State> {
+class ThemePage extends Component<Props, State> {
   public state = {
     data: {
       title: '',
@@ -175,4 +175,4 @@ class Theme extends Component<Props, State> {
   }
 }
 
-export default Theme;
+export default ThemePage;

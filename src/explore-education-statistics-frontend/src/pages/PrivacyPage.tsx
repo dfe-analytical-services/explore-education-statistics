@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 
-class Feedback extends Component {
+class PrivacyPage extends Component {
   public render() {
     return (
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">Feedback</h1>
+          <h1 className="govuk-heading-xl">Privacy policy</h1>
         </div>
       </div>
     );
   }
 }
 
-export default Feedback;
+export default PrivacyPage;

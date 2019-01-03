@@ -7,14 +7,14 @@ interface State {
   data: any[];
 }
 
-class Themes extends Component<{}, State> {
+class TopicsPage extends Component<{}, State> {
   public state = {
     data: [],
   };
 
   public componentDidMount() {
     api
-      .get('theme')
+      .get('topic')
       .then(({ data }) => this.setState({ data }))
       .catch(error => alert(error));
   }
@@ -25,7 +25,7 @@ class Themes extends Component<{}, State> {
     return (
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <Title label="Themes" />
+          <Title label="Topics" />
           <DataList data={data} linkIdentifier={window.location.pathname} />
         </div>
       </div>
@@ -33,4 +33,4 @@ class Themes extends Component<{}, State> {
   }
 }
 
-export default Themes;
+export default TopicsPage;
