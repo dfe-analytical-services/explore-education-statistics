@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Breadcrumbs from '../components/Breadcrumbs';
 import API from '../api';
 import { match } from 'react-router';
+import Date from '../components/Date';
+import Glink from '../components/Glink';
 
 interface Props {
   match: match<{
@@ -13,6 +15,8 @@ interface State {
   data: {
     title: string,
     nextUpdate: string,
+    published: string,
+    releaseName: string,
   }
 }
 
@@ -21,6 +25,8 @@ class Publication extends Component<Props, State> {
     data: {
       title: '',
       nextUpdate: '',
+      published: '',
+      releaseName: '',
     },
   };
 
@@ -55,13 +61,21 @@ class Publication extends Component<Props, State> {
               </h3>
 
               <h3 className="govuk-heading-s">
+                <span className="govuk-caption-m">Release name: </span>
+                {data.releaseName}  (latest data)
+                <span className="govuk-caption-m">
+                  <Glink>See previous years</Glink>
+                </span>
+              </h3>
+
+              <h3 className="govuk-heading-s">
                 <span className="govuk-caption-m">Published: </span>
-                {/* 22 March 2018  */}
+                <Date value={data.published} />
               </h3>
 
               <h2 className="govuk-heading-s">
                 <span className="govuk-caption-m">Next update: </span>
-                {data.nextUpdate}
+                <Date value={data.nextUpdate} />
 
                 <span className="govuk-caption-m">
                   <a href="#notify">Notify me</a>
