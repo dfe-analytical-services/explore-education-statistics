@@ -28,8 +28,6 @@ const DataList = ({ linkIdentifier = '', data = [] }: Props) => (
               </Link>
             </h4>
             <p className="govuk-body">{elem.summary}</p>
-
-            <p className="govuk-body">link description</p>
           </div>
         ))}
       </div>
