@@ -1,19 +1,25 @@
 import React, { Component } from 'react';
 import Breadcrumbs from '../components/breadcrumbs';
 import API from '../api';
+import Date from '../components/date';
+import Glink from '../components/glink';
 
 class Publication extends Component {
 
     constructor(props) {
         super(props)
         this.state = {
-            data: []
+            data: {
+                publication: {
+                    legacyReleases: []
+                }
+            }
         }
     }
 
     componentDidMount() {
         const { publication } = this.props.match.params;
-        API.get(`publication/${publication}`)
+        API.get(`publication/${publication}/latest`)
             .then(json => this.setState({ data: json.data }))
             .catch(error => alert(error))
     }
@@ -37,15 +43,23 @@ class Publication extends Component {
                             <h3 className="govuk-heading-m" id="subsection-title">
                                 About this data
                             </h3>
+
+                            <h3 className="govuk-heading-s">
+                                <span className="govuk-caption-m">Release name: </span>
+                                {data.releaseName}  (latest data)
+                                <span className="govuk-caption-m">
+                                    <Glink>See previous {data.publication.legacyReleases.length} years</Glink>
+                                </span>
+                            </h3>
                             <h3 className="govuk-heading-s">
                                 <span className="govuk-caption-m">Published: </span>
-                                {/* 22 March 2018  */}
+                                <Date>{data.published}</Date>
                             </h3>
                             <h2 className="govuk-heading-s">
                                 <span className="govuk-caption-m">Next update: </span>
-                                    {data.nextUpdate}
+                                <Date>{data.publication.nextUpdate}</Date>
                                 <span className="govuk-caption-m">
-                                    <a href="#notify">Notify me</a>
+                                    <a className="govuk-link" href="#notify">Notify me</a>
                                 </span>
                             </h2>
 
