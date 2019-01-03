@@ -81,11 +81,19 @@ class PublicationPage extends Component<Props, State> {
               </h3>
 
               <h2 className="govuk-heading-s">
+                <span className="govuk-caption-m">Last updated: </span>
+                <Date value="1970-01-01T00:00:00" />
+                <span className="govuk-caption-m">
+                  <Glink>See all 999 updates</Glink>
+                </span>
+              </h2>
+
+              <h2 className="govuk-heading-s">
                 <span className="govuk-caption-m">Next update: </span>
                 <Date value={data.publication.nextUpdate} />
 
                 <span className="govuk-caption-m">
-                  <a href="#notify">Notify me</a>
+                  <Glink>Notify me</Glink>
                 </span>
               </h2>
 
@@ -97,19 +105,13 @@ class PublicationPage extends Component<Props, State> {
 
               <ul className="govuk-list">
                 <li>
-                  <a href="#download" className="govuk-link">
-                    Download pdf files
-                  </a>
+                  <Glink>Download pdf files</Glink>
                 </li>
                 <li>
-                  <a href="#download" className="govuk-link">
-                    Download .csv files
-                  </a>
+                  <Glink>Download .csv files</Glink>
                 </li>
                 <li>
-                  <a href="#api" className="govuk-link">
-                    Access API
-                  </a>
+                  <Glink>Access API</Glink>
                 </li>
               </ul>
             </aside>
