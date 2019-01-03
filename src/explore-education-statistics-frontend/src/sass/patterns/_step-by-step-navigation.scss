@@ -439,8 +439,8 @@
 
 @include govuk-media-query($from: tablet) {
   .app-step-nav--large
-  .app-step-nav__list--choice
-  .app-step-nav__list-item--active:before {
+    .app-step-nav__list--choice
+    .app-step-nav__list-item--active:before {
     left: -80px;
   }
 }
