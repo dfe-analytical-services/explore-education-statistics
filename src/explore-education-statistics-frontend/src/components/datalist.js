@@ -11,7 +11,7 @@ class DataList extends Component {
                     {this.props.data.map(elem => (
                         <div className="govuk-grid-column-one-half" key={elem.id}>
                             <h4 className="govuk-heading-s">
-                                <Link className="govuk-link" to={`${this.props.linkIdentifier}/${elem.id}`}>{elem.title}</Link>
+                                <Link className="govuk-link" to={`${this.props.linkIdentifier}/${elem.slug}`}>{elem.title}</Link>
                             </h4>
                             <p className="govuk-body">{elem.summary}</p>
                         </div>
