@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Swagger;
@@ -16,6 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Publication> Publications { get; set; }
         public DbSet<Release> Releases { get; set; }
+        public DbSet<Link> Links { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -25,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                 new Theme() { Id = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"), Title = "Social Care", Summary = "Lorem ipsum dolor sit amet.", Slug = "schools" },
                 new Theme() { Id = new Guid("bc08839f-2970-4f34-af2d-29608a48082f"), Title = "16+", Summary = "Lorem ipsum dolor sit amet.", Slug = "16+" }
                 );
-            
+
             modelBuilder.Entity<Topic>().HasData(
                 new Topic() { Id = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Title = "Absence and exclusions", Summary = "Pupil absence, permanent and fixed period exlusions", ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Slug = "absence-and-exclusions"},
                 new Topic() { Id = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"), Title = "School & pupil numbers", Summary = "Schools, pupils and their characteristics, SEN and EHC plans, SEN in England", ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Slug = "school-and-pupil-numbers"},
@@ -43,7 +45,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
 
             modelBuilder.Entity<Publication>().HasData(
                 // Absence and exclusions
-                new Publication() { Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Title = "Pupil absence in schools in England", Summary = "Overall absence, Authorised absence, Unauthorised absence, Persistence absence", TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Slug = "pupil-absence-in-schools-in-england" },
+                new Publication()
+                {
+                    Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), 
+                    Title = "Pupil absence in schools in England", 
+                    Summary = "Overall absence, Authorised absence, Unauthorised absence, Persistence absence", 
+                    TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), 
+                    Slug = "pupil-absence-in-schools-in-england",
+                    NextUpdate = new DateTime(2018, 3, 22),
+                },
                 new Publication() { Id = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"), Title = "Permanent and fixed period exclusions", Summary = "Permanent exclusions, fixed period exclusions", TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Slug = "permanent-and-fixed-period-exclusions" },
                 
                 // School and pupil numbers
@@ -85,6 +95,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     Published = new DateTime(2018,3,22),
                     Summary = "<p class=\"govuk-body\"> This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools.</p><p class=\"govuk-body\">It allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:</p>"
                 }
+            );
+            
+            modelBuilder.Entity<Link>().HasData(
+                new Link { PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Id = new Guid("8693c112-225e-4e09-80c2-820cb307bc58"), Description = "2015 to 2016", Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2015-to-2016"},
+                new Link { PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Id = new Guid("45bc02ff-de90-489b-b78e-cdc7db662353"), Description = "2014 to 2015", Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015"},
+                new Link { PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Id = new Guid("82292fe7-1545-44eb-a094-80c5064701a7"), Description = "2013 to 2014", Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014"},
+                new Link { PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Id = new Guid("6907625d-0c2e-4fd8-8e96-aedd85b2ff97"), Description = "2012 to 2013", Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013"},
+                new Link { PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Id = new Guid("a538e57a-da5e-4a2c-a89e-b74dbae0c30b"), Description = "2011 to 2012", Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics"},
+                new Link { PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Id = new Guid("18b24d60-c56e-44f0-8baa-6db4c6e7deee"), Description = "2010 to 2011", Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011"},
+                new Link { PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Id = new Guid("c5444f5a-6ba5-4c80-883c-6bca0d8a9eb5"), Description = "2009 to 2010", Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010"}
             );
         }
     }

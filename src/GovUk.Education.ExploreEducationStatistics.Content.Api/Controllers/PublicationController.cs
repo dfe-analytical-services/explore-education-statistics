@@ -31,8 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         public ActionResult<Publication> Get(string id)
         {
             return Guid.TryParse(id, out var newGuid) ? 
-                _context.Publications.FirstOrDefault(t => t.Id == newGuid) : 
-                _context.Publications.FirstOrDefault(t => t.Slug == id);
+                _context.Publications.Include(x => x.LegacyReleases).FirstOrDefault(t => t.Id == newGuid) : 
+                _context.Publications.Include(x => x.LegacyReleases).FirstOrDefault(t => t.Slug == id);
         }
         
         // GET api/publication/5
@@ -40,8 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         public ActionResult<Release> GetLatest(string id)
         {
             return Guid.TryParse(id, out var newGuid) ? 
-                _context.Releases.Include(x => x.Publication).FirstOrDefault(t => t.PublicationId == newGuid) : 
-                _context.Releases.Include(x => x.Publication).FirstOrDefault(t => t.Publication.Slug == id);
+                _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases).FirstOrDefault(t => t.PublicationId == newGuid) : 
+                _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases).FirstOrDefault(t => t.Publication.Slug == id);
         }
     }
 }

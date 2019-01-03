@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
         
         public List<Release> Releases { get; set; }
         
-        //public List<Link> LegacyReleases { get; set; }
+        public List<Link> LegacyReleases { get; set; }
         
         public Guid TopicId { get; set; }
         
