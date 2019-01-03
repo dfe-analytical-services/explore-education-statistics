@@ -36,11 +36,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         // GET api/theme/5/topics
         [HttpGet("{id}/topics")]
         public ActionResult<List<Topic>> GetTopics(string id)
-        {
-            
+        {   
             return Guid.TryParse(id, out var newGuid) ? 
                 _context.Topics.Where(t => t.ThemeId == newGuid).ToList() : 
-                _context.Topics.Where(t => t.Slug == id).ToList();
+                _context.Topics.Where(t => t.Theme.Slug == id).ToList();
         }
     }
 }

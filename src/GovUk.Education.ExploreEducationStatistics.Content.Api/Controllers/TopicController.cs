@@ -27,17 +27,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 
         // GET api/topic/5
         [HttpGet("{id}")]
-        public ActionResult<Topic> Get(Guid id)
+        public ActionResult<Topic> Get(string id)
         {
-            return _context.Topics.FirstOrDefault(t => t.Id == id);
+            return Guid.TryParse(id, out var newGuid) ? 
+                _context.Topics.FirstOrDefault(t => t.Id == newGuid) : 
+                _context.Topics.FirstOrDefault(t => t.Slug == id);
         }
         
         
         // GET api/topic/5/publications
         [HttpGet("{id}/publications")]
-        public ActionResult<List<Publication>> GetPublications(Guid id)
+        public ActionResult<List<Publication>> GetPublications(string id)
         {
-            return _context.Publications.Where(t => t.TopicId == id).ToList();
+            return Guid.TryParse(id, out var newGuid) ? 
+                _context.Publications.Where(t => t.TopicId == newGuid).ToList() : 
+                _context.Publications.Where(t => t.Topic.Slug == id).ToList();
         }
     }
 }
