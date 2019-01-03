@@ -26,13 +26,14 @@
     "typescript": "^3.2.2"
   },
   "scripts": {
-    "prebuild": "npm run assets",
     "assets": "npm-run-all clean copy-assets",
     "clean": "rimraf public/assets",
     "copy-assets": "ncp node_modules/govuk-frontend/assets public/assets && ncp node_modules/govuk-frontend/all.js public/all.js",
     "start": "npm run assets && react-scripts start",
+    "prebuild": "CI=true npm-run-all assets test lint format:check",
     "build": "react-scripts build",
     "format": "prettier --write '**/*.{js,jsx,ts,tsx,css,scss,html}'",
+    "format:check": "prettier --list-different '**/*.{js,jsx,ts,tsx,css,scss,html}'",
     "lint": "tslint --project tsconfig.json 'src/**/*.{ts,tsx}'",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
