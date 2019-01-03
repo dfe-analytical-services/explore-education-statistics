@@ -13,12 +13,12 @@ class DataList extends Component {
                             <h4 className="govuk-heading-s">
                                 <Link className="govuk-link" to={`${this.props.linkIdentifier}/${elem.id}`}>{elem.title}</Link>
                             </h4>
-                            <p className="govuk-body">link description</p>
+                            <p className="govuk-body">{elem.summary}</p>
                         </div>
                     ))}
                     </div>
                 ) : (
-                    <div class="govuk-inset-text">
+                    <div className="govuk-inset-text">
                         None currently published.
                     </div>
                 )}

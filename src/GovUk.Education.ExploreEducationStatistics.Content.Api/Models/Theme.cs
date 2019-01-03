@@ -14,6 +14,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
         
         [Required]
         public string Title { get; set; }
+        
+        public string Summary { get; set; }
 
         public List<Topic> Topics { get; set; }
     }

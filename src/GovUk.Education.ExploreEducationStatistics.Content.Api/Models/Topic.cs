@@ -20,6 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
         public Guid ThemeId { get; set; }
         
         public Theme Theme { get; set; }
+        
+        public string Summary { get; set; }
 
         public List<Publication> Publications { get; set; }
     }

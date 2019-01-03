@@ -18,6 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
 
         public string Description { get; set; }
         
+        public string Summary { get; set; }
+        
         public DateTime? NextUpdate { get; set; }
         
         public List<Release> Releases { get; set; }
