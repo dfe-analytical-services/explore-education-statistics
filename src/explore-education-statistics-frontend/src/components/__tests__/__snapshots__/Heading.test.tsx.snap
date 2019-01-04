@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`H1 renders correctly as \`xl\` size 1`] = `
+
+<h1 class="govuk-heading-xl">
+  Test Heading 1
+</h1>
+
+`;
+
+exports[`H2 renders correctly as \`l\` size 1`] = `
+
+<h2 class="govuk-heading-l">
+  Test Heading 2
+</h2>
+
+`;
+
+exports[`H3 renders correctly as \`m\` size 1`] = `
+
+<h3 class="govuk-heading-m">
+  Test Heading 3
+</h3>
+
+`;
+
+exports[`H4 renders correctly as \`xl\` size 1`] = `
+
+<h4 class="govuk-heading-s">
+  Test Heading 4
+</h4>
+
+`;
+
+exports[`Heading renders \`l\` size correctly as h2 1`] = `
+
+<h2 class="govuk-heading-l">
+  Test Heading 2
+</h2>
+
+`;
+
+exports[`Heading renders \`m\` size correctly as h3 1`] = `
+
+<h3 class="govuk-heading-m">
+  Test Heading 3
+</h3>
+
+`;
+
+exports[`Heading renders \`s\` size correctly as h4 1`] = `
+
+<h4 class="govuk-heading-s">
+  Test Heading 4
+</h4>
+
+`;
+
+exports[`Heading renders \`xl\` size correctly as h1 1`] = `
+
+<h1 class="govuk-heading-xl">
+  Test Heading 1
+</h1>
+
+`;
