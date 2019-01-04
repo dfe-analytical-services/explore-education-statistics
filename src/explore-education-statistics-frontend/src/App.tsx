@@ -66,12 +66,22 @@ class App extends Component {
                   path="/themes/:theme/:topic/:publication"
                   component={PublicationPage}
                 />
+                <Route
+                  exact
+                  path="/themes/:theme/:topic/:publication/:release"
+                  component={PublicationPage}
+                />
 
                 <Route exact path="/topics" component={TopicsPage} />
                 <Route exact path="/topics/:topic" component={TopicPage} />
                 <Route
                   exact
                   path="/topics/:topic/:publication"
+                  component={PublicationPage}
+                />
+                <Route
+                  exact
+                  path="/topics/:topic/:publication/:release"
                   component={PublicationPage}
                 />
 
@@ -83,6 +93,11 @@ class App extends Component {
                 <Route
                   exact
                   path="/publications/:publication"
+                  component={PublicationPage}
+                />
+                <Route
+                  exact
+                  path="/publications/:publication/:release"
                   component={PublicationPage}
                 />
 

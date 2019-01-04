@@ -8,10 +8,14 @@ import Link from '../components/Link';
 interface Props {
   match: match<{
     publication: string;
+    release: string;
+    theme: string;
+    topic: string;
   }>;
 }
 
 interface LegacyRelease {
+  id: string;
   description: string;
   url: string;
 }
@@ -25,6 +29,7 @@ interface Publication {
   nextUpdate: string;
   releases: Release[];
   legacyReleases: LegacyRelease[];
+  slug: string;
 }
 
 interface State {
@@ -44,6 +49,7 @@ class PublicationPage extends Component<Props, State> {
         legacyReleases: [
           {
             description: '',
+            id: '',
             url: '',
           },
         ],
@@ -54,6 +60,7 @@ class PublicationPage extends Component<Props, State> {
             releaseName: '',
           },
         ],
+        slug: '',
       },
       published: '',
       releaseName: '',
@@ -73,6 +80,8 @@ class PublicationPage extends Component<Props, State> {
 
   public render() {
     const { data } = this.state;
+    const { theme } = this.props.match.params;
+    const { topic } = this.props.match.params;
     const releaseCount =
       data.publication.releases.length + data.publication.legacyReleases.length;
 
@@ -102,12 +111,18 @@ class PublicationPage extends Component<Props, State> {
                   <div className="govuk-details__text">
                     <ul>
                       {data.publication.releases.map(elem => (
-                        <li>
-                          <Link to="#">{elem.releaseName}</Link>
+                        <li key={elem.id}>
+                          <Link
+                            to={`/themes/${theme}/${topic}/${
+                              data.publication.slug
+                            }/${elem.id}`}
+                          >
+                            {elem.releaseName}
+                          </Link>
                         </li>
                       ))}
                       {data.publication.legacyReleases.map(elem => (
-                        <li>
+                        <li key={elem.id}>
                           <a className="govuk-link" href={elem.url}>
                             {elem.description}
                           </a>
