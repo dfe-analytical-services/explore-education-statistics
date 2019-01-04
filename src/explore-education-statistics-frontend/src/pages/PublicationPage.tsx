@@ -4,6 +4,8 @@ import { match } from 'react-router';
 import api from '../api';
 import Date from '../components/Date';
 import Glink from '../components/Glink';
+import StepByStepNavigation from '../components/StepByStepNavigation';
+import StepByStepNavigationStep from '../components/StepByStepNavigationStep';
 
 interface Props {
   match: match<{
@@ -71,6 +73,32 @@ class PublicationPage extends Component<Props, State> {
             <h1 className="govuk-heading-l">{data.title}</h1>
 
             <ReactMarkdown className="govuk-body" source={data.summary} />
+
+            <StepByStepNavigation>
+              <StepByStepNavigationStep
+                title="Where does this data come from?"
+                caption="How we collect an process the data"
+              />
+              <StepByStepNavigationStep title="Feedback and questions">
+                <ul className="govuk-list">
+                  <li>
+                    <a href="#" className="govuk-link">
+                      Feedback on this page
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="govuk-link">
+                      Make a suggestion
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="govuk-link">
+                      Ask a question
+                    </a>
+                  </li>
+                </ul>
+              </StepByStepNavigationStep>
+            </StepByStepNavigation>
           </div>
           <div className="govuk-grid-column-one-third">
             <aside className="app-related-items">
