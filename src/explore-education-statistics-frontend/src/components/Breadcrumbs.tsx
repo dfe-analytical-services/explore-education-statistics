@@ -17,8 +17,8 @@ const Breadcrumbs = ({ current }: Props) => (
         {window.location.pathname
           .split('/')
           .slice(1)
-          .map(elem => (
-            <li className="govuk-breadcrumbs__list-item">
+          .map((elem, index) => (
+            <li key={index} className="govuk-breadcrumbs__list-item">
               <Link className="govuk-breadcrumbs__link" to={`/${elem}`}>
                 {elem}
               </Link>
