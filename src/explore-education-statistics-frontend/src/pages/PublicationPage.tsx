@@ -3,7 +3,6 @@ import ReactMarkdown from 'react-markdown';
 import { match } from 'react-router';
 import api from '../api';
 import Date from '../components/Date';
-import { H2, H3, H4 } from '../components/Heading';
 import Link from '../components/Link';
 
 interface Props {
@@ -69,15 +68,15 @@ class PublicationPage extends Component<Props, State> {
           <div className="govuk-grid-column-two-thirds">
             <strong className="govuk-tag">This is the latest data</strong>
 
-            <H2>{data.title}</H2>
+            <h2>{data.title}</h2>
 
             <ReactMarkdown className="govuk-body" source={data.summary} />
           </div>
           <div className="govuk-grid-column-one-third">
             <aside className="app-related-items">
-              <H3 id="subsection-title">About this data</H3>
+              <h3 id="subsection-title">About this data</h3>
 
-              <H4>
+              <h4>
                 <span className="govuk-caption-m">Release name: </span>
                 {data.releaseName} (latest data)
                 <details className="govuk-details">
@@ -88,7 +87,7 @@ class PublicationPage extends Component<Props, State> {
                     </span>
                   </summary>
                   <div className="govuk-details__text">
-                    <ul className="govuk-list">
+                    <ul>
                       {data.publication.legacyReleases.map(elem => (
                         <li>
                           <a className="govuk-link" href={elem.url}>
@@ -99,16 +98,17 @@ class PublicationPage extends Component<Props, State> {
                     </ul>
                   </div>
                 </details>
-              </H4>
+              </h4>
 
-              <H4>
+              <h4>
                 <span className="govuk-caption-m">Published: </span>
                 <Date value={data.published} />
-              </H4>
+              </h4>
 
-              <H4>
+              <h4>
                 <span className="govuk-caption-m">Last updated: </span>
                 <Date value="1970-01-01T00:00:00" />
+
                 <details className="govuk-details">
                   <summary className="govuk-details__summary">
                     <span className="govuk-details__summary-text">
@@ -116,23 +116,23 @@ class PublicationPage extends Component<Props, State> {
                     </span>
                   </summary>
                   <div className="govuk-details__text">
-                    <p className="govuk-body govuk-!-font-weight-bold">
+                    <p>
                       19 April 2017
                     </p>
-                    <p className="govuk-body">
+                    <p>
                       Underlying data file updated to include absence data by
                       pupil residency and school location, andupdated metadata
                       document.
                     </p>
-                    <p className="govuk-body govuk-!-font-weight-bold">
+                    <strong>
                       23 March 2017
-                    </p>
-                    <p className="govuk-body">First published.</p>
+                    </strong>
+                    <p>First published.</p>
                   </div>
                 </details>
-              </H4>
+              </h4>
 
-              <H4>
+              <h4>
                 <span className="govuk-caption-m">Next update: </span>
                 <Date value={data.publication.nextUpdate} />
 
@@ -141,13 +141,13 @@ class PublicationPage extends Component<Props, State> {
                     Notify me
                   </Link>
                 </span>
-              </H4>
+              </h4>
 
               <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
 
-              <H3 id="getting-the-data">Getting the data</H3>
+              <h3 id="getting-the-data">Getting the data</h3>
 
-              <ul className="govuk-list">
+              <ul>
                 <li>
                   <Link to="#">Download pdf files</Link>
                 </li>

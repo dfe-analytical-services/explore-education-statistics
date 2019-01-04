@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { H4 } from './Heading';
 
 interface Datum {
   id: string;
@@ -20,15 +19,15 @@ const DataList = ({ linkIdentifier = '', data = [] }: Props) => (
       <div className="govuk-grid-row">
         {data.map(elem => (
           <div className="govuk-grid-column-one-half" key={elem.id}>
-            <H4>
+            <h4>
               <Link
                 className="govuk-link"
                 to={`${linkIdentifier}/${elem.slug}`}
               >
                 {elem.title}
               </Link>
-            </H4>
-            <p className="govuk-body">{elem.summary}</p>
+            </h4>
+            <p>{elem.summary}</p>
           </div>
         ))}
       </div>
