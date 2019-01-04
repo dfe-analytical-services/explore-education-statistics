@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { match } from 'react-router';
 import api from '../api';
 import Date from '../components/Date';
-import Glink from '../components/Glink';
+import Link from '../components/Link';
 
 interface Props {
   match: match<{
@@ -138,7 +138,7 @@ class PublicationPage extends Component<Props, State> {
                 <Date value={data.publication.nextUpdate} />
 
                 <span className="govuk-caption-m">
-                  <Glink>Notify me</Glink>
+                  <Link to="#" unvisited>Notify me</Link>
                 </span>
               </h2>
 
@@ -150,13 +150,13 @@ class PublicationPage extends Component<Props, State> {
 
               <ul className="govuk-list">
                 <li>
-                  <Glink>Download pdf files</Glink>
+                  <Link to="#">Download pdf files</Link>
                 </li>
                 <li>
-                  <Glink>Download .csv files</Glink>
+                  <Link to="#">Download .csv files</Link>
                 </li>
                 <li>
-                  <Glink>Access API</Glink>
+                  <Link to="#">Access API</Link>
                 </li>
               </ul>
             </aside>

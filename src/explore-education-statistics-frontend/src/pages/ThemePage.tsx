@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { match } from 'react-router';
 import api from '../api';
 import DataList from '../components/DataList';
-import Glink from '../components/Glink';
+import Link from '../components/Link';
 import Title from '../components/Title';
 
 interface Props {
@@ -51,7 +51,7 @@ class ThemePage extends Component<Props, State> {
             <p className="govuk-body">
               Here you can find DfE stats for Schools, and access them as
               reports, customise and download as excel files or csv files, and
-              access them via an API. <Glink>(Find out more)</Glink>
+              access them via an API. <Link to="#">(Find out more)</Link>
             </p>
             <p className="govuk-body">
               You can also see our statistics for 16+ education and social care.

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import Link from '../components/Link';
 
 class HomePage extends Component {
   public render() {
@@ -29,17 +29,17 @@ class HomePage extends Component {
             <nav role="navigation" aria-labelledby="subsection-title">
               <ul className="govuk-list govuk-!-font-size-16">
                 <li>
-                  <Link to={'/themes'} className="govuk-link">
+                  <Link to="/themes">
                     Themes
                   </Link>
                 </li>
                 <li>
-                  <Link to={'/topics'} className="govuk-link">
+                  <Link to="topics">
                     Topics
                   </Link>
                 </li>
                 <li>
-                  <Link to={'/publications'} className="govuk-link">
+                  <Link to="/publications">
                     Publications
                   </Link>
                 </li>
