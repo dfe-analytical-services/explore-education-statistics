@@ -44,5 +44,7 @@ h4 {
 }
 
 hr {
-  @extend %govuk-section-break, %govuk-section-break--visible;
+  @extend %govuk-section-break,
+    %govuk-section-break--m,
+    %govuk-section-break--visible;
 }
