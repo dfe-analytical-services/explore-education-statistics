@@ -76,18 +76,14 @@ class ThemePage extends Component<Props, State> {
                 Find
               </button>
             </div>
-            <H3>
-              What sort of stats are you looking for?
-            </H3>
+            <H3>What sort of stats are you looking for?</H3>
             <DataList data={topics} linkIdentifier={window.location.pathname} />
           </div>
         </div>
         <hr className="govuk-section-break--l govuk-section-break--visible" />
 
         <section id="latest-publications">
-          <H2>
-            Latest publications in {(data.title || '').toLowerCase()}
-          </H2>
+          <H2>Latest publications in {(data.title || '').toLowerCase()}</H2>
 
           <p className="govuk-body">
             These are the latest official statistics with figures in{' '}
@@ -101,9 +97,7 @@ class ThemePage extends Component<Props, State> {
         </section>
 
         <section id="key-indicators">
-          <H2>
-            Key indicators for {(data.title || '').toLowerCase()}
-          </H2>
+          <H2>Key indicators for {(data.title || '').toLowerCase()}</H2>
 
           <p className="govuk-body">
             These are some key indicators for {(data.title || '').toLowerCase()}
@@ -113,9 +107,7 @@ class ThemePage extends Component<Props, State> {
         </section>
 
         <section id="explore-statistics">
-          <H2>
-            Explore {(data.title || '').toLowerCase()} statistics
-          </H2>
+          <H2>Explore {(data.title || '').toLowerCase()} statistics</H2>
           <ul className="govuk-list govuk-list--bullet">
             <li>
               You can explore all the DfE statistics available for{' '}

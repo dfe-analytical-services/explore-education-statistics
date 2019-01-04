@@ -75,9 +75,7 @@ class PublicationPage extends Component<Props, State> {
           </div>
           <div className="govuk-grid-column-one-third">
             <aside className="app-related-items">
-              <H3 id="subsection-title">
-                About this data
-              </H3>
+              <H3 id="subsection-title">About this data</H3>
 
               <H4>
                 <span className="govuk-caption-m">Release name: </span>
@@ -139,15 +137,15 @@ class PublicationPage extends Component<Props, State> {
                 <Date value={data.publication.nextUpdate} />
 
                 <span className="govuk-caption-m">
-                  <Link to="#" unvisited>Notify me</Link>
+                  <Link to="#" unvisited>
+                    Notify me
+                  </Link>
                 </span>
               </H4>
 
               <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
 
-              <H3 id="getting-the-data">
-                Getting the data
-              </H3>
+              <H3 id="getting-the-data">Getting the data</H3>
 
               <ul className="govuk-list">
                 <li>

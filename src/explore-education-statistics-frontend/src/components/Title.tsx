@@ -8,9 +8,7 @@ interface Props {
 const Title = ({ label }: Props) => (
   <div className="app-content__header">
     <span className="govuk-caption-xl">{label}</span>
-    <H1>
-      Find {(label || '').toLowerCase()} statistics
-    </H1>
+    <H1>Find {(label || '').toLowerCase()} statistics</H1>
   </div>
 );
 

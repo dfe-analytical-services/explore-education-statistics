@@ -31,19 +31,13 @@ class HomePage extends Component {
             <nav role="navigation" aria-labelledby="subsection-title">
               <ul className="govuk-list govuk-!-font-size-16">
                 <li>
-                  <Link to="/themes">
-                    Themes
-                  </Link>
+                  <Link to="/themes">Themes</Link>
                 </li>
                 <li>
-                  <Link to="topics">
-                    Topics
-                  </Link>
+                  <Link to="topics">Topics</Link>
                 </li>
                 <li>
-                  <Link to="/publications">
-                    Publications
-                  </Link>
+                  <Link to="/publications">Publications</Link>
                 </li>
               </ul>
             </nav>

@@ -72,9 +72,7 @@ class TopicPage extends Component<Props, State> {
         <hr className="govuk-section-break govuk-section-break--xl govuk-section-break--visible" />
 
         <section id="latest-publications">
-          <H2>
-            Latest publications in {(data.title || '').toLowerCase()}
-          </H2>
+          <H2>Latest publications in {(data.title || '').toLowerCase()}</H2>
           <p className="govuk-body">
             These are the latest official statistics with figures in
             {(data.title || '').toLowerCase()}. You can access the report and
@@ -86,9 +84,7 @@ class TopicPage extends Component<Props, State> {
         </section>
 
         <section id="key-indicators">
-          <H2>
-            Key indicators for {(data.title || '').toLowerCase()}
-          </H2>
+          <H2>Key indicators for {(data.title || '').toLowerCase()}</H2>
           <p className="govuk-body">
             These are some key indicators for {(data.title || '').toLowerCase()}
             . You can change what you see here according to your requirements.
@@ -97,9 +93,7 @@ class TopicPage extends Component<Props, State> {
         </section>
 
         <section id="explore-statistics">
-          <H2>
-            Explore {(data.title || '').toLowerCase()} statistics
-          </H2>
+          <H2>Explore {(data.title || '').toLowerCase()} statistics</H2>
 
           <ul className="govuk-list govuk-list--bullet">
             <li>
