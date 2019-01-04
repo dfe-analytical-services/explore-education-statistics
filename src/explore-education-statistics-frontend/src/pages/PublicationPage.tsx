@@ -16,8 +16,14 @@ interface LegacyRelease {
   url: string;
 }
 
+interface Release {
+  id: string;
+  releaseName: string;
+}
+
 interface Publication {
   nextUpdate: string;
+  releases: Release[];
   legacyReleases: LegacyRelease[];
 }
 
@@ -42,6 +48,12 @@ class PublicationPage extends Component<Props, State> {
           },
         ],
         nextUpdate: '',
+        releases: [
+          {
+            id: '',
+            releaseName: '',
+          },
+        ],
       },
       published: '',
       releaseName: '',
@@ -61,6 +73,8 @@ class PublicationPage extends Component<Props, State> {
 
   public render() {
     const { data } = this.state;
+    const releaseCount =
+      data.publication.releases.length + data.publication.legacyReleases.length;
 
     return (
       <div>
@@ -82,12 +96,16 @@ class PublicationPage extends Component<Props, State> {
                 <details className="govuk-details">
                   <summary className="govuk-details__summary">
                     <span className="govuk-details__summary-text">
-                      See previous {data.publication.legacyReleases.length}{' '}
-                      releases
+                      See previous {releaseCount} releases
                     </span>
                   </summary>
                   <div className="govuk-details__text">
                     <ul>
+                      {data.publication.releases.map(elem => (
+                        <li>
+                          <Link to="#">{elem.releaseName}</Link>
+                        </li>
+                      ))}
                       {data.publication.legacyReleases.map(elem => (
                         <li>
                           <a className="govuk-link" href={elem.url}>
@@ -116,17 +134,13 @@ class PublicationPage extends Component<Props, State> {
                     </span>
                   </summary>
                   <div className="govuk-details__text">
-                    <p>
-                      19 April 2017
-                    </p>
+                    <p>19 April 2017</p>
                     <p>
                       Underlying data file updated to include absence data by
                       pupil residency and school location, andupdated metadata
                       document.
                     </p>
-                    <strong>
-                      23 March 2017
-                    </strong>
+                    <strong>23 March 2017</strong>
                     <p>First published.</p>
                   </div>
                 </details>
