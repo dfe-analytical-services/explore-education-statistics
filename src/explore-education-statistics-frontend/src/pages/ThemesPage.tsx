@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import api from '../api';
 import DataList from '../components/DataList';
-import Title from '../components/Title';
+import { H1 } from '../components/Heading';
 
 interface State {
   data: any[];
@@ -25,7 +25,7 @@ class ThemesPage extends Component<{}, State> {
     return (
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">Themes</h1>
+          <H1>Themes</H1>
           <DataList data={data} linkIdentifier={window.location.pathname} />
         </div>
       </div>

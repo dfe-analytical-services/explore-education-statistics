@@ -1,4 +1,5 @@
 import React from 'react';
+import { H1 } from './Heading';
 
 interface Props {
   label: string;
@@ -7,9 +8,9 @@ interface Props {
 const Title = ({ label }: Props) => (
   <div className="app-content__header">
     <span className="govuk-caption-xl">{label}</span>
-    <h1 className="govuk-heading-xl">
+    <H1>
       Find {(label || '').toLowerCase()} statistics
-    </h1>
+    </H1>
   </div>
 );
 

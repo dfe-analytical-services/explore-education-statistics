@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { match } from 'react-router';
 import api from '../api';
 import Date from '../components/Date';
+import { H2, H3, H4 } from '../components/Heading';
 import Link from '../components/Link';
 
 interface Props {
@@ -68,17 +69,17 @@ class PublicationPage extends Component<Props, State> {
           <div className="govuk-grid-column-two-thirds">
             <strong className="govuk-tag">This is the latest data</strong>
 
-            <h1 className="govuk-heading-l">{data.title}</h1>
+            <H2>{data.title}</H2>
 
             <ReactMarkdown className="govuk-body" source={data.summary} />
           </div>
           <div className="govuk-grid-column-one-third">
             <aside className="app-related-items">
-              <h3 className="govuk-heading-m" id="subsection-title">
+              <H3 id="subsection-title">
                 About this data
-              </h3>
+              </H3>
 
-              <h3 className="govuk-heading-s">
+              <H4>
                 <span className="govuk-caption-m">Release name: </span>
                 {data.releaseName} (latest data)
                 <details className="govuk-details">
@@ -100,14 +101,14 @@ class PublicationPage extends Component<Props, State> {
                     </ul>
                   </div>
                 </details>
-              </h3>
+              </H4>
 
-              <h3 className="govuk-heading-s">
+              <H4>
                 <span className="govuk-caption-m">Published: </span>
                 <Date value={data.published} />
-              </h3>
+              </H4>
 
-              <h2 className="govuk-heading-s">
+              <H4>
                 <span className="govuk-caption-m">Last updated: </span>
                 <Date value="1970-01-01T00:00:00" />
                 <details className="govuk-details">
@@ -131,22 +132,22 @@ class PublicationPage extends Component<Props, State> {
                     <p className="govuk-body">First published.</p>
                   </div>
                 </details>
-              </h2>
+              </H4>
 
-              <h2 className="govuk-heading-s">
+              <H4>
                 <span className="govuk-caption-m">Next update: </span>
                 <Date value={data.publication.nextUpdate} />
 
                 <span className="govuk-caption-m">
                   <Link to="#" unvisited>Notify me</Link>
                 </span>
-              </h2>
+              </H4>
 
               <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
 
-              <h2 className="govuk-heading-m" id="getting-the-data">
+              <H3 id="getting-the-data">
                 Getting the data
-              </h2>
+              </H3>
 
               <ul className="govuk-list">
                 <li>

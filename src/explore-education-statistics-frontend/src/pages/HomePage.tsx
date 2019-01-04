@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { H1, H2 } from '../components/Heading';
 import Link from '../components/Link';
 
 class HomePage extends Component {
@@ -6,7 +7,7 @@ class HomePage extends Component {
     return (
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">Explore education statistics</h1>
+          <H1>Explore education statistics</H1>
           <p className="govuk-body">Use this service to:</p>
           <ul className="govuk-list govuk-list--bullet">
             <li>do something</li>
@@ -19,13 +20,14 @@ class HomePage extends Component {
           >
             Start now
           </a>
-          <h2 className="govuk-heading-m">Before you start</h2>
+          <H2>Before you start</H2>
           <p className="govuk-body">Do something.</p>
         </div>
 
         <div className="govuk-grid-column-one-third">
           <aside className="app-related-items" role="complementary">
-            <h2 className="govuk-heading-m">Quick Links</h2>
+            <H2>Quick Links</H2>
+
             <nav role="navigation" aria-labelledby="subsection-title">
               <ul className="govuk-list govuk-!-font-size-16">
                 <li>

@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
+import { H1 } from '../components/Heading';
 
 class NotFoundPage extends Component {
   public render() {
     return (
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">Page not found</h1>
+          <H1>Page not found</H1>
           <p className="govuk-body">
             If you typed the web address, check it is correct.
           </p>

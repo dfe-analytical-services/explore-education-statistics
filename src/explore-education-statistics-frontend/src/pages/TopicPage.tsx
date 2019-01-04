@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { match } from 'react-router';
 import api from '../api';
 import DataList from '../components/DataList';
+import { H2, H3 } from '../components/Heading';
 import Link from '../components/Link';
 import Title from '../components/Title';
 
@@ -58,10 +59,10 @@ class TopicPage extends Component<Props, State> {
               You can also see our statistics for 16+ education and social care.
             </p>
 
-            <h3 className="govuk-heading-m">
+            <H3>
               The following publications are available in{' '}
               {(data.title || '').toLowerCase()}
-            </h3>
+            </H3>
             <DataList
               data={publications}
               linkIdentifier={window.location.pathname}
@@ -71,9 +72,9 @@ class TopicPage extends Component<Props, State> {
         <hr className="govuk-section-break govuk-section-break--xl govuk-section-break--visible" />
 
         <section id="latest-publications">
-          <h2 className="govuk-heading-l">
+          <H2>
             Latest publications in {(data.title || '').toLowerCase()}
-          </h2>
+          </H2>
           <p className="govuk-body">
             These are the latest official statistics with figures in
             {(data.title || '').toLowerCase()}. You can access the report and
@@ -85,9 +86,9 @@ class TopicPage extends Component<Props, State> {
         </section>
 
         <section id="key-indicators">
-          <h2 className="govuk-heading-l">
+          <H2>
             Key indicators for {(data.title || '').toLowerCase()}
-          </h2>
+          </H2>
           <p className="govuk-body">
             These are some key indicators for {(data.title || '').toLowerCase()}
             . You can change what you see here according to your requirements.
@@ -96,9 +97,9 @@ class TopicPage extends Component<Props, State> {
         </section>
 
         <section id="explore-statistics">
-          <h2 className="govuk-heading-l">
+          <H2>
             Explore {(data.title || '').toLowerCase()} statistics
-          </h2>
+          </H2>
 
           <ul className="govuk-list govuk-list--bullet">
             <li>
