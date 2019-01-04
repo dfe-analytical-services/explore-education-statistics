@@ -50,9 +50,7 @@ class LocalAuthorityPage extends Component<{}> {
           </div>
           <div className="govuk-grid-column-one-third">
             <Link to="#">Schools</Link>
-            <p>
-              Number of children, Vulnerable children
-            </p>
+            <p>Number of children, Vulnerable children</p>
           </div>
           <div className="govuk-grid-column-one-third">
             <Link to="#">16+ Education</Link>

@@ -116,17 +116,13 @@ class PublicationPage extends Component<Props, State> {
                     </span>
                   </summary>
                   <div className="govuk-details__text">
-                    <p>
-                      19 April 2017
-                    </p>
+                    <p>19 April 2017</p>
                     <p>
                       Underlying data file updated to include absence data by
                       pupil residency and school location, andupdated metadata
                       document.
                     </p>
-                    <strong>
-                      23 March 2017
-                    </strong>
+                    <strong>23 March 2017</strong>
                     <p>First published.</p>
                   </div>
                 </details>
