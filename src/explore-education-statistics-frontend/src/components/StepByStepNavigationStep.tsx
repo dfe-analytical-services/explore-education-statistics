@@ -46,10 +46,7 @@ const StepByStepNavigationStep = ({ children, title, caption }: Props) => (
         </span>
       </h2>
 
-      <div
-        className="app-step-nav__panel js-panel js-hidden"
-        id="step-panel"
-      >
+      <div className="app-step-nav__panel js-panel js-hidden" id="step-panel">
         {children}
       </div>
     </div>
