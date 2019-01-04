@@ -28,7 +28,7 @@ class HomePage extends Component {
             <h2>Quick Links</h2>
 
             <nav role="navigation" aria-labelledby="subsection-title">
-              <ul className="govuk-!-font-size-16">
+              <ul className="govuk-body-s">
                 <li>
                   <Link to="/themes">Themes</Link>
                 </li>
@@ -37,6 +37,11 @@ class HomePage extends Component {
                 </li>
                 <li>
                   <Link to="/publications">Publications</Link>
+                </li>
+                <li>
+                  <Link to="/local-authority/sheffield">
+                    Local Authority - Sheffield
+                  </Link>
                 </li>
               </ul>
             </nav>
