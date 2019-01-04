@@ -1,4 +1,5 @@
 @import '~govuk-frontend/core/lists';
+@import '~govuk-frontend/core/section-break';
 @import '~govuk-frontend/core/typography';
 @import '~govuk-frontend/helpers/typography';
 
@@ -40,4 +41,8 @@ h3 {
 
 h4 {
   @extend %govuk-heading-s;
+}
+
+hr {
+  @extend %govuk-section-break, %govuk-section-break--visible;
 }

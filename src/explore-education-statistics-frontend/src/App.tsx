@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
-import {
-  BrowserRouter as Router,
-  HashRouter,
-  Route,
-  Switch,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import './App.scss';
 import Breadcrumbs from './components/Breadcrumbs';
 import CookiesPage from './pages/CookiesPage';
 import FeedbackPage from './pages/FeedbackPage';
 import HomePage from './pages/HomePage';
+import LocalAuthorityPage from './pages/LocalAuthorityPage';
 import NotFoundPage from './pages/NotFoundPage';
 import PrivacyPage from './pages/PrivacyPage';
 import PublicationPage from './pages/PublicationPage';
@@ -16,9 +13,8 @@ import PublicationsPage from './pages/PublicationsPage';
 import ThemePage from './pages/ThemePage';
 import ThemesPage from './pages/ThemesPage';
 import TopicPage from './pages/TopicPage';
-import TopicsPage from './pages/TopicsPage';
 
-import './App.scss';
+import TopicsPage from './pages/TopicsPage';
 
 class App extends Component {
   public render() {
@@ -51,6 +47,12 @@ class App extends Component {
                 <Route exact path="/cookies" component={CookiesPage} />
                 <Route exact path="/privacy-policy" component={PrivacyPage} />
                 <Route exact path="/feedback" component={FeedbackPage} />
+
+                <Route
+                  exact
+                  path="/local-authority/:localAuthority"
+                  component={LocalAuthorityPage}
+                />
 
                 <Route exact path="/themes" component={ThemesPage} />
                 <Route exact path="/themes/:theme" component={ThemePage} />
