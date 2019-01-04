@@ -5,7 +5,7 @@ class FeedbackPage extends Component {
     return (
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">Feedback</h1>
+          <h1>Feedback</h1>
         </div>
       </div>
     );

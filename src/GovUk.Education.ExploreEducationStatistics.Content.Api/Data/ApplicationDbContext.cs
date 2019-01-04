@@ -94,7 +94,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), 
                     Published = new DateTime(2018,3,22),
                     Summary = "This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools.\n\nIt allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:"
-                }
+                },
+                new Release()
+                {
+                    Id = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"), 
+                    Title = "Pupil absence data and statistics for schools in England", 
+                    ReleaseName = "2015-16",
+                    PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), 
+                    Published = new DateTime(2018,3,22),
+                    Summary = "This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools.\n\nIt allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:"
+                }                
             );
             
             modelBuilder.Entity<Link>().HasData(

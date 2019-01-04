@@ -1,6 +1,9 @@
+@import '~normalize.css/normalize.css';
 @import '~govuk-frontend/all';
 
+@import 'styles/typography';
+
 // Patterns that aren't in Frontend
-@import 'sass/patterns/step-by-step-navigation';
-@import 'sass/patterns/task-list';
-@import 'sass/patterns/related-items';
+@import 'styles/patterns/step-by-step-navigation';
+@import 'styles/patterns/task-list';
+@import 'styles/patterns/related-items';

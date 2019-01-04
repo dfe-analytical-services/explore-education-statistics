@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { match } from 'react-router';
 import api from '../api';
 import DataList from '../components/DataList';
-import Glink from '../components/Glink';
+import Link from '../components/Link';
 import Title from '../components/Title';
 
 interface Props {
@@ -48,17 +48,17 @@ class TopicPage extends Component<Props, State> {
           <div className="govuk-grid-column-two-thirds">
             <Title label={data.title} />
 
-            <p className="govuk-body">
+            <p>
               Here you can find DfE stats for {(data.title || '').toLowerCase()}
               , and access them as reports, customise and download as excel
               files or csv files, and access them via an API.{' '}
-              <Glink>(Find out more)</Glink>
+              <Link to="#">(Find out more)</Link>
             </p>
-            <p className="govuk-body">
+            <p>
               You can also see our statistics for 16+ education and social care.
             </p>
 
-            <h3 className="govuk-heading-m">
+            <h3>
               The following publications are available in{' '}
               {(data.title || '').toLowerCase()}
             </h3>
@@ -71,10 +71,8 @@ class TopicPage extends Component<Props, State> {
         <hr className="govuk-section-break govuk-section-break--xl govuk-section-break--visible" />
 
         <section id="latest-publications">
-          <h2 className="govuk-heading-l">
-            Latest publications in {(data.title || '').toLowerCase()}
-          </h2>
-          <p className="govuk-body">
+          <h2>Latest publications in {(data.title || '').toLowerCase()}</h2>
+          <p>
             These are the latest official statistics with figures in
             {(data.title || '').toLowerCase()}. You can access the report and
             commentary, and also get the data for use in Excel and other tools.
@@ -85,10 +83,8 @@ class TopicPage extends Component<Props, State> {
         </section>
 
         <section id="key-indicators">
-          <h2 className="govuk-heading-l">
-            Key indicators for {(data.title || '').toLowerCase()}
-          </h2>
-          <p className="govuk-body">
+          <h2>Key indicators for {(data.title || '').toLowerCase()}</h2>
+          <p>
             These are some key indicators for {(data.title || '').toLowerCase()}
             . You can change what you see here according to your requirements.
           </p>
@@ -96,11 +92,9 @@ class TopicPage extends Component<Props, State> {
         </section>
 
         <section id="explore-statistics">
-          <h2 className="govuk-heading-l">
-            Explore {(data.title || '').toLowerCase()} statistics
-          </h2>
+          <h2>Explore {(data.title || '').toLowerCase()} statistics</h2>
 
-          <ul className="govuk-list govuk-list--bullet">
+          <ul>
             <li>
               You can explore all the DfE statistics available for
               {(data.title || '').toLowerCase()} here. You can use our step by

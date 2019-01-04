@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { match } from 'react-router';
 import api from '../api';
 import Date from '../components/Date';
-import Glink from '../components/Glink';
+import Link from '../components/Link';
 import StepByStepNavigation from '../components/StepByStepNavigation';
 import StepByStepNavigationStep from '../components/StepByStepNavigationStep';
 
@@ -18,8 +18,14 @@ interface LegacyRelease {
   url: string;
 }
 
+interface Release {
+  id: string;
+  releaseName: string;
+}
+
 interface Publication {
   nextUpdate: string;
+  releases: Release[];
   legacyReleases: LegacyRelease[];
 }
 
@@ -44,6 +50,12 @@ class PublicationPage extends Component<Props, State> {
           },
         ],
         nextUpdate: '',
+        releases: [
+          {
+            id: '',
+            releaseName: '',
+          },
+        ],
       },
       published: '',
       releaseName: '',
@@ -63,6 +75,8 @@ class PublicationPage extends Component<Props, State> {
 
   public render() {
     const { data } = this.state;
+    const releaseCount =
+      data.publication.releases.length + data.publication.legacyReleases.length;
 
     return (
       <div>
@@ -70,7 +84,7 @@ class PublicationPage extends Component<Props, State> {
           <div className="govuk-grid-column-two-thirds">
             <strong className="govuk-tag">This is the latest data</strong>
 
-            <h1 className="govuk-heading-l">{data.title}</h1>
+            <h2>{data.title}</h2>
 
             <ReactMarkdown className="govuk-body" source={data.summary} />
 
@@ -102,22 +116,24 @@ class PublicationPage extends Component<Props, State> {
           </div>
           <div className="govuk-grid-column-one-third">
             <aside className="app-related-items">
-              <h3 className="govuk-heading-m" id="subsection-title">
-                About this data
-              </h3>
+              <h3 id="subsection-title">About this data</h3>
 
-              <h3 className="govuk-heading-s">
+              <h4>
                 <span className="govuk-caption-m">Release name: </span>
                 {data.releaseName} (latest data)
                 <details className="govuk-details">
                   <summary className="govuk-details__summary">
                     <span className="govuk-details__summary-text">
-                      See previous {data.publication.legacyReleases.length}{' '}
-                      releases
+                      See previous {releaseCount} releases
                     </span>
                   </summary>
                   <div className="govuk-details__text">
-                    <ul className="govuk-list">
+                    <ul>
+                      {data.publication.releases.map(elem => (
+                        <li>
+                          <Link to="#">{elem.releaseName}</Link>
+                        </li>
+                      ))}
                       {data.publication.legacyReleases.map(elem => (
                         <li>
                           <a className="govuk-link" href={elem.url}>
@@ -128,16 +144,17 @@ class PublicationPage extends Component<Props, State> {
                     </ul>
                   </div>
                 </details>
-              </h3>
+              </h4>
 
-              <h3 className="govuk-heading-s">
+              <h4>
                 <span className="govuk-caption-m">Published: </span>
                 <Date value={data.published} />
-              </h3>
+              </h4>
 
-              <h2 className="govuk-heading-s">
+              <h4>
                 <span className="govuk-caption-m">Last updated: </span>
                 <Date value="1970-01-01T00:00:00" />
+
                 <details className="govuk-details">
                   <summary className="govuk-details__summary">
                     <span className="govuk-details__summary-text">
@@ -145,46 +162,42 @@ class PublicationPage extends Component<Props, State> {
                     </span>
                   </summary>
                   <div className="govuk-details__text">
-                    <p className="govuk-body govuk-!-font-weight-bold">
-                      19 April 2017
-                    </p>
-                    <p className="govuk-body">
+                    <p>19 April 2017</p>
+                    <p>
                       Underlying data file updated to include absence data by
                       pupil residency and school location, andupdated metadata
                       document.
                     </p>
-                    <p className="govuk-body govuk-!-font-weight-bold">
-                      23 March 2017
-                    </p>
-                    <p className="govuk-body">First published.</p>
+                    <strong>23 March 2017</strong>
+                    <p>First published.</p>
                   </div>
                 </details>
-              </h2>
+              </h4>
 
-              <h2 className="govuk-heading-s">
+              <h4>
                 <span className="govuk-caption-m">Next update: </span>
                 <Date value={data.publication.nextUpdate} />
 
                 <span className="govuk-caption-m">
-                  <Glink>Notify me</Glink>
+                  <Link to="#" unvisited>
+                    Notify me
+                  </Link>
                 </span>
-              </h2>
+              </h4>
 
               <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
 
-              <h2 className="govuk-heading-m" id="getting-the-data">
-                Getting the data
-              </h2>
+              <h3 id="getting-the-data">Getting the data</h3>
 
-              <ul className="govuk-list">
+              <ul>
                 <li>
-                  <Glink>Download pdf files</Glink>
+                  <Link to="#">Download pdf files</Link>
                 </li>
                 <li>
-                  <Glink>Download .csv files</Glink>
+                  <Link to="#">Download .csv files</Link>
                 </li>
                 <li>
-                  <Glink>Access API</Glink>
+                  <Link to="#">Access API</Link>
                 </li>
               </ul>
             </aside>

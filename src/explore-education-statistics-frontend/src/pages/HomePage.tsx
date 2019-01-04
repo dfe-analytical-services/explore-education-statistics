@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import Link from '../components/Link';
 
 class HomePage extends Component {
   public render() {
     return (
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">Explore education statistics</h1>
-          <p className="govuk-body">Use this service to:</p>
-          <ul className="govuk-list govuk-list--bullet">
+          <h1>Explore education statistics</h1>
+          <p>Use this service to:</p>
+          <ul>
             <li>do something</li>
             <li>do something else</li>
           </ul>
@@ -19,28 +19,28 @@ class HomePage extends Component {
           >
             Start now
           </a>
-          <h2 className="govuk-heading-m">Before you start</h2>
-          <p className="govuk-body">Do something.</p>
+          <h2>Before you start</h2>
+          <p>Do something.</p>
         </div>
 
         <div className="govuk-grid-column-one-third">
           <aside className="app-related-items" role="complementary">
-            <h2 className="govuk-heading-m">Quick Links</h2>
+            <h2>Quick Links</h2>
+
             <nav role="navigation" aria-labelledby="subsection-title">
-              <ul className="govuk-list govuk-!-font-size-16">
+              <ul className="govuk-body-s">
                 <li>
-                  <Link to={'/themes'} className="govuk-link">
-                    Themes
-                  </Link>
+                  <Link to="/themes">Themes</Link>
                 </li>
                 <li>
-                  <Link to={'/topics'} className="govuk-link">
-                    Topics
-                  </Link>
+                  <Link to="topics">Topics</Link>
                 </li>
                 <li>
-                  <Link to={'/publications'} className="govuk-link">
-                    Publications
+                  <Link to="/publications">Publications</Link>
+                </li>
+                <li>
+                  <Link to="/local-authority/sheffield">
+                    Local Authority - Sheffield
                   </Link>
                 </li>
               </ul>

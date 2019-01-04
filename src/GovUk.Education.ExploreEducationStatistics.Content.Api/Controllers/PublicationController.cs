@@ -31,17 +31,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         public ActionResult<Publication> Get(string id)
         {
             return Guid.TryParse(id, out var newGuid) ? 
-                _context.Publications.Include(x => x.LegacyReleases).FirstOrDefault(t => t.Id == newGuid) : 
-                _context.Publications.Include(x => x.LegacyReleases).FirstOrDefault(t => t.Slug == id);
+                _context.Publications.Include(x => x.Releases).Include(x => x.LegacyReleases).FirstOrDefault(t => t.Id == newGuid) : 
+                _context.Publications.Include(x => x.Releases).Include(x => x.LegacyReleases).FirstOrDefault(t => t.Slug == id);
         }
         
-        // GET api/publication/5
+        // GET api/publication/5/latest
         [HttpGet("{id}/latest")]
         public ActionResult<Release> GetLatest(string id)
-        {
-            return Guid.TryParse(id, out var newGuid) ? 
+        {            
+            var release =  Guid.TryParse(id, out var newGuid) ? 
                 _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases).FirstOrDefault(t => t.PublicationId == newGuid) : 
-                _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases).FirstOrDefault(t => t.Publication.Slug == id);
+                _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases).FirstOrDefault(t => t.Publication.Slug == id);            
+           
+            if (release != null)
+            {
+                var releases = _context.Releases.Where(x => x.Publication.Id == release.Publication.Id).ToList();
+                release.Publication.Releases = new List<Release>();
+                releases.ForEach(r => release.Publication.Releases.Add(new Release()
+                {
+                    Id = r.Id,
+                    Title = r.Title,
+                    ReleaseName = r.ReleaseName,
+                    Published = r.Published,
+                    Summary = r.Summary,
+                    Publication = r.Publication,
+                    PublicationId =  r.PublicationId
+                }));
+            }
+
+            return release;
         }
     }
 }
