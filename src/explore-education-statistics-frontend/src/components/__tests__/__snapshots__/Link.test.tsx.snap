@@ -2,7 +2,7 @@
 
 exports[`Link renders correctly with \`unvisited\` state 1`] = `
 <a
-  class="govuk-link"
+  class="govuk-link govuk-link--no-visited-state"
   href="/the-link"
 >
   Test Link
