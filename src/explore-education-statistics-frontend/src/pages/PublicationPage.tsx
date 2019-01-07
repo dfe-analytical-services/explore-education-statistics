@@ -112,7 +112,10 @@ class PublicationPage extends Component<Props, State> {
                 title="Where does this data come from?"
                 caption="How we collect an process the data"
               >
-                <ReactMarkdown className="govuk-body" source={data.publication.dataSource} />
+                <ReactMarkdown
+                  className="govuk-body"
+                  source={data.publication.dataSource}
+                />
               </StepByStepNavigationStep>
               <StepByStepNavigationStep title="Feedback and questions">
                 <ul className="govuk-list">
