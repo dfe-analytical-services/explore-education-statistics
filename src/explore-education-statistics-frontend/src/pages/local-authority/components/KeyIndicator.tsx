@@ -1,15 +1,10 @@
 import React from 'react';
+import { ChangeText, ChangeTextProps } from '../../../components/ChangeText';
 import Link from '../../../components/Link';
 import styles from './KeyIndicator.module.scss';
 
-interface Change {
-  description: string;
-  units: string;
-  value: number;
-}
-
-interface Props {
-  changes: Change[];
+export interface KeyIndicatorProps {
+  changes: ChangeTextProps[];
   link: string;
   reference: string;
   referenceLink: string;
@@ -18,26 +13,7 @@ interface Props {
   value: number;
 }
 
-const getChangeText = ({ description, units, value }: Change) => {
-  let diff = 'same as';
-  let marker = '\u2BC8';
-
-  if (value > 0) {
-    diff = 'higher than';
-    marker = '\u2BC5';
-  } else if (value < 0) {
-    diff = 'lower than';
-    marker = '\u2BC6';
-  }
-
-  const signedValue = value > 0 ? `+${value}` : value;
-
-  return `${marker} ${
-    units ? signedValue + units : signedValue
-  } ${diff} ${description}`;
-};
-
-const KeyIndicator = ({
+export const KeyIndicator = ({
   changes = [],
   link,
   reference,
@@ -45,7 +21,7 @@ const KeyIndicator = ({
   title,
   units,
   value,
-}: Props) => (
+}: KeyIndicatorProps) => (
   <div className={styles.container}>
     <h3>
       <Link to={link}>{title}</Link>
@@ -55,7 +31,7 @@ const KeyIndicator = ({
     <ul className={styles.changeList}>
       {changes.map(change => (
         <li key={`${change.description}:${change.value}`}>
-          {getChangeText(change)}
+          <ChangeText {...change} />
         </li>
       ))}
     </ul>
