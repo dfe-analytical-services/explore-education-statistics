@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Breadcrumbs from '../../components/Breadcrumbs';
+import Button from '../../components/Button';
 import Link from '../../components/Link';
 import { KeyIndicator } from './components/KeyIndicator';
 import keyIndicatorTestData from './components/keyIndicatorTestData';
@@ -102,6 +103,10 @@ class LocalAuthorityPage extends Component<{}> {
           <Link to="#">Find out more</Link>)
         </p>
 
+        <h3>
+          <Link to="#">Find an indicator &#x25BC;</Link>
+        </h3>
+
         <div className={styles.wrappedRow}>
           {keyIndicatorTestData.map(keyIndicator => (
             <div className={styles.keyIndicator}>
@@ -109,6 +114,8 @@ class LocalAuthorityPage extends Component<{}> {
             </div>
           ))}
         </div>
+
+        <Button to="#">&#xFF0B; Add more/edit</Button>
       </>
     );
   }
