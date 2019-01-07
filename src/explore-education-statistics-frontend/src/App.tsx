@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.scss';
 import Breadcrumbs from './components/Breadcrumbs';
+import AlphaFeedbackPage from './pages/AlphaFeedbackPage';
 import CookiesPage from './pages/CookiesPage';
 import FeedbackPage from './pages/FeedbackPage';
 import HomePage from './pages/HomePage';
@@ -29,7 +30,7 @@ class App extends Component {
                 </strong>
                 <span className="govuk-phase-banner__text">
                   This is a new service – your{' '}
-                  <a className="govuk-link" href="/feedback">
+                  <a className="govuk-link" href="/alpha-feedback">
                     feedback
                   </a>{' '}
                   will help us to improve it.
@@ -46,6 +47,7 @@ class App extends Component {
                 <Route exact path="/" component={HomePage} />
                 <Route exact path="/cookies" component={CookiesPage} />
                 <Route exact path="/privacy-policy" component={PrivacyPage} />
+                <Route exact path="/alpha-feedback" component={AlphaFeedbackPage} />
                 <Route exact path="/feedback" component={FeedbackPage} />
 
                 <Route

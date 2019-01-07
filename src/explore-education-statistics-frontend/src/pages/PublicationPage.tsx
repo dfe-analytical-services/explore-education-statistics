@@ -120,17 +120,17 @@ class PublicationPage extends Component<Props, State> {
               <StepByStepNavigationStep title="Feedback and questions">
                 <ul className="govuk-list">
                   <li>
-                    <a href="#" className="govuk-link">
+                    <a href="/feedback?type=page" className="govuk-link">
                       Feedback on this page
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="govuk-link">
+                    <a href="/feedback?type=suggestion" className="govuk-link">
                       Make a suggestion
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="govuk-link">
+                    <a href="/feedback?type=question" className="govuk-link">
                       Ask a question
                     </a>
                   </li>
@@ -221,13 +221,13 @@ class PublicationPage extends Component<Props, State> {
 
               <ul className="govuk-list">
                 <li>
-                  <Link to="#">Download pdf files</Link>
+                  <Link to="#pdf">Download pdf files</Link>
                 </li>
                 <li>
-                  <Link to="#">Download .csv files</Link>
+                  <Link to="#csv">Download .csv files</Link>
                 </li>
                 <li>
-                  <Link to="#">Access API</Link>
+                  <Link to="#api">Access API</Link>
                 </li>
               </ul>
             </aside>
