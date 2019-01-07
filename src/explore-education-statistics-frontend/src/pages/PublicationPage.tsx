@@ -76,32 +76,32 @@ class PublicationPage extends Component<Props, State> {
   };
 
   public componentDidMount() {
-    const { publication } = this.props.match.params;
-    const { release } = this.props.match.params;
+    this.fetchData();
+  }
 
-    const url = release
-      ? `release/${release}`
-      : `publication/${publication}/latest`;
-
-    api
-      .get(url)
-      .then(({ data }) => this.setState({ data }))
-      .catch(error => alert(error));
+  public componentDidUpdate(prevProps: Props) {
+    if (this.props.match.params !== prevProps.match.params) {
+      this.fetchData();
+    }
   }
 
   public render() {
     const { data } = this.state;
     const { theme } = this.props.match.params;
     const { topic } = this.props.match.params;
+    const { release } = this.props.match.params;
 
     const releaseCount =
-      data.publication.releases.length + data.publication.legacyReleases.length;
+      data.publication.releases.slice(1).length +
+      data.publication.legacyReleases.length;
 
     return (
       <div>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            <strong className="govuk-tag">This is the latest data</strong>
+            {!release && (
+              <strong className="govuk-tag">This is the latest data</strong>
+            )}
 
             <h2>{data.title}</h2>
 
@@ -120,19 +120,15 @@ class PublicationPage extends Component<Props, State> {
               <StepByStepNavigationStep title="Feedback and questions">
                 <ul className="govuk-list">
                   <li>
-                    <Link to="/feedback?type=page">
-                      Feedback on this page
-                    </Link>
+                    <Link to="/feedback?type=page">Feedback on this page</Link>
                   </li>
                   <li>
-                    <Link to="/feedback?type=suggestion" >
+                    <Link to="/feedback?type=suggestion">
                       Make a suggestion
                     </Link>
                   </li>
                   <li>
-                    <Link to="/feedback?type=question">
-                      Ask a question
-                    </Link>
+                    <Link to="/feedback?type=question">Ask a question</Link>
                   </li>
                 </ul>
               </StepByStepNavigationStep>
@@ -144,7 +140,7 @@ class PublicationPage extends Component<Props, State> {
 
               <h4>
                 <span className="govuk-caption-m">Release name: </span>
-                {data.releaseName} (latest data)
+                {data.releaseName} {!release && <span>(latest data)</span>}
                 <details className="govuk-details">
                   <summary className="govuk-details__summary">
                     <span className="govuk-details__summary-text">
@@ -153,7 +149,7 @@ class PublicationPage extends Component<Props, State> {
                   </summary>
                   <div className="govuk-details__text">
                     <ul className="govuk-list">
-                      {data.publication.releases.map(elem => (
+                      {data.publication.releases.slice(1).map((elem, index) => (
                         <li key={elem.id}>
                           <Link
                             to={`/themes/${theme}/${topic}/${
@@ -241,6 +237,20 @@ class PublicationPage extends Component<Props, State> {
         </div>
       </div>
     );
+  }
+
+  private fetchData() {
+    const { publication } = this.props.match.params;
+    const { release } = this.props.match.params;
+
+    const url = release
+      ? `release/${release}`
+      : `publication/${publication}/latest`;
+
+    api
+      .get(url)
+      .then(({ data }) => this.setState({ data }))
+      .catch(error => alert(error));
   }
 }
 
