@@ -53,6 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), 
                     Slug = "pupil-absence-in-schools-in-england",
                     NextUpdate = new DateTime(2018, 3, 22),
+                    DataSource = "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)"
                 },
                 new Publication() { Id = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"), Title = "Permanent and fixed period exclusions", Summary = "Permanent exclusions, fixed period exclusions", TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Slug = "permanent-and-fixed-period-exclusions" },
                 
@@ -94,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), 
                     Published = new DateTime(2018,3,22),
                     Slug = "2016-17",
-                    Summary = "This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools.\n\nIt allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:"
+                    Summary = "This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools.\n\nIt allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:",
                 },
                 new Release()
                 {

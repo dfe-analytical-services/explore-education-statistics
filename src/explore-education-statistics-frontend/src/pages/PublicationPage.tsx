@@ -29,6 +29,7 @@ interface Release {
 }
 
 interface Publication {
+  dataSource: string;
   nextUpdate: string;
   releases: Release[];
   legacyReleases: LegacyRelease[];
@@ -49,6 +50,7 @@ class PublicationPage extends Component<Props, State> {
   public state = {
     data: {
       publication: {
+        dataSource: '',
         legacyReleases: [
           {
             description: '',
@@ -109,7 +111,9 @@ class PublicationPage extends Component<Props, State> {
               <StepByStepNavigationStep
                 title="Where does this data come from?"
                 caption="How we collect an process the data"
-              />
+              >
+                <ReactMarkdown className="govuk-body" source={data.publication.dataSource} />
+              </StepByStepNavigationStep>
               <StepByStepNavigationStep title="Feedback and questions">
                 <ul className="govuk-list">
                   <li>

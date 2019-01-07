@@ -21,13 +21,13 @@ const StepByStepNavigationStep = ({ children, title, caption }: Props) => (
         <span className="js-step-title">
           <button
             className="app-step-nav__button app-step-nav__button--title js-step-title-button"
-            aria-expanded="false"
+            aria-expanded="true"
             aria-controls="step-panel"
           >
             <span className="js-step-title-text">
               <button
                 className="app-step-nav__button app-step-nav__button--title js-step-title-button"
-                aria-expanded="false"
+                aria-expanded="true"
                 aria-controls="step-panel"
               >
                 <span className="js-step-title-text">
@@ -36,7 +36,7 @@ const StepByStepNavigationStep = ({ children, title, caption }: Props) => (
                 </span>
                 <span
                   className="app-step-nav__toggle-link js-toggle-link"
-                  aria-hidden="true"
+                  aria-hidden="false"
                 >
                   Show
                 </span>
@@ -45,11 +45,10 @@ const StepByStepNavigationStep = ({ children, title, caption }: Props) => (
           </button>
         </span>
       </h2>
-
-      <div className="app-step-nav__panel js-panel js-hidden" id="step-panel">
+    </div>
+    <div className="app-step-nav__panel js-panel" id="step-panel">
         {children}
       </div>
-    </div>
   </li>
 );
 
