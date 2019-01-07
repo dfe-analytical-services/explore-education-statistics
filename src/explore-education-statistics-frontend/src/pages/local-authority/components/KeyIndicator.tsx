@@ -6,8 +6,10 @@ import styles from './KeyIndicator.module.scss';
 export interface KeyIndicatorProps {
   changes: ChangeTextProps[];
   link: string;
-  reference: string;
-  referenceLink: string;
+  reference?: {
+    title: string;
+    link: string;
+  };
   title: string;
   units: string;
   value: number;
@@ -17,7 +19,6 @@ export const KeyIndicator = ({
   changes = [],
   link,
   reference,
-  referenceLink,
   title,
   units,
   value,
@@ -36,10 +37,10 @@ export const KeyIndicator = ({
       ))}
     </ul>
 
-    <Link to={referenceLink} className={styles.referenceLink}>
-      From: {reference}
-    </Link>
+    {reference && (
+      <Link to={reference.link} className={styles.referenceLink}>
+        From: {reference.title}
+      </Link>
+    )}
   </div>
 );
-
-export default KeyIndicator;

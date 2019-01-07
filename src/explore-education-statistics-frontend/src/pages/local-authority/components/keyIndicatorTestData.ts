@@ -1,4 +1,6 @@
-export default [
+import { KeyIndicatorProps } from './KeyIndicator';
+
+const testData: KeyIndicatorProps[] = [
   {
     changes: [
       {
@@ -13,8 +15,10 @@ export default [
       },
     ],
     link: '#',
-    reference: 'Early years foundation state profile results',
-    referenceLink: '#',
+    reference: {
+      link: '#',
+      title: 'Early years foundation state profile results',
+    },
     title: 'EYFSP good level of development',
     units: '%',
     value: 70.3,
@@ -33,8 +37,10 @@ export default [
       },
     ],
     link: '#',
-    reference: 'KS2 SAT expected standard',
-    referenceLink: '#',
+    reference: {
+      link: '#',
+      title: 'KS2 SAT expected standard',
+    },
     title: 'National curriculum assessments at key stage 2 in England',
     units: '%',
     value: 47,
@@ -53,8 +59,10 @@ export default [
       },
     ],
     link: '#',
-    reference: 'KS4 GCSE average attainment 8 score',
-    referenceLink: '#',
+    reference: {
+      link: '#',
+      title: 'KS4 GCSE average attainment 8 score',
+    },
     title: 'GCSE and equivalent results: 2017 to 2018 (provisional)',
     units: '%',
     value: 44.6,
@@ -73,10 +81,14 @@ export default [
       },
     ],
     link: '#',
-    reference: 'KS5 A-level pupils attaining at least 2',
-    referenceLink: '#',
+    reference: {
+      link: '#',
+      title: 'KS5 A-level pupils attaining at least 2',
+    },
     title: 'A level and other 16 to 18 results: 2017 to 2018 (provisional)',
     units: '%',
     value: 72.7,
   },
 ];
+
+export default testData;
