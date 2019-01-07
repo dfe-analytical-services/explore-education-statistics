@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                 {
                     Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"), 
                     Title = "Pupil absence data and statistics for schools in England", 
-                    ReleaseName = "2016-17",
+                    ReleaseName = "2016 to 2017",
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), 
                     Published = new DateTime(2018,3,22),
                     Slug = "2016-17",
@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                 {
                     Id = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"), 
                     Title = "Pupil absence data and statistics for schools in England", 
-                    ReleaseName = "2015-16",
+                    ReleaseName = "2015 to 2016",
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), 
                     Published = new DateTime(2018,3,22),
                     Slug = "2015-16",
@@ -110,7 +110,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
             );
             
             modelBuilder.Entity<Link>().HasData(
-                new Link { PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Id = new Guid("8693c112-225e-4e09-80c2-820cb307bc58"), Description = "2015 to 2016", Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2015-to-2016"},
                 new Link { PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Id = new Guid("45bc02ff-de90-489b-b78e-cdc7db662353"), Description = "2014 to 2015", Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015"},
                 new Link { PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Id = new Guid("82292fe7-1545-44eb-a094-80c5064701a7"), Description = "2013 to 2014", Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014"},
                 new Link { PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Id = new Guid("6907625d-0c2e-4fd8-8e96-aedd85b2ff97"), Description = "2012 to 2013", Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013"},
