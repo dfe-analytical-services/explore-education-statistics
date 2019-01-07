@@ -28,7 +28,7 @@ class App extends Component {
                   alpha
                 </strong>
                 <span className="govuk-phase-banner__text">
-                  This is a new service – your
+                  This is a new service – your{' '}
                   <a className="govuk-link" href="/feedback">
                     feedback
                   </a>{' '}

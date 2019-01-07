@@ -25,6 +25,7 @@ interface LegacyRelease {
 interface Release {
   id: string;
   releaseName: string;
+  slug: string;
 }
 
 interface Publication {
@@ -60,6 +61,7 @@ class PublicationPage extends Component<Props, State> {
           {
             id: '',
             releaseName: '',
+            slug: '',
           },
         ],
         slug: '',
@@ -73,9 +75,14 @@ class PublicationPage extends Component<Props, State> {
 
   public componentDidMount() {
     const { publication } = this.props.match.params;
+    const { release } = this.props.match.params;
+
+    const url = release
+      ? `release/${release}`
+      : `publication/${publication}/latest`;
 
     api
-      .get(`publication/${publication}/latest`)
+      .get(url)
       .then(({ data }) => this.setState({ data }))
       .catch(error => alert(error));
   }
@@ -84,6 +91,7 @@ class PublicationPage extends Component<Props, State> {
     const { data } = this.state;
     const { theme } = this.props.match.params;
     const { topic } = this.props.match.params;
+
     const releaseCount =
       data.publication.releases.length + data.publication.legacyReleases.length;
 
@@ -143,7 +151,7 @@ class PublicationPage extends Component<Props, State> {
                           <Link
                             to={`/themes/${theme}/${topic}/${
                               data.publication.slug
-                            }/${elem.id}`}
+                            }/${elem.slug}`}
                           >
                             {elem.releaseName}
                           </Link>

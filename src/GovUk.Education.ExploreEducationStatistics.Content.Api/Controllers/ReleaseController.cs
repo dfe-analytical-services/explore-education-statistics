@@ -10,38 +10,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PublicationController : ControllerBase
+    public class ReleaseController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public PublicationController(ApplicationDbContext context)
+        public ReleaseController(ApplicationDbContext context)
         {
             _context = context;    
         }
-
+        
         // GET api/publication
         [HttpGet]
-        public ActionResult<List<Publication>> Get()
+        public ActionResult<List<Release>> Get()
         {
-            return _context.Publications.ToList();
-        }
-
-        // GET api/publication/5
-        [HttpGet("{id}")]
-        public ActionResult<Publication> Get(string id)
-        {
-            return Guid.TryParse(id, out var newGuid) ? 
-                _context.Publications.Include(x => x.Releases).Include(x => x.LegacyReleases).FirstOrDefault(t => t.Id == newGuid) : 
-                _context.Publications.Include(x => x.Releases).Include(x => x.LegacyReleases).FirstOrDefault(t => t.Slug == id);
+            return _context.Releases.ToList();
         }
         
-        // GET api/publication/5/latest
-        [HttpGet("{id}/latest")]
-        public ActionResult<Release> GetLatest(string id)
+        // GET api/release/5
+        [HttpGet("{id}")]
+        public ActionResult<Release> Get(string id)
         {            
             var release =  Guid.TryParse(id, out var newGuid) ? 
-                _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases).FirstOrDefault(t => t.PublicationId == newGuid) : 
-                _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases).FirstOrDefault(t => t.Publication.Slug == id);            
+                _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases).FirstOrDefault(x => x.Id == newGuid) : 
+                _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases).FirstOrDefault(x => x.Slug == id);
            
             if (release != null)
             {

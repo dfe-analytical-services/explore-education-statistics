@@ -16,6 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
         
         public DateTime? Published { get; set; }
         
+        public string Slug { get; set; }
+        
         public string Summary { get; set; }
         
         public Guid PublicationId { get; set; }
