@@ -5,7 +5,7 @@ interface Props {
 }
 
 const StepByStepNavigation = ({ children }: Props) => (
-  <div className="app-step-nav app-step-nav--large app-step-nav--active">
+  <div className="app-step-nav app-step-nav--large" data-show-text="Show" data-hide-text="Hide" data-show-all-text="Show all" data-hide-all-text="Hide all" data-module="step-by-step-navigation">
     <div className="app-step-nav__controls">
       <button
         aria-expanded="false"
