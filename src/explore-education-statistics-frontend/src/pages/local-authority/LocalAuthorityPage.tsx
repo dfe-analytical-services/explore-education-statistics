@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
-import Breadcrumbs from '../components/Breadcrumbs';
-import Link from '../components/Link';
+import Breadcrumbs from '../../components/Breadcrumbs';
+import Link from '../../components/Link';
+import KeyIndicator from './components/KeyIndicator';
+import keyIndicatorTestData from './components/keyIndicatorTestData';
+import styles from './LocalAuthorityPage.module.scss';
 
 class LocalAuthorityPage extends Component<{}> {
   public render() {
@@ -59,6 +62,40 @@ class LocalAuthorityPage extends Component<{}> {
         </div>
 
         <hr />
+
+        <h3>
+          Latest publications for Sheffield (
+          <Link to="#">see all publications</Link>)
+        </h3>
+
+        <p>
+          These are the latest official statistics with figures for Sheffield.
+          You can access the report and commentary, and also get the data for
+          use in Excel and other tools. You can now customise the data to your
+          requirements, and get a variety of formats. (
+          <Link to="#">Find out more</Link>) (
+          <Link to="#">Find more publications</Link>)
+        </p>
+
+        <hr />
+
+        <h3>
+          Key indicators for Sheffield (<Link to="#">change</Link>)
+        </h3>
+
+        <p>
+          These are some key indicators for Sheffield. You can change what you
+          see here according your requirements. (
+          <Link to="#">Find out more</Link>)
+        </p>
+
+        <div className={styles.keyIndicatorsList}>
+          {keyIndicatorTestData.map(keyIndicator => (
+            <div className={styles.keyIndicator}>
+              <KeyIndicator {...keyIndicator} />
+            </div>
+          ))}
+        </div>
       </>
     );
   }

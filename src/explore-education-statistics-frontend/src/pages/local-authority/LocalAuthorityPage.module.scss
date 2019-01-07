@@ -1,0 +1,15 @@
+@import '~govuk-frontend/settings/all';
+@import '~govuk-frontend/tools/all';
+@import '~govuk-frontend/helpers/all';
+@import '~govuk-frontend/objects/grid';
+
+.keyIndicatorsList {
+  composes: govuk-grid-row;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.keyIndicator {
+  composes: govuk-grid-column-one-third;
+  margin-bottom: 2rem;
+}

@@ -6,7 +6,7 @@ import AlphaFeedbackPage from './pages/AlphaFeedbackPage';
 import CookiesPage from './pages/CookiesPage';
 import FeedbackPage from './pages/FeedbackPage';
 import HomePage from './pages/HomePage';
-import LocalAuthorityPage from './pages/LocalAuthorityPage';
+import LocalAuthorityPage from './pages/local-authority/LocalAuthorityPage';
 import NotFoundPage from './pages/NotFoundPage';
 import PrivacyPage from './pages/PrivacyPage';
 import PublicationPage from './pages/PublicationPage';
