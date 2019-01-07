@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { match } from 'react-router';
-import api from '../api';
+import api, { baseUrl } from '../api';
 import Date from '../components/Date';
 import Link from '../components/Link';
 import StepByStepNavigation from '../components/StepByStepNavigation';
@@ -227,7 +227,9 @@ class PublicationPage extends Component<Props, State> {
                   <Link to="#csv">Download .csv files</Link>
                 </li>
                 <li>
-                  <Link to="#api">Access API</Link>
+                  <a href={baseUrl.data} className="govuk-link">
+                    Access API
+                  </a>
                 </li>
               </ul>
             </aside>

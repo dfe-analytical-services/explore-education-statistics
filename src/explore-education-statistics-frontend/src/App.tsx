@@ -47,7 +47,11 @@ class App extends Component {
                 <Route exact path="/" component={HomePage} />
                 <Route exact path="/cookies" component={CookiesPage} />
                 <Route exact path="/privacy-policy" component={PrivacyPage} />
-                <Route exact path="/alpha-feedback" component={AlphaFeedbackPage} />
+                <Route
+                  exact
+                  path="/alpha-feedback"
+                  component={AlphaFeedbackPage}
+                />
                 <Route exact path="/feedback" component={FeedbackPage} />
 
                 <Route
