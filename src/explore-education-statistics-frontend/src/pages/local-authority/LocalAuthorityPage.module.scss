@@ -3,13 +3,20 @@
 @import '~govuk-frontend/helpers/all';
 @import '~govuk-frontend/objects/grid';
 
-.keyIndicatorsList {
+.wrappedRow {
   composes: govuk-grid-row;
   display: flex;
   flex-wrap: wrap;
 }
 
+.publicationSummary {
+  @include govuk-responsive-margin(6, 'bottom');
+
+  composes: govuk-grid-column-one-half;
+}
+
 .keyIndicator {
+  @include govuk-responsive-margin(6, 'bottom');
+
   composes: govuk-grid-column-one-third;
-  margin-bottom: 2rem;
 }

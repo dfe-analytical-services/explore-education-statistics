@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import Breadcrumbs from '../../components/Breadcrumbs';
 import Link from '../../components/Link';
-import KeyIndicator from './components/KeyIndicator';
+import { KeyIndicator } from './components/KeyIndicator';
 import keyIndicatorTestData from './components/keyIndicatorTestData';
+import { PublicationSummary } from './components/PublicationSummary';
+import publicationSummaryTestData from './components/publicationSummaryTestData';
 import styles from './LocalAuthorityPage.module.scss';
 
 class LocalAuthorityPage extends Component<{}> {
@@ -77,6 +79,14 @@ class LocalAuthorityPage extends Component<{}> {
           <Link to="#">Find more publications</Link>)
         </p>
 
+        <div className={styles.wrappedRow}>
+          {publicationSummaryTestData.map(publicationSummary => (
+            <div className={styles.publicationSummary}>
+              <PublicationSummary {...publicationSummary} />
+            </div>
+          ))}
+        </div>
+
         <hr />
 
         <h3>
@@ -89,7 +99,7 @@ class LocalAuthorityPage extends Component<{}> {
           <Link to="#">Find out more</Link>)
         </p>
 
-        <div className={styles.keyIndicatorsList}>
+        <div className={styles.wrappedRow}>
           {keyIndicatorTestData.map(keyIndicator => (
             <div className={styles.keyIndicator}>
               <KeyIndicator {...keyIndicator} />

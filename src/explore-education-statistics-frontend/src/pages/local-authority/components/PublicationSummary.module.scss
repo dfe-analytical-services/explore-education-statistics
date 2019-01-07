@@ -1,0 +1,15 @@
+@import '~govuk-frontend/settings/all';
+@import '~govuk-frontend/tools/all';
+@import '~govuk-frontend/helpers/all';
+@import '~govuk-frontend/core/typography';
+
+.container {
+  background: govuk-colour('grey-4');
+  box-sizing: border-box;
+  height: 100%;
+  padding: 1rem;
+}
+
+.summaryText {
+  @extend %govuk-body-s;
+}
