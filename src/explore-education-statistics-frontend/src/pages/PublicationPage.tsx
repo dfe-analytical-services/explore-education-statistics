@@ -221,10 +221,14 @@ class PublicationPage extends Component<Props, State> {
 
               <ul className="govuk-list">
                 <li>
-                  <Link to="#pdf">Download pdf files</Link>
-                </li>
-                <li>
-                  <Link to="#csv">Download .csv files</Link>
+                  <a
+                    href={`${baseUrl.data}/downloads/${
+                      data.publication.slug
+                    }/csv/`}
+                    className="govuk-link"
+                  >
+                    Download .csv files
+                  </a>
                 </li>
                 <li>
                   <a href={baseUrl.data} className="govuk-link">
