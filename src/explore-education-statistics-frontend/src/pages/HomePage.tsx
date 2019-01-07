@@ -28,7 +28,7 @@ class HomePage extends Component {
             <h2>Quick Links</h2>
 
             <nav role="navigation" aria-labelledby="subsection-title">
-              <ul className="govuk-body-s">
+              <ul className="govuk-list govuk-body-s">
                 <li>
                   <Link to="/themes">Themes</Link>
                 </li>
