@@ -5,6 +5,7 @@ import { KeyIndicator } from './components/KeyIndicator';
 import keyIndicatorTestData from './components/keyIndicatorTestData';
 import { PublicationSummary } from './components/PublicationSummary';
 import publicationSummaryTestData from './components/publicationSummaryTestData';
+import SearchForm from './components/SearchForm';
 import styles from './LocalAuthorityPage.module.scss';
 
 class LocalAuthorityPage extends Component<{}> {
@@ -28,6 +29,8 @@ class LocalAuthorityPage extends Component<{}> {
               reports, customise and download as excel files or csv files, and
               access them via an API. <Link to="#">(Find out more)</Link>
             </p>
+
+            <SearchForm />
           </div>
 
           <div className="govuk-grid-column-one-third">
@@ -54,7 +57,7 @@ class LocalAuthorityPage extends Component<{}> {
             </p>
           </div>
           <div className="govuk-grid-column-one-third">
-            <Link to="#">Schools</Link>
+            <Link to="#">Social Care</Link>
             <p>Number of children, Vulnerable children</p>
           </div>
           <div className="govuk-grid-column-one-third">
