@@ -71,7 +71,10 @@ class ThemePage extends Component<Props, State> {
                 type="text"
                 aria-describedby="find-for-schools-hint"
               />
-              <button type="submit" className="govuk-button govuk-!-margin-top-2">
+              <button
+                type="submit"
+                className="govuk-button govuk-!-margin-top-2"
+              >
                 Find
               </button>
             </div>
