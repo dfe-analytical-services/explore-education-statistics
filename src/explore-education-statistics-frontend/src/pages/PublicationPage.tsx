@@ -145,7 +145,7 @@ class PublicationPage extends Component<Props, State> {
                     </span>
                   </summary>
                   <div className="govuk-details__text">
-                    <ul>
+                    <ul className="govuk-list">
                       {data.publication.releases.map(elem => (
                         <li key={elem.id}>
                           <Link
@@ -212,7 +212,7 @@ class PublicationPage extends Component<Props, State> {
 
               <h3 id="getting-the-data">Getting the data</h3>
 
-              <ul>
+              <ul className="govuk-list">
                 <li>
                   <Link to="#">Download pdf files</Link>
                 </li>
