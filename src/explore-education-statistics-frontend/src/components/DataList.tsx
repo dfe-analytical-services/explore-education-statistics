@@ -20,7 +20,7 @@ const DataList = ({ linkIdentifier = '', data = [] }: Props) => (
         {data.map(elem => (
           <div className="govuk-grid-column-one-half" key={elem.id}>
             <h4>
-              <Link to={`${linkIdentifier}/${elem.slug}`}>{elem.title}</Link>
+              <Link to={`${linkIdentifier}/${elem.slug}`} className="govuk-link">{elem.title}</Link>
             </h4>
             <p>{elem.summary}</p>
           </div>
