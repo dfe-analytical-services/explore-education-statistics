@@ -28,9 +28,26 @@ export const PublicationSummary = ({
           <KeyIndicator {...keyIndicator} />
         </div>
         <div className="govuk-grid-column-one-half">
-          <ReactMarkdown className={styles.summaryText} source={summary} />
+          <ReactMarkdown className="govuk-body-s" source={summary} />
         </div>
       </div>
-    </div>
+
+      <hr />
+
+      <ul>
+        <li>
+          <Link to="#" >View report</Link>
+        </li>
+        <li>
+          <Link to="#">Download data</Link>
+        </li>
+        <li>
+          <Link to="#">Visualise data</Link>
+        </li>
+        <li>
+          <Link to="#">Create your own dataset</Link>
+        </li>
+      </ul>
+      </div>
   );
 };
