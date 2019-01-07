@@ -120,19 +120,19 @@ class PublicationPage extends Component<Props, State> {
               <StepByStepNavigationStep title="Feedback and questions">
                 <ul className="govuk-list">
                   <li>
-                    <a href="/feedback?type=page" className="govuk-link">
+                    <Link to="/feedback?type=page">
                       Feedback on this page
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/feedback?type=suggestion" className="govuk-link">
+                    <Link to="/feedback?type=suggestion" >
                       Make a suggestion
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/feedback?type=question" className="govuk-link">
+                    <Link to="/feedback?type=question">
                       Ask a question
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </StepByStepNavigationStep>
