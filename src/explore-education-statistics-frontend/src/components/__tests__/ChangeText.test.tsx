@@ -16,7 +16,7 @@ describe('ChangeText', () => {
   test('text is correct for a negative change', () => {
     const { getByText } = render(
       <span>
-        <ChangeText description="16/17" units="ppt" value={-10} />
+        <ChangeText description="16/17" units="ppt" value={-20} />
       </span>,
     );
 
