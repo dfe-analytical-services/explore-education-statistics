@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { match } from 'react-router';
-import api from '../api';
+import api, { baseUrl } from '../api';
 import Date from '../components/Date';
 import Link from '../components/Link';
 import StepByStepNavigation from '../components/StepByStepNavigation';
@@ -112,22 +112,25 @@ class PublicationPage extends Component<Props, State> {
                 title="Where does this data come from?"
                 caption="How we collect an process the data"
               >
-                <ReactMarkdown className="govuk-body" source={data.publication.dataSource} />
+                <ReactMarkdown
+                  className="govuk-body"
+                  source={data.publication.dataSource}
+                />
               </StepByStepNavigationStep>
               <StepByStepNavigationStep title="Feedback and questions">
                 <ul className="govuk-list">
                   <li>
-                    <a href="#" className="govuk-link">
+                    <a href="/feedback?type=page" className="govuk-link">
                       Feedback on this page
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="govuk-link">
+                    <a href="/feedback?type=suggestion" className="govuk-link">
                       Make a suggestion
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="govuk-link">
+                    <a href="/feedback?type=question" className="govuk-link">
                       Ask a question
                     </a>
                   </li>
@@ -218,13 +221,19 @@ class PublicationPage extends Component<Props, State> {
 
               <ul className="govuk-list">
                 <li>
-                  <Link to="#">Download pdf files</Link>
+                  <a
+                    href={`${baseUrl.data}/downloads/${
+                      data.publication.slug
+                    }/csv/`}
+                    className="govuk-link"
+                  >
+                    Download .csv files
+                  </a>
                 </li>
                 <li>
-                  <Link to="#">Download .csv files</Link>
-                </li>
-                <li>
-                  <Link to="#">Access API</Link>
+                  <a href={baseUrl.data} className="govuk-link">
+                    Access API
+                  </a>
                 </li>
               </ul>
             </aside>

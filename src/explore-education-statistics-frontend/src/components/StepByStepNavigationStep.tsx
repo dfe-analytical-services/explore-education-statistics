@@ -47,8 +47,8 @@ const StepByStepNavigationStep = ({ children, title, caption }: Props) => (
       </h2>
     </div>
     <div className="app-step-nav__panel js-panel" id="step-panel">
-        {children}
-      </div>
+      {children}
+    </div>
   </li>
 );
 

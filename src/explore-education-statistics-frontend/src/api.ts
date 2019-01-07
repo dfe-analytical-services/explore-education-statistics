@@ -1,18 +1,29 @@
 import axios from 'axios';
 
 const hostname = window && window.location && window.location.hostname;
-let baseURL;
+let contentBase;
+let dataBase;
 
 if (hostname === 'educationstatisticstest.z6.web.core.windows.net') {
-  baseURL = '//content-explore-education-statistics-test.azurewebsites.net';
+  contentBase = '//content-explore-education-statistics-test.azurewebsites.net';
+  dataBase = '//data-explore-education-statistics-test.azurewebsites.net';
 } else if (hostname === 'educationstatisticsstage.z6.web.core.windows.net') {
-  baseURL = '//content-explore-education-statistics-stage.azurewebsites.net';
+  contentBase =
+    '//content-explore-education-statistics-stage.azurewebsites.net';
+  dataBase = '//data-explore-education-statistics-stage.azurewebsites.net';
 } else if (hostname === 'educationstatistics.z6.web.core.windows.net') {
-  baseURL = '//content-explore-education-statistics-live.azurewebsites.net';
+  contentBase = '//content-explore-education-statistics-live.azurewebsites.net';
+  dataBase = '//data-explore-education-statistics-live.azurewebsites.net';
 } else {
-  baseURL = '//localhost:5010';
+  contentBase = '//localhost:5010';
+  dataBase = '//localhost:5000';
 }
 
 export default axios.create({
-  baseURL: `${baseURL}/api/`,
+  baseURL: `${contentBase}/api/`,
 });
+
+export const baseUrl = {
+  content: contentBase,
+  data: dataBase,
+};
