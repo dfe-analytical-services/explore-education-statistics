@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button renders correctly as anchor element 1`] = `
+
+<a class="govuk-button"
+   role="button"
+   aria-disabled="false"
+   href="/"
+>
+  Test button
+</a>
+
+`;
+
+exports[`Button renders correctly as button element 1`] = `
+
+<button aria-disabled="false"
+        class="govuk-button"
+        type="button"
+>
+  Test button
+</button>
+
+`;
