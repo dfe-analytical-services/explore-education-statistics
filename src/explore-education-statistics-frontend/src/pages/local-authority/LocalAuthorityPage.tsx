@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import Breadcrumbs from '../../components/Breadcrumbs';
-import Button from '../../components/Button';
+import ButtonLink from '../../components/ButtonLink';
 import Link from '../../components/Link';
 import { KeyIndicator } from './components/KeyIndicator';
 import keyIndicatorTestData from './components/keyIndicatorTestData';
@@ -13,8 +12,6 @@ class LocalAuthorityPage extends Component<{}> {
   public render() {
     return (
       <>
-        <Breadcrumbs current="Sheffield" />
-
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <span className="govuk-caption-xl">Metropolitan borough</span>
@@ -115,7 +112,7 @@ class LocalAuthorityPage extends Component<{}> {
           ))}
         </div>
 
-        <Button to="#">&#xFF0B; Add more/edit</Button>
+        <ButtonLink to="#">&#xFF0B; Add more/edit</ButtonLink>
       </>
     );
   }

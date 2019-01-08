@@ -1,18 +1,22 @@
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
+import { LinkProps } from 'react-router-dom';
+import Link from './Link';
 
-interface Props {
+type Props = {
   children: ReactNode;
   className?: string;
   disabled?: boolean;
-  type?: 'button' | 'submit' | 'reset';
-}
+  to: string;
+} & Partial<LinkProps>;
 
-const Button = ({
+const ButtonLink = ({
   children,
   className,
   disabled = false,
+  to,
   type = 'button',
+  ...linkProps
 }: Props) => {
   const classes = classNames(
     'govuk-button',
@@ -23,15 +27,16 @@ const Button = ({
   );
 
   return (
-    <button
-      aria-disabled={disabled}
+    <Link
+      {...linkProps}
+      to={to}
       className={classes}
-      disabled={disabled}
-      type={type}
+      role="button"
+      aria-disabled={disabled}
     >
       {children}
-    </button>
+    </Link>
   );
 };
 
-export default Button;
+export default ButtonLink;
