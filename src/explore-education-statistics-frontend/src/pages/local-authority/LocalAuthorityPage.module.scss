@@ -1,0 +1,22 @@
+@import '~govuk-frontend/settings/all';
+@import '~govuk-frontend/tools/all';
+@import '~govuk-frontend/helpers/all';
+@import '~govuk-frontend/objects/grid';
+
+.wrappedRow {
+  composes: govuk-grid-row;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.publicationSummary {
+  @include govuk-responsive-margin(6, 'bottom');
+
+  composes: govuk-grid-column-one-half;
+}
+
+.keyIndicator {
+  @include govuk-responsive-margin(6, 'bottom');
+
+  composes: govuk-grid-column-one-third;
+}

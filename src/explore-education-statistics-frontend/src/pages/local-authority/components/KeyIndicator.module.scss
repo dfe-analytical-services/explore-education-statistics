@@ -1,0 +1,19 @@
+@import '~govuk-frontend/settings/all';
+@import '~govuk-frontend/tools/all';
+@import '~govuk-frontend/helpers/all';
+
+.container {
+  background: govuk-colour('grey-4');
+  box-sizing: border-box;
+  height: 100%;
+  padding: 1rem;
+}
+
+.referenceLink {
+  @include govuk-font($size: 14);
+}
+
+.changeList {
+  list-style: none;
+  padding-left: 0;
+}
