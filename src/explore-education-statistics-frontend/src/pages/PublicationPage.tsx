@@ -128,9 +128,9 @@ class PublicationPage extends Component<Props, State> {
                   <XAxis
                     dataKey="name"
                     label={{
-                      value: 'School year',
-                      position: 'bottom',
                       offset: 5,
+                      position: 'bottom',
+                      value: 'School year',
                     }}
                     padding={{ left: 20, right: 20 }}
                     tickMargin={10}
