@@ -25,7 +25,7 @@ const testData: PublicationSummaryProps[] = [
 - On average in 2016/17, **pupils missed 8.2 school days**
 - Overall and unauthorised absence rates have **increased** since last year
 - **One in ten** pupils was persistently absent during the academic year 2016/17`,
-    title: 'Pupil absence in schools in England'
+    title: 'Pupil absence in schools in England',
   },
   {
     keyIndicator: {
@@ -52,8 +52,8 @@ const testData: PublicationSummaryProps[] = [
 - **English and maths average progress increased** for students still working towards 
 qualifications below level 3
 - Approximately **5% of institutions** fall below the academic and applied **general minimum**`,
-    title: 'KS5 A-level results'
-  }
+    title: 'KS5 A-level results',
+  },
 ];
 
 export default testData;

@@ -36,7 +36,7 @@ export const PublicationSummary = ({
 
       <ul>
         <li>
-          <Link to="#" >View report</Link>
+          <Link to="#">View report</Link>
         </li>
         <li>
           <Link to="#">Download data</Link>
@@ -48,6 +48,6 @@ export const PublicationSummary = ({
           <Link to="#">Create your own dataset</Link>
         </li>
       </ul>
-      </div>
+    </div>
   );
 };
