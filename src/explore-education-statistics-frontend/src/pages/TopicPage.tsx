@@ -3,7 +3,7 @@ import { match } from 'react-router';
 import api from '../api';
 import DataList from '../components/DataList';
 import Link from '../components/Link';
-import Title from '../components/Title';
+import PageHeading from '../components/PageHeading';
 
 interface Props {
   match: match<{
@@ -46,7 +46,7 @@ class TopicPage extends Component<Props, State> {
       <div>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            <Title label={data.title} />
+            <PageHeading caption="Topics" heading={`Find ${data.title.toLowerCase()} statistics`} />
 
             <p>
               Here you can find DfE stats for {(data.title || '').toLowerCase()}

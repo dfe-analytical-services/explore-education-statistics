@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Title from '../components/Title';
 
 class AlphaFeedbackPage extends Component {
   public render() {

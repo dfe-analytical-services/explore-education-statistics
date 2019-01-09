@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ButtonLink from '../../components/ButtonLink';
 import Link from '../../components/Link';
+import PageHeading from '../../components/PageHeading';
 import { KeyIndicator } from './components/KeyIndicator';
 import keyIndicatorTestData from './components/keyIndicatorTestData';
 import { PublicationSummary } from './components/PublicationSummary';
@@ -14,8 +15,8 @@ class LocalAuthorityPage extends Component<{}> {
       <>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            <span className="govuk-caption-xl">Metropolitan borough</span>
-            <h1>Sheffield</h1>
+
+            <PageHeading caption="Metropolitan borough" heading="Sheffield" />
 
             <h3>
               Find school, social care and 16+ education statistics for
