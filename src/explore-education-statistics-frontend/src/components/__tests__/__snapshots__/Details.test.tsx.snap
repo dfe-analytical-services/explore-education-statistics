@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Details renders correctly 1`] = `
+
+<details class="govuk-details">
+  <summary class="govuk-details__summary">
+    <span class="govuk-details__summary-text">
+      Test summary
+    </span>
+  </summary>
+  <div class="govuk-details__text">
+    <p>
+      Test details
+    </p>
+  </div>
+</details>
+
+`;

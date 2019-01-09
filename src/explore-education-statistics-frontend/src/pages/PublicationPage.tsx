@@ -4,6 +4,7 @@ import { match } from 'react-router';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 import api, { baseUrl } from '../api';
 import Date from '../components/Date';
+import Details from '../components/Details';
 import Link from '../components/Link';
 import StepByStepNavigation from '../components/StepByStepNavigation';
 import StepByStepNavigationStep from '../components/StepByStepNavigationStep';
@@ -210,33 +211,26 @@ class PublicationPage extends Component<Props, State> {
               <h4>
                 <span className="govuk-caption-m">Release name: </span>
                 {data.releaseName} {!release && <span>(latest data)</span>}
-                <details className="govuk-details">
-                  <summary className="govuk-details__summary">
-                    <span className="govuk-details__summary-text">
-                      See previous {releaseCount} releases
-                    </span>
-                  </summary>
-                  <div className="govuk-details__text">
-                    <ul className="govuk-list">
-                      {data.publication.releases.slice(1).map((elem, index) => (
-                        <li key={elem.id}>
-                          <Link
-                            to={`/themes/${theme}/${topic}/${
-                              data.publication.slug
-                            }/${elem.slug}`}
-                          >
-                            {elem.releaseName}
-                          </Link>
-                        </li>
-                      ))}
-                      {data.publication.legacyReleases.map(elem => (
-                        <li key={elem.id}>
-                          <a href={elem.url}>{elem.description}</a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </details>
+                <Details summary={`See previous ${releaseCount} releases`}>
+                  <ul className="govuk-list">
+                    {data.publication.releases.slice(1).map((elem, index) => (
+                      <li key={elem.id}>
+                        <Link
+                          to={`/themes/${theme}/${topic}/${
+                            data.publication.slug
+                          }/${elem.slug}`}
+                        >
+                          {elem.releaseName}
+                        </Link>
+                      </li>
+                    ))}
+                    {data.publication.legacyReleases.map(elem => (
+                      <li key={elem.id}>
+                        <a href={elem.url}>{elem.description}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </Details>
               </h4>
 
               <h4>
@@ -248,24 +242,17 @@ class PublicationPage extends Component<Props, State> {
                 <span className="govuk-caption-m">Last updated: </span>
                 <Date value={data.updates[0].on} />
 
-                <details className="govuk-details">
-                  <summary className="govuk-details__summary">
-                    <span className="govuk-details__summary-text">
-                      See all {data.updates.length} updates
-                    </span>
-                  </summary>
-                  <div className="govuk-details__text">
-                    {data.updates.map(elem => (
-                      <div>
-                        <Date
-                          className="govuk-body govuk-!-font-weight-bold"
-                          value={elem.on}
-                        />
-                        <p>{elem.reason}</p>
-                      </div>
-                    ))}
-                  </div>
-                </details>
+                <Details summary={`See all ${data.updates.length} updates`}>
+                  {data.updates.map(elem => (
+                    <div>
+                      <Date
+                        className="govuk-body govuk-!-font-weight-bold"
+                        value={elem.on}
+                      />
+                      <p>{elem.reason}</p>
+                    </div>
+                  ))}
+                </Details>
               </h4>
 
               <h4>
