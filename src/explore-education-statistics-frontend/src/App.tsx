@@ -56,7 +56,7 @@ class App extends Component {
 
                 <Route
                   exact
-                  path="/local-authority/:localAuthority"
+                  path="/local-authorities/:localAuthority"
                   component={LocalAuthorityPage}
                 />
 
