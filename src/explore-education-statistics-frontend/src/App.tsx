@@ -37,7 +37,9 @@ class App extends Component {
                 </span>
               </p>
             </div>
-            <Breadcrumbs current={'current page'} />
+
+            <Breadcrumbs />
+
             <main
               className="govuk-main-wrapper app-main-class"
               id="main-content"
