@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Breadcrumbs renders correctly with just home breadcrumb 1`] = `
+
+<div class="govuk-breadcrumbs">
+  <ol class="govuk-breadcrumbs__list">
+    <li class="govuk-breadcrumbs__list-item">
+      <a class="govuk-breadcrumbs__link"
+         href="/"
+      >
+        <span match="[object Object]"
+              location="[object Object]"
+        >
+          Home
+        </span>
+      </a>
+    </li>
+  </ol>
+</div>
+
+`;
+
+exports[`Breadcrumbs renders correctly with multiple breadcrumbs 1`] = `
+
+<div class="govuk-breadcrumbs">
+  <ol class="govuk-breadcrumbs__list">
+    <li class="govuk-breadcrumbs__list-item">
+      <a class="govuk-breadcrumbs__link"
+         href="/"
+      >
+        <span match="[object Object]"
+              location="[object Object]"
+        >
+          Home
+        </span>
+      </a>
+    </li>
+    <li class="govuk-breadcrumbs__list-item">
+      <a class="govuk-breadcrumbs__link"
+         href="/publications"
+      >
+        <span match="[object Object]"
+              location="[object Object]"
+        >
+          Publications
+        </span>
+      </a>
+    </li>
+    <li class="govuk-breadcrumbs__list-item">
+      <a class="govuk-breadcrumbs__link"
+         href="/publications/test-publication"
+      >
+        <span match="[object Object]"
+              location="[object Object]"
+        >
+          Test publication
+        </span>
+      </a>
+    </li>
+  </ol>
+</div>
+
+`;

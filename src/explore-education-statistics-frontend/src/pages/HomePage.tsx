@@ -33,13 +33,13 @@ class HomePage extends Component {
                   <Link to="/themes">Themes</Link>
                 </li>
                 <li>
-                  <Link to="topics">Topics</Link>
+                  <Link to="/topics">Topics</Link>
                 </li>
                 <li>
                   <Link to="/publications">Publications</Link>
                 </li>
                 <li>
-                  <Link to="/local-authority/sheffield">
+                  <Link to="/local-authorities/sheffield">
                     Local Authority - Sheffield
                   </Link>
                 </li>
