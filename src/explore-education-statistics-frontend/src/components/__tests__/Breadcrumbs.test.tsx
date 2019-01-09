@@ -19,7 +19,7 @@ describe('Breadcrumbs', () => {
     const breadcrumbs = container.querySelectorAll('li');
 
     expect(breadcrumbs).toHaveLength(1);
-    expect((breadcrumbs[0] as HTMLElement).textContent).toBe('Home');
+    expect(breadcrumbs[0]!.textContent).toBe('Home');
 
     expect(container.innerHTML).toMatchSnapshot();
   });
