@@ -116,7 +116,7 @@ class PublicationPage extends Component<Props, State> {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             {!release && (
-              <strong className="govuk-tag">This is the latest data</strong>
+              <strong className="govuk-tag" data-testid="latest-data-heading">This is the latest data</strong>
             )}
 
             <h2>{data.title}</h2>
@@ -210,7 +210,7 @@ class PublicationPage extends Component<Props, State> {
 
               <h4>
                 <span className="govuk-caption-m">Release name: </span>
-                {data.releaseName} {!release && <span>(latest data)</span>}
+                <div data-testid="release-name">{data.releaseName} {!release && <span>(latest data)</span>}</div>
                 <Details summary={`See previous ${releaseCount} releases`}>
                   <ul className="govuk-list">
                     {data.publication.releases.slice(1).map((elem, index) => (

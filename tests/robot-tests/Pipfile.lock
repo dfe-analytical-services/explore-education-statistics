@@ -1,0 +1,63 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "19027351b783324fbaca24760139ef5259a13b1537e9a96f57e441503360801f"
+        },
+        "pipfile-spec": 6,
+        "requires": {
+            "python_version": "3.7"
+        },
+        "sources": [
+            {
+                "name": "pypi",
+                "url": "https://pypi.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "robotframework": {
+            "hashes": [
+                "sha256:ab94257cbd848dfca7148e092d233a12853cc7e840ce8231af9cbb5e7f51aa47"
+            ],
+            "version": "==3.0.4"
+        },
+        "robotframework-pabot": {
+            "hashes": [
+                "sha256:d42450c1c4c251545bcda9cb30833ad5dbd3f46cda8e8313b546507601a79ca0"
+            ],
+            "index": "pypi",
+            "version": "==0.45"
+        },
+        "robotframework-seleniumlibrary": {
+            "hashes": [
+                "sha256:113ee01aa4fbfd322d4816e5704c0187ffcf6a047ea012a66d305f250ab485db",
+                "sha256:8a53ec6bc2f2969dbec9904400b539c4323bf6620da23dd17527928385a53466"
+            ],
+            "index": "pypi",
+            "version": "==3.2.0"
+        },
+        "robotremoteserver": {
+            "hashes": [
+                "sha256:1d78ebc63738838a638042407c1da472811853892d64498fd89e061f7f15addd",
+                "sha256:b95e75d5de49f4ba5eefb985469ee6dd3604042faed7198d2a77be35e56aea9e"
+            ],
+            "version": "==1.1"
+        },
+        "selenium": {
+            "hashes": [
+                "sha256:2d7131d7bc5a5b99a2d9b04aaf2612c411b03b8ca1b1ee8d3de5845a9be2cb3c",
+                "sha256:deaf32b60ad91a4611b98d8002757f29e6f2c2d5fcaf202e1c9ad06d6772300d"
+            ],
+            "version": "==3.141.0"
+        },
+        "urllib3": {
+            "hashes": [
+                "sha256:61bf29cada3fc2fbefad4fdf059ea4bd1b4a86d2b6d15e1c7c0b582b9752fe39",
+                "sha256:de9529817c93f27c8ccbfead6985011db27bd0ddfcdb2d86f3f663385c6a9c22"
+            ],
+            "version": "==1.24.1"
+        }
+    },
+    "develop": {}
+}
