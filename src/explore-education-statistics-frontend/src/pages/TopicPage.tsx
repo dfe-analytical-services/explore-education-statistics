@@ -46,7 +46,10 @@ class TopicPage extends Component<Props, State> {
       <div>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            <PageHeading caption="Topics" heading={`Find ${data.title.toLowerCase()} statistics`} />
+            <PageHeading
+              caption="Topics"
+              heading={`Find ${data.title.toLowerCase()} statistics`}
+            />
 
             <p>
               Here you can find DfE stats for {(data.title || '').toLowerCase()}

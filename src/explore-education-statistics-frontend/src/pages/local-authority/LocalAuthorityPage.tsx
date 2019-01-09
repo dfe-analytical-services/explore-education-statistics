@@ -15,7 +15,6 @@ class LocalAuthorityPage extends Component<{}> {
       <>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-
             <PageHeading caption="Metropolitan borough" heading="Sheffield" />
 
             <h3>
@@ -83,7 +82,10 @@ class LocalAuthorityPage extends Component<{}> {
 
         <div className={styles.wrappedRow}>
           {publicationSummaryTestData.map(publicationSummary => (
-            <div className={styles.publicationSummary} key={publicationSummary.title}>
+            <div
+              className={styles.publicationSummary}
+              key={publicationSummary.title}
+            >
               <PublicationSummary {...publicationSummary} />
             </div>
           ))}

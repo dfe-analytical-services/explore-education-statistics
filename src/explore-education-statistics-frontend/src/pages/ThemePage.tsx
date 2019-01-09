@@ -46,7 +46,10 @@ class ThemePage extends Component<Props, State> {
       <div>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            <PageHeading caption="Theme" heading={`Find ${data.title.toLowerCase()} statistics`} />
+            <PageHeading
+              caption="Theme"
+              heading={`Find ${data.title.toLowerCase()} statistics`}
+            />
 
             <p>
               Here you can find DfE stats for Schools, and access them as
