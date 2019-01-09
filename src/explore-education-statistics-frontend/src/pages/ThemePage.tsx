@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { match } from 'react-router';
 import api from '../api';
-import DataList from '../components/DataList';
+import ContentItemList from '../components/ContentItemList';
 import Link from '../components/Link';
 import PageHeading from '../components/PageHeading';
 
@@ -84,7 +84,10 @@ class ThemePage extends Component<Props, State> {
 
             <h3>What sort of stats are you looking for?</h3>
 
-            <DataList data={topics} linkIdentifier={window.location.pathname} />
+            <ContentItemList
+              items={topics}
+              linkIdentifier={window.location.pathname}
+            />
           </div>
         </div>
 

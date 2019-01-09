@@ -1,33 +1,39 @@
 import React, { Component } from 'react';
+import { RouteComponentProps } from 'react-router';
 import api from '../api';
-import DataList from '../components/DataList';
+import ContentItemList from '../components/ContentItemList';
 import PageHeading from '../components/PageHeading';
 
+interface Props extends RouteComponentProps<{}> {}
+
 interface State {
-  data: any[];
+  items: any[];
 }
 
-class PublicationsPage extends Component<{}, State> {
+class PublicationsPage extends Component<Props, State> {
   public state = {
-    data: [],
+    items: [],
   };
 
   public componentDidMount() {
     api
       .get('publication')
-      .then(({ data }) => this.setState({ data }))
+      .then(({ data }) => this.setState({ items: data }))
       .catch(error => alert(error));
   }
 
   public render() {
-    const { data } = this.state;
+    const { items } = this.state;
 
     return (
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <PageHeading caption="Publications" heading="Find publications" />
 
-          <DataList data={data} linkIdentifier={window.location.pathname} />
+          <ContentItemList
+            items={items}
+            linkIdentifier={this.props.match.url}
+          />
         </div>
       </div>
     );

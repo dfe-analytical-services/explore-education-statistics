@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
-import { match } from 'react-router';
+import { match, RouteComponentProps } from 'react-router';
 import api from '../api';
-import DataList from '../components/DataList';
+import ContentItemList from '../components/ContentItemList';
 import Link from '../components/Link';
 import PageHeading from '../components/PageHeading';
 
-interface Props {
-  match: match<{
+interface Props
+  extends RouteComponentProps<{
     topic: string;
-  }>;
-}
+  }> {}
 
 interface State {
   data: {
@@ -65,9 +64,9 @@ class TopicPage extends Component<Props, State> {
               The following publications are available in{' '}
               {(data.title || '').toLowerCase()}
             </h3>
-            <DataList
-              data={publications}
-              linkIdentifier={window.location.pathname}
+            <ContentItemList
+              items={publications}
+              linkIdentifier={this.props.match.url}
             />
           </div>
         </div>
