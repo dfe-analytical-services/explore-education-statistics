@@ -16,6 +16,11 @@ describe('Breadcrumbs', () => {
       </MemoryRouter>,
     );
 
+    const breadcrumbs = container.querySelectorAll('li');
+
+    expect(breadcrumbs).toHaveLength(1);
+    expect((breadcrumbs[0] as HTMLElement).textContent).toBe('Home');
+
     expect(container.innerHTML).toMatchSnapshot();
   });
 
@@ -30,6 +35,30 @@ describe('Breadcrumbs', () => {
       </MemoryRouter>,
     );
 
+    const breadcrumbs = container.querySelectorAll('li');
+
+    expect(breadcrumbs).toHaveLength(3);
+    expect(breadcrumbs[0]!.textContent).toBe('Home');
+    expect(breadcrumbs[1]!.textContent).toBe('Publications');
+    expect(breadcrumbs[2]!.textContent).toBe('Test publication');
+
     expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('does not render last breadcrumb as a link', () => {
+    const path = '/publications/test-publication';
+
+    const { container } = render(
+      <MemoryRouter initialEntries={[path]}>
+        <Route path={path} exact>
+          <Breadcrumbs />
+        </Route>
+      </MemoryRouter>,
+    );
+
+    const lastBreadcrumb = container.querySelector('li:last-child');
+
+    expect(lastBreadcrumb).toBeDefined();
+    expect(lastBreadcrumb!.querySelector('a')).toBeNull();
   });
 });

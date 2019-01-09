@@ -4,16 +4,14 @@ exports[`Breadcrumbs renders correctly with just home breadcrumb 1`] = `
 
 <div class="govuk-breadcrumbs">
   <ol class="govuk-breadcrumbs__list">
-    <li class="govuk-breadcrumbs__list-item">
-      <a class="govuk-breadcrumbs__link"
-         href="/"
+    <li aria-current="page"
+        class="govuk-breadcrumbs__list-item"
+    >
+      <span match="[object Object]"
+            location="[object Object]"
       >
-        <span match="[object Object]"
-              location="[object Object]"
-        >
-          Home
-        </span>
-      </a>
+        Home
+      </span>
     </li>
   </ol>
 </div>
@@ -46,16 +44,14 @@ exports[`Breadcrumbs renders correctly with multiple breadcrumbs 1`] = `
         </span>
       </a>
     </li>
-    <li class="govuk-breadcrumbs__list-item">
-      <a class="govuk-breadcrumbs__link"
-         href="/publications/test-publication"
+    <li aria-current="page"
+        class="govuk-breadcrumbs__list-item"
+    >
+      <span match="[object Object]"
+            location="[object Object]"
       >
-        <span match="[object Object]"
-              location="[object Object]"
-        >
-          Test publication
-        </span>
-      </a>
+        Test publication
+      </span>
     </li>
   </ol>
 </div>
