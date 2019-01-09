@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { match } from 'react-router';
-import { CartesianGrid, Legend, Line, LineChart, XAxis, YAxis } from 'recharts';
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 import api, { baseUrl } from '../api';
 import Date from '../components/Date';
 import Link from '../components/Link';
@@ -231,9 +231,7 @@ class PublicationPage extends Component<Props, State> {
                       ))}
                       {data.publication.legacyReleases.map(elem => (
                         <li key={elem.id}>
-                          <a className="govuk-link" href={elem.url}>
-                            {elem.description}
-                          </a>
+                          <a href={elem.url}>{elem.description}</a>
                         </li>
                       ))}
                     </ul>
@@ -281,7 +279,7 @@ class PublicationPage extends Component<Props, State> {
                 </span>
               </h4>
 
-              <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
+              <hr />
 
               <h3 id="getting-the-data">Getting the data</h3>
 
@@ -291,15 +289,12 @@ class PublicationPage extends Component<Props, State> {
                     href={`${baseUrl.data}/downloads/${
                       data.publication.slug
                     }/csv/`}
-                    className="govuk-link"
                   >
                     Download .csv files
                   </a>
                 </li>
                 <li>
-                  <a href={baseUrl.data} className="govuk-link">
-                    Access API
-                  </a>
+                  <a href={baseUrl.data}>Access API</a>
                 </li>
               </ul>
             </aside>

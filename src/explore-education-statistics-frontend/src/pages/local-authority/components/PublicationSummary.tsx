@@ -34,7 +34,7 @@ export const PublicationSummary = ({
 
       <hr />
 
-      <ul>
+      <ul className="govuk-list">
         <li>
           <Link to="#">View report</Link>
         </li>

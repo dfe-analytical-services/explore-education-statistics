@@ -1,10 +1,15 @@
 @import '~govuk-frontend/core/lists';
 @import '~govuk-frontend/core/section-break';
 @import '~govuk-frontend/core/typography';
+@import '~govuk-frontend/core/links';
 @import '~govuk-frontend/helpers/typography';
 
 body {
   @extend %govuk-body-m;
+}
+
+a {
+  @extend %govuk-link;
 }
 
 strong {

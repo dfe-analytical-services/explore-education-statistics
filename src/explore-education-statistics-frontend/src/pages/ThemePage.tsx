@@ -78,11 +78,14 @@ class ThemePage extends Component<Props, State> {
                 Find
               </button>
             </div>
+
             <h3>What sort of stats are you looking for?</h3>
+
             <DataList data={topics} linkIdentifier={window.location.pathname} />
           </div>
         </div>
-        <hr className="govuk-section-break--l govuk-section-break--visible" />
+
+        <hr />
 
         <section id="latest-publications">
           <h2>Latest publications in {(data.title || '').toLowerCase()}</h2>
@@ -94,9 +97,9 @@ class ThemePage extends Component<Props, State> {
             You can now customise the data to your requirements, and get a
             variety of formats.
           </p>
-
-          <hr className="govuk-section-break govuk-section-break--xl govuk-section-break--visible" />
         </section>
+
+        <hr />
 
         <section id="key-indicators">
           <h2>Key indicators for {(data.title || '').toLowerCase()}</h2>
@@ -105,8 +108,9 @@ class ThemePage extends Component<Props, State> {
             These are some key indicators for {(data.title || '').toLowerCase()}
             . You can change what you see here according to your requirements.
           </p>
-          <hr className="govuk-section-break govuk-section-break--xl govuk-section-break--visible" />
         </section>
+
+        <hr />
 
         <section id="explore-statistics">
           <h2>Explore {(data.title || '').toLowerCase()} statistics</h2>

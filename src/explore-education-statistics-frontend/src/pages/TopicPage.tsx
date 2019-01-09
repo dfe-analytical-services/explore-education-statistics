@@ -68,7 +68,7 @@ class TopicPage extends Component<Props, State> {
             />
           </div>
         </div>
-        <hr className="govuk-section-break govuk-section-break--xl govuk-section-break--visible" />
+        <hr />
 
         <section id="latest-publications">
           <h2>Latest publications in {(data.title || '').toLowerCase()}</h2>
@@ -79,7 +79,7 @@ class TopicPage extends Component<Props, State> {
             You can now customise the data to your requirements, and get a
             variety of formats.
           </p>
-          <hr className="govuk-section-break govuk-section-break--xl govuk-section-break--visible" />
+          <hr />
         </section>
 
         <section id="key-indicators">
@@ -88,7 +88,7 @@ class TopicPage extends Component<Props, State> {
             These are some key indicators for {(data.title || '').toLowerCase()}
             . You can change what you see here according to your requirements.
           </p>
-          <hr className="govuk-section-break govuk-section-break--xl govuk-section-break--visible" />
+          <hr />
         </section>
 
         <section id="explore-statistics">
