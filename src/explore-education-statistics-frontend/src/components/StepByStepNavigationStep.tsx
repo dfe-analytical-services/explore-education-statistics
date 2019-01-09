@@ -25,22 +25,14 @@ const StepByStepNavigationStep = ({ children, title, caption }: Props) => (
             aria-controls="step-panel"
           >
             <span className="js-step-title-text">
-              <button
-                className="app-step-nav__button app-step-nav__button--title js-step-title-button"
-                aria-expanded="true"
-                aria-controls="step-panel"
-              >
-                <span className="js-step-title-text">
-                  {title}
-                  <span className="govuk-caption-m">{caption}</span>
-                </span>
-                <span
-                  className="app-step-nav__toggle-link js-toggle-link"
-                  aria-hidden="false"
-                >
-                  Show
-                </span>
-              </button>
+              {title}
+              <span className="govuk-caption-m">{caption}</span>
+            </span>
+            <span
+              className="app-step-nav__toggle-link js-toggle-link"
+              aria-hidden="false"
+            >
+              Show
             </span>
           </button>
         </span>
