@@ -29,10 +29,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         // GET api/release/5
         [HttpGet("{id}")]
         public ActionResult<Release> Get(string id)
-        {            
-            var release =  Guid.TryParse(id, out var newGuid) ? 
-                _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases).FirstOrDefault(x => x.Id == newGuid) : 
-                _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases).FirstOrDefault(x => x.Slug == id);
+        {
+            var release = Guid.TryParse(id, out var newGuid)
+                ? _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
+                    .Include(x => x.Updates).FirstOrDefault(x => x.Id == newGuid)
+                : _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
+                    .Include(x => x.Updates).FirstOrDefault(x => x.Slug == id);
            
             if (release != null)
             {
@@ -47,7 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                     Slug = r.Slug,
                     Summary = r.Summary,
                     Publication = r.Publication,
-                    PublicationId =  r.PublicationId
+                    PublicationId =  r.PublicationId,
+                    Updates = r.Updates
                 }));
             }
 

@@ -6,15 +6,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
 {
     public class Theme
     {
-        [Key]
-        [Required]
-        public Guid Id { get; set; }
+        [Key] [Required] public Guid Id { get; set; }
 
         public string Slug { get; set; }
-        
-        [Required]
-        public string Title { get; set; }
-        
+
+        [Required] public string Title { get; set; }
+
         public string Summary { get; set; }
 
         public List<Topic> Topics { get; set; }

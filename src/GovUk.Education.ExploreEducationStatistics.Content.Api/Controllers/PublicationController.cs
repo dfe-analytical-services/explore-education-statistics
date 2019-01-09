@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 
         public PublicationController(ApplicationDbContext context)
         {
-            _context = context;    
+            _context = context;
         }
 
         // GET api/publication
@@ -30,19 +30,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [HttpGet("{id}")]
         public ActionResult<Publication> Get(string id)
         {
-            return Guid.TryParse(id, out var newGuid) ? 
-                _context.Publications.Include(x => x.Releases).Include(x => x.LegacyReleases).FirstOrDefault(t => t.Id == newGuid) : 
-                _context.Publications.Include(x => x.Releases).Include(x => x.LegacyReleases).FirstOrDefault(t => t.Slug == id);
+            return Guid.TryParse(id, out var newGuid)
+                ? _context.Publications.Include(x => x.Releases).Include(x => x.LegacyReleases)
+                    .FirstOrDefault(t => t.Id == newGuid)
+                : _context.Publications.Include(x => x.Releases).Include(x => x.LegacyReleases)
+                    .FirstOrDefault(t => t.Slug == id);
         }
-        
+
         // GET api/publication/5/latest
         [HttpGet("{id}/latest")]
         public ActionResult<Release> GetLatest(string id)
-        {            
-            var release =  Guid.TryParse(id, out var newGuid) ? 
-                _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases).FirstOrDefault(t => t.PublicationId == newGuid) : 
-                _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases).FirstOrDefault(t => t.Publication.Slug == id);            
-           
+        {
+            var release = Guid.TryParse(id, out var newGuid)
+                ? _context.Releases.Include(x => x.Updates).Include(x => x.Publication)
+                    .ThenInclude(x => x.LegacyReleases).Include(x => x.Updates).OrderBy(x => x.Published)
+                    .Last(t => t.PublicationId == newGuid)
+                : _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
+                    .Include(x => x.Updates).OrderBy(x => x.Published).Last(t => t.Publication.Slug == id);
+
             if (release != null)
             {
                 var releases = _context.Releases.Where(x => x.Publication.Id == release.Publication.Id).ToList();
@@ -56,7 +61,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                     Slug = r.Slug,
                     Summary = r.Summary,
                     Publication = r.Publication,
-                    PublicationId =  r.PublicationId
+                    PublicationId = r.PublicationId,
+                    Updates = r.Updates
                 }));
             }
 

@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
 using Microsoft.EntityFrameworkCore;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
 {
@@ -93,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     Title = "Pupil absence data and statistics for schools in England", 
                     ReleaseName = "2016 to 2017",
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), 
-                    Published = new DateTime(2018,3,22),
+                    Published = new DateTime(2017,3,22),
                     Slug = "2016-17",
                     Summary = "This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools.\n\nIt allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:",
                 },
@@ -103,10 +101,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     Title = "Pupil absence data and statistics for schools in England", 
                     ReleaseName = "2015 to 2016",
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), 
-                    Published = new DateTime(2018,3,22),
+                    Published = new DateTime(2016,3,25),
                     Slug = "2015-16",
                     Summary = "This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools.\n\nIt allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:"
                 }                
+            );
+
+            modelBuilder.Entity<Update>().HasData(
+                new Update()
+                {
+                    Id = new Guid("9c0f0139-7f88-4750-afe0-1c85cdf1d047"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    On = new DateTime(2017,4,19),
+                    Reason = "Underlying data file updated to include absence data by pupil residency and school location, andupdated metadata document."
+                },
+                new Update()
+                {
+                    Id = new Guid("18e0d40e-bdf7-4c84-99dd-732e72e9c9a5"),
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    On = new DateTime(2017,3,22),
+                    Reason = "First published."
+                },
+                new Update()
+                {
+                    Id = new Guid("51bd1e2f-2669-4708-b300-799b6be9ec9a"),
+                    ReleaseId = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"),
+                    On = new DateTime(2016,3,25),
+                    Reason = "First published."
+                }
             );
             
             modelBuilder.Entity<Link>().HasData(

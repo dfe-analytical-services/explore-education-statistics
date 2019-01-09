@@ -73,6 +73,12 @@ class PublicationPage extends Component<Props, State> {
       releaseName: '',
       summary: '',
       title: '',
+      updates: [
+        {
+          on: '',
+          reason: '',
+        },
+      ],
     },
   };
 
@@ -242,23 +248,24 @@ class PublicationPage extends Component<Props, State> {
 
               <h4>
                 <span className="govuk-caption-m">Last updated: </span>
-                <Date value="1970-01-01T00:00:00" />
+                <Date value={data.updates[0].on} />
 
                 <details className="govuk-details">
                   <summary className="govuk-details__summary">
                     <span className="govuk-details__summary-text">
-                      See all 999 updates
+                      See all {data.updates.length} updates
                     </span>
                   </summary>
                   <div className="govuk-details__text">
-                    <p>19 April 2017</p>
-                    <p>
-                      Underlying data file updated to include absence data by
-                      pupil residency and school location, andupdated metadata
-                      document.
-                    </p>
-                    <strong>23 March 2017</strong>
-                    <p>First published.</p>
+                    {data.updates.map(elem => (
+                      <div>
+                        <Date
+                          className="govuk-body govuk-!-font-weight-bold"
+                          value={elem.on}
+                        />
+                        <p>{elem.reason}</p>
+                      </div>
+                    ))}
                   </div>
                 </details>
               </h4>
