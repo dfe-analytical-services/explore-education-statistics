@@ -82,7 +82,7 @@ class LocalAuthorityPage extends Component<{}> {
 
         <div className={styles.wrappedRow}>
           {publicationSummaryTestData.map(publicationSummary => (
-            <div className={styles.publicationSummary}>
+            <div className={styles.publicationSummary} key={publicationSummary.title}>
               <PublicationSummary {...publicationSummary} />
             </div>
           ))}
@@ -106,7 +106,7 @@ class LocalAuthorityPage extends Component<{}> {
 
         <div className={styles.wrappedRow}>
           {keyIndicatorTestData.map(keyIndicator => (
-            <div className={styles.keyIndicator}>
+            <div className={styles.keyIndicator} key={keyIndicator.title}>
               <KeyIndicator {...keyIndicator} />
             </div>
           ))}
