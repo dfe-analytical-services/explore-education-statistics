@@ -15,7 +15,7 @@ Validate Schools page displays links to publications
     user clicks link  ${HomePage_ThemesLink}
     user clicks link  ${ThemesPage_SchoolsLink}
 
-    css should match x times  css:[data-testid="data-list-element"]  6
+    css should match x times  css:[data-testid="contentitemlist--element"]  6
 
 Validate that Pupil Absence in Schools in England page is for latest data
     [Tags]  HappyPath

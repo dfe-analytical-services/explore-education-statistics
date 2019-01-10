@@ -18,9 +18,17 @@ const ContentItemList = ({ linkIdentifier = '', items = [] }: Props) => (
     {items.length > 0 ? (
       <div className="govuk-grid-row">
         {items.map(({ id, slug, title, summary }) => (
-          <div className="govuk-grid-column-one-half" key={id}>
+          <div
+            className="govuk-grid-column-one-half"
+            key={id}
+            data-testid="contentitemlist--element"
+          >
             <h4>
-              <Link to={`${linkIdentifier}/${slug}`} className="govuk-link">
+              <Link
+                to={`${linkIdentifier}/${slug}`}
+                className="govuk-link"
+                data-testid={slug}
+              >
                 {title}
               </Link>
             </h4>
