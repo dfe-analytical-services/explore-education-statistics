@@ -1,0 +1,14 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+robotframework-seleniumlibrary = "==3.2.0"
+robotframework-pabot = "==0.45"
+chromedriver-install = "==0.3"
+
+[requires]
+python_version = "3.7"

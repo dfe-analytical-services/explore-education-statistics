@@ -1,0 +1,99 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "0e8ca7f7cc3c1ded7ba21ec7eb63b791b4324282ce7b42f7c2d8f1e229ce0487"
+        },
+        "pipfile-spec": 6,
+        "requires": {
+            "python_version": "3.7"
+        },
+        "sources": [
+            {
+                "name": "pypi",
+                "url": "https://pypi.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "certifi": {
+            "hashes": [
+                "sha256:47f9c83ef4c0c621eaef743f133f09fa8a74a9b75f037e8624f83bd1b6626cb7",
+                "sha256:993f830721089fef441cdfeb4b2c8c9df86f0c63239f06bd025a76a7daddb033"
+            ],
+            "version": "==2018.11.29"
+        },
+        "chardet": {
+            "hashes": [
+                "sha256:84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae",
+                "sha256:fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691"
+            ],
+            "version": "==3.0.4"
+        },
+        "chromedriver-install": {
+            "hashes": [
+                "sha256:fa68817d9442879dab4c3015fc7adb2966f735ffdab2956a383e1e7ea9b6eeb7"
+            ],
+            "index": "pypi",
+            "version": "==0.3"
+        },
+        "idna": {
+            "hashes": [
+                "sha256:c357b3f628cf53ae2c4c05627ecc484553142ca23264e593d327bcde5e9c3407",
+                "sha256:ea8b7f6188e6fa117537c3df7da9fc686d485087abf6ac197f9c46432f7e4a3c"
+            ],
+            "version": "==2.8"
+        },
+        "requests": {
+            "hashes": [
+                "sha256:502a824f31acdacb3a35b6690b5fbf0bc41d63a24a45c4004352b0242707598e",
+                "sha256:7bf2a778576d825600030a110f3c0e3e8edc51dfaafe1c146e39a2027784957b"
+            ],
+            "version": "==2.21.0"
+        },
+        "robotframework": {
+            "hashes": [
+                "sha256:7e29b2ac415e6bdbde348d25c0c759c6d3df012c897b31dcf98fd2dd94cee7bd",
+                "sha256:a43761d8be581da34d601c8b1511a21f06efdaefa5974d4946d219f73c17fd39"
+            ],
+            "version": "==3.1.1"
+        },
+        "robotframework-pabot": {
+            "hashes": [
+                "sha256:d42450c1c4c251545bcda9cb30833ad5dbd3f46cda8e8313b546507601a79ca0"
+            ],
+            "index": "pypi",
+            "version": "==0.45"
+        },
+        "robotframework-seleniumlibrary": {
+            "hashes": [
+                "sha256:113ee01aa4fbfd322d4816e5704c0187ffcf6a047ea012a66d305f250ab485db",
+                "sha256:8a53ec6bc2f2969dbec9904400b539c4323bf6620da23dd17527928385a53466"
+            ],
+            "index": "pypi",
+            "version": "==3.2.0"
+        },
+        "robotremoteserver": {
+            "hashes": [
+                "sha256:1d78ebc63738838a638042407c1da472811853892d64498fd89e061f7f15addd",
+                "sha256:b95e75d5de49f4ba5eefb985469ee6dd3604042faed7198d2a77be35e56aea9e"
+            ],
+            "version": "==1.1"
+        },
+        "selenium": {
+            "hashes": [
+                "sha256:2d7131d7bc5a5b99a2d9b04aaf2612c411b03b8ca1b1ee8d3de5845a9be2cb3c",
+                "sha256:deaf32b60ad91a4611b98d8002757f29e6f2c2d5fcaf202e1c9ad06d6772300d"
+            ],
+            "version": "==3.141.0"
+        },
+        "urllib3": {
+            "hashes": [
+                "sha256:61bf29cada3fc2fbefad4fdf059ea4bd1b4a86d2b6d15e1c7c0b582b9752fe39",
+                "sha256:de9529817c93f27c8ccbfead6985011db27bd0ddfcdb2d86f3f663385c6a9c22"
+            ],
+            "version": "==1.24.1"
+        }
+    },
+    "develop": {}
+}

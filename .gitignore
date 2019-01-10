@@ -6,3 +6,6 @@ obj
 .vscode
 dfe-meta.db
 *.~lock*
+tags
+*.pyc
+**/test-results/
