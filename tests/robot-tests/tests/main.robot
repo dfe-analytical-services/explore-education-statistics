@@ -16,12 +16,6 @@ Validate Schools page displays links to publications
     user clicks link  ${ThemesPage_SchoolsLink}
 
     css should match x times  css:[data-testid="data-list-element"]  6
-    element should contain  css:[data-testid="absence-and-exclusions"]  Absence and exclusions
-    element should contain  css:[data-testid="school-and-pupil-numbers"]  School & pupil numbers
-    element should contain  css:[data-testid="capacity-admissions"]  Capacity and admissions
-    element should contain  css:[data-testid="results"]  Results
-    element should contain  css:[data-testid="school-finance"]  School finance
-    element should contain  css:[data-testid="teacher-numbers"]  Teacher Numbers
 
 Validate that Pupil Absence in Schools in England page is for latest data
     [Tags]  HappyPath

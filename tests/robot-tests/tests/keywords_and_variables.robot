@@ -1,5 +1,6 @@
 *** Settings ***
-Library     SeleniumLibrary    # pip install robotframework-seleniumlibrary
+Library     SeleniumLibrary
+Library     OperatingSystem
 #Library     XvfbRobot           # sudo apt install xvfb + pip install robotframework-xvfb
 
 Library    library.py
@@ -12,6 +13,7 @@ ${headless}   1
 
 *** Keywords ***
 user opens the browser
+  add lib dir to path
   run keyword if    "${browser}" == "chrome"    user opens chrome
   run keyword if    "${browser}" == "firefox"   user opens firefox
   go to    about:blank

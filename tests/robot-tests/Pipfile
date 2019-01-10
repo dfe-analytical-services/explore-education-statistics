@@ -8,6 +8,7 @@ verify_ssl = true
 [packages]
 robotframework-seleniumlibrary = "==3.2.0"
 robotframework-pabot = "==0.45"
+chromedriver-install = "==0.3"
 
 [requires]
 python_version = "3.7"
