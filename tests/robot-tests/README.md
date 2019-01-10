@@ -13,9 +13,12 @@ This was created in order to help testers get started quickly on a new project, 
 
 # What do I need to install
 
-* Python 3
-* Pip 3
-* Pipenv
+* Python3 (which should include pip3)
+
+Then install pipenv
+```
+pip3 install pipenv
+```
 
 Then in the test directory run
 

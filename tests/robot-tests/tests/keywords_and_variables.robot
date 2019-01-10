@@ -133,39 +133,39 @@ user checks element is disabled
   element should be disabled   ${element}
 
 user clicks link
-	[Arguments]    ${linkToClick}
+  [Arguments]    ${linkToClick}
   set focus to element    ${linkToClick}
   wait until element is visible  ${linkToClick}
-	click link    ${linkToClick}
+  click link    ${linkToClick}
 
 user clicks button
   [Arguments]     ${buttonToClick}
-	set focus to element    ${buttonToClick}
-	wait until element is visible  ${buttonToClick}
+  set focus to element    ${buttonToClick}
+  wait until element is visible  ${buttonToClick}
   click button    ${buttonToClick}
 
 user clicks element
   [Arguments]     ${elementToClick}
-	set focus to element    ${elementToClick}
-	wait until element is visible  ${elementToClick}
+  set focus to element    ${elementToClick}
+  wait until element is visible  ${elementToClick}
   click element   ${elementToClick}
 
 user selects checkbox
   [Arguments]     ${checkboxToSelect}
-	set focus to element    ${checkboxToSelect}
-	wait until element is visible  ${checkboxToSelect}
+  set focus to element    ${checkboxToSelect}
+  wait until element is visible  ${checkboxToSelect}
   select checkbox     ${checkboxToSelect}
 
 user unselects checkbox
   [Arguments]     ${checkboxToUnselect}
-	set focus to element    ${checkboxToUnselect}
-	wait until element is visible  ${checkboxToUnselect}
+  set focus to element    ${checkboxToUnselect}
+  wait until element is visible  ${checkboxToUnselect}
   unselect checkbox     ${checkboxToUnselect}
 
 user inputs text into textfield
   [Arguments]    ${textField}    ${textInput}
-	set focus to element    ${textField}
-	wait until element is visible  ${textField}
+  set focus to element    ${textField}
+  wait until element is visible  ${textField}
   input text    ${textField}    ${textInput}
 
 user clears element text
