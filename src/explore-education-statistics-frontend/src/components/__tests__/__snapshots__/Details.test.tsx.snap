@@ -4,7 +4,9 @@ exports[`Details renders correctly 1`] = `
 
 <details class="govuk-details">
   <summary class="govuk-details__summary">
-    <span class="govuk-details__summary-text">
+    <span class="govuk-details__summary-text"
+          data-testid="see-previous-releases"
+    >
       Test summary
     </span>
   </summary>
