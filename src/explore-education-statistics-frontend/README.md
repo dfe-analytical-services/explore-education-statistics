@@ -1,5 +1,16 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Setup
+
+1. Create a new `.env` file from `.env.example` and replace any variables as required. `.env.example` 
+   should be mostly work with `.env` out-of-the-box. 
+   
+2. Install NPM dependencies.
+
+    ```bash
+    npm install
+    ```
+
 ## Available Scripts
 
 In the project directory, you can run:
