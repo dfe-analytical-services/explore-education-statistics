@@ -15,6 +15,7 @@ ${implicit_wait}   0.25
 
 *** Keywords ***
 setup configuration
+  install chromedriver
   add lib dir to path  # Need chromedriver to run selenium!
 
 user opens the browser
