@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEduc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Data.Api.Tests", "GovUk.Education.ExploreEducationStatistics.Data.Api.Tests\GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.csproj", "{C6673886-11C0-49AA-A29A-1EA960D9F09C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Admin", "GovUk.Education.ExploreEducationStatistics.Admin\GovUk.Education.ExploreEducationStatistics.Admin.csproj", "{2E86DE1F-C2C7-4AFB-A37B-9F922ABF829B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,5 +60,17 @@ Global
 		{C6673886-11C0-49AA-A29A-1EA960D9F09C}.Release|x64.Build.0 = Release|Any CPU
 		{C6673886-11C0-49AA-A29A-1EA960D9F09C}.Release|x86.ActiveCfg = Release|Any CPU
 		{C6673886-11C0-49AA-A29A-1EA960D9F09C}.Release|x86.Build.0 = Release|Any CPU
+		{2E86DE1F-C2C7-4AFB-A37B-9F922ABF829B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E86DE1F-C2C7-4AFB-A37B-9F922ABF829B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E86DE1F-C2C7-4AFB-A37B-9F922ABF829B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2E86DE1F-C2C7-4AFB-A37B-9F922ABF829B}.Debug|x64.Build.0 = Debug|Any CPU
+		{2E86DE1F-C2C7-4AFB-A37B-9F922ABF829B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2E86DE1F-C2C7-4AFB-A37B-9F922ABF829B}.Debug|x86.Build.0 = Debug|Any CPU
+		{2E86DE1F-C2C7-4AFB-A37B-9F922ABF829B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E86DE1F-C2C7-4AFB-A37B-9F922ABF829B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E86DE1F-C2C7-4AFB-A37B-9F922ABF829B}.Release|x64.ActiveCfg = Release|Any CPU
+		{2E86DE1F-C2C7-4AFB-A37B-9F922ABF829B}.Release|x64.Build.0 = Release|Any CPU
+		{2E86DE1F-C2C7-4AFB-A37B-9F922ABF829B}.Release|x86.ActiveCfg = Release|Any CPU
+		{2E86DE1F-C2C7-4AFB-A37B-9F922ABF829B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
