@@ -14,8 +14,8 @@ import PublicationsPage from './pages/PublicationsPage';
 import ThemePage from './pages/ThemePage';
 import ThemesPage from './pages/ThemesPage';
 import TopicPage from './pages/TopicPage';
-
 import TopicsPage from './pages/TopicsPage';
+import { PrototypeRoutes } from './prototypes/PrototypesHomePage';
 
 class App extends Component {
   public render() {
@@ -108,6 +108,8 @@ class App extends Component {
                   path="/publications/:publication/:release"
                   component={PublicationPage}
                 />
+
+                <PrototypeRoutes />
 
                 <Route component={NotFoundPage} />
               </Switch>
