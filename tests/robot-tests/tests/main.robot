@@ -12,21 +12,21 @@ Suite Teardown    user closes the browser
 Validate Schools page displays links to publications
     [Tags]  HappyPath
     user goes to url  ${url}
-    user clicks link  ${HomePage_ThemesLink}
-    user clicks link  ${ThemesPage_SchoolsLink}
+    user clicks element  ${HomePage_ThemesLink}
+    user clicks element  ${ThemesPage_SchoolsLink}
 
+    user waits until page contains element  css:[data-testid="contentitemlist--element"]
     css should match x times  css:[data-testid="contentitemlist--element"]  6
 
 Validate that Pupil Absence in Schools in England page is for latest data
     [Tags]  HappyPath
-    user clicks link  css:[data-testid="absence-and-exclusions"]
-    user clicks link  css:[data-testid="pupil-absence-in-schools-in-england"]
-    page should contain element  css:[data-testid="latest-data-heading"]
-    element should contain  css:[data-testid="release-name"]  (latest data)
+    user clicks element  css:[data-testid="absence-and-exclusions"]
+    user clicks element  css:[data-testid="pupil-absence-in-schools-in-england"]
+    verify element should contain  css:[data-testid="release-name"]  (latest data)
 
 Validate 2015/2016 isn't labelled as latest data
     [Tags]  HappyPath
     user clicks element  css:[data-testid="see-previous-releases"]
-    click link  2015 to 2016
-    page should not contain element  css:[data-testid="latest-data-heading"]
-    element should not contain  css:[data-testid="release-name"]  (latest data)
+    user clicks link  2015 to 2016
+    verify page should not contain element  css:[data-testid="latest-data-heading"]
+    verify element should not contain  css:[data-testid="release-name"]  (latest data)
