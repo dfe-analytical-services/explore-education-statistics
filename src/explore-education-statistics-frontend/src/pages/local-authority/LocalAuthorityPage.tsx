@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import ButtonLink from '../../components/ButtonLink';
+import { KeyIndicatorTile } from '../../components/KeyIndicatorTile';
 import Link from '../../components/Link';
 import PageHeading from '../../components/PageHeading';
-import { KeyIndicator } from './components/KeyIndicator';
-import keyIndicatorTestData from './components/keyIndicatorTestData';
 import { PublicationSummary } from './components/PublicationSummary';
-import publicationSummaryTestData from './components/publicationSummaryTestData';
 import SearchForm from './components/SearchForm';
 import styles from './LocalAuthorityPage.module.scss';
+import keyIndicatorTestData from './test-data/keyIndicatorTestData';
+import publicationSummaryTestData from './test-data/publicationSummaryTestData';
 
 class LocalAuthorityPage extends Component<{}> {
   public render() {
@@ -110,7 +110,7 @@ class LocalAuthorityPage extends Component<{}> {
         <div className={styles.wrappedRow}>
           {keyIndicatorTestData.map(keyIndicator => (
             <div className={styles.keyIndicator} key={keyIndicator.title}>
-              <KeyIndicator {...keyIndicator} />
+              <KeyIndicatorTile {...keyIndicator} />
             </div>
           ))}
         </div>
