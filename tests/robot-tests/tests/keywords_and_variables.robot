@@ -13,9 +13,9 @@ ${headless}   1
 
 *** Keywords ***
 do setup configuration
-  add lib dir to path
+  add lib dir to path  # Needed for chromedriver
   #set selenium timeout  1000ms
-  set selenium implicit wait  250ms
+  set selenium implicit wait  500ms
 
 user opens the browser
   do setup configuration
