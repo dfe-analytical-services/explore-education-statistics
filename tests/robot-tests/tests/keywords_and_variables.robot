@@ -1,5 +1,5 @@
 *** Settings ***
-Library     SeleniumLibrary
+Library     SeleniumLibrary  timeout=${timeout}  implicit_wait=${implicit_wait}
 Library     OperatingSystem
 #Library     XvfbRobot           # sudo apt install xvfb + pip install robotframework-xvfb
 
@@ -9,16 +9,16 @@ Library    library.py
 ${browser}    chrome
 ${url}        http://localhost:3000
 ${headless}   1
+${timeout}    0.25
+${implicit_wait}   0.25
 
 
 *** Keywords ***
-do setup configuration
-  add lib dir to path  # Needed for chromedriver
-  #set selenium timeout  1000ms
-  set selenium implicit wait  500ms
+setup configuration
+  add lib dir to path  # Need chromedriver to run selenium!
 
 user opens the browser
-  do setup configuration
+  setup configuration
   run keyword if    "${browser}" == "chrome"    user opens chrome
   run keyword if    "${browser}" == "firefox"   user opens firefox
   go to    about:blank
@@ -137,66 +137,28 @@ user checks element is disabled
   [Arguments]   ${element}
   element should be disabled   ${element}
 
-user clicks link
-  [Arguments]    ${linkToClick}
-  set focus to element    ${linkToClick}
-  wait until element is visible  ${linkToClick}
-  click link    ${linkToClick}
-
-user clicks button
-  [Arguments]     ${buttonToClick}
-  set focus to element    ${buttonToClick}
-  wait until element is visible  ${buttonToClick}
-  click button    ${buttonToClick}
-
 user clicks element
   [Arguments]     ${elementToClick}
+  wait until page contains element  ${elementToClick}
   set focus to element    ${elementToClick}
-  wait until element is visible  ${elementToClick}
   click element   ${elementToClick}
 
-user selects checkbox
-  [Arguments]     ${checkboxToSelect}
-  set focus to element    ${checkboxToSelect}
-  wait until element is visible  ${checkboxToSelect}
-  select checkbox     ${checkboxToSelect}
-
-user unselects checkbox
-  [Arguments]     ${checkboxToUnselect}
-  set focus to element    ${checkboxToUnselect}
-  wait until element is visible  ${checkboxToUnselect}
-  unselect checkbox     ${checkboxToUnselect}
-
-user inputs text into textfield
-  [Arguments]    ${textField}    ${textInput}
-  set focus to element    ${textField}
-  wait until element is visible  ${textField}
-  input text    ${textField}    ${textInput}
-
-user clears element text
-  [Arguments]   ${element}
-  set focus to element    ${element}
-  wait until element is visible   ${element}  
-  clear element text    ${element}
-
-verify the page contains
+user clicks link
   [Arguments]   ${text}
-  wait until page contains    ${text}
-  page should contain    ${text}
+  click link  ${text}
 
-verify the page does not contain
-  [Arguments]   ${text}
-  page should not contain   ${text}
+verify element should contain
+  [Arguments]   ${element}  ${text}
+  element should contain  ${element}    ${text}
 
-verify the page contains element
-  [Arguments]   ${element}
-  wait until page contains element    ${element}
-  page should contain element   ${element}
+verify element should not contain
+  [Arguments]   ${element}  ${text}
+  element should not contain  ${element}    ${text}
 
-verify the page does not contain element
-  [Arguments]   ${element}
-  page should not contain element    ${element}
+verify page should contain element
+  [Arguments]  ${element}
+  page should contain element  ${element}
 
-verify textfield contains
-  [Arguments]   ${locator}   ${text}
-  textfield should contain   ${locator}   ${text}
+verify page should not contain element
+  [Arguments]  ${element}
+  page should not contain element  ${element}
