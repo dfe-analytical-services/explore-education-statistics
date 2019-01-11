@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 s2l = BuiltIn().get_library_instance('SeleniumLibrary')
 
 def add_lib_dir_to_path():
-  os.environ["PATH"] += os.pathsep + os.getcwd() + '/lib'
+  os.environ["PATH"] += os.pathsep + os.getcwd() + os.sep + 'lib'
 
 def get_matching_css_count(css):
   if css.startswith('css:'):

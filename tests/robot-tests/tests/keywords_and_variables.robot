@@ -12,8 +12,13 @@ ${headless}   1
 
 
 *** Keywords ***
-user opens the browser
+do setup configuration
   add lib dir to path
+  #set selenium timeout  1000ms
+  set selenium implicit wait  250ms
+
+user opens the browser
+  do setup configuration
   run keyword if    "${browser}" == "chrome"    user opens chrome
   run keyword if    "${browser}" == "firefox"   user opens firefox
   go to    about:blank
