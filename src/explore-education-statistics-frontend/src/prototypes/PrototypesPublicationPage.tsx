@@ -1,8 +1,17 @@
 import React from 'react';
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 import CollapsibleSection from '../components/CollapsibleSection';
 import Details from '../components/Details';
 
 const TestPage = () => {
+  const chartData = [
+    { name: '2012/13', unauthorised: 1.1, authorised: 4.2, overall: 5.3 },
+    { name: '2013/14', unauthorised: 1.1, authorised: 3.5, overall: 4.5 },
+    { name: '2014/15', unauthorised: 1.1, authorised: 3.5, overall: 4.6 },
+    { name: '2015/16', unauthorised: 1.1, authorised: 3.4, overall: 4.6 },
+    { name: '2016/17', unauthorised: 1.3, authorised: 3.4, overall: 4.7 },
+  ];
+
   return (
     <>
       <div className="govuk-breadcrumbs">
@@ -90,34 +99,33 @@ const TestPage = () => {
               About this data
             </h2>
 
-            <h2 className="govuk-heading-s">
+            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <span className="govuk-caption-m">For school year: </span>
               2016-2017
               <span className="govuk-caption-m govuk-caption-inline">
                 (latest data)
               </span>
-              <span className="govuk-caption-m">
-                <a href="#">See previous 10 years</a>
-              </span>
-            </h2>
-
-            <h2 className="govuk-heading-s">
+            </h3>
+            <p className="govuk-caption-m govuk-!-margin-top-0">
+              <a href="#">See previous 10 years</a>
+            </p>
+            <h3 className="govuk-heading-s">
               <span className="govuk-caption-m">Published: </span>22 March 2018
-            </h2>
-            <h2 className="govuk-heading-s">
+            </h3>
+            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <span className="govuk-caption-m">Last updated: </span>20 June
               2018
-              <span className="govuk-caption-m">
-                <a href="#">See all 4 updates</a>
-              </span>
-            </h2>
-            <h2 className="govuk-heading-s">
+            </h3>
+            <p className="govuk-caption-m govuk-!-margin-top-0">
+              <a href="#">See all 4 updates</a>
+            </p>
+            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <span className="govuk-caption-m">Next update: </span>22 March
               2019
-              <span className="govuk-caption-m">
-                <a href="#">Notify me</a>
-              </span>
-            </h2>
+            </h3>
+            <p className="govuk-caption-m govuk-!-margin-top-0">
+              <a href="#">Notify me</a>
+            </p>
           </aside>
         </div>
       </div>
@@ -137,18 +145,66 @@ const TestPage = () => {
         <h3 className="govuk-heading-s">
           Chart showing the change in different types of absence over time
         </h3>
-        <div
-          id="da7c10ac-eab3-4a0d-b7ee-2dc75bf614ba"
-          className="plotly-graph-div"
-        />
+        <LineChart
+          width={900}
+          height={300}
+          data={chartData}
+          margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis
+            dataKey="name"
+            label={{
+              offset: 5,
+              position: 'bottom',
+              value: 'School year',
+            }}
+            padding={{ left: 20, right: 20 }}
+            tickMargin={10}
+          />
+          <YAxis
+            label={{
+              angle: -90,
+              offset: 0,
+              position: 'left',
+              value: 'Absence rate',
+            }}
+            scale="auto"
+            unit="%"
+          />
+          <Line
+            type="linear"
+            dataKey="unauthorised"
+            stroke="#28A197"
+            strokeWidth="1"
+            unit="%"
+            activeDot={{ r: 3 }}
+          />
+          <Line
+            type="linear"
+            dataKey="authorised"
+            stroke="#6F72AF"
+            strokeWidth="1"
+            unit="%"
+            activeDot={{ r: 3 }}
+          />
+          <Line
+            type="linear"
+            dataKey="overall"
+            stroke="#DF3034"
+            strokeWidth="1"
+            unit="%"
+            activeDot={{ r: 3 }}
+          />
+        </LineChart>
         <div className="dfe-dash-tiles dfe-dash-tiles--simple">
           <div className="dfe-dash-tiles__tile">
-            <h2 className="govuk-heading-m">
+            <h3 className="govuk-heading-m">
               Overall absence
               <span className="govuk-caption-m date-range govuk-tag">
                 2016/17
               </span>
-            </h2>
+            </h3>
             <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
               4.7%
             </span>
@@ -175,12 +231,12 @@ const TestPage = () => {
           </div>
 
           <div className="dfe-dash-tiles__tile">
-            <h2 className="govuk-heading-m">
+            <h3 className="govuk-heading-m">
               Authorised absence
               <span className="govuk-caption-m date-range govuk-tag">
                 2016/17
               </span>
-            </h2>
+            </h3>
             <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
               3.4%
             </span>
@@ -207,12 +263,12 @@ const TestPage = () => {
           </div>
 
           <div className="dfe-dash-tiles__tile">
-            <h2 className="govuk-heading-m">
+            <h3 className="govuk-heading-m">
               Unauthorised absence
               <span className="govuk-caption-m date-range govuk-tag">
                 2016/17
               </span>
-            </h2>
+            </h3>
             <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
               1.3%
             </span>
@@ -239,12 +295,12 @@ const TestPage = () => {
           </div>
 
           <div className="dfe-dash-tiles__tile">
-            <h2 className="govuk-heading-m">
+            <h3 className="govuk-heading-m">
               Persistent absence
               <span className="govuk-caption-m date-range govuk-tag">
                 2016/17
               </span>
-            </h2>
+            </h3>
             <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
               10.8%
             </span>
@@ -449,6 +505,23 @@ const TestPage = () => {
           accordance with the rules prescribed by the school’.
         </p>
       </CollapsibleSection>
+      <CollapsibleSection heading="Distribution of absence">
+        text here
+      </CollapsibleSection>
+      <CollapsibleSection heading="Absence by pupil characteristics">
+        text here
+      </CollapsibleSection>
+      <CollapsibleSection heading="Pupil referral unit absence">
+        text here
+      </CollapsibleSection>
+      <CollapsibleSection heading="Pupil absence by local authority">
+        text here
+      </CollapsibleSection>
+      <div className="govuk-!-margin-top-9">
+        <CollapsibleSection heading="Pupil absence by local authority">
+          text here
+        </CollapsibleSection>
+      </div>
     </>
   );
 };
