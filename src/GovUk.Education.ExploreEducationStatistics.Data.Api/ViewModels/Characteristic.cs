@@ -1,4 +1,4 @@
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 {
     public class Characteristic
     {

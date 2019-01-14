@@ -1,19 +1,13 @@
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
     public class Region
     {
-        public Region()
-        {
-        }
-
-        public Region(string name, string code)
-        {
-            Name = name;
-            Code = code;
-        }
-
+        [BsonElement("region_name")]
         public string Name { get; set; }
         
+        [BsonElement("region_code")]
         public string Code { get; set; }
     }
 }

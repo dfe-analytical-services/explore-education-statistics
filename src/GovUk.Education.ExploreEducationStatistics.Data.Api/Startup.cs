@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 c.IncludeXmlComments(filePath);
             });
 
+            services.AddScoped<DataService>();
             services.AddSingleton<ICsvReader, CsvReader>();
             
             services.AddCors();
