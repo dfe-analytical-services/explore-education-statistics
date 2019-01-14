@@ -10,6 +10,7 @@ using Microsoft.WindowsAzure.Storage.Queue;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 {
     [Route("api/Upload")]
+    [RequestSizeLimit(100*1024*1024)]
     public class UploadController : Controller
     {
         [HttpPost("Upload")]
