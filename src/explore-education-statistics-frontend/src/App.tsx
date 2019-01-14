@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.scss';
 import Breadcrumbs from './components/Breadcrumbs';
 import PageBanner from './components/PageBanner';
+import PageFooter from './components/PageFooter';
+import PageHeader from './components/PageHeader';
 import AlphaFeedbackPage from './pages/AlphaFeedbackPage';
 import CookiesPage from './pages/CookiesPage';
 import FeedbackPage from './pages/FeedbackPage';
@@ -78,18 +80,19 @@ const AppRoutes = () => (
 class App extends Component {
   public render() {
     return (
-      <div className="App">
-        <Router>
-          <>
-            <Switch>
-              <Route path="/prototypes">
-                <PrototypeRoutes />
-              </Route>
+      <Router>
+        <>
+          <Switch>
+            <Route path="/prototypes">
+              <PrototypeRoutes />
+            </Route>
 
-              <Route path="/">
-                <>
+            <Route path="/">
+              <>
+                <PageHeader />
+
+                <div className="govuk-width-container">
                   <PageBanner />
-
                   <Breadcrumbs />
 
                   <main
@@ -99,12 +102,14 @@ class App extends Component {
                   >
                     <AppRoutes />
                   </main>
-                </>
-              </Route>
-            </Switch>
-          </>
-        </Router>
-      </div>
+                </div>
+
+                <PageFooter />
+              </>
+            </Route>
+          </Switch>
+        </>
+      </Router>
     );
   }
 }
