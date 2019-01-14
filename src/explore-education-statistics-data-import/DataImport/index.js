@@ -10,7 +10,7 @@ module.exports = async function(context, blobId) {
     context.log("Publication blob id", blobId);
 
     var client = yield MongoClient.connect(
-      "mongodb://root:example@localhost:27017/test",
+      "mongodb://root:example@mongo:27017/test",
       { db: { authSource: "admin" } }
     );
 

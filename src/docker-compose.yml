@@ -32,6 +32,13 @@ services:
       - "10000:10000"
       - "10001:10001"
       - "10002:10002"
+  data-import:
+    container_name: ees-import
+    build: explore-education-statistics-data-import
+    ports:
+      - "8080:80" 
+    depends_on:
+      - mongo
   mongo:
     container_name: ees-mongo
     image: mongo
