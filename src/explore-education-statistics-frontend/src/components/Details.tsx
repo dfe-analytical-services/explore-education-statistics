@@ -11,7 +11,7 @@ const Details = ({ children, summary }: Props) => {
       <summary className="govuk-details__summary">
         <span
           className="govuk-details__summary-text"
-          data-testid="see-previous-releases"
+          data-testid="details--expand"
         >
           {summary}
         </span>

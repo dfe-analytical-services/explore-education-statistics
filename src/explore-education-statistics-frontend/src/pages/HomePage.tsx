@@ -32,12 +32,12 @@ class HomePage extends Component {
             <nav role="navigation" aria-labelledby="subsection-title">
               <ul className="govuk-list govuk-body-s">
                 <li>
-                  <Link to="/themes" data-testid="themes-link">
+                  <Link to="/themes" data-testid="home-page--themes-link">
                     Themes
                   </Link>
                 </li>
                 <li>
-                  <Link to="/topics" data-testid="topics-link">
+                  <Link to="/topics" data-testid="home-page--topics-link">
                     Topics
                   </Link>
                 </li>
