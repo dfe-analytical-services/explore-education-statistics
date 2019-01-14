@@ -3,11 +3,11 @@ const azure = require("azure-storage");
 const parse = require("csv-parse");
 const MongoClient = require("mongodb").MongoClient;
 
-module.exports = async function(context, blobId) {
+module.exports = async function(context, myQueueItem) {
+  context.log("Message", myQueueItem);
+
   co(function*() {
     var blobService = azure.createBlobService();
-
-    context.log("Publication blob id", blobId);
 
     var client = yield MongoClient.connect(
       "mongodb://root:example@mongo:27017/test",
@@ -24,10 +24,10 @@ module.exports = async function(context, blobId) {
     };
 
     const db = client.db("test");
-    const collection = db.collection("publications");
+    const collection = db.collection("releases");
     const output = [];
 
-    blobService.createReadStream("publications", blobId).pipe(
+    blobService.createReadStream("releases", myQueueItem.Release).pipe(
       parse({
         columns: true,
         separator: ",",
