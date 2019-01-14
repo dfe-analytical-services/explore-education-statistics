@@ -1,12 +1,12 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 import Link from '../components/Link';
-import TestPage from './TestPage';
+import PublicationPage from './PrototypesPublicationPage';
 
 export const PrototypeRoutes = () => (
   <>
     <Route exact path="/prototypes" component={PrototypesHomePage} />
-    <Route exact path="/prototypes/test-page" component={TestPage} />
+    <Route exact path="/prototypes/publication" component={PublicationPage} />
   </>
 );
 
@@ -17,7 +17,7 @@ export const PrototypesHomePage = () => {
 
       <ul>
         <li>
-          <Link to="/prototypes/test-page">Test Page</Link>
+          <Link to="/prototypes/publication">Publication Page</Link>
         </li>
       </ul>
     </div>
