@@ -514,14 +514,18 @@ const TestPage = () => {
       <CollapsibleSection heading="Pupil referral unit absence">
         text here
       </CollapsibleSection>
-      <CollapsibleSection heading="Pupil absence by local authority">
+      <CollapsibleSection
+        heading="Pupil absence by local authority"
+        caption="Some caption text"
+      >
         text here
       </CollapsibleSection>
-      <div className="govuk-!-margin-top-9">
-        <CollapsibleSection heading="Pupil absence by local authority">
-          text here
-        </CollapsibleSection>
-      </div>
+      <CollapsibleSection
+        heading="Pupil absence by local authority"
+        className="govuk-!margin-top-9"
+      >
+        text here
+      </CollapsibleSection>
     </>
   );
 };

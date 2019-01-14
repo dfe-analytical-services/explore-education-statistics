@@ -1,11 +1,18 @@
 @import '~govuk-frontend/settings/all';
 @import '~govuk-frontend/helpers/all';
 @import '~govuk-frontend/tools/all';
+@import '~govuk-frontend/core/typography';
 
 .heading {
+  @extend %govuk-heading-m;
   border-top: 1px solid $govuk-border-colour;
   clear: both;
   margin: 0;
+}
+
+.caption {
+  composes: govuk-caption-m;
+  margin-bottom: govuk-spacing(2);
 }
 
 .collapseToggle {
