@@ -23,6 +23,10 @@
   position: relative;
   width: 100%;
 
+  &:focus {
+    background: govuk-colour('grey-4');
+  }
+
   &::after {
     position: absolute;
     right: 0;

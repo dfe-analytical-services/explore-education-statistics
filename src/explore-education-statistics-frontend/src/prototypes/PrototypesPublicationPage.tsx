@@ -113,7 +113,7 @@ const TestPage = () => {
           </aside>
         </div>
       </div>
-
+      <h2 className="govuk-heading-m">Contents</h2>
       <CollapsibleSection heading="Headline pupil absence facts and figures for 2016/17">
         <ul className="govuk-list govuk-list--bullet">
           <li>Pupils missed on average 8.2 school days</li>
@@ -157,7 +157,7 @@ const TestPage = () => {
             type="linear"
             dataKey="unauthorised"
             stroke="#28A197"
-            strokeWidth="1"
+            strokeWidth="3"
             unit="%"
             activeDot={{ r: 3 }}
           />
@@ -165,7 +165,7 @@ const TestPage = () => {
             type="linear"
             dataKey="authorised"
             stroke="#6F72AF"
-            strokeWidth="1"
+            strokeWidth="3"
             unit="%"
             activeDot={{ r: 3 }}
           />
@@ -173,7 +173,7 @@ const TestPage = () => {
             type="linear"
             dataKey="overall"
             stroke="#DF3034"
-            strokeWidth="1"
+            strokeWidth="3"
             unit="%"
             activeDot={{ r: 3 }}
           />
@@ -641,10 +641,42 @@ const TestPage = () => {
         caption="How we collect and process the data"
         headingTag="h3"
       >
-        text here
+        <ul className="govuk-list">
+          <li>
+            <a href="#" className="govuk-link">
+              How do we collect it?
+            </a>
+          </li>
+          <li>
+            <a href="#" className="govuk-link">
+              What do we do with it?
+            </a>
+          </li>
+          <li>
+            <a href="#" className="govuk-link">
+              Related policies
+            </a>
+          </li>
+        </ul>
       </CollapsibleSection>
       <CollapsibleSection heading="Feedback and questions" headingTag="h3">
-        text here
+        <ul className="govuk-list">
+          <li>
+            <a href="#" className="govuk-link">
+              Feedback on this page
+            </a>
+          </li>
+          <li>
+            <a href="#" className="govuk-link">
+              Make a suggestion
+            </a>
+          </li>
+          <li>
+            <a href="#" className="govuk-link">
+              Ask a question
+            </a>
+          </li>
+        </ul>
       </CollapsibleSection>
 
       <h2

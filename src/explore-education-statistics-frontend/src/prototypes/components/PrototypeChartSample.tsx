@@ -42,7 +42,7 @@ const PrototypeChartSample = () => {
           type="linear"
           dataKey="unauthorised"
           stroke="#28A197"
-          strokeWidth="1"
+          strokeWidth="3"
           unit="%"
           activeDot={{ r: 3 }}
         />
@@ -50,7 +50,7 @@ const PrototypeChartSample = () => {
           type="linear"
           dataKey="authorised"
           stroke="#6F72AF"
-          strokeWidth="1"
+          strokeWidth="3"
           unit="%"
           activeDot={{ r: 3 }}
         />
@@ -58,7 +58,7 @@ const PrototypeChartSample = () => {
           type="linear"
           dataKey="overall"
           stroke="#DF3034"
-          strokeWidth="1"
+          strokeWidth="3"
           unit="%"
           activeDot={{ r: 3 }}
         />
