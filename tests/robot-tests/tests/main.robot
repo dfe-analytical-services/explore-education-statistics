@@ -1,9 +1,7 @@
 *** Settings ***
 Documentation  DFE-115 Setup automated testing framework
 
-Resource    keywords_and_variables.robot
-Resource    ../pages/HomePage.robot
-Resource    ../pages/ThemesPage.robot
+Resource    libs/keywords_and_variables.robot
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -12,8 +10,8 @@ Suite Teardown    user closes the browser
 Validate Schools page displays links to publications
     [Tags]  HappyPath
     user goes to url  ${url}
-    user clicks element  ${HomePage_ThemesLink}
-    user clicks element  ${ThemesPage_SchoolsLink}
+    user clicks element  css:[data-testid="themes-link"]
+    user clicks element  css:[data-testid="schools"]
 
     user waits until page contains element  css:[data-testid="contentitemlist--element"]
     css should match x times  css:[data-testid="contentitemlist--element"]  6

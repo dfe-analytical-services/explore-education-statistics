@@ -7,16 +7,24 @@ Library    library.py
 
 *** Variables ***
 ${browser}    chrome
-${url}        http://localhost:3000
 ${headless}   1
-${timeout}    0.25
-${implicit_wait}   0.25
 
+${timeout}    2
+${implicit_wait}   2
+
+${env}        test   # default environment to test against. Can be "local", "test", "stage", "prod"
+${url}        about:blank
+${localUrl}   http://localhost:3000
+${testUrl}    https://educationstatisticstest.z6.web.core.windows.net/
+${stageUrl}   https://educationstatisticsstage.z6.web.core.windows.net/
+${prodUrl}    https://educationstatistics.z6.web.core.windows.net/
 
 *** Keywords ***
 setup configuration
   install chromedriver
-  add lib dir to path  # Need chromedriver to run selenium!
+  add lib dir to path  # Need chromedriver in PATH to run selenium!
+  ${newUrl} =   get URL for env  ${env}
+  set global variable  ${url}   ${newUrl}
 
 user opens the browser
   setup configuration
