@@ -1,6 +1,9 @@
 using System;
 using System.IO;
+using System.Runtime.Serialization.Json;
+using System.Text;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.WindowsAzure.Storage;
@@ -10,11 +13,11 @@ using Microsoft.WindowsAzure.Storage.Queue;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 {
     [Route("api/Upload")]
-    [RequestSizeLimit(100*1024*1024)]
+    [RequestSizeLimit(100 * 1024 * 1024)]
     public class UploadController : Controller
     {
-        [HttpPost("Upload")]
-        public async Task<IActionResult> Post(IFormFile file)
+        [HttpPost("Upload/{publicationId}")]
+        public async Task<IActionResult> Post(IFormFile file, String publicationId)
         {
             // full path to file in temp location
             var filePath = Path.GetTempFileName();
@@ -26,40 +29,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                 }
             }
             
-            ProcessAsync(filePath).GetAwaiter().GetResult();
-            return Ok(new { count = 1, file.Length, filePath});
+            ProcessAsync(filePath, Guid.Parse(publicationId)).GetAwaiter().GetResult();
+            return Ok(new {count = 1, file.Length, filePath});
         }
-        
-        private static async Task ProcessAsync(string sourceFile)
+
+        private static async Task ProcessAsync(string sourceFile, Guid publicationId)
         {
             var storageConnectionString = Environment.GetEnvironmentVariable("STORAGE_CONNECTION_STRING");
-            
+
             if (CloudStorageAccount.TryParse(storageConnectionString, out var storageAccount))
             {
                 try
-                {   
+                {
                     var blobClient = storageAccount.CreateCloudBlobClient();
                     var queueClient = storageAccount.CreateCloudQueueClient();
-                    
-                    var blobContainer = blobClient.GetContainerReference("publications");
-                    var queue = queueClient.GetQueueReference("publications");
-                    
+
+                    var blobContainer = blobClient.GetContainerReference("releases");
+                    var queue = queueClient.GetQueueReference("releases");
+
                     await blobContainer.CreateIfNotExistsAsync();
                     await queue.CreateIfNotExistsAsync();
 
                     // Set the permissions so the blobs are public. 
-                    BlobContainerPermissions permissions = new BlobContainerPermissions
+                    var permissions = new BlobContainerPermissions
                     {
                         PublicAccess = BlobContainerPublicAccessType.Blob
                     };
                     await blobContainer.SetPermissionsAsync(permissions);
 
-                    var publicationName = "publication-" + Guid.NewGuid();
-                    
-                    CloudBlockBlob cloudBlockBlob = blobContainer.GetBlockBlobReference(publicationName);
+                    var releaseId = Guid.NewGuid();
+
+                    var cloudBlockBlob = blobContainer.GetBlockBlobReference(releaseId.ToString());
                     await cloudBlockBlob.UploadFromFileAsync(sourceFile);
-                    
-                    CloudQueueMessage message = new CloudQueueMessage(publicationName);
+
+
+                    var message = new CloudQueueMessage(getReleaseMessage(publicationId, releaseId));
                     await queue.AddMessageAsync(message);
                 }
                 catch (StorageException ex)
@@ -67,6 +71,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                     Console.WriteLine("Error returned from the service: {0}", ex.Message);
                 }
             }
+        }
+
+        private static string getReleaseMessage(Guid publicationId, Guid releaseId)
+        {
+            var jsonSerializer = new DataContractJsonSerializer(typeof(ReleaseMessage));
+            var ms = new MemoryStream();
+            
+            jsonSerializer.WriteObject(ms, new ReleaseMessage()
+            {
+                Publication = publicationId,
+                Release = releaseId,
+                UploadedOn = DateTime.Now
+            });
+
+            return Encoding.UTF8.GetString(ms.ToArray());
         }
     }
 }

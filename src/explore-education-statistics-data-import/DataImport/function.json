@@ -5,7 +5,7 @@
       "name": "myQueueItem",
       "type": "queueTrigger",
       "direction": "in",
-      "queueName": "publications",
+      "queueName": "releases",
       "connection": "AZURE_STORAGE_CONNECTION_STRING"
     }
   ]
