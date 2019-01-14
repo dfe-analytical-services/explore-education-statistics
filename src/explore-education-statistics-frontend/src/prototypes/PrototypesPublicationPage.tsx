@@ -3,6 +3,7 @@ import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 import CollapsibleSection from '../components/CollapsibleSection';
 import Details from '../components/Details';
 import PrototypePage from './components/PrototypePage';
+import PrototypeDataSample from './components/PrototypeDataSample';
 
 const TestPage = () => {
   const chartData = [
@@ -336,6 +337,10 @@ const TestPage = () => {
           authorised and unauthorised absence and one session is equal to half a
           day.
         </Details>
+        <PrototypeDataSample
+          sectionId="absenceRates"
+          chartTitle="absence rates"
+        />
         <p>
           The overall absence rate across state-funded primary, secondary and
           special schools increased from 4.6 per cent in 2015/16 to 4.7 per cent
@@ -382,7 +387,7 @@ const TestPage = () => {
       </CollapsibleSection>
 
       <CollapsibleSection heading="Persistent absence">
-        <Details summary="Persistent absence definition">
+        <Details summary="absence definition">
           <p>
             A pupil enrolment is identified as a persistent absentee if they
             miss 10% or more of their possible sessions
@@ -397,6 +402,10 @@ const TestPage = () => {
             <a href="#">guide to absence statistics</a>.
           </p>
         </Details>
+        <PrototypeDataSample
+          sectionId="persistentAbsence"
+          chartTitle="persistent absence rates"
+        />
         <p>
           The percentage of enrolments in state-funded primary and state-funded
           secondary schools that were classified as persistent absentees in
@@ -445,6 +454,10 @@ const TestPage = () => {
             enrolments missing at least one session due to each reason.
           </p>
         </div>
+        <PrototypeDataSample
+          sectionId="reasonAbsence"
+          chartTitle="reason for absence"
+        />
         <p>
           Illness is the main driver for overall absence rates, however whilst
           overall absence rates have increased slightly since 2015/16, illness
