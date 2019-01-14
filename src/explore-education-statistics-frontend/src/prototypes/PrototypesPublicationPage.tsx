@@ -2,6 +2,7 @@ import React from 'react';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 import CollapsibleSection from '../components/CollapsibleSection';
 import Details from '../components/Details';
+import PrototypePage from './components/PrototypePage';
 
 const TestPage = () => {
   const chartData = [
@@ -13,31 +14,11 @@ const TestPage = () => {
   ];
 
   return (
-    <>
-      <div className="govuk-breadcrumbs">
-        <ol className="govuk-breadcrumbs__list">
-          <li className="govuk-breadcrumbs__list-item">
-            <a className="govuk-breadcrumbs__link" href="https://www.gov.uk">
-              Home
-            </a>
-          </li>
-          <li className="govuk-breadcrumbs__list-item">
-            <a className="govuk-breadcrumbs__link" href="#">
-              Education, training and skills
-            </a>
-          </li>
-          <li className="govuk-breadcrumbs__list-item">
-            <a className="govuk-breadcrumbs__link" href="#">
-              Pupil wellbeing, behaviour and attendance
-            </a>
-          </li>
-          <li className="govuk-breadcrumbs__list-item">
-            <a className="govuk-breadcrumbs__link" href="#">
-              School attendance and absence
-            </a>
-          </li>
-        </ol>
-      </div>
+    <PrototypePage breadcrumbs={[
+      { text: 'Education, training and skills' },
+      { text: 'Pupil wellbeing, behaviour and attendance' },
+      { text: 'School attendance and absence' },
+    ]}>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <strong className="govuk-tag"> This is the latest data </strong>
@@ -526,7 +507,7 @@ const TestPage = () => {
       >
         text here
       </CollapsibleSection>
-    </>
+    </PrototypePage>
   );
 };
 
