@@ -14,11 +14,13 @@ const TestPage = () => {
   ];
 
   return (
-    <PrototypePage breadcrumbs={[
-      { text: 'Education, training and skills' },
-      { text: 'Pupil wellbeing, behaviour and attendance' },
-      { text: 'School attendance and absence' },
-    ]}>
+    <PrototypePage
+      breadcrumbs={[
+        { text: 'Education, training and skills' },
+        { text: 'Pupil wellbeing, behaviour and attendance' },
+        { text: 'School attendance and absence' },
+      ]}
+    >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <strong className="govuk-tag"> This is the latest data </strong>

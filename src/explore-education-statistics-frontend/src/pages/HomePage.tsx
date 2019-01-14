@@ -12,8 +12,11 @@ class HomePage extends Component {
             <li>do something</li>
             <li>do something else</li>
           </ul>
-          <Link to="themes" role="button"
-            className="govuk-button govuk-button--start govuk-!-margin-top-2 govuk-!-margin-bottom-8">
+          <Link
+            to="themes"
+            role="button"
+            className="govuk-button govuk-button--start govuk-!-margin-top-2 govuk-!-margin-bottom-8"
+          >
             Start now
           </Link>
           <h2>Before you start</h2>

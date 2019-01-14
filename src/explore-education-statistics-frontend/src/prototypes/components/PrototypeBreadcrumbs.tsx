@@ -21,7 +21,10 @@ const PrototypeBreadcrumbs = ({ items }: Props) => {
         </li>
         {items.map(({ link, text }) => (
           <li className="govuk-breadcrumbs__list-item">
-            <Link className="govuk-breadcrumbs__link" to={link || '/prototypes'}>
+            <Link
+              className="govuk-breadcrumbs__link"
+              to={link || '/prototypes'}
+            >
               {text}
             </Link>
           </li>

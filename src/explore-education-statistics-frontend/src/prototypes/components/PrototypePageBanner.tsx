@@ -11,7 +11,7 @@ const PrototypePageBanner = () => {
           className={classNames(
             'govuk-tag',
             'govuk-phase-banner__content__tag',
-            [styles.prototypeTag]
+            [styles.prototypeTag],
           )}
         >
           Prototype
