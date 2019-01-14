@@ -345,7 +345,7 @@ const TestPage = () => {
         </p>
       </CollapsibleSection>
 
-      <CollapsibleSection heading="Absence rates">
+      <CollapsibleSection heading="Overall absence rates">
         <Details summary="Overall absence rate definition">
           The overall absence rate is the total number of overall absence
           sessions for all pupils as a percentage of the total number of
@@ -353,6 +353,92 @@ const TestPage = () => {
           authorised and unauthorised absence and one session is equal to half a
           day.
         </Details>
+
+        <div className="govuk-tabs" data-module="tabs">
+          <ul className="govuk-tabs__list">
+            <li className="govuk-tabs__list-item">
+              <a
+                className="govuk-tabs__tab govuk-tabs__tab--selected"
+                href="#overall-chart"
+              >
+                Chart
+              </a>
+            </li>
+            <li className="govuk-tabs__list-item">
+              <a className="govuk-tabs__tab" href="#overall-long">
+                Further details
+              </a>
+            </li>
+
+            <li className="govuk-tabs__list-item">
+              <a className="govuk-tabs__tab" href="#overall-data">
+                Data tables
+              </a>
+            </li>
+
+            <li className="govuk-tabs__list-item">
+              <a className="govuk-tabs__tab" href="#overall-download">
+                Data downloads
+              </a>
+            </li>
+          </ul>
+
+          <section className="govuk-tabs__panel" id="overall-chart">
+            <LineChart
+              width={900}
+              height={300}
+              data={chartData}
+              margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="name"
+                label={{
+                  offset: 5,
+                  position: 'bottom',
+                  value: 'School year',
+                }}
+                padding={{ left: 20, right: 20 }}
+                tickMargin={10}
+              />
+              <YAxis
+                label={{
+                  angle: -90,
+                  offset: 0,
+                  position: 'left',
+                  value: 'Absence rate',
+                }}
+                scale="auto"
+                unit="%"
+              />
+              <Line
+                type="linear"
+                dataKey="unauthorised"
+                stroke="#28A197"
+                strokeWidth="1"
+                unit="%"
+                activeDot={{ r: 3 }}
+              />
+              <Line
+                type="linear"
+                dataKey="authorised"
+                stroke="#6F72AF"
+                strokeWidth="1"
+                unit="%"
+                activeDot={{ r: 3 }}
+              />
+              <Line
+                type="linear"
+                dataKey="overall"
+                stroke="#DF3034"
+                strokeWidth="1"
+                unit="%"
+                activeDot={{ r: 3 }}
+              />
+            </LineChart>
+          </section>
+        </div>
+
         <p>
           The overall absence rate across state-funded primary, secondary and
           special schools increased from 4.6 per cent in 2015/16 to 4.7 per cent
@@ -514,16 +600,35 @@ const TestPage = () => {
       <CollapsibleSection heading="Pupil referral unit absence">
         text here
       </CollapsibleSection>
+      <CollapsibleSection heading="Pupil absence by local authority">
+        text here
+      </CollapsibleSection>
       <CollapsibleSection
-        heading="Pupil absence by local authority"
-        caption="Some caption text"
+        heading="Local authorities"
+        caption="Find absence facts and figures for an individual LA or compare rates between LAs"
+        className="govuk-!-margin-top-9"
       >
         text here
       </CollapsibleSection>
       <CollapsibleSection
-        heading="Pupil absence by local authority"
-        className="govuk-!margin-top-9"
+        heading="Pupil characteristics"
+        caption="Figures for age, gender, ethnicity and more"
       >
+        text here
+      </CollapsibleSection>
+      <CollapsibleSection
+        heading="Types of school"
+        caption="Figures for different types of state school"
+      >
+        text here
+      </CollapsibleSection>
+      <CollapsibleSection
+        heading="Where does the data come from?"
+        caption="How we collect and process the data"
+      >
+        text here
+      </CollapsibleSection>
+      <CollapsibleSection heading="Feedback and questions" headingSize={4}>
         text here
       </CollapsibleSection>
     </>
