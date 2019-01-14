@@ -1,0 +1,39 @@
+@import '~govuk-frontend/settings/all';
+@import '~govuk-frontend/helpers/all';
+@import '~govuk-frontend/tools/all';
+
+.heading {
+  border-top: 1px solid $govuk-border-colour;
+  clear: both;
+  margin: 0;
+}
+
+.collapseToggle {
+  @include govuk-focusable-fill;
+  all: unset;
+  cursor: pointer;
+  padding: 10px 0;
+  position: relative;
+  width: 100%;
+
+  &::after {
+    position: absolute;
+    right: 0;
+  }
+
+  &[aria-expanded='true']::after {
+    content: '\FF0D';
+  }
+
+  &[aria-expanded='false']::after {
+    content: '\FF0B';
+  }
+}
+
+.collapsed {
+  display: none;
+}
+
+.content {
+  @include govuk-clearfix;
+}

@@ -1,0 +1,54 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CollapsibleSection renders with hidden content by default 1`] = `
+<div>
+  <div>
+    <h3
+      class="heading"
+    >
+      <button
+        aria-controls="the-content"
+        aria-expanded="false"
+        class="collapseToggle"
+      >
+        Test heading
+      </button>
+    </h3>
+    <div
+      class="content collapsed"
+      hidden=""
+      id="the-content"
+    >
+      <p>
+        Test content
+      </p>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`CollapsibleSection renders with visible content when \`open\` is true 1`] = `
+<div>
+  <div>
+    <h3
+      class="heading"
+    >
+      <button
+        aria-controls="the-content"
+        aria-expanded="true"
+        class="collapseToggle"
+      >
+        Test heading
+      </button>
+    </h3>
+    <div
+      class="content"
+      id="the-content"
+    >
+      <p>
+        Test content
+      </p>
+    </div>
+  </div>
+</div>
+`;

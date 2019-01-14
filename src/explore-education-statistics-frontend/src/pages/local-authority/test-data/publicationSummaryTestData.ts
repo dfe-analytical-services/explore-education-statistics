@@ -1,4 +1,4 @@
-import { PublicationSummaryProps } from './PublicationSummary';
+import { PublicationSummaryProps } from '../components/PublicationSummary';
 
 const testData: PublicationSummaryProps[] = [
   {

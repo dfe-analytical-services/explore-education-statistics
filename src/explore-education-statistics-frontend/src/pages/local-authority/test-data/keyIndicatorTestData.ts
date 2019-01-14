@@ -1,6 +1,6 @@
-import { KeyIndicatorProps } from './KeyIndicator';
+import { KeyIndicatorTileProps } from '../../../components/KeyIndicatorTile';
 
-const testData: KeyIndicatorProps[] = [
+const testData: KeyIndicatorTileProps[] = [
   {
     changes: [
       {

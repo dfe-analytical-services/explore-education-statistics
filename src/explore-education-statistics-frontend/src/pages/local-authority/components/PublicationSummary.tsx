@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import { KeyIndicatorTile, KeyIndicatorTileProps } from '../../../components/KeyIndicatorTile';
 import Link from '../../../components/Link';
-import { KeyIndicator, KeyIndicatorProps } from './KeyIndicator';
 import styles from './PublicationSummary.module.scss';
 
 export interface PublicationSummaryProps {
-  keyIndicator: KeyIndicatorProps;
+  keyIndicator: KeyIndicatorTileProps;
   link: string;
   summary: string;
   title: string;
@@ -25,7 +25,7 @@ export const PublicationSummary = ({
 
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-half">
-          <KeyIndicator {...keyIndicator} />
+          <KeyIndicatorTile {...keyIndicator} />
         </div>
         <div className="govuk-grid-column-one-half">
           <ReactMarkdown className="govuk-body-s" source={summary} />

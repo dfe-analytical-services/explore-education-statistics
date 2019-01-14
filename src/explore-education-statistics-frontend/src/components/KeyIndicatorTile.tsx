@@ -1,9 +1,9 @@
 import React from 'react';
-import { ChangeText, ChangeTextProps } from '../../../components/ChangeText';
-import Link from '../../../components/Link';
-import styles from './KeyIndicator.module.scss';
+import { ChangeText, ChangeTextProps } from './ChangeText';
+import styles from './KeyIndicatorTile.module.scss';
+import Link from './Link';
 
-export interface KeyIndicatorProps {
+export interface KeyIndicatorTileProps {
   changes: ChangeTextProps[];
   link: string;
   reference?: {
@@ -15,14 +15,14 @@ export interface KeyIndicatorProps {
   value: number;
 }
 
-export const KeyIndicator = ({
+export const KeyIndicatorTile = ({
   changes = [],
   link,
   reference,
   title,
   units,
   value,
-}: KeyIndicatorProps) => (
+}: KeyIndicatorTileProps) => (
   <div className={styles.container}>
     <h3>
       <Link to={link}>{title}</Link>
