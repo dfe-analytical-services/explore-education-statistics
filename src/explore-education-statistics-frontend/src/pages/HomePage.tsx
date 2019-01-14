@@ -21,6 +21,8 @@ class HomePage extends Component {
           </a>
           <h2>Before you start</h2>
           <p>Do something.</p>
+
+          <Link to="/prototypes">See prototypes</Link>
         </div>
 
         <div className="govuk-grid-column-one-third">

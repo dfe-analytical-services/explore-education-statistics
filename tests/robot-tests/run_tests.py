@@ -32,6 +32,7 @@ profile = False
 tests = "tests/"
 browser = "chrome"
 interp = "robot"
+url = ""
 
 for i in range(1, len(sys.argv)):
     # print(i, sys.argv[i])
@@ -47,6 +48,8 @@ for i in range(1, len(sys.argv)):
         interp = sys.argv[i+1]  # NOTE: could add error checking...
     elif sys.argv[i] == "-f" or sys.argv[i] == "--file":
         tests = sys.argv[i+1]  # NOTE: could add error checking...
+    elif sys.argv[i] == "-u" or sys.argv[i] == "--url":
+        url = sys.argv[i+1]  # NOTE: could add error checking...
 
 arguments += ["--outputdir", "test-results/", "--exclude", "Failing",
               "--exclude", "UnderConstruction"]
@@ -60,6 +63,10 @@ else:
     arguments += ["-v", "headless:0"]
 
 arguments += ["-v", "browser:" + browser]
+
+if url:
+    arguments += ["-v", "url:" + url]
+
 arguments += [tests]
 
 # print(arguments)
