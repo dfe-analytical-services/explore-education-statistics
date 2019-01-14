@@ -7,12 +7,7 @@ interface Props {
   value: string | string[] | number;
 }
 
-const FormCheckbox = ({
-  id,
-  label,
-  name,
-  value,
-}: Props) => {
+const FormCheckbox = ({ id, label, name, value }: Props) => {
   return (
     <div className="govuk-checkboxes__item">
       <input
