@@ -28,8 +28,13 @@
     right: 0;
   }
 
+  &[aria-expanded='true'] {
+    margin-bottom: 0.5rem;
+  }
+
   &[aria-expanded='true']::after {
     content: '\FF0D';
+    font-weight: 900;
   }
 
   &[aria-expanded='false']::after {
@@ -43,4 +48,5 @@
 
 .content {
   @include govuk-clearfix;
+  padding-bottom: 5rem;
 }
