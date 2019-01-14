@@ -4,7 +4,7 @@
 @import '~govuk-frontend/core/typography';
 
 .heading {
-  @extend %govuk-heading-m;
+  @extend %govuk-heading-s;
   border-top: 1px solid $govuk-border-colour;
   clear: both;
   margin: 0;

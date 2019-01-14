@@ -497,18 +497,89 @@ const TestPage = () => {
       <CollapsibleSection heading="Pupil referral unit absence">
         text here
       </CollapsibleSection>
+      <CollapsibleSection heading="Pupil absence by local authority">
+        text here
+      </CollapsibleSection>
+
+      <h2 className="govuk-heading-m govuk-!-margin-top-9">
+        Extra information
+      </h2>
       <CollapsibleSection
-        heading="Pupil absence by local authority"
-        caption="Some caption text"
+        heading="Local authorities"
+        caption="Find absence facts and figures for an individual LA or compare rates between LAs"
+        headingTag="h3"
       >
         text here
       </CollapsibleSection>
       <CollapsibleSection
-        heading="Pupil absence by local authority"
-        className="govuk-!margin-top-9"
+        heading="Pupil characteristics"
+        caption="Figures for age, gender, ethnicity, and more"
+        headingTag="h3"
       >
         text here
       </CollapsibleSection>
+      <CollapsibleSection
+        heading="Types of school"
+        caption="Figures for different types of state school"
+        headingTag="h3"
+      >
+        text here
+      </CollapsibleSection>
+      <CollapsibleSection
+        heading="Where does this data come from"
+        caption="How we collect and process the data"
+        headingTag="h3"
+      >
+        text here
+      </CollapsibleSection>
+      <CollapsibleSection heading="Feedback and questions" headingTag="h3">
+        text here
+      </CollapsibleSection>
+
+      <h2
+        className="govuk-heading-m govuk-!-margin-top-9"
+        id="subsection-title"
+      >
+        Getting the data
+      </h2>
+
+      <ul className="govuk-list">
+        <li>
+          <a href="#" className="govuk-link">
+            View by graphs and charts
+          </a>
+        </li>
+        <li>
+          <a href="#" className="govuk-link">
+            View by tables and numbers
+          </a>
+        </li>
+        <li>
+          <a href="#" className="govuk-link">
+            Create your own tables and charts
+          </a>
+        </li>
+        <li>
+          <a href="#" className="govuk-link">
+            Download pdf files
+          </a>
+        </li>
+        <li>
+          <a href="#" className="govuk-link">
+            Download Excel files
+          </a>
+        </li>
+        <li>
+          <a href="#" className="govuk-link">
+            Download .csv files
+          </a>
+        </li>
+        <li>
+          <a href="#" className="govuk-link">
+            Access API
+          </a>
+        </li>
+      </ul>
     </PrototypePage>
   );
 };
