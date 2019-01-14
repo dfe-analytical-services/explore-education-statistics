@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import PageFooter from '../../components/PageFooter';
 import PageHeader from '../../components/PageHeader';
@@ -7,14 +8,19 @@ import PrototypePageBanner from './PrototypePageBanner';
 interface Props {
   breadcrumbs?: Breadcrumb[];
   children: ReactNode;
+  wide?: boolean;
 }
 
-const PrototypePage = ({ breadcrumbs = [], children }: Props) => {
+const PrototypePage = ({ breadcrumbs = [], children, wide }: Props) => {
   return (
     <>
-      <PageHeader />
+      <PageHeader wide={wide} />
 
-      <div className="govuk-width-container">
+      <div
+        className={classNames('govuk-width-container', {
+          'dfe-width-container--wide': wide,
+        })}
+      >
         <PrototypePageBanner />
 
         <PrototypeBreadcrumbs items={breadcrumbs} />
@@ -28,7 +34,7 @@ const PrototypePage = ({ breadcrumbs = [], children }: Props) => {
         </main>
       </div>
 
-      <PageFooter />
+      <PageFooter wide={wide} />
     </>
   );
 };
