@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Imported;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
