@@ -9,7 +9,7 @@ interface Props {
   heading: string;
   // Only for accessibility/semantic markup,
   // does not change the actual styling
-  headingSize?: 1 | 2 | 3 | 4;
+  headingTag?: 'h2' | 'h3' | 'h4';
   contentId?: string;
   open?: boolean;
 }
@@ -21,8 +21,8 @@ interface State {
 let idCounter = 0;
 
 class CollapsibleSection extends Component<Props, State> {
-  public static defaultProps = {
-    headingSize: 2,
+  public static defaultProps: Partial<Props> = {
+    headingTag: 'h2',
     open: false,
   };
 
@@ -33,13 +33,13 @@ class CollapsibleSection extends Component<Props, State> {
   };
 
   public render() {
-    const { className, heading, headingSize, caption, children } = this.props;
+    const { className, heading, headingTag, caption, children } = this.props;
     const { isCollapsed, contentId } = this.state;
 
     return (
       <div className={className}>
         {React.createElement(
-          `h${headingSize}`,
+          `${headingTag}`,
           {
             className: styles.heading,
           },

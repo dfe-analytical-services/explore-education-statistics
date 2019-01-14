@@ -59,7 +59,7 @@ describe('CollapsibleSection', () => {
     const { container } = render(
       <CollapsibleSection
         heading="Test heading"
-        headingSize={3}
+        headingTag="h3"
         contentId="the-content"
       >
         <p>Test content</p>
