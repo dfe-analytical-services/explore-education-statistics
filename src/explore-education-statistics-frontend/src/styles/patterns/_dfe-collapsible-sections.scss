@@ -20,14 +20,47 @@
     border-top: 1px solid $govuk-border-colour;
   }
 
-  .govuk-heading-m {
+  > .govuk-heading-m {
     margin: 0;
   }
 
   > h2 button,
   > h3 button {
-    @include govuk-font(24);
-    font-weight: bold;
+    @extend %toggle-button;
+    border: 0;
+    cursor: pointer;
+    position: relative;
+  }
+
+  > h2 button:hover,
+  > h2 button:focus {
+    background: govuk-colour('grey-4');
+  }
+
+  > h2 button:focus {
+    outline: 3px solid $govuk-focus-colour;
+    z-index: 1;
+  }
+
+  > h2 button::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+  }
+
+  > h2 button {
+    display: block;
+    width: 100%;
+  }
+
+  > h2 button::after {
+    background: url('images/icon-plus-minus.png') 0 100%;
+    content: '';
+    height: 16px;
+    line-height: 1;
+    position: absolute; //absolute position for ie8
+    right: 15px;
+    top: 13px;
+    width: 16px;
   }
 }
 

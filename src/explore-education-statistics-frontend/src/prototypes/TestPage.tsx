@@ -1,6 +1,15 @@
 import React from 'react';
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 
 const TestPage = () => {
+  const chartData = [
+    { name: '2012/13', unauthorised: 1.1, authorised: 4.2, overall: 5.3 },
+    { name: '2013/14', unauthorised: 1.1, authorised: 3.5, overall: 4.5 },
+    { name: '2014/15', unauthorised: 1.1, authorised: 3.5, overall: 4.6 },
+    { name: '2015/16', unauthorised: 1.1, authorised: 3.4, overall: 4.6 },
+    { name: '2016/17', unauthorised: 1.3, authorised: 3.4, overall: 4.7 },
+  ];
+
   return (
     <>
       <div className="govuk-breadcrumbs">
@@ -136,10 +145,58 @@ const TestPage = () => {
           <h3 className="govuk-heading-s">
             Chart showing the change in different types of absence over time
           </h3>
-          <div
-            id="da7c10ac-eab3-4a0d-b7ee-2dc75bf614ba"
-            className="plotly-graph-div"
-          />
+          <LineChart
+            width={900}
+            height={300}
+            data={chartData}
+            margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="name"
+              label={{
+                offset: 5,
+                position: 'bottom',
+                value: 'School year',
+              }}
+              padding={{ left: 20, right: 20 }}
+              tickMargin={10}
+            />
+            <YAxis
+              label={{
+                angle: -90,
+                offset: 0,
+                position: 'left',
+                value: 'Absence rate',
+              }}
+              scale="auto"
+              unit="%"
+            />
+            <Line
+              type="linear"
+              dataKey="unauthorised"
+              stroke="#28A197"
+              strokeWidth="1"
+              unit="%"
+              activeDot={{ r: 3 }}
+            />
+            <Line
+              type="linear"
+              dataKey="authorised"
+              stroke="#6F72AF"
+              strokeWidth="1"
+              unit="%"
+              activeDot={{ r: 3 }}
+            />
+            <Line
+              type="linear"
+              dataKey="overall"
+              stroke="#DF3034"
+              strokeWidth="1"
+              unit="%"
+              activeDot={{ r: 3 }}
+            />
+          </LineChart>
           <div className="dfe-dash-tiles dfe-dash-tiles--simple">
             <div className="dfe-dash-tiles__tile">
               <h2 className="govuk-heading-m">
@@ -166,7 +223,7 @@ const TestPage = () => {
               <details className="govuk-details">
                 <summary className="govuk-details__summary">
                   <span className="govuk-details__summary-text">
-                    What does this mean?
+                    What does overall absencemean?
                   </span>
                 </summary>
                 <div className="govuk-details__text">
@@ -284,8 +341,13 @@ const TestPage = () => {
         </div>
       </div>
       <div className="collapsible">
-        <h2 className="open govuk-heading-m">About this release</h2>
+        <h2 className="open govuk-heading-m">
+          <button aria-expanded="false">About this release</button>
+        </h2>
         <div className="collapsible-content">
+          <h2 className="govuk-heading-m" aria-expanded="false">
+            tester
+          </h2>
           <p className="govuk-body">
             This statistical first release (SFR) reports on absence of pupils of
             compulsory school age in state-funded primary, secondary and special
