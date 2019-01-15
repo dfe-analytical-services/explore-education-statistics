@@ -1767,16 +1767,16 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201415,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Severe_learning_difficulty,Total,32090,15,0.04,860,2.68,380,1.18
 201415,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Specific_learning_difficulty,Total,135505,155,0.12,10310,7.61,5230,3.86
 201415,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Visual_impairment,Total,10840,10,0.11,545,5.04,250,2.31
-201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_0_to_10pc_most_deprived,Total,"749,750",845,0.11,"40,155",5.36,"19,385",2.59
-201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_10_to_20pc,Total,"811,585",665,0.08,"37,320",4.6,"18,870",2.33
-201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_20_to_30pc,Total,"813,390",760,0.09,"35,340",4.34,"18,085",2.22
-201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_30_to_40pc,Total,"798,255",705,0.09,"35,845",4.49,"17,280",2.16
-201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_40_to_50pc,Total,"803,255",610,0.08,"33,945",4.23,"16,620",2.07
-201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_50_to_60pc,Total,"791,055",550,0.07,"29,590",3.74,"15,620",1.97
-201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_60_to_70pc,Total,"752,560",395,0.05,"25,100",3.34,"12,680",1.68
-201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_70_to_80pc,Total,"755,525",465,0.06,"22,555",2.99,"12,390",1.64
-201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_80_to_90pc,Total,"792,455",450,0.06,"23,615",2.98,"12,505",1.58
-201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_90_to_100pc_least_deprived,Total,"730,915",350,0.05,"19,490",2.67,"10,615",1.45
+201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_0_to_10pc_most_deprived,Total,749750,845,0.11,40155,5.36,19385,2.59
+201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_10_to_20pc,Total,811585,665,0.08,37320,4.6,18870,2.33
+201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_20_to_30pc,Total,813390,760,0.09,35340,4.34,18085,2.22
+201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_30_to_40pc,Total,798255,705,0.09,35845,4.49,17280,2.16
+201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_40_to_50pc,Total,803255,610,0.08,33945,4.23,16620,2.07
+201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_50_to_60pc,Total,791055,550,0.07,29590,3.74,15620,1.97
+201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_60_to_70pc,Total,752560,395,0.05,25100,3.34,12680,1.68
+201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_70_to_80pc,Total,755525,465,0.06,22555,2.99,12390,1.64
+201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_80_to_90pc,Total,792455,450,0.06,23615,2.98,12505,1.58
+201415,NATIONAL,E92000001,England,Total,IDACI_decile,IDACI_decile_90_to_100pc_least_deprived,Total,730915,350,0.05,19490,2.67,10615,1.45
 201415,NATIONAL,E92000001,England,State-funded primary,Total,Total,Total,4510310,915,0.02,49655,1.1,23630,0.52
 201415,NATIONAL,E92000001,England,State-funded primary,Gender,Gender_male,Total,2299805,825,0.04,44120,1.92,20810,0.9
 201415,NATIONAL,E92000001,England,State-funded primary,Gender,Gender_female,Total,2210505,95,0,5530,0.25,2820,0.13

@@ -17,25 +17,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public int Seed()
         {
-            return SeedGeoglevelsData();
+            var count = 0;
+            
+            count += SeedGeoglevelsData();
+            count += SeedNationalCharacteristicData();
+            count += SeedLaCharacteristicData();
+            
+            return count;
         }
-
+        
         private int SeedGeoglevelsData()
         {
-            var mongoGeoLevelsCsvImporter = new MongoGeoLevelsCsvImporter();
+            var importer = new MongoGeoLevelsCsvImporter();
 
             var count = 0;
             
-            count += Seed(mongoGeoLevelsCsvImporter, Publication.absence, DataCsvFilename.absence_geoglevels);
-            count += Seed(mongoGeoLevelsCsvImporter, Publication.exclusion, DataCsvFilename.exclusion_geoglevels);
-            count += Seed(mongoGeoLevelsCsvImporter, Publication.schpupnum, DataCsvFilename.schpupnum_geoglevels);
+            count += Seed(importer, Publication.absence, DataCsvFilename.absence_geoglevels);
+            count += Seed(importer, Publication.exclusion, DataCsvFilename.exclusion_geoglevels);
+            count += Seed(importer, Publication.schpupnum, DataCsvFilename.schpupnum_geoglevels);
 
             return count;
         }
 
-        private int Seed(MongoGeoLevelsCsvImporter mongoGeoLevelsCsvImporter, Publication publication, DataCsvFilename dataCsvFilename)
+        private int SeedNationalCharacteristicData()
         {
-            var data = mongoGeoLevelsCsvImporter.Data(dataCsvFilename);
+            var importer = new MongoNationalCharacteristicCsvImporter();
+
+            var count = 0;
+            
+            count += Seed(importer, Publication.absence, DataCsvFilename.absence_natcharacteristics);
+            count += Seed(importer, Publication.exclusion, DataCsvFilename.exclusion_natcharacteristics);
+            count += Seed(importer, Publication.schpupnum, DataCsvFilename.schpupnum_natcharacteristics);
+
+            return count;
+        }
+
+        private int SeedLaCharacteristicData()
+        {
+            var count = 0;
+            // TODO
+            return 0;
+        }
+
+        private int Seed(IMongoCsvImporter mongoCsvImporter, Publication publication, DataCsvFilename dataCsvFilename)
+        {
+            var data = mongoCsvImporter.Data(dataCsvFilename);
             Collection(publication).InsertMany(data);
             return data.Count;
         }
