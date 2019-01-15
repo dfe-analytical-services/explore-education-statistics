@@ -38,7 +38,9 @@ export default class Upload extends Component {
   render() {
     return (
       <div>
+        <label for="publicationId">Publication guid:</label> 
         <input
+          id="publicationId"
           type="text"
           value={this.state.publication}
           onChange={this.handleChange}
