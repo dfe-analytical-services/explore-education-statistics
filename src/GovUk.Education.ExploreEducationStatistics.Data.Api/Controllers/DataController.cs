@@ -22,55 +22,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return _dataService.Get();
         }
 
-        [HttpGet("{id:length(24)}", Name = "GetBook")]
-        public ActionResult<TidyData> Get(string id)
+
+        [HttpGet("seed")]
+        public string Seed()
         {
-            var tidyData = _dataService.Get(id);
-
-            if (tidyData == null)
-            {
-                return NotFound();
-            }
-
-            return tidyData;
-        }
-
-        [HttpPost]
-        public ActionResult<TidyData> Create(TidyData book)
-        {
-            _dataService.Create(book);
-
-            return CreatedAtRoute("GetBook", new { id = book.Id.ToString() }, book);
-        }
-
-        [HttpPut("{id:length(24)}")]
-        public IActionResult Update(string id, TidyData bookIn)
-        {
-            var tidyData = _dataService.Get(id);
-
-            if (tidyData == null)
-            {
-                return NotFound();
-            }
-
-            _dataService.Update(id, bookIn);
-
-            return NoContent();
-        }
-
-        [HttpDelete("{id:length(24)}")]
-        public IActionResult Delete(string id)
-        {
-            var tidyData = _dataService.Get(id);
-
-            if (tidyData == null)
-            {
-                return NotFound();
-            }
-
-            _dataService.Remove(tidyData.Id);
-
-            return NoContent();
+            return "Inserted " + _dataService.Seed() + " rows";
         }
     }
 }

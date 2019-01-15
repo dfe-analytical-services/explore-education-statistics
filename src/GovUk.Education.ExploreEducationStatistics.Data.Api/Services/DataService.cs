@@ -22,14 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         
         public List<TidyData> Get()
         {
-            if (_collection.Find(x => x.Level == "national" && x.SchoolType == "Total").ToList().Any() == false)
-            {
-                // TODO: temp seed of data
-                var seed = new MongoCsvImporter().GeoLevels("absence_geoglevels").ToList();
-
-                _collection.InsertMany(seed);
-            }
-            
             // TODO: Temp limit on query
             var query = _collection.Find(x => x.Level == "national" && x.SchoolType == "Total").ToList();
 
@@ -64,6 +56,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public void Remove(ObjectId id)
         {
             _collection.DeleteOne(book => book.Id == id);
+        }
+        
+        public int Seed()
+        {
+            if (_collection.Find(x => x.Level == "national" && x.SchoolType == "Total").ToList().Any() == false)
+            {
+                // TODO: temp seed of data
+                var seed = new MongoCsvImporter().GeoLevels("absence_geoglevels").ToList();
+
+                _collection.InsertMany(seed);
+
+                return seed.Count();
+            }
+
+            return 0;
         }
     }
 }
