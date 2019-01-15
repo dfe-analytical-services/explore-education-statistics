@@ -2,11 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
-using Country = GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Country;
-using LocalAuthority = GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.LocalAuthority;
-using Region = GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Region;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 {

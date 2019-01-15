@@ -1,35 +1,30 @@
+using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
-    public class TidyData
+    public abstract class TidyData
     {
-        public ObjectId Id { get; set; }
-        
-        // potentially optional
-        [BsonElement("term")]
-        public string Term { get; set; }
-        
-        [BsonElement("year")]
-        public int Year { get; set; }
-        
-        [BsonElement("level")]
-        public string Level { get; set; }
-        
-        public Country Country { get; set; }
-        
-        public Region Region { get; set; }
-        
-        public LocalAuthority LocalAuthority { get; set; }
+        protected TidyData()
+        {
+        }
 
-        [BsonElement("estab")]
-        public string Estab { get; set; }
+        protected TidyData(int year, string level, Country country, string schoolType,
+            Dictionary<string, string> attributes)
+        {
+            Year = year;
+            Level = level;
+            Country = country;
+            SchoolType = schoolType;
+            Attributes = attributes;
+        }
         
-        [BsonElement("laestab")]
-        public string LaEstab { get; set; }
-        
-        [BsonElement("school_type")]
-        public string SchoolType { get; set; }
+        public ObjectId Id { get; set; }
+        [BsonElement("year")] public int Year { get; set; }
+        [BsonElement("level")] public string Level { get; set; }
+        public Country Country { get; set; }
+        [BsonElement("school_type")] public string SchoolType { get; set; }
+        public Dictionary<string, string> Attributes { get; set; }
     }
 }

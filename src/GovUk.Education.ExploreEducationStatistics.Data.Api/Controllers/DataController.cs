@@ -17,16 +17,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<TidyData>> Get()
+        public ActionResult<List<TidyDataGeographic>> Get()
         {
             return _dataService.Get();
         }
-
-
-        [HttpGet("seed")]
-        public string Seed()
+        
+        [HttpGet("{laEstab}")]
+        public ActionResult<TidyDataGeographic> Get(string laEstab)
         {
-            return "Inserted " + _dataService.Seed() + " rows";
+            return _dataService.Get(laEstab);
         }
     }
 }
