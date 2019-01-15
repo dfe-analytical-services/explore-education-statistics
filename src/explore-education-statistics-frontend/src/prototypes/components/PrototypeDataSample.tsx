@@ -39,7 +39,7 @@ const PrototypeDataSample = ({ sectionId, chartTitle }: Props) => {
           className="govuk-tabs__panel govuk-tabs__panel--hidden"
           id={`${sectionId}TableData`}
         >
-          <h2 className="govuk-heading-s">{`Table showing${chartTitle}`}</h2>
+          <h2 className="govuk-heading-s">{`Table showing ${chartTitle}`}</h2>
           <PrototypeTableSample />
         </section>
       </div>

@@ -6,14 +6,6 @@ import PrototypeDataSample from './components/PrototypeDataSample';
 import PrototypePage from './components/PrototypePage';
 
 const TestPage = () => {
-  const chartData = [
-    { name: '2012/13', unauthorised: 1.1, authorised: 4.2, overall: 5.3 },
-    { name: '2013/14', unauthorised: 1.1, authorised: 3.5, overall: 4.5 },
-    { name: '2014/15', unauthorised: 1.1, authorised: 3.5, overall: 4.6 },
-    { name: '2015/16', unauthorised: 1.1, authorised: 3.4, overall: 4.6 },
-    { name: '2016/17', unauthorised: 1.3, authorised: 3.4, overall: 4.7 },
-  ];
-
   return (
     <PrototypePage
       breadcrumbs={[
@@ -90,9 +82,58 @@ const TestPage = () => {
                 (latest data)
               </span>
             </h3>
-            <p className="govuk-caption-m govuk-!-margin-top-0">
-              <a href="#">See previous 10 years</a>
-            </p>
+            <details className="govuk-details">
+              <summary className="govuk-details__summary">
+                <span
+                  className="govuk-details__summary-text"
+                  data-testid="details--expand"
+                >
+                  See previous 7 releases
+                </span>
+              </summary>
+              <div className="govuk-details__text">
+                <ul className="govuk-list">
+                  <li>
+                    <a
+                      className="govuk-link"
+                      href="/themes/schools/absence-and-exclusions/pupil-absence-in-schools-in-england/2015-16"
+                    >
+                      2015 to 2016
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015">
+                      2014 to 2015
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014">
+                      2013 to 2014
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013">
+                      2012 to 2013
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics">
+                      2011 to 2012
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011">
+                      2010 to 2011
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010">
+                      2009 to 2010
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </details>
             <h3 className="govuk-heading-s">
               <span className="govuk-caption-m">Published: </span>22 March 2018
             </h3>
@@ -100,9 +141,30 @@ const TestPage = () => {
               <span className="govuk-caption-m">Last updated: </span>20 June
               2018
             </h3>
-            <p className="govuk-caption-m govuk-!-margin-top-0">
-              <a href="#">See all 4 updates</a>
-            </p>
+            <details className="govuk-details">
+              <summary className="govuk-details__summary">
+                <span
+                  className="govuk-details__summary-text"
+                  data-testid="details--expand"
+                >
+                  See all 2 updates
+                </span>
+              </summary>
+              <div className="govuk-details__text">
+                <div data-testid="publication-page--update-element">
+                  <h3 className="govuk-heading-s">19 April 2017</h3>
+                  <p>
+                    Underlying data file updated to include absence data by
+                    pupil residency and school location, andupdated metadata
+                    document.
+                  </p>
+                </div>
+                <div data-testid="publication-page--update-element">
+                  <h3 className="govuk-heading-s">22 March 2017</h3>
+                  <p>First published.</p>
+                </div>
+              </div>
+            </details>
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <span className="govuk-caption-m">Next update: </span>22 March
               2019
@@ -123,61 +185,10 @@ const TestPage = () => {
           </li>
           <li>10% of pupils persistently absent during 2016/17</li>
         </ul>
-        <h3 className="govuk-heading-s">
-          Chart showing the change in different types of absence over time
-        </h3>
-        <LineChart
-          width={900}
-          height={300}
-          data={chartData}
-          margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="name"
-            label={{
-              offset: 5,
-              position: 'bottom',
-              value: 'School year',
-            }}
-            padding={{ left: 20, right: 20 }}
-            tickMargin={10}
-          />
-          <YAxis
-            label={{
-              angle: -90,
-              offset: 0,
-              position: 'left',
-              value: 'Absence rate',
-            }}
-            scale="auto"
-            unit="%"
-          />
-          <Line
-            type="linear"
-            dataKey="unauthorised"
-            stroke="#28A197"
-            strokeWidth="3"
-            unit="%"
-            activeDot={{ r: 3 }}
-          />
-          <Line
-            type="linear"
-            dataKey="authorised"
-            stroke="#6F72AF"
-            strokeWidth="3"
-            unit="%"
-            activeDot={{ r: 3 }}
-          />
-          <Line
-            type="linear"
-            dataKey="overall"
-            stroke="#DF3034"
-            strokeWidth="3"
-            unit="%"
-            activeDot={{ r: 3 }}
-          />
-        </LineChart>
+        <PrototypeDataSample
+          sectionId="headlines"
+          chartTitle="change in different types of absence over time"
+        />
         <div className="dfe-dash-tiles dfe-dash-tiles--simple">
           <div className="dfe-dash-tiles__tile">
             <h3 className="govuk-heading-m">
