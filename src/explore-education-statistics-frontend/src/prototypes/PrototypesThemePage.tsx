@@ -52,16 +52,206 @@ const ThemePage = () => {
         </div>
       </div>
       <hr />
-      <h3>
+      <h2 className="govuk-heading-m">
+        Latest publications in absence and exclusions{' '}
+        <Link to="#" className="govuk-body">
+          (see all publications)
+        </Link>
+      </h2>
+      <p>
+        These are the latest official statistics with figures for Sheffield. You
+        can access the report and commentary, and also get the data for use in
+        Excel and other tools. You can now customise the data to your
+        requirements, and get a variety of formats.
+      </p>
+      <div className="dfe-dash-tiles dfe-dash-tiles--2-in-row govuk-!-margin-top-0 govuk-!-padding-top-0">
+        <div className="dfe-dash-tiles__tile">
+          <h2 className="govuk-heading-m">
+            <Link to="publication">Pupil absence in schools in England</Link>
+          </h2>
+
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-one-half">
+              <h2 className="govuk-heading-s">Sheffield overall absence</h2>
+              <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
+                4.7%
+              </span>
+              <p className="govuk-body">
+                <strong className="increase">
+                  +0.4
+                  <abbr
+                    aria-label="Percentage points"
+                    title="Percentage points"
+                  >
+                    ppt
+                  </abbr>
+                </strong>
+                more than 2015/16
+              </p>
+            </div>
+            <div className="govuk-grid-column-one-half">
+              <div className="govuk-body-s">
+                <ul>
+                  <li>
+                    On average in 2016/17,{' '}
+                    <strong>pupils missed 8.2 school days</strong>
+                  </li>
+                  <li>
+                    Overall and unauthorised absence rates have{' '}
+                    <strong>increased</strong> since last year
+                  </li>
+                  <li>
+                    <strong>One in ten</strong> pupils was persistently absent
+                    during the academic year 2016/17
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <details className="govuk-details">
+            <summary className="govuk-details__summary">
+              <span className="govuk-details__summary-text">
+                What does this mean?
+              </span>
+            </summary>
+            <div className="govuk-details__text">
+              Permanent exclusion rate is the adipisicing elit. Dolorum hic
+              nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
+            </div>
+          </details>
+          <hr />
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-one-half">
+              <ul className="govuk-list govuk-body-s">
+                <li>
+                  <a className="govuk-link" href="/local-authorities/sheffield">
+                    View report
+                  </a>
+                </li>
+                <li>
+                  <a className="govuk-link" href="/local-authorities/sheffield">
+                    Download data
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div className="govuk-grid-column-one-half">
+              <ul className="govuk-list govuk-body-s">
+                <li>
+                  <a className="govuk-link" href="/local-authorities/sheffield">
+                    Visualise data
+                  </a>
+                </li>
+                <li>
+                  <a className="govuk-link" href="/local-authorities/sheffield">
+                    Create your own dataset
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div className="dfe-dash-tiles__tile">
+          <h2 className="govuk-heading-m">
+            <Link to="publication">Permanent and fixed period exlusions</Link>
+          </h2>
+
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-one-half">
+              <h2 className="govuk-heading-s">
+                Overall rate of fixed period exclusions
+              </h2>
+              <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
+                0.10%
+              </span>
+              <p className="govuk-body">
+                <strong className="increase">
+                  +0.2
+                  <abbr
+                    aria-label="Percentage points"
+                    title="Percentage points"
+                  >
+                    ppt
+                  </abbr>
+                </strong>
+                more than 2015/16
+              </p>
+            </div>
+            <div className="govuk-grid-column-one-half">
+              <div className="govuk-body-s">
+                <ul>
+                  <li>
+                    On average in 2016/17,{' '}
+                    <strong>pupils missed 8.2 school days</strong>
+                  </li>
+                  <li>
+                    Overall and unauthorised absence rates have{' '}
+                    <strong>increased</strong> since last year
+                  </li>
+                  <li>
+                    <strong>One in ten</strong> pupils was persistently absent
+                    during the academic year 2016/17
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <details className="govuk-details">
+            <summary className="govuk-details__summary">
+              <span className="govuk-details__summary-text">
+                What does this mean?
+              </span>
+            </summary>
+            <div className="govuk-details__text">
+              Permanent exclusion rate is the adipisicing elit. Dolorum hic
+              nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
+            </div>
+          </details>
+          <hr />
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-one-half">
+              <ul className="govuk-list govuk-body-s">
+                <li>
+                  <a className="govuk-link" href="/local-authorities/sheffield">
+                    View report
+                  </a>
+                </li>
+                <li>
+                  <a className="govuk-link" href="/local-authorities/sheffield">
+                    Download data
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div className="govuk-grid-column-one-half">
+              <ul className="govuk-list govuk-body-s">
+                <li>
+                  <a className="govuk-link" href="/local-authorities/sheffield">
+                    Visualise data
+                  </a>
+                </li>
+                <li>
+                  <a className="govuk-link" href="/local-authorities/sheffield">
+                    Create your own dataset
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr />
+      <h2 className="govuk-heading-m">
         Key indicators for Sheffield{' '}
         <Link to="#" className="govuk-body">
-          (Change key indicators)
+          (change key indicators)
         </Link>
-      </h3>
+      </h2>
       <p>
         These are some key indicators for Sheffield. You can change what you see
         here according your requirements. <Link to="#">Find out more</Link>
       </p>
+
       <h3 className="govuk-heading-s">
         <Link to="#">Find an indicator &#x25BC;</Link>
       </h3>
@@ -177,8 +367,8 @@ const ThemePage = () => {
           </details>
         </div>
       </div>
-      <a href="#" className="govuk-link">
-        Add more or edit indicators
+      <a href="#" className="govuk-button">
+        Explore statistics
       </a>
     </PrototypePage>
   );

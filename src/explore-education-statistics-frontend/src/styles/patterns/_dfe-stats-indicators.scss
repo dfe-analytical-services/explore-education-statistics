@@ -59,7 +59,9 @@
     position: absolute;
   }
 
-  strong {
+  .increase,
+  .decrease,
+  .level {
     color: $govuk-text-colour;
     font-size: 1.3rem;
     font-weight: normal;
