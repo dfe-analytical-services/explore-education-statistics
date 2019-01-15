@@ -1,8 +1,8 @@
 import React from 'react';
 // import CollapsibleSection from '../components/CollapsibleSection';
 // import Details from '../components/Details';
-// import PrototypeDataSample from './components/PrototypeDataSample';
 import Link from '../components/Link';
+import PrototypeIckleChart from './components/PrototypeIckleChart';
 import PrototypePage from './components/PrototypePage';
 import PrototypeSearchForm from './components/PrototypeSearchForm';
 
@@ -73,6 +73,7 @@ const ThemePage = () => {
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-one-half">
               <h2 className="govuk-heading-s">Sheffield overall absence</h2>
+              <PrototypeIckleChart />
               <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
                 4.7%
               </span>
@@ -108,7 +109,7 @@ const ThemePage = () => {
               </div>
             </div>
           </div>
-          <details className="govuk-details">
+          <details className="govuk-details govuk-!-margin-bottom-0">
             <summary className="govuk-details__summary">
               <span className="govuk-details__summary-text">
                 What does this mean?
@@ -161,6 +162,7 @@ const ThemePage = () => {
               <h2 className="govuk-heading-s">
                 Overall rate of fixed period exclusions
               </h2>
+              <PrototypeIckleChart />
               <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
                 0.10%
               </span>
@@ -196,7 +198,7 @@ const ThemePage = () => {
               </div>
             </div>
           </div>
-          <details className="govuk-details">
+          <details className="govuk-details govuk-!-margin-bottom-0">
             <summary className="govuk-details__summary">
               <span className="govuk-details__summary-text">
                 What does this mean?
