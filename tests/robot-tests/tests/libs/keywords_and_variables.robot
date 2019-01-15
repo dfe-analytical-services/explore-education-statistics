@@ -4,6 +4,7 @@ Library     OperatingSystem
 #Library     XvfbRobot           # sudo apt install xvfb + pip install robotframework-xvfb
 
 Library    library.py
+Library    file_operations.py
 
 *** Variables ***
 ${browser}    chrome
@@ -92,6 +93,9 @@ user closes the browser
 user goes to url
   [Arguments]   ${destination}
   go to   ${destination}
+
+user goes back
+  go back
 
 user scrolls to the top of the page
   execute javascript      window.scrollTo(0, 0);

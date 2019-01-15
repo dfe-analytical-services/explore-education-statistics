@@ -6,11 +6,15 @@ import PageFooter from '../components/PageFooter';
 import PageHeader from '../components/PageHeader';
 import PrototypePageBanner from './components/PrototypePageBanner';
 import PublicationPage from './PrototypesPublicationPage';
+import ThemePage from './PrototypesThemePage';
+import TopicPage from './PrototypesTopicPage';
 
 export const PrototypeRoutes = () => (
   <>
     <Route exact path="/prototypes" component={PrototypesHomePage} />
     <Route exact path="/prototypes/publication" component={PublicationPage} />
+    <Route exact path="/prototypes/theme" component={ThemePage} />
+    <Route exact path="/prototypes/topic" component={TopicPage} />
   </>
 );
 
@@ -33,12 +37,16 @@ export const PrototypesHomePage = () => {
 
           <ul>
             <li>
-              <Link to="/prototypes/publication">Publication Page</Link>
+              <Link to="/prototypes/topic">Topic page</Link>
+            </li>
+            <li>
+              <Link to="/prototypes/theme">Theme page</Link>
+            </li>
+            <li>
+              <Link to="/prototypes/publication">Publication page</Link>
             </li>
           </ul>
         </main>
-
-        <PageFooter />
       </div>
     </>
   );

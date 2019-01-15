@@ -5,13 +5,26 @@
   flex-flow: row wrap;
 }
 
-.dfe-dash-tiles--simple {
+.dfe-dash-tiles--2-in-row {
   margin-top: 2rem;
   padding-top: 2rem;
 
   .dfe-dash-tiles__tile {
-    flex-basis: 46%;
-    margin: 2% 2% 4%;
+    flex-basis: 48%;
+    margin: 2% 2% 4% 0;
+    @include govuk-media-query($until: tablet) {
+      flex-basis: 100%;
+    }
+  }
+}
+
+.dfe-dash-tiles--3-in-row {
+  margin-top: 0;
+  padding-top: 2rem;
+
+  .dfe-dash-tiles__tile {
+    flex-basis: 32%;
+    margin: 2% 1% 4% 0;
     @include govuk-media-query($until: tablet) {
       flex-basis: 100%;
     }
@@ -22,15 +35,23 @@
   background: govuk-colour('grey-4');
   border-top: 1px solid $govuk-border-colour;
   box-sizing: border-box;
+  display: flex;
   flex-basis: 23%;
-  margin: 2% 1% 1%;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 2% 2% 1% 0;
   padding: 20px;
   position: relative;
+
+  .referenceLink {
+    @include govuk-font(14);
+    line-height: 1rem !important;
+  }
 
   .govuk-tag {
     background: none;
     bottom: 100%;
-    color: $govuk-secondary-text-colour;
+    color: $govuk-text-colour;
     font-weight: normal;
     left: 0;
     margin-bottom: 0;

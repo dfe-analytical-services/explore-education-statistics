@@ -8,9 +8,9 @@ const PublicationPage = () => {
   return (
     <PrototypePage
       breadcrumbs={[
-        { text: 'Education, training and skills' },
-        { text: 'Pupil wellbeing, behaviour and attendance' },
-        { text: 'School attendance and absence' },
+        { text: 'Schools', link: 'topic' },
+        { text: 'Absence and exclusions', link: 'theme' },
+        { text: 'Absence statistics for schools in England', link: '#' },
       ]}
     >
       <div className="govuk-grid-row">
@@ -71,7 +71,7 @@ const PublicationPage = () => {
         <div className="govuk-grid-column-one-third">
           <aside className="app-related-items">
             <h2 className="govuk-heading-m" id="subsection-title">
-              About this data
+              About these statistics
             </h2>
 
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
@@ -175,7 +175,7 @@ const PublicationPage = () => {
         </div>
       </div>
       <h2 className="govuk-heading-m">Contents</h2>
-      <CollapsibleSection heading="Headline pupil absence facts and figures for 2016/17">
+      <CollapsibleSection heading="Latest headline facts and figures - 2016/17">
         <ul className="govuk-list govuk-list--bullet">
           <li>Pupils missed on average 8.2 school days</li>
           <li>Overall and unauthorised absence rates up on previous year</li>
@@ -186,9 +186,9 @@ const PublicationPage = () => {
         </ul>
         <PrototypeDataSample
           sectionId="headlines"
-          chartTitle="change in different types of absence over time"
+          chartTitle="change in absence types 2012/13 to 2016/17"
         />
-        <div className="dfe-dash-tiles dfe-dash-tiles--simple">
+        <div className="dfe-dash-tiles dfe-dash-tiles--2-in-row">
           <div className="dfe-dash-tiles__tile">
             <h3 className="govuk-heading-m">
               Overall absence
@@ -196,18 +196,23 @@ const PublicationPage = () => {
                 2016/17
               </span>
             </h3>
-            <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
-              4.7%
-            </span>
-            <p className="govuk-body">
-              <strong className="increase">
-                +0.4
-                <abbr aria-label="Percentage points" title="Percentage points">
-                  ppt
-                </abbr>
-              </strong>
-              more than 2015/16
-            </p>
+            <div>
+              <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
+                4.7%
+              </span>
+              <p className="govuk-body">
+                <strong className="increase">
+                  +0.4
+                  <abbr
+                    aria-label="Percentage points"
+                    title="Percentage points"
+                  >
+                    ppt
+                  </abbr>
+                </strong>
+                more than 2015/16
+              </p>
+            </div>
             <details className="govuk-details">
               <summary className="govuk-details__summary">
                 <span className="govuk-details__summary-text">
@@ -693,7 +698,7 @@ const PublicationPage = () => {
         className="govuk-heading-m govuk-!-margin-top-9"
         id="subsection-title"
       >
-        Getting the data
+        Download data files
       </h2>
 
       <ul className="govuk-list">
