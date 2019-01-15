@@ -7,26 +7,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class DataService
     {
-        private readonly IMongoCollection<TidyDataGeographic> _collection;
+        private readonly IMongoDatabase _database;
 
         public DataService(IConfiguration config)
         {
             var client = new MongoClient(config.GetConnectionString("StatisticsDb"));
-            var database = client.GetDatabase("education-statistics");
-            _collection = database.GetCollection<TidyDataGeographic>("absence");
+            _database = client.GetDatabase("education-statistics");
         }
 
-        public List<TidyDataGeographic> Get(string level = "")
+        public IEnumerable<TidyDataGeographic> Get(string publication, string level = "")
         {
-            // TODO: Temp limit on query
-            var query = _collection.Find(x => x.Level == level).ToList();
+            var query = _database.GetCollection<TidyDataGeographic>(publication)
+                                      .Find(x => x.Level == level)
+                                      .ToList();
 
             return query;
         }
 
-        public TidyDataGeographic GetLaEstab(string laEstab)
-        {
-            return _collection.Find(elem => elem.School.LaEstab == laEstab).FirstOrDefault();
-        }
+//        public TidyDataGeographic GetLaEstab(string laEstab)
+//        {
+//            return _database.Find(elem => elem.School.LaEstab == laEstab).FirstOrDefault();
+//        }
     }
 }

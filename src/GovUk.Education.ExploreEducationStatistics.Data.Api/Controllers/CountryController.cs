@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            var data = _dataService.Get("national").Where(x =>
+            var data = _dataService.Get(publication, "national").Where(x =>
                     (string.IsNullOrEmpty(schoolType) ||
                      string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
                     (!year.HasValue || x.Year == year)
