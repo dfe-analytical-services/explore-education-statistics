@@ -27,6 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             var count = 0;
             
             count += Seed(mongoGeoLevelsCsvImporter, Publication.absence, DataCsvFilename.absence_geoglevels);
+            count += Seed(mongoGeoLevelsCsvImporter, Publication.exclusion, DataCsvFilename.exclusion_geoglevels);
+            count += Seed(mongoGeoLevelsCsvImporter, Publication.schpupnum, DataCsvFilename.schpupnum_geoglevels);
 
             return count;
         }

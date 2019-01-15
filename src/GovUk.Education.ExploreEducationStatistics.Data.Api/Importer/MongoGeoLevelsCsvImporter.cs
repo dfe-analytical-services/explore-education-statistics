@@ -15,8 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
             var headerValues = new[]
             {
                 "year", "level", "country_code", "country_name", "region_code", "region_name", "old_la_code",
-                "new_la_code", "la_name", "estab", "laestab", "acad_type", "academy_type", "acad_opendate",
-                "academy_open_date", "school_type"
+                "new_la_code", "la_name", "estab", "laestab", "acad_type", "acad_opendate", "school_type"
             };
             var values = csvLine.Split(',');
             var model = new TidyDataGeographic
@@ -43,8 +42,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 {
                     Estab = values[headers.FindIndex(h => h.Equals("estab"))],
                     LaEstab = values[headers.FindIndex(h => h.Equals("laestab"))],
-                    AcademyOpenDate = values[headers.FindIndex(h => h.Equals("academy_open_date"))],
-                    AcademyType = values[headers.FindIndex(h => h.Equals("academy_type"))]
+                    AcademyOpenDate = values[headers.FindIndex(h => h.Equals("acad_opendate"))],
+                    AcademyType = values[headers.FindIndex(h => h.Equals("acad_type"))]
                 },
                 SchoolType = values[headers.FindIndex(h => h.Equals("school_type"))],
                 Attributes = new Dictionary<string, string>()
