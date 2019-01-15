@@ -5,6 +5,7 @@ import Link from '../components/Link';
 import PrototypeIckleChart from './components/PrototypeIckleChart';
 import PrototypePage from './components/PrototypePage';
 import PrototypeSearchForm from './components/PrototypeSearchForm';
+import PrototypeTileWithChart from './components/PrototypeTileWithChart';
 
 const ThemePage = () => {
   return (
@@ -65,182 +66,16 @@ const ThemePage = () => {
         requirements, and get a variety of formats.
       </p>
       <div className="dfe-dash-tiles dfe-dash-tiles--2-in-row govuk-!-margin-top-0 govuk-!-padding-top-0">
-        <div className="dfe-dash-tiles__tile">
-          <h2 className="govuk-heading-m">
-            <Link to="publication">Pupil absence in schools in England</Link>
-          </h2>
-
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-half">
-              <h2 className="govuk-heading-s">Sheffield overall absence</h2>
-              <PrototypeIckleChart />
-              <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
-                4.7%
-              </span>
-              <p className="govuk-body">
-                <strong className="increase">
-                  +0.4
-                  <abbr
-                    aria-label="Percentage points"
-                    title="Percentage points"
-                  >
-                    ppt
-                  </abbr>
-                </strong>
-                more than 2015/16
-              </p>
-            </div>
-            <div className="govuk-grid-column-one-half">
-              <div className="govuk-body-s">
-                <ul>
-                  <li>
-                    On average in 2016/17,{' '}
-                    <strong>pupils missed 8.2 school days</strong>
-                  </li>
-                  <li>
-                    Overall and unauthorised absence rates have{' '}
-                    <strong>increased</strong> since last year
-                  </li>
-                  <li>
-                    <strong>One in ten</strong> pupils was persistently absent
-                    during the academic year 2016/17
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <details className="govuk-details govuk-!-margin-bottom-0">
-            <summary className="govuk-details__summary">
-              <span className="govuk-details__summary-text">
-                What does this mean?
-              </span>
-            </summary>
-            <div className="govuk-details__text">
-              Permanent exclusion rate is the adipisicing elit. Dolorum hic
-              nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
-            </div>
-          </details>
-          <hr />
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-half">
-              <ul className="govuk-list govuk-body-s">
-                <li>
-                  <a className="govuk-link" href="/local-authorities/sheffield">
-                    View report
-                  </a>
-                </li>
-                <li>
-                  <a className="govuk-link" href="/local-authorities/sheffield">
-                    Download data
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div className="govuk-grid-column-one-half">
-              <ul className="govuk-list govuk-body-s">
-                <li>
-                  <a className="govuk-link" href="/local-authorities/sheffield">
-                    Visualise data
-                  </a>
-                </li>
-                <li>
-                  <a className="govuk-link" href="/local-authorities/sheffield">
-                    Create your own dataset
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div className="dfe-dash-tiles__tile">
-          <h2 className="govuk-heading-m">
-            <Link to="publication">Permanent and fixed period exlusions</Link>
-          </h2>
-
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-half">
-              <h2 className="govuk-heading-s">
-                Overall rate of fixed period exclusions
-              </h2>
-              <PrototypeIckleChart />
-              <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
-                0.10%
-              </span>
-              <p className="govuk-body">
-                <strong className="increase">
-                  +0.2
-                  <abbr
-                    aria-label="Percentage points"
-                    title="Percentage points"
-                  >
-                    ppt
-                  </abbr>
-                </strong>
-                more than 2015/16
-              </p>
-            </div>
-            <div className="govuk-grid-column-one-half">
-              <div className="govuk-body-s">
-                <ul>
-                  <li>
-                    On average in 2016/17,{' '}
-                    <strong>pupils missed 8.2 school days</strong>
-                  </li>
-                  <li>
-                    Overall and unauthorised absence rates have{' '}
-                    <strong>increased</strong> since last year
-                  </li>
-                  <li>
-                    <strong>One in ten</strong> pupils was persistently absent
-                    during the academic year 2016/17
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <details className="govuk-details govuk-!-margin-bottom-0">
-            <summary className="govuk-details__summary">
-              <span className="govuk-details__summary-text">
-                What does this mean?
-              </span>
-            </summary>
-            <div className="govuk-details__text">
-              Permanent exclusion rate is the adipisicing elit. Dolorum hic
-              nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
-            </div>
-          </details>
-          <hr />
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-half">
-              <ul className="govuk-list govuk-body-s">
-                <li>
-                  <a className="govuk-link" href="/local-authorities/sheffield">
-                    View report
-                  </a>
-                </li>
-                <li>
-                  <a className="govuk-link" href="/local-authorities/sheffield">
-                    Download data
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div className="govuk-grid-column-one-half">
-              <ul className="govuk-list govuk-body-s">
-                <li>
-                  <a className="govuk-link" href="/local-authorities/sheffield">
-                    Visualise data
-                  </a>
-                </li>
-                <li>
-                  <a className="govuk-link" href="/local-authorities/sheffield">
-                    Create your own dataset
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        <PrototypeTileWithChart
+          heading="Pupil absence in schools in England"
+          subheading="Sheffield overall absence"
+          percent="4.7%"
+        />
+        <PrototypeTileWithChart
+          heading="Permanent and fixed period exclusions"
+          subheading="Overall rate of fixed period exclusions"
+          percent="0.10%"
+        />
       </div>
       <hr />
       <h2 className="govuk-heading-m">
