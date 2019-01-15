@@ -7,7 +7,7 @@ const Breadcrumbs = ({ breadcrumbs }: InjectedProps<{}>) => {
 
   return (
     <div className="govuk-breadcrumbs">
-      <ol className="govuk-breadcrumbs__list">
+      <ol className="govuk-breadcrumbs__list" data-testid="breadcrumbs--list">
         {breadcrumbs.map((breadcrumb, index) =>
           index < currentBreadcrumbIndex ? (
             <li key={index} className="govuk-breadcrumbs__list-item">
@@ -20,9 +20,9 @@ const Breadcrumbs = ({ breadcrumbs }: InjectedProps<{}>) => {
             </li>
           ) : (
             <li
-              aria-current="page"
-              className="govuk-breadcrumbs__list-item"
               key={index}
+              className="govuk-breadcrumbs__list-item"
+              aria-current="page"
             >
               {breadcrumb}
             </li>

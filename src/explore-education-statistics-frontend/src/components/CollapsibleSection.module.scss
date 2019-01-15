@@ -1,11 +1,18 @@
 @import '~govuk-frontend/settings/all';
 @import '~govuk-frontend/helpers/all';
 @import '~govuk-frontend/tools/all';
+@import '~govuk-frontend/core/typography';
 
 .heading {
+  @extend %govuk-heading-s;
   border-top: 1px solid $govuk-border-colour;
   clear: both;
   margin: 0;
+}
+
+.caption {
+  composes: govuk-caption-m;
+  margin-bottom: govuk-spacing(2);
 }
 
 .collapseToggle {
@@ -16,13 +23,22 @@
   position: relative;
   width: 100%;
 
+  &:focus {
+    background: govuk-colour('grey-4');
+  }
+
   &::after {
     position: absolute;
     right: 0;
   }
 
+  &[aria-expanded='true'] {
+    margin-bottom: 0.5rem;
+  }
+
   &[aria-expanded='true']::after {
     content: '\FF0D';
+    font-weight: 900;
   }
 
   &[aria-expanded='false']::after {
@@ -36,4 +52,5 @@
 
 .content {
   @include govuk-clearfix;
+  padding-bottom: 5rem;
 }

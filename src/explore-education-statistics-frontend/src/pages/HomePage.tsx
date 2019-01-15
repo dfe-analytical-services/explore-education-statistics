@@ -6,23 +6,21 @@ class HomePage extends Component {
     return (
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1>Explore education statistics</h1>
+          <h1 data-testid="home-page--heading">Explore education statistics</h1>
           <p>Use this service to:</p>
           <ul>
             <li>do something</li>
             <li>do something else</li>
           </ul>
-          <a
-            href="#"
+          <Link
+            to="themes"
             role="button"
             className="govuk-button govuk-button--start govuk-!-margin-top-2 govuk-!-margin-bottom-8"
           >
             Start now
-          </a>
+          </Link>
           <h2>Before you start</h2>
           <p>Do something.</p>
-
-          <Link to="/prototypes">See prototypes</Link>
         </div>
 
         <div className="govuk-grid-column-one-third">
@@ -32,22 +30,17 @@ class HomePage extends Component {
             <nav role="navigation" aria-labelledby="subsection-title">
               <ul className="govuk-list govuk-body-s">
                 <li>
-                  <Link to="/themes" data-testid="themes-link">
-                    Themes
+                  <Link to="/themes" data-testid="home-page--themes-link">
+                    Homepage (Tech Demo)
                   </Link>
-                </li>
-                <li>
-                  <Link to="/topics" data-testid="topics-link">
-                    Topics
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/publications">Publications</Link>
                 </li>
                 <li>
                   <Link to="/local-authorities/sheffield">
                     Local Authority - Sheffield
                   </Link>
+                </li>
+                <li>
+                  <Link to="/prototypes">Prototypes</Link>
                 </li>
               </ul>
             </nav>

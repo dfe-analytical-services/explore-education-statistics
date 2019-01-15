@@ -6,28 +6,33 @@
 Options:
 -v|--visual : Don't run the tests headless. Usage: "./run_tests.py -v"
 
+-e|--env : Run against specific environment, "local", "test", "stage", "prod".
+Usage: "./run_tests.py -e test"
+
+-h|--happypath: Run happypath tests only. Usage: "./run_tests.py -h"
+
 -b BROWSER|--browser BROWSER : Run a different browser to the default, chrome.
 Usage: "./run_tests.py -b firefox"
 
 -f FILE|--file FILE : To run a specific test file or folder instead of the
-entire tests/ directory. Usage: "./run_tests.py -f tests/main.robot"
+entire tests/ directory. Usage: "./run_tests.py -f tests/directory/" OR "./run_tests.py -f tests/directory/suite.robot"
 
 -i INTERPRETER|--interp INTERPRETER : Run tests through a different interpreter
-than cpython. Usage: "./run_tests.py -i pabot"
+than cpython. Mainly for using pabot, which runs test suites in parallel.
+Usage: "./run_tests.py -i pabot"
 
--p|--profile : Output robot framework results AND python profile information
+-p|--profile : Additionally output python profile information
 AND keyword profile information. Outputs log files to test-results directory.
 Usage: "./run_tests.py -p"
 
--c|--complete: Run all available tests. Without this, tests expected to provide
-little value running everytime are ignored. Usage: "./run_tests.py -c"
 """
 
 import sys
 
 arguments = []
 headless = True
-happypath = True
+environment = "test"
+happypath = False
 profile = False
 tests = "tests/"
 browser = "chrome"
@@ -35,21 +40,20 @@ interp = "robot"
 url = ""
 
 for i in range(1, len(sys.argv)):
-    # print(i, sys.argv[i])
     if sys.argv[i] == "-v" or sys.argv[i] == "--visual":
         headless = False
-    elif sys.argv[i] == "-c" or sys.argv[i] == "--complete":
-        happypath = False
-    elif sys.argv[i] == "-p" or sys.argv[i] == "--profile":
-        profile = True
+    elif sys.argv[i] == "-e" or sys.argv[i] == "--env":
+        environment = sys.argv[i+1]  # NOTE: could add error checking...
+    elif sys.argv[i] == "-h" or sys.argv[i] == "--happypath":
+        happypath = True
     elif sys.argv[i] == "-b" or sys.argv[i] == "--browser":
         browser = sys.argv[i+1]  # NOTE: could add error checking...
-    elif sys.argv[i] == "-i" or sys.argv[i] == "--interp":
-        interp = sys.argv[i+1]  # NOTE: could add error checking...
     elif sys.argv[i] == "-f" or sys.argv[i] == "--file":
         tests = sys.argv[i+1]  # NOTE: could add error checking...
-    elif sys.argv[i] == "-u" or sys.argv[i] == "--url":
-        url = sys.argv[i+1]  # NOTE: could add error checking...
+    elif sys.argv[i] == "-i" or sys.argv[i] == "--interp":
+        interp = sys.argv[i+1]  # NOTE: could add error checking...
+    elif sys.argv[i] == "-p" or sys.argv[i] == "--profile":
+        profile = True
 
 arguments += ["--outputdir", "test-results/", "--exclude", "Failing",
               "--exclude", "UnderConstruction"]
@@ -62,14 +66,11 @@ if headless:
 else:
     arguments += ["-v", "headless:0"]
 
+arguments += ["-v", "env:" + environment]
+
 arguments += ["-v", "browser:" + browser]
 
-if url:
-    arguments += ["-v", "url:" + url]
-
 arguments += [tests]
-
-# print(arguments)
 
 if interp == "robot":
     from robot import run_cli

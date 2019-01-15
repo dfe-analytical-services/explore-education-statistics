@@ -2,16 +2,17 @@ import React, { ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
+  open?: boolean;
   summary: string;
 }
 
-const Details = ({ children, summary }: Props) => {
+const Details = ({ children, summary, open }: Props) => {
   return (
-    <details className="govuk-details">
+    <details className="govuk-details" open={open}>
       <summary className="govuk-details__summary">
         <span
           className="govuk-details__summary-text"
-          data-testid="see-previous-releases"
+          data-testid="details--expand"
         >
           {summary}
         </span>

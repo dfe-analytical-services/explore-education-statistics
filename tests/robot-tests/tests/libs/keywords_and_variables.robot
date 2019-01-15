@@ -7,16 +7,26 @@ Library    library.py
 
 *** Variables ***
 ${browser}    chrome
-${url}        http://localhost:3000
 ${headless}   1
-${timeout}    0.25
-${implicit_wait}   0.25
 
+${timeout}    2
+${implicit_wait}   2
+
+${download_dir}    test-results/download
+
+${env}        test   # default environment to test against. Can be "local", "test", "stage", "prod"
+${url}        about:blank
+${localUrl}   http://localhost:3000
+${testUrl}    https://educationstatisticstest.z6.web.core.windows.net
+${stageUrl}   https://educationstatisticsstage.z6.web.core.windows.net
+${prodUrl}    https://educationstatistics.z6.web.core.windows.net
 
 *** Keywords ***
 setup configuration
   install chromedriver
-  add lib dir to path  # Need chromedriver to run selenium!
+  add lib dir to path  # Need chromedriver in PATH to run selenium!
+  ${newUrl} =   get URL for env  ${env}
+  set global variable  ${url}   ${newUrl}
 
 user opens the browser
   setup configuration
@@ -91,12 +101,12 @@ user waits until page contains
   wait until page contains   ${pageText}
 
 user waits until page contains element
-  [Arguments]    ${pageText}
-  wait until page contains element  ${pageText}
+  [Arguments]    ${element}
+  wait until page contains element  ${element}
 
 user waits until page does not contain element
-  [Arguments]    ${pageText}
-  wait until page does not contain element  ${pageText}
+  [Arguments]    ${element}
+  wait until page does not contain element  ${element}
 
 user waits until element contains
   [Arguments]    ${element}    ${text}
@@ -104,6 +114,7 @@ user waits until element contains
 
 user checks element contains
   [Arguments]   ${element}    ${text}
+  wait until element contains  ${element}    ${text}
   element should contain    ${element}    ${text}
 
 user checks element does not contain
@@ -117,6 +128,10 @@ user waits until element is visible
 user checks element is visible
   [Arguments]   ${element}
   element should be visible   ${element}
+
+user checks element is not visible
+  [Arguments]   ${element}
+  element should not be visible   ${element}
 
 user checks checkbox is selected
   [Arguments]    ${checkbox}
@@ -138,6 +153,22 @@ user checks element is disabled
   [Arguments]   ${element}
   element should be disabled   ${element}
 
+user checks element should contain
+  [Arguments]   ${element}  ${text}
+  element should contain  ${element}    ${text}
+
+user checks element should not contain
+  [Arguments]   ${element}  ${text}
+  element should not contain  ${element}    ${text}
+
+user checks page contains element
+  [Arguments]  ${element}
+  page should contain element  ${element}
+
+user checks page does not contain element
+  [Arguments]  ${element}
+  page should not contain element  ${element}
+
 user clicks element
   [Arguments]     ${elementToClick}
   wait until page contains element  ${elementToClick}
@@ -148,18 +179,7 @@ user clicks link
   [Arguments]   ${text}
   click link  ${text}
 
-verify element should contain
-  [Arguments]   ${element}  ${text}
-  element should contain  ${element}    ${text}
+user checks element attribute value should be
+  [Arguments]   ${locator}  ${attribute}    ${expected}
+  element attribute value should be  ${locator}     ${attribute}   ${expected}
 
-verify element should not contain
-  [Arguments]   ${element}  ${text}
-  element should not contain  ${element}    ${text}
-
-verify page should contain element
-  [Arguments]  ${element}
-  page should contain element  ${element}
-
-verify page should not contain element
-  [Arguments]  ${element}
-  page should not contain element  ${element}

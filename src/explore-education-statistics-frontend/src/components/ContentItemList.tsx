@@ -21,13 +21,13 @@ const ContentItemList = ({ linkIdentifier = '', items = [] }: Props) => (
           <div
             className="govuk-grid-column-one-half"
             key={id}
-            data-testid="contentitemlist--element"
+            data-testid="content-item-list--element"
           >
             <h4>
               <Link
                 to={`${linkIdentifier}/${slug}`}
                 className="govuk-link"
-                data-testid={slug}
+                data-testid={`content-item-list--${slug}`}
               >
                 {title}
               </Link>

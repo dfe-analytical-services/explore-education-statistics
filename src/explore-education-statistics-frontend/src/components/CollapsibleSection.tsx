@@ -3,8 +3,13 @@ import React, { Component, ReactNode, SyntheticEvent } from 'react';
 import styles from './CollapsibleSection.module.scss';
 
 interface Props {
+  caption?: string;
   children: ReactNode;
-  heading: ReactNode | string;
+  className?: string;
+  heading: string;
+  // Only for accessibility/semantic markup,
+  // does not change the actual styling
+  headingTag?: 'h2' | 'h3' | 'h4';
   contentId?: string;
   open?: boolean;
 }
@@ -16,7 +21,8 @@ interface State {
 let idCounter = 0;
 
 class CollapsibleSection extends Component<Props, State> {
-  public static defaultProps = {
+  public static defaultProps: Partial<Props> = {
+    headingTag: 'h2',
     open: false,
   };
 
@@ -27,21 +33,28 @@ class CollapsibleSection extends Component<Props, State> {
   };
 
   public render() {
-    const { heading, children } = this.props;
+    const { className, heading, headingTag, caption, children } = this.props;
     const { isCollapsed, contentId } = this.state;
 
     return (
-      <div>
-        <h3 className={styles.heading}>
-          <button
-            aria-controls={contentId}
-            aria-expanded={!isCollapsed}
-            className={styles.collapseToggle}
-            onClick={this.handleClick}
-          >
-            {heading}
-          </button>
-        </h3>
+      <div className={className}>
+        {React.createElement(
+          `${headingTag}`,
+          {
+            className: styles.heading,
+          },
+          <>
+            <button
+              aria-controls={contentId}
+              aria-expanded={!isCollapsed}
+              className={styles.collapseToggle}
+              onClick={this.handleClick}
+            >
+              {heading}
+            </button>
+            {caption && <span className={styles.caption}>{caption}</span>}
+          </>,
+        )}
 
         <div
           className={classNames(styles.content, {

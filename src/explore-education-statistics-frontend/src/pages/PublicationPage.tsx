@@ -116,7 +116,10 @@ class PublicationPage extends Component<Props, State> {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             {!release && (
-              <strong className="govuk-tag" data-testid="latest-data-heading">
+              <strong
+                className="govuk-tag"
+                data-testid="publication-page--latest-data-heading"
+              >
                 This is the latest data
               </strong>
             )}
@@ -210,15 +213,16 @@ class PublicationPage extends Component<Props, State> {
             <aside className="app-related-items">
               <h3 id="subsection-title">About this data</h3>
 
-              <h4>
+              <h4 data-testid="publication-page--release-name">
                 <span className="govuk-caption-m">Release name: </span>
-                <div data-testid="release-name">
-                  {data.releaseName} {!release && <span>(latest data)</span>}
-                </div>
+                {data.releaseName} {!release && <span>(latest data)</span>}
                 <Details summary={`See previous ${releaseCount} releases`}>
-                  <ul className="govuk-list">
+                  <ul
+                    className="govuk-list"
+                    data-testid="publication-page--release-name-list"
+                  >
                     {data.publication.releases.slice(1).map((elem, index) => (
-                      <li key={elem.id}>
+                      <li key={elem.id} data-testid="item-internal">
                         <Link
                           to={`/themes/${theme}/${topic}/${
                             data.publication.slug
@@ -229,7 +233,7 @@ class PublicationPage extends Component<Props, State> {
                       </li>
                     ))}
                     {data.publication.legacyReleases.map(elem => (
-                      <li key={elem.id}>
+                      <li key={elem.id} data-testid="item-external">
                         <a href={elem.url}>{elem.description}</a>
                       </li>
                     ))}
@@ -242,13 +246,13 @@ class PublicationPage extends Component<Props, State> {
                 <Date value={data.published} />
               </h4>
 
-              <h4>
+              <h4 data-testid="publication-page--last-updated">
                 <span className="govuk-caption-m">Last updated: </span>
                 <Date value={data.updates[0].on} />
 
                 <Details summary={`See all ${data.updates.length} updates`}>
                   {data.updates.map(elem => (
-                    <div>
+                    <div data-testid="publication-page--update-element">
                       <Date
                         className="govuk-body govuk-!-font-weight-bold"
                         value={elem.on}
@@ -280,6 +284,7 @@ class PublicationPage extends Component<Props, State> {
                     href={`${baseUrl.data}/downloads/${
                       data.publication.slug
                     }/csv/`}
+                    data-testid="publication-page--download-csvs"
                   >
                     Download .csv files
                   </a>

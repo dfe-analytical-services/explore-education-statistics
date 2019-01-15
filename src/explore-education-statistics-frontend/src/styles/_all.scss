@@ -1,4 +1,6 @@
+@import './variables';
 @import './reset';
+@import './layout';
 @import './typography';
 
 // Patterns that aren't in Frontend
@@ -8,4 +10,3 @@
 
 // DfE patterns
 @import './patterns/dfe-stats-indicators';
-@import './patterns/dfe-collapsible-sections';
