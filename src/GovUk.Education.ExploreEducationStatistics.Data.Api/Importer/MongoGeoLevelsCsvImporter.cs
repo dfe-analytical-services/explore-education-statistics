@@ -4,13 +4,13 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
 {
-    public class MongoGeoLevelsCsvImporter : MongoCsvImporter<TidyDataGeographic>
+    public class MongoGeoLevelsCsvImporter : MongoCsvImporter
     {
         public MongoGeoLevelsCsvImporter(string path = "") : base(path)
         {
         }
 
-        protected override TidyDataGeographic TidyDataFromCsv(string csvLine, List<string> headers)
+        protected override TidyData TidyDataFromCsv(string csvLine, List<string> headers)
         {
             var headerValues = new[]
             {

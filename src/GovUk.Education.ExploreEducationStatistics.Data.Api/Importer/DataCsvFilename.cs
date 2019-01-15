@@ -10,6 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
         exclusion_natcharacteristics,
         schpupnum_geoglevels,
         schpupnum_lacharacteristics,
-        schpupnum_natcharacteristicsv
+        schpupnum_natcharacteristics
     }
 }

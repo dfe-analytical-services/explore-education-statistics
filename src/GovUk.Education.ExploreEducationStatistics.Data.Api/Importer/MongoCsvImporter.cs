@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
 {
-    public abstract class MongoCsvImporter<T> where T : TidyData
+    public abstract class MongoCsvImporter : IMongoCsvImporter
     {
         private readonly string _path;
 
@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
             _path = path;
         }
 
-        public List<T> Data(DataCsvFilename dataCsvFilename)
+        public List<TidyData> Data(DataCsvFilename dataCsvFilename)
         {
             var file = dataCsvFilename + ".csv";
             var directory = Directory.GetCurrentDirectory();
@@ -35,6 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
             return data.ToList();
         }
 
-        protected abstract T TidyDataFromCsv(string csvLine, List<string> headers);
+        protected abstract TidyData TidyDataFromCsv(string csvLine, List<string> headers);
     }
 }
