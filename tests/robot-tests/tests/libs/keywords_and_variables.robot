@@ -17,9 +17,9 @@ ${download_dir}    test-results/download
 ${env}        test   # default environment to test against. Can be "local", "test", "stage", "prod"
 ${url}        about:blank
 ${localUrl}   http://localhost:3000
-${testUrl}    https://educationstatisticstest.z6.web.core.windows.net/
-${stageUrl}   https://educationstatisticsstage.z6.web.core.windows.net/
-${prodUrl}    https://educationstatistics.z6.web.core.windows.net/
+${testUrl}    https://educationstatisticstest.z6.web.core.windows.net
+${stageUrl}   https://educationstatisticsstage.z6.web.core.windows.net
+${prodUrl}    https://educationstatistics.z6.web.core.windows.net
 
 *** Keywords ***
 setup configuration
@@ -35,7 +35,6 @@ user opens the browser
   go to    about:blank
 
 user opens chrome
-  ${c_opts} =     Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
   run keyword if    ${headless} == 1      user opens chrome headless
   #run keyword if    ${headless} == 1      user opens chrome with xvfb
   run keyword if    ${headless} == 0      user opens chrome without xvfb
@@ -47,6 +46,7 @@ user opens firefox
 
 # Requires chromedriver v2.31+ -- you can alternatively use "user opens chrome with xvfb"
 user opens chrome headless
+  ${c_opts} =     Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
   Call Method    ${c_opts}   add_argument    headless
   Call Method    ${c_opts}   add_argument    disable-gpu
   #Call Method    ${c_opts}   add_argument    no-sandbox

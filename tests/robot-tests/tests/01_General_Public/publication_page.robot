@@ -67,7 +67,7 @@ Release Name list should display API data
 
 Download CSV Zip and validate containing files
     [Documentation]  DFE-102
-    [Tags]  HappyPath
+    [Tags]  HappyPath   UnderConstruction
     user clicks link    Download .csv files
 
 
