@@ -2,7 +2,6 @@ import React from 'react';
 // import CollapsibleSection from '../components/CollapsibleSection';
 // import Details from '../components/Details';
 import Link from '../components/Link';
-import PrototypeIckleChart from './components/PrototypeIckleChart';
 import PrototypePage from './components/PrototypePage';
 import PrototypeSearchForm from './components/PrototypeSearchForm';
 import PrototypeTileWithChart from './components/PrototypeTileWithChart';
