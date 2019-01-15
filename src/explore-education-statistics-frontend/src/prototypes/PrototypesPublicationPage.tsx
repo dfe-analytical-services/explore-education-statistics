@@ -17,7 +17,7 @@ const PublicationPage = () => {
         <div className="govuk-grid-column-two-thirds">
           <strong className="govuk-tag"> This is the latest data </strong>
           <h1 className="govuk-heading-l">
-            Pupil absence data and statistics for schools in England
+            Explore pupil absence statistics for schools in England
           </h1>
           <p>
             This service helps parents, specialists and the public find
@@ -26,9 +26,8 @@ const PublicationPage = () => {
           </p>
 
           <p>
-            It allows you to find out about, view and download overall,
-            authorised and unauthorised absence data and statistics going back
-            to 2006/07 on the following levels:
+            Use this page to find and view statistical facts and figures for
+            state-funded schools and download the latest data files.
           </p>
 
           <details className="govuk-details">
@@ -40,29 +39,30 @@ const PublicationPage = () => {
             </summary>
             <div className="govuk-details__text">
               <p>
-                To help you analyse and understand the data and statistics under
-                the above each one is split into the following tabs:
+                Each section is divided into the following sections to help you
+                analyse, download and understand the related statistics and
+                data:
               </p>
 
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  Summary - includes the latest headline statistical insights
-                  and breakdowns
+                  Headlines - the latest statistical insights and chart
+                  breakdowns
                 </li>
                 <li>
-                  Further details - includes more detailed explanations, facts
-                  and figures
+                  Explanation - detailed explanations of related facts and
+                  figures
                 </li>
+                <li>Tables - view data tables for a 5-year period</li>
                 <li>
-                  Data and downloads - includes relevant data tables and
-                  download links to data files
+                  Data and downloads - links to download underlying data files
                 </li>
               </ul>
 
               <div className="govuk-inset-text">
                 <a href="">
-                  Find out more about our pupil absence data and statistics
-                  methodology and terminology
+                  Find out more about our pupil absence statistics methodology
+                  and terminology
                 </a>
               </div>
             </div>
