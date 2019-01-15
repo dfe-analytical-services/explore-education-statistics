@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
 
-        [HttpGet]
+        [HttpGet("seed")]
         public string Seed()
         {
             return "Inserted " + _dataService.Seed() + " rows";
