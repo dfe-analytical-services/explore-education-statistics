@@ -1,11 +1,10 @@
 import React from 'react';
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 import CollapsibleSection from '../components/CollapsibleSection';
 import Details from '../components/Details';
 import PrototypeDataSample from './components/PrototypeDataSample';
 import PrototypePage from './components/PrototypePage';
 
-const TestPage = () => {
+const PublicationPage = () => {
   return (
     <PrototypePage
       breadcrumbs={[
@@ -738,4 +737,4 @@ const TestPage = () => {
   );
 };
 
-export default TestPage;
+export default PublicationPage;
