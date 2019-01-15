@@ -68,8 +68,11 @@ Release Name list should display API data
 Download CSV Zip and validate containing files
     [Documentation]  DFE-102
     [Tags]  HappyPath
-    user clicks link    Download .csv files
-
+    ${csv_zip_link} =   get element attribute   css:[data-testid="publication-page--download-csvs"]     href
+    download file  ${csv_zip_link}  publication_page_csvs.zip
+    zip should contain file  publication_page_csvs.zip    absence_geoglevels.csv
+    zip should contain file  publication_page_csvs.zip    absence_lacharacteristics.csv
+    zip should contain file  publication_page_csvs.zip    absence_natcharacteristics.csv
 
 Validate 2015/2016 isn't labelled as latest data
     [Tags]  HappyPath
