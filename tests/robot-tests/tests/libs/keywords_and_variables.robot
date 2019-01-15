@@ -12,6 +12,8 @@ ${headless}   1
 ${timeout}    2
 ${implicit_wait}   2
 
+${download_dir}    test-results/download
+
 ${env}        test   # default environment to test against. Can be "local", "test", "stage", "prod"
 ${url}        about:blank
 ${localUrl}   http://localhost:3000
@@ -33,6 +35,7 @@ user opens the browser
   go to    about:blank
 
 user opens chrome
+  ${c_opts} =     Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
   run keyword if    ${headless} == 1      user opens chrome headless
   #run keyword if    ${headless} == 1      user opens chrome with xvfb
   run keyword if    ${headless} == 0      user opens chrome without xvfb
@@ -44,7 +47,6 @@ user opens firefox
 
 # Requires chromedriver v2.31+ -- you can alternatively use "user opens chrome with xvfb"
 user opens chrome headless
-  ${c_opts} =     Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
   Call Method    ${c_opts}   add_argument    headless
   Call Method    ${c_opts}   add_argument    disable-gpu
   #Call Method    ${c_opts}   add_argument    no-sandbox
@@ -99,12 +101,12 @@ user waits until page contains
   wait until page contains   ${pageText}
 
 user waits until page contains element
-  [Arguments]    ${pageText}
-  wait until page contains element  ${pageText}
+  [Arguments]    ${element}
+  wait until page contains element  ${element}
 
 user waits until page does not contain element
-  [Arguments]    ${pageText}
-  wait until page does not contain element  ${pageText}
+  [Arguments]    ${element}
+  wait until page does not contain element  ${element}
 
 user waits until element contains
   [Arguments]    ${element}    ${text}
@@ -112,6 +114,7 @@ user waits until element contains
 
 user checks element contains
   [Arguments]   ${element}    ${text}
+  wait until element contains  ${element}    ${text}
   element should contain    ${element}    ${text}
 
 user checks element does not contain
@@ -125,6 +128,10 @@ user waits until element is visible
 user checks element is visible
   [Arguments]   ${element}
   element should be visible   ${element}
+
+user checks element is not visible
+  [Arguments]   ${element}
+  element should not be visible   ${element}
 
 user checks checkbox is selected
   [Arguments]    ${checkbox}
@@ -146,6 +153,22 @@ user checks element is disabled
   [Arguments]   ${element}
   element should be disabled   ${element}
 
+user checks element should contain
+  [Arguments]   ${element}  ${text}
+  element should contain  ${element}    ${text}
+
+user checks element should not contain
+  [Arguments]   ${element}  ${text}
+  element should not contain  ${element}    ${text}
+
+user checks page contains element
+  [Arguments]  ${element}
+  page should contain element  ${element}
+
+user checks page does not contain element
+  [Arguments]  ${element}
+  page should not contain element  ${element}
+
 user clicks element
   [Arguments]     ${elementToClick}
   wait until page contains element  ${elementToClick}
@@ -156,18 +179,7 @@ user clicks link
   [Arguments]   ${text}
   click link  ${text}
 
-verify element should contain
-  [Arguments]   ${element}  ${text}
-  element should contain  ${element}    ${text}
+user checks element attribute value should be
+  [Arguments]   ${locator}  ${attribute}    ${expected}
+  element attribute value should be  ${locator}     ${attribute}   ${expected}
 
-verify element should not contain
-  [Arguments]   ${element}  ${text}
-  element should not contain  ${element}    ${text}
-
-verify page should contain element
-  [Arguments]  ${element}
-  page should contain element  ${element}
-
-verify page should not contain element
-  [Arguments]  ${element}
-  page should not contain element  ${element}

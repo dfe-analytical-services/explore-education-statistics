@@ -15,7 +15,7 @@ Usage: "./run_tests.py -e test"
 Usage: "./run_tests.py -b firefox"
 
 -f FILE|--file FILE : To run a specific test file or folder instead of the
-entire tests/ directory. Usage: "./run_tests.py -f tests/main.robot"
+entire tests/ directory. Usage: "./run_tests.py -f tests/directory/" OR "./run_tests.py -f tests/directory/suite.robot"
 
 -i INTERPRETER|--interp INTERPRETER : Run tests through a different interpreter
 than cpython. Mainly for using pabot, which runs test suites in parallel.

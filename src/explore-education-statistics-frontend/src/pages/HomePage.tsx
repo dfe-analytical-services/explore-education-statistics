@@ -6,7 +6,7 @@ class HomePage extends Component {
     return (
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1>Explore education statistics</h1>
+          <h1 data-testid="home-page--heading">Explore education statistics</h1>
           <p>Use this service to:</p>
           <ul>
             <li>do something</li>

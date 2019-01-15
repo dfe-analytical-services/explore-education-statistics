@@ -217,9 +217,12 @@ class PublicationPage extends Component<Props, State> {
                 <span className="govuk-caption-m">Release name: </span>
                 {data.releaseName} {!release && <span>(latest data)</span>}
                 <Details summary={`See previous ${releaseCount} releases`}>
-                  <ul className="govuk-list">
+                  <ul
+                    className="govuk-list"
+                    data-testid="publication-page--release-name-list"
+                  >
                     {data.publication.releases.slice(1).map((elem, index) => (
-                      <li key={elem.id}>
+                      <li key={elem.id} data-testid="item-internal">
                         <Link
                           to={`/themes/${theme}/${topic}/${
                             data.publication.slug
@@ -230,7 +233,7 @@ class PublicationPage extends Component<Props, State> {
                       </li>
                     ))}
                     {data.publication.legacyReleases.map(elem => (
-                      <li key={elem.id}>
+                      <li key={elem.id} data-testid="item-external">
                         <a href={elem.url}>{elem.description}</a>
                       </li>
                     ))}
