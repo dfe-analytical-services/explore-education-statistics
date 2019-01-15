@@ -16,16 +16,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             _dataService = dataService;
         }
 
-        [HttpGet]
-        public ActionResult<List<TidyDataGeographic>> Get()
-        {
-            return _dataService.Get();
-        }
-        
-        [HttpGet("{laEstab}")]
-        public ActionResult<TidyDataGeographic> Get(string laEstab)
-        {
-            return _dataService.Get(laEstab);
-        }
+//        [HttpGet]
+//        public ActionResult<List<TidyDataGeographic>> Get()
+//        {
+//            return _dataService.Get();
+//        }
+//        
+//        [HttpGet("{laEstab}")]
+//        public ActionResult<TidyDataGeographic> Get(string laEstab)
+//        {
+//            return _dataService.GetLaEstab(laEstab);
+//        }
     }
-}
+} 

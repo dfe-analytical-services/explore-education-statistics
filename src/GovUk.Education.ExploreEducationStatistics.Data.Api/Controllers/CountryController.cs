@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,10 +14,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     public class CountryController : ControllerBase
     {
         private readonly ICsvReader _csvReader;
+        private readonly DataService _dataService;
+        private readonly IMapper _mapper;
 
-        public CountryController(ICsvReader csvReader)
+
+        public CountryController(ICsvReader csvReader, DataService dataService, IMapper mapper)
         {
             _csvReader = csvReader;
+            _dataService = dataService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -24,13 +31,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            return _csvReader.GeoLevels(publication + "_geoglevels", attributes)
-                .Where(x =>
+            var data = _dataService.Get("national").Where(x =>
                     (string.IsNullOrEmpty(schoolType) ||
                      string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
-                    (!year.HasValue || x.Year == year) &&
-                    x.Level.ToLower() == "national"
+                    (!year.HasValue || x.Year == year)
                 ).ToList();
+
+
+            return _mapper.Map<List<GeographicModel>>(data);
         }
 
         [HttpGet("{countryId}")]

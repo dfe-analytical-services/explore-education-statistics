@@ -16,15 +16,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _collection = database.GetCollection<TidyDataGeographic>("absence");
         }
 
-        public List<TidyDataGeographic> Get()
+        public List<TidyDataGeographic> Get(string level = "")
         {
             // TODO: Temp limit on query
-            var query = _collection.Find(x => x.Level == "national" && x.SchoolType == "Total").ToList();
+            var query = _collection.Find(x => x.Level == level).ToList();
 
             return query;
         }
 
-        public TidyDataGeographic Get(string laEstab)
+        public TidyDataGeographic GetLaEstab(string laEstab)
         {
             return _collection.Find(elem => elem.School.LaEstab == laEstab).FirstOrDefault();
         }

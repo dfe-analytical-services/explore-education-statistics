@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -46,6 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddSingleton<ICsvReader, CsvReader>();
             
             services.AddCors();
+            services.AddAutoMapper(); 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -6,20 +6,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
         {
         }
 
-        public School(string estab, string laestab, string acadType, string acadOpend)
+        public School(string estab, string laestab, string academyType, string academyOpenDate)
         {
             this.estab = estab;
             this.laestab = laestab;
-            acad_type = acadType;
-            acad_opend = acadOpend;
+            AcademyType = academyType;
+            AcademyOpenDate = academyOpenDate;
         }
 
         public string estab { get; set; }
         
         public string laestab { get; set; }
         
-        public string acad_type { get; set; }
+        public string AcademyType { get; set; }
         
-        public string acad_opend { get; set; }
+        public string AcademyOpenDate { get; set; }
     }
 }
