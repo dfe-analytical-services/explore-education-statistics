@@ -5,12 +5,7 @@ import FormRadio from '../FormRadio';
 describe('FormRadio', () => {
   test('renders correctly with required props', () => {
     const { container } = render(
-      <FormRadio
-        name="test"
-        id="test-radio"
-        label="Test radio"
-        value="true"
-      />,
+      <FormRadio name="test" id="test-radio" label="Test radio" value="true" />,
     );
 
     expect(container.innerHTML).toMatchSnapshot();

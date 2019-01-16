@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FunctionComponent } from 'react';
+import React, { ChangeEventHandler, FunctionComponent } from 'react';
 
 interface Props {
   checked?: boolean;
@@ -6,7 +6,7 @@ interface Props {
   id: string;
   label: string;
   name: string;
-  onChange?: (event: ChangeEvent) => void;
+  onChange?: ChangeEventHandler<HTMLInputElement>;
   value: string;
 }
 
@@ -16,6 +16,7 @@ const FormRadio: FunctionComponent<Props> = ({
   id,
   label,
   name,
+  onChange,
   value,
 }) => {
   return (
@@ -26,6 +27,7 @@ const FormRadio: FunctionComponent<Props> = ({
         checked={checked}
         id={id}
         name={name}
+        onChange={onChange}
         type="radio"
         value={value}
       />

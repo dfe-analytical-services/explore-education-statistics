@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FunctionComponent } from 'react';
+import React, { ChangeEventHandler, FunctionComponent } from 'react';
 
 interface Props {
   checked?: boolean;
@@ -6,7 +6,7 @@ interface Props {
   hint?: string;
   label: string;
   name: string;
-  onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
+  onChange?: ChangeEventHandler<HTMLInputElement>;
   value: string | string[] | number;
 }
 
