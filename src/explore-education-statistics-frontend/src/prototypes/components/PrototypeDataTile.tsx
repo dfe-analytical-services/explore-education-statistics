@@ -7,12 +7,7 @@ interface Props {
   fromText: string;
 }
 
-const PrototypeDataTile = ({
-  period,
-  heading,
-  percent,
-  fromText,
-}: Props) => (
+const PrototypeDataTile = ({ period, heading, percent, fromText }: Props) => (
   <div className="dfe-dash-tiles__tile">
     <h3 className="govuk-heading-m">
       {heading}
