@@ -11,7 +11,7 @@ interface Props {
 const PrototypeTileWithChart = ({ heading, subheading, percent }: Props) => (
   <div className="dfe-dash-tiles__tile">
     <h2 className="govuk-heading-m">
-      <Link to="publication">{heading}</Link>
+      <Link to="/prototypes/publication">{heading}</Link>
     </h2>
 
     <div className="govuk-grid-row">

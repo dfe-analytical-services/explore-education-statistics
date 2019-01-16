@@ -8,8 +8,8 @@ const PublicationPage = () => {
   return (
     <PrototypePage
       breadcrumbs={[
-        { text: 'Schools', link: 'topic' },
-        { text: 'Absence and exclusions', link: 'theme' },
+        { text: 'Schools', link: '/prototypes/theme' },
+        { text: 'Absence and exclusions', link: '/prototypes/topic' },
         { text: 'Absence statistics for schools in England', link: '#' },
       ]}
     >
