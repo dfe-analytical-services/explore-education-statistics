@@ -1,0 +1,8 @@
+@import '~govuk-frontend/settings/all';
+@import '~govuk-frontend/helpers/all';
+
+.filterMenu {
+  background-color: govuk-colour('grey-4');
+  border: 2px solid govuk-colour('grey-2');
+  padding: govuk-spacing(4);
+}

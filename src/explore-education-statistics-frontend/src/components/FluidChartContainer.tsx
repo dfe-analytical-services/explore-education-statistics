@@ -6,7 +6,10 @@ interface Props {
   className?: string;
 }
 
-const FluidChartContainer: FunctionComponent<Props> = ({ className, children }) => {
+const FluidChartContainer: FunctionComponent<Props> = ({
+  className,
+  children,
+}) => {
   return (
     <FluidWidthContainer className={className}>
       <ResponsiveContainer>{children}</ResponsiveContainer>

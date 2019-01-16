@@ -6,11 +6,12 @@ interface Props {
   className?: string;
 }
 
-const FluidWidthContainer: FunctionComponent<Props> = ({ children, className }) => {
+const FluidWidthContainer: FunctionComponent<Props> = ({
+  children,
+  className,
+}) => {
   return (
-    <div className={classNames(styles.wrapper, className)}>
-      {children}
-    </div>
+    <div className={classNames(styles.wrapper, className)}>{children}</div>
   );
 };
 
