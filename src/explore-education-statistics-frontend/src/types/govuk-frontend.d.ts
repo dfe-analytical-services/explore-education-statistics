@@ -12,4 +12,3 @@ declare module 'govuk-frontend' {
 declare module 'govuk-frontend/components/tabs/tabs' {
   export default GovUkModule;
 }
-
