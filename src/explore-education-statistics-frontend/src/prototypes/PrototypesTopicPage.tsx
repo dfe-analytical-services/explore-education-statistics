@@ -3,6 +3,7 @@ import React from 'react';
 // import Details from '../components/Details';
 // import PrototypeDataSample from './components/PrototypeDataSample';
 import Link from '../components/Link';
+import PrototypeDataTile from './components/PrototypeDataTile';
 import PrototypePage from './components/PrototypePage';
 import PrototypeSearchForm from './components/PrototypeSearchForm';
 import PrototypeTileWithChart from './components/PrototypeTileWithChart';
@@ -112,6 +113,44 @@ const TopicPage = () => {
           percent="72.7%"
         />
       </div>
+      <hr />
+      <h2 className="govuk-heading-m">
+        Key indicators for schools{' '}
+        <Link to="#" className="govuk-body">
+          (change)
+        </Link>
+      </h2>
+      <p>
+        These are some key indicators for schools. You can{' '}
+        <Link to="#">change what you see here</Link> according to your
+        requirements. <Link to="#">Find out more</Link>
+      </p>
+      <h3 className="govuk-heading-s">
+        <Link to="#">Find an indicator &#x25BC;</Link>
+      </h3>
+      <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">
+        <PrototypeDataTile
+          period="2017/18"
+          heading="EYFSP good level of development"
+          percent="70.3%"
+          fromText="Early years foundation state profile results"
+        />
+        <PrototypeDataTile
+          period="2016/17"
+          heading="KS2 SAT expected standard"
+          percent="3.4%"
+          fromText="National curriculum assessments at Key Stage 2 in England"
+        />
+        <PrototypeDataTile
+          period="2016/17"
+          heading="KS4 GCSE average attainment 8 score"
+          percent="1.3%"
+          fromText="GCSE and equivalent results: 2017 to 2018 (provisional)"
+        />
+      </div>
+      <a href="#" className="govuk-button">
+        Explore statistics
+      </a>
     </PrototypePage>
   );
 };
