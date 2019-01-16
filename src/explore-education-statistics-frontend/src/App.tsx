@@ -18,7 +18,7 @@ import ThemePage from './pages/ThemePage';
 import ThemesPage from './pages/ThemesPage';
 import TopicPage from './pages/TopicPage';
 import TopicsPage from './pages/TopicsPage';
-import { PrototypeRoutes } from './prototypes/PrototypesHomePage';
+import { PrototypeRoutes } from './prototypes/PrototypeIndexPage';
 
 const AppRoutes = () => (
   <Switch>

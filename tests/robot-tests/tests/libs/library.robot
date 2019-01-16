@@ -3,7 +3,8 @@ Library     SeleniumLibrary  timeout=${timeout}  implicit_wait=${implicit_wait}
 Library     OperatingSystem
 #Library     XvfbRobot           # sudo apt install xvfb + pip install robotframework-xvfb
 
-Library    library.py
+Library    setup_utilities.py
+Library    utilities.py
 Library    file_operations.py
 
 *** Variables ***
@@ -13,24 +14,15 @@ ${headless}   1
 ${timeout}    2
 ${implicit_wait}   2
 
-${download_dir}    test-results/download
-
-${env}        test   # default environment to test against. Can be "local", "test", "stage", "prod"
 ${url}        about:blank
-${localUrl}   http://localhost:3000
-${testUrl}    https://educationstatisticstest.z6.web.core.windows.net
-${stageUrl}   https://educationstatisticsstage.z6.web.core.windows.net
-${prodUrl}    https://educationstatistics.z6.web.core.windows.net
 
 *** Keywords ***
-setup configuration
+perform setup
   install chromedriver
   add lib dir to path  # Need chromedriver in PATH to run selenium!
-  ${newUrl} =   get URL for env  ${env}
-  set global variable  ${url}   ${newUrl}
 
 user opens the browser
-  setup configuration
+  perform setup
   run keyword if    "${browser}" == "chrome"    user opens chrome
   run keyword if    "${browser}" == "firefox"   user opens firefox
   go to    about:blank

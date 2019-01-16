@@ -38,7 +38,7 @@
   display: flex;
   flex-basis: 23%;
   flex-direction: column;
-  justify-content: space-between;
+  // justify-content: space-between;
   margin: 2% 2% 1% 0;
   padding: 20px;
   position: relative;
@@ -59,7 +59,9 @@
     position: absolute;
   }
 
-  strong {
+  .increase,
+  .decrease,
+  .level {
     color: $govuk-text-colour;
     font-size: 1.3rem;
     font-weight: normal;

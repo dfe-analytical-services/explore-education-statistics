@@ -9,6 +9,7 @@
   ],
   "jsRules": {},
   "rules": {
+    "array-type": [true, "array"],
     "jsx-boolean-value": false,
     "import-name": false,
     "interface-name": [true, "never-prefix"],

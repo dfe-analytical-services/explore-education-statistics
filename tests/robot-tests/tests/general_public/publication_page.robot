@@ -6,7 +6,7 @@ Documentation   DFE-115 Setup automated testing framework
 ...             DFE-102 General Public - Getting the data
 ...             DFE-103 General Public - Publication Page
 
-Resource    ../libs/keywords_and_variables.robot
+Resource    ../libs/library.robot
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser

@@ -1,4 +1,6 @@
 import React from 'react';
+import Tabs from '../../components/Tabs';
+import TabsSection from '../../components/TabsSection';
 import PrototypeChartSample from './PrototypeChartSample';
 import PrototypeTableSample from './PrototypeTableSample';
 
@@ -10,39 +12,43 @@ interface Props {
 const PrototypeDataSample = ({ sectionId, chartTitle }: Props) => {
   return (
     <>
-      <div className="govuk-tabs" data-module="tabs">
-        <ul className="govuk-tabs__list">
-          <li className="govuk-tabs__list-item">
-            <a
-              className="govuk-tabs__tab govuk-tabs__tab--selected"
-              href={`#${sectionId}ChartData`}
-            >
-              Summary
-            </a>
-          </li>
-          <li className="govuk-tabs__list-item">
-            <a className="govuk-tabs__tab" href={`#${sectionId}TableData`}>
-              Data tables
-            </a>
-          </li>
-          <li className="govuk-tabs__list-item">
-            <a className="govuk-tabs__tab" href={`#${sectionId}Downloads`}>
-              Data downloads
-            </a>
-          </li>
-        </ul>
-        <section className="govuk-tabs__panel" id={`${sectionId}ChartData`}>
+      <Tabs>
+        <TabsSection id={`${sectionId}ChartData`} title="Summary">
           <h2 className="govuk-heading-s">{`Chart showing ${chartTitle}`}</h2>
           <PrototypeChartSample />
-        </section>
-        <section
-          className="govuk-tabs__panel govuk-tabs__panel--hidden"
-          id={`${sectionId}TableData`}
-        >
+        </TabsSection>
+        <TabsSection id={`${sectionId}TableData`} title="Data tables">
           <h2 className="govuk-heading-s">{`Table showing ${chartTitle}`}</h2>
           <PrototypeTableSample />
-        </section>
-      </div>
+        </TabsSection>
+        <TabsSection id={`${sectionId}Downloads`} title="Data downloads">
+          <h2 className="govuk-heading-s">
+            Download overall absence data files
+          </h2>
+          <ul className="govuk-list">
+            <li>
+              <a className="govuk-link" href="#">
+                Excel table
+              </a>
+            </li>
+            <li>
+              <a className="govuk-link" href="#">
+                csv
+              </a>
+            </li>
+            <li>
+              <a className="govuk-link" href="#">
+                json
+              </a>
+            </li>
+            <li>
+              <a className="govuk-link" href="#">
+                API
+              </a>
+            </li>
+          </ul>
+        </TabsSection>
+      </Tabs>
     </>
   );
 };
