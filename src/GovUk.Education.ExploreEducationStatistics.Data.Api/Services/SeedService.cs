@@ -54,9 +54,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private int SeedLaCharacteristicData()
         {
+            var importer = new MongoLaCharacteristicCsvImporter();
+            
             var count = 0;
-            // TODO
-            return 0;
+            
+            count += Seed(importer, Publication.absence, DataCsvFilename.absence_lacharacteristics);
+            count += Seed(importer, Publication.exclusion, DataCsvFilename.exclusion_lacharacteristics);
+            count += Seed(importer, Publication.schpupnum, DataCsvFilename.schpupnum_lacharacteristics);
+            
+            return count;
         }
 
         private int Seed(IMongoCsvImporter mongoCsvImporter, Publication publication, DataCsvFilename dataCsvFilename)
