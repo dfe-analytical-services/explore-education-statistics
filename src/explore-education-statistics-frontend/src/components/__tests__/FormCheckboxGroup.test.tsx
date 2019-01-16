@@ -52,7 +52,7 @@ describe('FormCheckboxGroup', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('clicking a checkbox checks it', () => {
+  test('clicking an unchecked checkbox checks it', () => {
     const { getByLabelText } = render(
       <FormCheckboxGroup
         name="test-checkboxes"
@@ -69,8 +69,8 @@ describe('FormCheckboxGroup', () => {
     expect(checkbox.checked).toBe(true);
   });
 
-  test('clicking a checkbox un-checks it', () => {
-    const { container, getByLabelText } = render(
+  test('clicking a checked checkbox un-checks it', () => {
+    const { getByLabelText } = render(
       <FormCheckboxGroup
         name="test-checkboxes"
         options={[
@@ -91,5 +91,33 @@ describe('FormCheckboxGroup', () => {
     fireEvent.click(checkbox);
 
     expect(checkbox.checked).toBe(false);
+  });
+
+  test('clicking multiple checkboxes checks them all', () => {
+    const { getByLabelText } = render(
+      <FormCheckboxGroup
+        name="test-checkboxes"
+        options={[
+          { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
+          { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
+          { id: 'checkbox-3', label: 'Test checkbox 3', value: '3' },
+        ]}
+      />,
+    );
+
+    const checkbox1 = getByLabelText('Test checkbox 1') as HTMLInputElement;
+    const checkbox2 = getByLabelText('Test checkbox 2') as HTMLInputElement;
+    const checkbox3 = getByLabelText('Test checkbox 3') as HTMLInputElement;
+
+    expect(checkbox1.checked).toBe(false);
+    expect(checkbox2.checked).toBe(false);
+    expect(checkbox3.checked).toBe(false);
+
+    fireEvent.click(checkbox1);
+    fireEvent.click(checkbox2);
+
+    expect(checkbox1.checked).toBe(true);
+    expect(checkbox2.checked).toBe(true);
+    expect(checkbox3.checked).toBe(false);
   });
 });
