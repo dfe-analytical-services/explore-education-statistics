@@ -27,23 +27,35 @@ Usage: "./run_tests.py -p"
 
 """
 
+import os
 import sys
+import cProfile
+import pstats
+import scripts.keyword_profile as kp
+import scripts.warm_up_servers as warm_up_servers
 
 arguments = []
 headless = True
-environment = "test"
 happypath = False
 profile = False
+ci = False
 tests = "tests/"
 browser = "chrome"
 interp = "robot"
-url = ""
 
+env = "test"  # by default, run tests against test environment
+url = "about:blank"
+localUrl = "http://localhost:3000"
+testUrl = "https://educationstatisticstest.z6.web.core.windows.net"
+stageUrl = "https://educationstatisticsstage.z6.web.core.windows.net"
+prodUrl = "https://educationstatistics.z6.web.core.windows.net"
+
+# Process arguments
 for i in range(1, len(sys.argv)):
     if sys.argv[i] == "-v" or sys.argv[i] == "--visual":
         headless = False
     elif sys.argv[i] == "-e" or sys.argv[i] == "--env":
-        environment = sys.argv[i+1]  # NOTE: could add error checking...
+        env = sys.argv[i+1]  # NOTE: could add error checking...
     elif sys.argv[i] == "-h" or sys.argv[i] == "--happypath":
         happypath = True
     elif sys.argv[i] == "-b" or sys.argv[i] == "--browser":
@@ -54,6 +66,8 @@ for i in range(1, len(sys.argv)):
         interp = sys.argv[i+1]  # NOTE: could add error checking...
     elif sys.argv[i] == "-p" or sys.argv[i] == "--profile":
         profile = True
+    elif sys.argv[i] == "--ci":
+      ci = True
 
 arguments += ["--outputdir", "test-results/", "--exclude", "Failing",
               "--exclude", "UnderConstruction"]
@@ -61,34 +75,48 @@ arguments += ["--outputdir", "test-results/", "--exclude", "Failing",
 if happypath:
     arguments += ["--include", "HappyPath"]
 
+if ci:
+  arguments += ["--xunit", "xunit", "-v", "timeout:10", "-v", "implicit_wait:10"]
+
 if headless:
     arguments += ["-v", "headless:1"]
 else:
     arguments += ["-v", "headless:0"]
 
-arguments += ["-v", "env:" + environment]
+if env == 'local':
+    url = localUrl
+elif env == 'test':
+    url = testUrl
+elif env == 'stage' or env == "staging":
+    url = stageUrl
+elif env == "prod" or env == "live":
+    url = prodUrl
+else:
+    raise Exception('Invalid environment \"' + env + '\"! Must be \"local\", \"test\", \"stage\", or \"prod\"!')
+
+arguments += ["-v", "url:" + url]
 
 arguments += ["-v", "browser:" + browser]
 
 arguments += [tests]
 
+# Wait until environment is warmed up
+warm_up_servers.wait_for_server(url)
+
+# Run tests
 if interp == "robot":
     from robot import run_cli
     if profile:
         # Python profiling
-        import cProfile
         cProfile.run('run_cli(arguments)', 'profile-data')
-        import pstats
         stream = open('test-results/python-profiling-results.log', 'w')
         p = pstats.Stats('profile-data', stream=stream)
         p.sort_stats('time')
         # p.sort_stats('cumulative')
         p.print_stats()
-        import os
         os.remove('profile-data')
 
         # Keyword profiling
-        import scripts.keyword_profile as kp
         kp.run_keyword_profile('test-results/output.xml',
                                printresults=False,
                                writepath='test-results/keyword-profiling-results.log')
@@ -99,20 +127,15 @@ elif interp == "pabot":
     from pabot.pabot import main
     if profile:
         # Python profiling
-        import cProfile
         cProfile.run('main(arguments)', 'profile-data')
-
-        import pstats
         stream = open('test-results/python-profiling-results.log', 'w')
         p = pstats.Stats('profile-data', stream=stream)
         p.sort_stats('time')
         # p.sort_stats('cumulative')
         p.print_stats()
-        import os
         os.remove('profile-data')
 
         # Keyword profiling
-        import scripts.keyword_profile as kp
         kp.run_keyword_profile('test-results/output.xml',
                                printresults=False,
                                writepath='test-results/keyword-profiling-results.log')

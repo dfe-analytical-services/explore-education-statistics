@@ -11,15 +11,3 @@ def install_chromedriver():
 def add_lib_dir_to_path():
   os.environ["PATH"] += os.pathsep + os.getcwd() + os.sep + 'lib'
   # BuiltIn().log_to_console('PATH: ' + os.environ["PATH"])
-
-def get_url_for_env(env):
-  if env == "local":
-    return BuiltIn().get_variable_value("${localUrl}")
-  elif env == "test":
-    return BuiltIn().get_variable_value("${testUrl}")
-  elif env == "stage":
-    return BuiltIn().get_variable_value("${stageUrl}")
-  elif env == "prod":
-    return BuiltIn().get_variable_value("${prodUrl}")
-  else:
-    raise AssertionError("Invalid environment \"" + env + "\"!")
