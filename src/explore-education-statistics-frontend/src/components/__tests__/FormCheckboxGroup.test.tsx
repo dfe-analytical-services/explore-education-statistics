@@ -56,9 +56,7 @@ describe('FormCheckboxGroup', () => {
     const { getByLabelText } = render(
       <FormCheckboxGroup
         name="test-checkboxes"
-        options={[
-          { id: 'checkbox-1', label: 'Test checkbox', value: '1' },
-        ]}
+        options={[{ id: 'checkbox-1', label: 'Test checkbox', value: '1' }]}
       />,
     );
 
@@ -68,7 +66,7 @@ describe('FormCheckboxGroup', () => {
 
     fireEvent.click(checkbox);
 
-    expect(checkbox.checked).toBe(true)
+    expect(checkbox.checked).toBe(true);
   });
 
   test('clicking a checkbox un-checks it', () => {
@@ -76,7 +74,12 @@ describe('FormCheckboxGroup', () => {
       <FormCheckboxGroup
         name="test-checkboxes"
         options={[
-          { id: 'checkbox-1', label: 'Test checkbox', value: '1', checked: true },
+          {
+            id: 'checkbox-1',
+            label: 'Test checkbox',
+            value: '1',
+            checked: true,
+          },
         ]}
       />,
     );
