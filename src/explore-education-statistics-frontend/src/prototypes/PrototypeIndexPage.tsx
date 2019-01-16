@@ -6,12 +6,14 @@ import PageHeader from '../components/PageHeader';
 import PrototypePageBanner from './components/PrototypePageBanner';
 import PrototypeLocalAuthorityDataTable from './local-authority/PrototypeLocalAuthorityDataTable';
 import PublicationPage from './PrototypePublicationPage';
+import StartPage from './PrototypeStartPage';
 import ThemePage from './PrototypeThemePage';
 import TopicPage from './PrototypeTopicPage';
 
 export const PrototypeRoutes = () => (
   <>
-    <Route exact path="/prototypes" component={PrototypeHomePage} />
+    <Route exact path="/prototypes" component={PrototypeIndexPage} />
+    <Route exact path="/prototypes/start" component={StartPage} />
     <Route exact path="/prototypes/publication" component={PublicationPage} />
     <Route exact path="/prototypes/theme" component={ThemePage} />
     <Route exact path="/prototypes/topic" component={TopicPage} />
@@ -23,7 +25,7 @@ export const PrototypeRoutes = () => (
   </>
 );
 
-export const PrototypeHomePage = () => {
+export const PrototypeIndexPage = () => {
   return (
     <>
       <PageHeader />
@@ -38,9 +40,12 @@ export const PrototypeHomePage = () => {
           id="main-content"
           role="main"
         >
-          <h1>Prototypes</h1>
+          <h1>Prototypes index page</h1>
 
           <ul>
+            <li>
+              <Link to="/prototypes/start">Start page</Link>
+            </li>
             <li>
               <Link to="/prototypes/topic">Topic page</Link>
             </li>
