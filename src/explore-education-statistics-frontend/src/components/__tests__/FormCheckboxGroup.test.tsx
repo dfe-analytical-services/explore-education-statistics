@@ -75,10 +75,10 @@ describe('FormCheckboxGroup', () => {
         name="test-checkboxes"
         options={[
           {
+            checked: true,
             id: 'checkbox-1',
             label: 'Test checkbox',
             value: '1',
-            checked: true,
           },
         ]}
       />,

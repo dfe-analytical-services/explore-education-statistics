@@ -36,6 +36,35 @@ class FormCheckboxGroup extends Component<Props, State> {
     new Checkboxes(this.ref.current).init();
   }
 
+  private isChecked({ value, checked = false }: CheckboxOption) {
+    if (this.state.values[value] !== undefined) {
+      return this.state.values[value];
+    }
+
+    return checked;
+  }
+
+  private handleChange = ({ value, checked = false }: CheckboxOption) => {
+    const isChecked =
+      this.state.values[value] !== undefined
+        ? this.state.values[value]
+        : checked;
+
+    this.setState(
+      {
+        values: {
+          ...this.state.values,
+          [value]: !isChecked,
+        },
+      },
+      () => {
+        if (this.props.onChange) {
+          this.props.onChange(this.state.values);
+        }
+      },
+    );
+  };
+
   public render() {
     return (
       <div className="govuk-checkboxes" ref={this.ref}>
@@ -51,28 +80,6 @@ class FormCheckboxGroup extends Component<Props, State> {
       </div>
     );
   }
-
-  private isChecked({ value, checked = false }: CheckboxOption) {
-    if (this.state.values[value] !== undefined) {
-      return this.state.values[value];
-    }
-
-    return checked;
-  }
-
-  private handleChange = ({ value, checked = false }: CheckboxOption) => {
-    const isChecked =
-      this.state.values[value] !== undefined
-        ? this.state.values[value]
-        : checked;
-
-    this.setState({
-      values: {
-        ...this.state.values,
-        [value]: !isChecked,
-      },
-    });
-  };
 }
 
 export default FormCheckboxGroup;
