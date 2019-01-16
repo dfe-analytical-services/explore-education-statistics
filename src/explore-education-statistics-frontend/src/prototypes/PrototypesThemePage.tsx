@@ -2,6 +2,7 @@ import React from 'react';
 // import CollapsibleSection from '../components/CollapsibleSection';
 // import Details from '../components/Details';
 import Link from '../components/Link';
+import PrototypeDataTile from './components/PrototypeDataTile';
 import PrototypePage from './components/PrototypePage';
 import PrototypeSearchForm from './components/PrototypeSearchForm';
 import PrototypeTileWithChart from './components/PrototypeTileWithChart';
@@ -92,116 +93,24 @@ const ThemePage = () => {
         <Link to="#">Find an indicator &#x25BC;</Link>
       </h3>
       <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">
-        <div className="dfe-dash-tiles__tile">
-          <h3 className="govuk-heading-m">
-            Permanent exclusion rate
-            <span className="govuk-caption-m date-range govuk-tag">
-              2016/17
-            </span>
-          </h3>
-          <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
-            4.7%
-          </span>
-          <p className="govuk-body">
-            <strong className="increase">
-              +0.4
-              <abbr aria-label="Percentage points" title="Percentage points">
-                ppt
-              </abbr>
-            </strong>
-            more than 2015/16
-            <br />
-            <a className="referenceLink" href="/local-authorities/sheffield">
-              From: Early years foundation state profile results
-            </a>
-          </p>
-          <details className="govuk-details">
-            <summary className="govuk-details__summary">
-              <span className="govuk-details__summary-text">
-                What does this mean?
-              </span>
-            </summary>
-            <div className="govuk-details__text">
-              Permanent exclusion rate is the adipisicing elit. Dolorum hic
-              nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
-            </div>
-          </details>
-        </div>
-
-        <div className="dfe-dash-tiles__tile">
-          <h3 className="govuk-heading-m">
-            Fixed period exlusion rate
-            <span className="govuk-caption-m date-range govuk-tag">
-              2016/17
-            </span>
-          </h3>
-          <div>
-            <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
-              3.4%
-            </span>
-            <p className="govuk-body">
-              <strong className="level">
-                0
-                <abbr aria-label="Percentage points" title="Percentage points">
-                  ppt
-                </abbr>
-              </strong>
-              the same as 2015/16
-              <br />
-              <a className="referenceLink" href="/local-authorities/sheffield">
-                From: National curriculum assessments at key stage 2 in England
-              </a>
-            </p>
-          </div>
-          <details className="govuk-details">
-            <summary className="govuk-details__summary">
-              <span className="govuk-details__summary-text">
-                What does this mean?
-              </span>
-            </summary>
-            <div className="govuk-details__text">
-              Fixed period exlusion rateis the adipisicing elit. Dolorum hic
-              nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
-            </div>
-          </details>
-        </div>
-
-        <div className="dfe-dash-tiles__tile">
-          <h3 className="govuk-heading-m">
-            One or more fixed period exclusion
-            <span className="govuk-caption-m date-range govuk-tag">
-              2016/17
-            </span>
-          </h3>
-          <div>
-            <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
-              1.3%
-            </span>
-            <p className="govuk-body">
-              <strong className="decrease">
-                -0.4
-                <abbr aria-label="Percentage points" title="Percentage points">
-                  ppt
-                </abbr>
-              </strong>
-              more than 2015/16 <br />
-              <a className="referenceLink" href="/local-authorities/sheffield">
-                From: GCSE and equivalent results: 2017 to 2018 (provisional)
-              </a>
-            </p>
-          </div>
-          <details className="govuk-details">
-            <summary className="govuk-details__summary">
-              <span className="govuk-details__summary-text">
-                What does this mean?
-              </span>
-            </summary>
-            <div className="govuk-details__text">
-              One or more fixed period exclusionis the adipisicing elit. Dolorum
-              hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
-            </div>
-          </details>
-        </div>
+        <PrototypeDataTile
+          period="2016/17"
+          heading="Permanent exclusion rate"
+          percent="4.7%"
+          fromText="Early years foundation state profile results"
+        />
+        <PrototypeDataTile
+          period="2016/17"
+          heading="Fixed period exclusion rate"
+          percent="3.4%"
+          fromText="National curriculum assessments at Key Stage 2 in England"
+        />
+        <PrototypeDataTile
+          period="2016/17"
+          heading="One or more fixed period exclusion"
+          percent="1.3%"
+          fromText="GCSE and equivalent results: 2017 to 2018 (provisional)"
+        />
       </div>
       <a href="#" className="govuk-button">
         Explore statistics
