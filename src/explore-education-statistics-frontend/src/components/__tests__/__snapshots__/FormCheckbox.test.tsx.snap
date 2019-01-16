@@ -8,7 +8,7 @@ exports[`FormCheckbox renders correctly when \`hint\` is provided 1`] = `
          id="test-checkbox"
          name="test"
          type="checkbox"
-         value="test-checkbox-value"
+         value="true"
   >
   <label class="govuk-label govuk-checkboxes__label"
          for="test-checkbox"
