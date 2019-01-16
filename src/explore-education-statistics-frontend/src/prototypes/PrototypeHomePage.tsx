@@ -18,18 +18,10 @@ const HomePage = () => {
             to="/prototypes/theme"
             className="govuk-heading-m govuk-!-margin-bottom-0"
           >
-            Schools (under 16 years)
+            Schools
           </Link>
           <p className="govuk-caption-m govuk-!-margin-top-0">
             A wide range of statistical data from Schools in England
-          </p>
-        </div>
-        <div className="govuk-grid-column-one-third dfe-dash-tiles__til">
-          <Link to="#" className="govuk-heading-m govuk-!-margin-bottom-0">
-            16+ education
-          </Link>
-          <p className="govuk-caption-m govuk-!-margin-top-0">
-            Repudiandae nam officiis suscipit!
           </p>
         </div>
         <div className="govuk-grid-column-one-third dfe-dash-tiles__til">
@@ -38,6 +30,14 @@ const HomePage = () => {
           </Link>
           <p className="govuk-caption-m govuk-!-margin-top-0">
             Tempore, fuga nobis optio doloremque perspiciatis
+          </p>
+        </div>
+        <div className="govuk-grid-column-one-third dfe-dash-tiles__til">
+          <Link to="#" className="govuk-heading-m govuk-!-margin-bottom-0">
+            16+ education
+          </Link>
+          <p className="govuk-caption-m govuk-!-margin-top-0">
+            Repudiandae nam officiis suscipit!
           </p>
         </div>
       </div>
