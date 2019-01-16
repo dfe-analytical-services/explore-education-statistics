@@ -15,6 +15,8 @@ This was created in order to help testers get started quickly on a new project, 
 
 * Python3 (which should include pip3)
 
+Then ensure python3 and pip3 are included in your PATH environment variable
+
 Then install pipenv
 ```
 pip3 install pipenv
