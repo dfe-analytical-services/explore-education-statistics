@@ -6,7 +6,7 @@ import PrototypePage from './components/PrototypePage';
 import PrototypeSearchForm from './components/PrototypeSearchForm';
 // import PrototypeTileWithChart from './components/PrototypeTileWithChart';
 
-const HomePage = () => {
+const HomePageV2 = () => {
   return (
     <PrototypePage>
       <h1 className="govuk-heading-l">Explore education statistics</h1>
@@ -28,7 +28,7 @@ const HomePage = () => {
         </div>
         <div className="govuk-grid-column-one-third dfe-dash-tiles__til">
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <Link to="#">16+ education</Link>
+            <Link to="#">Further and higher education</Link>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-0">
             Data from further education, higher education and apprenticeships in
@@ -37,7 +37,7 @@ const HomePage = () => {
         </div>
         <div className="govuk-grid-column-one-third dfe-dash-tiles__til">
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <Link to="#">Social care</Link>
+            <Link to="#">Children and young people</Link>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-0">
             Data from social care in England including number of children,
@@ -63,4 +63,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default HomePageV2;

@@ -13,10 +13,8 @@ const ThemePage = () => {
       <h1 className="govuk-heading-l">Schools</h1>
       <p className="govuk-body">
         Here you can find DfE stats for schools, customise and download as excel
-        files, and access them via an API. <a href="#">Find out more</a>
-      </p>
-      <p className="govuk-body">
-        You can also see our statistics for <a href="#">16+ education</a> and{' '}
+        files, and access them via an API <a href="#">find out more</a>. You can
+        also see our statistics for <a href="#">16+ education</a> and{' '}
         <a href="#">social care</a>.
       </p>
       <PrototypeSearchForm />
@@ -83,7 +81,7 @@ const ThemePage = () => {
             href="publication"
             className="govuk-heading-s govuk-!-margin-bottom-0"
           >
-            School and pupil numbers
+            Teacher numbers
           </a>
           <p className="govuk-caption-m govuk-!-margin-top-0">
             School capacity, admission appeals

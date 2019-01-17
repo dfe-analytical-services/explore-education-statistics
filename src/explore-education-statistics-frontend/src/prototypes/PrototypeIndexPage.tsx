@@ -6,6 +6,7 @@ import PageHeader from '../components/PageHeader';
 import PrototypePageBanner from './components/PrototypePageBanner';
 import PrototypeLocalAuthorityDataTable from './local-authority/PrototypeLocalAuthorityDataTable';
 import HomePage from './PrototypeHomePage';
+import HomePageV2 from './PrototypeHomePageV2';
 import PublicationPage from './PrototypePublicationPage';
 import StartPage from './PrototypeStartPage';
 import ThemePage from './PrototypeThemePage';
@@ -16,6 +17,7 @@ export const PrototypeRoutes = () => (
     <Route exact path="/prototypes" component={PrototypeIndexPage} />
     <Route exact path="/prototypes/start" component={StartPage} />
     <Route exact path="/prototypes/home" component={HomePage} />
+    <Route exact path="/prototypes/home-v2" component={HomePageV2} />
     <Route exact path="/prototypes/publication" component={PublicationPage} />
     <Route exact path="/prototypes/theme" component={ThemePage} />
     <Route exact path="/prototypes/topic" component={TopicPage} />
@@ -50,6 +52,11 @@ export const PrototypeIndexPage = () => {
             </li>
             <li>
               <Link to="/prototypes/home">Home page</Link>
+            </li>
+            <li>
+              <Link to="/prototypes/home-v2">
+                Home page - alternative headings
+              </Link>
             </li>
             <li>
               <Link to="/prototypes/theme">Theme page</Link>
