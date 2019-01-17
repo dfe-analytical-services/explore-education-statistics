@@ -1,10 +1,14 @@
 import React, { Component } from 'react';
+import { Helmet } from 'react-helmet';
 import Link from '../components/Link';
 
 class HomePage extends Component {
   public render() {
     return (
       <div className="govuk-grid-row">
+        <Helmet>
+          <title>Explore Education Statistics - GOV.UK</title>
+        </Helmet>
         <div className="govuk-grid-column-two-thirds">
           <h1 data-testid="home-page--heading">Explore education statistics</h1>
           <p>Use this service to:</p>
