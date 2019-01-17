@@ -54,8 +54,8 @@ const HomePage = () => {
         </div>
       </div>
 
-      <Link to="#" className="govuk-button">
-        Explore our statistics
+      <Link to="#" className="govuk-button govuk-!-margin-top-9">
+        Explore all our statistics
       </Link>
     </PrototypePage>
   );
