@@ -1,7 +1,6 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 
@@ -26,20 +25,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return query;
         }
 
-        public IEnumerable<TableToolData> GetTableToolData()
+        public IMongoCollection<TidyData> GetCollectionForPublication(Guid publication)
         {
-            var query = _database.GetCollection<TidyDataGeographic>("absence")
-                .Find(x => x.Level == "national" && x.SchoolType == SchoolType.Total.ToString())
-                .ToList();
-
-            var mappedResults = query.Select(item => new TableToolData
-            {
-                Domain = item.Year.ToString(),
-                Range = item.Attributes.Where(pair => pair.Key.Contains("_exact") || pair.Key.Contains("_percent"))
-                    .ToDictionary(pair => pair.Key, pair => pair.Value)
-            });
-            
-            return mappedResults;
+            return _database.GetCollection<TidyData>(publication.ToString());
         }
     }
 }

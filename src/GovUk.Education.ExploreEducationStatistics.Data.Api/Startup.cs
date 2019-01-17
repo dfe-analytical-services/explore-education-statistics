@@ -44,6 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 
             services.AddScoped<DataService>();
             services.AddScoped<SeedService>();
+            services.AddScoped<TableBuilderService>();
             services.AddSingleton<ICsvReader, CsvReader>();
             
             services.AddCors();

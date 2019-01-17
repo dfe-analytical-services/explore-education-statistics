@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
@@ -10,17 +11,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     [ApiController]
     public class TableToolController : ControllerBase
     {
-        private readonly DataService _dataService;
+        private readonly TableBuilderService _tableBuilderService;
 
-        public TableToolController(DataService dataService)
+        public TableToolController(TableBuilderService tableBuilderService)
         {
-            _dataService = dataService;
+            _tableBuilderService = tableBuilderService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<TableToolData>> Get()
+        [HttpGet("{publicationId}/{schoolType}/{level}")]
+        public ActionResult<TableToolResult> Get(string publicationId,
+            SchoolType schoolType,
+            Level level = Level.National)
         {
-            return _dataService.GetTableToolData().ToList();
+            return _tableBuilderService.Get(Guid.Parse(publicationId), schoolType, level);
         }
     }
 }
