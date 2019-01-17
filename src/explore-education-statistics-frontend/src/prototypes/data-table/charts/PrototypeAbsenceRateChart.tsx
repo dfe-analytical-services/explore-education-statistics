@@ -1,5 +1,13 @@
 import React from 'react';
-import { CartesianGrid, Label, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
+import {
+  CartesianGrid,
+  Label,
+  Line,
+  LineChart,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import FluidChartContainer from '../../../components/FluidChartContainer';
 import absenceRateData from '../test-data/absenceRateData';
 

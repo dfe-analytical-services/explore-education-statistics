@@ -1,6 +1,8 @@
 import React, { FunctionComponent } from 'react';
 import Button from '../../../components/Button';
-import FormCheckboxGroup, { CheckboxGroupChangeEventHandler } from '../../../components/FormCheckboxGroup';
+import FormCheckboxGroup, {
+  CheckboxGroupChangeEventHandler,
+} from '../../../components/FormCheckboxGroup';
 import styles from './FilterMenu.module.scss';
 import MenuDetails from './MenuDetails';
 

@@ -59,8 +59,8 @@ class PrototypeNationalDataTable extends Component<{}, State> {
 
         <ul>
           <li>
-            You can explore all the DfE statistics available at national level here.
-            You can use our step by step guide, or dive straight in.
+            You can explore all the DfE statistics available at national level
+            here. You can use our step by step guide, or dive straight in.
           </li>
           <li>
             Once you've chosen your data you can view it by year, school type,
