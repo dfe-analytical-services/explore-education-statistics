@@ -9,10 +9,14 @@ declare module 'govuk-frontend' {
   export function initAll(): void;
 }
 
-declare module 'govuk-frontend/components/tabs/tabs' {
+declare module 'govuk-frontend/components/checkboxes/checkboxes' {
   export default GovUkModule;
 }
 
-declare module 'govuk-frontend/components/checkboxes/checkboxes' {
+declare module 'govuk-frontend/components/radios/radios' {
+  export default GovUkModule;
+}
+
+declare module 'govuk-frontend/components/tabs/tabs' {
   export default GovUkModule;
 }

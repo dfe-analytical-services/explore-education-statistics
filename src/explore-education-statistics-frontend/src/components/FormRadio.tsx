@@ -2,43 +2,40 @@ import React, { ChangeEventHandler, FunctionComponent } from 'react';
 
 interface Props {
   checked?: boolean;
-  id: string;
   hint?: string;
+  id: string;
   label: string;
   name: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
-  value: string | string[] | number;
+  value: string;
 }
 
-const FormCheckbox: FunctionComponent<Props> = ({
+const FormRadio: FunctionComponent<Props> = ({
   checked,
-  id,
   hint,
+  id,
   label,
   name,
   onChange,
   value,
 }) => {
   return (
-    <div className="govuk-checkboxes__item">
+    <div className="govuk-radios__item">
       <input
         aria-describedby={hint ? `${id}-item-hint` : undefined}
-        className="govuk-checkboxes__input"
+        className="govuk-radios__input"
         checked={checked}
         id={id}
         name={name}
         onChange={onChange}
-        type="checkbox"
+        type="radio"
         value={value}
       />
-      <label className="govuk-label govuk-checkboxes__label" htmlFor={id}>
+      <label className="govuk-label govuk-radios__label" htmlFor={id}>
         {label}
       </label>
       {hint && (
-        <span
-          id={`${id}-item-hint`}
-          className="govuk-hint govuk-checkboxes__hint"
-        >
+        <span id={`${id}-item-hint`} className="govuk-hint govuk-radios__hint">
           {hint}
         </span>
       )}
@@ -46,4 +43,4 @@ const FormCheckbox: FunctionComponent<Props> = ({
   );
 };
 
-export default FormCheckbox;
+export default FormRadio;

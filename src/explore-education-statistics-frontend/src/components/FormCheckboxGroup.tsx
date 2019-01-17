@@ -44,7 +44,7 @@ class FormCheckboxGroup extends Component<Props, State> {
     return checked;
   }
 
-  private handleChange = ({ value, checked = false }: CheckboxOption) => {
+  private handleChange({ value, checked = false }: CheckboxOption) {
     const isChecked =
       this.state.values[value] !== undefined
         ? this.state.values[value]
@@ -63,7 +63,7 @@ class FormCheckboxGroup extends Component<Props, State> {
         }
       },
     );
-  };
+  }
 
   public render() {
     return (
@@ -73,7 +73,7 @@ class FormCheckboxGroup extends Component<Props, State> {
             {...option}
             name={name}
             key={option.id}
-            onChange={this.handleChange.bind(null, option)}
+            onChange={this.handleChange.bind(this, option)}
             checked={this.isChecked(option)}
           />
         ))}

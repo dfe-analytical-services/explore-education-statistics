@@ -1,16 +1,11 @@
 import React from 'react';
 import { render } from 'react-testing-library';
-import FormCheckbox from '../FormCheckbox';
+import FormRadio from '../FormRadio';
 
-describe('FormCheckbox', () => {
+describe('FormRadio', () => {
   test('renders correctly with required props', () => {
     const { container } = render(
-      <FormCheckbox
-        name="test"
-        id="test-checkbox"
-        label="Test checkbox"
-        value="true"
-      />,
+      <FormRadio name="test" id="test-radio" label="Test radio" value="true" />,
     );
 
     expect(container.innerHTML).toMatchSnapshot();
@@ -18,22 +13,22 @@ describe('FormCheckbox', () => {
 
   test('renders correctly when `hint` is provided', () => {
     const { container, getByLabelText, getByText } = render(
-      <FormCheckbox
+      <FormRadio
         name="test"
         hint="Click me to proceed"
-        id="test-checkbox"
-        label="Test checkbox"
+        id="test-radio"
+        label="Test radio"
         value="true"
       />,
     );
 
     expect(getByText('Click me to proceed')).toHaveAttribute(
       'id',
-      'test-checkbox-item-hint',
+      'test-radio-item-hint',
     );
-    expect(getByLabelText('Test checkbox')).toHaveAttribute(
+    expect(getByLabelText('Test radio')).toHaveAttribute(
       'aria-describedby',
-      'test-checkbox-item-hint',
+      'test-radio-item-hint',
     );
 
     expect(container.innerHTML).toMatchSnapshot();
