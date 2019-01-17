@@ -12,10 +12,7 @@ const HomePage = () => {
       <h1 className="govuk-heading-xl">Explore education statistics</h1>
       <p>
         Use this service to search for and find out about Department for
-        Education (DfE) official statistics for England. The statistics can be
-        viewed as reports, or you can customise and download as excel or .csv
-        files. The data can also be accessed via an API.{' '}
-        <Link to="#">Find out more</Link>
+        Education (DfE) official statistics for England.
       </p>
       <PrototypeSearchForm />
       <h2 className="govuk-heading-l govuk-!-margin-top-9">
@@ -53,8 +50,18 @@ const HomePage = () => {
           </p>
         </div>
       </div>
-
-      <Link to="#" className="govuk-button govuk-!-margin-top-9">
+      <h2 className="govuk-heading-m govuk-!-margin-top-9">
+        Exploring the data
+      </h2>
+      <p>
+        The statistics can be viewed as reports, or you can customise and
+        download as excel or .csv files . The data can also be accessed via an
+        API.
+      </p>
+      <Link
+        to="/prototypes/local-authority/data-table"
+        className="govuk-button"
+      >
         Explore all our statistics
       </Link>
     </PrototypePage>

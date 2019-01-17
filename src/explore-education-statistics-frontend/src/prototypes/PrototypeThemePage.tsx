@@ -150,7 +150,7 @@ const ThemePage = () => {
           fromText="GCSE and equivalent results: 2017 to 2018 (provisional)"
         />
       </div>
-      <a href="#" className="govuk-button">
+      <a href="/prototypes/local-authority/data-table" className="govuk-button">
         Explore statistics
       </a>
     </PrototypePage>
