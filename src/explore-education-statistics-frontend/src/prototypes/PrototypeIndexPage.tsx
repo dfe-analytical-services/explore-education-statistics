@@ -5,6 +5,7 @@ import Link from '../components/Link';
 import PageHeader from '../components/PageHeader';
 import PrototypePageBanner from './components/PrototypePageBanner';
 import PrototypeLocalAuthorityDataTable from './data-table/PrototypeLocalAuthorityDataTable';
+import PrototypeNationalDataTable from './data-table/PrototypeNationalDataTable';
 import HomePage from './PrototypeHomePage';
 import HomePageV2 from './PrototypeHomePageV2';
 import PublicationPage from './PrototypePublicationPage';
@@ -23,7 +24,12 @@ export const PrototypeRoutes = () => (
     <Route exact path="/prototypes/topic" component={TopicPage} />
     <Route
       exact
-      path="/prototypes/local-authority/data-table"
+      path="/prototypes/data-table/national"
+      component={PrototypeNationalDataTable}
+    />
+    <Route
+      exact
+      path="/prototypes/data-table/local-authority"
       component={PrototypeLocalAuthorityDataTable}
     />
   </>
@@ -67,9 +73,19 @@ export const PrototypeIndexPage = () => {
             <li>
               <Link to="/prototypes/publication">Publication page</Link>
             </li>
+          </ul>
+
+          <h2>Data table</h2>
+
+          <ul>
             <li>
-              <Link to="/prototypes/local-authority/data-table">
-                Local authority data table
+              <Link to="/prototypes/data-table/local-authority">
+                Data table - local authority
+              </Link>
+            </li>
+            <li>
+              <Link to="/prototypes/data-table/national">
+                Data table - national level
               </Link>
             </li>
           </ul>

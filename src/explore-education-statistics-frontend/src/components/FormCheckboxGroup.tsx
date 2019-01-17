@@ -10,13 +10,15 @@ interface CheckboxOption {
   checked?: boolean;
 }
 
+export type CheckboxGroupChangeEventHandler = (
+  state: {
+    [value: string]: boolean;
+  },
+) => void;
+
 type Props = {
   name: string;
-  onChange?: (
-    state: {
-      [value: string]: boolean;
-    },
-  ) => void;
+  onChange?: CheckboxGroupChangeEventHandler;
   options: CheckboxOption[];
 } & Partial<FieldSetProps>;
 

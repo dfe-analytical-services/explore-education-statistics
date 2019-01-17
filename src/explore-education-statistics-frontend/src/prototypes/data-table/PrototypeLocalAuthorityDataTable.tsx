@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import Button from '../../components/Button';
-import FormCheckboxGroup from '../../components/FormCheckboxGroup';
 import FormRadioGroup from '../../components/FormRadioGroup';
 import PageHeading from '../../components/PageHeading';
 import Tabs from '../../components/Tabs';
@@ -8,8 +6,7 @@ import TabsSection from '../../components/TabsSection';
 import PrototypePage from '../components/PrototypePage';
 import PrototypeAbsenceRateChart from './charts/PrototypeAbsenceRateChart';
 import PrototypeExclusionsChart from './charts/PrototypeExclusionsChart';
-import MenuDetails from './components/MenuDetails';
-import styles from './PrototypeLocalAuthorityDataTable.module.scss';
+import FilterMenu from './components/FilterMenu';
 import absenceRateData from './test-data/absenceRateData';
 import exclusionRateData from './test-data/exclusionRateData';
 
@@ -79,47 +76,7 @@ class PrototypeLocalAuthorityDataTable extends Component<{}, State> {
 
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-one-quarter">
-            <div className={styles.filterMenu}>
-              <h3 className="govuk-heading-s">
-                Choose publications or indicators
-              </h3>
-
-              <form>
-                <div className="govuk-form-group">
-                  <input type="text" className="govuk-input" />
-                </div>
-
-                <Button>Search</Button>
-              </form>
-
-              <MenuDetails summary="School statistics (under 16)" open>
-                <MenuDetails summary="Absence and exclusions" open>
-                  <FormCheckboxGroup
-                    name="absenceAndExclusions"
-                    onChange={this.handleCheckboxChange}
-                    options={[
-                      {
-                        checked: true,
-                        id: 'pupilAbsence',
-                        label: 'Pupil absence',
-                        value: 'PUPIL_ABSENCE',
-                      },
-                      {
-                        checked: true,
-                        id: 'exclusions',
-                        label: 'Exclusions',
-                        value: 'EXCLUSIONS',
-                      },
-                    ]}
-                  />
-                </MenuDetails>
-                <MenuDetails summary="Capacity and admissions" />
-                <MenuDetails summary="Results" />
-                <MenuDetails summary="School and pupil numbers" />
-                <MenuDetails summary="School finance" />
-                <MenuDetails summary="Teacher numbers" />
-              </MenuDetails>
-            </div>
+            <FilterMenu onChange={this.handleCheckboxChange} />
           </div>
           <div className="govuk-grid-column-three-quarters">
             <p>View by:</p>
