@@ -82,7 +82,7 @@ const TopicPage = () => {
       <h2 className="govuk-heading-m">
         Key indicators for Sheffield{' '}
         <Link to="#" className="govuk-body">
-          (change key indicators)
+          (change location)
         </Link>
       </h2>
       <p>
