@@ -20,9 +20,9 @@ const TopicPage = () => {
         Explore pupil absence statistics for schools in England
       </h1>
       <p className="govuk-body">
-        Here you can find DfE stats for absence and exlusions, and access them
-        as reports, customise and download as excel files, and access them via
-        an API. <a href="#">Find out more</a>
+        Here you can find DfE statistics for absence and exlusions. You can
+        access the statistics as reports, customise and download them as excel
+        files, and access them via an API. <a href="#">What is an API?</a>
       </p>
       <PrototypeSearchForm />
       <h2 className="govuk-heading-m">

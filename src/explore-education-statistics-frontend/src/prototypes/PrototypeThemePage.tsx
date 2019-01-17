@@ -12,9 +12,12 @@ const ThemePage = () => {
     <PrototypePage breadcrumbs={[{ text: 'Schools' }]}>
       <h1 className="govuk-heading-l">Schools</h1>
       <p className="govuk-body">
-        Here you can find DfE stats for schools, customise and download as excel
-        files, and access them via an API <a href="#">find out more</a>. You can
-        also see our statistics for <a href="#">16+ education</a> and{' '}
+        Here you can find DfE statistics for schools. You can customise and
+        download the statistics as excel files, and access them via an API.{' '}
+        <a href="#">What is an API?</a>
+      </p>
+      <p>
+        You can also see our statistics for <a href="#">16+ education</a> and{' '}
         <a href="#">social care</a>.
       </p>
       <PrototypeSearchForm />
