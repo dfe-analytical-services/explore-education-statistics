@@ -8,6 +8,7 @@ import PrototypePage from '../components/PrototypePage';
 import PrototypeAbsenceRateChart from './charts/PrototypeAbsenceRateChart';
 import PrototypeExclusionsChart from './charts/PrototypeExclusionsChart';
 import FilterMenu from './components/FilterMenu';
+import Button from './PrototypeDataTableVerticalLayout';
 import absenceRateData from './test-data/absenceRateData';
 import exclusionRateData from './test-data/exclusionRateData';
 
@@ -76,7 +77,20 @@ class PrototypeDataTableNational extends Component<{}, State> {
 
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-one-quarter">
-            <FilterMenu onChange={this.handleCheckboxChange} />
+            <FilterMenu
+              onChange={this.handleCheckboxChange}
+              beforeMenu={
+                <form>
+                  <h3 className="govuk-heading-s">Search for statistics</h3>
+
+                  <div className="govuk-form-group">
+                    <input type="text" className="govuk-input" />
+                  </div>
+
+                  <Button>Search</Button>
+                </form>
+              }
+            />
           </div>
           <div className="govuk-grid-column-three-quarters">
             <p>View by:</p>

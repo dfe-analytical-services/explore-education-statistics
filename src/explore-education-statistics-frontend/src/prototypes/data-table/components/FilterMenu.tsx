@@ -1,5 +1,4 @@
-import React, { FunctionComponent } from 'react';
-import Button from '../../../components/Button';
+import React, { FunctionComponent, ReactNode } from 'react';
 import FormCheckboxGroup, {
   CheckboxGroupChangeEventHandler,
 } from '../../../components/FormCheckboxGroup';
@@ -7,21 +6,14 @@ import styles from './FilterMenu.module.scss';
 import MenuDetails from './MenuDetails';
 
 interface Props {
+  beforeMenu?: ReactNode;
   onChange: CheckboxGroupChangeEventHandler;
 }
 
-const FilterMenu: FunctionComponent<Props> = ({ onChange }) => {
+const FilterMenu: FunctionComponent<Props> = ({ beforeMenu, onChange }) => {
   return (
     <div className={styles.filterMenu}>
-      <h3 className="govuk-heading-s">Choose publications or indicators</h3>
-
-      <form>
-        <div className="govuk-form-group">
-          <input type="text" className="govuk-input" />
-        </div>
-
-        <Button>Search</Button>
-      </form>
+      {beforeMenu}
 
       <MenuDetails summary="School statistics (under 16)" open>
         <MenuDetails summary="Absence and exclusions" open>

@@ -6,6 +6,7 @@ import PageHeader from '../components/PageHeader';
 import PrototypePageBanner from './components/PrototypePageBanner';
 import PrototypeDataTableLocalAuthority from './data-table/PrototypeDataTableLocalAuthority';
 import PrototypeDataTableNational from './data-table/PrototypeDataTableNational';
+import PrototypeDataTableVerticalLayout from './data-table/PrototypeDataTableVerticalLayout';
 import HomePage from './PrototypeHomePage';
 import HomePageV2 from './PrototypeHomePageV2';
 import PublicationPage from './PrototypePublicationPage';
@@ -31,6 +32,11 @@ export const PrototypeRoutes = () => (
       exact
       path="/prototypes/data-table/local-authority"
       component={PrototypeDataTableLocalAuthority}
+    />
+    <Route
+      exact
+      path="/prototypes/data-table/vertical-layout"
+      component={PrototypeDataTableVerticalLayout}
     />
   </>
 );
@@ -86,6 +92,11 @@ export const PrototypeIndexPage = () => {
             <li>
               <Link to="/prototypes/data-table/national">
                 Data table - national level
+              </Link>
+            </li>
+            <li>
+              <Link to="/prototypes/data-table/vertical-layout">
+                Data table - vertical layout
               </Link>
             </li>
           </ul>
