@@ -4,10 +4,11 @@ import FormCheckbox from './FormCheckbox';
 import FormFieldSet, { FieldSetProps } from './FormFieldSet';
 
 interface CheckboxOption {
+  checked?: boolean;
+  hint?: string;
   id: string;
   label: string;
   value: string;
-  checked?: boolean;
 }
 
 export type CheckboxGroupChangeEventHandler = (

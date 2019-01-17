@@ -4,7 +4,10 @@ import React, { Component, createRef } from 'react';
 import FormFieldSet, { FieldSetProps } from './FormFieldSet';
 import FormRadio from './FormRadio';
 
+export type RadioGroupChangeEventHandler = (value: string) => void;
+
 interface RadioOption {
+  hint?: string;
   id: string;
   label: string;
   value: string;
@@ -13,12 +16,12 @@ interface RadioOption {
 type Props = {
   inline?: boolean;
   name: string;
-  onChange?: (value: string | null) => void;
+  onChange?: RadioGroupChangeEventHandler;
   options: RadioOption[];
 } & Partial<FieldSetProps>;
 
 interface State {
-  selectedValue: string | null;
+  selectedValue: string;
 }
 
 class FormRadioGroup extends Component<Props, State> {
@@ -28,7 +31,7 @@ class FormRadioGroup extends Component<Props, State> {
   };
 
   public state: State = {
-    selectedValue: null,
+    selectedValue: '',
   };
 
   private ref = createRef<HTMLInputElement>();
