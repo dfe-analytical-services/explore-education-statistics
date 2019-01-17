@@ -13,12 +13,15 @@ let idCounter = 0;
 const FormFieldSet: FunctionComponent<FieldSetProps> = ({
   children,
   hint,
-  hintId = `formFieldSetHint-${idCounter += 1}`,
+  hintId = `formFieldSetHint-${(idCounter += 1)}`,
   legend,
   legendSize = 'm',
 }) => {
   return (
-    <fieldset className="govuk-fieldset" aria-describedby={hint ? hintId : undefined}>
+    <fieldset
+      className="govuk-fieldset"
+      aria-describedby={hint ? hintId : undefined}
+    >
       <legend
         className={classNames(
           'govuk-fieldset__legend',

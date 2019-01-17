@@ -38,17 +38,25 @@ describe('FormFieldSet', () => {
       </FormFieldSet>,
     );
 
-    expect(getByText('All fields are required').id).toContain('formFieldSetHint');
+    expect(getByText('All fields are required').id).toContain(
+      'formFieldSetHint',
+    );
   });
 
   test('setting `legendSize` to xl applies class correctly', () => {
     const { container } = render(
-      <FormFieldSet legend="Fill the form" hint="All fields are required" legendSize="xl">
+      <FormFieldSet
+        legend="Fill the form"
+        hint="All fields are required"
+        legendSize="xl"
+      >
         <input type="text" name="test-input-1" />
         <input type="text" name="test-input-2" />
       </FormFieldSet>,
     );
 
-    expect(container.querySelector('legend')).toHaveClass('govuk-fieldset__legend--xl');
+    expect(container.querySelector('legend')).toHaveClass(
+      'govuk-fieldset__legend--xl',
+    );
   });
 });
