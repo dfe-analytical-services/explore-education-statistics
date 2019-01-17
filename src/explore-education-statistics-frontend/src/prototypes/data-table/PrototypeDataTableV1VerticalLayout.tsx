@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import Button from '../../components/Button';
+import { CheckboxGroupChangeEventHandler } from '../../components/FormCheckboxGroup';
 import FormRadioGroup from '../../components/FormRadioGroup';
 import PageHeading from '../../components/PageHeading';
 import Tabs from '../../components/Tabs';
@@ -7,7 +9,6 @@ import PrototypePage from '../components/PrototypePage';
 import PrototypeAbsenceRateChart from './charts/PrototypeAbsenceRateChart';
 import PrototypeExclusionsChart from './charts/PrototypeExclusionsChart';
 import FilterMenu from './components/FilterMenu';
-import Button from './PrototypeDataTableVerticalLayout';
 import absenceRateData from './test-data/absenceRateData';
 import exclusionRateData from './test-data/exclusionRateData';
 
@@ -21,7 +22,7 @@ interface State {
   };
 }
 
-class PrototypeDataTableLocalAuthority extends Component<{}, State> {
+class PrototypeDataTableV1VerticalLayout extends Component<{}, State> {
   public state: State = {
     dataToggle: 'CHARTS_TABLES',
     filters: {
@@ -30,7 +31,7 @@ class PrototypeDataTableLocalAuthority extends Component<{}, State> {
     },
   };
 
-  private handleCheckboxChange = (values: { [value: string]: boolean }) => {
+  private handleCheckboxChange: CheckboxGroupChangeEventHandler = values => {
     this.setState({
       filters: {
         ...this.state.filters,
@@ -50,18 +51,17 @@ class PrototypeDataTableLocalAuthority extends Component<{}, State> {
       <PrototypePage
         breadcrumbs={[
           { text: 'Education training and skills' },
-          { text: 'Local authorities' },
-          { text: 'Sheffield' },
+          { text: 'National level' },
           { text: 'Explore statistics' },
         ]}
         wide
       >
-        <PageHeading caption="Sheffield" heading="Explore statistics" />
+        <PageHeading caption="National level" heading="Explore statistics" />
 
         <ul>
           <li>
-            You can explore all the DfE statistics available for Sheffield here.
-            You can use our step by step guide, or dive straight in.
+            You can explore all the DfE statistics available at national level
+            here. You can use our step by step guide, or dive straight in.
           </li>
           <li>
             Once you've chosen your data you can view it by year, school type,
@@ -73,24 +73,26 @@ class PrototypeDataTableLocalAuthority extends Component<{}, State> {
           </li>
         </ul>
 
-        <h2>Find and compare statistics for Sheffield</h2>
+        <h2>Find and compare statistics at national level</h2>
 
         <div className="govuk-grid-row">
-          <div className="govuk-grid-column-one-quarter">
-            <FilterMenu
-              onChange={this.handleCheckboxChange}
-              beforeMenu={
-                <form>
-                  <div className="govuk-form-group">
-                    <input type="text" className="govuk-input" />
-                  </div>
+          <div className="govuk-grid-column-full">
+            <FilterMenu onChange={this.handleCheckboxChange} beforeMenu={(
+              <form>
+                <h3 className="govuk-heading-s">Search for statistics</h3>
 
-                  <Button>Search</Button>
-                </form>
-              }
-            />
+                <div className="govuk-form-group">
+                  <input type="text" className="govuk-input govuk-input--width-20" />
+                </div>
+
+                <Button>Search</Button>
+              </form>
+            )} />
           </div>
-          <div className="govuk-grid-column-three-quarters">
+        </div>
+
+        <div className="govuk-grid-row">
+          <div className="govuk-grid-column-full">
             <p>View by:</p>
 
             <Tabs>
@@ -269,4 +271,4 @@ class PrototypeDataTableLocalAuthority extends Component<{}, State> {
   }
 }
 
-export default PrototypeDataTableLocalAuthority;
+export default PrototypeDataTableV1VerticalLayout;

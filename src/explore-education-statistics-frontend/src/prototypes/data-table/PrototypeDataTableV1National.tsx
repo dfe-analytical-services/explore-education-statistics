@@ -8,7 +8,7 @@ import PrototypePage from '../components/PrototypePage';
 import PrototypeAbsenceRateChart from './charts/PrototypeAbsenceRateChart';
 import PrototypeExclusionsChart from './charts/PrototypeExclusionsChart';
 import FilterMenu from './components/FilterMenu';
-import Button from './PrototypeDataTableVerticalLayout';
+import Button from './PrototypeDataTableV1VerticalLayout';
 import absenceRateData from './test-data/absenceRateData';
 import exclusionRateData from './test-data/exclusionRateData';
 
@@ -22,7 +22,7 @@ interface State {
   };
 }
 
-class PrototypeDataTableNational extends Component<{}, State> {
+class PrototypeDataTableV1National extends Component<{}, State> {
   public state: State = {
     dataToggle: 'CHARTS_TABLES',
     filters: {
@@ -271,4 +271,4 @@ class PrototypeDataTableNational extends Component<{}, State> {
   }
 }
 
-export default PrototypeDataTableNational;
+export default PrototypeDataTableV1National;
