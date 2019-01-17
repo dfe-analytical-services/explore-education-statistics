@@ -21,7 +21,7 @@ interface State {
   };
 }
 
-class PrototypeNationalDataTable extends Component<{}, State> {
+class PrototypeDataTableNational extends Component<{}, State> {
   public state: State = {
     dataToggle: 'CHARTS_TABLES',
     filters: {
@@ -257,4 +257,4 @@ class PrototypeNationalDataTable extends Component<{}, State> {
   }
 }
 
-export default PrototypeNationalDataTable;
+export default PrototypeDataTableNational;

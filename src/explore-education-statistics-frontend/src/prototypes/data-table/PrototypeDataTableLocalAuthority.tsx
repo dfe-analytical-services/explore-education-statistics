@@ -20,7 +20,7 @@ interface State {
   };
 }
 
-class PrototypeLocalAuthorityDataTable extends Component<{}, State> {
+class PrototypeDataTableLocalAuthority extends Component<{}, State> {
   public state: State = {
     dataToggle: 'CHARTS_TABLES',
     filters: {
@@ -257,4 +257,4 @@ class PrototypeLocalAuthorityDataTable extends Component<{}, State> {
   }
 }
 
-export default PrototypeLocalAuthorityDataTable;
+export default PrototypeDataTableLocalAuthority;

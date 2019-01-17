@@ -4,8 +4,8 @@ import Breadcrumbs from '../components/Breadcrumbs';
 import Link from '../components/Link';
 import PageHeader from '../components/PageHeader';
 import PrototypePageBanner from './components/PrototypePageBanner';
-import PrototypeLocalAuthorityDataTable from './data-table/PrototypeLocalAuthorityDataTable';
-import PrototypeNationalDataTable from './data-table/PrototypeNationalDataTable';
+import PrototypeDataTableLocalAuthority from './data-table/PrototypeDataTableLocalAuthority';
+import PrototypeDataTableNational from './data-table/PrototypeDataTableNational';
 import HomePage from './PrototypeHomePage';
 import HomePageV2 from './PrototypeHomePageV2';
 import PublicationPage from './PrototypePublicationPage';
@@ -25,12 +25,12 @@ export const PrototypeRoutes = () => (
     <Route
       exact
       path="/prototypes/data-table/national"
-      component={PrototypeNationalDataTable}
+      component={PrototypeDataTableNational}
     />
     <Route
       exact
       path="/prototypes/data-table/local-authority"
-      component={PrototypeLocalAuthorityDataTable}
+      component={PrototypeDataTableLocalAuthority}
     />
   </>
 );
