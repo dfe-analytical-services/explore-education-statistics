@@ -12,7 +12,7 @@ import FilterMenu from './components/FilterMenu';
 import absenceRateData from './test-data/absenceRateData';
 import exclusionRateData from './test-data/exclusionRateData';
 
-type DataToggles = 'CHARTS_TABLES' | 'CHARTS' | 'TABLES';
+type DataToggles = 'CHARTS_TABLES' | 'CHARTS' | 'TABLES' | null;
 
 interface State {
   dataToggle: DataToggles;
@@ -24,7 +24,7 @@ interface State {
 
 class PrototypeDataTableV1VerticalLayout extends Component<{}, State> {
   public state: State = {
-    dataToggle: 'CHARTS_TABLES',
+    dataToggle: null,
     filters: {
       EXCLUSIONS: true,
       PUPIL_ABSENCE: true,

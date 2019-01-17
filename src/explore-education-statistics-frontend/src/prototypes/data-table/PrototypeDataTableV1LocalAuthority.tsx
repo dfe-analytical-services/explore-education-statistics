@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Button from '../../components/Button';
 import FormRadioGroup from '../../components/FormRadioGroup';
 import PageHeading from '../../components/PageHeading';
 import Tabs from '../../components/Tabs';
@@ -7,11 +8,10 @@ import PrototypePage from '../components/PrototypePage';
 import PrototypeAbsenceRateChart from './charts/PrototypeAbsenceRateChart';
 import PrototypeExclusionsChart from './charts/PrototypeExclusionsChart';
 import FilterMenu from './components/FilterMenu';
-import Button from './PrototypeDataTableV1VerticalLayout';
 import absenceRateData from './test-data/absenceRateData';
 import exclusionRateData from './test-data/exclusionRateData';
 
-type DataToggles = 'CHARTS_TABLES' | 'CHARTS' | 'TABLES';
+type DataToggles = 'CHARTS_TABLES' | 'CHARTS' | 'TABLES' | null;
 
 interface State {
   dataToggle: DataToggles;
@@ -23,7 +23,7 @@ interface State {
 
 class PrototypeDataTableV1LocalAuthority extends Component<{}, State> {
   public state: State = {
-    dataToggle: 'CHARTS_TABLES',
+    dataToggle: null,
     filters: {
       EXCLUSIONS: true,
       PUPIL_ABSENCE: true,
@@ -79,7 +79,7 @@ class PrototypeDataTableV1LocalAuthority extends Component<{}, State> {
           <div className="govuk-grid-column-one-quarter">
             <FilterMenu
               onChange={this.handleCheckboxChange}
-              beforeMenu={
+              beforeMenu={(
                 <form>
                   <div className="govuk-form-group">
                     <input type="text" className="govuk-input" />
@@ -87,7 +87,7 @@ class PrototypeDataTableV1LocalAuthority extends Component<{}, State> {
 
                   <Button>Search</Button>
                 </form>
-              }
+              )}
             />
           </div>
           <div className="govuk-grid-column-three-quarters">
