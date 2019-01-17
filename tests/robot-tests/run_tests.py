@@ -50,6 +50,9 @@ testUrl = "https://educationstatisticstest.z6.web.core.windows.net"
 stageUrl = "https://educationstatisticsstage.z6.web.core.windows.net"
 prodUrl = "https://educationstatistics.z6.web.core.windows.net"
 
+timeout = 10
+implicit_wait = 10
+
 # Process arguments
 for i in range(1, len(sys.argv)):
     if sys.argv[i] == "-v" or sys.argv[i] == "--visual":
@@ -76,7 +79,7 @@ if happypath:
     arguments += ["--include", "HappyPath"]
 
 if ci:
-  arguments += ["--xunit", "xunit", "-v", "timeout:10", "-v", "implicit_wait:10"]
+  arguments += ["--xunit", "xunit", "-v", "timeout:" + str(timeout), "-v", "implicit_wait:" + str(implicit_wait)]
 
 if headless:
     arguments += ["-v", "headless:1"]

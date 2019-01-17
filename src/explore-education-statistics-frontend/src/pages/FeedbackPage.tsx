@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
+import { Helmet } from 'react-helmet';
 
 class FeedbackPage extends Component {
   public render() {
     return (
       <div className="govuk-grid-row">
+        <Helmet>
+          <title>Feedback - GOV.UK</title>
+        </Helmet>
         <div className="govuk-grid-column-two-thirds">
           <h1>Feedback</h1>
           <form>

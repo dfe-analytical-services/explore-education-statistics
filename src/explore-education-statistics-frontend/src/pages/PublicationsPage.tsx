@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Helmet } from 'react-helmet';
 import { RouteComponentProps } from 'react-router';
 import api from '../api';
 import ContentItemList from '../components/ContentItemList';
@@ -27,6 +28,9 @@ class PublicationsPage extends Component<Props, State> {
 
     return (
       <div className="govuk-grid-row">
+        <Helmet>
+          <title>Publications - GOV.UK</title>
+        </Helmet>
         <div className="govuk-grid-column-two-thirds">
           <PageHeading caption="Publications" heading="Find publications" />
 

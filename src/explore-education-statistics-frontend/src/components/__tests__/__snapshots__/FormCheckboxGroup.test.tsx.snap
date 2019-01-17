@@ -47,6 +47,57 @@ exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
 
 `;
 
+exports[`FormCheckboxGroup renders correctly with legend 1`] = `
+
+<fieldset class="govuk-fieldset">
+  <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+    Choose some checkboxes
+  </legend>
+  <div class="govuk-checkboxes">
+    <div class="govuk-checkboxes__item">
+      <input class="govuk-checkboxes__input"
+             id="radio-1"
+             name="nodejs"
+             type="checkbox"
+             value="1"
+      >
+      <label class="govuk-label govuk-checkboxes__label"
+             for="radio-1"
+      >
+        Test radio 1
+      </label>
+    </div>
+    <div class="govuk-checkboxes__item">
+      <input class="govuk-checkboxes__input"
+             id="radio-2"
+             name="nodejs"
+             type="checkbox"
+             value="2"
+      >
+      <label class="govuk-label govuk-checkboxes__label"
+             for="radio-2"
+      >
+        Test radio 2
+      </label>
+    </div>
+    <div class="govuk-checkboxes__item">
+      <input class="govuk-checkboxes__input"
+             id="radio-3"
+             name="nodejs"
+             type="checkbox"
+             value="3"
+      >
+      <label class="govuk-label govuk-checkboxes__label"
+             for="radio-3"
+      >
+        Test radio 3
+      </label>
+    </div>
+  </div>
+</fieldset>
+
+`;
+
 exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
 
 <div class="govuk-checkboxes">
