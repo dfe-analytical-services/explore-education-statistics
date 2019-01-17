@@ -170,10 +170,10 @@ const PublicationPage = () => {
       <h2 className="govuk-heading-m">Contents</h2>
       <CollapsibleSection heading="Latest headline facts and figures - 2016/17">
         <ul className="govuk-list govuk-list--bullet">
-          <li>Pupils missed on average 8.2 school days</li>
-          <li>Overall and unauthorised absence rates up on previous year</li>
+          <li>pupils missed on average 8.2 school days</li>
+          <li>overall and unauthorised absence rates up on previous year</li>
           <li>
-            Unauthorised rise due to higher rates of unauthorised holidays
+            unauthorised rise due to higher rates of unauthorised holidays
           </li>
           <li>10% of pupils persistently absent during 2016/17</li>
         </ul>
