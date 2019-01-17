@@ -14,3 +14,7 @@
     @extend .govuk-table__caption;
   }
 }
+
+.govuk-table__row--striped {
+  background: govuk-colour('grey-4');
+}

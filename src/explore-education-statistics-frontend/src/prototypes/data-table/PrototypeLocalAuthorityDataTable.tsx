@@ -185,8 +185,13 @@ class PrototypeLocalAuthorityDataTable extends Component<{}, State> {
                           </tr>
                         </thead>
                         <tbody>
-                          {this.state.filters.EXCLUSIONS && (
+                          {this.state.filters.PUPIL_ABSENCE && (
                             <>
+                              <tr className="govuk-table__row--striped">
+                                <td colSpan={6} scope="rowgroup">
+                                  <strong>Pupil absence</strong>
+                                </td>
+                              </tr>
                               <tr>
                                 <td scope="row">Overall absence rate</td>
                                 {absenceRateData.map(({ Overall, name }) => (
@@ -209,11 +214,16 @@ class PrototypeLocalAuthorityDataTable extends Component<{}, State> {
                               </tr>
                             </>
                           )}
-                          {this.state.filters.PUPIL_ABSENCE && (
+                          {this.state.filters.EXCLUSIONS && (
                             <>
+                              <tr className="govuk-table__row--striped">
+                                <td colSpan={6} scope="rowgroup">
+                                  <strong>Exclusions</strong>
+                                </td>
+                              </tr>
                               <tr>
                                 <td scope="row">
-                                  Primary permanent exclusions rate
+                                  Primary permanent exclusion rate
                                 </td>
                                 {exclusionRateData.map(({ Primary, name }) => (
                                   <td key={name}>{`${Primary.toFixed(3)}%`}</td>
@@ -221,7 +231,7 @@ class PrototypeLocalAuthorityDataTable extends Component<{}, State> {
                               </tr>
                               <tr>
                                 <td scope="row">
-                                  Secondary permanent exclusions rate
+                                  Secondary permanent exclusion rate
                                 </td>
                                 {exclusionRateData.map(
                                   ({ Secondary, name }) => (
@@ -233,7 +243,7 @@ class PrototypeLocalAuthorityDataTable extends Component<{}, State> {
                               </tr>
                               <tr>
                                 <td scope="row">
-                                  Special permanent exclusions rate
+                                  Special permanent exclusion rate
                                 </td>
                                 {exclusionRateData.map(({ Special, name }) => (
                                   <td key={name}>{`${Special.toFixed(3)}%`}</td>
@@ -241,7 +251,7 @@ class PrototypeLocalAuthorityDataTable extends Component<{}, State> {
                               </tr>
                               <tr>
                                 <td scope="row">
-                                  Primary permanent exclusions rate
+                                  Primary permanent exclusion rate
                                 </td>
                                 {exclusionRateData.map(({ Total, name }) => (
                                   <td key={name}>{`${Total.toFixed(3)}%`}</td>
