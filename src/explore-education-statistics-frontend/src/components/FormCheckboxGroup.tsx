@@ -1,6 +1,7 @@
 import Checkboxes from 'govuk-frontend/components/checkboxes/checkboxes';
 import React, { Component, createRef } from 'react';
 import FormCheckbox from './FormCheckbox';
+import FormFieldSet, { FieldSetProps } from './FormFieldSet';
 
 interface CheckboxOption {
   id: string;
@@ -9,7 +10,7 @@ interface CheckboxOption {
   checked?: boolean;
 }
 
-interface Props {
+type Props = {
   name: string;
   onChange?: (
     state: {
@@ -17,7 +18,7 @@ interface Props {
     },
   ) => void;
   options: CheckboxOption[];
-}
+} & Partial<FieldSetProps>;
 
 interface State {
   values: {
@@ -26,6 +27,10 @@ interface State {
 }
 
 class FormCheckboxGroup extends Component<Props, State> {
+  public static defaultProps: Partial<Props> = {
+    legendSize: 'm',
+  };
+
   public state: State = {
     values: {},
   };
@@ -65,7 +70,7 @@ class FormCheckboxGroup extends Component<Props, State> {
     );
   }
 
-  public render() {
+  private renderCheckboxes() {
     return (
       <div className="govuk-checkboxes" ref={this.ref}>
         {this.props.options.map(option => (
@@ -78,6 +83,18 @@ class FormCheckboxGroup extends Component<Props, State> {
           />
         ))}
       </div>
+    );
+  }
+
+  public render() {
+    const { legend, ...restProps } = this.props;
+
+    return legend ? (
+      <FormFieldSet {...restProps} legend={legend}>
+        {this.renderCheckboxes()}
+      </FormFieldSet>
+    ) : (
+      this.renderCheckboxes()
     );
   }
 }
