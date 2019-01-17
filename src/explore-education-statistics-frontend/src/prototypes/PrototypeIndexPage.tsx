@@ -4,7 +4,7 @@ import Breadcrumbs from '../components/Breadcrumbs';
 import Link from '../components/Link';
 import PageHeader from '../components/PageHeader';
 import PrototypePageBanner from './components/PrototypePageBanner';
-import PrototypeLocalAuthorityDataTable from './local-authority/PrototypeLocalAuthorityDataTable';
+import PrototypeLocalAuthorityDataTable from './data-table/PrototypeLocalAuthorityDataTable';
 import HomePage from './PrototypeHomePage';
 import HomePageV2 from './PrototypeHomePageV2';
 import PublicationPage from './PrototypePublicationPage';

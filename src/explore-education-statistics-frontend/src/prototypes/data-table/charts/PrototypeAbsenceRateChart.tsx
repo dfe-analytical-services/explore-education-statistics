@@ -1,21 +1,13 @@
 import React from 'react';
-import {
-  CartesianGrid,
-  Label,
-  Line,
-  LineChart,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { CartesianGrid, Label, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
 import FluidChartContainer from '../../../components/FluidChartContainer';
-import exclusionRateData from '../test-data/exclusionRateData';
+import absenceRateData from '../test-data/absenceRateData';
 
-const PrototypeExclusionsChart = () => {
+const PrototypeAbsenceRateChart = () => {
   return (
     <FluidChartContainer>
       <LineChart
-        data={exclusionRateData}
+        data={absenceRateData}
         margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
@@ -23,17 +15,11 @@ const PrototypeExclusionsChart = () => {
           <Label position="bottom" offset={5} value="Academic year" />
         </XAxis>
         <YAxis scale="auto" unit="%">
-          <Label
-            angle={-90}
-            fontSize={14}
-            position="center"
-            value="Permanent exclusion percentage"
-            dx={-40}
-          />
+          <Label angle={-90} position="left" value="Absence rate" />
         </YAxis>
         <Line
           type="linear"
-          dataKey="Primary"
+          dataKey="Unauthorised"
           stroke="#28A197"
           strokeWidth="1"
           unit="%"
@@ -41,7 +27,7 @@ const PrototypeExclusionsChart = () => {
         />
         <Line
           type="linear"
-          dataKey="Secondary"
+          dataKey="Authorised"
           stroke="#6F72AF"
           strokeWidth="1"
           unit="%"
@@ -49,16 +35,8 @@ const PrototypeExclusionsChart = () => {
         />
         <Line
           type="linear"
-          dataKey="Special"
+          dataKey="Overall"
           stroke="#DF3034"
-          strokeWidth="1"
-          unit="%"
-          activeDot={{ r: 3 }}
-        />
-        <Line
-          type="linear"
-          dataKey="Total"
-          stroke="#ffbf47"
           strokeWidth="1"
           unit="%"
           activeDot={{ r: 3 }}
@@ -69,4 +47,4 @@ const PrototypeExclusionsChart = () => {
   );
 };
 
-export default PrototypeExclusionsChart;
+export default PrototypeAbsenceRateChart;
