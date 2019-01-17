@@ -9,35 +9,28 @@ import PrototypeTileWithChart from './components/PrototypeTileWithChart';
 
 const ThemePage = () => {
   return (
-    <PrototypePage
-      breadcrumbs={[
-        { text: 'Schools', link: 'topic' },
-        { text: 'Absence and exclusions', link: '#' },
-      ]}
-    >
-      <h1 className="govuk-heading-l">
-        Explore pupil absence statistics for schools in England
-      </h1>
+    <PrototypePage breadcrumbs={[{ text: 'Schools' }]}>
+      <h1 className="govuk-heading-l">Schools</h1>
       <p className="govuk-body">
-        Here you can find DfE stats for absence and exlusions, and access them
-        as reports, customise and download as excel files, and access them via
-        an API. <a href="#">Find out more</a>
+        Here you can find DfE stats for schools, customise and download as excel
+        files, and access them via an API. <a href="#">Find out more</a>
+      </p>
+      <p className="govuk-body">
+        You can also see our statistics for <a href="#">16+ education</a> and{' '}
+        <a href="#">social care</a>.
       </p>
       <PrototypeSearchForm />
-      <h2 className="govuk-heading-m">
-        The following publications are available in absence and exclusions
-      </h2>
+      <h2 className="govuk-heading-m">What statistics are you looking for?</h2>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-half">
           <a
-            href="publication"
+            href="/prototypes/topic"
             className="govuk-heading-s govuk-!-margin-bottom-0"
           >
-            Pupil absence
+            Absence and exclusions
           </a>
           <p className="govuk-caption-m govuk-!-margin-top-0">
-            Overall absence, authorised absence, unauthorised absence,
-            persisitent absence
+            Pupil absence, permanent and fixed period exclusions
           </p>
         </div>
         <div className="govuk-grid-column-one-half">
@@ -45,18 +38,63 @@ const ThemePage = () => {
             href="publication"
             className="govuk-heading-s govuk-!-margin-bottom-0"
           >
-            Permananent and fixed period exclusions
+            School finance
           </a>
           <p className="govuk-caption-m govuk-!-margin-top-0">
-            Permanent exclusions, and fixed period exclusions
+            Schools, pupils and their characteristics, SEN and EHC plans, SEN in
+            England
+          </p>
+        </div>
+      </div>
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-one-half">
+          <a href="#" className="govuk-heading-s govuk-!-margin-bottom-0">
+            Capacity and exclusions
+          </a>
+          <p className="govuk-caption-m govuk-!-margin-top-0">
+            School capacity, admission appeals
+          </p>
+        </div>
+        <div className="govuk-grid-column-one-half">
+          <a
+            href="publication"
+            className="govuk-heading-s govuk-!-margin-bottom-0"
+          >
+            School and pupil numbers
+          </a>
+          <p className="govuk-caption-m govuk-!-margin-top-0">
+            Schools, pupils and their characteristics, SEN and EHC plans, SEN in
+            England
+          </p>
+        </div>
+      </div>
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-one-half">
+          <a href="#" className="govuk-heading-s govuk-!-margin-bottom-0">
+            Results
+          </a>
+          <p className="govuk-caption-m govuk-!-margin-top-0">
+            Schools, pupils and their characteristics, SEN and EHC plans, SEN in
+            England
+          </p>
+        </div>
+        <div className="govuk-grid-column-one-half">
+          <a
+            href="publication"
+            className="govuk-heading-s govuk-!-margin-bottom-0"
+          >
+            School and pupil numbers
+          </a>
+          <p className="govuk-caption-m govuk-!-margin-top-0">
+            School capacity, admission appeals
           </p>
         </div>
       </div>
       <hr />
       <h2 className="govuk-heading-m">
-        Latest publications in absence and exclusions{' '}
+        Latest publications in schools{' '}
         <Link to="#" className="govuk-body">
-          (see all publications)
+          (see all school publications)
         </Link>
       </h2>
       <p>
@@ -72,42 +110,42 @@ const ThemePage = () => {
           percent="4.7%"
         />
         <PrototypeTileWithChart
-          heading="Permanent and fixed period exclusions"
-          subheading="Overall rate of fixed period exclusions"
-          percent="0.10%"
+          heading="KS5 A-level results"
+          subheading="Sheffield pupils with at least 2 A-levels"
+          percent="72.7%"
         />
       </div>
       <hr />
       <h2 className="govuk-heading-m">
-        Key indicators for Sheffield{' '}
+        Key indicators for schools{' '}
         <Link to="#" className="govuk-body">
-          (change key indicators)
+          (change)
         </Link>
       </h2>
       <p>
-        These are some key indicators for Sheffield. You can change what you see
-        here according your requirements. <Link to="#">Find out more</Link>
+        These are some key indicators for schools. You can{' '}
+        <Link to="#">change what you see here</Link> according to your
+        requirements. <Link to="#">Find out more</Link>
       </p>
-
       <h3 className="govuk-heading-s">
         <Link to="#">Find an indicator &#x25BC;</Link>
       </h3>
       <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">
         <PrototypeDataTile
-          period="2016/17"
-          heading="Permanent exclusion rate"
-          percent="4.7%"
+          period="2017/18"
+          heading="EYFSP good level of development"
+          percent="70.3%"
           fromText="Early years foundation state profile results"
         />
         <PrototypeDataTile
           period="2016/17"
-          heading="Fixed period exclusion rate"
+          heading="KS2 SAT expected standard"
           percent="3.4%"
           fromText="National curriculum assessments at Key Stage 2 in England"
         />
         <PrototypeDataTile
           period="2016/17"
-          heading="One or more fixed period exclusion"
+          heading="KS4 GCSE average attainment 8 score"
           percent="1.3%"
           fromText="GCSE and equivalent results: 2017 to 2018 (provisional)"
         />

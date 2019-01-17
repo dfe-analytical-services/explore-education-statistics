@@ -13,6 +13,7 @@
     "jsx-boolean-value": false,
     "import-name": false,
     "interface-name": [true, "never-prefix"],
+    "member-ordering": false,
     "variable-name": [true, "check-format", "allow-pascal-case"]
   },
   "rulesDirectory": []

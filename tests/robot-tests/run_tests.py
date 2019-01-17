@@ -38,6 +38,7 @@ arguments = []
 headless = True
 happypath = False
 profile = False
+ci = False
 tests = "tests/"
 browser = "chrome"
 interp = "robot"
@@ -65,12 +66,17 @@ for i in range(1, len(sys.argv)):
         interp = sys.argv[i+1]  # NOTE: could add error checking...
     elif sys.argv[i] == "-p" or sys.argv[i] == "--profile":
         profile = True
+    elif sys.argv[i] == "--ci":
+      ci = True
 
 arguments += ["--outputdir", "test-results/", "--exclude", "Failing",
               "--exclude", "UnderConstruction"]
 
 if happypath:
     arguments += ["--include", "HappyPath"]
+
+if ci:
+  arguments += ["--xunit", "xunit", "-v", "timeout:10", "-v", "implicit_wait:10"]
 
 if headless:
     arguments += ["-v", "headless:1"]
