@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Button from '../../components/Button';
 import FormCheckboxGroup from '../../components/FormCheckboxGroup';
+import FormRadioGroup from '../../components/FormRadioGroup';
 import PageHeading from '../../components/PageHeading';
 import Tabs from '../../components/Tabs';
 import TabsSection from '../../components/TabsSection';
@@ -12,7 +13,10 @@ import styles from './PrototypeLocalAuthorityDataTable.module.scss';
 import absenceRateData from './test-data/absenceRateData';
 import exclusionRateData from './test-data/exclusionRateData';
 
+type DataToggles = 'CHARTS_TABLES' | 'CHARTS' | 'TABLES';
+
 interface State {
+  dataToggle: DataToggles;
   filters: {
     EXCLUSIONS: boolean;
     PUPIL_ABSENCE: boolean;
@@ -21,19 +25,26 @@ interface State {
 
 class PrototypeLocalAuthorityDataTable extends Component<{}, State> {
   public state: State = {
+    dataToggle: 'CHARTS_TABLES',
     filters: {
       EXCLUSIONS: true,
       PUPIL_ABSENCE: true,
     },
   };
 
-  private handleChange = (values: { [value: string]: boolean }) => {
+  private handleCheckboxChange = (values: { [value: string]: boolean }) => {
     this.setState({
       filters: {
         ...this.state.filters,
         ...values,
       },
     });
+  };
+
+  private handleRadioChange = (value: DataToggles | null) => {
+    if (value) {
+      this.setState({ dataToggle: value });
+    }
   };
 
   public render() {
@@ -85,7 +96,7 @@ class PrototypeLocalAuthorityDataTable extends Component<{}, State> {
                 <MenuDetails summary="Absence and exclusions" open>
                   <FormCheckboxGroup
                     name="absenceAndExclusions"
-                    onChange={this.handleChange}
+                    onChange={this.handleCheckboxChange}
                     options={[
                       {
                         checked: true,
@@ -118,99 +129,129 @@ class PrototypeLocalAuthorityDataTable extends Component<{}, State> {
                 {(this.state.filters.EXCLUSIONS ||
                   this.state.filters.PUPIL_ABSENCE) && (
                   <>
-                    <div className="govuk-grid-row">
-                      {this.state.filters.PUPIL_ABSENCE && (
-                        <div className="govuk-grid-column-one-half">
-                          <p>Overall absence rate</p>
+                    <FormRadioGroup
+                      inline
+                      name="dataToggle"
+                      legend="What do you want to see?"
+                      legendSize="s"
+                      onChange={this.handleRadioChange as any}
+                      options={[
+                        {
+                          id: 'chartsAndTable',
+                          label: 'Charts and table',
+                          value: 'CHARTS_TABLES',
+                        },
+                        { id: 'charts', label: 'Charts', value: 'CHARTS' },
+                        { id: 'table', label: 'Table', value: 'TABLES' },
+                      ]}
+                    />
 
-                          <PrototypeAbsenceRateChart />
-                        </div>
-                      )}
-                      {this.state.filters.EXCLUSIONS && (
-                        <div className="govuk-grid-column-one-half">
-                          <p>Exclusions: Permanent exclusion rate</p>
+                    {(this.state.dataToggle === 'CHARTS_TABLES' ||
+                      this.state.dataToggle === 'CHARTS') && (
+                      <div className="govuk-grid-row">
+                        {this.state.filters.PUPIL_ABSENCE && (
+                          <div className="govuk-grid-column-one-half">
+                            <p>Overall absence rate</p>
 
-                          <PrototypeExclusionsChart />
-                        </div>
-                      )}
-                    </div>
+                            <PrototypeAbsenceRateChart />
+                          </div>
+                        )}
+                        {this.state.filters.EXCLUSIONS && (
+                          <div className="govuk-grid-column-one-half">
+                            <p>Exclusions: Permanent exclusion rate</p>
+
+                            <PrototypeExclusionsChart />
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     <hr />
-                    <table className="govuk-table">
-                      <caption>
-                        Comparing statistics between 2012 and 2017
-                      </caption>
-                      <thead>
-                        <tr>
-                          <th />
-                          <th scope="col">2012/13</th>
-                          <th scope="col">2013/14</th>
-                          <th scope="col">2014/15</th>
-                          <th scope="col">2015/16</th>
-                          <th scope="col">2016/17</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {this.state.filters.EXCLUSIONS && (
-                          <>
-                            <tr>
-                              <td scope="row">Overall absence rate</td>
-                              {absenceRateData.map(({ Overall, name }) => (
-                                <td key={name}>{`${Overall}%`}</td>
-                              ))}
-                            </tr>
-                            <tr>
-                              <td scope="row">Authorised absence rate</td>
-                              {absenceRateData.map(({ Authorised, name }) => (
-                                <td key={name}>{`${Authorised}%`}</td>
-                              ))}
-                            </tr>
-                            <tr>
-                              <td scope="row">Unauthorised absence rate</td>
-                              {absenceRateData.map(({ Unauthorised, name }) => (
-                                <td key={name}>{`${Unauthorised}%`}</td>
-                              ))}
-                            </tr>
-                          </>
-                        )}
-                        {this.state.filters.PUPIL_ABSENCE && (
-                          <>
-                            <tr>
-                              <td scope="row">
-                                Primary permanent exclusions rate
-                              </td>
-                              {exclusionRateData.map(({ Primary, name }) => (
-                                <td key={name}>{`${Primary.toFixed(3)}%`}</td>
-                              ))}
-                            </tr>
-                            <tr>
-                              <td scope="row">
-                                Secondary permanent exclusions rate
-                              </td>
-                              {exclusionRateData.map(({ Secondary, name }) => (
-                                <td key={name}>{`${Secondary.toFixed(3)}%`}</td>
-                              ))}
-                            </tr>
-                            <tr>
-                              <td scope="row">
-                                Special permanent exclusions rate
-                              </td>
-                              {exclusionRateData.map(({ Special, name }) => (
-                                <td key={name}>{`${Special.toFixed(3)}%`}</td>
-                              ))}
-                            </tr>
-                            <tr>
-                              <td scope="row">
-                                Primary permanent exclusions rate
-                              </td>
-                              {exclusionRateData.map(({ Total, name }) => (
-                                <td key={name}>{`${Total.toFixed(3)}%`}</td>
-                              ))}
-                            </tr>
-                          </>
-                        )}
-                      </tbody>
-                    </table>
+
+                    {(this.state.dataToggle === 'CHARTS_TABLES' ||
+                      this.state.dataToggle === 'TABLES') && (
+                      <table className="govuk-table">
+                        <caption>
+                          Comparing statistics between 2012 and 2017
+                        </caption>
+                        <thead>
+                          <tr>
+                            <th />
+                            <th scope="col">2012/13</th>
+                            <th scope="col">2013/14</th>
+                            <th scope="col">2014/15</th>
+                            <th scope="col">2015/16</th>
+                            <th scope="col">2016/17</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {this.state.filters.EXCLUSIONS && (
+                            <>
+                              <tr>
+                                <td scope="row">Overall absence rate</td>
+                                {absenceRateData.map(({ Overall, name }) => (
+                                  <td key={name}>{`${Overall}%`}</td>
+                                ))}
+                              </tr>
+                              <tr>
+                                <td scope="row">Authorised absence rate</td>
+                                {absenceRateData.map(({ Authorised, name }) => (
+                                  <td key={name}>{`${Authorised}%`}</td>
+                                ))}
+                              </tr>
+                              <tr>
+                                <td scope="row">Unauthorised absence rate</td>
+                                {absenceRateData.map(
+                                  ({ Unauthorised, name }) => (
+                                    <td key={name}>{`${Unauthorised}%`}</td>
+                                  ),
+                                )}
+                              </tr>
+                            </>
+                          )}
+                          {this.state.filters.PUPIL_ABSENCE && (
+                            <>
+                              <tr>
+                                <td scope="row">
+                                  Primary permanent exclusions rate
+                                </td>
+                                {exclusionRateData.map(({ Primary, name }) => (
+                                  <td key={name}>{`${Primary.toFixed(3)}%`}</td>
+                                ))}
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  Secondary permanent exclusions rate
+                                </td>
+                                {exclusionRateData.map(
+                                  ({ Secondary, name }) => (
+                                    <td key={name}>{`${Secondary.toFixed(
+                                      3,
+                                    )}%`}</td>
+                                  ),
+                                )}
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  Special permanent exclusions rate
+                                </td>
+                                {exclusionRateData.map(({ Special, name }) => (
+                                  <td key={name}>{`${Special.toFixed(3)}%`}</td>
+                                ))}
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  Primary permanent exclusions rate
+                                </td>
+                                {exclusionRateData.map(({ Total, name }) => (
+                                  <td key={name}>{`${Total.toFixed(3)}%`}</td>
+                                ))}
+                              </tr>
+                            </>
+                          )}
+                        </tbody>
+                      </table>
+                    )}
 
                     <ul className="govuk-list">
                       <li>
