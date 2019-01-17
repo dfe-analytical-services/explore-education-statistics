@@ -53,21 +53,7 @@ const HomePage = () => {
           </p>
         </div>
       </div>
-      <h2 className="govuk-heading-m govuk-!-margin-top-9">
-        Highlights from latest publications
-      </h2>
-      <div className="dfe-dash-tiles dfe-dash-tiles--2-in-row govuk-!-margin-top-0 govuk-!-padding-top-0">
-        <PrototypeTileWithChart
-          heading="Pupil absence in schools in England"
-          subheading="Sheffield overall absence"
-          percent="4.7%"
-        />
-        <PrototypeTileWithChart
-          heading="KS5 A-level results"
-          subheading="Sheffield pupils with at least 2 A-levels"
-          percent="72.7%"
-        />
-      </div>
+
       <Link to="#" className="govuk-button">
         Explore our statistics
       </Link>

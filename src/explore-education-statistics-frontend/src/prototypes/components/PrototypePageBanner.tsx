@@ -18,8 +18,8 @@ const PrototypePageBanner = () => {
         </strong>
 
         <span className="govuk-phase-banner__text">
-          This is a new service – your{' '}
-          <Link to="/alpha-feedback">feedback</Link> will help us to improve it.
+          This is a prototype site –{' '}
+          <Link to="/prototypes">View prototype index</Link>
         </span>
       </p>
     </div>
