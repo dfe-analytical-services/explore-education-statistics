@@ -51,12 +51,9 @@ const HomePage = () => {
       <p>
         The statistics can be viewed as reports, or you can customise and
         download as excel or .csv files . The data can also be accessed via an
-        API.
+        API. <a href="#">What is an API?</a>
       </p>
-      <Link
-        to="/prototypes/local-authority/data-table"
-        className="govuk-button"
-      >
+      <Link to="/prototypes/data-table/national" className="govuk-button">
         Explore all our statistics
       </Link>
     </PrototypePage>

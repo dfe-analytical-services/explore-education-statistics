@@ -151,8 +151,16 @@ const ThemePage = () => {
           fromText="GCSE and equivalent results: 2017 to 2018 (provisional)"
         />
       </div>
-      <a href="/prototypes/local-authority/data-table" className="govuk-button">
-        Explore statistics
+      <h2 className="govuk-heading-m govuk-!-margin-top-9">
+        Exploring the data
+      </h2>
+      <p>
+        The statistics can be viewed as reports, or you can customise and
+        download as excel or .csv files . The data can also be accessed via an
+        API. <a href="#">What is an API?</a>
+      </p>
+      <a href="/prototypes/data-table/national" className="govuk-button">
+        Explore schools statistics
       </a>
     </PrototypePage>
   );
