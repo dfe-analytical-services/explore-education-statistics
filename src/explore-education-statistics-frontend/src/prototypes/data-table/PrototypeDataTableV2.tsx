@@ -26,15 +26,25 @@ const allTableData: any = {
   ...exclusionTableData,
 };
 
+interface Filters {
+  GENERAL_ENROLMENTS: boolean;
+  GENERAL_SCHOOLS: boolean;
+  SESSIONS_AUTHORISED_RATE: boolean;
+  SESSIONS_OVERALL_RATE: boolean;
+  SESSIONS_UNAUTHORISED_RATE: boolean;
+  PERMANENT_EXCLUSIONS: boolean;
+  PERMANENT_EXCLUSIONS_RATE: boolean;
+  FIXED_PERIOD_EXCLUSIONS: boolean;
+  FIXED_PERIOD_EXCLUSIONS_RATE: boolean;
+}
+
 interface State {
   chartData: {
     [key: string]: number;
   }[];
   dataToggle: DataToggles;
   menuOption?: MenuOption | null;
-  filters: {
-    [filter: string]: boolean;
-  };
+  filters: Filters;
   tableData: string[][];
 }
 
@@ -42,7 +52,17 @@ class PrototypeDataTableV2 extends Component<{}, State> {
   public state: State = {
     chartData: [],
     dataToggle: '',
-    filters: {},
+    filters: {
+      FIXED_PERIOD_EXCLUSIONS: false,
+      FIXED_PERIOD_EXCLUSIONS_RATE: false,
+      GENERAL_ENROLMENTS: false,
+      GENERAL_SCHOOLS: false,
+      PERMANENT_EXCLUSIONS: false,
+      PERMANENT_EXCLUSIONS_RATE: false,
+      SESSIONS_AUTHORISED_RATE: false,
+      SESSIONS_OVERALL_RATE: false,
+      SESSIONS_UNAUTHORISED_RATE: false,
+    },
     menuOption: null,
     tableData: [],
   };
@@ -50,12 +70,22 @@ class PrototypeDataTableV2 extends Component<{}, State> {
   private handleMenuChange: MenuChangeEventHandler = menuOption => {
     this.setState({
       menuOption,
-      filters: {},
+      filters: {
+        FIXED_PERIOD_EXCLUSIONS: false,
+        FIXED_PERIOD_EXCLUSIONS_RATE: false,
+        GENERAL_ENROLMENTS: false,
+        GENERAL_SCHOOLS: false,
+        PERMANENT_EXCLUSIONS: false,
+        PERMANENT_EXCLUSIONS_RATE: false,
+        SESSIONS_AUTHORISED_RATE: false,
+        SESSIONS_OVERALL_RATE: false,
+        SESSIONS_UNAUTHORISED_RATE: false,
+      },
       tableData: [],
     });
   };
 
-  private handleFilterCheckboxChange: CheckboxGroupChangeEventHandler = values => {
+  private handleFilterCheckboxChange: CheckboxGroupChangeEventHandler<Filters> = values => {
     const filters = {
       ...this.state.filters,
       ...values,
