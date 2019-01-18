@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
@@ -8,9 +9,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
         {
         }
 
-        public TidyDataGeographic(int year, string level, Country country, string schoolType,
-            Dictionary<string, string> attributes, Region region, LocalAuthority localAuthority, School school) :
-            base(year, level, country, schoolType, attributes)
+        public TidyDataGeographic(
+            Guid publicationId,
+            Guid releaseId,
+            DateTime dateTime,
+            int year,
+            string level,
+            Country country,
+            string schoolType,
+            Dictionary<string, string> attributes,
+            Region region,
+            LocalAuthority localAuthority,
+            School school) :
+            base(publicationId, releaseId, dateTime, year, level, country, schoolType, attributes)
         {
             Region = region;
             LocalAuthority = localAuthority;

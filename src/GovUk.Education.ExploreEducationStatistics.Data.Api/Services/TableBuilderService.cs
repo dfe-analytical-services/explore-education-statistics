@@ -15,24 +15,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _dataService = dataService;
         }
 
-        public TableToolResult Get(Guid publication,
+        public TableToolResult Get(Guid publicationId,
             SchoolType schoolType,
             Level level = Level.National)
         {
-            return new TableToolResult
-            {
-                Publication = publication,
-                Release = new Guid(),
-                Result = GetTableToolData(publication, level, schoolType)
-            };
-        }
-
-        private IEnumerable<TableToolData> GetTableToolData(Guid publication, Level level, SchoolType schoolType)
-        {
-            return _dataService.GetCollectionForPublication(publication)
+            var data = _dataService.GetCollectionForPublication(publicationId)
                 .Find(x => x.Level == level.ToString() && x.SchoolType == schoolType.ToString())
-                .ToList()
-                .Select(DataToTableToolData);
+                .ToList();
+            
+            var first = data.FirstOrDefault(); 
+            
+            return new TableToolResult
+            { 
+                PublicationId = first.PublicationId,
+                ReleaseId = first.ReleaseId,
+                ReleaseDate = first.ReleaseDate,
+                Result = data.Select(DataToTableToolData)
+            };
         }
 
         private static TableToolData DataToTableToolData(TidyData data)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
@@ -8,10 +9,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
         {
         }
 
-        public TidyDataLaCharacteristic(int year, string level, Country country, string schoolType,
-            Dictionary<string, string> attributes, Region region, LocalAuthority localAuthority,
+        public TidyDataLaCharacteristic(Guid publicationId,
+            Guid releaseId,
+            DateTime releaseDate,
+            int year,
+            string level,
+            Country country,
+            string schoolType,
+            Dictionary<string, string> attributes,
+            Region region,
+            LocalAuthority localAuthority,
             Characteristic characteristic) :
-            base(year, level, country, schoolType, attributes)
+            base(publicationId, releaseId, releaseDate, year, level, country, schoolType, attributes)
         {
             Region = region;
             LocalAuthority = localAuthority;

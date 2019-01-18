@@ -15,7 +15,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
             _path = path;
         }
 
-        public List<TidyData> Data(DataCsvFilename dataCsvFilename)
+        public List<TidyData> Data(DataCsvFilename dataCsvFilename,
+            Guid publicationId,
+            Guid releaseId,
+            DateTime releaseDate)
         {
             var file = dataCsvFilename + ".csv";
             var directory = Directory.GetCurrentDirectory();
@@ -29,12 +32,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
 
             var data = File.ReadAllLines(path)
                 .Skip(1)
-                .Select(x => TidyDataFromCsv(x, headers)).ToList();
+                .Select(x => TidyDataFromCsv(x, headers, publicationId, releaseId, releaseDate)).ToList();
 
             Console.WriteLine(data.Count + " rows");
             return data.ToList();
         }
 
-        protected abstract TidyData TidyDataFromCsv(string csvLine, List<string> headers);
+        protected abstract TidyData TidyDataFromCsv(string csvLine,
+            List<string> headers,
+            Guid publicationId,
+            Guid releaseId,
+            DateTime releaseDate);
     }
 }

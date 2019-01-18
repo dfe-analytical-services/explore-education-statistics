@@ -5,8 +5,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
     public class TableToolResult
     {
-        public Guid Publication { get; set; }
-        public Guid Release { get; set; }
+        public Guid PublicationId { get; set; }
+        public Guid ReleaseId { get; set; }
+        public DateTime ReleaseDate { get; set; }
         public IEnumerable<TableToolData> Result { get; set; }
     }
 }
