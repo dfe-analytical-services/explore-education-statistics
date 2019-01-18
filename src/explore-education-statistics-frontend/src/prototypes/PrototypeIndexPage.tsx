@@ -7,6 +7,7 @@ import PrototypePageBanner from './components/PrototypePageBanner';
 import PrototypeDataTableV1LocalAuthority from './data-table/PrototypeDataTableV1LocalAuthority';
 import PrototypeDataTableV1National from './data-table/PrototypeDataTableV1National';
 import PrototypeDataTableV1VerticalLayout from './data-table/PrototypeDataTableV1VerticalLayout';
+import PrototypeDataTableV2 from './data-table/PrototypeDataTableV2';
 import HomePage from './PrototypeHomePage';
 import HomePageV2 from './PrototypeHomePageV2';
 import PublicationPage from './PrototypePublicationPage';
@@ -25,18 +26,23 @@ export const PrototypeRoutes = () => (
     <Route exact path="/prototypes/topic" component={TopicPage} />
     <Route
       exact
-      path="/prototypes/data-table/national"
+      path="/prototypes/data-table-v1/national"
       component={PrototypeDataTableV1National}
     />
     <Route
       exact
-      path="/prototypes/data-table/local-authority"
+      path="/prototypes/data-table-v1/local-authority"
       component={PrototypeDataTableV1LocalAuthority}
     />
     <Route
       exact
-      path="/prototypes/data-table/vertical-layout"
+      path="/prototypes/data-table-v1/vertical-layout"
       component={PrototypeDataTableV1VerticalLayout}
+    />
+    <Route
+      exact
+      path="/prototypes/data-table-v2"
+      component={PrototypeDataTableV2}
     />
   </>
 );
@@ -85,19 +91,25 @@ export const PrototypeIndexPage = () => {
 
           <ul>
             <li>
-              <Link to="/prototypes/data-table/local-authority">
+              <Link to="/prototypes/data-table-v1/local-authority">
                 Data table v1 - local authority
               </Link>
             </li>
             <li>
-              <Link to="/prototypes/data-table/national">
+              <Link to="/prototypes/data-table-v1/national">
                 Data table v1 - national level
               </Link>
             </li>
             <li>
-              <Link to="/prototypes/data-table/vertical-layout">
+              <Link to="/prototypes/data-table-v1/vertical-layout">
                 Data table v1 - vertical layout
               </Link>
+            </li>
+          </ul>
+
+          <ul>
+            <li>
+              <Link to="/prototypes/data-table-v2">Data table v2</Link>
             </li>
           </ul>
         </main>

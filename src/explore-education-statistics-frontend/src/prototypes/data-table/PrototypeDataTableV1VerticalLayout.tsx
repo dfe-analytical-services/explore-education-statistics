@@ -7,10 +7,10 @@ import Tabs from '../../components/Tabs';
 import TabsSection from '../../components/TabsSection';
 import PrototypePage from '../components/PrototypePage';
 import PrototypeAbsenceRateChart from './charts/PrototypeAbsenceRateChart';
-import PrototypeExclusionsChart from './charts/PrototypeExclusionsChart';
+import PrototypePermanentExclusionsChart from './charts/PrototypePermanentExclusionsChart';
 import FilterMenu from './components/FilterMenu';
 import { sessionsAbsentTableData } from './test-data/absenceRateData';
-import { permanentExclusionRateTableData } from './test-data/exclusionRateData';
+import { permanentExclusionTableData } from './test-data/exclusionRateData';
 
 type DataToggles = 'CHARTS_TABLES' | 'CHARTS' | 'TABLES' | null;
 
@@ -130,14 +130,21 @@ class PrototypeDataTableV1VerticalLayout extends Component<{}, State> {
                           <div className="govuk-grid-column-one-half">
                             <p>Overall absence rate</p>
 
-                            <PrototypeAbsenceRateChart />
+                            <PrototypeAbsenceRateChart
+                              authorised={true}
+                              overall={true}
+                              unauthorised={true}
+                            />
                           </div>
                         )}
                         {this.state.filters.EXCLUSIONS && (
                           <div className="govuk-grid-column-one-half">
                             <p>Exclusions: Permanent exclusion rate</p>
 
-                            <PrototypeExclusionsChart />
+                            <PrototypePermanentExclusionsChart
+                              exclusions={true}
+                              exclusionsRate={true}
+                            />
                           </div>
                         )}
                       </div>
@@ -188,7 +195,7 @@ class PrototypeDataTableV1VerticalLayout extends Component<{}, State> {
                                   <strong>Exclusions</strong>
                                 </td>
                               </tr>
-                              {permanentExclusionRateTableData.map(
+                              {Object.values(permanentExclusionTableData).map(
                                 ([firstCell, ...cells], rowIndex) => (
                                   <tr key={rowIndex}>
                                     <td scope="row">{firstCell}</td>

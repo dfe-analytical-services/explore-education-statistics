@@ -1,13 +1,3 @@
-const dataGroupedByYear = {
-  '2012/13': {
-    ENROLMENTS: 6223740,
-    SCHOOLS: 19975,
-    SESSIONS_AUTHORISED_RATE: 4.2,
-    SESSIONS_OVERALL_RATE: 5.3,
-    SESSIONS_UNAUTHORISED_RATE: 1.1,
-  },
-};
-
 export const sessionsAbsentChartData = [
   { name: '2012/13', unauthorised: 1.1, authorised: 4.2, overall: 5.3 },
   { name: '2013/14', unauthorised: 1.1, authorised: 3.5, overall: 4.5 },
@@ -44,11 +34,11 @@ export const sessionsAbsentTableData = {
 };
 
 export const generalTableData = {
-  ENROLMENTS: [
+  GENERAL_ENROLMENTS: [
     'Enrolments',
     ...generalChartData.map(({ enrolments }) => enrolments.toFixed(0)),
   ],
-  SCHOOLS: [
+  GENERAL_SCHOOLS: [
     'Schools',
     ...generalChartData.map(({ schools }) => schools.toFixed(0)),
   ],
