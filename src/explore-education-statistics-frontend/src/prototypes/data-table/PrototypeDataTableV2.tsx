@@ -85,7 +85,9 @@ class PrototypeDataTableV2 extends Component<{}, State> {
     });
   };
 
-  private handleFilterCheckboxChange: CheckboxGroupChangeEventHandler<Filters> = values => {
+  private handleFilterCheckboxChange: CheckboxGroupChangeEventHandler<
+    Filters
+  > = values => {
     const filters = {
       ...this.state.filters,
       ...values,
