@@ -120,4 +120,21 @@ describe('FormCheckboxGroup', () => {
     expect(checkbox2.checked).toBe(true);
     expect(checkbox3.checked).toBe(false);
   });
+
+  test('renders correctly with legend', () => {
+    const { container, getByText } = render(
+      <FormCheckboxGroup
+        legend="Choose some checkboxes"
+        name="test-radios"
+        options={[
+          { id: 'radio-1', label: 'Test radio 1', value: '1' },
+          { id: 'radio-2', label: 'Test radio 2', value: '2' },
+          { id: 'radio-3', label: 'Test radio 3', value: '3' },
+        ]}
+      />,
+    );
+
+    expect(getByText('Choose some checkboxes')).toBeDefined();
+    expect(container.innerHTML).toMatchSnapshot();
+  });
 });

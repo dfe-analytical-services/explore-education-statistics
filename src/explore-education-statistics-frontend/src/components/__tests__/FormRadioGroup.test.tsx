@@ -43,7 +43,7 @@ describe('FormRadioGroup', () => {
   });
 
   test('clicking radios toggles between them', () => {
-    const { container, getByLabelText } = render(
+    const { getByLabelText } = render(
       <FormRadioGroup
         name="test-radios"
         options={[
@@ -65,5 +65,22 @@ describe('FormRadioGroup', () => {
 
     expect(radio1.checked).toBe(false);
     expect(radio2.checked).toBe(true);
+  });
+
+  test('renders correctly with legend', () => {
+    const { container, getByText } = render(
+      <FormRadioGroup
+        legend="Choose a radio"
+        name="test-radios"
+        options={[
+          { id: 'radio-1', label: 'Test radio 1', value: '1' },
+          { id: 'radio-2', label: 'Test radio 2', value: '2' },
+          { id: 'radio-3', label: 'Test radio 3', value: '3' },
+        ]}
+      />,
+    );
+
+    expect(getByText('Choose a radio')).toBeDefined();
+    expect(container.innerHTML).toMatchSnapshot();
   });
 });

@@ -12,10 +12,11 @@ const ThemePage = () => {
     <PrototypePage breadcrumbs={[{ text: 'Schools' }]}>
       <h1 className="govuk-heading-l">Schools</h1>
       <p className="govuk-body">
-        Here you can find DfE stats for schools, customise and download as excel
-        files, and access them via an API. <a href="#">Find out more</a>
+        Here you can find DfE statistics for schools. You can customise and
+        download the statistics as excel files, and access them via an API.{' '}
+        <a href="#">What is an API?</a>
       </p>
-      <p className="govuk-body">
+      <p>
         You can also see our statistics for <a href="#">16+ education</a> and{' '}
         <a href="#">social care</a>.
       </p>
@@ -83,7 +84,7 @@ const ThemePage = () => {
             href="publication"
             className="govuk-heading-s govuk-!-margin-bottom-0"
           >
-            School and pupil numbers
+            Teacher numbers
           </a>
           <p className="govuk-caption-m govuk-!-margin-top-0">
             School capacity, admission appeals
@@ -150,8 +151,16 @@ const ThemePage = () => {
           fromText="GCSE and equivalent results: 2017 to 2018 (provisional)"
         />
       </div>
-      <a href="#" className="govuk-button">
-        Explore statistics
+      <h2 className="govuk-heading-m govuk-!-margin-top-9">
+        Exploring the data
+      </h2>
+      <p>
+        The statistics can be viewed as reports, or you can customise and
+        download as excel or .csv files . The data can also be accessed via an
+        API. <a href="#">What is an API?</a>
+      </p>
+      <a href="/prototypes/data-table/national" className="govuk-button">
+        Explore schools statistics
       </a>
     </PrototypePage>
   );

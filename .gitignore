@@ -9,3 +9,4 @@ dfe-meta.db
 tags
 *.pyc
 **/test-results/
+tests/robot-tests/lib

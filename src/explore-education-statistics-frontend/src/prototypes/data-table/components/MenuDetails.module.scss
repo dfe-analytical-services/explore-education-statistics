@@ -1,0 +1,13 @@
+@import '~govuk-frontend/settings/all';
+@import '~govuk-frontend/helpers/all';
+@import '~govuk-frontend/utilities/all';
+@import '~govuk-frontend/components/details/details';
+
+.details {
+  @include govuk-responsive-margin(2, 'bottom');
+  composes: govuk-details;
+}
+
+.content {
+  padding-left: govuk-spacing(4);
+}

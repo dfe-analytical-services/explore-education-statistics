@@ -4,27 +4,26 @@
 *** Robot Framework Test Runner Script ***
 
 Options:
--v|--visual : Don't run the tests headless. Usage: "./run_tests.py -v"
+-v|--visual : Don't run the tests headless. Usage: "pipenv run python run_tests.py -v"
 
 -e|--env : Run against specific environment, "local", "test", "stage", "prod".
-Usage: "./run_tests.py -e test"
+Usage: "pipenv run python run_tests.py -e test"
 
--h|--happypath: Run happypath tests only. Usage: "./run_tests.py -h"
+-h|--happypath: Run happypath tests only. Usage: "pipenv run python run_tests.py -h"
 
 -b BROWSER|--browser BROWSER : Run a different browser to the default, chrome.
-Usage: "./run_tests.py -b firefox"
+Usage: "pipenv run python run_tests.py -b firefox". You will need to install the webdriver for that browser (e.g. geckodriver for firefox)
 
 -f FILE|--file FILE : To run a specific test file or folder instead of the
-entire tests/ directory. Usage: "./run_tests.py -f tests/directory/" OR "./run_tests.py -f tests/directory/suite.robot"
+entire tests/ directory. Usage: "pipenv run python run_tests.py -f tests/directorynamehere/" OR "pipenv run python run_tests.py -f tests/directorynamehere/testsuitenamehere.robot"
 
 -i INTERPRETER|--interp INTERPRETER : Run tests through a different interpreter
-than cpython. Mainly for using pabot, which runs test suites in parallel.
-Usage: "./run_tests.py -i pabot"
+than pabot. Mainly for using robot, which doesn't run the test suites in parallel.
+Usage: "pipenv run python run_tests.py -i robot"
 
 -p|--profile : Additionally output python profile information
 AND keyword profile information. Outputs log files to test-results directory.
-Usage: "./run_tests.py -p"
-
+Usage: "pipenv run python run_tests.py -p"
 """
 
 import os
@@ -41,7 +40,7 @@ profile = False
 ci = False
 tests = "tests/"
 browser = "chrome"
-interp = "robot"
+interp = "pabot"
 
 env = "test"  # by default, run tests against test environment
 url = "about:blank"
@@ -49,6 +48,9 @@ localUrl = "http://localhost:3000"
 testUrl = "https://educationstatisticstest.z6.web.core.windows.net"
 stageUrl = "https://educationstatisticsstage.z6.web.core.windows.net"
 prodUrl = "https://educationstatistics.z6.web.core.windows.net"
+
+timeout = 10
+implicit_wait = 10
 
 # Process arguments
 for i in range(1, len(sys.argv)):
@@ -76,7 +78,7 @@ if happypath:
     arguments += ["--include", "HappyPath"]
 
 if ci:
-  arguments += ["--xunit", "xunit", "-v", "timeout:10", "-v", "implicit_wait:10"]
+  arguments += ["--xunit", "xunit", "-v", "timeout:" + str(timeout), "-v", "implicit_wait:" + str(implicit_wait)]
 
 if headless:
     arguments += ["-v", "headless:1"]

@@ -22,13 +22,13 @@ def wait_for_server(url):
   while not __check_elem_exists(driver, '[data-testid="content-item-list--schools"]'):
     print('.', end='')
     sys.stdout.flush()
-    time.sleep(3)
     timeWaited += 5
     if timeWaited > 300:
       driver.close()
       print(' I CANNE DO IT CAPTAIN!')
       raise Exception('APIs not spun up after five minutes!')
     driver.refresh()
+    time.sleep(3)
 
   driver.close()
   print(' IT\'S ALIVE!')

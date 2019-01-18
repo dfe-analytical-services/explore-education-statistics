@@ -1,32 +1,37 @@
 import classNames from 'classnames';
 import Radios from 'govuk-frontend/components/radios/radios';
 import React, { Component, createRef } from 'react';
+import FormFieldSet, { FieldSetProps } from './FormFieldSet';
 import FormRadio from './FormRadio';
 
+export type RadioGroupChangeEventHandler = (value: string) => void;
+
 interface RadioOption {
+  hint?: string;
   id: string;
   label: string;
   value: string;
 }
 
-interface Props {
+type Props = {
   inline?: boolean;
   name: string;
-  onChange?: (value: string | null) => void;
+  onChange?: RadioGroupChangeEventHandler;
   options: RadioOption[];
-}
+} & Partial<FieldSetProps>;
 
 interface State {
-  selectedValue: string | null;
+  selectedValue: string;
 }
 
 class FormRadioGroup extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     inline: false,
+    legendSize: 'm',
   };
 
   public state: State = {
-    selectedValue: null,
+    selectedValue: '',
   };
 
   private ref = createRef<HTMLInputElement>();
@@ -52,7 +57,7 @@ class FormRadioGroup extends Component<Props, State> {
     );
   }
 
-  public render() {
+  private renderRadios() {
     const { inline, name, options } = this.props;
 
     return (
@@ -72,6 +77,18 @@ class FormRadioGroup extends Component<Props, State> {
           />
         ))}
       </div>
+    );
+  }
+
+  public render() {
+    const { legend, ...restProps } = this.props;
+
+    return legend ? (
+      <FormFieldSet {...restProps} legend={legend}>
+        {this.renderRadios()}
+      </FormFieldSet>
+    ) : (
+      this.renderRadios()
     );
   }
 }

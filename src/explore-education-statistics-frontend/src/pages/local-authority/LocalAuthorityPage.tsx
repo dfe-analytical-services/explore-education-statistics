@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Helmet } from 'react-helmet';
 import ButtonLink from '../../components/ButtonLink';
 import { KeyIndicatorTile } from '../../components/KeyIndicatorTile';
 import Link from '../../components/Link';
@@ -14,6 +15,9 @@ class LocalAuthorityPage extends Component<{}> {
     return (
       <>
         <div className="govuk-grid-row">
+          <Helmet>
+            <title>Local Authority - Sheffield - GOV.UK</title>
+          </Helmet>
           <div className="govuk-grid-column-two-thirds">
             <PageHeading caption="Metropolitan borough" heading="Sheffield" />
 

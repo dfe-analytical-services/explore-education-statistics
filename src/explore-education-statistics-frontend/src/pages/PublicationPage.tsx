@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Helmet } from 'react-helmet';
 import ReactMarkdown from 'react-markdown';
 import { match } from 'react-router';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
@@ -113,6 +114,9 @@ class PublicationPage extends Component<Props, State> {
 
     return (
       <div>
+        <Helmet>
+          <title>{data.title} - GOV.UK</title>
+        </Helmet>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             {!release && (

@@ -20,9 +20,9 @@ const TopicPage = () => {
         Explore pupil absence statistics for schools in England
       </h1>
       <p className="govuk-body">
-        Here you can find DfE stats for absence and exlusions, and access them
-        as reports, customise and download as excel files, and access them via
-        an API. <a href="#">Find out more</a>
+        Here you can find DfE statistics for absence and exlusions. You can
+        access the statistics as reports, customise and download them as excel
+        files, and access them via an API. <a href="#">What is an API?</a>
       </p>
       <PrototypeSearchForm />
       <h2 className="govuk-heading-m">
@@ -82,7 +82,7 @@ const TopicPage = () => {
       <h2 className="govuk-heading-m">
         Key indicators for Sheffield{' '}
         <Link to="#" className="govuk-body">
-          (change key indicators)
+          (change location)
         </Link>
       </h2>
       <p>
@@ -113,8 +113,16 @@ const TopicPage = () => {
           fromText="GCSE and equivalent results: 2017 to 2018 (provisional)"
         />
       </div>
+      <h2 className="govuk-heading-m govuk-!-margin-top-9">
+        Exploring the data
+      </h2>
+      <p>
+        The statistics can be viewed as reports, or you can customise and
+        download as excel or .csv files . The data can also be accessed via an
+        API. <a href="#">What is an API?</a>
+      </p>
       <a href="#" className="govuk-button">
-        Explore statistics
+        Explore absence and exclusion statistics
       </a>
     </PrototypePage>
   );

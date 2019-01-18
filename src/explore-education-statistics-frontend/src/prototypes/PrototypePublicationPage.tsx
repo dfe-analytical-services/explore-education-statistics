@@ -1,6 +1,7 @@
 import React from 'react';
 import CollapsibleSection from '../components/CollapsibleSection';
 import Details from '../components/Details';
+import Link from '../components/Link';
 import PrototypeDataSample from './components/PrototypeDataSample';
 import PrototypePage from './components/PrototypePage';
 
@@ -15,55 +16,48 @@ const PublicationPage = () => {
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <strong className="govuk-tag"> This is the latest data </strong>
+          <strong className="govuk-tag govuk-!-margin-bottom-2">
+            {' '}
+            This is the latest data{' '}
+          </strong>
           <h1 className="govuk-heading-l">
-            Explore pupil absence statistics for schools in England
+            Pupil absence data and statistics for schools in England
           </h1>
           <p>
-            This service helps parents, specialists and the public find
-            different kinds of pupil absence facts and figures for state-funded
-            schools.
-          </p>
-
-          <p>
-            Use this page to find and view statistical facts and figures for
-            state-funded schools and download the latest data files.
+            View statistics and download data files for authorised and
+            unauthorised absence in state-funded schools.
           </p>
 
           <details className="govuk-details">
             <summary className="govuk-details__summary">
-              <span className="govuk-details__summary-text">
-                {' '}
-                Further details{' '}
-              </span>
+              <span className="govuk-details__summary-text"> Read more </span>
             </summary>
             <div className="govuk-details__text">
               <p>
-                Each section is divided into the following sections to help you
-                analyse, download and understand the related statistics and
-                data:
+                To help you analyse and understand the statistics the following
+                sections include:
               </p>
 
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  Headlines - the latest statistical insights and chart
-                  breakdowns
+                  summaries with the latest headline statistical insights and
+                  breakdowns and definitions
                 </li>
                 <li>
-                  Explanation - detailed explanations of related facts and
-                  figures
+                  charts, graphs and tables to help you compare and contrast
+                  statistics and highlight any trends from 2006/7 onwards
                 </li>
-                <li>Tables - view data tables for a 5-year period</li>
                 <li>
-                  Data and downloads - links to download underlying data files
+                  links to a range of data files so you can download them and
+                  carry out your own analysis
                 </li>
               </ul>
 
               <div className="govuk-inset-text">
-                <a href="">
-                  Find out more about our pupil absence statistics methodology
-                  and terminology
-                </a>
+                <Link to="#">
+                  Find out more about our pupil absence data and statistics
+                  methodology and terminology
+                </Link>
               </div>
             </div>
           </details>
@@ -75,11 +69,10 @@ const PublicationPage = () => {
             </h2>
 
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <span className="govuk-caption-m">For school year: </span>
-              2016-2017
               <span className="govuk-caption-m govuk-caption-inline">
-                (latest data)
+                For school year:{' '}
               </span>
+              2016-2017 (latest data)
             </h3>
             <details className="govuk-details">
               <summary className="govuk-details__summary">
@@ -177,10 +170,10 @@ const PublicationPage = () => {
       <h2 className="govuk-heading-m">Contents</h2>
       <CollapsibleSection heading="Latest headline facts and figures - 2016/17">
         <ul className="govuk-list govuk-list--bullet">
-          <li>Pupils missed on average 8.2 school days</li>
-          <li>Overall and unauthorised absence rates up on previous year</li>
+          <li>pupils missed on average 8.2 school days</li>
+          <li>overall and unauthorised absence rates up on previous year</li>
           <li>
-            Unauthorised rise due to higher rates of unauthorised holidays
+            unauthorised rise due to higher rates of unauthorised holidays
           </li>
           <li>10% of pupils persistently absent during 2016/17</li>
         </ul>
@@ -738,6 +731,18 @@ const PublicationPage = () => {
           </a>
         </li>
       </ul>
+
+      <h2 className="govuk-heading-m govuk-!-margin-top-9">
+        Exploring the data
+      </h2>
+      <p>
+        The statistics can be viewed as reports, or you can customise and
+        download as excel or .csv files . The data can also be accessed via an
+        API. <a href="#">What is an API?</a>
+      </p>
+      <Link to="/prototypes/data-table/national" className="govuk-button">
+        Explore pupil absence statistics
+      </Link>
     </PrototypePage>
   );
 };

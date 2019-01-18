@@ -1,23 +1,27 @@
 import Checkboxes from 'govuk-frontend/components/checkboxes/checkboxes';
 import React, { Component, createRef } from 'react';
 import FormCheckbox from './FormCheckbox';
+import FormFieldSet, { FieldSetProps } from './FormFieldSet';
 
 interface CheckboxOption {
+  checked?: boolean;
+  hint?: string;
   id: string;
   label: string;
   value: string;
-  checked?: boolean;
 }
 
-interface Props {
+export type CheckboxGroupChangeEventHandler = (
+  state: {
+    [value: string]: boolean;
+  },
+) => void;
+
+type Props = {
   name: string;
-  onChange?: (
-    state: {
-      [value: string]: boolean;
-    },
-  ) => void;
+  onChange?: CheckboxGroupChangeEventHandler;
   options: CheckboxOption[];
-}
+} & Partial<FieldSetProps>;
 
 interface State {
   values: {
@@ -26,6 +30,10 @@ interface State {
 }
 
 class FormCheckboxGroup extends Component<Props, State> {
+  public static defaultProps: Partial<Props> = {
+    legendSize: 'm',
+  };
+
   public state: State = {
     values: {},
   };
@@ -65,7 +73,7 @@ class FormCheckboxGroup extends Component<Props, State> {
     );
   }
 
-  public render() {
+  private renderCheckboxes() {
     return (
       <div className="govuk-checkboxes" ref={this.ref}>
         {this.props.options.map(option => (
@@ -78,6 +86,18 @@ class FormCheckboxGroup extends Component<Props, State> {
           />
         ))}
       </div>
+    );
+  }
+
+  public render() {
+    const { legend, ...restProps } = this.props;
+
+    return legend ? (
+      <FormFieldSet {...restProps} legend={legend}>
+        {this.renderCheckboxes()}
+      </FormFieldSet>
+    ) : (
+      this.renderCheckboxes()
     );
   }
 }

@@ -1,5 +1,13 @@
 import React from 'react';
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
 const PrototypeChartSample = () => {
   const chartData = [
@@ -18,6 +26,8 @@ const PrototypeChartSample = () => {
           data={chartData}
           margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
         >
+          <Tooltip />
+          <Legend iconType="square" verticalAlign="top" height={36} />
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="name"
@@ -42,24 +52,24 @@ const PrototypeChartSample = () => {
           <Line
             type="linear"
             dataKey="unauthorised"
-            stroke="#28A197"
-            strokeWidth="3"
+            stroke="#b10e1e"
+            strokeWidth="5"
             unit="%"
             activeDot={{ r: 3 }}
           />
           <Line
             type="linear"
             dataKey="authorised"
-            stroke="#6F72AF"
-            strokeWidth="3"
+            stroke="#006435"
+            strokeWidth="5"
             unit="%"
             activeDot={{ r: 3 }}
           />
           <Line
             type="linear"
             dataKey="overall"
-            stroke="#DF3034"
-            strokeWidth="3"
+            stroke="#005ea5"
+            strokeWidth="5"
             unit="%"
             activeDot={{ r: 3 }}
           />
