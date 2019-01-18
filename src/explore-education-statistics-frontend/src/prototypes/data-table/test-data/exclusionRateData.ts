@@ -30,12 +30,12 @@ export const fixedPeriodExclusionChartData = [
   {
     exclusions: 267520,
     exclusionsRate: 3.51,
-    name: '2012/13'
+    name: '2012/13',
   },
   {
     exclusions: 269475,
     exclusionsRate: 3.5,
-    name: '2013/14'
+    name: '2013/14',
   },
   {
     exclusions: 302975,
