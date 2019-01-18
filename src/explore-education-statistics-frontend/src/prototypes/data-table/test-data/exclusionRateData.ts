@@ -38,19 +38,19 @@ export const permanentExclusionRateChartData = [
 
 export const permanentExclusionRateTableData = [
   [
-    'primary schools',
+    'Primary schools',
     ...permanentExclusionRateChartData.map(({ primary }) => `${primary}%`),
   ],
   [
-    'secondary schools',
+    'Secondary schools',
     ...permanentExclusionRateChartData.map(({ secondary }) => `${secondary}%`),
   ],
   [
-    'special schools',
+    'Special schools',
     ...permanentExclusionRateChartData.map(({ special }) => `${special}%`),
   ],
   [
-    'total',
+    'Total',
     ...permanentExclusionRateChartData.map(({ total }) => `${total}%`),
   ],
 ];
