@@ -96,7 +96,7 @@ class PrototypeDataTableV1National extends Component<{}, State> {
             <p>View by:</p>
 
             <Tabs>
-              <TabsSection id="years" title="Years">
+              <TabsSection id="years" title="Academic years">
                 {(this.state.filters.EXCLUSIONS ||
                   this.state.filters.PUPIL_ABSENCE) && (
                   <>
