@@ -1,21 +1,13 @@
 import React from 'react';
-import {
-  CartesianGrid,
-  Label,
-  Line,
-  LineChart,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { CartesianGrid, Label, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
 import FluidChartContainer from '../../../components/FluidChartContainer';
-import absenceRateData from '../test-data/absenceRateData';
+import { sessionsAbsentChartData } from '../test-data/absenceRateData';
 
 const PrototypeAbsenceRateChart = () => {
   return (
     <FluidChartContainer>
       <LineChart
-        data={absenceRateData}
+        data={sessionsAbsentChartData}
         margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
@@ -27,7 +19,8 @@ const PrototypeAbsenceRateChart = () => {
         </YAxis>
         <Line
           type="linear"
-          dataKey="Unauthorised"
+          dataKey="unauthorised"
+          name="Unauthorised absence rate"
           stroke="#28A197"
           strokeWidth="1"
           unit="%"
@@ -35,7 +28,8 @@ const PrototypeAbsenceRateChart = () => {
         />
         <Line
           type="linear"
-          dataKey="Authorised"
+          dataKey="authorised"
+          name="Authorised absence rate"
           stroke="#6F72AF"
           strokeWidth="1"
           unit="%"
@@ -43,7 +37,8 @@ const PrototypeAbsenceRateChart = () => {
         />
         <Line
           type="linear"
-          dataKey="Overall"
+          dataKey="overall"
+          name="Overall absence rate"
           stroke="#DF3034"
           strokeWidth="1"
           unit="%"

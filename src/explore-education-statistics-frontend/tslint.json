@@ -14,6 +14,7 @@
     "import-name": false,
     "interface-name": [true, "never-prefix"],
     "member-ordering": false,
+    "object-literal-sort-keys": [true, "shorthand-first"],
     "variable-name": [true, "check-format", "allow-pascal-case"]
   },
   "rulesDirectory": []

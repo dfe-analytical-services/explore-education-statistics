@@ -9,8 +9,8 @@ import PrototypePage from '../components/PrototypePage';
 import PrototypeAbsenceRateChart from './charts/PrototypeAbsenceRateChart';
 import PrototypeExclusionsChart from './charts/PrototypeExclusionsChart';
 import FilterMenu from './components/FilterMenu';
-import absenceRateData from './test-data/absenceRateData';
-import exclusionRateData from './test-data/exclusionRateData';
+import { sessionsAbsentTableData } from './test-data/absenceRateData';
+import { permanentExclusionRateTableData } from './test-data/exclusionRateData';
 
 type DataToggles = 'CHARTS_TABLES' | 'CHARTS' | 'TABLES' | null;
 
@@ -163,26 +163,16 @@ class PrototypeDataTableV1National extends Component<{}, State> {
                                   <strong>Pupil absence</strong>
                                 </td>
                               </tr>
-                              <tr>
-                                <td scope="row">Overall absence rate</td>
-                                {absenceRateData.map(({ Overall, name }) => (
-                                  <td key={name}>{`${Overall}%`}</td>
-                                ))}
-                              </tr>
-                              <tr>
-                                <td scope="row">Authorised absence rate</td>
-                                {absenceRateData.map(({ Authorised, name }) => (
-                                  <td key={name}>{`${Authorised}%`}</td>
-                                ))}
-                              </tr>
-                              <tr>
-                                <td scope="row">Unauthorised absence rate</td>
-                                {absenceRateData.map(
-                                  ({ Unauthorised, name }) => (
-                                    <td key={name}>{`${Unauthorised}%`}</td>
-                                  ),
-                                )}
-                              </tr>
+                              {Object.values(sessionsAbsentTableData).map(
+                                ([firstCell, ...cells], rowIndex) => (
+                                  <tr key={rowIndex}>
+                                    <td scope="row">{firstCell}</td>
+                                    {cells.map((cell, cellIndex) => (
+                                      <td key={cellIndex}>{cell}</td>
+                                    ))}
+                                  </tr>
+                                ),
+                              )}
                             </>
                           )}
                           {this.state.filters.EXCLUSIONS && (
@@ -192,42 +182,16 @@ class PrototypeDataTableV1National extends Component<{}, State> {
                                   <strong>Exclusions</strong>
                                 </td>
                               </tr>
-                              <tr>
-                                <td scope="row">
-                                  Primary permanent exclusion rate
-                                </td>
-                                {exclusionRateData.map(({ Primary, name }) => (
-                                  <td key={name}>{`${Primary.toFixed(3)}%`}</td>
-                                ))}
-                              </tr>
-                              <tr>
-                                <td scope="row">
-                                  Secondary permanent exclusion rate
-                                </td>
-                                {exclusionRateData.map(
-                                  ({ Secondary, name }) => (
-                                    <td key={name}>{`${Secondary.toFixed(
-                                      3,
-                                    )}%`}</td>
-                                  ),
-                                )}
-                              </tr>
-                              <tr>
-                                <td scope="row">
-                                  Special permanent exclusion rate
-                                </td>
-                                {exclusionRateData.map(({ Special, name }) => (
-                                  <td key={name}>{`${Special.toFixed(3)}%`}</td>
-                                ))}
-                              </tr>
-                              <tr>
-                                <td scope="row">
-                                  Primary permanent exclusion rate
-                                </td>
-                                {exclusionRateData.map(({ Total, name }) => (
-                                  <td key={name}>{`${Total.toFixed(3)}%`}</td>
-                                ))}
-                              </tr>
+                              {permanentExclusionRateTableData.map(
+                                ([firstCell, ...cells], rowIndex) => (
+                                  <tr key={rowIndex}>
+                                    <td scope="row">{firstCell}</td>
+                                    {cells.map((cell, cellIndex) => (
+                                      <td key={cellIndex}>{cell}</td>
+                                    ))}
+                                  </tr>
+                                ),
+                              )}
                             </>
                           )}
                         </tbody>

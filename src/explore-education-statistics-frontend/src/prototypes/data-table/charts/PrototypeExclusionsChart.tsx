@@ -1,21 +1,13 @@
 import React from 'react';
-import {
-  CartesianGrid,
-  Label,
-  Line,
-  LineChart,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { CartesianGrid, Label, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
 import FluidChartContainer from '../../../components/FluidChartContainer';
-import exclusionRateData from '../test-data/exclusionRateData';
+import { permanentExclusionRateChartData } from '../test-data/exclusionRateData';
 
 const PrototypeExclusionsChart = () => {
   return (
     <FluidChartContainer>
       <LineChart
-        data={exclusionRateData}
+        data={permanentExclusionRateChartData}
         margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
@@ -34,6 +26,7 @@ const PrototypeExclusionsChart = () => {
         <Line
           type="linear"
           dataKey="Primary"
+          name="Primary schools"
           stroke="#28A197"
           strokeWidth="1"
           unit="%"
@@ -42,6 +35,7 @@ const PrototypeExclusionsChart = () => {
         <Line
           type="linear"
           dataKey="Secondary"
+          name="Secondary schools"
           stroke="#6F72AF"
           strokeWidth="1"
           unit="%"
@@ -50,6 +44,7 @@ const PrototypeExclusionsChart = () => {
         <Line
           type="linear"
           dataKey="Special"
+          name="Special schools"
           stroke="#DF3034"
           strokeWidth="1"
           unit="%"
@@ -58,6 +53,7 @@ const PrototypeExclusionsChart = () => {
         <Line
           type="linear"
           dataKey="Total"
+          name="Total"
           stroke="#ffbf47"
           strokeWidth="1"
           unit="%"
