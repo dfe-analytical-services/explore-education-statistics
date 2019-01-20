@@ -1,0 +1,15 @@
+@import '~govuk-frontend/settings/all';
+@import '~govuk-frontend/helpers/all';
+@import '~govuk-frontend/tools/all';
+@import '~govuk-frontend/core/lists';
+
+.filterMenu {
+  @include govuk-responsive-margin(6, 'bottom');
+
+  composes: filterMenu from './FilterMenu.module.scss';
+}
+
+.linkList {
+  @extend %govuk-list;
+  padding-left: govuk-spacing(4);
+}

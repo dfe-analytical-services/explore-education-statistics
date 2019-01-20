@@ -3,7 +3,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## Setup
 
 1. Create a new `.env` file from `.env.example` and replace any variables as required. `.env.example` 
-   should be mostly work with `.env` out-of-the-box. 
+   should work as `.env` out-of-the-box.
    
 2. Install NPM dependencies.
 
@@ -11,9 +11,18 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
     npm install
     ```
 
+## Data API and Content API
+
+If running the app in development mode, you will need to run these APIs locally.
+
+This can be done by running the following _from the src directory_:
+```bash
+docker-compose up data-api content-api
+```
+
 ## Available Scripts
 
-In the project directory, you can run:
+In the project directory (i.e. explore-education-statics-frontend), you can run:
 
 ### `npm start`
 

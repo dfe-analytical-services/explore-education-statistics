@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Helmet } from 'react-helmet';
 import { match } from 'react-router';
 import api from '../api';
 import ContentItemList from '../components/ContentItemList';
@@ -44,6 +45,9 @@ class ThemePage extends Component<Props, State> {
 
     return (
       <div>
+        <Helmet>
+          <title>{data.title} - GOV.UK</title>
+        </Helmet>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <PageHeading

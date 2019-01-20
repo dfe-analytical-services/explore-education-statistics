@@ -7,7 +7,7 @@ interface Props {
 }
 
 const StepByStepNavigationStep = ({ children, title, caption }: Props) => (
-  <li className="app-step-nav__step js-step">
+  <li className="app-step-nav__step js-step" data-testid="step-by-step">
     <div className="app-step-nav__header js-toggle-panel" data-position="4">
       <h2 className="app-step-nav__title">
         <span className="app-step-nav__circle app-step-nav__circle--number">
@@ -24,13 +24,17 @@ const StepByStepNavigationStep = ({ children, title, caption }: Props) => (
             aria-expanded="true"
             aria-controls="step-panel"
           >
-            <span className="js-step-title-text">
+            <span
+              className="js-step-title-text"
+              data-testid="step-by-step--title"
+            >
               {title}
               <span className="govuk-caption-m">{caption}</span>
             </span>
             <span
               className="app-step-nav__toggle-link js-toggle-link"
               aria-hidden="false"
+              data-testid="step-by-step--show-link"
             >
               Show
             </span>
@@ -38,7 +42,11 @@ const StepByStepNavigationStep = ({ children, title, caption }: Props) => (
         </span>
       </h2>
     </div>
-    <div className="app-step-nav__panel js-panel" id="step-panel">
+    <div
+      className="app-step-nav__panel js-panel"
+      id="step-panel"
+      data-testid="step-by-step--panel"
+    >
       {children}
     </div>
   </li>

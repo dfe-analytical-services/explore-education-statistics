@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormFieldSet renders correctly with hint 1`] = `
+
+<fieldset class="govuk-fieldset"
+          aria-describedby="the-hint"
+>
+  <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+    Fill the form
+  </legend>
+  <span class="govuk-hint"
+        id="the-hint"
+  >
+    All fields are required
+  </span>
+  <input type="text"
+         name="test-input-1"
+  >
+  <input type="text"
+         name="test-input-2"
+  >
+</fieldset>
+
+`;
+
+exports[`FormFieldSet renders correctly with required props 1`] = `
+
+<fieldset class="govuk-fieldset">
+  <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+    Fill the form
+  </legend>
+  <input type="text"
+         name="test-input-1"
+  >
+  <input type="text"
+         name="test-input-2"
+  >
+</fieldset>
+
+`;

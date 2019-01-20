@@ -1,0 +1,20 @@
+@import '~govuk-frontend/components/table/table';
+
+/* stylelint-disable scss/at-extend-no-missing-placeholder */
+.govuk-table {
+  th {
+    @extend .govuk-table__header;
+  }
+
+  td {
+    @extend .govuk-table__cell;
+  }
+
+  caption {
+    @extend .govuk-table__caption;
+  }
+}
+
+.govuk-table__row--striped {
+  background: govuk-colour('grey-4');
+}

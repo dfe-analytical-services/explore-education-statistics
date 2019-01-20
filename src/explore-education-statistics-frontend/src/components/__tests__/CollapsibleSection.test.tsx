@@ -54,4 +54,35 @@ describe('CollapsibleSection', () => {
 
     expect(content.getAttribute('id')).toContain('collapsible-section-');
   });
+
+  test('renders with different heading size', () => {
+    const { container } = render(
+      <CollapsibleSection
+        heading="Test heading"
+        headingTag="h3"
+        contentId="the-content"
+      >
+        <p>Test content</p>
+      </CollapsibleSection>,
+    );
+
+    expect(container.querySelector('h2')).toBeNull();
+    expect(container.querySelector('h3')).not.toBeNull();
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders with caption', () => {
+    const { container, getByText } = render(
+      <CollapsibleSection
+        heading="Test heading"
+        caption="Some caption text"
+        contentId="the-content"
+      >
+        <p>Test content</p>
+      </CollapsibleSection>,
+    );
+
+    expect(getByText('Some caption text')).toBeDefined();
+    expect(container.innerHTML).toMatchSnapshot();
+  });
 });

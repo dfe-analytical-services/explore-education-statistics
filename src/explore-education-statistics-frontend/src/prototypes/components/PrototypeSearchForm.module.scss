@@ -1,0 +1,16 @@
+@import '~govuk-frontend/settings/all';
+@import '~govuk-frontend/tools/all';
+@import '~govuk-frontend/helpers/all';
+
+.container {
+  @include govuk-responsive-padding(3);
+
+  background: govuk-colour('grey-3');
+  margin-bottom: govuk-spacing(6);
+
+  @include govuk-media-query($until: tablet) {
+    button {
+      margin-top: govuk-spacing(2);
+    }
+  }
+}
