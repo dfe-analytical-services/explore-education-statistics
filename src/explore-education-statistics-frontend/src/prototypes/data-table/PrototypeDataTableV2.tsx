@@ -148,9 +148,7 @@ class PrototypeDataTableV2 extends Component<{}, State> {
         filters.PERMANENT_EXCLUSIONS &&
         filters.FIXED_PERIOD_EXCLUSIONS_RATE &&
         filters.FIXED_PERIOD_EXCLUSIONS,
-      GENERAL_ALL:
-        filters.GENERAL_ENROLMENTS &&
-        filters.GENERAL_SCHOOLS,
+      GENERAL_ALL: filters.GENERAL_ENROLMENTS && filters.GENERAL_SCHOOLS,
       SESSIONS_ALL:
         filters.SESSIONS_UNAUTHORISED_RATE &&
         filters.SESSIONS_OVERALL_RATE &&
