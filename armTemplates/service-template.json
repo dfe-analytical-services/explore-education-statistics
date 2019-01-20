@@ -1,191 +1,220 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "webAppName": {
-            "type": "string"
-        },
-        "hostingPlanName": {
-            "type": "string"
-        },
-        "appInsightsLocation": {
-            "type": "string"
-        },
-        "sku": {
-            "type": "string",
-            "defaultValue": "Standard S1"
-        },
-        "storageAccountName": {
-            "type": "string"
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "webAppName": {
+      "type": "string"
     },
-    "variables": {
-        "dataAppName": "[concat('data-', parameters('webAppName'))]",
-        "contentAppName": "[concat('content-', parameters('webAppName'))]",
-        "dataPlanName": "[concat('data-', parameters('hostingPlanName'))]", 
-        "contentPlanName": "[concat('content-', parameters('hostingPlanName'))]"
+    "hostingPlanName": {
+      "type": "string"
     },
-    "resources": [
+    "appInsightsLocation": {
+      "type": "string"
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "Standard S1"
+    },
+    "storageAccountName": {
+      "type": "string"
+    },
+    "cosmosAccountName": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "dataAppName": "[concat('data-', parameters('webAppName'))]",
+    "contentAppName": "[concat('content-', parameters('webAppName'))]",
+    "dataPlanName": "[concat('data-', parameters('hostingPlanName'))]",
+    "contentPlanName": "[concat('content-', parameters('hostingPlanName'))]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-04-08",
+      "kind": "MongoDB",
+      "type": "Microsoft.DocumentDb/databaseAccounts",
+      "name": "[parameters('cosmosAccountName')]",
+      "location": "westeurope",
+      "properties": {
+        "databaseAccountOfferType": "Standard",
+        "locations": [
+          {
+            "failoverPriority": 0,
+            "locationName": "westeurope"
+          }
+        ],
+        "enableMultipleWriteLocations": false,
+        "isVirtualNetworkFilterEnabled": false,
+        "virtualNetworkRules": [],
+        "dependsOn": []
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('dataAppName')]",
+      "apiVersion": "2016-08-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('dataPlanName'))]": "empty"
+      },
+      "resources": [
         {
-            "type": "Microsoft.Web/sites",
-            "name": "[variables('dataAppName')]",
-            "apiVersion": "2016-08-01",
-            "location": "[resourceGroup().location]",
-            "tags": {
-                "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('dataPlanName'))]": "empty"
-            },
-            "resources": [
-                {
-                    "type": "siteextensions",
-                    "name": "Microsoft.ApplicationInsights.AzureWebSites",
-                    "apiVersion": "2015-08-01",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
-                    ],
-                    "properties": {
-                    }
-                }
-            ],
-            "properties": {
-                "siteConfig": {
-                    "appSettings": [
-                        {
-                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                            "value": "[reference(resourceId('microsoft.insights/components/', variables('dataAppName')), '2015-05-01').InstrumentationKey]"
-                        },
-                        {
-                            "name": "WEBSITE_NODE_DEFAULT_VERSION",
-                            "value": "6.9.1"
-                        }
-                    ],
-                    "phpVersion": "7.1"
-                },
-                "name": "[variables('dataAppName')]",
-                "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
-                "hostingEnvironment": ""
-            },
-            "dependsOn": [
-                "[concat('Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
-                "[resourceId('microsoft.insights/components/', variables('dataAppName'))]"
-            ]
-        },
-        {
-            "type": "Microsoft.Web/serverfarms",
-            "sku": {
-                "Tier": "[first(skip(split(parameters('sku'), ' '), 1))]",
-                "Name": "[first(split(parameters('sku'), ' '))]"
-            },
-            "name": "[variables('dataPlanName')]",
-            "apiVersion": "2015-08-01",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "name": "[variables('dataPlanName')]",
-                "workerSizeId": "0",
-                "reserved": false,
-                "numberOfWorkers": "1",
-                "hostingEnvironment": ""
-            }
-        },
-        {
-            "type": "Microsoft.Insights/components",
-            "name": "[variables('dataAppName')]",
-            "apiVersion": "2014-04-01",
-            "location": "[parameters('appInsightsLocation')]",
-            "tags": {
-                "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('dataAppName'))]": "Resource"
-            },
-            "properties": {
-                "applicationId": "[variables('dataAppName')]",
-                "Request_Source": "AzureTfsExtensionAzureProject"
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites",
-            "name": "[variables('contentAppName')]",
-            "apiVersion": "2016-08-01",
-            "location": "[resourceGroup().location]",
-            "tags": {
-                "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('contentPlanName'))]": "empty"
-            },
-            "resources": [
-                {
-                    "type": "siteextensions",
-                    "name": "Microsoft.ApplicationInsights.AzureWebSites",
-                    "apiVersion": "2015-08-01",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
-                    ],
-                    "properties": {
-                    }
-                }
-            ],
-            "properties": {
-                "siteConfig": {
-                    "appSettings": [
-                        {
-                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                            "value": "[reference(resourceId('microsoft.insights/components/', variables('contentAppName')), '2015-05-01').InstrumentationKey]"
-                        },
-                        {
-                            "name": "WEBSITE_NODE_DEFAULT_VERSION",
-                            "value": "6.9.1"
-                        }
-                    ],
-                    "phpVersion": "7.1"
-                },
-                "name": "[variables('contentAppName')]",
-                "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
-                "hostingEnvironment": ""
-            },
-            "dependsOn": [
-                "[concat('Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
-                "[resourceId('microsoft.insights/components/', variables('contentAppName'))]"
-            ]
-        },
-        {
-            "type": "Microsoft.Web/serverfarms",
-            "sku": {
-                "Tier": "[first(skip(split(parameters('sku'), ' '), 1))]",
-                "Name": "[first(split(parameters('sku'), ' '))]"
-            },
-            "name": "[variables('contentPlanName')]",
-            "apiVersion": "2015-08-01",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "name": "[variables('contentPlanName')]",
-                "workerSizeId": "0",
-                "reserved": false,
-                "numberOfWorkers": "1",
-                "hostingEnvironment": ""
-            }
-        },
-        {
-            "type": "Microsoft.Insights/components",
-            "name": "[variables('contentAppName')]",
-            "apiVersion": "2014-04-01",
-            "location": "[parameters('appInsightsLocation')]",
-            "tags": {
-                "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('contentAppName'))]": "Resource"
-            },
-            "properties": {
-                "applicationId": "[variables('contentAppName')]",
-                "Request_Source": "AzureTfsExtensionAzureProject"
-            }
-        },
-        {
-            "name": "[parameters('storageAccountName')]",
-            "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2018-07-01",
-            "location": "westeurope",
-            "properties": {
-                "accessTier": "Hot",
-                "supportsHttpsTrafficOnly": true
-            },
-            "dependsOn": [],
-            "sku": {
-                "name": "Standard_RAGRS"
-            },
-            "kind": "StorageV2"
+          "type": "siteextensions",
+          "name": "Microsoft.ApplicationInsights.AzureWebSites",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
+          ],
+          "properties": {}
         }
-    ]
+      ],
+      "properties": {
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('dataAppName')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "WEBSITE_NODE_DEFAULT_VERSION",
+              "value": "6.9.1"
+            },
+            {
+              "Name": "DOCUMENTDB_ENDPOINT",
+              "Value": "[reference(concat('Microsoft.DocumentDb/databaseAccounts/', parameters('cosmosAccountName'))).documentEndpoint]"
+            },
+            {
+              "Name": "DOCUMENTDB_PRIMARY_KEY",
+              "Value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('cosmosAccountName')), '2015-04-08').primaryMasterKey]"
+            }
+          ],
+          "phpVersion": "off"
+        },
+        "name": "[variables('dataAppName')]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
+        "hostingEnvironment": ""
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
+        "[resourceId('microsoft.insights/components/', variables('dataAppName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "Tier": "[first(skip(split(parameters('sku'), ' '), 1))]",
+        "Name": "[first(split(parameters('sku'), ' '))]"
+      },
+      "name": "[variables('dataPlanName')]",
+      "apiVersion": "2015-08-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "name": "[variables('dataPlanName')]",
+        "workerSizeId": "0",
+        "reserved": false,
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "name": "[variables('dataAppName')]",
+      "apiVersion": "2014-04-01",
+      "location": "[parameters('appInsightsLocation')]",
+      "tags": {
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('dataAppName'))]": "Resource"
+      },
+      "properties": {
+        "applicationId": "[variables('dataAppName')]",
+        "Request_Source": "AzureTfsExtensionAzureProject"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('contentAppName')]",
+      "apiVersion": "2016-08-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('contentPlanName'))]": "empty"
+      },
+      "resources": [
+        {
+          "type": "siteextensions",
+          "name": "Microsoft.ApplicationInsights.AzureWebSites",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
+          ],
+          "properties": {}
+        }
+      ],
+      "properties": {
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('contentAppName')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "WEBSITE_NODE_DEFAULT_VERSION",
+              "value": "6.9.1"
+            }
+          ],
+          "phpVersion": "7.1"
+        },
+        "name": "[variables('contentAppName')]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
+        "hostingEnvironment": ""
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
+        "[resourceId('microsoft.insights/components/', variables('contentAppName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "Tier": "[first(skip(split(parameters('sku'), ' '), 1))]",
+        "Name": "[first(split(parameters('sku'), ' '))]"
+      },
+      "name": "[variables('contentPlanName')]",
+      "apiVersion": "2015-08-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "name": "[variables('contentPlanName')]",
+        "workerSizeId": "0",
+        "reserved": false,
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "name": "[variables('contentAppName')]",
+      "apiVersion": "2014-04-01",
+      "location": "[parameters('appInsightsLocation')]",
+      "tags": {
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('contentAppName'))]": "Resource"
+      },
+      "properties": {
+        "applicationId": "[variables('contentAppName')]",
+        "Request_Source": "AzureTfsExtensionAzureProject"
+      }
+    },
+    {
+      "name": "[parameters('storageAccountName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2018-07-01",
+      "location": "westeurope",
+      "properties": {
+        "accessTier": "Hot",
+        "supportsHttpsTrafficOnly": true
+      },
+      "dependsOn": [],
+      "sku": {
+        "name": "Standard_RAGRS"
+      },
+      "kind": "StorageV2"
+    }
+  ]
 }
