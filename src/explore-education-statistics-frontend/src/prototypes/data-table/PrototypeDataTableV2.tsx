@@ -24,23 +24,29 @@ const allTableData: any = {
   ...exclusionTableData,
 };
 
+// tslint:disable-next-line:interface-over-type-literal
+type Filters = {
+  GENERAL_ALL: boolean;
+  FIXED_PERIOD_EXCLUSIONS: boolean;
+  FIXED_PERIOD_EXCLUSIONS_RATE: boolean;
+  EXCLUSIONS_ALL: boolean;
+  GENERAL_ENROLMENTS: boolean;
+  GENERAL_SCHOOLS: boolean;
+  PERMANENT_EXCLUSIONS: boolean;
+  PERMANENT_EXCLUSIONS_RATE: boolean;
+  SESSIONS_ALL: boolean;
+  SESSIONS_AUTHORISED_RATE: boolean;
+  SESSIONS_OVERALL_RATE: boolean;
+  SESSIONS_UNAUTHORISED_RATE: boolean;
+};
+
 interface State {
   chartData: {
     [key: string]: number;
   }[];
   dataToggle: DataToggles;
   menuOption?: MenuOption | null;
-  filters: {
-    GENERAL_ENROLMENTS: boolean;
-    GENERAL_SCHOOLS: boolean;
-    SESSIONS_AUTHORISED_RATE: boolean;
-    SESSIONS_OVERALL_RATE: boolean;
-    SESSIONS_UNAUTHORISED_RATE: boolean;
-    PERMANENT_EXCLUSIONS: boolean;
-    PERMANENT_EXCLUSIONS_RATE: boolean;
-    FIXED_PERIOD_EXCLUSIONS: boolean;
-    FIXED_PERIOD_EXCLUSIONS_RATE: boolean;
-  };
+  filters: Filters;
   tableData: string[][];
 }
 
@@ -49,12 +55,15 @@ class PrototypeDataTableV2 extends Component<{}, State> {
     chartData: [],
     dataToggle: null,
     filters: {
+      EXCLUSIONS_ALL: false,
       FIXED_PERIOD_EXCLUSIONS: false,
       FIXED_PERIOD_EXCLUSIONS_RATE: false,
+      GENERAL_ALL: false,
       GENERAL_ENROLMENTS: false,
       GENERAL_SCHOOLS: false,
       PERMANENT_EXCLUSIONS: false,
       PERMANENT_EXCLUSIONS_RATE: false,
+      SESSIONS_ALL: false,
       SESSIONS_AUTHORISED_RATE: false,
       SESSIONS_OVERALL_RATE: false,
       SESSIONS_UNAUTHORISED_RATE: false,
@@ -70,12 +79,15 @@ class PrototypeDataTableV2 extends Component<{}, State> {
       {
         menuOption,
         filters: {
+          EXCLUSIONS_ALL: false,
           FIXED_PERIOD_EXCLUSIONS: false,
           FIXED_PERIOD_EXCLUSIONS_RATE: false,
+          GENERAL_ALL: false,
           GENERAL_ENROLMENTS: false,
           GENERAL_SCHOOLS: false,
           PERMANENT_EXCLUSIONS: false,
           PERMANENT_EXCLUSIONS_RATE: false,
+          SESSIONS_ALL: false,
           SESSIONS_AUTHORISED_RATE: false,
           SESSIONS_OVERALL_RATE: false,
           SESSIONS_UNAUTHORISED_RATE: false,
@@ -93,16 +105,65 @@ class PrototypeDataTableV2 extends Component<{}, State> {
   private handleFilterCheckboxChange: ChangeEventHandler<
     HTMLInputElement
   > = event => {
-    const filters = {
-      ...this.state.filters,
-      [event.target.value]: event.target.checked,
+    let filters: Filters;
+
+    const checkedValue = event.target.checked;
+
+    switch (event.target.value) {
+      case 'GENERAL_ALL':
+        filters = {
+          ...this.state.filters,
+          GENERAL_ENROLMENTS: checkedValue,
+          GENERAL_SCHOOLS: checkedValue,
+        };
+        break;
+      case 'SESSIONS_ALL':
+        filters = {
+          ...this.state.filters,
+          SESSIONS_AUTHORISED_RATE: checkedValue,
+          SESSIONS_OVERALL_RATE: checkedValue,
+          SESSIONS_UNAUTHORISED_RATE: checkedValue,
+        };
+        break;
+      case 'EXCLUSIONS_ALL':
+        filters = {
+          ...this.state.filters,
+          FIXED_PERIOD_EXCLUSIONS: checkedValue,
+          FIXED_PERIOD_EXCLUSIONS_RATE: checkedValue,
+          PERMANENT_EXCLUSIONS: checkedValue,
+          PERMANENT_EXCLUSIONS_RATE: checkedValue,
+        };
+        break;
+      default:
+        filters = {
+          ...this.state.filters,
+          [event.target.value]: checkedValue,
+        };
+    }
+
+    filters = {
+      ...filters,
+      EXCLUSIONS_ALL:
+        filters.PERMANENT_EXCLUSIONS_RATE &&
+        filters.PERMANENT_EXCLUSIONS &&
+        filters.FIXED_PERIOD_EXCLUSIONS_RATE &&
+        filters.FIXED_PERIOD_EXCLUSIONS,
+      GENERAL_ALL:
+        filters.GENERAL_ENROLMENTS &&
+        filters.GENERAL_SCHOOLS,
+      SESSIONS_ALL:
+        filters.SESSIONS_UNAUTHORISED_RATE &&
+        filters.SESSIONS_OVERALL_RATE &&
+        filters.SESSIONS_AUTHORISED_RATE,
     };
 
     const checkedFilters = Object.entries(filters)
       .filter(([_, isChecked]) => isChecked)
       .map(([key]) => key);
 
-    const tableData = checkedFilters.map(key => allTableData[key]);
+    const tableData = checkedFilters
+      .filter(key => allTableData[key])
+      .map(key => allTableData[key]);
 
     this.setState({
       filters,
@@ -219,12 +280,17 @@ class PrototypeDataTableV2 extends Component<{}, State> {
                         onChange={this.handleFilterCheckboxChange}
                         options={[
                           {
-                            id: 'enrolments',
+                            id: 'general-all',
+                            label: 'Select all',
+                            value: 'GENERAL_ALL',
+                          },
+                          {
+                            id: 'general-enrolments',
                             label: 'Enrolments',
                             value: 'GENERAL_ENROLMENTS',
                           },
                           {
-                            id: 'schools',
+                            id: 'general-schools',
                             label: 'Schools',
                             value: 'GENERAL_SCHOOLS',
                           },
@@ -234,22 +300,28 @@ class PrototypeDataTableV2 extends Component<{}, State> {
 
                     <div className="govuk-form-group">
                       <FormCheckboxGroup
+                        checkedValues={this.state.filters}
                         name="pupilAbsence"
                         legend="Sessions absent"
                         onChange={this.handleFilterCheckboxChange}
                         options={[
                           {
-                            id: 'sessionsAuthorised',
+                            id: 'sessions-all',
+                            label: 'Select all',
+                            value: 'SESSIONS_ALL',
+                          },
+                          {
+                            id: 'sessions-authorised-rate',
                             label: 'Authorised rate',
                             value: 'SESSIONS_AUTHORISED_RATE',
                           },
                           {
-                            id: 'sessionsOverall',
+                            id: 'sessions-overall-rate',
                             label: 'Overall rate',
                             value: 'SESSIONS_OVERALL_RATE',
                           },
                           {
-                            id: 'sessionsUnauthorised',
+                            id: 'sessions-unauthorised-rate',
                             label: 'Unauthorised rate',
                             value: 'SESSIONS_UNAUTHORISED_RATE',
                           },
@@ -261,27 +333,33 @@ class PrototypeDataTableV2 extends Component<{}, State> {
 
                 {this.state.menuOption === 'EXCLUSIONS' && (
                   <FormCheckboxGroup
+                    checkedValues={this.state.filters}
                     name="pupilAbsence"
                     legend="Exclusions"
                     onChange={this.handleFilterCheckboxChange}
                     options={[
                       {
-                        id: 'permanentExclusions',
+                        id: 'exclusions-all',
+                        label: 'Select all',
+                        value: 'EXCLUSIONS_ALL',
+                      },
+                      {
+                        id: 'permanent-exclusions',
                         label: 'Permanent exclusions',
                         value: 'PERMANENT_EXCLUSIONS',
                       },
                       {
-                        id: 'permanentExclusionRate',
+                        id: 'permanent-exclusions-rate',
                         label: 'Permanent exclusion rate',
                         value: 'PERMANENT_EXCLUSIONS_RATE',
                       },
                       {
-                        id: 'fixedPeriodExclusions',
+                        id: 'fixed-period-exclusions',
                         label: 'Fixed period exclusions',
                         value: 'FIXED_PERIOD_EXCLUSIONS',
                       },
                       {
-                        id: 'fixedPeriodExclusionRate',
+                        id: 'fixed-period-exclusions-rate',
                         label: 'Fixed period exclusion rate',
                         value: 'FIXED_PERIOD_EXCLUSIONS_RATE',
                       },
