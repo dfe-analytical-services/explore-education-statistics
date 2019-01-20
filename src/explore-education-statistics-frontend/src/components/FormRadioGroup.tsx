@@ -4,7 +4,7 @@ import React, { Component, createRef } from 'react';
 import FormFieldSet, { FieldSetProps } from './FormFieldSet';
 import FormRadio from './FormRadio';
 
-export type RadioGroupChangeEventHandler = (value: string) => void;
+export type RadioGroupChangeEventHandler<T = string> = (value: T) => void;
 
 interface RadioOption {
   hint?: string;
@@ -16,7 +16,7 @@ interface RadioOption {
 type Props = {
   inline?: boolean;
   name: string;
-  onChange?: RadioGroupChangeEventHandler;
+  onChange?: RadioGroupChangeEventHandler<any>;
   options: RadioOption[];
 } & Partial<FieldSetProps>;
 
