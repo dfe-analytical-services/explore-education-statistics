@@ -1,5 +1,6 @@
 import React, { ChangeEventHandler, Component } from 'react';
 import Button from '../../components/Button';
+import { RadioChangeEventHandler } from '../../components/FormRadio';
 import FormRadioGroup from '../../components/FormRadioGroup';
 import PageHeading from '../../components/PageHeading';
 import Tabs from '../../components/Tabs';
@@ -41,10 +42,10 @@ class PrototypeDataTableV1LocalAuthority extends Component<{}, State> {
     });
   };
 
-  private handleRadioChange = (value: DataToggles | null) => {
-    if (value) {
-      this.setState({ dataToggle: value });
-    }
+  private handleRadioChange: RadioChangeEventHandler<{
+    value: DataToggles;
+  }> = event => {
+    this.setState({ dataToggle: event.target.value });
   };
 
   public render() {
@@ -107,7 +108,7 @@ class PrototypeDataTableV1LocalAuthority extends Component<{}, State> {
                       name="dataToggle"
                       legend="What do you want to see?"
                       legendSize="s"
-                      onChange={this.handleRadioChange as any}
+                      onChange={this.handleRadioChange}
                       options={[
                         {
                           id: 'chartsAndTable',
