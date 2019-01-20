@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import Button from '../../components/Button';
+import React, { Component, createRef } from 'react';
 import FormCheckboxGroup, {
   CheckboxGroupChangeEventHandler,
 } from '../../components/FormCheckboxGroup';
@@ -13,8 +12,8 @@ import PrototypeAbsenceRateChart from './charts/PrototypeAbsenceRateChart';
 import PrototypeFixedPeriodExclusionsChart from './charts/PrototypeFixedPeriodExclusionsChart';
 import PrototypePermanentExclusionsChart from './charts/PrototypePermanentExclusionsChart';
 import FilterMenuRadios, {
-  MenuChangeEventHandler,
   MenuOption,
+  MenuSubmitEventHandler,
 } from './components/FilterMenuRadios';
 import { allTableData as absenceTableData } from './test-data/absenceRateData';
 import { allTableData as exclusionTableData } from './test-data/exclusionRateData';
@@ -67,22 +66,31 @@ class PrototypeDataTableV2 extends Component<{}, State> {
     tableData: [],
   };
 
-  private handleMenuChange: MenuChangeEventHandler = menuOption => {
-    this.setState({
-      menuOption,
-      filters: {
-        FIXED_PERIOD_EXCLUSIONS: false,
-        FIXED_PERIOD_EXCLUSIONS_RATE: false,
-        GENERAL_ENROLMENTS: false,
-        GENERAL_SCHOOLS: false,
-        PERMANENT_EXCLUSIONS: false,
-        PERMANENT_EXCLUSIONS_RATE: false,
-        SESSIONS_AUTHORISED_RATE: false,
-        SESSIONS_OVERALL_RATE: false,
-        SESSIONS_UNAUTHORISED_RATE: false,
+  private dataTableRef = createRef<HTMLDivElement>();
+
+  private handleMenuChange: MenuSubmitEventHandler = menuOption => {
+    this.setState(
+      {
+        menuOption,
+        filters: {
+          FIXED_PERIOD_EXCLUSIONS: false,
+          FIXED_PERIOD_EXCLUSIONS_RATE: false,
+          GENERAL_ENROLMENTS: false,
+          GENERAL_SCHOOLS: false,
+          PERMANENT_EXCLUSIONS: false,
+          PERMANENT_EXCLUSIONS_RATE: false,
+          SESSIONS_AUTHORISED_RATE: false,
+          SESSIONS_OVERALL_RATE: false,
+          SESSIONS_UNAUTHORISED_RATE: false,
+        },
+        tableData: [],
       },
-      tableData: [],
-    });
+      () => {
+        if (this.dataTableRef.current) {
+          this.dataTableRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      },
+    );
   };
 
   private handleFilterCheckboxChange: CheckboxGroupChangeEventHandler<
@@ -161,7 +169,7 @@ class PrototypeDataTableV2 extends Component<{}, State> {
         <ul>
           <li>
             You can explore all the DfE statistics available at national level
-            here. You can use our step by step guide, or dive straight in.
+            here.
           </li>
           <li>
             Once you've chosen your data you can view it by year, school type,
@@ -173,36 +181,33 @@ class PrototypeDataTableV2 extends Component<{}, State> {
           </li>
         </ul>
 
-        <h2>Find and compare statistics at national level</h2>
-
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-full">
-            <FilterMenuRadios
-              onChange={this.handleMenuChange}
-              beforeMenu={
-                <form>
-                  <h3 className="govuk-heading-s">Search for statistics</h3>
-
-                  <div className="govuk-form-group">
-                    <input type="text" className="govuk-input" />
-                  </div>
-
-                  <Button>Search</Button>
-                </form>
-              }
-            />
+            <FilterMenuRadios onSubmit={this.handleMenuChange} />
           </div>
         </div>
 
         {(this.state.menuOption === 'EXCLUSIONS' ||
           this.state.menuOption === 'PUPIL_ABSENCE') && (
-          <>
+          <div ref={this.dataTableRef}>
             {this.state.menuOption === 'PUPIL_ABSENCE' && (
-              <h3>Choose indicators from 'Pupil absence'</h3>
+              <h2>
+                Explore statistics from 'Pupil absence'
+                <span className="govuk-hint">
+                  Select any statistics you are interested in from the
+                  checkboxes below
+                </span>
+              </h2>
             )}
 
             {this.state.menuOption === 'EXCLUSIONS' && (
-              <h3>Choose indicators from 'Exclusions'</h3>
+              <h2>
+                Explore statistics from 'Exclusions'
+                <span className="govuk-hint">
+                  Select any statistics you are interested in from the
+                  checkboxes below
+                </span>
+              </h2>
             )}
 
             <div className="govuk-grid-row">
@@ -287,173 +292,185 @@ class PrototypeDataTableV2 extends Component<{}, State> {
                 )}
               </div>
 
-              <div className="govuk-grid-column-three-quarters">
-                <p>View by:</p>
+              {this.hasAnyFilters() && (
+                <div className="govuk-grid-column-three-quarters">
+                  <FormRadioGroup
+                    inline
+                    name="dataToggle"
+                    legend="What do you want to see?"
+                    legendSize="m"
+                    onChange={this.handleRadioChange as any}
+                    options={[
+                      {
+                        id: 'chartsAndTable',
+                        label: 'Charts and table',
+                        value: 'CHARTS_TABLES',
+                      },
+                      { id: 'charts', label: 'Charts', value: 'CHARTS' },
+                      { id: 'table', label: 'Table', value: 'TABLES' },
+                    ]}
+                  />
 
-                <Tabs>
-                  <TabsSection id="years" title="Academic years">
+                  {this.state.dataToggle && (
                     <>
-                      <FormRadioGroup
-                        inline
-                        name="dataToggle"
-                        legend="What do you want to see?"
-                        legendSize="s"
-                        onChange={this.handleRadioChange as any}
-                        options={[
-                          {
-                            id: 'chartsAndTable',
-                            label: 'Charts and table',
-                            value: 'CHARTS_TABLES',
-                          },
-                          { id: 'charts', label: 'Charts', value: 'CHARTS' },
-                          { id: 'table', label: 'Table', value: 'TABLES' },
-                        ]}
-                      />
+                      <p>View by:</p>
 
-                      {(this.state.dataToggle === 'CHARTS_TABLES' ||
-                        this.state.dataToggle === 'CHARTS') && (
-                        <div className="govuk-grid-row">
-                          {this.state.menuOption === 'PUPIL_ABSENCE' && (
-                            <>
-                              {this.hasGeneralFilters() && (
-                                <div className="govuk-grid-column-one-half">
-                                  <p>General</p>
+                      <Tabs>
+                        <TabsSection id="years" title="Academic years">
+                          <>
+                            {(this.state.dataToggle === 'CHARTS_TABLES' ||
+                              this.state.dataToggle === 'CHARTS') && (
+                              <div className="govuk-grid-row">
+                                {this.state.menuOption === 'PUPIL_ABSENCE' && (
+                                  <>
+                                    {this.hasGeneralFilters() && (
+                                      <div className="govuk-grid-column-one-half">
+                                        <p>General</p>
 
-                                  <PrototypeAbsenceGeneralChart
-                                    enrolments={
-                                      this.state.filters.GENERAL_ENROLMENTS
-                                    }
-                                    schools={this.state.filters.GENERAL_SCHOOLS}
-                                  />
-                                </div>
-                              )}
-                              {this.hasSessionsFilters() && (
-                                <div className="govuk-grid-column-one-half">
-                                  <p>Sessions absent</p>
+                                        <PrototypeAbsenceGeneralChart
+                                          enrolments={
+                                            this.state.filters
+                                              .GENERAL_ENROLMENTS
+                                          }
+                                          schools={
+                                            this.state.filters.GENERAL_SCHOOLS
+                                          }
+                                        />
+                                      </div>
+                                    )}
+                                    {this.hasSessionsFilters() && (
+                                      <div className="govuk-grid-column-one-half">
+                                        <p>Sessions absent</p>
 
-                                  <PrototypeAbsenceRateChart
-                                    authorised={
-                                      this.state.filters
-                                        .SESSIONS_AUTHORISED_RATE
-                                    }
-                                    unauthorised={
-                                      this.state.filters
-                                        .SESSIONS_UNAUTHORISED_RATE
-                                    }
-                                    overall={
-                                      this.state.filters.SESSIONS_OVERALL_RATE
-                                    }
-                                  />
-                                </div>
-                              )}
-                            </>
-                          )}
-                          {this.state.menuOption === 'EXCLUSIONS' && (
-                            <>
-                              {this.hasPermanentExclusionFilters() && (
-                                <div className="govuk-grid-column-one-half">
-                                  <p>Permanent exclusions</p>
-
-                                  <PrototypePermanentExclusionsChart
-                                    exclusions={
-                                      this.state.filters.PERMANENT_EXCLUSIONS
-                                    }
-                                    exclusionsRate={
-                                      this.state.filters
-                                        .PERMANENT_EXCLUSIONS_RATE
-                                    }
-                                  />
-                                </div>
-                              )}
-                              {this.hasFixedPeriodExclusionFilters() && (
-                                <div className="govuk-grid-column-one-half">
-                                  <p>Fixed period exclusions</p>
-
-                                  <PrototypeFixedPeriodExclusionsChart
-                                    exclusions={
-                                      this.state.filters.FIXED_PERIOD_EXCLUSIONS
-                                    }
-                                    exclusionsRate={
-                                      this.state.filters
-                                        .FIXED_PERIOD_EXCLUSIONS_RATE
-                                    }
-                                  />
-                                </div>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      )}
-
-                      {this.hasAnyFilters() && (
-                        <>
-                          <hr />
-
-                          {(this.state.dataToggle === 'CHARTS_TABLES' ||
-                            this.state.dataToggle === 'TABLES') && (
-                            <table className="govuk-table">
-                              <caption>
-                                Comparing statistics between 2012 and 2017
-                              </caption>
-                              <thead>
-                                <tr>
-                                  <th />
-                                  <th scope="col">2012/13</th>
-                                  <th scope="col">2013/14</th>
-                                  <th scope="col">2014/15</th>
-                                  <th scope="col">2015/16</th>
-                                  <th scope="col">2016/17</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {this.state.tableData.map(
-                                  ([firstCell, ...cells], rowIndex) => (
-                                    <tr key={rowIndex}>
-                                      <td scope="row">{firstCell}</td>
-                                      {cells.map((cell, cellIndex) => (
-                                        <td key={cellIndex}>{cell}</td>
-                                      ))}
-                                    </tr>
-                                  ),
+                                        <PrototypeAbsenceRateChart
+                                          authorised={
+                                            this.state.filters
+                                              .SESSIONS_AUTHORISED_RATE
+                                          }
+                                          unauthorised={
+                                            this.state.filters
+                                              .SESSIONS_UNAUTHORISED_RATE
+                                          }
+                                          overall={
+                                            this.state.filters
+                                              .SESSIONS_OVERALL_RATE
+                                          }
+                                        />
+                                      </div>
+                                    )}
+                                  </>
                                 )}
-                              </tbody>
-                            </table>
-                          )}
+                                {this.state.menuOption === 'EXCLUSIONS' && (
+                                  <>
+                                    {this.hasPermanentExclusionFilters() && (
+                                      <div className="govuk-grid-column-one-half">
+                                        <p>Permanent exclusions</p>
 
-                          <ul className="govuk-list">
-                            <li>
-                              <a href="#download">Download data (.csv)</a>
-                            </li>
-                            <li>
-                              <a href="#api">Access developer API</a>
-                            </li>
-                            <li>
-                              <a href="#methodology">Methodology</a>
-                            </li>
-                            <li>
-                              <a href="#contact">Contact</a>
-                            </li>
-                          </ul>
-                        </>
-                      )}
+                                        <PrototypePermanentExclusionsChart
+                                          exclusions={
+                                            this.state.filters
+                                              .PERMANENT_EXCLUSIONS
+                                          }
+                                          exclusionsRate={
+                                            this.state.filters
+                                              .PERMANENT_EXCLUSIONS_RATE
+                                          }
+                                        />
+                                      </div>
+                                    )}
+                                    {this.hasFixedPeriodExclusionFilters() && (
+                                      <div className="govuk-grid-column-one-half">
+                                        <p>Fixed period exclusions</p>
+
+                                        <PrototypeFixedPeriodExclusionsChart
+                                          exclusions={
+                                            this.state.filters
+                                              .FIXED_PERIOD_EXCLUSIONS
+                                          }
+                                          exclusionsRate={
+                                            this.state.filters
+                                              .FIXED_PERIOD_EXCLUSIONS_RATE
+                                          }
+                                        />
+                                      </div>
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            )}
+
+                            {this.hasAnyFilters() && (
+                              <>
+                                <hr />
+
+                                {(this.state.dataToggle === 'CHARTS_TABLES' ||
+                                  this.state.dataToggle === 'TABLES') && (
+                                  <table className="govuk-table">
+                                    <caption>
+                                      Comparing statistics between 2012 and 2017
+                                    </caption>
+                                    <thead>
+                                      <tr>
+                                        <th />
+                                        <th scope="col">2012/13</th>
+                                        <th scope="col">2013/14</th>
+                                        <th scope="col">2014/15</th>
+                                        <th scope="col">2015/16</th>
+                                        <th scope="col">2016/17</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {this.state.tableData.map(
+                                        ([firstCell, ...cells], rowIndex) => (
+                                          <tr key={rowIndex}>
+                                            <td scope="row">{firstCell}</td>
+                                            {cells.map((cell, cellIndex) => (
+                                              <td key={cellIndex}>{cell}</td>
+                                            ))}
+                                          </tr>
+                                        ),
+                                      )}
+                                    </tbody>
+                                  </table>
+                                )}
+
+                                <ul className="govuk-list">
+                                  <li>
+                                    <a href="#download">Download data (.csv)</a>
+                                  </li>
+                                  <li>
+                                    <a href="#api">Access developer API</a>
+                                  </li>
+                                  <li>
+                                    <a href="#methodology">Methodology</a>
+                                  </li>
+                                  <li>
+                                    <a href="#contact">Contact</a>
+                                  </li>
+                                </ul>
+                              </>
+                            )}
+                          </>
+                        </TabsSection>
+                        <TabsSection id="school-type" title="School type">
+                          {null}
+                        </TabsSection>
+                        <TabsSection id="geography" title="Geography">
+                          {null}
+                        </TabsSection>
+                        <TabsSection
+                          id="demographics-characteristics"
+                          title="Demographics/characteristics"
+                        >
+                          {null}
+                        </TabsSection>
+                      </Tabs>
                     </>
-                  </TabsSection>
-                  <TabsSection id="school-type" title="School type">
-                    {null}
-                  </TabsSection>
-                  <TabsSection id="geography" title="Geography">
-                    {null}
-                  </TabsSection>
-                  <TabsSection
-                    id="demographics-characteristics"
-                    title="Demographics/characteristics"
-                  >
-                    {null}
-                  </TabsSection>
-                </Tabs>
-              </div>
+                  )}
+                </div>
+              )}
             </div>
-          </>
+          </div>
         )}
       </PrototypePage>
     );
