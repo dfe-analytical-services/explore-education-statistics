@@ -14,7 +14,7 @@ interface CheckboxOption {
 type Props = {
   checkedValues: {
     [value: string]: boolean;
-  },
+  };
   name: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   options: CheckboxOption[];
