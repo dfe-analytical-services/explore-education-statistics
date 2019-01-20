@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
+import React, { ChangeEventHandler, Component } from 'react';
 import Button from '../../components/Button';
-import { CheckboxGroupChangeEventHandler } from '../../components/FormCheckboxGroup';
 import FormRadioGroup from '../../components/FormRadioGroup';
 import PageHeading from '../../components/PageHeading';
 import Tabs from '../../components/Tabs';
@@ -31,11 +30,11 @@ class PrototypeDataTableV1National extends Component<{}, State> {
     },
   };
 
-  private handleCheckboxChange: CheckboxGroupChangeEventHandler = values => {
+  private handleCheckboxChange: ChangeEventHandler<HTMLInputElement> = event => {
     this.setState({
       filters: {
         ...this.state.filters,
-        ...values,
+        [event.target.value]: event.target.checked,
       },
     });
   };
@@ -78,6 +77,7 @@ class PrototypeDataTableV1National extends Component<{}, State> {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-one-quarter">
             <FilterMenu
+              filters={this.state.filters}
               onChange={this.handleCheckboxChange}
               beforeMenu={
                 <form>

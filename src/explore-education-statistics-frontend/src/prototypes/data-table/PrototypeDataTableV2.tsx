@@ -1,7 +1,5 @@
-import React, { Component, createRef } from 'react';
-import FormCheckboxGroup, {
-  CheckboxGroupChangeEventHandler,
-} from '../../components/FormCheckboxGroup';
+import React, { ChangeEventHandler, Component, createRef } from 'react';
+import FormCheckboxGroup from '../../components/FormCheckboxGroup';
 import FormRadioGroup from '../../components/FormRadioGroup';
 import PageHeading from '../../components/PageHeading';
 import Tabs from '../../components/Tabs';
@@ -25,25 +23,23 @@ const allTableData: any = {
   ...exclusionTableData,
 };
 
-interface Filters {
-  GENERAL_ENROLMENTS: boolean;
-  GENERAL_SCHOOLS: boolean;
-  SESSIONS_AUTHORISED_RATE: boolean;
-  SESSIONS_OVERALL_RATE: boolean;
-  SESSIONS_UNAUTHORISED_RATE: boolean;
-  PERMANENT_EXCLUSIONS: boolean;
-  PERMANENT_EXCLUSIONS_RATE: boolean;
-  FIXED_PERIOD_EXCLUSIONS: boolean;
-  FIXED_PERIOD_EXCLUSIONS_RATE: boolean;
-}
-
 interface State {
   chartData: {
     [key: string]: number;
   }[];
   dataToggle: DataToggles;
   menuOption?: MenuOption | null;
-  filters: Filters;
+  filters: {
+    GENERAL_ENROLMENTS: boolean;
+    GENERAL_SCHOOLS: boolean;
+    SESSIONS_AUTHORISED_RATE: boolean;
+    SESSIONS_OVERALL_RATE: boolean;
+    SESSIONS_UNAUTHORISED_RATE: boolean;
+    PERMANENT_EXCLUSIONS: boolean;
+    PERMANENT_EXCLUSIONS_RATE: boolean;
+    FIXED_PERIOD_EXCLUSIONS: boolean;
+    FIXED_PERIOD_EXCLUSIONS_RATE: boolean;
+  };
   tableData: string[][];
 }
 
@@ -93,12 +89,10 @@ class PrototypeDataTableV2 extends Component<{}, State> {
     );
   };
 
-  private handleFilterCheckboxChange: CheckboxGroupChangeEventHandler<
-    Filters
-  > = values => {
+  private handleFilterCheckboxChange: ChangeEventHandler<HTMLInputElement> = event => {
     const filters = {
       ...this.state.filters,
-      ...values,
+      [event.target.value]: event.target.checked,
     };
 
     const checkedFilters = Object.entries(filters)
@@ -216,6 +210,7 @@ class PrototypeDataTableV2 extends Component<{}, State> {
                   <>
                     <div className="govuk-form-group">
                       <FormCheckboxGroup
+                        checkedValues={this.state.filters}
                         name="enrolments"
                         legend="General"
                         onChange={this.handleFilterCheckboxChange}

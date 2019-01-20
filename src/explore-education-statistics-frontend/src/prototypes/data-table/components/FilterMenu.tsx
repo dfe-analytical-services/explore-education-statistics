@@ -1,16 +1,18 @@
-import React, { FunctionComponent, ReactNode } from 'react';
-import FormCheckboxGroup, {
-  CheckboxGroupChangeEventHandler,
-} from '../../../components/FormCheckboxGroup';
+import React, { ChangeEventHandler, FunctionComponent, ReactNode } from 'react';
+import FormCheckboxGroup  from '../../../components/FormCheckboxGroup';
 import styles from './FilterMenu.module.scss';
 import MenuDetails from './MenuDetails';
 
 interface Props {
   beforeMenu?: ReactNode;
-  onChange: CheckboxGroupChangeEventHandler;
+  filters: {
+    EXCLUSIONS: boolean;
+    PUPIL_ABSENCE: boolean;
+  },
+  onChange: ChangeEventHandler<HTMLInputElement>;
 }
 
-const FilterMenu: FunctionComponent<Props> = ({ beforeMenu, onChange }) => {
+const FilterMenu: FunctionComponent<Props> = ({ beforeMenu, filters, onChange }) => {
   return (
     <div className={styles.filterMenu}>
       {beforeMenu}
@@ -19,17 +21,18 @@ const FilterMenu: FunctionComponent<Props> = ({ beforeMenu, onChange }) => {
         <MenuDetails summary="Schools (under 16)" open>
           <MenuDetails summary="Absence and exclusions" open>
             <FormCheckboxGroup
+              checkedValues={filters}
               name="absenceAndExclusions"
               onChange={onChange}
               options={[
                 {
-                  checked: true,
+                  checked: filters.PUPIL_ABSENCE,
                   id: 'pupilAbsence',
                   label: 'Pupil absence',
                   value: 'PUPIL_ABSENCE',
                 },
                 {
-                  checked: true,
+                  checked: filters.EXCLUSIONS,
                   id: 'exclusions',
                   label: 'Exclusions',
                   value: 'EXCLUSIONS',

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { ChangeEventHandler, Component } from 'react';
 import Button from '../../components/Button';
 import FormRadioGroup from '../../components/FormRadioGroup';
 import PageHeading from '../../components/PageHeading';
@@ -30,11 +30,11 @@ class PrototypeDataTableV1LocalAuthority extends Component<{}, State> {
     },
   };
 
-  private handleCheckboxChange = (values: { [value: string]: boolean }) => {
+  private handleCheckboxChange: ChangeEventHandler<HTMLInputElement> = event => {
     this.setState({
       filters: {
         ...this.state.filters,
-        ...values,
+        [event.target.value]: event.target.checked,
       },
     });
   };
@@ -78,6 +78,7 @@ class PrototypeDataTableV1LocalAuthority extends Component<{}, State> {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-one-quarter">
             <FilterMenu
+              filters={this.state.filters}
               onChange={this.handleCheckboxChange}
               beforeMenu={
                 <form>
