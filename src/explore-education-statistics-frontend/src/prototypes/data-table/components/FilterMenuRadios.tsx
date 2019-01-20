@@ -28,7 +28,7 @@ class FilterMenuRadios extends Component<Props, State> {
     });
   };
 
-  private handleSubmit: FormEventHandler = (e) => {
+  private handleSubmit: FormEventHandler = e => {
     e.preventDefault();
     this.props.onSubmit(this.state.menuOption);
   };
