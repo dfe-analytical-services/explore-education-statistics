@@ -1,5 +1,5 @@
 import React, { ChangeEventHandler, FunctionComponent, ReactNode } from 'react';
-import FormCheckboxGroup  from '../../../components/FormCheckboxGroup';
+import FormCheckboxGroup from '../../../components/FormCheckboxGroup';
 import styles from './FilterMenu.module.scss';
 import MenuDetails from './MenuDetails';
 
@@ -8,11 +8,15 @@ interface Props {
   filters: {
     EXCLUSIONS: boolean;
     PUPIL_ABSENCE: boolean;
-  },
+  };
   onChange: ChangeEventHandler<HTMLInputElement>;
 }
 
-const FilterMenu: FunctionComponent<Props> = ({ beforeMenu, filters, onChange }) => {
+const FilterMenu: FunctionComponent<Props> = ({
+  beforeMenu,
+  filters,
+  onChange,
+}) => {
   return (
     <div className={styles.filterMenu}>
       {beforeMenu}

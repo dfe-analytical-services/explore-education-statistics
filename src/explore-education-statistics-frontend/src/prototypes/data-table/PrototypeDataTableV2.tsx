@@ -1,5 +1,6 @@
 import React, { ChangeEventHandler, Component, createRef } from 'react';
 import FormCheckboxGroup from '../../components/FormCheckboxGroup';
+import { RadioChangeEventHandler } from '../../components/FormRadio';
 import FormRadioGroup from '../../components/FormRadioGroup';
 import PageHeading from '../../components/PageHeading';
 import Tabs from '../../components/Tabs';
@@ -16,7 +17,7 @@ import FilterMenuRadios, {
 import { allTableData as absenceTableData } from './test-data/absenceRateData';
 import { allTableData as exclusionTableData } from './test-data/exclusionRateData';
 
-type DataToggles = 'CHARTS_TABLES' | 'CHARTS' | 'TABLES' | '';
+type DataToggles = 'CHARTS_TABLES' | 'CHARTS' | 'TABLES' | null;
 
 const allTableData: any = {
   ...absenceTableData,
@@ -46,7 +47,7 @@ interface State {
 class PrototypeDataTableV2 extends Component<{}, State> {
   public state: State = {
     chartData: [],
-    dataToggle: '',
+    dataToggle: null,
     filters: {
       FIXED_PERIOD_EXCLUSIONS: false,
       FIXED_PERIOD_EXCLUSIONS_RATE: false,
@@ -89,7 +90,9 @@ class PrototypeDataTableV2 extends Component<{}, State> {
     );
   };
 
-  private handleFilterCheckboxChange: ChangeEventHandler<HTMLInputElement> = event => {
+  private handleFilterCheckboxChange: ChangeEventHandler<
+    HTMLInputElement
+  > = event => {
     const filters = {
       ...this.state.filters,
       [event.target.value]: event.target.checked,
@@ -107,10 +110,10 @@ class PrototypeDataTableV2 extends Component<{}, State> {
     });
   };
 
-  private handleRadioChange = (value: DataToggles | null) => {
-    if (value) {
-      this.setState({ dataToggle: value });
-    }
+  private handleRadioChange: RadioChangeEventHandler<{
+    value: DataToggles;
+  }> = event => {
+    this.setState({ dataToggle: event.target.value });
   };
 
   private hasSessionsFilters() {
@@ -290,6 +293,7 @@ class PrototypeDataTableV2 extends Component<{}, State> {
               {this.hasAnyFilters() && (
                 <div className="govuk-grid-column-three-quarters">
                   <FormRadioGroup
+                    checkedValue={this.state.dataToggle}
                     inline
                     name="dataToggle"
                     legend="What do you want to see?"

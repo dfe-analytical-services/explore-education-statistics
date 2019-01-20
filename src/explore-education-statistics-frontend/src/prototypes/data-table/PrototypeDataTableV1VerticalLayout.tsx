@@ -30,7 +30,9 @@ class PrototypeDataTableV1VerticalLayout extends Component<{}, State> {
     },
   };
 
-  private handleCheckboxChange: ChangeEventHandler<HTMLInputElement> = event => {
+  private handleCheckboxChange: ChangeEventHandler<
+    HTMLInputElement
+  > = event => {
     this.setState({
       filters: {
         ...this.state.filters,
@@ -107,6 +109,7 @@ class PrototypeDataTableV1VerticalLayout extends Component<{}, State> {
                   this.state.filters.PUPIL_ABSENCE) && (
                   <>
                     <FormRadioGroup
+                      checkedValue={this.state.dataToggle}
                       inline
                       name="dataToggle"
                       legend="What do you want to see?"

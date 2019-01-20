@@ -1,12 +1,11 @@
 import React, { Component, FormEventHandler, ReactNode } from 'react';
 import Button from '../../../components/Button';
-import FormRadioGroup, {
-  RadioGroupChangeEventHandler,
-} from '../../../components/FormRadioGroup';
+import { RadioChangeEventHandler } from '../../../components/FormRadio';
+import FormRadioGroup from '../../../components/FormRadioGroup';
 import styles from './FilterMenuRadios.module.scss';
 import MenuDetails from './MenuDetails';
 
-export type MenuOption = 'EXCLUSIONS' | 'PUPIL_ABSENCE';
+export type MenuOption = 'EXCLUSIONS' | 'PUPIL_ABSENCE' | '';
 
 export type MenuSubmitEventHandler = (option: MenuOption) => void;
 
@@ -20,11 +19,15 @@ interface State {
 }
 
 class FilterMenuRadios extends Component<Props, State> {
-  private handleRadioChange: RadioGroupChangeEventHandler<MenuOption> = (
-    option: MenuOption,
-  ) => {
+  public state: State = {
+    menuOption: '',
+  };
+
+  private handleRadioChange: RadioChangeEventHandler<{
+    value: MenuOption;
+  }> = event => {
     this.setState({
-      menuOption: option,
+      menuOption: event.target.value,
     });
   };
 
@@ -50,6 +53,7 @@ class FilterMenuRadios extends Component<Props, State> {
             <MenuDetails summary="Schools (under 16)" open>
               <MenuDetails summary="Absence and exclusions" open>
                 <FormRadioGroup
+                  checkedValue={this.state.menuOption}
                   name="absenceAndExclusions"
                   onChange={this.handleRadioChange}
                   options={[
