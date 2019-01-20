@@ -53,7 +53,7 @@
   "scripts": {
     "assets": "npm-run-all clean copy-assets",
     "clean": "rimraf public/assets",
-    "copy-assets": "ncp node_modules/govuk-frontend/assets public/assets && ncp node_modules/govuk-frontend/all.js public/all.js",
+    "copy-assets": "ncp node_modules/govuk-frontend/assets public/assets",
     "start": "npm run assets && react-app-rewired start",
     "prebuild": "npm-run-all assets",
     "build": "react-app-rewired build",
