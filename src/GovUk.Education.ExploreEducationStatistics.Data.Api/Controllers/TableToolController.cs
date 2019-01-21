@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -21,9 +20,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("{publicationId}/{schoolType}/{level}")]
         public ActionResult<TableToolResult> Get(string publicationId,
             SchoolType schoolType,
+            [FromQuery(Name = "years")] ICollection<int> yearFilter,
+            [FromQuery(Name = "attributes")] ICollection<string> attributeFilter,
             Level level = Level.National)
         {
-            return _tableBuilderService.Get(Guid.Parse(publicationId), schoolType, level);
+            return _tableBuilderService.Get(Guid.Parse(publicationId), schoolType, level, yearFilter, attributeFilter);
         }
     }
 }
