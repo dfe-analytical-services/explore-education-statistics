@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.DataTable;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
@@ -23,28 +21,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _nationalCharacteristicService = nationalCharacteristicService;
         }
 
-        public TableToolResult GetGeographic(GeographicQueryContext query)
+        public TableBuilderResult GetGeographic(GeographicQueryContext query)
         {
             var data = _geographicService.FindMany(query);
 
             if (!data.Any())
             {
-                return new TableToolResult();
+                return new TableBuilderResult();
             }
 
             var first = data.FirstOrDefault();
-            return new TableToolResult
+            return new TableBuilderResult
             {
                 PublicationId = first.PublicationId,
                 ReleaseId = first.ReleaseId,
                 ReleaseDate = first.ReleaseDate,
-                Result = data.Select(tidyData => DataToTableToolData(tidyData, query.Attributes))
+                Result = data.Select(tidyData => DataToTableBuilderData(tidyData, query.Attributes))
             };
         }
 
-        private static TableToolData DataToTableToolData(TidyData data, ICollection<string> attributeFilter)
+        public TableBuilderResult GetLocalAuthority(LaQueryContext query)
         {
-            return new TableToolData
+            var data = _laCharacteristicService.FindMany(query);
+
+            if (!data.Any())
+            {
+                return new TableBuilderResult();
+            }
+
+            var first = data.FirstOrDefault();
+            return new TableBuilderResult
+            {
+                PublicationId = first.PublicationId,
+                ReleaseId = first.ReleaseId,
+                ReleaseDate = first.ReleaseDate,
+                Result = data.Select(tidyData => DataToTableBuilderData(tidyData, query.Attributes))
+            };
+        }
+
+        public TableBuilderResult GetNational(NationalQueryContext query)
+        {
+            var data = _nationalCharacteristicService.FindMany(query);
+
+            if (!data.Any())
+            {
+                return new TableBuilderResult();
+            }
+
+            var first = data.FirstOrDefault();
+            return new TableBuilderResult
+            {
+                PublicationId = first.PublicationId,
+                ReleaseId = first.ReleaseId,
+                ReleaseDate = first.ReleaseDate,
+                Result = data.Select(tidyData => DataToTableBuilderData(tidyData, query.Attributes))
+            };
+        }
+
+        private static TableBuilderData DataToTableBuilderData(TidyData data, ICollection<string> attributeFilter)
+        {
+            return new TableBuilderData
             {
                 Domain = data.Year.ToString(),
                 Range = attributeFilter.Count > 0 ? FilterAttributes(data.Attributes, attributeFilter) : data.Attributes
