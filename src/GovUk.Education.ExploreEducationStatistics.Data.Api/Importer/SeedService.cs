@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using Microsoft.Extensions.Configuration;
@@ -98,6 +99,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return count;
         }
 
+        public void DropAllCollections()
+        {
+            _database.ListCollectionNames().ForEachAsync(collection => _database.DropCollection(collection));
+        }
+        
         private int Seed(Release release)
         {
             var count = 0;

@@ -19,5 +19,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
         {
             return "Inserted " + _seedService.Seed() + " rows";
         }
+
+        [HttpDelete("DropAllCollections")]
+        public void DropAllCollections()
+        {
+            _seedService.DropAllCollections();
+        }
     }
 }

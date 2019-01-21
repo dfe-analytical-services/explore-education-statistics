@@ -34,7 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 .Skip(1)
                 .Select(x => TidyDataFromCsv(x, headers, publicationId, releaseId, releaseDate)).ToList();
 
-            Console.WriteLine(data.Count + " rows");
             return data.ToList();
         }
 
