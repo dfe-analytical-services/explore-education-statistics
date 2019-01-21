@@ -80,6 +80,10 @@
               "value": "6.9.1"
             },
             {
+              "Name": "StatisticsDb",
+              "Value": "[concat('mongodb://', parameters('cosmosAccountName'), ':', listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('cosmosAccountName')), '2015-04-08').primaryMasterKey, '@', parameters('cosmosAccountName'), '.documents.azure.com:10255/?ssl=true&replicaSet=globaldb')]"
+            },
+            {
               "Name": "DOCUMENTDB_ENDPOINT",
               "Value": "[reference(concat('Microsoft.DocumentDb/databaseAccounts/', parameters('cosmosAccountName'))).documentEndpoint]"
             },
