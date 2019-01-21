@@ -24,13 +24,7 @@ class AccordionSection extends Component<Props> {
   };
 
   public render() {
-    const {
-      caption,
-      className,
-      children,
-      heading,
-      headingTag,
-    } = this.props;
+    const { caption, className, children, heading, headingTag } = this.props;
 
     return (
       <div className={classNames('govuk-accordion__section', className)}>
