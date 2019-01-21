@@ -6,6 +6,7 @@ declare class GovUkModule {
 declare module 'govuk-frontend' {
   export const Accordion = GovUkModule;
   export const Checkboxes = GovUkModule;
+  export const Details = GovUkModule;
   export const Radios = GovUkModule;
   export const Tabs = GovUkModule;
 
@@ -17,6 +18,10 @@ declare module 'govuk-frontend/components/accordion/accordion' {
 }
 
 declare module 'govuk-frontend/components/checkboxes/checkboxes' {
+  export default GovUkModule;
+}
+
+declare module 'govuk-frontend/components/details/details' {
   export default GovUkModule;
 }
 

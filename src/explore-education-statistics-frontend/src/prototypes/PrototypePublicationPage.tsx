@@ -29,39 +29,34 @@ const PublicationPage = () => {
             unauthorised absence in state-funded schools.
           </p>
 
-          <details className="govuk-details">
-            <summary className="govuk-details__summary">
-              <span className="govuk-details__summary-text"> Read more </span>
-            </summary>
-            <div className="govuk-details__text">
-              <p>
-                To help you analyse and understand the statistics the following
-                sections include:
-              </p>
+          <Details summary="Read more">
+            <p>
+              To help you analyse and understand the statistics the following
+              sections include:
+            </p>
 
-              <ul className="govuk-list govuk-list--bullet">
-                <li>
-                  summaries with the latest headline statistical insights and
-                  breakdowns and definitions
-                </li>
-                <li>
-                  charts, graphs and tables to help you compare and contrast
-                  statistics and highlight any trends from 2006/7 onwards
-                </li>
-                <li>
-                  links to a range of data files so you can download them and
-                  carry out your own analysis
-                </li>
-              </ul>
+            <ul className="govuk-list govuk-list--bullet">
+              <li>
+                summaries with the latest headline statistical insights and
+                breakdowns and definitions
+              </li>
+              <li>
+                charts, graphs and tables to help you compare and contrast
+                statistics and highlight any trends from 2006/7 onwards
+              </li>
+              <li>
+                links to a range of data files so you can download them and
+                carry out your own analysis
+              </li>
+            </ul>
 
-              <div className="govuk-inset-text">
-                <Link to="#">
-                  Find out more about our pupil absence data and statistics
-                  methodology and terminology
-                </Link>
-              </div>
+            <div className="govuk-inset-text">
+              <Link to="#">
+                Find out more about our pupil absence data and statistics
+                methodology and terminology
+              </Link>
             </div>
-          </details>
+          </Details>
         </div>
         <div className="govuk-grid-column-one-third">
           <aside className="app-related-items">
@@ -75,89 +70,73 @@ const PublicationPage = () => {
               </span>
               2016-2017 (latest data)
             </h3>
-            <details className="govuk-details">
-              <summary className="govuk-details__summary">
-                <span
-                  className="govuk-details__summary-text"
-                  data-testid="details--expand"
-                >
-                  See previous 7 releases
-                </span>
-              </summary>
-              <div className="govuk-details__text">
-                <ul className="govuk-list">
-                  <li>
-                    <a
-                      className="govuk-link"
-                      href="/themes/schools/absence-and-exclusions/pupil-absence-in-schools-in-england/2015-16"
-                    >
-                      2015 to 2016
-                    </a>
-                  </li>
-                  <li>
-                    <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015">
-                      2014 to 2015
-                    </a>
-                  </li>
-                  <li>
-                    <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014">
-                      2013 to 2014
-                    </a>
-                  </li>
-                  <li>
-                    <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013">
-                      2012 to 2013
-                    </a>
-                  </li>
-                  <li>
-                    <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics">
-                      2011 to 2012
-                    </a>
-                  </li>
-                  <li>
-                    <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011">
-                      2010 to 2011
-                    </a>
-                  </li>
-                  <li>
-                    <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010">
-                      2009 to 2010
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </details>
+
+            <Details summary="See previous 7 releases">
+              <ul className="govuk-list">
+                <li>
+                  <a
+                    className="govuk-link"
+                    href="/themes/schools/absence-and-exclusions/pupil-absence-in-schools-in-england/2015-16"
+                  >
+                    2015 to 2016
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015">
+                    2014 to 2015
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014">
+                    2013 to 2014
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013">
+                    2012 to 2013
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics">
+                    2011 to 2012
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011">
+                    2010 to 2011
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010">
+                    2009 to 2010
+                  </a>
+                </li>
+              </ul>
+            </Details>
+
             <h3 className="govuk-heading-s">
               <span className="govuk-caption-m">Published: </span>22 March 2018
             </h3>
+
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <span className="govuk-caption-m">Last updated: </span>20 June
               2018
             </h3>
-            <details className="govuk-details">
-              <summary className="govuk-details__summary">
-                <span
-                  className="govuk-details__summary-text"
-                  data-testid="details--expand"
-                >
-                  See all 2 updates
-                </span>
-              </summary>
-              <div className="govuk-details__text">
-                <div data-testid="publication-page--update-element">
-                  <h3 className="govuk-heading-s">19 April 2017</h3>
-                  <p>
-                    Underlying data file updated to include absence data by
-                    pupil residency and school location, andupdated metadata
-                    document.
-                  </p>
-                </div>
-                <div data-testid="publication-page--update-element">
-                  <h3 className="govuk-heading-s">22 March 2017</h3>
-                  <p>First published.</p>
-                </div>
+
+            <Details summary="See all 2 updates">
+              <div data-testid="publication-page--update-element">
+                <h3 className="govuk-heading-s">19 April 2017</h3>
+                <p>
+                  Underlying data file updated to include absence data by pupil
+                  residency and school location, andupdated metadata document.
+                </p>
               </div>
-            </details>
+              <div data-testid="publication-page--update-element">
+                <h3 className="govuk-heading-s">22 March 2017</h3>
+                <p>First published.</p>
+              </div>
+            </Details>
+
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <span className="govuk-caption-m">Next update: </span>22 March
               2019
@@ -212,17 +191,10 @@ const PublicationPage = () => {
                   more than 2015/16
                 </p>
               </div>
-              <details className="govuk-details">
-                <summary className="govuk-details__summary">
-                  <span className="govuk-details__summary-text">
-                    What does overall absence mean?
-                  </span>
-                </summary>
-                <div className="govuk-details__text">
-                  Overall absence is the adipisicing elit. Dolorum hic nobis
-                  voluptas quidem fugiat enim ipsa reprehenderit nulla.
-                </div>
-              </details>
+              <Details summary="What does overall absence mean?">
+                Overall absence is the adipisicing elit. Dolorum hic nobis
+                voluptas quidem fugiat enim ipsa reprehenderit nulla.
+              </Details>
             </div>
 
             <div className="dfe-dash-tiles__tile">
@@ -247,17 +219,10 @@ const PublicationPage = () => {
                 </strong>
                 the same as 2015/16
               </p>
-              <details className="govuk-details">
-                <summary className="govuk-details__summary">
-                  <span className="govuk-details__summary-text">
-                    What does authorised absence mean?
-                  </span>
-                </summary>
-                <div className="govuk-details__text">
-                  Overall absence is the adipisicing elit. Dolorum hic nobis
-                  voluptas quidem fugiat enim ipsa reprehenderit nulla.
-                </div>
-              </details>
+              <Details summary="What does authorised absence mean?">
+                Overall absence is the adipisicing elit. Dolorum hic nobis
+                voluptas quidem fugiat enim ipsa reprehenderit nulla.
+              </Details>
             </div>
 
             <div className="dfe-dash-tiles__tile">
@@ -282,17 +247,10 @@ const PublicationPage = () => {
                 </strong>
                 more than 2015/16
               </p>
-              <details className="govuk-details">
-                <summary className="govuk-details__summary">
-                  <span className="govuk-details__summary-text">
-                    What does unauthorised absence mean?
-                  </span>
-                </summary>
-                <div className="govuk-details__text">
-                  Overall absence is the adipisicing elit. Dolorum hic nobis
-                  voluptas quidem fugiat enim ipsa reprehenderit nulla.
-                </div>
-              </details>
+              <Details summary="What does unauthorised absence mean?">
+                Overall absence is the adipisicing elit. Dolorum hic nobis
+                voluptas quidem fugiat enim ipsa reprehenderit nulla.
+              </Details>
             </div>
 
             <div className="dfe-dash-tiles__tile">
@@ -317,17 +275,10 @@ const PublicationPage = () => {
                 </strong>
                 less than 2015/16
               </p>
-              <details className="govuk-details">
-                <summary className="govuk-details__summary">
-                  <span className="govuk-details__summary-text">
-                    What does persistent absence mean?
-                  </span>
-                </summary>
-                <div className="govuk-details__text">
-                  Overall absence is the adipisicing elit. Dolorum hic nobis
-                  voluptas quidem fugiat enim ipsa reprehenderit nulla.
-                </div>
-              </details>
+              <Details summary="What does persistent absence mean?">
+                Overall absence is the adipisicing elit. Dolorum hic nobis
+                voluptas quidem fugiat enim ipsa reprehenderit nulla.
+              </Details>
             </div>
           </div>
         </AccordionSection>
