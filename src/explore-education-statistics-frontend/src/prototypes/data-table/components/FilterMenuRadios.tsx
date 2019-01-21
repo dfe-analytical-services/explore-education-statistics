@@ -41,7 +41,7 @@ class FilterMenuRadios extends Component<Props, State> {
         {this.props.beforeMenu}
 
         <h2>
-          Choose a publication
+          1. Choose a publication
           <div className="govuk-hint">
             Pick a publication below to explore its statistics
           </div>

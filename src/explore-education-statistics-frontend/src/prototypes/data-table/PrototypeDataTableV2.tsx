@@ -248,7 +248,7 @@ class PrototypeDataTableV2 extends Component<{}, State> {
           <div ref={this.dataTableRef}>
             {this.state.menuOption === 'PUPIL_ABSENCE' && (
               <h2>
-                Explore statistics from 'Pupil absence'
+                2. Explore statistics from 'Pupil absence'
                 <span className="govuk-hint">
                   Select any statistics you are interested in from the
                   checkboxes below
@@ -258,7 +258,7 @@ class PrototypeDataTableV2 extends Component<{}, State> {
 
             {this.state.menuOption === 'EXCLUSIONS' && (
               <h2>
-                Explore statistics from 'Exclusions'
+                2. Explore statistics from 'Exclusions'
                 <span className="govuk-hint">
                   Select any statistics you are interested in from the
                   checkboxes below
