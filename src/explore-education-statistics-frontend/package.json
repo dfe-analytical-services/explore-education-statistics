@@ -16,7 +16,7 @@
     "axios": "^0.18.0",
     "classnames": "^2.2.6",
     "dotenv-webpack": "^1.6.0",
-    "govuk-frontend": "^2.4.1",
+    "govuk-frontend": "^2.5.1",
     "jest-dom": "^3.0.0",
     "jest-serializer-html": "^6.0.0",
     "lodash": "^4.17.11",

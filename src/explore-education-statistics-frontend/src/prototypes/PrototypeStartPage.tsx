@@ -1,5 +1,4 @@
 import React from 'react';
-// import CollapsibleSection from '../components/CollapsibleSection';
 // import Details from '../components/Details';
 // import PrototypeDataSample from './components/PrototypeDataSample';
 import Link from '../components/Link';

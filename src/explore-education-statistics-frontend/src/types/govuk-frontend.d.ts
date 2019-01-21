@@ -4,9 +4,16 @@ declare class GovUkModule {
 }
 
 declare module 'govuk-frontend' {
+  export const Accordion = GovUkModule;
+  export const Checkboxes = GovUkModule;
+  export const Radios = GovUkModule;
   export const Tabs = GovUkModule;
 
   export function initAll(): void;
+}
+
+declare module 'govuk-frontend/components/accordion/accordion' {
+  export default GovUkModule;
 }
 
 declare module 'govuk-frontend/components/checkboxes/checkboxes' {
