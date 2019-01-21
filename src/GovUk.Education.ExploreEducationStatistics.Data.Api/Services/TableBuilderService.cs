@@ -23,7 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             ICollection<string> attributeFilter)
         {
             var data = _dataService.GetCollectionForPublication(publicationId)
-                .Find(FindExpression(level, schoolType, yearFilter))
+                .AsQueryable().OfType<TidyDataGeographic>()
+                .Where(FindExpression(level, schoolType, yearFilter))
                 .ToList();
 
             var first = data.FirstOrDefault();
@@ -47,13 +48,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 x.SchoolType == schoolType.ToString() &&
                 (yearFilter.Count == 0 || yearFilter.Contains(x.Year));
         }
-
-//        private static Expression<Func<T, bool>> And<T>(Expression<Func<TidyData, bool>> expr1,
-//            Expression<Func<T, bool>> expr2)
-//        {
-//            var invokedExpr = Expression.Invoke(expr2, expr2.Parameters);
-//            return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(expr1.Body, invokedExpr), expr1.Parameters);
-//        }
 
         private static TableToolData DataToTableToolData(TidyData data, ICollection<string> attributeFilter)
         {

@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             SchoolType schoolType,
             [FromQuery(Name = "years")] ICollection<int> yearFilter,
             [FromQuery(Name = "attributes")] ICollection<string> attributeFilter,
-            Level level = Level.National)
+            Level level = Level.national)
         {
             return _tableBuilderService.Get(Guid.Parse(publicationId), schoolType, level, yearFilter, attributeFilter);
         }
