@@ -1,6 +1,6 @@
 import React from 'react';
-import Accordion from '../components/Accordion';
-import AccordionSection from '../components/AccordionSection';
+import { Accordion } from '../components/Accordion';
+import { AccordionSection } from '../components/AccordionSection';
 import Details from '../components/Details';
 import Link from '../components/Link';
 import PrototypeDataSample from './components/PrototypeDataSample';
@@ -171,7 +171,10 @@ const PublicationPage = () => {
       <h2 className="govuk-heading-m">Contents</h2>
 
       <Accordion id="contents-sections">
-        <AccordionSection heading="Latest headline facts and figures - 2016/17">
+        <AccordionSection
+          heading="Latest headline facts and figures - 2016/17"
+          open
+        >
           <ul className="govuk-list govuk-list--bullet">
             <li>pupils missed on average 8.2 school days</li>
             <li>overall and unauthorised absence rates up on previous year</li>
