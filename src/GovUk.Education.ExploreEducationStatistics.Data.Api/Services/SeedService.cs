@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using Microsoft.Extensions.Configuration;
@@ -12,11 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     {
         private readonly IMongoDatabase _database;
         private readonly MongoCsvImporterFactory _mongoCsvImporterFactory = new MongoCsvImporterFactory();
-
-        public SeedService(IMongoDatabase database)
-        {
-            _database = database;
-        }
 
         private readonly Dictionary<string, Release[]> _publications = new Dictionary<string, Release[]>
         {
@@ -103,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             _database.ListCollectionNames().ForEachAsync(collection => _database.DropCollection(collection));
         }
-        
+
         private int Seed(Release release)
         {
             var count = 0;

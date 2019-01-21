@@ -1,7 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

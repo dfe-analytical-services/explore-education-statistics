@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -37,9 +37,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "Explore education statistics - Data API", Version = "v1" });
+                c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Data API", Version = "v1"});
 
-                var filePath = Path.Combine(AppContext.BaseDirectory, "GovUk.Education.ExploreEducationStatistics.Data.Api.xml");
+                var filePath = Path.Combine(AppContext.BaseDirectory,
+                    "GovUk.Education.ExploreEducationStatistics.Data.Api.xml");
                 c.IncludeXmlComments(filePath);
             });
 
@@ -47,9 +48,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddScoped<SeedService>();
             services.AddScoped<TableBuilderService>();
             services.AddSingleton<ICsvReader, CsvReader>();
-            
+
+            services.AddSingleton<IMDatabase<TidyDataGeographic>, MDatabase<TidyDataGeographic>>();
+            services.AddSingleton<IMDatabase<TidyDataLaCharacteristic>, MDatabase<TidyDataLaCharacteristic>>();
+            services
+                .AddSingleton<IMDatabase<TidyDataNationalCharacteristic>, MDatabase<TidyDataNationalCharacteristic>>();
+
+            services.AddScoped<GeographicService>();
+            services.AddScoped<LaCharacteristicService>();
+            services.AddScoped<NationalCharacteristicService>();
+
             services.AddCors();
-            services.AddAutoMapper(); 
+            services.AddAutoMapper();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,6 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             {
                 app.UseHsts();
             }
+
             // Adds Brotli and Gzip compressing
             app.UseResponseCompression();
 

@@ -1,52 +1,45 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
+using System.Runtime.InteropServices.WindowsRuntime;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
-using MongoDB.Driver;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.DataTable;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class TableBuilderService
     {
-        private readonly DataService _dataService;
+        private readonly GeographicService _geographicService;
+        private readonly LaCharacteristicService _laCharacteristicService;
+        private readonly NationalCharacteristicService _nationalCharacteristicService;
 
-        public TableBuilderService(DataService dataService)
+        public TableBuilderService(GeographicService geographicService,
+            LaCharacteristicService laCharacteristicService,
+            NationalCharacteristicService nationalCharacteristicService)
         {
-            _dataService = dataService;
+            _geographicService = geographicService;
+            _laCharacteristicService = laCharacteristicService;
+            _nationalCharacteristicService = nationalCharacteristicService;
         }
 
-        public TableToolResult Get(Guid publicationId,
-            SchoolType schoolType,
-            Level level,
-            ICollection<int> yearFilter,
-            ICollection<string> attributeFilter)
+        public TableToolResult GetGeographic(GeographicQueryContext query)
         {
-            var data = _dataService.GetCollectionForPublication(publicationId)
-                .AsQueryable().OfType<TidyDataGeographic>()
-                .Where(FindExpression(level, schoolType, yearFilter))
-                .ToList();
+            var data = _geographicService.FindMany(query);
+
+            if (!data.Any())
+            {
+                return new TableToolResult();
+            }
 
             var first = data.FirstOrDefault();
-
             return new TableToolResult
             {
                 PublicationId = first.PublicationId,
                 ReleaseId = first.ReleaseId,
                 ReleaseDate = first.ReleaseDate,
-                Result = data.Select(tidyData => DataToTableToolData(tidyData, attributeFilter))
+                Result = data.Select(tidyData => DataToTableToolData(tidyData, query.Attributes))
             };
-        }
-
-        private static Expression<Func<TidyData, bool>> FindExpression(
-            Level level,
-            SchoolType schoolType,
-            ICollection<int> yearFilter)
-        {
-            return x =>
-                x.Level == level.ToString() &&
-                x.SchoolType == schoolType.ToString() &&
-                (yearFilter.Count == 0 || yearFilter.Contains(x.Year));
         }
 
         private static TableToolData DataToTableToolData(TidyData data, ICollection<string> attributeFilter)

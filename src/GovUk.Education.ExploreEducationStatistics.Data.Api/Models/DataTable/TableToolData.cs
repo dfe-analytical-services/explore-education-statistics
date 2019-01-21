@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.DataTable
 {
     public class TableToolData
     {
