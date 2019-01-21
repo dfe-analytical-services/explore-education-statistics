@@ -52,7 +52,7 @@ const HomePageV2 = () => {
         download as excel or .csv files . The data can also be accessed via an
         API.
       </p>
-      <Link to="/prototypes/data-table/national" className="govuk-button">
+      <Link to="/prototypes/data-table-v1/national" className="govuk-button">
         Explore all our statistics
       </Link>
     </PrototypePage>
