@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class GeographicService : BaseTidyDataService<TidyDataGeographic, GeographicQueryContext>
     {
-        public GeographicService(IMDatabase<TidyDataGeographic> database) : base(database)
+        public GeographicService(IMDatabase<TidyData> database) : base(database)
         {
         }
     }

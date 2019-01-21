@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public Expression<Func<TidyDataNationalCharacteristic, bool>> FindExpression()
         {
             return x =>
-                x.Level == Level.ToString() &&
+                x.Level.ToLower() == Level.ToString().ToLower() &&
                 x.SchoolType == SchoolType.ToString() &&
                 (Years.Count == 0 || Years.Contains(x.Year));
         }

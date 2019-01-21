@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             SchoolType schoolType,
             [FromQuery(Name = "years")] ICollection<int> years,
             [FromQuery(Name = "attributes")] ICollection<string> attributes,
-            Level level = Level.national)
+            Level level = Level.National)
         {
             var query = new GeographicQueryContext
             {
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             SchoolType schoolType,
             [FromQuery(Name = "years")] ICollection<int> years,
             [FromQuery(Name = "attributes")] ICollection<string> attributes,
-            Level level = Level.national)
+            Level level = Level.National)
         {
             var query = new LaQueryContext
             {
@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             SchoolType schoolType,
             [FromQuery(Name = "years")] ICollection<int> years,
             [FromQuery(Name = "attributes")] ICollection<string> attributes,
-            Level level = Level.national)
+            Level level = Level.National)
         {
             var query = new NationalQueryContext
             {

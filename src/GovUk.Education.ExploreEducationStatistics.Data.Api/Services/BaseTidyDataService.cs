@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using MongoDB.Driver;
@@ -12,14 +10,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         where TCollection : TidyData
         where TQueryContext : IQueryContext<TCollection>
     {
-        private readonly IMDatabase<TCollection> _database;
+        private readonly IMDatabase<TidyData> _database;
 
-        protected BaseTidyDataService(IMDatabase<TCollection> database)
+        protected BaseTidyDataService(IMDatabase<TidyData> database)
         {
             _database = database;
         }
 
-        private IMongoCollection<TCollection> Collection(string collectionName)
+        private IMongoCollection<TidyData> Collection(string collectionName)
         {
             return _database.Collection(collectionName);
         }
