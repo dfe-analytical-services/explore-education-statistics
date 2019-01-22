@@ -3,6 +3,7 @@ import React, { Component, createRef, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
+  id?: string;
   open?: boolean;
   summary: string;
 }
@@ -15,7 +16,7 @@ class Details extends Component<Props> {
   }
 
   public render() {
-    const { children, open, summary } = this.props;
+    const { children, id, open, summary } = this.props;
 
     return (
       <details className="govuk-details" open={open} ref={this.ref}>
@@ -27,7 +28,9 @@ class Details extends Component<Props> {
             {summary}
           </span>
         </summary>
-        <div className="govuk-details__text">{children}</div>
+        <div className="govuk-details__text" id={id}>
+          {children}
+        </div>
       </details>
     );
   }
