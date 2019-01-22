@@ -1,0 +1,12 @@
+{
+  "disabled": false,
+  "bindings": [
+    {
+      "name": "myQueueItem",
+      "type": "queueTrigger",
+      "direction": "in",
+      "queueName": "releases",
+      "connection": "AZURE_STORAGE_CONNECTION_STRING"
+    }
+  ]
+}

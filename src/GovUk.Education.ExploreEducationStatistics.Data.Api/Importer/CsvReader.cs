@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 {
@@ -117,8 +117,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 {
                     estab = values[headers.FindIndex(h => h.Equals("estab"))], 
                     laestab = values[headers.FindIndex(h => h.Equals("laestab"))],
-                    acad_type = values[headers.FindIndex(h => h.Equals("acad_type") || h.Equals("academy_type"))], 
-                    acad_opend = values[headers.FindIndex(h => h.Equals("acad_opendate") || h.Equals("academy_open_date"))],
+                    AcademyType = values[headers.FindIndex(h => h.Equals("acad_type") || h.Equals("academy_type"))], 
+                    AcademyOpenDate = values[headers.FindIndex(h => h.Equals("acad_opendate") || h.Equals("academy_open_date"))],
                 },
                 SchoolType = values[headers.FindIndex(h => h.Equals("school_type"))], 
                 Attributes = new Dictionary<string, string>()
