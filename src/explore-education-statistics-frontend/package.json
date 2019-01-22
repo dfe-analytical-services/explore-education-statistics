@@ -15,8 +15,9 @@
     "@types/recharts": "^1.1.6",
     "axios": "^0.18.0",
     "classnames": "^2.2.6",
+    "core-js": "^2.6.2",
     "dotenv-webpack": "^1.6.0",
-    "govuk-frontend": "^2.4.1",
+    "govuk-frontend": "^2.5.1",
     "jest-dom": "^3.0.0",
     "jest-serializer-html": "^6.0.0",
     "lodash": "^4.17.11",
@@ -53,7 +54,7 @@
   "scripts": {
     "assets": "npm-run-all clean copy-assets",
     "clean": "rimraf public/assets",
-    "copy-assets": "ncp node_modules/govuk-frontend/assets public/assets && ncp node_modules/govuk-frontend/all.js public/all.js",
+    "copy-assets": "ncp node_modules/govuk-frontend/assets public/assets",
     "start": "npm run assets && react-app-rewired start",
     "prebuild": "npm-run-all assets",
     "build": "react-app-rewired build",
@@ -75,7 +76,7 @@
   "browserslist": [
     ">0.2%",
     "not dead",
-    "not ie <= 11",
+    "not ie < 11",
     "not op_mini all"
   ],
   "jest": {

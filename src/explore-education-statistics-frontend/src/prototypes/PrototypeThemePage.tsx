@@ -1,5 +1,4 @@
 import React from 'react';
-// import CollapsibleSection from '../components/CollapsibleSection';
 // import Details from '../components/Details';
 import Link from '../components/Link';
 import PrototypeDataTile from './components/PrototypeDataTile';
@@ -159,7 +158,7 @@ const ThemePage = () => {
         download as excel or .csv files . The data can also be accessed via an
         API. <a href="#">What is an API?</a>
       </p>
-      <a href="/prototypes/data-table/national" className="govuk-button">
+      <a href="/prototypes/data-table-v1/national" className="govuk-button">
         Explore schools statistics
       </a>
     </PrototypePage>

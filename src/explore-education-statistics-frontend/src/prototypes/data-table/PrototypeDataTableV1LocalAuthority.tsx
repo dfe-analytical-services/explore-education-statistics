@@ -1,15 +1,16 @@
-import React, { Component } from 'react';
+import React, { ChangeEventHandler, Component } from 'react';
 import Button from '../../components/Button';
+import { RadioChangeEventHandler } from '../../components/FormRadio';
 import FormRadioGroup from '../../components/FormRadioGroup';
 import PageHeading from '../../components/PageHeading';
 import Tabs from '../../components/Tabs';
 import TabsSection from '../../components/TabsSection';
 import PrototypePage from '../components/PrototypePage';
 import PrototypeAbsenceRateChart from './charts/PrototypeAbsenceRateChart';
-import PrototypeExclusionsChart from './charts/PrototypeExclusionsChart';
+import PrototypePermanentExclusionsChart from './charts/PrototypePermanentExclusionsChart';
 import FilterMenu from './components/FilterMenu';
-import absenceRateData from './test-data/absenceRateData';
-import exclusionRateData from './test-data/exclusionRateData';
+import { sessionsAbsentTableData } from './test-data/absenceRateData';
+import { permanentExclusionTableData } from './test-data/exclusionRateData';
 
 type DataToggles = 'CHARTS_TABLES' | 'CHARTS' | 'TABLES' | null;
 
@@ -30,19 +31,21 @@ class PrototypeDataTableV1LocalAuthority extends Component<{}, State> {
     },
   };
 
-  private handleCheckboxChange = (values: { [value: string]: boolean }) => {
+  private handleCheckboxChange: ChangeEventHandler<
+    HTMLInputElement
+  > = event => {
     this.setState({
       filters: {
         ...this.state.filters,
-        ...values,
+        [event.target.value]: event.target.checked,
       },
     });
   };
 
-  private handleRadioChange = (value: DataToggles | null) => {
-    if (value) {
-      this.setState({ dataToggle: value });
-    }
+  private handleRadioChange: RadioChangeEventHandler<{
+    value: DataToggles;
+  }> = event => {
+    this.setState({ dataToggle: event.target.value });
   };
 
   public render() {
@@ -78,8 +81,9 @@ class PrototypeDataTableV1LocalAuthority extends Component<{}, State> {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-one-quarter">
             <FilterMenu
+              filters={this.state.filters}
               onChange={this.handleCheckboxChange}
-              beforeMenu={(
+              beforeMenu={
                 <form>
                   <div className="govuk-form-group">
                     <input type="text" className="govuk-input" />
@@ -87,23 +91,24 @@ class PrototypeDataTableV1LocalAuthority extends Component<{}, State> {
 
                   <Button>Search</Button>
                 </form>
-              )}
+              }
             />
           </div>
           <div className="govuk-grid-column-three-quarters">
             <p>View by:</p>
 
             <Tabs>
-              <TabsSection id="years" title="Years">
+              <TabsSection id="years" title="Academic years">
                 {(this.state.filters.EXCLUSIONS ||
                   this.state.filters.PUPIL_ABSENCE) && (
                   <>
                     <FormRadioGroup
+                      checkedValue={this.state.dataToggle}
                       inline
                       name="dataToggle"
                       legend="What do you want to see?"
                       legendSize="s"
-                      onChange={this.handleRadioChange as any}
+                      onChange={this.handleRadioChange}
                       options={[
                         {
                           id: 'chartsAndTable',
@@ -122,14 +127,21 @@ class PrototypeDataTableV1LocalAuthority extends Component<{}, State> {
                           <div className="govuk-grid-column-one-half">
                             <p>Overall absence rate</p>
 
-                            <PrototypeAbsenceRateChart />
+                            <PrototypeAbsenceRateChart
+                              authorised={true}
+                              overall={true}
+                              unauthorised={true}
+                            />
                           </div>
                         )}
                         {this.state.filters.EXCLUSIONS && (
                           <div className="govuk-grid-column-one-half">
                             <p>Exclusions: Permanent exclusion rate</p>
 
-                            <PrototypeExclusionsChart />
+                            <PrototypePermanentExclusionsChart
+                              exclusions={true}
+                              exclusionsRate={true}
+                            />
                           </div>
                         )}
                       </div>
@@ -161,26 +173,16 @@ class PrototypeDataTableV1LocalAuthority extends Component<{}, State> {
                                   <strong>Pupil absence</strong>
                                 </td>
                               </tr>
-                              <tr>
-                                <td scope="row">Overall absence rate</td>
-                                {absenceRateData.map(({ Overall, name }) => (
-                                  <td key={name}>{`${Overall}%`}</td>
-                                ))}
-                              </tr>
-                              <tr>
-                                <td scope="row">Authorised absence rate</td>
-                                {absenceRateData.map(({ Authorised, name }) => (
-                                  <td key={name}>{`${Authorised}%`}</td>
-                                ))}
-                              </tr>
-                              <tr>
-                                <td scope="row">Unauthorised absence rate</td>
-                                {absenceRateData.map(
-                                  ({ Unauthorised, name }) => (
-                                    <td key={name}>{`${Unauthorised}%`}</td>
-                                  ),
-                                )}
-                              </tr>
+                              {Object.values(sessionsAbsentTableData).map(
+                                ([firstCell, ...cells], rowIndex) => (
+                                  <tr key={rowIndex}>
+                                    <td scope="row">{firstCell}</td>
+                                    {cells.map((cell, cellIndex) => (
+                                      <td key={cellIndex}>{cell}</td>
+                                    ))}
+                                  </tr>
+                                ),
+                              )}
                             </>
                           )}
                           {this.state.filters.EXCLUSIONS && (
@@ -190,42 +192,16 @@ class PrototypeDataTableV1LocalAuthority extends Component<{}, State> {
                                   <strong>Exclusions</strong>
                                 </td>
                               </tr>
-                              <tr>
-                                <td scope="row">
-                                  Primary permanent exclusion rate
-                                </td>
-                                {exclusionRateData.map(({ Primary, name }) => (
-                                  <td key={name}>{`${Primary.toFixed(3)}%`}</td>
-                                ))}
-                              </tr>
-                              <tr>
-                                <td scope="row">
-                                  Secondary permanent exclusion rate
-                                </td>
-                                {exclusionRateData.map(
-                                  ({ Secondary, name }) => (
-                                    <td key={name}>{`${Secondary.toFixed(
-                                      3,
-                                    )}%`}</td>
-                                  ),
-                                )}
-                              </tr>
-                              <tr>
-                                <td scope="row">
-                                  Special permanent exclusion rate
-                                </td>
-                                {exclusionRateData.map(({ Special, name }) => (
-                                  <td key={name}>{`${Special.toFixed(3)}%`}</td>
-                                ))}
-                              </tr>
-                              <tr>
-                                <td scope="row">
-                                  Primary permanent exclusion rate
-                                </td>
-                                {exclusionRateData.map(({ Total, name }) => (
-                                  <td key={name}>{`${Total.toFixed(3)}%`}</td>
-                                ))}
-                              </tr>
+                              {Object.values(permanentExclusionTableData).map(
+                                ([firstCell, ...cells], rowIndex) => (
+                                  <tr key={rowIndex}>
+                                    <td scope="row">{firstCell}</td>
+                                    {cells.map((cell, cellIndex) => (
+                                      <td key={cellIndex}>{cell}</td>
+                                    ))}
+                                  </tr>
+                                ),
+                              )}
                             </>
                           )}
                         </tbody>

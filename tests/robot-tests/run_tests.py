@@ -24,6 +24,8 @@ Usage: "pipenv run python run_tests.py -i robot"
 -p|--profile : Additionally output python profile information
 AND keyword profile information. Outputs log files to test-results directory.
 Usage: "pipenv run python run_tests.py -p"
+
+--ci : Add arguments for running the tests as part of the CI pipeline
 """
 
 import os

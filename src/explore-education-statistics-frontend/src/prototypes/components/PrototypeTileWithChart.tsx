@@ -1,4 +1,5 @@
 import React from 'react';
+import Details from '../../components/Details';
 import Link from '../../components/Link';
 import PrototypeIckleChart from '../components/PrototypeIckleChart';
 
@@ -50,18 +51,14 @@ const PrototypeTileWithChart = ({ heading, subheading, percent }: Props) => (
         </div>
       </div>
     </div>
-    <details className="govuk-details govuk-!-margin-bottom-0">
-      <summary className="govuk-details__summary">
-        <span className="govuk-details__summary-text">
-          What does this mean?
-        </span>
-      </summary>
-      <div className="govuk-details__text">
-        Permanent exclusion rate is the adipisicing elit. Dolorum hic nobis
-        voluptas quidem fugiat enim ipsa reprehenderit nulla.
-      </div>
-    </details>
+
+    <Details summary="What does this mean?">
+      Permanent exclusion rate is the adipisicing elit. Dolorum hic nobis
+      voluptas quidem fugiat enim ipsa reprehenderit nulla.
+    </Details>
+
     <hr />
+
     <div className="govuk-grid-row">
       <div className="govuk-grid-column-one-half">
         <ul className="govuk-list govuk-body-s">
