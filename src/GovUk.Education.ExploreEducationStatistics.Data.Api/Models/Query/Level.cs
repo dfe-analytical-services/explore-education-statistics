@@ -2,6 +2,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 {
     public enum Level
     {
-        National
+        National,
+        Local_Authority
     }
 }
