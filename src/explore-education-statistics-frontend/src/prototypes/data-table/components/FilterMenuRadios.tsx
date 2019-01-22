@@ -1,42 +1,65 @@
-import React, { ChangeEventHandler, FunctionComponent, ReactNode } from 'react';
-import FormCheckboxGroup from '../../../components/FormCheckboxGroup';
-import styles from './FilterMenu.module.scss';
+import React, { Component, ReactNode } from 'react';
+import { RadioChangeEventHandler } from '../../../components/FormRadio';
+import FormRadioGroup from '../../../components/FormRadioGroup';
+import styles from './FilterMenuRadios.module.scss';
 import MenuDetails from './MenuDetails';
+
+export type MenuOption = 'EXCLUSIONS' | 'PUPIL_ABSENCE' | '';
+
+export type MenuChangeEventHandler = (option: MenuOption) => void;
 
 interface Props {
   beforeMenu?: ReactNode;
-  filters: {
-    EXCLUSIONS: boolean;
-    PUPIL_ABSENCE: boolean;
-  };
-  onChange: ChangeEventHandler<HTMLInputElement>;
+  onChange: MenuChangeEventHandler;
 }
 
-const FilterMenu: FunctionComponent<Props> = ({
-  beforeMenu,
-  filters,
-  onChange,
-}) => {
-  return (
-    <div className={styles.filterMenu}>
-      {beforeMenu}
+interface State {
+  menuOption: MenuOption;
+}
 
-      <div>
+class FilterMenuRadios extends Component<Props, State> {
+  public state: State = {
+    menuOption: '',
+  };
+
+  private handleRadioChange: RadioChangeEventHandler<{
+    value: MenuOption;
+  }> = event => {
+    this.setState(
+      {
+        menuOption: event.target.value,
+      },
+      () => {
+        this.props.onChange(this.state.menuOption);
+      },
+    );
+  };
+
+  public render() {
+    return (
+      <div className={styles.filterMenu}>
+        {this.props.beforeMenu}
+
+        <h2>
+          1. Choose a publication
+          <div className="govuk-hint">
+            Pick a publication below to explore its statistics
+          </div>
+        </h2>
+
         <MenuDetails summary="Schools (under 16)" open>
           <MenuDetails summary="Absence and exclusions" open>
-            <FormCheckboxGroup
-              checkedValues={filters}
+            <FormRadioGroup
+              checkedValue={this.state.menuOption}
               name="absenceAndExclusions"
-              onChange={onChange}
+              onChange={this.handleRadioChange}
               options={[
                 {
-                  checked: filters.PUPIL_ABSENCE,
                   id: 'pupilAbsence',
                   label: 'Pupil absence',
                   value: 'PUPIL_ABSENCE',
                 },
                 {
-                  checked: filters.EXCLUSIONS,
                   id: 'exclusions',
                   label: 'Exclusions',
                   value: 'EXCLUSIONS',
@@ -67,8 +90,8 @@ const FilterMenu: FunctionComponent<Props> = ({
           <MenuDetails summary="Teacher numbers" />
         </MenuDetails>
       </div>
-    </div>
-  );
-};
+    );
+  }
+}
 
-export default FilterMenu;
+export default FilterMenuRadios;

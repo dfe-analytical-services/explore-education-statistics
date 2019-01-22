@@ -1,12 +1,16 @@
 import React, { ChangeEventHandler, FunctionComponent } from 'react';
 
+export type RadioChangeEventHandler<T = HTMLInputElement> = ChangeEventHandler<
+  T
+>;
+
 interface Props {
   checked?: boolean;
   hint?: string;
   id: string;
   label: string;
   name: string;
-  onChange?: ChangeEventHandler<HTMLInputElement>;
+  onChange?: RadioChangeEventHandler;
   value: string;
 }
 

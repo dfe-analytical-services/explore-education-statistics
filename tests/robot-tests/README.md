@@ -1,10 +1,10 @@
 # What is this?
 
-This test framework runs selenium tests against the Explore Education Statistics service.
+This test framework runs acceptance tests against the Explore Education Statistics service using selenium and robot framework.
 
 Currently, these tests are being maintained so they can be run on Linux or Windows. They're not being maintained for MacOS, but they may work without too much trouble. If you try MacOS, ensure you're using python3 and not python2!
 
-# What do I need to install
+# What do I need to install?
 
 Firstly, install python3
    * For Windows, you'll need to download python3 from here: https://www.python.org/downloads/
@@ -35,13 +35,13 @@ Further instructions on how to use the test runner are included inside the run\_
 # Organisation
 
 ### scripts
-This directory holds scripts used by the run_tests.py and the Azure pipeline.
+This directory holds scripts used by the run\_tests.py and the Azure pipeline.
 
 ### test-results
 This directory holds the output of a test run, including the test report and log.
 
 ### tests
-This holds the actual robot framework/selenium tests. The `libs` folder holds python and robot framework libraries used by the tests themselves. libraries used by the tests themselves.
+This holds the actual robot framework/selenium tests. The `libs` folder holds python and robot framework libraries used by the tests themselves.
 
 ### lib
 This holds chromedriver, used by selenium to interact with the browser. It is automatically downloaded when the tests are run.

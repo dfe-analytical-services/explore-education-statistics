@@ -1,5 +1,5 @@
 import Checkboxes from 'govuk-frontend/components/checkboxes/checkboxes';
-import React, { Component, createRef } from 'react';
+import React, { ChangeEventHandler, Component, createRef } from 'react';
 import FormCheckbox from './FormCheckbox';
 import FormFieldSet, { FieldSetProps } from './FormFieldSet';
 
@@ -11,31 +11,19 @@ interface CheckboxOption {
   value: string;
 }
 
-export type CheckboxGroupChangeEventHandler = (
-  state: {
-    [value: string]: boolean;
-  },
-) => void;
-
 type Props = {
+  checkedValues: {
+    [value: string]: boolean;
+  };
   name: string;
-  onChange?: CheckboxGroupChangeEventHandler;
+  onChange?: ChangeEventHandler<HTMLInputElement>;
   options: CheckboxOption[];
 } & Partial<FieldSetProps>;
 
-interface State {
-  values: {
-    [value: string]: boolean;
-  };
-}
-
-class FormCheckboxGroup extends Component<Props, State> {
+class FormCheckboxGroup extends Component<Props> {
   public static defaultProps: Partial<Props> = {
+    checkedValues: {},
     legendSize: 'm',
-  };
-
-  public state: State = {
-    values: {},
   };
 
   private ref = createRef<HTMLDivElement>();
@@ -44,34 +32,11 @@ class FormCheckboxGroup extends Component<Props, State> {
     new Checkboxes(this.ref.current).init();
   }
 
-  private isChecked({ value, checked = false }: CheckboxOption) {
-    if (this.state.values[value] !== undefined) {
-      return this.state.values[value];
+  private handleChange: ChangeEventHandler<HTMLInputElement> = event => {
+    if (this.props.onChange) {
+      this.props.onChange(event);
     }
-
-    return checked;
-  }
-
-  private handleChange({ value, checked = false }: CheckboxOption) {
-    const isChecked =
-      this.state.values[value] !== undefined
-        ? this.state.values[value]
-        : checked;
-
-    this.setState(
-      {
-        values: {
-          ...this.state.values,
-          [value]: !isChecked,
-        },
-      },
-      () => {
-        if (this.props.onChange) {
-          this.props.onChange(this.state.values);
-        }
-      },
-    );
-  }
+  };
 
   private renderCheckboxes() {
     return (
@@ -81,8 +46,8 @@ class FormCheckboxGroup extends Component<Props, State> {
             {...option}
             name={name}
             key={option.id}
-            onChange={this.handleChange.bind(this, option)}
-            checked={this.isChecked(option)}
+            onChange={this.handleChange}
+            checked={this.props.checkedValues[option.value]}
           />
         ))}
       </div>

@@ -1,4 +1,5 @@
-import React, { ReactNode } from 'react';
+import GovUkDetails from 'govuk-frontend/components/details/details';
+import React, { Component, createRef, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -6,20 +7,30 @@ interface Props {
   summary: string;
 }
 
-const Details = ({ children, summary, open }: Props) => {
-  return (
-    <details className="govuk-details" open={open}>
-      <summary className="govuk-details__summary">
-        <span
-          className="govuk-details__summary-text"
-          data-testid="details--expand"
-        >
-          {summary}
-        </span>
-      </summary>
-      <div className="govuk-details__text">{children}</div>
-    </details>
-  );
-};
+class Details extends Component<Props> {
+  private ref = createRef<HTMLElement>();
+
+  public componentDidMount(): void {
+    new GovUkDetails(this.ref.current).init();
+  }
+
+  public render() {
+    const { children, open, summary } = this.props;
+
+    return (
+      <details className="govuk-details" open={open} ref={this.ref}>
+        <summary className="govuk-details__summary">
+          <span
+            className="govuk-details__summary-text"
+            data-testid="details--expand"
+          >
+            {summary}
+          </span>
+        </summary>
+        <div className="govuk-details__text">{children}</div>
+      </details>
+    );
+  }
+}
 
 export default Details;

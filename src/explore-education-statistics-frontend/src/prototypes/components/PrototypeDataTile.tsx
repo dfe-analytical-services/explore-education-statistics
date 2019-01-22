@@ -1,4 +1,5 @@
 import React from 'react';
+import Details from '../../components/Details';
 
 interface Props {
   period: string;
@@ -29,17 +30,10 @@ const PrototypeDataTile = ({ period, heading, percent, fromText }: Props) => (
         From: {fromText}
       </a>
     </p>
-    <details className="govuk-details">
-      <summary className="govuk-details__summary">
-        <span className="govuk-details__summary-text">
-          What does this mean?
-        </span>
-      </summary>
-      <div className="govuk-details__text">
-        Permanent exclusion rate is the adipisicing elit. Dolorum hic nobis
-        voluptas quidem fugiat enim ipsa reprehenderit nulla.
-      </div>
-    </details>
+    <Details summary="What does this mean?">
+      Permanent exclusion rate is the adipisicing elit. Dolorum hic nobis
+      voluptas quidem fugiat enim ipsa reprehenderit nulla.
+    </Details>
   </div>
 );
 

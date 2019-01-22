@@ -9,62 +9,47 @@ import {
   YAxis,
 } from 'recharts';
 import FluidChartContainer from '../../../components/FluidChartContainer';
-import { sessionsAbsentChartData } from '../test-data/absenceRateData';
+import { generalChartData } from '../test-data/absenceRateData';
 
 interface Props {
-  authorised: boolean;
-  unauthorised: boolean;
-  overall: boolean;
+  enrolments: boolean;
+  schools: boolean;
 }
 
-const PrototypeAbsenceRateChart: FunctionComponent<Props> = ({
-  authorised,
-  overall,
-  unauthorised,
+const PrototypeAbsenceGeneralChart: FunctionComponent<Props> = ({
+  enrolments,
+  schools,
 }) => {
   return (
     <FluidChartContainer>
       <LineChart
-        data={sessionsAbsentChartData}
+        data={generalChartData}
         margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" padding={{ left: 20, right: 20 }} tickMargin={10}>
           <Label position="bottom" offset={5} value="Academic year" />
         </XAxis>
-        <YAxis scale="auto" unit="%">
-          <Label angle={-90} position="left" value="Absence rate" />
+        <YAxis scale="auto">
+          <Label angle={-90} position="left" value="Number" />
         </YAxis>
-        {unauthorised && (
+        {enrolments && (
           <Line
             type="linear"
-            dataKey="unauthorised"
-            name="Unauthorised absence rate"
+            dataKey="enrolments"
+            name="Enrolments"
             stroke="#28A197"
             strokeWidth="1"
-            unit="%"
             activeDot={{ r: 3 }}
           />
         )}
-        {authorised && (
+        {schools && (
           <Line
             type="linear"
-            dataKey="authorised"
-            name="Authorised absence rate"
+            dataKey="schools"
+            name="Schools"
             stroke="#6F72AF"
             strokeWidth="1"
-            unit="%"
-            activeDot={{ r: 3 }}
-          />
-        )}
-        {overall && (
-          <Line
-            type="linear"
-            dataKey="overall"
-            name="Overall absence rate"
-            stroke="#DF3034"
-            strokeWidth="1"
-            unit="%"
             activeDot={{ r: 3 }}
           />
         )}
@@ -74,4 +59,4 @@ const PrototypeAbsenceRateChart: FunctionComponent<Props> = ({
   );
 };
 
-export default PrototypeAbsenceRateChart;
+export default PrototypeAbsenceGeneralChart;
