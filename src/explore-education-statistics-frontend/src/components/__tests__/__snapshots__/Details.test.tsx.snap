@@ -2,18 +2,25 @@
 
 exports[`Details renders correctly 1`] = `
 
-<details class="govuk-details">
-  <summary class="govuk-details__summary">
+<details class="govuk-details"
+         role="group"
+>
+  <summary class="govuk-details__summary"
+           role="button"
+           aria-controls="test-details"
+           aria-expanded="false"
+  >
     <span class="govuk-details__summary-text"
           data-testid="details--expand"
     >
       Test summary
     </span>
   </summary>
-  <div class="govuk-details__text">
-    <p>
-      Test details
-    </p>
+  <div class="govuk-details__text"
+       id="test-details"
+       aria-hidden="true"
+  >
+    Test content
   </div>
 </details>
 
@@ -23,18 +30,24 @@ exports[`Details renders correctly with \`open\` prop set to true 1`] = `
 
 <details class="govuk-details"
          open
+         role="group"
 >
-  <summary class="govuk-details__summary">
+  <summary class="govuk-details__summary"
+           role="button"
+           aria-controls="test-details"
+           aria-expanded="true"
+  >
     <span class="govuk-details__summary-text"
           data-testid="details--expand"
     >
       Test summary
     </span>
   </summary>
-  <div class="govuk-details__text">
-    <p>
-      Test details
-    </p>
+  <div class="govuk-details__text"
+       id="test-details"
+       aria-hidden="false"
+  >
+    Test content
   </div>
 </details>
 
