@@ -22,7 +22,10 @@ describe('Details', () => {
 
     expect(container.querySelector('[open]')).not.toBeNull();
 
-    expect(container.querySelector('summary')).toHaveAttribute('aria-expanded', 'true');
+    expect(container.querySelector('summary')).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
     expect(getByText('Test content')).toHaveAttribute('aria-hidden', 'false');
 
     expect(container.innerHTML).toMatchSnapshot();
