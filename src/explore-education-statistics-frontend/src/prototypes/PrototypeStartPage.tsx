@@ -9,7 +9,7 @@ const StartPage = () => {
     <PrototypePage breadcrumbs={[]}>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">Exploring education statistics</h1>
+          <h1 className="govuk-heading-xl">Explore education statistics</h1>
           <p className="govuk-body">
             Use this service to search for and find out about Department for
             Education (DfE) official statistics for England on:
