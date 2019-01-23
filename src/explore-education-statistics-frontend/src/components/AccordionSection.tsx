@@ -13,10 +13,12 @@ export interface AccordionSectionProps {
   headingTag?: 'h2' | 'h3' | 'h4';
   id?: string;
   open?: boolean;
+  goToTopLink: boolean;
 }
 
 export class AccordionSection extends Component<AccordionSectionProps> {
   public static defaultProps: Partial<AccordionSectionProps> = {
+    goToTopLink: true,
     headingTag: 'h2',
     open: false,
   };
@@ -31,6 +33,7 @@ export class AccordionSection extends Component<AccordionSectionProps> {
       headingId,
       headingTag,
       open,
+      goToTopLink,
     } = this.props;
 
     return (
@@ -60,6 +63,7 @@ export class AccordionSection extends Component<AccordionSectionProps> {
           id={contentId}
         >
           {children}
+          {goToTopLink && <a href="#application">Go to Top</a>}
         </div>
       </div>
     );

@@ -190,6 +190,7 @@ const PublicationPage = () => {
 
       <AccordionSection
         heading="Latest headline facts and figures - 2016/17"
+        goToTopLink={false}
         open
       >
         <ul className="govuk-list govuk-list--bullet">
@@ -846,6 +847,8 @@ const PublicationPage = () => {
       <Link to="/prototypes/data-table-v1/national" className="govuk-button">
         Explore pupil absence statistics
       </Link>
+      <br />
+      <a href="#application">Go to Top</a>
     </PrototypePage>
   );
 };

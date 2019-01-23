@@ -1,18 +1,33 @@
 import React from 'react';
 
-const PrototypeTableSample = () => {
+interface Props {
+  caption?: string;
+}
+
+const PrototypeTableSample = ({ caption }: Props) => {
   return (
     <>
       <div className="dfe-content-overflow">
         <table className="govuk-table">
+          <caption className="govuk-heading-s">{caption}</caption>
           <thead className="govuk-table__head">
             <tr className="tableizer-firstrow">
               <th className="govuk-table__header" />
-              <th className="govuk-table__header">2012/13</th>
-              <th className="govuk-table__header">2013/14</th>
-              <th className="govuk-table__header">2014/15</th>
-              <th className="govuk-table__header">2015/16</th>
-              <th className="govuk-table__header">2016/17</th>
+              <th className="govuk-table__header" scope="col">
+                2012/13
+              </th>
+              <th className="govuk-table__header" scope="col">
+                2013/14
+              </th>
+              <th className="govuk-table__header" scope="col">
+                2014/15
+              </th>
+              <th className="govuk-table__header" scope="col">
+                2015/16
+              </th>
+              <th className="govuk-table__header" scope="col">
+                2016/17
+              </th>
             </tr>
           </thead>
 

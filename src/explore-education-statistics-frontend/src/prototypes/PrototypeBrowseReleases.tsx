@@ -36,27 +36,21 @@ const BrowseReleasesPage = () => {
               >
                 Pupil absence release
               </Link>
-              <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-0">
+              <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
                 Overall absence, authorised absence, unauthorised absence,
                 persisitent absence
               </p>
               <Link
                 to="/prototypes/publication"
-                className="govuk-!-margin-left-3 govuk-!-margin-top-0"
+                className="govuk-!-margin-top-0"
               >
-                Download this data
+                Download data
               </Link>
               <Link
                 to="/prototypes/publication"
                 className="govuk-!-margin-left-3 govuk-!-margin-top-0"
               >
-                Download this data
-              </Link>
-              <Link
-                to="/prototypes/publication"
-                className="govuk-!-margin-left-3 govuk-!-margin-top-0"
-              >
-                Explore this data
+                Explore data
               </Link>
             </li>
             <li className="govuk-!-margin-top-6">
@@ -66,7 +60,7 @@ const BrowseReleasesPage = () => {
               >
                 Permananent and fixed period exclusions release
               </a>
-              <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-0">
+              <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
                 Permanent exclusions, and fixed period exclusions
               </p>
               <Link
@@ -75,6 +69,12 @@ const BrowseReleasesPage = () => {
               >
                 Download data
               </Link>
+              <Link
+                to="/prototypes/publication"
+                className="govuk-!-margin-left-3 govuk-!-margin-top-0"
+              >
+                Explore data
+              </Link>
             </li>
           </ul>
         </AccordionSection>
@@ -82,31 +82,31 @@ const BrowseReleasesPage = () => {
           heading="Capacity and exclusions"
           caption="School capacity, admission appeals"
         >
-          School finance releases
+          Capacity and exclusions releases
         </AccordionSection>
         <AccordionSection
           heading="Results"
           caption="Local authority and school finance"
         >
-          School finance releases
+          Results releases
         </AccordionSection>
         <AccordionSection
           heading="School and pupil numbers"
           caption="Schools, pupils and their characteristics, SEN and EHC plans, SEN in England"
         >
-          School finance
+          School and pupil numbers releases
         </AccordionSection>
         <AccordionSection
           heading="School finance"
           caption="Local authority and school finance"
         >
-          School finance
+          School finance releases
         </AccordionSection>
         <AccordionSection
           heading="Teacher numbers"
           caption="The number and characteristics of teachers"
         >
-          School finance
+          Teacher number releases
         </AccordionSection>
       </Accordion>
       <h2 className="govuk-heading-l govuk-!-margin-top-9">

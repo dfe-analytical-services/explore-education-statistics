@@ -34,8 +34,7 @@ const PrototypeDataSample = ({
           />
         </TabsSection>
         <TabsSection id={`${sectionId}TableData`} title="Data tables">
-          <h2 className="govuk-heading-s">{`Table showing ${chartTitle}`}</h2>
-          <PrototypeTableSample />
+          <PrototypeTableSample caption={`Table showing ${chartTitle}`} />
         </TabsSection>
         <TabsSection id={`${sectionId}Downloads`} title="Data downloads">
           <h2 className="govuk-heading-s">
