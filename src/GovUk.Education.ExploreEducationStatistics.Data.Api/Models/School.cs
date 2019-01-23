@@ -1,25 +1,12 @@
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
     public class School
     {
-        public School()
-        {
-        }
-
-        public School(string estab, string laestab, string acadType, string acadOpend)
-        {
-            this.estab = estab;
-            this.laestab = laestab;
-            acad_type = acadType;
-            acad_opend = acadOpend;
-        }
-
-        public string estab { get; set; }
-        
-        public string laestab { get; set; }
-        
-        public string acad_type { get; set; }
-        
-        public string acad_opend { get; set; }
+        [BsonElement("estab")] public string Estab { get; set; }
+        [BsonElement("laestab")] public string LaEstab { get; set; }
+        [BsonElement("acad_type")] public string AcademyType { get; set; }
+        [BsonElement("acad_opendate")] public string AcademyOpenDate { get; set; }
     }
 }

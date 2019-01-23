@@ -30,6 +30,8 @@ Usage: "pipenv run python run_tests.py -p"
 
 import os
 import sys
+from robot import run_cli as robot_run_cli
+from pabot.pabot import main as pabot_run_cli
 import cProfile
 import pstats
 import scripts.keyword_profile as kp
@@ -109,10 +111,9 @@ warm_up_servers.wait_for_server(url)
 
 # Run tests
 if interp == "robot":
-    from robot import run_cli
     if profile:
         # Python profiling
-        cProfile.run('run_cli(arguments)', 'profile-data')
+        cProfile.run('robot_run_cli(arguments)', 'profile-data')
         stream = open('test-results/python-profiling-results.log', 'w')
         p = pstats.Stats('profile-data', stream=stream)
         p.sort_stats('time')
@@ -126,12 +127,11 @@ if interp == "robot":
                                writepath='test-results/keyword-profiling-results.log')
         print("\nProfiling logs created in test-results/")
     else:
-        run_cli(arguments)
+        robot_run_cli(arguments)
 elif interp == "pabot":
-    from pabot.pabot import main
     if profile:
         # Python profiling
-        cProfile.run('main(arguments)', 'profile-data')
+        cProfile.run('pabot_run_cli(arguments)', 'profile-data')
         stream = open('test-results/python-profiling-results.log', 'w')
         p = pstats.Stats('profile-data', stream=stream)
         p.sort_stats('time')
@@ -145,4 +145,4 @@ elif interp == "pabot":
                                writepath='test-results/keyword-profiling-results.log')
         print("\nProfiling logs created in test-results/")
     else:
-        main(arguments)
+        pabot_run_cli(arguments)

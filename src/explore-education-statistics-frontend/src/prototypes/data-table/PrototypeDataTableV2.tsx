@@ -11,8 +11,8 @@ import PrototypeAbsenceRateChart from './charts/PrototypeAbsenceRateChart';
 import PrototypeFixedPeriodExclusionsChart from './charts/PrototypeFixedPeriodExclusionsChart';
 import PrototypePermanentExclusionsChart from './charts/PrototypePermanentExclusionsChart';
 import FilterMenuRadios, {
+  MenuChangeEventHandler,
   MenuOption,
-  MenuSubmitEventHandler,
 } from './components/FilterMenuRadios';
 import { allTableData as absenceTableData } from './test-data/absenceRateData';
 import { allTableData as exclusionTableData } from './test-data/exclusionRateData';
@@ -74,7 +74,7 @@ class PrototypeDataTableV2 extends Component<{}, State> {
 
   private dataTableRef = createRef<HTMLDivElement>();
 
-  private handleMenuChange: MenuSubmitEventHandler = menuOption => {
+  private handleMenuChange: MenuChangeEventHandler = menuOption => {
     this.setState(
       {
         menuOption,
@@ -239,7 +239,7 @@ class PrototypeDataTableV2 extends Component<{}, State> {
 
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-full">
-            <FilterMenuRadios onSubmit={this.handleMenuChange} />
+            <FilterMenuRadios onChange={this.handleMenuChange} />
           </div>
         </div>
 
@@ -248,7 +248,7 @@ class PrototypeDataTableV2 extends Component<{}, State> {
           <div ref={this.dataTableRef}>
             {this.state.menuOption === 'PUPIL_ABSENCE' && (
               <h2>
-                Explore statistics from 'Pupil absence'
+                2. Explore statistics from 'Pupil absence'
                 <span className="govuk-hint">
                   Select any statistics you are interested in from the
                   checkboxes below
@@ -258,7 +258,7 @@ class PrototypeDataTableV2 extends Component<{}, State> {
 
             {this.state.menuOption === 'EXCLUSIONS' && (
               <h2>
-                Explore statistics from 'Exclusions'
+                2. Explore statistics from 'Exclusions'
                 <span className="govuk-hint">
                   Select any statistics you are interested in from the
                   checkboxes below
