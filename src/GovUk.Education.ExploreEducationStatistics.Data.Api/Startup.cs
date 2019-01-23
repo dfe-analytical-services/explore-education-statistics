@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer.Old;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -44,6 +45,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 c.IncludeXmlComments(filePath);
             });
 
+
+            services.AddScoped<GeographicResultBuilder>();
+            services.AddScoped<CharacteristicResultBuilder>();
+            
             services.AddScoped<DataService>();
             services.AddScoped<SeedService>();
             services.AddScoped<TableBuilderService>();
@@ -51,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 
             services.AddSingleton<MDatabase>();
             
-            services.AddScoped<GeographicService>();
+            services.AddScoped<GeographicDataService>();
             services.AddScoped<LaCharacteristicService>();
             services.AddScoped<NationalCharacteristicService>();
 

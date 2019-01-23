@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 {
+    [Obsolete]
     public class DataModel<T> where T : DataModel<T>
     {
         protected DataModel()

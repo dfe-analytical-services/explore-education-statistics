@@ -1,5 +1,8 @@
+using System;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 {
+    [Obsolete]
     public class Characteristic
     {
         public Characteristic()

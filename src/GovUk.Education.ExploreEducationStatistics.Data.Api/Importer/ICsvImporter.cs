@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
 {
-    public interface IMongoCsvImporter
+    public interface ICsvImporter
     {
         List<TidyData> Data(DataCsvFilename dataCsvFilename,
             Guid publicationId,

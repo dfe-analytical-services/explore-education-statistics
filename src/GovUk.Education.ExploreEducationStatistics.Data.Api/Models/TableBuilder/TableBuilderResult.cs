@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilde
         public Guid PublicationId { get; set; }
         public Guid ReleaseId { get; set; }
         public DateTime ReleaseDate { get; set; }
-        public IEnumerable<TableBuilderData> Result { get; set; }
+        public IEnumerable<ITableBuilderData> Result { get; set; }
     }
 }

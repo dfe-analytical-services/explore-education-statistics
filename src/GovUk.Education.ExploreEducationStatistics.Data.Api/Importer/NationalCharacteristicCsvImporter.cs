@@ -5,9 +5,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
 {
-    public class MongoLaCharacteristicCsvImporter : MongoCsvImporter
+    public class NationalCharacteristicCsvImporter : CsvImporter
     {
-        public MongoLaCharacteristicCsvImporter(string path = "") : base(path)
+        public NationalCharacteristicCsvImporter(string path = "") : base(path)
         {
         }
 
@@ -19,11 +19,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
         {
             var headerValues = new[]
             {
-                "term", "year", "level", "country_code", "country_name", "region_code", "region_name", "old_la_code",
-                "new_la_code", "la_name", "school_type", "characteristic_desc", "characteristic"
+                "term", "year", "level", "country_code", "country_name", "school_type", "characteristic_desc",
+                "characteristic_1", "characteristic_2"
             };
             var values = csvLine.Split(',');
-            var model = new TidyDataLaCharacteristic
+            var model = new CharacteristicDataNational
             {
                 PublicationId = publicationId,
                 ReleaseId = releaseId,
@@ -35,22 +35,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                     Code = values[headers.FindIndex(h => h.Equals("country_code"))],
                     Name = values[headers.FindIndex(h => h.Equals("country_name"))]
                 },
-                Region = new Region
-                {
-                    Code = values[headers.FindIndex(h => h.Equals("region_code"))],
-                    Name = values[headers.FindIndex(h => h.Equals("region_name"))]
-                },
-                LocalAuthority = new LocalAuthority
-                {
-                    Old_Code = values[headers.FindIndex(h => h.Equals("old_la_code"))],
-                    Code = values[headers.FindIndex(h => h.Equals("new_la_code"))],
-                    Name = values[headers.FindIndex(h => h.Equals("la_name"))]
-                },
                 SchoolType = values[headers.FindIndex(h => h.Equals("school_type"))],
                 Attributes = new Dictionary<string, string>(),
                 Characteristic = new Characteristic
                 {
-                    Name = values[headers.FindIndex(h => h.Equals("characteristic"))],
+                    Name = values[headers.FindIndex(h => h.Equals("characteristic_1"))],
+                    Name2 = values[headers.FindIndex(h => h.Equals("characteristic_2"))],
                     Description = values[headers.FindIndex(h => h.Equals("characteristic_desc"))]
                 }
             };

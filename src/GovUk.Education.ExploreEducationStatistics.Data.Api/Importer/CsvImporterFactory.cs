@@ -2,32 +2,32 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
 {
-    public class MongoCsvImporterFactory
+    public class CsvImporterFactory
     {
-        private readonly MongoGeoLevelsCsvImporter mongoGeoLevelsCsvImporter = new MongoGeoLevelsCsvImporter();
+        private readonly GeoLevelsCsvImporter _geoLevelsCsvImporter = new GeoLevelsCsvImporter();
 
-        private readonly MongoNationalCharacteristicCsvImporter mongoNationalCharacteristicCsvImporter =
-            new MongoNationalCharacteristicCsvImporter();
+        private readonly NationalCharacteristicCsvImporter _nationalCharacteristicCsvImporter =
+            new NationalCharacteristicCsvImporter();
 
-        private readonly MongoLaCharacteristicCsvImporter mongoLaCharacteristicCsvImporter =
-            new MongoLaCharacteristicCsvImporter();
+        private readonly LaCharacteristicCsvImporter _laCharacteristicCsvImporter =
+            new LaCharacteristicCsvImporter();
 
-        public IMongoCsvImporter Importer(DataCsvFilename filename)
+        public ICsvImporter Importer(DataCsvFilename filename)
         {
             switch (filename)
             {
                 case DataCsvFilename.absence_geoglevels:
                 case DataCsvFilename.exclusion_geoglevels:
                 case DataCsvFilename.schpupnum_geoglevels:
-                    return mongoGeoLevelsCsvImporter;
+                    return _geoLevelsCsvImporter;
                 case DataCsvFilename.absence_lacharacteristics:
                 case DataCsvFilename.exclusion_lacharacteristics:
                 case DataCsvFilename.schpupnum_lacharacteristics:
-                    return mongoLaCharacteristicCsvImporter;
+                    return _laCharacteristicCsvImporter;
                 case DataCsvFilename.absence_natcharacteristics:
                 case DataCsvFilename.exclusion_natcharacteristics:
                 case DataCsvFilename.schpupnum_natcharacteristics:
-                    return mongoNationalCharacteristicCsvImporter;      
+                    return _nationalCharacteristicCsvImporter;      
                 default:
                     throw new ArgumentOutOfRangeException(nameof(filename), filename, null);
             }

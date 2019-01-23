@@ -3,9 +3,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
-    public class GeographicService : BaseTidyDataService<TidyDataGeographic, GeographicQueryContext>
+    public class GeographicDataService : BaseDataService<GeographicData, GeographicQueryContext>
     {
-        public GeographicService(MDatabase database) : base(database)
+        public GeographicDataService(MDatabase database) : base(database)
         {
         }
     }

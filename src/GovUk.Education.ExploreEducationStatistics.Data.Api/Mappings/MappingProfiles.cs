@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
     {
         public MappingProfiles()
         {
-            CreateMap<GeographicModel, TidyDataGeographic>().ReverseMap();
+            CreateMap<GeographicModel, GeographicData>().ReverseMap();
             CreateMap<CharacteristicViewModel, Characteristic>().ReverseMap();
         }
     }

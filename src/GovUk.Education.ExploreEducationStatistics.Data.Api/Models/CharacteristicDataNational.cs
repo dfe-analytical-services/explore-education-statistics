@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
-    public class TidyDataLaCharacteristic : TidyData, ITidyDataCharacteristic
+    public class CharacteristicDataNational : TidyData, ICharacteristicData
     {
-        public TidyDataLaCharacteristic()
+        public CharacteristicDataNational()
         {
         }
 
-        public TidyDataLaCharacteristic(Guid publicationId,
+        public CharacteristicDataNational(Guid publicationId,
             Guid releaseId,
             DateTime releaseDate,
             string term,
@@ -18,19 +18,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
             Country country,
             string schoolType,
             Dictionary<string, string> attributes,
-            Region region,
-            LocalAuthority localAuthority,
             Characteristic characteristic) :
             base(publicationId, releaseId, releaseDate, term, year, level, country, schoolType, attributes)
         {
-            Region = region;
-            LocalAuthority = localAuthority;
             Characteristic = characteristic;
         }
-
-        public Region Region { get; set; }
-
-        public LocalAuthority LocalAuthority { get; set; }
 
         public Characteristic Characteristic { get; set; }
     }

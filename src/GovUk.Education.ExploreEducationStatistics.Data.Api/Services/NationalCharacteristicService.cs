@@ -3,7 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
-    public class NationalCharacteristicService : BaseTidyDataService<TidyDataNationalCharacteristic, NationalQueryContext>
+    public class NationalCharacteristicService : BaseDataService<CharacteristicDataNational, NationalQueryContext>
     {
         public NationalCharacteristicService(MDatabase database) : base(database)
         {
