@@ -57,7 +57,47 @@ const PublicationPage = () => {
               </Link>
             </div>
           </Details>
+          <Details summary="Download data files">
+            <ul className="govuk-list">
+              <li>
+                <a href="#" className="govuk-link">
+                  View by graphs and charts
+                </a>
+              </li>
+              <li>
+                <a href="#" className="govuk-link">
+                  View by tables and numbers
+                </a>
+              </li>
+              <li>
+                <a href="#" className="govuk-link">
+                  Create your own tables and charts
+                </a>
+              </li>
+              <li>
+                <a href="#" className="govuk-link">
+                  Download pdf files
+                </a>
+              </li>
+              <li>
+                <a href="#" className="govuk-link">
+                  Download Excel files
+                </a>
+              </li>
+              <li>
+                <a href="#" className="govuk-link">
+                  Download .csv files
+                </a>
+              </li>
+              <li>
+                <a href="#" className="govuk-link">
+                  Access API
+                </a>
+              </li>
+            </ul>
+          </Details>
         </div>
+
         <div className="govuk-grid-column-one-third">
           <aside className="app-related-items">
             <h2 className="govuk-heading-m" id="subsection-title">
@@ -147,97 +187,73 @@ const PublicationPage = () => {
           </aside>
         </div>
       </div>
-      <h2 className="govuk-heading-m">Contents</h2>
 
-      <Accordion id="contents-sections">
-        <AccordionSection
-          heading="Latest headline facts and figures - 2016/17"
-          open
-        >
-          <ul className="govuk-list govuk-list--bullet">
-            <li>pupils missed on average 8.2 school days</li>
-            <li>overall and unauthorised absence rates up on previous year</li>
-            <li>
-              unauthorised rise due to higher rates of unauthorised holidays
-            </li>
-            <li>10% of pupils persistently absent during 2016/17</li>
-          </ul>
-          <PrototypeDataSample
-            sectionId="headlines"
-            chartTitle="change in absence types 2012/13 to 2016/17"
-          />
-          <div className="dfe-dash-tiles dfe-dash-tiles--2-in-row">
-            <div className="dfe-dash-tiles__tile">
-              <h3 className="govuk-heading-m">
-                Overall absence
-                <span className="govuk-caption-m date-range govuk-tag">
-                  2016/17
-                </span>
-              </h3>
-              <div>
-                <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
-                  4.7%
-                </span>
-                <p className="govuk-body">
-                  <strong className="increase">
-                    +0.4
-                    <abbr
-                      aria-label="Percentage points"
-                      title="Percentage points"
-                    >
-                      ppt
-                    </abbr>
-                  </strong>
-                  more than 2015/16
-                </p>
-              </div>
-              <Details summary="What does overall absence mean?">
-                Overall absence is the adipisicing elit. Dolorum hic nobis
-                voluptas quidem fugiat enim ipsa reprehenderit nulla.
-              </Details>
-            </div>
-
-            <div className="dfe-dash-tiles__tile">
-              <h3 className="govuk-heading-m">
-                Authorised absence
-                <span className="govuk-caption-m date-range govuk-tag">
-                  2016/17
-                </span>
-              </h3>
+      <AccordionSection
+        heading="Latest headline facts and figures - 2016/17"
+        open
+      >
+        <ul className="govuk-list govuk-list--bullet">
+          <li>pupils missed on average 8.2 school days</li>
+          <li>overall and unauthorised absence rates up on previous year</li>
+          <li>
+            unauthorised rise due to higher rates of unauthorised holidays
+          </li>
+          <li>10% of pupils persistently absent during 2016/17</li>
+        </ul>
+        <PrototypeDataSample
+          sectionId="headlines"
+          chartTitle="change in absence types 2012/13 to 2016/17"
+          xAxisLabel="School Year"
+          yAxisLabel="Absence Rate"
+          chartData={[
+            {
+              authorised: 4.2,
+              name: '2012/13',
+              overall: 5.3,
+              unauthorised: 1.1,
+            },
+            {
+              authorised: 3.5,
+              name: '2013/14',
+              overall: 4.5,
+              unauthorised: 1.1,
+            },
+            {
+              authorised: 3.5,
+              name: '2014/15',
+              overall: 4.6,
+              unauthorised: 1.1,
+            },
+            {
+              authorised: 3.4,
+              name: '2015/16',
+              overall: 4.6,
+              unauthorised: 1.1,
+            },
+            {
+              authorised: 3.4,
+              name: '2016/17',
+              overall: 4.7,
+              unauthorised: 1.3,
+            },
+          ]}
+          chartDataKeys={['unauthorised', 'authorised', 'overall']}
+        />
+        <div className="dfe-dash-tiles dfe-dash-tiles--2-in-row">
+          <div className="dfe-dash-tiles__tile">
+            <h3 className="govuk-heading-m">
+              Overall absence
+              <span className="govuk-caption-m date-range govuk-tag">
+                2016/17
+              </span>
+            </h3>
+            <div>
               <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
-                3.4%
+                4.7%
               </span>
               <p className="govuk-body">
-                <strong className="level">
-                  0
-                  <abbr
-                    aria-label="Percentage points"
-                    title="Percentage points"
-                  >
-                    ppt
-                  </abbr>
-                </strong>
-                the same as 2015/16
-              </p>
-              <Details summary="What does authorised absence mean?">
-                Overall absence is the adipisicing elit. Dolorum hic nobis
-                voluptas quidem fugiat enim ipsa reprehenderit nulla.
-              </Details>
-            </div>
-
-            <div className="dfe-dash-tiles__tile">
-              <h3 className="govuk-heading-m">
-                Unauthorised absence
-                <span className="govuk-caption-m date-range govuk-tag">
-                  2016/17
-                </span>
-              </h3>
-              <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
-                1.3%
-              </span>
-              <p className="govuk-body">
-                <strong className="decrease">
-                  -0.4
+                <strong className="increase">
+                  +0.4
                   <abbr
                     aria-label="Percentage points"
                     title="Percentage points"
@@ -247,42 +263,92 @@ const PublicationPage = () => {
                 </strong>
                 more than 2015/16
               </p>
-              <Details summary="What does unauthorised absence mean?">
-                Overall absence is the adipisicing elit. Dolorum hic nobis
-                voluptas quidem fugiat enim ipsa reprehenderit nulla.
-              </Details>
             </div>
-
-            <div className="dfe-dash-tiles__tile">
-              <h3 className="govuk-heading-m">
-                Persistent absence
-                <span className="govuk-caption-m date-range govuk-tag">
-                  2016/17
-                </span>
-              </h3>
-              <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
-                10.8%
-              </span>
-              <p className="govuk-body">
-                <strong className="increase">
-                  +0.3
-                  <abbr
-                    aria-label="Percentage points"
-                    title="Percentage points"
-                  >
-                    ppt
-                  </abbr>
-                </strong>
-                less than 2015/16
-              </p>
-              <Details summary="What does persistent absence mean?">
-                Overall absence is the adipisicing elit. Dolorum hic nobis
-                voluptas quidem fugiat enim ipsa reprehenderit nulla.
-              </Details>
-            </div>
+            <Details summary="What does overall absence mean?">
+              Overall absence is the adipisicing elit. Dolorum hic nobis
+              voluptas quidem fugiat enim ipsa reprehenderit nulla.
+            </Details>
           </div>
-        </AccordionSection>
 
+          <div className="dfe-dash-tiles__tile">
+            <h3 className="govuk-heading-m">
+              Authorised absence
+              <span className="govuk-caption-m date-range govuk-tag">
+                2016/17
+              </span>
+            </h3>
+            <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
+              3.4%
+            </span>
+            <p className="govuk-body">
+              <strong className="level">
+                0
+                <abbr aria-label="Percentage points" title="Percentage points">
+                  ppt
+                </abbr>
+              </strong>
+              the same as 2015/16
+            </p>
+            <Details summary="What does authorised absence mean?">
+              Overall absence is the adipisicing elit. Dolorum hic nobis
+              voluptas quidem fugiat enim ipsa reprehenderit nulla.
+            </Details>
+          </div>
+
+          <div className="dfe-dash-tiles__tile">
+            <h3 className="govuk-heading-m">
+              Unauthorised absence
+              <span className="govuk-caption-m date-range govuk-tag">
+                2016/17
+              </span>
+            </h3>
+            <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
+              1.3%
+            </span>
+            <p className="govuk-body">
+              <strong className="decrease">
+                -0.4
+                <abbr aria-label="Percentage points" title="Percentage points">
+                  ppt
+                </abbr>
+              </strong>
+              more than 2015/16
+            </p>
+            <Details summary="What does unauthorised absence mean?">
+              Overall absence is the adipisicing elit. Dolorum hic nobis
+              voluptas quidem fugiat enim ipsa reprehenderit nulla.
+            </Details>
+          </div>
+
+          <div className="dfe-dash-tiles__tile">
+            <h3 className="govuk-heading-m">
+              Persistent absence
+              <span className="govuk-caption-m date-range govuk-tag">
+                2016/17
+              </span>
+            </h3>
+            <span className="govuk-heading-xl govuk-!-margin-bottom-0 govuk-caption-increase-negative">
+              10.8%
+            </span>
+            <p className="govuk-body">
+              <strong className="increase">
+                +0.3
+                <abbr aria-label="Percentage points" title="Percentage points">
+                  ppt
+                </abbr>
+              </strong>
+              less than 2015/16
+            </p>
+            <Details summary="What does persistent absence mean?">
+              Overall absence is the adipisicing elit. Dolorum hic nobis
+              voluptas quidem fugiat enim ipsa reprehenderit nulla.
+            </Details>
+          </div>
+        </div>
+      </AccordionSection>
+
+      <h2 className="govuk-heading-m">Contents</h2>
+      <Accordion id="contents-sections">
         <AccordionSection heading="About this release">
           <p>
             This statistical first release (SFR) reports on absence of pupils of
@@ -312,6 +378,41 @@ const PublicationPage = () => {
           <PrototypeDataSample
             sectionId="absenceRates"
             chartTitle="absence rates"
+            xAxisLabel="School Year"
+            yAxisLabel="Absence Rate"
+            chartData={[
+              {
+                name: '2012/13',
+                primary: 4.7,
+                'primary and secondary': 5.9,
+                secondary: 7.3,
+              },
+              {
+                name: '2013/14',
+                primary: 3.9,
+                'primary and secondary': 4.3,
+                secondary: 5.0,
+              },
+              {
+                name: '2014/15',
+                primary: 4.6,
+                'primary and secondary': 5.8,
+                secondary: 7.1,
+              },
+              {
+                name: '2015/16',
+                primary: 3.8,
+                'primary and secondary': 4.0,
+                secondary: 4.6,
+              },
+              {
+                name: '2016/17',
+                primary: 4.7,
+                'primary and secondary': 5.8,
+                secondary: 7.1,
+              },
+            ]}
+            chartDataKeys={['primary', 'secondary', 'primary and secondary']}
           />
           <p>
             The overall absence rate across state-funded primary, secondary and
@@ -377,6 +478,41 @@ const PublicationPage = () => {
           <PrototypeDataSample
             sectionId="persistentAbsence"
             chartTitle="persistent absence rates"
+            xAxisLabel="School Year"
+            yAxisLabel="Persistent Absence Rate"
+            chartData={[
+              {
+                name: '2012/13',
+                primary: 14.7,
+                'primary and secondary': 18.9,
+                secondary: 23.3,
+              },
+              {
+                name: '2013/14',
+                primary: 13.9,
+                'primary and secondary': 18.3,
+                secondary: 22.0,
+              },
+              {
+                name: '2014/15',
+                primary: 14.6,
+                'primary and secondary': 18.8,
+                secondary: 24.1,
+              },
+              {
+                name: '2015/16',
+                primary: 13.8,
+                'primary and secondary': 18.0,
+                secondary: 22.6,
+              },
+              {
+                name: '2016/17',
+                primary: 14.7,
+                'primary and secondary': 18.9,
+                secondary: 24.1,
+              },
+            ]}
+            chartDataKeys={['primary', 'secondary', 'primary and secondary']}
           />
           <p>
             The percentage of enrolments in state-funded primary and
@@ -429,6 +565,41 @@ const PublicationPage = () => {
           <PrototypeDataSample
             sectionId="reasonAbsence"
             chartTitle="reason for absence"
+            xAxisLabel="School Year"
+            yAxisLabel="Absence Rate"
+            chartData={[
+              {
+                'family holiday': 0.7,
+                illness: 3.2,
+                name: '2012/13',
+                overall: 4.2,
+              },
+              {
+                'family holiday': 0.7,
+                illness: 3.5,
+                name: '2013/14',
+                overall: 4.5,
+              },
+              {
+                'family holiday': 0.7,
+                illness: 3.4,
+                name: '2014/15',
+                overall: 4.6,
+              },
+              {
+                'family holiday': 0.7,
+                illness: 3.3,
+                name: '2015/16',
+                overall: 4.6,
+              },
+              {
+                'family holiday': 0.7,
+                illness: 3.7,
+                name: '2016/17',
+                overall: 4.7,
+              },
+            ]}
+            chartDataKeys={['overall', 'illness', 'family holiday']}
           />
           <p>
             Illness is the main driver for overall absence rates, however whilst
@@ -663,51 +834,6 @@ const PublicationPage = () => {
           </ul>
         </AccordionSection>
       </Accordion>
-
-      <h2
-        className="govuk-heading-m govuk-!-margin-top-9"
-        id="subsection-title"
-      >
-        Download data files
-      </h2>
-
-      <ul className="govuk-list">
-        <li>
-          <a href="#" className="govuk-link">
-            View by graphs and charts
-          </a>
-        </li>
-        <li>
-          <a href="#" className="govuk-link">
-            View by tables and numbers
-          </a>
-        </li>
-        <li>
-          <a href="#" className="govuk-link">
-            Create your own tables and charts
-          </a>
-        </li>
-        <li>
-          <a href="#" className="govuk-link">
-            Download pdf files
-          </a>
-        </li>
-        <li>
-          <a href="#" className="govuk-link">
-            Download Excel files
-          </a>
-        </li>
-        <li>
-          <a href="#" className="govuk-link">
-            Download .csv files
-          </a>
-        </li>
-        <li>
-          <a href="#" className="govuk-link">
-            Access API
-          </a>
-        </li>
-      </ul>
 
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
         Exploring the data

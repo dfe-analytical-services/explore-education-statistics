@@ -7,15 +7,31 @@ import PrototypeTableSample from './PrototypeTableSample';
 interface Props {
   sectionId?: string;
   chartTitle?: string;
+  xAxisLabel?: string;
+  yAxisLabel?: string;
+  chartData?: any;
+  chartDataKeys: string[];
 }
 
-const PrototypeDataSample = ({ sectionId, chartTitle }: Props) => {
+const PrototypeDataSample = ({
+  sectionId,
+  chartTitle,
+  xAxisLabel,
+  yAxisLabel,
+  chartData,
+  chartDataKeys,
+}: Props) => {
   return (
     <>
       <Tabs>
         <TabsSection id={`${sectionId}ChartData`} title="Summary">
           <h2 className="govuk-heading-s">{`Chart showing ${chartTitle}`}</h2>
-          <PrototypeChartSample />
+          <PrototypeChartSample
+            xAxisLabel={xAxisLabel}
+            yAxisLabel={yAxisLabel}
+            chartData={chartData}
+            chartDataKeys={chartDataKeys}
+          />
         </TabsSection>
         <TabsSection id={`${sectionId}TableData`} title="Data tables">
           <h2 className="govuk-heading-s">{`Table showing ${chartTitle}`}</h2>
