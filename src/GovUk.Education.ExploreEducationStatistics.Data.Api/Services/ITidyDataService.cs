@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public interface ITidyDataService<out TCollection, in TQueryContext>
-        where TCollection : TidyData
+        where TCollection : ITidyData
         where TQueryContext : IQueryContext<TCollection>
     {
         IEnumerable<TCollection> FindMany(TQueryContext queryContext);

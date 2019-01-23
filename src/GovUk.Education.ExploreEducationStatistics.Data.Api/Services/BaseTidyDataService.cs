@@ -7,12 +7,12 @@ using MongoDB.Driver.Linq;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public abstract class BaseTidyDataService<TCollection, TQueryContext> : ITidyDataService<TCollection, TQueryContext>
-        where TCollection : TidyData
+        where TCollection : ITidyData
         where TQueryContext : IQueryContext<TCollection>
     {
-        private readonly IMDatabase<TidyData> _database;
+        private readonly MDatabase _database;
 
-        protected BaseTidyDataService(IMDatabase<TidyData> database)
+        protected BaseTidyDataService(MDatabase database)
         {
             _database = database;
         }

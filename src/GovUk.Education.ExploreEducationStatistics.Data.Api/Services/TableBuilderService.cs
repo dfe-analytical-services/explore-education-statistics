@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
@@ -11,14 +12,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly GeographicService _geographicService;
         private readonly LaCharacteristicService _laCharacteristicService;
         private readonly NationalCharacteristicService _nationalCharacteristicService;
+        private readonly IMapper _mapper;
 
-        public TableBuilderService(GeographicService geographicService,
-            LaCharacteristicService laCharacteristicService,
-            NationalCharacteristicService nationalCharacteristicService)
+        public TableBuilderService(GeographicService geographicService, LaCharacteristicService laCharacteristicService,
+            NationalCharacteristicService nationalCharacteristicService, IMapper mapper)
         {
             _geographicService = geographicService;
             _laCharacteristicService = laCharacteristicService;
             _nationalCharacteristicService = nationalCharacteristicService;
+            _mapper = mapper;
         }
 
         public TableBuilderResult GetGeographic(GeographicQueryContext query)
@@ -55,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 PublicationId = first.PublicationId,
                 ReleaseId = first.ReleaseId,
                 ReleaseDate = first.ReleaseDate,
-                Result = data.Select(tidyData => DataToTableBuilderData(tidyData, query.Attributes))
+                Result = data.Select(tidyData => CharacteristicDataToTableBuilderData(tidyData, query.Attributes))
             };
         }
 
@@ -74,15 +76,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 PublicationId = first.PublicationId,
                 ReleaseId = first.ReleaseId,
                 ReleaseDate = first.ReleaseDate,
-                Result = data.Select(tidyData => DataToTableBuilderData(tidyData, query.Attributes))
+                Result = data.Select(tidyData => CharacteristicDataToTableBuilderData(tidyData, query.Attributes))
             };
         }
 
-        private static TableBuilderData DataToTableBuilderData(TidyData data, ICollection<string> attributeFilter)
+        private static TableBuilderData DataToTableBuilderData(ITidyData data, ICollection<string> attributeFilter)
         {
             return new TableBuilderData
             {
                 Domain = data.Year.ToString(),
+                Range = attributeFilter.Count > 0 ? FilterAttributes(data.Attributes, attributeFilter) : data.Attributes
+            };
+        }
+
+
+        private TableBuilderData CharacteristicDataToTableBuilderData(ITidyDataCharacteristic data,
+            ICollection<string> attributeFilter)
+        {
+            return new TableBuilderData
+            {
+                Domain = data.Year.ToString(),
+                Characteristic = _mapper.Map<CharacteristicViewModel>(data.Characteristic),
                 Range = attributeFilter.Count > 0 ? FilterAttributes(data.Attributes, attributeFilter) : data.Attributes
             };
         }

@@ -17,7 +17,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet]
         public string Seed()
         {
-            return "Inserted " + _seedService.Seed() + " rows";
+            if (_seedService.CanSeed())
+            {
+                return "Inserted " + _seedService.Seed() + " rows";
+            }
+
+            return "Cannot seed. Database is not empty";
         }
 
         [HttpDelete("DropAllCollections")]

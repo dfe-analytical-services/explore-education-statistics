@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
     [BsonKnownTypes(typeof(TidyDataGeographic), typeof(TidyDataLaCharacteristic),
         typeof(TidyDataNationalCharacteristic))]
-    public abstract class TidyData
+    public abstract class TidyData : ITidyData
     {
         protected TidyData()
         {
@@ -16,6 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
         protected TidyData(Guid publicationId,
             Guid releaseId,
             DateTime releaseDate,
+            string term,
             int year,
             string level,
             Country country,
@@ -25,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
             PublicationId = publicationId;
             ReleaseId = releaseId;
             ReleaseDate = releaseDate;
+            Term = term;
             Year = year;
             Level = level;
             Country = country;
@@ -36,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
         public Guid PublicationId { get; set; }
         public Guid ReleaseId { get; set; }
         public DateTime ReleaseDate { get; set; }
+        [BsonElement("term")] public string Term { get; set; }
         [BsonElement("year")] public int Year { get; set; }
         [BsonElement("level")] public string Level { get; set; }
         public Country Country { get; set; }

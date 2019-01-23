@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
-    public class TidyDataLaCharacteristic : TidyData
+    public class TidyDataLaCharacteristic : TidyData, ITidyDataCharacteristic
     {
         public TidyDataLaCharacteristic()
         {
@@ -12,6 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
         public TidyDataLaCharacteristic(Guid publicationId,
             Guid releaseId,
             DateTime releaseDate,
+            string term,
             int year,
             string level,
             Country country,
@@ -20,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
             Region region,
             LocalAuthority localAuthority,
             Characteristic characteristic) :
-            base(publicationId, releaseId, releaseDate, year, level, country, schoolType, attributes)
+            base(publicationId, releaseId, releaseDate, term, year, level, country, schoolType, attributes)
         {
             Region = region;
             LocalAuthority = localAuthority;

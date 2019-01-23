@@ -93,6 +93,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return count;
         }
 
+        public bool CanSeed()
+        {
+            return !_database.ListCollectionNames().Any();
+        }
+
         public void DropAllCollections()
         {
             _database.ListCollectionNames().ForEachAsync(collection => _database.DropCollection(collection));
@@ -106,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 var importer = _mongoCsvImporterFactory.Importer(dataCsvFilename);
                 var data = importer.Data(dataCsvFilename, release.PublicationId, release.ReleaseId,
                     release.ReleaseDate);
-                Collection(release).InsertMany(data);
+                Collection(release).InsertManyAsync(data);
                 count += data.Count;
             }
 

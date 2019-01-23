@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
         {
             var headerValues = new[]
             {
-                "year", "level", "country_code", "country_name", "region_code", "region_name", "old_la_code",
+                "term", "year", "level", "country_code", "country_name", "region_code", "region_name", "old_la_code",
                 "new_la_code", "la_name", "school_type", "characteristic_desc", "characteristic"
             };
             var values = csvLine.Split(',');
@@ -55,6 +55,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             };
 
+            if (headers.Contains("term"))
+            {
+                model.Term = values[headers.FindIndex(h => h.Equals("term"))];
+            }
+            
             for (var i = 0; i < values.Length; i++)
             {
                 if (!headerValues.Contains(headers[i]))

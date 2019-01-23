@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class NationalCharacteristicService : BaseTidyDataService<TidyDataNationalCharacteristic, NationalQueryContext>
     {
-        public NationalCharacteristicService(IMDatabase<TidyData> database) : base(database)
+        public NationalCharacteristicService(MDatabase database) : base(database)
         {
         }
     }

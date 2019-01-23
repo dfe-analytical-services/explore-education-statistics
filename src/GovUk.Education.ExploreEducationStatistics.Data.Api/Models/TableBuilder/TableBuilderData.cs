@@ -5,6 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilde
     public class TableBuilderData
     {
         public string Domain { get; set; }
+        public CharacteristicViewModel Characteristic { get; set; }
         public Dictionary<string, string> Range { get; set; }
     }
 }

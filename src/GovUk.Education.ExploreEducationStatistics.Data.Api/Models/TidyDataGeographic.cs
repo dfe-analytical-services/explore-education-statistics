@@ -12,7 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
         public TidyDataGeographic(
             Guid publicationId,
             Guid releaseId,
-            DateTime dateTime,
+            DateTime releaseDate,
+            string term,
             int year,
             string level,
             Country country,
@@ -21,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
             Region region,
             LocalAuthority localAuthority,
             School school) :
-            base(publicationId, releaseId, dateTime, year, level, country, schoolType, attributes)
+            base(publicationId, releaseId, releaseDate, term, year, level, country, schoolType, attributes)
         {
             Region = region;
             LocalAuthority = localAuthority;

@@ -48,8 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddScoped<SeedService>();
             services.AddScoped<TableBuilderService>();
             services.AddSingleton<ICsvReader, CsvReader>();
-            
-            services.AddSingleton<IMDatabase<TidyData>, MDatabase<TidyData>>();
+
+            services.AddSingleton<MDatabase>();
             
             services.AddScoped<GeographicService>();
             services.AddScoped<LaCharacteristicService>();

@@ -1,9 +1,11 @@
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
-    public class MDatabase<T> : IMDatabase<T>
+    public class MDatabase
+
     {
         public IMongoDatabase Database { get; }
 
@@ -13,9 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             Database = client.GetDatabase("education-statistics");
         }
 
-        public IMongoCollection<T> Collection(string collectionName)
+        public IMongoCollection<TidyData> Collection(string collectionName)
         {
-            return Database.GetCollection<T>(collectionName);
+            return Database.GetCollection<TidyData>(collectionName);
         }
     }
 }

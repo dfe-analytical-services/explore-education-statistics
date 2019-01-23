@@ -1,24 +1,27 @@
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
-using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class DataService
     {
-        private readonly IMDatabase<TidyDataGeographic> _database;
+        private readonly MDatabase _database;
 
-        public DataService(IMDatabase<TidyDataGeographic> database)
+        public DataService(MDatabase database)
         {
             _database = database;
         }
 
         public IEnumerable<TidyDataGeographic> Get(string publication, string level = "")
         {
-            return _database.Collection(publication)
-                                      .Find(x => x.Level == level)
-                                      .ToList();
+            return Queryable(publication).Where(x => x.Level == level).ToList();
+        }
+
+        private IMongoQueryable<TidyDataGeographic> Queryable(string collectionName)
+        {
+            return _database.Collection(collectionName).AsQueryable().OfType<TidyDataGeographic>();
         }
     }
 }

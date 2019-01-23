@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class LaCharacteristicService : BaseTidyDataService<TidyDataLaCharacteristic, LaQueryContext>
     {
-        public LaCharacteristicService(IMDatabase<TidyData> database) : base(database)
+        public LaCharacteristicService(MDatabase database) : base(database)
         {
         }
     }
