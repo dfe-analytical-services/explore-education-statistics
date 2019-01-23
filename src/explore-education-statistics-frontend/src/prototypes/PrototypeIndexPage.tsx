@@ -8,7 +8,9 @@ import PrototypeDataTableV1LocalAuthority from './data-table/PrototypeDataTableV
 import PrototypeDataTableV1National from './data-table/PrototypeDataTableV1National';
 import PrototypeDataTableV1VerticalLayout from './data-table/PrototypeDataTableV1VerticalLayout';
 import PrototypeDataTableV2 from './data-table/PrototypeDataTableV2';
+import BrowseReleases from './PrototypeBrowseReleases';
 import HomePage from './PrototypeHomePage';
+import HomePageOriginal from './PrototypeHomePageOriginal';
 import HomePageV2 from './PrototypeHomePageV2';
 import PublicationPage from './PrototypePublicationPage';
 import StartPage from './PrototypeStartPage';
@@ -20,7 +22,17 @@ export const PrototypeRoutes = () => (
     <Route exact path="/prototypes" component={PrototypeIndexPage} />
     <Route exact path="/prototypes/start" component={StartPage} />
     <Route exact path="/prototypes/home" component={HomePage} />
+    <Route
+      exact
+      path="/prototypes/home-original"
+      component={HomePageOriginal}
+    />
     <Route exact path="/prototypes/home-v2" component={HomePageV2} />
+    <Route
+      exact
+      path="/prototypes/browse-releases"
+      component={BrowseReleases}
+    />
     <Route exact path="/prototypes/publication" component={PublicationPage} />
     <Route exact path="/prototypes/theme" component={ThemePage} />
     <Route exact path="/prototypes/topic" component={TopicPage} />
@@ -72,9 +84,7 @@ export const PrototypeIndexPage = () => {
               <Link to="/prototypes/home">Home page</Link>
             </li>
             <li>
-              <Link to="/prototypes/home-v2">
-                Home page - alternative headings
-              </Link>
+              <Link to="/prototypes/browse-releases">Browse releases</Link>
             </li>
             <li>
               <Link to="/prototypes/theme">Theme page</Link>
