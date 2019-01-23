@@ -57,6 +57,7 @@ const PrototypeChartSample = ({
         />
         {chartDataKeys.map((dataKey, index) => (
           <Line
+            key={index}
             type="linear"
             dataKey={dataKey}
             stroke={colours[index]}
