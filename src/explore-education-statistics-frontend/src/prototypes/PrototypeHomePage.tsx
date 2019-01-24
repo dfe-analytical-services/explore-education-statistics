@@ -54,7 +54,7 @@ const HomePage = () => {
         </div>
         <div className="govuk-grid-column-one-half">
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <Link to="#">Get information about schools</Link>
+            <Link to="#">Compare schools</Link>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-0">
             At dolore eligendi eaque molestias asperiores ullam exercitationem
