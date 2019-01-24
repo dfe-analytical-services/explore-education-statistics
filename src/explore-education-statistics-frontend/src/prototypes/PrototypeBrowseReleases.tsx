@@ -40,9 +40,9 @@ const BrowseReleasesPage = () => {
                   Overall absence, authorised absence, unauthorised absence,
                   persisitent absence
                 </p>
-                <p className="govuk-!-margin-top-0">
+                <div className="govuk-!-margin-top-0">
                   <PrototypeDownloadDropdown />
-                </p>
+                </div>
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
@@ -53,9 +53,9 @@ const BrowseReleasesPage = () => {
                 <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
                   Permanent exclusions, and fixed period exclusions
                 </p>
-                <p className="govuk-!-margin-top-0">
+                <div className="govuk-!-margin-top-0">
                   <PrototypeDownloadDropdown />
-                </p>
+                </div>
               </li>
             </ul>
           </div>

@@ -14,8 +14,8 @@ import FilterMenuRadios, {
   MenuChangeEventHandler,
   MenuOption,
 } from './components/FilterMenuRadios';
-import { allTableData as absenceTableData } from './test-data/absenceRateData';
-import { allTableData as exclusionTableData } from './test-data/exclusionRateData';
+import { allTableData as exclusionTableData } from './test-data/exclusionsDataV1';
+import { allTableData as absenceTableData } from './test-data/pupilAbsenceDataV1';
 
 type DataToggles = 'CHARTS_TABLES' | 'CHARTS' | 'TABLES' | null;
 

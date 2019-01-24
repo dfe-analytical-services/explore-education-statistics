@@ -8,15 +8,42 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import styles from './PrototypeChartSample.module.scss';
 
 interface Props {
   xAxisLabel?: string;
   yAxisLabel?: string;
   chartData?: any;
-  chartDataKeys: string[];
+  chartDataKeys: any[];
 }
 
-const colours = ['#b10e1e', '#006435', '#005ea5', '#800080', '#C0C0C0'];
+const colours: string[] = [
+  '#b10e1e',
+  '#006435',
+  '#005ea5',
+  '#800080',
+  '#C0C0C0',
+];
+
+const CustomToolTip = (props: any) => {
+  if (props.active) {
+    const { payload, label } = props;
+    return (
+      <div className={styles.tooltip}>
+        <p>{label}</p>
+        {payload
+          .sort((a: any, b: any) => {
+            return b.value - a.value;
+          })
+          .map((_: any, index: number) => (
+            <p key={index}>{`${payload[index].name} : ${
+              payload[index].value
+            }`}</p>
+          ))}
+      </div>
+    );
+  }
+};
 
 const PrototypeChartSample = ({
   xAxisLabel,
@@ -32,8 +59,8 @@ const PrototypeChartSample = ({
         data={chartData}
         margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
       >
-        <Tooltip />
-        <Legend iconType="square" verticalAlign="top" height={36} />
+        <Tooltip content={CustomToolTip} />
+        <Legend verticalAlign="top" height={36} />
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
           dataKey="name"
@@ -58,6 +85,7 @@ const PrototypeChartSample = ({
         {chartDataKeys.map((dataKey, index) => (
           <Line
             key={index}
+            name={dataKey}
             type="linear"
             dataKey={dataKey}
             stroke={colours[index]}
