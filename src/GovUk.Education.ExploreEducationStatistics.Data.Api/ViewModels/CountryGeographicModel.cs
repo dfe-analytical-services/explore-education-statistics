@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 {
+    [Obsolete]
     public class CountryGeographicModel
     {
         public string Level { get; set; }

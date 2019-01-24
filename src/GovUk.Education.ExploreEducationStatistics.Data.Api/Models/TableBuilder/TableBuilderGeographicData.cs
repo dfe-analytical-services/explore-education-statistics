@@ -2,10 +2,9 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder
 {
-    public class TableBuilderData
+    public class TableBuilderGeographicData : ITableBuilderData
     {
-        public string Domain { get; set; }
-        public CharacteristicViewModel Characteristic { get; set; }
+        public string Year { get; set; }
         public Dictionary<string, string> Range { get; set; }
     }
 }

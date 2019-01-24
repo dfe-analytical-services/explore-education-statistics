@@ -4,8 +4,9 @@ using System.IO;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer.Old
 {
+    [Obsolete]
     public class CsvReader : ICsvReader
     {
         private readonly string _path;

@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 {
-    public class GeographicQueryContext : IQueryContext<TidyDataGeographic>
+    public class GeographicQueryContext : IQueryContext<GeographicData>
     {
         public Guid PublicationId { get; set; }
         public Level Level { get; set; }
@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public ICollection<int> Years { get; set; }
         public ICollection<string> Attributes { get; set; }
 
-        public Expression<Func<TidyDataGeographic, bool>> FindExpression()
+        public Expression<Func<GeographicData, bool>> FindExpression()
         {
             return x =>
                 x.Level.ToLower() == Levels.getLevel(Level).ToLower() &&

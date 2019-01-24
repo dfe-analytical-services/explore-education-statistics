@@ -5,9 +5,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
 {
-    public class MongoGeoLevelsCsvImporter : MongoCsvImporter
+    public class LaCharacteristicCsvImporter : CsvImporter
     {
-        public MongoGeoLevelsCsvImporter(string path = "") : base(path)
+        public LaCharacteristicCsvImporter(string path = "") : base(path)
         {
         }
 
@@ -20,11 +20,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
             var headerValues = new[]
             {
                 "term", "year", "level", "country_code", "country_name", "region_code", "region_name", "old_la_code",
-                "new_la_code", "la_name", "estab", "laestab", "urn", "acad_type", "acad_opendate", "school_type"
+                "new_la_code", "la_name", "school_type", "characteristic_desc", "characteristic"
             };
             var values = csvLine.Split(',');
-            
-            var model = new TidyDataGeographic
+            var model = new CharacteristicDataLa
             {
                 PublicationId = publicationId,
                 ReleaseId = releaseId,
@@ -47,27 +46,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                     Code = values[headers.FindIndex(h => h.Equals("new_la_code"))],
                     Name = values[headers.FindIndex(h => h.Equals("la_name"))]
                 },
-                School = new School
-                {
-                    Estab = values[headers.FindIndex(h => h.Equals("estab"))],
-                    LaEstab = values[headers.FindIndex(h => h.Equals("laestab"))],
-                    AcademyOpenDate = values[headers.FindIndex(h => h.Equals("acad_opendate"))],
-                    AcademyType = values[headers.FindIndex(h => h.Equals("acad_type"))]
-                },
                 SchoolType = values[headers.FindIndex(h => h.Equals("school_type"))],
-                Attributes = new Dictionary<string, string>()
+                Attributes = new Dictionary<string, string>(),
+                Characteristic = new Characteristic
+                {
+                    Name = values[headers.FindIndex(h => h.Equals("characteristic"))],
+                    Description = values[headers.FindIndex(h => h.Equals("characteristic_desc"))]
+                }
             };
 
-            if (headers.Contains("urn"))
-            {
-                model.School.Urn = values[headers.FindIndex(h => h.Equals("urn"))];
-            }
-            
             if (headers.Contains("term"))
             {
                 model.Term = values[headers.FindIndex(h => h.Equals("term"))];
             }
-
+            
             for (var i = 0; i < values.Length; i++)
             {
                 if (!headerValues.Contains(headers[i]))

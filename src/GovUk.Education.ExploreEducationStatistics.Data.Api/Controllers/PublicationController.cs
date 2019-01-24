@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer.Old;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 

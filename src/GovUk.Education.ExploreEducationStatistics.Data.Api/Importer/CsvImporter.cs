@@ -6,11 +6,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
 {
-    public abstract class MongoCsvImporter : IMongoCsvImporter
+    public abstract class CsvImporter : ICsvImporter
     {
         private readonly string _path;
 
-        protected MongoCsvImporter(string path = "")
+        protected CsvImporter(string path = "")
         {
             _path = path;
         }

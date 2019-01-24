@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     public class SeedService
     {
         private readonly IMongoDatabase _database;
-        private readonly MongoCsvImporterFactory _mongoCsvImporterFactory = new MongoCsvImporterFactory();
+        private readonly CsvImporterFactory _csvImporterFactory = new CsvImporterFactory();
 
         private readonly Dictionary<string, Release[]> _publications = new Dictionary<string, Release[]>
         {
@@ -108,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             var count = 0;
             foreach (var dataCsvFilename in release.Filenames)
             {
-                var importer = _mongoCsvImporterFactory.Importer(dataCsvFilename);
+                var importer = _csvImporterFactory.Importer(dataCsvFilename);
                 var data = importer.Data(dataCsvFilename, release.PublicationId, release.ReleaseId,
                     release.ReleaseDate);
                 Collection(release).InsertManyAsync(data);

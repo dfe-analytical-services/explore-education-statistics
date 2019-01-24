@@ -5,8 +5,8 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
-    [BsonKnownTypes(typeof(TidyDataGeographic), typeof(TidyDataLaCharacteristic),
-        typeof(TidyDataNationalCharacteristic))]
+    [BsonKnownTypes(typeof(GeographicData), typeof(CharacteristicDataLa),
+        typeof(CharacteristicDataNational))]
     public abstract class TidyData : ITidyData
     {
         protected TidyData()

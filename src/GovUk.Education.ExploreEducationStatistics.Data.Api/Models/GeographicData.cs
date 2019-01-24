@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
-    public class TidyDataGeographic : TidyData
+    public class GeographicData : TidyData
     {
-        public TidyDataGeographic()
+        public GeographicData()
         {
         }
 
-        public TidyDataGeographic(
+        public GeographicData(
             Guid publicationId,
             Guid releaseId,
             DateTime releaseDate,
