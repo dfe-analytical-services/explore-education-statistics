@@ -6,6 +6,8 @@ services:
     ports:
     - "5000:5000"
     - "5001:5001"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
   content-api:
     container_name: ees-content
     build: GovUk.Education.ExploreEducationStatistics.Content.Api

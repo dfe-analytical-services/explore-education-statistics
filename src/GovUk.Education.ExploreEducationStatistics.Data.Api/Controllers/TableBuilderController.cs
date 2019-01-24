@@ -7,41 +7,40 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
-    
     [Route("api/[controller]")]
     [ApiController]
     public class TableBuilderController : ControllerBase
     {
         private readonly TableBuilderService _tableBuilderService;
-        
+
         public TableBuilderController(TableBuilderService tableBuilderService)
         {
             _tableBuilderService = tableBuilderService;
         }
 
-        [HttpGet("geographic/{publicationId}/{schoolType}/{level}")]
+        [HttpGet("geographic/{publicationId}/{level}")]
         public ActionResult<TableBuilderResult> GetGeographic(Guid publicationId,
-            SchoolType schoolType,
             [FromQuery(Name = "year")] ICollection<int> years,
+            [FromQuery(Name = "schoolType")] ICollection<SchoolType> schoolTypes,
             [FromQuery(Name = "attribute")] ICollection<string> attributes,
-            string level = "National")
-        {   
+            Level level = Level.National)
+        {
             var query = new GeographicQueryContext
             {
                 Attributes = attributes,
-                Level = Levels.getLevel(level),
+                Level = level,
                 PublicationId = publicationId,
-                SchoolType = schoolType,
+                SchoolTypes = schoolTypes,
                 Years = years
             };
-            
+
             return _tableBuilderService.GetGeographic(query);
         }
-        
-        [HttpGet("characteristics/local-authority/{publicationId}/{schoolType}")]
+
+        [HttpGet("characteristics/local-authority/{publicationId}")]
         public ActionResult<TableBuilderResult> GetLocalAuthority(Guid publicationId,
-            SchoolType schoolType,
             [FromQuery(Name = "year")] ICollection<int> years,
+            [FromQuery(Name = "schoolType")] ICollection<SchoolType> schoolTypes,
             [FromQuery(Name = "attribute")] ICollection<string> attributes,
             [FromQuery(Name = "characteristic")] ICollection<string> characteristics)
         {
@@ -50,17 +49,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 Attributes = attributes,
                 Characteristics = characteristics,
                 PublicationId = publicationId,
-                SchoolType = schoolType,
+                SchoolTypes = schoolTypes,
                 Years = years
             };
-            
+
             return _tableBuilderService.GetLocalAuthority(query);
         }
-        
-        [HttpGet("characteristics/national/{publicationId}/{schoolType}")]
+
+        [HttpGet("characteristics/national/{publicationId}")]
         public ActionResult<TableBuilderResult> GetNational(Guid publicationId,
-            SchoolType schoolType,
             [FromQuery(Name = "year")] ICollection<int> years,
+            [FromQuery(Name = "schoolType")] ICollection<SchoolType> schoolTypes,
             [FromQuery(Name = "attribute")] ICollection<string> attributes,
             [FromQuery(Name = "characteristic")] ICollection<string> characteristics)
         {
@@ -69,10 +68,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 Attributes = attributes,
                 Characteristics = characteristics,
                 PublicationId = publicationId,
-                SchoolType = schoolType,
+                SchoolTypes = schoolTypes,
                 Years = years
             };
-            
+
             return _tableBuilderService.GetNational(query);
         }
     }

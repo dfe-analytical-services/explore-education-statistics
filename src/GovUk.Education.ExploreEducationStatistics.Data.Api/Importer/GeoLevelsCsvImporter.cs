@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
 {
@@ -23,14 +24,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 "new_la_code", "la_name", "estab", "laestab", "urn", "acad_type", "acad_opendate", "school_type"
             };
             var values = csvLine.Split(',');
-            
+
             var model = new GeographicData
             {
                 PublicationId = publicationId,
                 ReleaseId = releaseId,
                 ReleaseDate = releaseDate,
                 Year = int.Parse(values[headers.FindIndex(h => h.Equals("year"))]),
-                Level = values[headers.FindIndex(h => h.Equals("level"))],
+                Level = Levels.EnumFromStringForImport(values[headers.FindIndex(h => h.Equals("level"))]).ToString(),
                 Country = new Country
                 {
                     Code = values[headers.FindIndex(h => h.Equals("country_code"))],
@@ -54,7 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                     AcademyOpenDate = values[headers.FindIndex(h => h.Equals("acad_opendate"))],
                     AcademyType = values[headers.FindIndex(h => h.Equals("acad_type"))]
                 },
-                SchoolType = values[headers.FindIndex(h => h.Equals("school_type"))],
+                SchoolType = SchoolTypes.EnumFromStringForImport(values[headers.FindIndex(h => h.Equals("school_type"))])
+                    .ToString(),
                 Attributes = new Dictionary<string, string>()
             };
 
@@ -62,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
             {
                 model.School.Urn = values[headers.FindIndex(h => h.Equals("urn"))];
             }
-            
+
             if (headers.Contains("term"))
             {
                 model.Term = values[headers.FindIndex(h => h.Equals("term"))];
