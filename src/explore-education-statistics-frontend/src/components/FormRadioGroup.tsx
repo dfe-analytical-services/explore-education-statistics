@@ -61,15 +61,7 @@ class FormRadioGroup extends Component<Props> {
   }
 
   public render() {
-    const { legend, ...restProps } = this.props;
-
-    return legend ? (
-      <FormFieldSet {...restProps} legend={legend}>
-        {this.renderRadios()}
-      </FormFieldSet>
-    ) : (
-      this.renderRadios()
-    );
+    return <FormFieldSet {...this.props}>{this.renderRadios()}</FormFieldSet>;
   }
 }
 

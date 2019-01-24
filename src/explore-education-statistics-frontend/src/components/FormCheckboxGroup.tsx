@@ -81,14 +81,8 @@ class FormCheckboxGroup extends Component<Props, State> {
   }
 
   public render() {
-    const { legend, ...restProps } = this.props;
-
-    return legend ? (
-      <FormFieldSet {...restProps} legend={legend}>
-        {this.renderCheckboxes()}
-      </FormFieldSet>
-    ) : (
-      this.renderCheckboxes()
+    return (
+      <FormFieldSet {...this.props}>{this.renderCheckboxes()}</FormFieldSet>
     );
   }
 }
