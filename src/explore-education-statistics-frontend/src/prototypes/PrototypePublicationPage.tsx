@@ -23,10 +23,10 @@ const PublicationPage = () => {
             {' '}
             This is the latest data{' '}
           </strong>
-          <h1 className="govuk-heading-l">
+          <h1 className="govuk-heading-xl">
             Pupil absence data and statistics for schools in England
           </h1>
-          <p>
+          <p className="govuk-body-l">
             View statistics and download data files for authorised and
             unauthorised absence in state-funded schools.
           </p>
