@@ -1,7 +1,9 @@
 import React from 'react';
+import Details from '../../components/Details';
 import Tabs from '../../components/Tabs';
 import TabsSection from '../../components/TabsSection';
 import PrototypeChartSample from './PrototypeChartSample';
+import PrototypeDataTilesHighlights from './PrototypeDataTilesHighlights';
 import PrototypeTableSample from './PrototypeTableSample';
 
 interface Props {
@@ -24,7 +26,22 @@ const PrototypeDataSample = ({
   return (
     <>
       <Tabs>
-        <TabsSection id={`${sectionId}ChartData`} title="Summary">
+        {sectionId === 'headlines' && (
+          <TabsSection id={`${sectionId}SummaryData`} title="Summary">
+            <PrototypeDataTilesHighlights />
+            <ul className="govuk-list govuk-list--bullet">
+              <li>pupils missed on average 8.2 school days</li>
+              <li>
+                overall and unauthorised absence rates up on previous year
+              </li>
+              <li>
+                unauthorised rise due to higher rates of unauthorised holidays
+              </li>
+              <li>10% of pupils persistently absent during 2016/17</li>
+            </ul>
+          </TabsSection>
+        )}
+        <TabsSection id={`${sectionId}ChartData`} title="Charts">
           <h2 className="govuk-heading-s">{`Chart showing ${chartTitle}`}</h2>
           <PrototypeChartSample
             xAxisLabel={xAxisLabel}
