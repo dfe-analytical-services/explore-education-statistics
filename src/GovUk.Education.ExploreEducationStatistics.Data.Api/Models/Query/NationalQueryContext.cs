@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
@@ -7,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
     public class NationalQueryContext : IQueryContext<CharacteristicDataNational>
     {
         public Guid PublicationId { get; set; }
-        public SchoolType SchoolType { get; set; }
+        public ICollection<SchoolType> SchoolTypes { get; set; }
         public ICollection<int> Years { get; set; }
         public ICollection<string> Attributes { get; set; }
         public ICollection<string> Characteristics { get; set; }
@@ -15,8 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public Expression<Func<CharacteristicDataNational, bool>> FindExpression()
         {
             return x =>
-                x.Level.ToLower() == Levels.getLevel(Level.National).ToLower() &&
-                x.SchoolType == SchoolType.ToString() &&
+                x.Level.ToLower() == Levels.getStringFromEnum(Level.National).ToLower() &&
+                (SchoolTypes.Count == 0 ||
+                 SchoolTypes.Select(Query.SchoolTypes.getStringFromEnum).Contains(x.SchoolType)) &&
                 (Years.Count == 0 || Years.Contains(x.Year)) &&
                 (Characteristics.Count == 0 || Characteristics.Contains(x.Characteristic.Name));
         }

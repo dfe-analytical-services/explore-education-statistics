@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder
@@ -10,8 +11,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
         {
             return new TableBuilderGeographicData
             {
-                Year = data.Year.ToString(),
-                Range = attributeFilter.Count > 0
+                Year = data.Year,
+                SchoolType = SchoolTypes.getEnumFromString(data.SchoolType).ToString(),
+                Attributes = attributeFilter.Count > 0
                     ? QueryUtil.FilterAttributes(data.Attributes, attributeFilter)
                     : data.Attributes
             };

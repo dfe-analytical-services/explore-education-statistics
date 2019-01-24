@@ -1,32 +1,18 @@
-using System;
 using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 {
-    public class Levels
+    public static class Levels
     {
-        private static readonly Dictionary<string, Level> levels = new Dictionary<string, Level>
+        private static readonly Dictionary<Level, string> values = new Dictionary<Level, string>
         {
-            {"National", Level.National},
-            {"LOCAL AUTHORITY", Level.Local_Authority}
+            {Level.National, "National"},
+            {Level.Local_Authority, "LOCAL AUTHORITY"}
         };
 
-        public static Level getLevel(string level)
+        public static string getStringFromEnum(Level value)
         {
-            return levels.GetValueOrDefault(level);
-        }
-
-        public static string getLevel(Level level)
-        {
-            foreach (var keyValuePair in levels)
-            {
-                if (keyValuePair.Value == level)
-                {
-                    return keyValuePair.Key;
-                }
-            }
-
-            throw new ArgumentException("Unexpected level: " + level);
+            return values.GetValueOrDefault(value);
         }
     }
 }
