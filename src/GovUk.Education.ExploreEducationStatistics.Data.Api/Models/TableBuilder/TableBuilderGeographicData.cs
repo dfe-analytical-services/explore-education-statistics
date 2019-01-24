@@ -4,7 +4,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilde
 {
     public class TableBuilderGeographicData : ITableBuilderData
     {
-        public string Year { get; set; }
-        public Dictionary<string, string> Range { get; set; }
+        public int Year { get; set; }
+        public string SchoolType { get; set; }
+        public Dictionary<string, string> Attributes { get; set; }
     }
 }

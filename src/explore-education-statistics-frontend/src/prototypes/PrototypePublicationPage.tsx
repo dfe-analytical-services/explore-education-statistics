@@ -202,7 +202,7 @@ const PublicationPage = () => {
         </ul>
         <PrototypeDataSample
           sectionId="headlines"
-          chartTitle="change in absence types 2012/13 to 2016/17"
+          chartTitle="change in absence types in England"
           xAxisLabel="School Year"
           yAxisLabel="Absence Rate"
           chartData={[
@@ -377,7 +377,7 @@ const PublicationPage = () => {
           </Details>
           <PrototypeDataSample
             sectionId="absenceRates"
-            chartTitle="absence rates"
+            chartTitle="absence rates in England"
             xAxisLabel="School Year"
             yAxisLabel="Absence Rate"
             chartData={[
@@ -477,7 +477,7 @@ const PublicationPage = () => {
           </Details>
           <PrototypeDataSample
             sectionId="persistentAbsence"
-            chartTitle="persistent absence rates"
+            chartTitle="persistent absence rates in England"
             xAxisLabel="School Year"
             yAxisLabel="Persistent Absence Rate"
             chartData={[
@@ -564,7 +564,7 @@ const PublicationPage = () => {
           </div>
           <PrototypeDataSample
             sectionId="reasonAbsence"
-            chartTitle="reason for absence"
+            chartTitle="reason for absence in England"
             xAxisLabel="School Year"
             yAxisLabel="Absence Rate"
             chartData={[

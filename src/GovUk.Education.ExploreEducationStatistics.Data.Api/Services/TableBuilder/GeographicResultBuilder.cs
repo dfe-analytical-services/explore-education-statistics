@@ -10,8 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
         {
             return new TableBuilderGeographicData
             {
-                Year = data.Year.ToString(),
-                Range = attributeFilter.Count > 0
+                Year = data.Year,
+                SchoolType = data.SchoolType,
+                Attributes = attributeFilter.Count > 0
                     ? QueryUtil.FilterAttributes(data.Attributes, attributeFilter)
                     : data.Attributes
             };

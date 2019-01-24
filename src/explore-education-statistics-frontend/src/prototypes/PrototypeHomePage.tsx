@@ -18,7 +18,7 @@ const HomePage = () => {
         <div className="govuk-grid-column-one-half">
           <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
             <Link to="/prototypes/browse-releases">
-             Find statistics and download data files
+              Find statistics and download data files
             </Link>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-2">

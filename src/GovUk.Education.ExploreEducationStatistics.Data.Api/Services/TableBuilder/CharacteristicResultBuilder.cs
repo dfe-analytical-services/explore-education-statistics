@@ -14,16 +14,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             _mapper = mapper;
         }
 
-        public TableBuilderCharacteristicData BuildResult(ICharacteristicData characteristicData,
-            ICollection<string> attributeFilter)
+        public TableBuilderCharacteristicData BuildResult(ICharacteristicData data, ICollection<string> attributeFilter)
         {
             return new TableBuilderCharacteristicData
             {
-                Year = characteristicData.Year.ToString(),
-                Characteristic = _mapper.Map<CharacteristicViewModel>(characteristicData.Characteristic),
-                Range = attributeFilter.Count > 0
-                    ? QueryUtil.FilterAttributes(characteristicData.Attributes, attributeFilter)
-                    : characteristicData.Attributes
+                Year = data.Year,
+                SchoolType = data.SchoolType,
+                Characteristic = _mapper.Map<CharacteristicViewModel>(data.Characteristic),
+                Attributes = attributeFilter.Count > 0
+                    ? QueryUtil.FilterAttributes(data.Attributes, attributeFilter)
+                    : data.Attributes
             };
         }
     }
