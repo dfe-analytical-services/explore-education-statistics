@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import React, { FunctionComponent, ReactNode } from 'react';
 
 export interface FieldSetProps {
-  legend: string | ReactNode;
+  legend?: string | ReactNode;
   legendSize?: 'xl' | 'l' | 'm' | 's';
   hint?: string;
   hintId?: string;
@@ -22,14 +22,16 @@ const FormFieldSet: FunctionComponent<FieldSetProps> = ({
       className="govuk-fieldset"
       aria-describedby={hint ? hintId : undefined}
     >
-      <legend
-        className={classNames(
-          'govuk-fieldset__legend',
-          `govuk-fieldset__legend--${legendSize}`,
-        )}
-      >
-        {legend}
-      </legend>
+      {legend && (
+        <legend
+          className={classNames(
+            'govuk-fieldset__legend',
+            `govuk-fieldset__legend--${legendSize}`,
+          )}
+        >
+          {legend}
+        </legend>
+      )}
       {hint && (
         <span className="govuk-hint" id={hintId}>
           {hint}

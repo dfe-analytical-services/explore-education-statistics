@@ -4,9 +4,8 @@
 @import '~govuk-frontend/core/lists';
 
 .filterMenu {
-  @include govuk-responsive-margin(6, 'bottom');
-
-  composes: filterMenu from './FilterMenu.module.scss';
+  @include govuk-responsive-margin(8, 'bottom');
+  @include govuk-responsive-margin(6, 'top');
 }
 
 .linkList {

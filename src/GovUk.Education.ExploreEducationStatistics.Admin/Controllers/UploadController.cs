@@ -1,4 +1,5 @@
 using System;
+using System.Data.Common;
 using System.IO;
 using System.Runtime.Serialization.Json;
 using System.Text;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Queue;
@@ -16,8 +18,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
     [RequestSizeLimit(100 * 1024 * 1024)]
     public class UploadController : Controller
     {
+        private readonly string _storageConnectionString;
+        public UploadController(IConfiguration config)
+        {
+            _storageConnectionString = config.GetConnectionString("AzureStorage");
+        }
+        
         [HttpPost("Upload/{publicationId}")]
-        public async Task<IActionResult> Post(IFormFile file, String publicationId)
+        public async Task<IActionResult> Post(IFormFile file, string publicationId)
         {
             // full path to file in temp location
             var filePath = Path.GetTempFileName();
@@ -33,11 +41,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
             return Ok(new {count = 1, file.Length, filePath});
         }
 
-        private static async Task ProcessAsync(string sourceFile, Guid publicationId)
+        private async Task ProcessAsync(string sourceFile, Guid publicationId)
         {
-            var storageConnectionString = Environment.GetEnvironmentVariable("STORAGE_CONNECTION_STRING");
-
-            if (CloudStorageAccount.TryParse(storageConnectionString, out var storageAccount))
+            if (CloudStorageAccount.TryParse(_storageConnectionString, out var storageAccount))
             {
                 try
                 {
@@ -73,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
             }
         }
 
-        private static string getReleaseMessage(Guid publicationId, Guid releaseId)
+        private string getReleaseMessage(Guid publicationId, Guid releaseId)
         {
             var jsonSerializer = new DataContractJsonSerializer(typeof(ReleaseMessage));
             var ms = new MemoryStream();
