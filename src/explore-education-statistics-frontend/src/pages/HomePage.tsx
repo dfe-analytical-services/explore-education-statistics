@@ -44,7 +44,12 @@ class HomePage extends Component {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/prototypes">Prototypes</Link>
+                  <Link
+                    to="/prototypes"
+                    data-testid="home-page--prototypes-link"
+                  >
+                    Prototypes
+                  </Link>
                 </li>
               </ul>
             </nav>

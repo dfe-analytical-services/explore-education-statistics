@@ -18,8 +18,7 @@ const PublicationPage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <strong className="govuk-tag govuk-!-margin-bottom-2">
-            {' '}
-            This is the latest data{' '}
+            This is the latest data
           </strong>
           <h1 className="govuk-heading-l">
             Pupil absence data and statistics for schools in England
@@ -106,7 +105,7 @@ const PublicationPage = () => {
 
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <span className="govuk-caption-m govuk-caption-inline">
-                For school year:{' '}
+                For school year:
               </span>
               2016-2017 (latest data)
             </h3>
@@ -291,7 +290,7 @@ const PublicationPage = () => {
               the same as 2015/16
             </p>
             <Details summary="What does authorised absence mean?">
-              Overall absence is the adipisicing elit. Dolorum hic nobis
+              Authorised absence is the adipisicing elit. Dolorum hic nobis
               voluptas quidem fugiat enim ipsa reprehenderit nulla.
             </Details>
           </div>
@@ -316,7 +315,7 @@ const PublicationPage = () => {
               more than 2015/16
             </p>
             <Details summary="What does unauthorised absence mean?">
-              Overall absence is the adipisicing elit. Dolorum hic nobis
+              Unauthorised absence is the adipisicing elit. Dolorum hic nobis
               voluptas quidem fugiat enim ipsa reprehenderit nulla.
             </Details>
           </div>
@@ -341,7 +340,7 @@ const PublicationPage = () => {
               less than 2015/16
             </p>
             <Details summary="What does persistent absence mean?">
-              Overall absence is the adipisicing elit. Dolorum hic nobis
+              Persistent absence is the adipisicing elit. Dolorum hic nobis
               voluptas quidem fugiat enim ipsa reprehenderit nulla.
             </Details>
           </div>
