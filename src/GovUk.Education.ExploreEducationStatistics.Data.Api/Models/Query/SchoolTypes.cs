@@ -1,28 +1,30 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 {
     public static class SchoolTypes
     {
-        private static readonly Dictionary<SchoolType, string> values = new Dictionary<SchoolType, string>
+        private static readonly Dictionary<SchoolType, string[]> values = new Dictionary<SchoolType, string[]>
         {
-            {SchoolType.Total, "Total"},
-            {SchoolType.State_Funded_Primary, "State-funded primary"},
-            {SchoolType.State_Funded_Secondary, "State-funded secondary"},
-            {SchoolType.Special, "Special"}
+            {SchoolType.Dummy, new [] {"Dummy"}},
+            {SchoolType.Total, new [] {"Total"}},
+            {SchoolType.State_Funded_Primary, new [] {"State-funded primary"}},
+            {SchoolType.State_Funded_Secondary, new [] {"State-funded secondary"}},
+            {SchoolType.Special, new [] {"Special"}}
         };
 
-        public static string getStringFromEnum(SchoolType value)
+        public static string EnumToString(SchoolType value)
         {
-            return values.GetValueOrDefault(value);
+            return value.ToString();
         }
-
-        public static SchoolType getEnumFromString(string value)
+        
+        public static SchoolType EnumFromStringForImport(string value)
         {
             foreach (var keyValuePair in values)
             {
-                if (keyValuePair.Value == value)
+                if (keyValuePair.Value.Select(s => s.ToLower()).Contains(value.ToLower()))
                 {
                     return keyValuePair.Key;
                 }

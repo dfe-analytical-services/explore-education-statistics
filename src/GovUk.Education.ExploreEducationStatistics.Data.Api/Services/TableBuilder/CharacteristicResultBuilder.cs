@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder
@@ -20,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             return new TableBuilderCharacteristicData
             {
                 Year = data.Year,
-                SchoolType = SchoolTypes.getEnumFromString(data.SchoolType).ToString(),
+                SchoolType = data.SchoolType,
                 Characteristic = _mapper.Map<CharacteristicViewModel>(data.Characteristic),
                 Attributes = attributeFilter.Count > 0
                     ? QueryUtil.FilterAttributes(data.Attributes, attributeFilter)

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
 {
@@ -29,13 +30,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 ReleaseId = releaseId,
                 ReleaseDate = releaseDate,
                 Year = int.Parse(values[headers.FindIndex(h => h.Equals("year"))]),
-                Level = values[headers.FindIndex(h => h.Equals("level"))],
+                Level = Levels.EnumFromStringForImport(values[headers.FindIndex(h => h.Equals("level"))]).ToString(),
                 Country = new Country
                 {
                     Code = values[headers.FindIndex(h => h.Equals("country_code"))],
                     Name = values[headers.FindIndex(h => h.Equals("country_name"))]
                 },
-                SchoolType = values[headers.FindIndex(h => h.Equals("school_type"))],
+                SchoolType = SchoolTypes
+                    .EnumFromStringForImport(values[headers.FindIndex(h => h.Equals("school_type"))]).ToString(),
                 Attributes = new Dictionary<string, string>(),
                 Characteristic = new Characteristic
                 {
@@ -49,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
             {
                 model.Term = values[headers.FindIndex(h => h.Equals("term"))];
             }
-            
+
             for (var i = 0; i < values.Length; i++)
             {
                 if (!headerValues.Contains(headers[i]))

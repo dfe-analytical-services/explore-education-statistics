@@ -16,9 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public Expression<Func<CharacteristicDataLa, bool>> FindExpression()
         {
             return x =>
-                x.Level.ToLower() == Levels.getStringFromEnum(Level.Local_Authority).ToLower() &&
+                x.Level == Level.Local_Authority.ToString() &&
                 (SchoolTypes.Count == 0 ||
-                 SchoolTypes.Select(Query.SchoolTypes.getStringFromEnum).Contains(x.SchoolType)) &&
+                 SchoolTypes.Select(Query.SchoolTypes.EnumToString).Contains(x.SchoolType)) &&
                 (Years.Count == 0 || Years.Contains(x.Year)) &&
                 (Characteristics.Count == 0 || Characteristics.Contains(x.Characteristic.Name));
         }
