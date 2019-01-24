@@ -15,17 +15,17 @@ export const generalChartData = [
 ];
 
 export const sessionsAbsentTableData = {
-  SESSIONS_AUTHORISED_RATE: [
+  authorisedRate: [
     'Authorised absence rate',
     ...sessionsAbsentChartData.map(
       ({ authorised }) => `${authorised.toFixed(1)}%`,
     ),
   ],
-  SESSIONS_OVERALL_RATE: [
+  overallRate: [
     'Overall absence rate',
     ...sessionsAbsentChartData.map(({ overall }) => `${overall.toFixed(1)}%`),
   ],
-  SESSIONS_UNAUTHORISED_RATE: [
+  unauthorisedRate: [
     'Unauthorised absence rate',
     ...sessionsAbsentChartData.map(
       ({ unauthorised }) => `${unauthorised.toFixed(1)}%`,
@@ -34,21 +34,26 @@ export const sessionsAbsentTableData = {
 };
 
 export const generalTableData = {
-  GENERAL_ENROLMENTS: [
+  enrolments: [
     'Enrolments',
     ...generalChartData.map(({ enrolments }) => enrolments.toFixed(0)),
   ],
-  GENERAL_SCHOOLS: [
+  schools: [
     'Schools',
     ...generalChartData.map(({ schools }) => schools.toFixed(0)),
   ],
 };
 
 interface TableData {
-  [key: string]: string[];
+  general: {
+    [key: string]: string[];
+  };
+  sessions: {
+    [key: string]: string[];
+  };
 }
 
 export const allTableData: TableData = {
-  ...generalTableData,
-  ...sessionsAbsentTableData,
+  general: generalTableData,
+  sessions: sessionsAbsentTableData,
 };
