@@ -18,7 +18,7 @@ const HomePage = () => {
         <div className="govuk-grid-column-one-half">
           <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
             <Link to="/prototypes/browse-releases">
-              Browse and download statistical releases
+             Find statistics and download data files
             </Link>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-2">
@@ -30,7 +30,7 @@ const HomePage = () => {
         <div className="govuk-grid-column-one-half">
           <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
             <Link to="/prototypes/data-table-v1/national">
-              Explore statistical data online
+              Explore statistics online
             </Link>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-2">
