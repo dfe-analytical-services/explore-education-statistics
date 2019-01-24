@@ -9,8 +9,8 @@ import PrototypePage from '../components/PrototypePage';
 import PrototypeAbsenceRateChart from './charts/PrototypeAbsenceRateChart';
 import PrototypePermanentExclusionsChart from './charts/PrototypePermanentExclusionsChart';
 import FilterMenu from './components/FilterMenu';
-import { sessionsAbsentTableData } from './test-data/absenceRateData';
-import { allTableData as exclusionTableData } from './test-data/exclusionRateData';
+import { allTableData as exclusionTableData } from './test-data/exclusionsDataV1';
+import { sessionsAbsentTableData } from './test-data/pupilAbsenceDataV1';
 
 type DataToggles = 'CHARTS_TABLES' | 'CHARTS' | 'TABLES' | null;
 

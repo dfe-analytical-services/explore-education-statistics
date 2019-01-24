@@ -9,7 +9,7 @@ import {
   YAxis,
 } from 'recharts';
 import FluidChartContainer from '../../../components/FluidChartContainer';
-import { fixedPeriodExclusionChartData } from '../test-data/exclusionRateData';
+import { fixedPeriodExclusionChartData } from '../test-data/exclusionsDataV1';
 
 interface Props {
   exclusions: boolean;

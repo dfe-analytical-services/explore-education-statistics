@@ -9,7 +9,7 @@ import {
   YAxis,
 } from 'recharts';
 import FluidChartContainer from '../../../components/FluidChartContainer';
-import { generalChartData } from '../test-data/absenceRateData';
+import { generalChartData } from '../test-data/pupilAbsenceDataV1';
 
 interface Props {
   enrolments: boolean;
