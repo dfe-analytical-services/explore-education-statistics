@@ -53,34 +53,25 @@ export const fixedPeriodExclusionChartData = [
     name: '2016/17',
   },
 ];
-
-export const permanentExclusionTableData = {
-  PERMANENT_EXCLUSIONS: [
-    'Permanent exclusions',
-    ...permanentExclusionChartData.map(({ exclusions }) => `${exclusions}`),
-  ],
-  PERMANENT_EXCLUSIONS_RATE: [
-    'Permanent exclusions rate',
-    ...permanentExclusionChartData.map(
-      ({ exclusionsRate }) => `${exclusionsRate.toFixed(2)}%`,
-    ),
-  ],
-};
-
-export const fixedPeriodExclusionTableData = {
-  FIXED_PERIOD_EXCLUSIONS: [
+export const allTableData = {
+  fixedPeriod: [
     'Fixed period exclusions',
     ...fixedPeriodExclusionChartData.map(({ exclusions }) => `${exclusions}`),
   ],
-  FIXED_PERIOD_EXCLUSIONS_RATE: [
+  fixedPeriodRate: [
     'Fixed period exclusions rate',
     ...fixedPeriodExclusionChartData.map(
       ({ exclusionsRate }) => `${exclusionsRate.toFixed(2)}%`,
     ),
   ],
-};
-
-export const allTableData = {
-  ...permanentExclusionTableData,
-  ...fixedPeriodExclusionTableData,
+  permanent: [
+    'Permanent exclusions',
+    ...permanentExclusionChartData.map(({ exclusions }) => `${exclusions}`),
+  ],
+  permanentRate: [
+    'Permanent exclusions rate',
+    ...permanentExclusionChartData.map(
+      ({ exclusionsRate }) => `${exclusionsRate.toFixed(2)}%`,
+    ),
+  ],
 };

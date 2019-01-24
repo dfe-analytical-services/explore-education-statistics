@@ -1,4 +1,4 @@
-import React, { ChangeEventHandler, Component, createRef } from 'react';
+import React, { ChangeEvent, Component, createRef } from 'react';
 import FormCheckboxGroup from '../../components/FormCheckboxGroup';
 import { RadioChangeEventHandler } from '../../components/FormRadio';
 import FormRadioGroup from '../../components/FormRadioGroup';
@@ -20,25 +20,20 @@ import { allTableData as exclusionTableData } from './test-data/exclusionRateDat
 type DataToggles = 'CHARTS_TABLES' | 'CHARTS' | 'TABLES' | null;
 
 const allTableData: any = {
-  ...absenceTableData,
-  ...exclusionTableData,
+  exclusions: exclusionTableData,
+  pupilAbsence: absenceTableData,
 };
 
-// tslint:disable-next-line:interface-over-type-literal
-type Filters = {
-  GENERAL_ALL: boolean;
-  FIXED_PERIOD_EXCLUSIONS: boolean;
-  FIXED_PERIOD_EXCLUSIONS_RATE: boolean;
-  EXCLUSIONS_ALL: boolean;
-  GENERAL_ENROLMENTS: boolean;
-  GENERAL_SCHOOLS: boolean;
-  PERMANENT_EXCLUSIONS: boolean;
-  PERMANENT_EXCLUSIONS_RATE: boolean;
-  SESSIONS_ALL: boolean;
-  SESSIONS_AUTHORISED_RATE: boolean;
-  SESSIONS_OVERALL_RATE: boolean;
-  SESSIONS_UNAUTHORISED_RATE: boolean;
-};
+type PupilAbsenceGeneralFilters = 'enrolments' | 'schools';
+type PupilAbsenceSessionsFilters =
+  | 'authorisedRate'
+  | 'overallRate'
+  | 'unauthorisedRate';
+type ExclusionsExclusionsFilters =
+  | 'permanent'
+  | 'permanentRate'
+  | 'fixedPeriod'
+  | 'fixedPeriodRate';
 
 interface State {
   chartData: {
@@ -46,7 +41,15 @@ interface State {
   }[];
   dataToggle: DataToggles;
   menuOption?: MenuOption | null;
-  filters: Filters;
+  filters: {
+    exclusions: {
+      exclusions: { [key in ExclusionsExclusionsFilters]: boolean };
+    };
+    pupilAbsence: {
+      general: { [key in PupilAbsenceGeneralFilters]: boolean };
+      sessions: { [key in PupilAbsenceSessionsFilters]: boolean };
+    };
+  };
   tableData: string[][];
 }
 
@@ -55,18 +58,25 @@ class PrototypeDataTableV2 extends Component<{}, State> {
     chartData: [],
     dataToggle: null,
     filters: {
-      EXCLUSIONS_ALL: false,
-      FIXED_PERIOD_EXCLUSIONS: false,
-      FIXED_PERIOD_EXCLUSIONS_RATE: false,
-      GENERAL_ALL: false,
-      GENERAL_ENROLMENTS: false,
-      GENERAL_SCHOOLS: false,
-      PERMANENT_EXCLUSIONS: false,
-      PERMANENT_EXCLUSIONS_RATE: false,
-      SESSIONS_ALL: false,
-      SESSIONS_AUTHORISED_RATE: false,
-      SESSIONS_OVERALL_RATE: false,
-      SESSIONS_UNAUTHORISED_RATE: false,
+      exclusions: {
+        exclusions: {
+          fixedPeriod: false,
+          fixedPeriodRate: false,
+          permanent: false,
+          permanentRate: false,
+        },
+      },
+      pupilAbsence: {
+        general: {
+          enrolments: false,
+          schools: false,
+        },
+        sessions: {
+          authorisedRate: false,
+          overallRate: false,
+          unauthorisedRate: false,
+        },
+      },
     },
     menuOption: null,
     tableData: [],
@@ -79,18 +89,25 @@ class PrototypeDataTableV2 extends Component<{}, State> {
       {
         menuOption,
         filters: {
-          EXCLUSIONS_ALL: false,
-          FIXED_PERIOD_EXCLUSIONS: false,
-          FIXED_PERIOD_EXCLUSIONS_RATE: false,
-          GENERAL_ALL: false,
-          GENERAL_ENROLMENTS: false,
-          GENERAL_SCHOOLS: false,
-          PERMANENT_EXCLUSIONS: false,
-          PERMANENT_EXCLUSIONS_RATE: false,
-          SESSIONS_ALL: false,
-          SESSIONS_AUTHORISED_RATE: false,
-          SESSIONS_OVERALL_RATE: false,
-          SESSIONS_UNAUTHORISED_RATE: false,
+          exclusions: {
+            exclusions: {
+              fixedPeriod: false,
+              fixedPeriodRate: false,
+              permanent: false,
+              permanentRate: false,
+            },
+          },
+          pupilAbsence: {
+            general: {
+              enrolments: false,
+              schools: false,
+            },
+            sessions: {
+              authorisedRate: false,
+              overallRate: false,
+              unauthorisedRate: false,
+            },
+          },
         },
         tableData: [],
       },
@@ -102,66 +119,58 @@ class PrototypeDataTableV2 extends Component<{}, State> {
     );
   };
 
-  private handleFilterCheckboxChange: ChangeEventHandler<
-    HTMLInputElement
-  > = event => {
-    let filters: Filters;
+  private handleFilterCheckboxChange = (
+    filterGroupName: 'pupilAbsence' | 'exclusions',
+    subFilterGroupName: 'exclusions' | 'general' | 'sessions',
+    event: ChangeEvent<HTMLInputElement>,
+  ) => {
+    const filterGroup = this.state.filters[filterGroupName] as any;
+    const subFilterGroup = filterGroup[subFilterGroupName];
 
-    const checkedValue = event.target.checked;
+    let filters: any;
 
-    switch (event.target.value) {
-      case 'GENERAL_ALL':
-        filters = {
-          ...this.state.filters,
-          GENERAL_ENROLMENTS: checkedValue,
-          GENERAL_SCHOOLS: checkedValue,
-        };
-        break;
-      case 'SESSIONS_ALL':
-        filters = {
-          ...this.state.filters,
-          SESSIONS_AUTHORISED_RATE: checkedValue,
-          SESSIONS_OVERALL_RATE: checkedValue,
-          SESSIONS_UNAUTHORISED_RATE: checkedValue,
-        };
-        break;
-      case 'EXCLUSIONS_ALL':
-        filters = {
-          ...this.state.filters,
-          FIXED_PERIOD_EXCLUSIONS: checkedValue,
-          FIXED_PERIOD_EXCLUSIONS_RATE: checkedValue,
-          PERMANENT_EXCLUSIONS: checkedValue,
-          PERMANENT_EXCLUSIONS_RATE: checkedValue,
-        };
-        break;
-      default:
-        filters = {
-          ...this.state.filters,
-          [event.target.value]: checkedValue,
-        };
+    if (event.target.value === 'all') {
+      filters = {
+        ...this.state.filters,
+        [filterGroupName]: {
+          ...filterGroup,
+          [subFilterGroupName]: Object.keys(subFilterGroup).reduce(
+            (acc, key) => {
+              return {
+                ...acc,
+                [key]: event.target.checked,
+              };
+            },
+            {},
+          ),
+        },
+      };
+    } else {
+      filters = {
+        ...this.state.filters,
+        [filterGroupName]: {
+          ...filterGroup,
+          [subFilterGroupName]: {
+            ...subFilterGroup,
+            [event.target.value]: event.target.checked,
+          },
+        },
+      };
     }
 
-    filters = {
-      ...filters,
-      EXCLUSIONS_ALL:
-        filters.PERMANENT_EXCLUSIONS_RATE &&
-        filters.PERMANENT_EXCLUSIONS &&
-        filters.FIXED_PERIOD_EXCLUSIONS_RATE &&
-        filters.FIXED_PERIOD_EXCLUSIONS,
-      GENERAL_ALL: filters.GENERAL_ENROLMENTS && filters.GENERAL_SCHOOLS,
-      SESSIONS_ALL:
-        filters.SESSIONS_UNAUTHORISED_RATE &&
-        filters.SESSIONS_OVERALL_RATE &&
-        filters.SESSIONS_AUTHORISED_RATE,
-    };
-
-    const checkedFilters = Object.entries(filters)
-      .filter(([_, isChecked]) => isChecked)
-      .map(([key]) => key);
-
-    const tableData = checkedFilters
-      .filter(key => allTableData[key])
-      .map(key => allTableData[key]);
+    const tableData = Object.entries(filters).flatMap(
+      ([publicationKey, publication]) => {
+        return Object.entries(publication)
+          .flatMap(([groupKey, group]) => {
+            return Object.entries(group)
+              .filter(([_, isChecked]) => isChecked)
+              .map(([filterKey]) => {
+                return allTableData[publicationKey][groupKey][filterKey];
+              });
+          })
+          .filter(row => row.length > 0);
+      },
+    );
 
     this.setState({
       filters,
@@ -177,40 +186,39 @@ class PrototypeDataTableV2 extends Component<{}, State> {
 
   private hasSessionsFilters() {
     return (
-      this.state.filters.SESSIONS_AUTHORISED_RATE ||
-      this.state.filters.SESSIONS_OVERALL_RATE ||
-      this.state.filters.SESSIONS_UNAUTHORISED_RATE
+      Object.values(this.state.filters.pupilAbsence.sessions).indexOf(true) > -1
     );
   }
 
   private hasGeneralFilters() {
     return (
-      this.state.filters.GENERAL_ENROLMENTS ||
-      this.state.filters.GENERAL_SCHOOLS
+      Object.values(this.state.filters.pupilAbsence.general).indexOf(true) > -1
     );
   }
 
   private hasPermanentExclusionFilters() {
     return (
-      this.state.filters.PERMANENT_EXCLUSIONS ||
-      this.state.filters.PERMANENT_EXCLUSIONS_RATE
+      this.state.filters.exclusions.exclusions.permanent ||
+      this.state.filters.exclusions.exclusions.permanentRate
     );
   }
 
   private hasFixedPeriodExclusionFilters() {
     return (
-      this.state.filters.FIXED_PERIOD_EXCLUSIONS ||
-      this.state.filters.FIXED_PERIOD_EXCLUSIONS_RATE
+      this.state.filters.exclusions.exclusions.fixedPeriod ||
+      this.state.filters.exclusions.exclusions.fixedPeriodRate
     );
   }
 
   private hasAnyFilters() {
-    return Object.entries(this.state.filters).some(
-      ([_, isChecked]) => isChecked,
+    return Object.values(this.state.filters).map(filterGroup =>
+      Object.values(filterGroup).some(filter => filter.size > 0),
     );
   }
 
   public render() {
+    const { filters } = this.state;
+
     return (
       <PrototypePage
         breadcrumbs={[
@@ -272,25 +280,29 @@ class PrototypeDataTableV2 extends Component<{}, State> {
                   <>
                     <div className="govuk-form-group">
                       <FormCheckboxGroup
-                        checkedValues={this.state.filters}
-                        name="enrolments"
+                        checkedValues={this.state.filters.pupilAbsence.general}
+                        name="pupilAbsence"
                         legend="General"
-                        onChange={this.handleFilterCheckboxChange}
+                        onChange={this.handleFilterCheckboxChange.bind(
+                          this,
+                          'pupilAbsence',
+                          'general',
+                        )}
                         options={[
                           {
                             id: 'general-all',
                             label: 'Select all',
-                            value: 'GENERAL_ALL',
+                            value: 'all',
                           },
                           {
                             id: 'general-enrolments',
                             label: 'Enrolments',
-                            value: 'GENERAL_ENROLMENTS',
+                            value: 'enrolments',
                           },
                           {
                             id: 'general-schools',
                             label: 'Schools',
-                            value: 'GENERAL_SCHOOLS',
+                            value: 'schools',
                           },
                         ]}
                       />
@@ -298,30 +310,34 @@ class PrototypeDataTableV2 extends Component<{}, State> {
 
                     <div className="govuk-form-group">
                       <FormCheckboxGroup
-                        checkedValues={this.state.filters}
+                        checkedValues={this.state.filters.pupilAbsence.sessions}
                         name="pupilAbsence"
                         legend="Sessions absent"
-                        onChange={this.handleFilterCheckboxChange}
+                        onChange={this.handleFilterCheckboxChange.bind(
+                          this,
+                          'pupilAbsence',
+                          'sessions',
+                        )}
                         options={[
                           {
                             id: 'sessions-all',
                             label: 'Select all',
-                            value: 'SESSIONS_ALL',
+                            value: 'all',
                           },
                           {
                             id: 'sessions-authorised-rate',
                             label: 'Authorised rate',
-                            value: 'SESSIONS_AUTHORISED_RATE',
+                            value: 'authorisedRate',
                           },
                           {
                             id: 'sessions-overall-rate',
                             label: 'Overall rate',
-                            value: 'SESSIONS_OVERALL_RATE',
+                            value: 'overallRate',
                           },
                           {
                             id: 'sessions-unauthorised-rate',
                             label: 'Unauthorised rate',
-                            value: 'SESSIONS_UNAUTHORISED_RATE',
+                            value: 'unauthorisedRate',
                           },
                         ]}
                       />
@@ -331,35 +347,39 @@ class PrototypeDataTableV2 extends Component<{}, State> {
 
                 {this.state.menuOption === 'EXCLUSIONS' && (
                   <FormCheckboxGroup
-                    checkedValues={this.state.filters}
-                    name="pupilAbsence"
+                    checkedValues={this.state.filters.exclusions.exclusions}
+                    name="exclusions"
                     legend="Exclusions"
-                    onChange={this.handleFilterCheckboxChange}
+                    onChange={this.handleFilterCheckboxChange.bind(
+                      this,
+                      'exclusions',
+                      'exclusions',
+                    )}
                     options={[
                       {
                         id: 'exclusions-all',
                         label: 'Select all',
-                        value: 'EXCLUSIONS_ALL',
+                        value: 'all',
                       },
                       {
                         id: 'permanent-exclusions',
                         label: 'Permanent exclusions',
-                        value: 'PERMANENT_EXCLUSIONS',
+                        value: 'permanent',
                       },
                       {
                         id: 'permanent-exclusions-rate',
                         label: 'Permanent exclusion rate',
-                        value: 'PERMANENT_EXCLUSIONS_RATE',
+                        value: 'permanentRate',
                       },
                       {
                         id: 'fixed-period-exclusions',
                         label: 'Fixed period exclusions',
-                        value: 'FIXED_PERIOD_EXCLUSIONS',
+                        value: 'fixedPeriod',
                       },
                       {
                         id: 'fixed-period-exclusions-rate',
                         label: 'Fixed period exclusion rate',
-                        value: 'FIXED_PERIOD_EXCLUSIONS_RATE',
+                        value: 'fixedPeriodRate',
                       },
                     ]}
                   />
@@ -404,11 +424,11 @@ class PrototypeDataTableV2 extends Component<{}, State> {
 
                                         <PrototypeAbsenceGeneralChart
                                           enrolments={
-                                            this.state.filters
-                                              .GENERAL_ENROLMENTS
+                                            filters.pupilAbsence.general
+                                              .enrolments
                                           }
                                           schools={
-                                            this.state.filters.GENERAL_SCHOOLS
+                                            filters.pupilAbsence.general.schools
                                           }
                                         />
                                       </div>
@@ -419,16 +439,16 @@ class PrototypeDataTableV2 extends Component<{}, State> {
 
                                         <PrototypeAbsenceRateChart
                                           authorised={
-                                            this.state.filters
-                                              .SESSIONS_AUTHORISED_RATE
+                                            filters.pupilAbsence.sessions
+                                              .authorisedRate
                                           }
                                           unauthorised={
-                                            this.state.filters
-                                              .SESSIONS_UNAUTHORISED_RATE
+                                            filters.pupilAbsence.sessions
+                                              .unauthorisedRate
                                           }
                                           overall={
-                                            this.state.filters
-                                              .SESSIONS_OVERALL_RATE
+                                            filters.pupilAbsence.sessions
+                                              .overallRate
                                           }
                                         />
                                       </div>
@@ -443,12 +463,12 @@ class PrototypeDataTableV2 extends Component<{}, State> {
 
                                         <PrototypePermanentExclusionsChart
                                           exclusions={
-                                            this.state.filters
-                                              .PERMANENT_EXCLUSIONS
+                                            filters.exclusions.exclusions
+                                              .permanent
                                           }
                                           exclusionsRate={
-                                            this.state.filters
-                                              .PERMANENT_EXCLUSIONS_RATE
+                                            filters.exclusions.exclusions
+                                              .permanentRate
                                           }
                                         />
                                       </div>
@@ -459,12 +479,12 @@ class PrototypeDataTableV2 extends Component<{}, State> {
 
                                         <PrototypeFixedPeriodExclusionsChart
                                           exclusions={
-                                            this.state.filters
-                                              .FIXED_PERIOD_EXCLUSIONS
+                                            filters.exclusions.exclusions
+                                              .fixedPeriod
                                           }
                                           exclusionsRate={
-                                            this.state.filters
-                                              .FIXED_PERIOD_EXCLUSIONS_RATE
+                                            filters.exclusions.exclusions
+                                              .fixedPeriodRate
                                           }
                                         />
                                       </div>

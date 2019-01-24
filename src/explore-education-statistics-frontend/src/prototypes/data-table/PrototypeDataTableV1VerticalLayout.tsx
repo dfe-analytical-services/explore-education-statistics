@@ -10,7 +10,7 @@ import PrototypeAbsenceRateChart from './charts/PrototypeAbsenceRateChart';
 import PrototypePermanentExclusionsChart from './charts/PrototypePermanentExclusionsChart';
 import FilterMenu from './components/FilterMenu';
 import { sessionsAbsentTableData } from './test-data/absenceRateData';
-import { permanentExclusionTableData } from './test-data/exclusionRateData';
+import { allTableData as exclusionTableData } from './test-data/exclusionRateData';
 
 type DataToggles = 'CHARTS_TABLES' | 'CHARTS' | 'TABLES' | null;
 
@@ -199,7 +199,7 @@ class PrototypeDataTableV1VerticalLayout extends Component<{}, State> {
                                   <strong>Exclusions</strong>
                                 </td>
                               </tr>
-                              {Object.values(permanentExclusionTableData).map(
+                              {Object.values(exclusionTableData).map(
                                 ([firstCell, ...cells], rowIndex) => (
                                   <tr key={rowIndex}>
                                     <td scope="row">{firstCell}</td>
