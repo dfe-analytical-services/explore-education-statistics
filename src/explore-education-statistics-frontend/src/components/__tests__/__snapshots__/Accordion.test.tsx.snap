@@ -54,6 +54,11 @@ exports[`Accordion renders with hidden content by default 1`] = `
         <p>
           Test content
         </p>
+        <a
+          href="#application"
+        >
+          Go to Top
+        </a>
       </div>
     </div>
   </div>
@@ -114,6 +119,11 @@ exports[`Accordion renders with visible content when \`open\` is true 1`] = `
         <p>
           Test content
         </p>
+        <a
+          href="#application"
+        >
+          Go to Top
+        </a>
       </div>
     </div>
   </div>
