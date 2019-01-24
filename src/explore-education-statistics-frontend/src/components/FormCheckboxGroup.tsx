@@ -47,7 +47,7 @@ class FormCheckboxGroup extends Component<Props> {
             name={name}
             key={option.id}
             onChange={this.handleChange}
-            checked={this.props.checkedValues[option.value]}
+            checked={Boolean(this.props.checkedValues[option.value])}
           />
         ))}
       </div>
