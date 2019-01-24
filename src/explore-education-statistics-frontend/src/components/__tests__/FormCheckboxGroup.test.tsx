@@ -1,4 +1,4 @@
-import React, { ChangeEventHandler, Component } from 'react';
+import React, { Component } from 'react';
 import { fireEvent, render } from 'react-testing-library';
 import FormCheckboxGroup from '../FormCheckboxGroup';
 

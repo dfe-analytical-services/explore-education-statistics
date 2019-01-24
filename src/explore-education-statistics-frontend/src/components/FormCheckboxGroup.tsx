@@ -1,6 +1,6 @@
 import Checkboxes from 'govuk-frontend/components/checkboxes/checkboxes';
 import React, { ChangeEventHandler, Component, createRef } from 'react';
-import FormCheckbox from './FormCheckbox';
+import FormCheckbox, { CheckboxChangeEventHandler } from './FormCheckbox';
 import FormFieldSet, { FieldSetProps } from './FormFieldSet';
 
 interface CheckboxOption {
@@ -16,7 +16,7 @@ type Props = {
     [value: string]: boolean;
   };
   name: string;
-  onChange?: ChangeEventHandler<HTMLInputElement>;
+  onChange?: CheckboxChangeEventHandler<any>;
   options: CheckboxOption[];
 } & Partial<FieldSetProps>;
 
