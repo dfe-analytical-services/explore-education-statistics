@@ -6,7 +6,7 @@ exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
   <div class="govuk-checkboxes__item">
     <input class="govuk-checkboxes__input"
            id="checkbox-1"
-           name="nodejs"
+           name="test-checkboxes"
            type="checkbox"
            value="1"
     >
@@ -19,7 +19,7 @@ exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
   <div class="govuk-checkboxes__item">
     <input class="govuk-checkboxes__input"
            id="checkbox-2"
-           name="nodejs"
+           name="test-checkboxes"
            type="checkbox"
            value="2"
            checked
@@ -33,7 +33,7 @@ exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
   <div class="govuk-checkboxes__item">
     <input class="govuk-checkboxes__input"
            id="checkbox-3"
-           name="nodejs"
+           name="test-checkboxes"
            type="checkbox"
            value="3"
     >
@@ -57,7 +57,7 @@ exports[`FormCheckboxGroup renders correctly with legend 1`] = `
     <div class="govuk-checkboxes__item">
       <input class="govuk-checkboxes__input"
              id="radio-1"
-             name="nodejs"
+             name="test-checkboxes"
              type="checkbox"
              value="1"
       >
@@ -70,7 +70,7 @@ exports[`FormCheckboxGroup renders correctly with legend 1`] = `
     <div class="govuk-checkboxes__item">
       <input class="govuk-checkboxes__input"
              id="radio-2"
-             name="nodejs"
+             name="test-checkboxes"
              type="checkbox"
              value="2"
       >
@@ -83,7 +83,7 @@ exports[`FormCheckboxGroup renders correctly with legend 1`] = `
     <div class="govuk-checkboxes__item">
       <input class="govuk-checkboxes__input"
              id="radio-3"
-             name="nodejs"
+             name="test-checkboxes"
              type="checkbox"
              value="3"
       >
@@ -104,7 +104,7 @@ exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
   <div class="govuk-checkboxes__item">
     <input class="govuk-checkboxes__input"
            id="checkbox-1"
-           name="nodejs"
+           name="test-checkboxes"
            type="checkbox"
            value="1"
     >
@@ -117,7 +117,7 @@ exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
   <div class="govuk-checkboxes__item">
     <input class="govuk-checkboxes__input"
            id="checkbox-2"
-           name="nodejs"
+           name="test-checkboxes"
            type="checkbox"
            value="2"
     >
@@ -130,7 +130,66 @@ exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
   <div class="govuk-checkboxes__item">
     <input class="govuk-checkboxes__input"
            id="checkbox-3"
-           name="nodejs"
+           name="test-checkboxes"
+           type="checkbox"
+           value="3"
+    >
+    <label class="govuk-label govuk-checkboxes__label"
+           for="checkbox-3"
+    >
+      Test checkbox 3
+    </label>
+  </div>
+</div>
+
+`;
+
+exports[`FormCheckboxGroup renders with \`Select all\` checkbox when \`onAllChange\` is set 1`] = `
+
+<div class="govuk-checkboxes">
+  <div class="govuk-checkboxes__item">
+    <input class="govuk-checkboxes__input"
+           id="test-checkboxes-all"
+           name="test-checkboxes"
+           type="checkbox"
+           value="select-all"
+    >
+    <label class="govuk-label govuk-checkboxes__label"
+           for="test-checkboxes-all"
+    >
+      Select all
+    </label>
+  </div>
+  <div class="govuk-checkboxes__item">
+    <input class="govuk-checkboxes__input"
+           id="checkbox-1"
+           name="test-checkboxes"
+           type="checkbox"
+           value="1"
+    >
+    <label class="govuk-label govuk-checkboxes__label"
+           for="checkbox-1"
+    >
+      Test checkbox 1
+    </label>
+  </div>
+  <div class="govuk-checkboxes__item">
+    <input class="govuk-checkboxes__input"
+           id="checkbox-2"
+           name="test-checkboxes"
+           type="checkbox"
+           value="2"
+    >
+    <label class="govuk-label govuk-checkboxes__label"
+           for="checkbox-2"
+    >
+      Test checkbox 2
+    </label>
+  </div>
+  <div class="govuk-checkboxes__item">
+    <input class="govuk-checkboxes__input"
+           id="checkbox-3"
+           name="test-checkboxes"
            type="checkbox"
            value="3"
     >
