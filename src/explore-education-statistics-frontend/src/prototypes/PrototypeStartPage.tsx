@@ -11,16 +11,16 @@ const StartPage = () => {
         <div className="govuk-grid-column-two-thirds">
           <h1 className="govuk-heading-xl">Explore education statistics</h1>
           <p className="govuk-body">
-            Use this service to find, download and explore official Department for Education (DfE) statistics and data for state-funded schools in England on:
+            Use this service to find, download and explore official Department
+            for Education (DfE) statistics and data for state-funded schools in
+            England on:
           </p>
           <ul className="govuk-bulllet-list">
             <li>children and young people</li>
             <li>further and higher education</li>
             <li>schools</li>
           </ul>
-          <p className="govuk-body">
-            The service will let you:
-          </p>
+          <p className="govuk-body">The service will let you:</p>
           <ul className="govuk-bulllet-list">
             <li>view annual statistical headlines and trends</li>
             <li>view statistical charts and tables</li>

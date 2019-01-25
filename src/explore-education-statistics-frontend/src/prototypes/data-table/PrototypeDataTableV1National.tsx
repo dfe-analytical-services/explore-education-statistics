@@ -58,22 +58,21 @@ class PrototypeDataTableV1National extends Component<{}, State> {
         ]}
         wide
       >
-        <PageHeading caption="National level" heading="Explore statistics and data" />
+        <PageHeading
+          caption="National level"
+          heading="Explore statistics and data"
+        />
 
-       <p>Browse to find the relevant statistical subjects and then use the builder tool to create charts and tables and view, compare and contrast individual and different data sets by:</p>
+        <p>
+          Browse to find the relevant statistical subjects and then use the
+          builder tool to create charts and tables and view, compare and
+          contrast individual and different data sets by:
+        </p>
         <ul>
-          <li>
-            academic year
-          </li>
-          <li>
-            geographical area
-          </li>
-          <li>
-            pupil characteristics
-          </li>
-          <li>
-           school types
-          </li>
+          <li>academic year</li>
+          <li>geographical area</li>
+          <li>pupil characteristics</li>
+          <li>school types</li>
         </ul>
 
         <h2>Find and compare statistics and data</h2>

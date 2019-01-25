@@ -13,12 +13,19 @@ const BrowseReleasesPage = () => {
     <PrototypePage breadcrumbs={[{ text: 'Browse statistical releases' }]}>
       <h1 className="govuk-heading-xl">Find statistics and download data</h1>
       <p className="govuk-body-l">
-        Browse to find the relevant statistical subject and open the section to get links to:
+        Browse to find the relevant statistical subject and open the section to
+        get links to:
       </p>
       <ul className="govuk-bulllet-list">
         <li>up-to-date statistical headlines, breakdowns and explanations</li>
-        <li>charts and tables to help you compare, contrast and view statistical data and trends</li>
-        <li>links to underlying data so you can download files and carry out your own statistical analysis</li>
+        <li>
+          charts and tables to help you compare, contrast and view statistical
+          data and trends
+        </li>
+        <li>
+          links to underlying data so you can download files and carry out your
+          own statistical analysis
+        </li>
       </ul>
       <h2 className="govuk-heading-l">Early years and schools</h2>
       <Accordion id="schools">
@@ -36,7 +43,8 @@ const BrowseReleasesPage = () => {
                   </Link>
                 </h4>
                 <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
-                  Includes authorised, overall, persistent and unauthorised absence statistics
+                  Includes authorised, overall, persistent and unauthorised
+                  absence statistics
                 </p>
                 <div className="govuk-!-margin-top-0">
                   <PrototypeDownloadDropdown />
@@ -45,7 +53,7 @@ const BrowseReleasesPage = () => {
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
                   <Link to="publication">
-                  View permanent and fixed-period exclusions statistics
+                    View permanent and fixed-period exclusions statistics
                   </Link>
                 </h4>
                 <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
