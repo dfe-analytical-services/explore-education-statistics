@@ -3,7 +3,7 @@ using MongoDB.Bson;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta
 {
-    public class AttributeMeta
+    public class AttributeMeta : IMeta
     {
         public ObjectId Id { get; set; }
         public Guid PublicationId { get; set; }

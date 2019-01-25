@@ -1,8 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer.Old;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
@@ -11,23 +10,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     [ApiController]
     public class PublicationController : ControllerBase
     {
-        private MetaService _metaService;
+        private readonly ICsvReader _csvReader;
 
-        public PublicationController(MetaService metaService)
+        public PublicationController(ICsvReader csvReader)
         {
-            _metaService = metaService;
+            _csvReader = csvReader;
         }
-
-        [HttpGet("meta/attributes/{publicationId}")]
-        public ActionResult<IEnumerable<AttributeMeta>> GetAttributeMeta(Guid publicationId)
+        
+        [HttpGet("{publicationId}")]
+        public ActionResult<List<GeographicModel>> Get(int publicationId)
         {
-            return _metaService.GetAttributeMeta(publicationId).ToList();
-        }
-
-        [HttpGet("meta/characteristics/{publicationId}")]
-        public ActionResult<IEnumerable<CharacteristicMeta>> GetCharacteristicMeta(Guid publicationId)
-        {
-            return _metaService.GetCharacteristicMeta(publicationId).ToList();
+            return Enumerable.Empty<GeographicModel>().ToList();
         }
     }
 }
