@@ -28,7 +28,8 @@
     "adminAppName": "[concat('admin-', parameters('webAppName'))]",
     "dataPlanName": "[concat('data-', parameters('hostingPlanName'))]",
     "contentPlanName": "[concat('content-', parameters('hostingPlanName'))]",
-    "adminPlanName": "[concat('admin-', parameters('hostingPlanName'))]"
+    "adminPlanName": "[concat('admin-', parameters('hostingPlanName'))]",
+    "importFunctionName": "[concat('data-', parameters('webAppName'))]"
   },
   "resources": [
     {
@@ -230,6 +231,12 @@
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
               "value": "6.9.1"
+            }
+          ],
+          "connectionStrings": [
+            {
+              "name": "AzureStorage",
+              "connectionString":"[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2016-01-01').keys[0].value),';EndpointSuffix=core.windows.net')]"
             }
           ],
           "phpVersion": "off"
