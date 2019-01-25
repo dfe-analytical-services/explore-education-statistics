@@ -236,7 +236,7 @@
           "connectionStrings": [
             {
               "name": "AzureStorage",
-              "connectionString":"[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2016-01-01').keys[0].value)';EndpointSuffix=core.windows.net)]"
+              "connectionString":"[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2016-01-01').keys[0].value),';EndpointSuffix=core.windows.net')]"
             }
           ],
           "phpVersion": "off"
