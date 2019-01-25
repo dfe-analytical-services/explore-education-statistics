@@ -63,6 +63,7 @@ export class AccordionSection extends Component<AccordionSectionProps> {
           id={contentId}
         >
           {children}
+          <br />
           {goToTopLink && <a href="#application">Go to Top</a>}
         </div>
       </div>

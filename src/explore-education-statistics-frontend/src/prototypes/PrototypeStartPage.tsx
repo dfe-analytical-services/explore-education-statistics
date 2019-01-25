@@ -80,7 +80,7 @@ const StartPage = () => {
                 className="govuk-link"
                 href="https://www.get-information-schools.service.gov.uk"
               >
-                Get information about schools]
+                Get information about schools
               </a>
             </li>
           </ul>
@@ -161,9 +161,12 @@ const StartPage = () => {
                 </a>
               </li>
               <li>
-                <Link to="https://www.gov.uk/guidance/how-to-access-department-for-education-dfe-data-extracts">
+                <a
+                  className="govuk-link"
+                  href="https://www.gov.uk/guidance/how-to-access-department-for-education-dfe-data-extracts"
+                >
                   How to access DfE data extracts
-                </Link>
+                </a>
               </li>
             </ul>
           </aside>

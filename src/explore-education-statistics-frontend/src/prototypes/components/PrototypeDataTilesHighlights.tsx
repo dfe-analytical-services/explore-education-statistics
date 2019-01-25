@@ -46,7 +46,7 @@ const PrototypeDataTileHighlights = () => (
         the same as 2015/16
       </p>
       <Details summary="What does this mean?">
-        Overall absence is the adipisicing elit. Dolorum hic nobis voluptas
+        Authorised absence is the adipisicing elit. Dolorum hic nobis voluptas
         quidem fugiat enim ipsa reprehenderit nulla.
       </Details>
     </div>
@@ -69,7 +69,7 @@ const PrototypeDataTileHighlights = () => (
         less than 2015/16
       </p>
       <Details summary="What does this mean?">
-        Overall absence is the adipisicing elit. Dolorum hic nobis voluptas
+        Unauthorised absence is the adipisicing elit. Dolorum hic nobis voluptas
         quidem fugiat enim ipsa reprehenderit nulla.
       </Details>
     </div>

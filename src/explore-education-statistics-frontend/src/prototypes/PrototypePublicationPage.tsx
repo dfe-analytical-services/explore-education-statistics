@@ -184,7 +184,7 @@ const PublicationPage = () => {
 
       <PrototypeDataSample
         sectionId="headlines"
-        chartTitle="change in absence types 2012/13 to 2016/17"
+        chartTitle="change in absence types in England"
         xAxisLabel="School Year"
         yAxisLabel="Absence Rate"
         chartData={[
@@ -252,7 +252,7 @@ const PublicationPage = () => {
           </Details>
           <PrototypeDataSample
             sectionId="absenceRates"
-            chartTitle="absence rates"
+            chartTitle="absence rates in England"
             xAxisLabel="School Year"
             yAxisLabel="Absence Rate"
             chartData={[
@@ -352,7 +352,7 @@ const PublicationPage = () => {
           </Details>
           <PrototypeDataSample
             sectionId="persistentAbsence"
-            chartTitle="persistent absence rates"
+            chartTitle="persistent absence rates in England"
             xAxisLabel="School Year"
             yAxisLabel="Persistent Absence Rate"
             chartData={[
@@ -439,7 +439,7 @@ const PublicationPage = () => {
           </div>
           <PrototypeDataSample
             sectionId="reasonAbsence"
-            chartTitle="reason for absence"
+            chartTitle="reason for absence in England"
             xAxisLabel="School Year"
             yAxisLabel="Absence Rate"
             chartData={[
@@ -447,31 +447,31 @@ const PublicationPage = () => {
                 'family holiday': 0.7,
                 illness: 3.2,
                 name: '2012/13',
-                overall: 4.2,
+                overall: 3.9,
               },
               {
                 'family holiday': 0.7,
                 illness: 3.5,
                 name: '2013/14',
-                overall: 4.5,
+                overall: 4.2,
               },
               {
                 'family holiday': 0.7,
                 illness: 3.4,
                 name: '2014/15',
-                overall: 4.6,
+                overall: 4.1,
               },
               {
                 'family holiday': 0.7,
                 illness: 3.3,
                 name: '2015/16',
-                overall: 4.6,
+                overall: 4.0,
               },
               {
                 'family holiday': 0.7,
                 illness: 3.7,
                 name: '2016/17',
-                overall: 4.7,
+                overall: 4.4,
               },
             ]}
             chartDataKeys={['overall', 'illness', 'family holiday']}
@@ -650,21 +650,21 @@ const PublicationPage = () => {
           caption="Find absence facts and figures for an individual LA or compare rates between LAs"
           headingTag="h3"
         >
-          text here
+          Local authorities text here.
         </AccordionSection>
         <AccordionSection
           heading="Pupil characteristics"
           caption="Figures for age, gender, ethnicity, and more"
           headingTag="h3"
         >
-          text here
+          Pupil characteristics text here.
         </AccordionSection>
         <AccordionSection
           heading="Types of school"
           caption="Figures for different types of state school"
           headingTag="h3"
         >
-          text here
+          Types of school text here.
         </AccordionSection>
         <AccordionSection
           heading="Where does this data come from"
