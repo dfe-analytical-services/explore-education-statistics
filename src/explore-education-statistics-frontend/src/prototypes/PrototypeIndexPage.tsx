@@ -9,6 +9,8 @@ import PrototypeDataTableV1National from './data-table/PrototypeDataTableV1Natio
 import PrototypeDataTableV1VerticalLayout from './data-table/PrototypeDataTableV1VerticalLayout';
 import PrototypeDataTableV2 from './data-table/PrototypeDataTableV2';
 import BrowseReleases from './PrototypeBrowseReleases';
+import BrowseReleasesDownload from './PrototypeBrowseReleasesDownload';
+import BrowseReleasesFind from './PrototypeBrowseReleasesFind';
 import HomePage from './PrototypeHomePage';
 import HomePageOriginal from './PrototypeHomePageOriginal';
 import HomePageV2 from './PrototypeHomePageV2';
@@ -32,6 +34,16 @@ export const PrototypeRoutes = () => (
       exact
       path="/prototypes/browse-releases"
       component={BrowseReleases}
+    />
+    <Route
+      exact
+      path="/prototypes/browse-releases-find"
+      component={BrowseReleasesFind}
+    />
+    <Route
+      exact
+      path="/prototypes/browse-releases-download"
+      component={BrowseReleasesDownload}
     />
     <Route exact path="/prototypes/publication" component={PublicationPage} />
     <Route exact path="/prototypes/theme" component={ThemePage} />
