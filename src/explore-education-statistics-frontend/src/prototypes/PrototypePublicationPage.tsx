@@ -24,33 +24,16 @@ const PublicationPage = () => {
             This is the latest data{' '}
           </strong>
           <h1 className="govuk-heading-l">
-            Pupil absence data and statistics for schools in England
+            Pupil absence statistics and data for schools in England
           </h1>
           <p>
-            View statistics and download data files for authorised and
-            unauthorised absence in state-funded schools.
-          </p>
+            Read statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.</p>
 
           <Details summary="Read more">
             <p>
               To help you analyse and understand the statistics the following
               sections include:
             </p>
-
-            <ul className="govuk-list govuk-list--bullet">
-              <li>
-                summaries with the latest headline statistical insights and
-                breakdowns and definitions
-              </li>
-              <li>
-                charts, graphs and tables to help you compare and contrast
-                statistics and highlight any trends from 2006/7 onwards
-              </li>
-              <li>
-                links to a range of data files so you can download them and
-                carry out your own analysis
-              </li>
-            </ul>
 
             <div className="govuk-inset-text">
               <Link to="#">

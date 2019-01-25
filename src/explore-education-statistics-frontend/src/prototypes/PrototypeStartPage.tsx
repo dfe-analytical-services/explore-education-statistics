@@ -11,8 +11,7 @@ const StartPage = () => {
         <div className="govuk-grid-column-two-thirds">
           <h1 className="govuk-heading-xl">Explore education statistics</h1>
           <p className="govuk-body">
-            Use this service to search for and find out about Department for
-            Education (DfE) official statistics for England on:
+            Use this service to find, download and explore official Department for Education (DfE) statistics and data for state-funded schools in England on:
           </p>
           <ul className="govuk-bulllet-list">
             <li>children and young people</li>
@@ -20,13 +19,13 @@ const StartPage = () => {
             <li>schools</li>
           </ul>
           <p className="govuk-body">
-            To find out more about these statistics the service will let you:
+            The service will let you:
           </p>
           <ul className="govuk-bulllet-list">
             <li>view annual statistical headlines and trends</li>
             <li>view statistical charts and tables</li>
-            <li>compare and contrast statistics</li>
-            <li>download data files for your own analysis</li>
+            <li>compare and contrast statistics and data online</li>
+            <li>download underlying data files for your own analysis</li>
           </ul>
           <div className="govuk-inset-text">
             <Link to="https://www.education-ni.gov.uk/topics/statistics-and-research/statistics">

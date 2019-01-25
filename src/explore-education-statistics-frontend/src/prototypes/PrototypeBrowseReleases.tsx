@@ -11,34 +11,32 @@ import PrototypeTileWithChart from './components/PrototypeTileWithChart';
 const BrowseReleasesPage = () => {
   return (
     <PrototypePage breadcrumbs={[{ text: 'Browse statistical releases' }]}>
-      <h1 className="govuk-heading-xl">Browse statistical releases</h1>
+      <h1 className="govuk-heading-xl">Find statistics and download data</h1>
       <p className="govuk-body-l">
-        Here you can browse DfE statistical releases for{' '}
-        <a href="#schools">schools</a>,{' '}
-        <a href="#higher-education">higher education</a> and{' '}
-        <a href="#social">social care</a> in England.
+        Browse to find the relevant statistical subject and open the section to get links to:
       </p>
-      <h2 className="govuk-heading-l">Schools and early years</h2>
+      <ul className="govuk-bulllet-list">
+        <li>up-to-date statistical headlines, breakdowns and explanations</li>
+        <li>charts and tables to help you compare, contrast and view statistical data and trends</li>
+        <li>links to underlying data so you can download files and carry out your own statistical analysis</li>
+      </ul>
+      <h2 className="govuk-heading-l">Early years and schools</h2>
       <Accordion id="schools">
         <AccordionSection
           heading="Absence and exclusions"
-          caption="Pupil absence, permanent and fixed period exclusions"
+          caption="Latest pupil absence and permanent and fixed-period exclusions statistics and data"
         >
           <div className="govuk-inset-text govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <h3 className="govuk-heading-m">
-              Latest absence and exclusions releases
-            </h3>
             <ul className="govuk-list">
               <li>
                 {' '}
                 <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
                   <Link to="/prototypes/publication">
-                    Pupil absence release
+                    View pupil absence statistics
                   </Link>
                 </h4>
                 <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
-                  Overall absence, authorised absence, unauthorised absence,
-                  persisitent absence
+                  Includes authorised, overall, persistent and unauthorised absence statistics
                 </p>
                 <div className="govuk-!-margin-top-0">
                   <PrototypeDownloadDropdown />
@@ -47,11 +45,11 @@ const BrowseReleasesPage = () => {
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
                   <Link to="publication">
-                    Permananent and fixed period exclusions release
+                  View permanent and fixed-period exclusions statistics
                   </Link>
                 </h4>
                 <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
-                  Permanent exclusions, and fixed period exclusions
+                  Includes fixed period and permanent exclusion statistics
                 </p>
                 <div className="govuk-!-margin-top-0">
                   <PrototypeDownloadDropdown />
