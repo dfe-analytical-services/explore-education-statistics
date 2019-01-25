@@ -75,7 +75,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "node hooks/ignoreWsl.js || lint-staged"
     }
   },
   "lint-staged": {
