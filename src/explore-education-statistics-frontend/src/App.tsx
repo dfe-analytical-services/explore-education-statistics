@@ -5,6 +5,7 @@ import Breadcrumbs from './components/Breadcrumbs';
 import PageBanner from './components/PageBanner';
 import PageFooter from './components/PageFooter';
 import PageHeader from './components/PageHeader';
+import ScrollToTop from './components/ScrollToTop';
 import AlphaFeedbackPage from './pages/AlphaFeedbackPage';
 import CookiesPage from './pages/CookiesPage';
 import FeedbackPage from './pages/FeedbackPage';
@@ -81,7 +82,7 @@ class App extends Component {
   public render() {
     return (
       <Router>
-        <>
+        <ScrollToTop>
           <Switch>
             <Route path="/prototypes">
               <PrototypeRoutes />
@@ -108,7 +109,7 @@ class App extends Component {
               </>
             </Route>
           </Switch>
-        </>
+        </ScrollToTop>
       </Router>
     );
   }
