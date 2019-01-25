@@ -43,25 +43,35 @@ const HomePage = () => {
       </div>
       <hr />
       <h2 className="govuk-heading-m govuk-!-margin-top-9">Related services</h2>
+      <p className="govuk-body">
+        Use these services to find information about individual schools and
+        colleges
+      </p>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-half">
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <Link to="https://www.gov.uk/school-performance-tables">
+            <a
+              className="govuk-link"
+              href="https://www.gov.uk/school-performance-tables"
+            >
               Find and compare schools in England
-            </Link>
+            </a>
           </h3>
-          <p className="govuk-caption-m govuk-!-margin-top-0">
+          <p className="govuk-caption-m govuk-!-margin-top-1">
             Search for and check the performance of primary, secondary and
             special needs schools and colleges
           </p>
         </div>
         <div className="govuk-grid-column-one-half">
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <Link to="https://www.get-information-schools.service.gov.uk/">
+            <a
+              className="govuk-link"
+              href="https://www.get-information-schools.service.gov.uk/"
+            >
               Get information about schools
-            </Link>
+            </a>
           </h3>
-          <p className="govuk-caption-m govuk-!-margin-top-0">
+          <p className="govuk-caption-m govuk-!-margin-top-1">
             Search this register to find and download information about of
             schools and colleges in England including details educational
             organisations and governors
