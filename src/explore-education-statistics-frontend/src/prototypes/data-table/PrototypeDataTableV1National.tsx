@@ -58,24 +58,24 @@ class PrototypeDataTableV1National extends Component<{}, State> {
         ]}
         wide
       >
-        <PageHeading caption="National level" heading="Explore statistics" />
+        <PageHeading
+          caption="National level"
+          heading="Explore statistics and data"
+        />
 
+        <p>
+          Browse to find the relevant statistical subjects and then use the
+          builder tool to create charts and tables and view, compare and
+          contrast individual and different data sets by:
+        </p>
         <ul>
-          <li>
-            You can explore all the DfE statistics available at national level
-            here. You can use our step by step guide, or dive straight in.
-          </li>
-          <li>
-            Once you've chosen your data you can view it by year, school type,
-            area or pupil characteristics.
-          </li>
-          <li>
-            You can also download it, visualise it or copy and paste it as you
-            need.
-          </li>
+          <li>academic year</li>
+          <li>geographical area</li>
+          <li>pupil characteristics</li>
+          <li>school types</li>
         </ul>
 
-        <h2>Find and compare statistics at national level</h2>
+        <h2>Find and compare statistics and data</h2>
 
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-one-quarter">

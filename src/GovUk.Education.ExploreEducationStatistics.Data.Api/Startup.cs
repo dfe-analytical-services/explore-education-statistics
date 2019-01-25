@@ -55,7 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddSingleton<ICsvReader, CsvReader>();
 
             services.AddSingleton<MDatabase>();
-            
+
+            services.AddScoped<MetaService>();
             services.AddScoped<GeographicDataService>();
             services.AddScoped<LaCharacteristicService>();
             services.AddScoped<NationalCharacteristicService>();

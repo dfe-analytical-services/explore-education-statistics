@@ -1,16 +1,20 @@
 import React, { ChangeEventHandler, FunctionComponent } from 'react';
 
+export type CheckboxChangeEventHandler<
+  T = HTMLInputElement
+> = ChangeEventHandler<T>;
+
 interface Props {
   checked?: boolean;
   id: string;
   hint?: string;
   label: string;
   name: string;
-  onChange?: ChangeEventHandler<HTMLInputElement>;
+  onChange?: CheckboxChangeEventHandler;
   value: string | string[] | number;
 }
 
-const FormCheckbox: FunctionComponent<Props> = ({
+export const FormCheckbox: FunctionComponent<Props> = ({
   checked,
   id,
   hint,
