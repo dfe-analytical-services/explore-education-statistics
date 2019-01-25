@@ -10,7 +10,9 @@ import PrototypeTileWithChart from './components/PrototypeTileWithChart';
 
 const BrowseReleasesPage = () => {
   return (
-    <PrototypePage breadcrumbs={[{ text: 'Browse statistical releases' }]}>
+    <PrototypePage
+      breadcrumbs={[{ text: 'Find statistics and download data' }]}
+    >
       <h1 className="govuk-heading-xl">Find statistics and download data</h1>
       <p className="govuk-body-l">
         Browse to find the relevant statistical subject and open the section to
