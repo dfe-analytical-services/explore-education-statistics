@@ -14,6 +14,7 @@ exports[`AccordionSection renders correctly with required props 1`] = `
     <p>
       Test content
     </p>
+    <br>
     <a href="#application">
       Go to Top
     </a>
@@ -39,6 +40,7 @@ exports[`AccordionSection renders with caption 1`] = `
     <p>
       Test content
     </p>
+    <br>
     <a href="#application">
       Go to Top
     </a>
@@ -61,6 +63,7 @@ exports[`AccordionSection renders with different heading size 1`] = `
     <p>
       Test content
     </p>
+    <br>
     <a href="#application">
       Go to Top
     </a>
