@@ -16,7 +16,7 @@ const BrowseReleasesPage = () => {
         Browse to find the relevant statistical subject and open the section to
         get links to:
       </p>
-      <ul className="govuk-bulllet-list">
+      <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
         <li>up-to-date statistical headlines, breakdowns and explanations</li>
         <li>
           charts and tables to help you compare, contrast and view statistical
@@ -33,8 +33,8 @@ const BrowseReleasesPage = () => {
           heading="Absence and exclusions"
           caption="Latest pupil absence and permanent and fixed-period exclusions statistics and data"
         >
-          <div className="govuk-inset-text govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-list">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
               <li>
                 {' '}
                 <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
