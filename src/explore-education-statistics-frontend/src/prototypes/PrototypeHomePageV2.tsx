@@ -18,7 +18,7 @@ const HomePage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="/prototypes/browse-releases">
+            <Link to="/prototypes/browse-releases-find">
               Find statistics and data
             </Link>
           </h2>
@@ -27,7 +27,7 @@ const HomePage = () => {
             help you understand and analyse our range of education statistics.
           </p>
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="/prototypes/data-table-v1/national">
+            <Link to="/prototypes/browse-releases-download">
               Download data files
             </Link>
           </h2>
