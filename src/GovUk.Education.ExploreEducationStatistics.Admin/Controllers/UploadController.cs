@@ -55,12 +55,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 
                     await blobContainer.CreateIfNotExistsAsync();
                     await queue.CreateIfNotExistsAsync();
-
-                    // Set the permissions so the blobs are public. 
+                    
+                    // Set the permissions so the blobs are private. 
                     var permissions = new BlobContainerPermissions
                     {
-                        PublicAccess = BlobContainerPublicAccessType.Blob
+                        PublicAccess = BlobContainerPublicAccessType.Off
                     };
+                    
                     await blobContainer.SetPermissionsAsync(permissions);
 
                     var releaseId = Guid.NewGuid();
