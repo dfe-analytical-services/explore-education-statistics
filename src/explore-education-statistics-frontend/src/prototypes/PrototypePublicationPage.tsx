@@ -12,7 +12,7 @@ const PublicationPage = () => {
       breadcrumbs={[
         {
           link: '/prototypes/browse-releases',
-          text: 'Browse statistical data',
+          text: 'Find statistics and download data',
         },
         { text: 'Absence statistics for schools in England', link: '#' },
       ]}
