@@ -81,7 +81,13 @@ export const PrototypeIndexPage = () => {
               <Link to="/prototypes/start">Start page</Link>
             </li>
             <li>
-              <Link to="/prototypes/home">Home page</Link>
+              <Link to="/prototypes/home">Home page (2 nav options)</Link>
+            </li>
+            <li>
+              <Link to="/prototypes/home-v2">Home page (3 nav options)</Link>
+            </li>
+            <li>
+              <Link to="/prototypes/home-original">Home page (original)</Link>
             </li>
             <li>
               <Link to="/prototypes/browse-releases">Browse releases</Link>
