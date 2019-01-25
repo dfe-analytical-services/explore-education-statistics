@@ -28,17 +28,26 @@ const StartPage = () => {
             <li>download underlying data files for your own analysis</li>
           </ul>
           <div className="govuk-inset-text">
-            <Link to="https://www.education-ni.gov.uk/topics/statistics-and-research/statistics">
+            <a
+              className="govuk-link"
+              href="https://www.education-ni.gov.uk/topics/statistics-and-research/statistics"
+            >
               Northern Ireland
-            </Link>
+            </a>
             ,{' '}
-            <Link to="https://www2.gov.scot/Topics/Statistics/Browse/School-Education">
+            <a
+              className="govuk-link"
+              href="https://www2.gov.scot/Topics/Statistics/Browse/School-Education"
+            >
               Scotland
-            </Link>
+            </a>
             , and{' '}
-            <Link to="https://gov.wales/statistics-and-research/?topic=Education+and+skills&lang=en">
+            <a
+              className="govuk-link"
+              href="https://gov.wales/statistics-and-research/?topic=Education+and+skills&lang=en"
+            >
               Wales
-            </Link>{' '}
+            </a>{' '}
             have their own websites to help you explore education statistics.
           </div>
           <Link
@@ -50,24 +59,74 @@ const StartPage = () => {
           <h2 className="govuk-heading-m govuk-!-margin-top-9">
             Before you start
           </h2>
+          <p className="govuk-body">
+            The service contains statistics and data going as far back as 2009.
+          </p>
+          <p className="govuk-body">
+            To find specific performance information about schools and colleges
+            near you use:
+          </p>
+          <ul className="govuk-list-bullet">
+            <li>
+              <a
+                className="govuk-link"
+                href="https://www.gov.uk/school-performance-tables"
+              >
+                Find and compare schools in England
+              </a>
+            </li>
+            <li>
+              <a
+                className="govuk-link"
+                href="https://www.get-information-schools.service.gov.uk"
+              >
+                Get information about schools]
+              </a>
+            </li>
+          </ul>
           <h3 className="govuk-heading-m app-related-items govuk-!-margin-top-9">
             Explore the topic
           </h3>
           <ul className="govuk-list">
             <li>
-              <Link to="https://www.gov.uk/topic/schools-colleges-childrens-services/data-collection-statistical-returns">
+              <a
+                className="govuk-link"
+                href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections"
+              >
                 DfE statistical collections
-              </Link>
+              </a>
             </li>
             <li>
-              <Link to="https://www.gov.uk/government/statistics?keywords=&amp;taxons%5B%5D=all&amp;departments%5B%5D=department-for-education&amp;from_date=&amp;to_date=">
-                DfE statistics: release calendar
-              </Link>
+              <a
+                className="govuk-link"
+                href="https://www.gov.uk/government/publications?departments%5B%5D=department-for-education&amp;publication_type=transparency-data"
+              >
+                DfE Transparency data
+              </a>
             </li>
             <li>
-              <Link to="https://www.gov.uk/guidance/how-to-access-department-for-education-dfe-data-extracts">
-                How to access DfE data extracts
-              </Link>
+              <a
+                className="govuk-link"
+                href="https://www.gov.uk/government/organisations/department-for-education/about/statistics"
+              >
+                Statistics at DfE
+              </a>
+            </li>
+            <li>
+              <a
+                className="govuk-link"
+                href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education"
+              >
+                Standards for official statistics published by DfE
+              </a>
+            </li>
+            <li>
+              <a
+                className="govuk-link"
+                href="https://www.statisticsauthority.gov.uk/code-of-practice"
+              >
+                UK Statistics Authority: Code of Practice for Statistics
+              </a>
             </li>
           </ul>
         </div>
@@ -78,28 +137,32 @@ const StartPage = () => {
             </h2>
             <ul className="govuk-list">
               <li>
-                <Link to="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                  DfE statistical collections
-                </Link>
+                <a
+                  className="govuk-link"
+                  href="https://www.gov.uk/topic/schools-colleges-childrens-services/data-collection-statistical-returns"
+                >
+                  Data collection and statistical returns
+                </a>
               </li>
               <li>
-                <Link to="https://www.gov.uk/government/publications?departments%5B%5D=department-for-education&amp;publication_type=transparency-data">
-                  DfE Transparency data
-                </Link>
+                <a
+                  className="govuk-link"
+                  href="https://www.gov.uk/government/statistics?keywords=&taxons%5B%5D=all&amp;departments%5B%5D=department-for-education&amp;from_date=&amp;to_date="
+                >
+                  DfE statistics: published
+                </a>
               </li>
               <li>
-                <Link to="https://www.gov.uk/government/organisations/department-for-education/about/statistics">
-                  Statistics at DfE
-                </Link>
+                <a
+                  className="govuk-link"
+                  href="https://www.gov.uk/government/statistics/announcements?utf8=%E2%9C%93&amp;organisations%5B%5D=department-for-education"
+                >
+                  DfE statistics: release calendar
+                </a>
               </li>
               <li>
-                <Link to="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
-                  Standards for official statistics published by DfE
-                </Link>
-              </li>
-              <li>
-                <Link to="https://www.statisticsauthority.gov.uk/code-of-practice/">
-                  UK Statistics Authority: Code of Practice for Statistics
+                <Link to="https://www.gov.uk/guidance/how-to-access-department-for-education-dfe-data-extracts">
+                  How to access DfE data extracts
                 </Link>
               </li>
             </ul>
