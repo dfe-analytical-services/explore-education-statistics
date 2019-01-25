@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormTextInput renders correctly with hint 1`] = `
+
+<label class="govuk-label"
+       for="test-input"
+>
+  Test input
+</label>
+<span id="test-input-hint"
+      class="govuk-hint"
+>
+  Fill me in
+</span>
+<input aria-describedby="test-input-hint"
+       type="text"
+       class="govuk-input"
+       id="test-input"
+       name="testInput"
+>
+
+`;
+
+exports[`FormTextInput renders correctly with required props 1`] = `
+
+<label class="govuk-label"
+       for="test-input"
+>
+  Test input
+</label>
+<input type="text"
+       class="govuk-input"
+       id="test-input"
+       name="testInput"
+>
+
+`;
