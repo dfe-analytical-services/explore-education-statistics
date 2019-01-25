@@ -1,7 +1,7 @@
-using System;
-using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 
@@ -12,85 +12,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly IMongoDatabase _database;
         private readonly CsvImporterFactory _csvImporterFactory = new CsvImporterFactory();
 
-        private readonly Dictionary<string, Release[]> _publications = new Dictionary<string, Release[]>
-        {
-            {
-                "absence", new[]
-                {
-                    new Release
-                    {
-                        PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                        ReleaseId = new Guid("1d395b31-a68e-489c-a257-b3ab5c40bb01"),
-                        ReleaseDate = new DateTime(2018, 4, 25),
-                        Filenames = new[]
-                        {
-                            DataCsvFilename.absence_geoglevels,
-                            DataCsvFilename.absence_lacharacteristics,
-                            DataCsvFilename.absence_natcharacteristics
-                        },
-                        Title = "absence"
-                    }
-                }
-            },
-
-            {
-                "exclusion", new[]
-                {
-                    new Release
-                    {
-                        PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                        ReleaseId = new Guid("ac602576-2d07-4324-8480-0cabb6294814"),
-                        ReleaseDate = new DateTime(2018, 3, 22),
-                        Filenames = new[]
-                        {
-                            DataCsvFilename.exclusion_geoglevels,
-                            DataCsvFilename.exclusion_lacharacteristics,
-                            DataCsvFilename.exclusion_natcharacteristics
-                        },
-                        Title = "exclusion"
-                    }
-                }
-            },
-
-            {
-                "schpupnum", new[]
-                {
-                    new Release
-                    {
-                        PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
-                        ReleaseId = new Guid("be51f939-e9f9-4509-8851-e72b66a3515b"),
-                        ReleaseDate = new DateTime(2018, 5, 30),
-                        Filenames = new[]
-                        {
-                            DataCsvFilename.schpupnum_geoglevels,
-                            DataCsvFilename.schpupnum_lacharacteristics,
-                            DataCsvFilename.schpupnum_natcharacteristics
-                        },
-                        Title = "schpupnum"
-                    }
-                }
-            }
-        };
-
         public SeedService(IConfiguration config)
         {
             var client = new MongoClient(config.GetConnectionString("StatisticsDb"));
             _database = client.GetDatabase("education-statistics");
-        }
-
-        public int Seed()
-        {
-            var count = 0;
-
-            foreach (var publication in _publications.Keys)
-            {
-                foreach (var release in _publications[publication])
-                {
-                    count += Seed(release);
-                }
-            }
-
-            return count;
         }
 
         public bool CanSeed()
@@ -103,6 +28,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _database.ListCollectionNames().ForEachAsync(collection => _database.DropCollection(collection));
         }
 
+        public int Seed()
+        {
+            return SamplePublications.Publications.Values.Sum(Seed);
+        }
+
+        private int Seed(Publication publication)
+        {
+            Seed(publication, publication.AttributeMetas);
+            Seed(publication, publication.CharacteristicMetas);
+            return publication.Releases.Sum(Seed);
+        }
+
         private int Seed(Release release)
         {
             var count = 0;
@@ -111,16 +48,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 var importer = _csvImporterFactory.Importer(dataCsvFilename);
                 var data = importer.Data(dataCsvFilename, release.PublicationId, release.ReleaseId,
                     release.ReleaseDate);
-                Collection(release).InsertManyAsync(data);
+                _database.GetCollection<TidyData>(release.PublicationId.ToString()).InsertManyAsync(data);
                 count += data.Count;
             }
 
             return count;
         }
 
-        private IMongoCollection<TidyData> Collection(Release release)
+        private void Seed(Publication publication, AttributeMeta[] attributeMetas)
         {
-            return _database.GetCollection<TidyData>(release.PublicationId.ToString());
+            foreach (var attributeMeta in attributeMetas)
+            {
+                attributeMeta.PublicationId = publication.PublicationId;
+            }
+
+            _database.GetCollection<AttributeMeta>("AttributeMeta").InsertManyAsync(attributeMetas);
+        }
+
+        private void Seed(Publication publication, CharacteristicMeta[] characteristicMetas)
+        {
+            foreach (var characteristicMeta in characteristicMetas)
+            {
+                characteristicMeta.PublicationId = publication.PublicationId;
+            }
+            _database.GetCollection<CharacteristicMeta>("CharacteristicMeta").InsertManyAsync(characteristicMetas);
         }
     }
 }
