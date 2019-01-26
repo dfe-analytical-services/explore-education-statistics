@@ -1,6 +1,6 @@
 import React, { Component, ReactNode } from 'react';
-import { RadioChangeEventHandler } from '../../../components/FormRadio';
-import FormRadioGroup from '../../../components/FormRadioGroup';
+import { RadioChangeEventHandler } from '../../../components/form/FormRadio';
+import FormRadioGroup from '../../../components/form/FormRadioGroup';
 import styles from './FilterMenuRadios.module.scss';
 import MenuDetails from './MenuDetails';
 

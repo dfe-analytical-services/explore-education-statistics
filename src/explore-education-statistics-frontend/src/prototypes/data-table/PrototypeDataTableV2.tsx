@@ -1,7 +1,7 @@
 import React, { ChangeEvent, Component, createRef } from 'react';
-import FormCheckboxGroup from '../../components/FormCheckboxGroup';
-import { RadioChangeEventHandler } from '../../components/FormRadio';
-import FormRadioGroup from '../../components/FormRadioGroup';
+import FormCheckboxGroup from '../../components/form/FormCheckboxGroup';
+import { RadioChangeEventHandler } from '../../components/form/FormRadio';
+import FormRadioGroup from '../../components/form/FormRadioGroup';
 import PageHeading from '../../components/PageHeading';
 import Tabs from '../../components/Tabs';
 import TabsSection from '../../components/TabsSection';
