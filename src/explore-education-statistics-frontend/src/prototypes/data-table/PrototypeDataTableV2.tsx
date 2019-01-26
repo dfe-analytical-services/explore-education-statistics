@@ -119,62 +119,69 @@ class PrototypeDataTableV2 extends Component<{}, State> {
     );
   };
 
-  private handleFilterCheckboxChange = (
-    filterGroupName: 'pupilAbsence' | 'exclusions',
-    subFilterGroupName: 'exclusions' | 'general' | 'sessions',
+  private createTableData(filters: {}) {
+    return Object.entries(filters).flatMap(([publicationKey, publication]) => {
+      return Object.entries(publication)
+        .flatMap(([groupKey, group]) => {
+          return Object.entries(group)
+            .filter(([_, isChecked]) => isChecked)
+            .map(([filterKey]) => {
+              return allTableData[publicationKey][groupKey][filterKey];
+            });
+        })
+        .filter(row => row.length > 0);
+    });
+  }
+
+  private handleAllFilterCheckboxChange = (
+    publicationKey: 'pupilAbsence' | 'exclusions',
+    filterGroupKey: 'exclusions' | 'general' | 'sessions',
     event: ChangeEvent<HTMLInputElement>,
   ) => {
-    const filterGroup = this.state.filters[filterGroupName] as any;
-    const subFilterGroup = filterGroup[subFilterGroupName];
+    const filterGroup = this.state.filters[publicationKey] as any;
+    const subFilterGroup = filterGroup[filterGroupKey];
 
-    let filters: any;
-
-    if (event.target.value === 'all') {
-      filters = {
-        ...this.state.filters,
-        [filterGroupName]: {
-          ...filterGroup,
-          [subFilterGroupName]: Object.keys(subFilterGroup).reduce(
-            (acc, key) => {
-              return {
-                ...acc,
-                [key]: event.target.checked,
-              };
-            },
-            {},
-          ),
-        },
-      };
-    } else {
-      filters = {
-        ...this.state.filters,
-        [filterGroupName]: {
-          ...filterGroup,
-          [subFilterGroupName]: {
-            ...subFilterGroup,
-            [event.target.value]: event.target.checked,
-          },
-        },
-      };
-    }
-
-    const tableData = Object.entries(filters).flatMap(
-      ([publicationKey, publication]) => {
-        return Object.entries(publication)
-          .flatMap(([groupKey, group]) => {
-            return Object.entries(group)
-              .filter(([_, isChecked]) => isChecked)
-              .map(([filterKey]) => {
-                return allTableData[publicationKey][groupKey][filterKey];
-              });
-          })
-          .filter(row => row.length > 0);
+    const filters = {
+      ...this.state.filters,
+      [publicationKey]: {
+        ...filterGroup,
+        [filterGroupKey]: Object.keys(subFilterGroup).reduce((acc, key) => {
+          return {
+            ...acc,
+            [key]: event.target.checked,
+          };
+        }, {}),
       },
-    );
+    };
 
     this.setState({
       filters,
-      tableData,
+      tableData: this.createTableData(filters),
+    });
+  };
+
+  private handleFilterCheckboxChange = (
+    publicationKey: 'pupilAbsence' | 'exclusions',
+    filterGroupKey: 'exclusions' | 'general' | 'sessions',
+    event: ChangeEvent<HTMLInputElement>,
+  ) => {
+    const filterGroup = this.state.filters[publicationKey] as any;
+    const subFilterGroup = filterGroup[filterGroupKey];
+
+    const filters = {
+      ...this.state.filters,
+      [publicationKey]: {
+        ...filterGroup,
+        [filterGroupKey]: {
+          ...subFilterGroup,
+          [event.target.value]: event.target.checked,
+        },
+      },
+    };
+
+    this.setState({
+      filters,
+      tableData: this.createTableData(filters),
     });
   };
 
@@ -281,19 +288,19 @@ class PrototypeDataTableV2 extends Component<{}, State> {
                     <div className="govuk-form-group">
                       <FormCheckboxGroup
                         checkedValues={this.state.filters.pupilAbsence.general}
-                        name="pupilAbsence"
+                        name="pupilAbsenceGeneral"
                         legend="General"
+                        onAllChange={this.handleAllFilterCheckboxChange.bind(
+                          this,
+                          'pupilAbsence',
+                          'general',
+                        )}
                         onChange={this.handleFilterCheckboxChange.bind(
                           this,
                           'pupilAbsence',
                           'general',
                         )}
                         options={[
-                          {
-                            id: 'general-all',
-                            label: 'Select all',
-                            value: 'all',
-                          },
                           {
                             id: 'general-enrolments',
                             label: 'Enrolments',
@@ -311,19 +318,19 @@ class PrototypeDataTableV2 extends Component<{}, State> {
                     <div className="govuk-form-group">
                       <FormCheckboxGroup
                         checkedValues={this.state.filters.pupilAbsence.sessions}
-                        name="pupilAbsence"
+                        name="pupilAbsenceSessions"
                         legend="Sessions absent"
+                        onAllChange={this.handleAllFilterCheckboxChange.bind(
+                          this,
+                          'pupilAbsence',
+                          'sessions',
+                        )}
                         onChange={this.handleFilterCheckboxChange.bind(
                           this,
                           'pupilAbsence',
                           'sessions',
                         )}
                         options={[
-                          {
-                            id: 'sessions-all',
-                            label: 'Select all',
-                            value: 'all',
-                          },
                           {
                             id: 'sessions-authorised-rate',
                             label: 'Authorised rate',
@@ -350,17 +357,17 @@ class PrototypeDataTableV2 extends Component<{}, State> {
                     checkedValues={this.state.filters.exclusions.exclusions}
                     name="exclusions"
                     legend="Exclusions"
+                    onAllChange={this.handleAllFilterCheckboxChange.bind(
+                      this,
+                      'exclusions',
+                      'exclusions',
+                    )}
                     onChange={this.handleFilterCheckboxChange.bind(
                       this,
                       'exclusions',
                       'exclusions',
                     )}
                     options={[
-                      {
-                        id: 'exclusions-all',
-                        label: 'Select all',
-                        value: 'all',
-                      },
                       {
                         id: 'permanent-exclusions',
                         label: 'Permanent exclusions',
