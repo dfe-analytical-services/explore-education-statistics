@@ -35,3 +35,24 @@ exports[`FormTextInput renders correctly with required props 1`] = `
 >
 
 `;
+
+exports[`FormTextInput renders with a specific width class 1`] = `
+
+<label class="govuk-label"
+       for="test-input"
+>
+  Test input
+</label>
+<span id="test-input-hint"
+      class="govuk-hint"
+>
+  Fill me in
+</span>
+<input aria-describedby="test-input-hint"
+       type="text"
+       class="govuk-input govuk-input--width-20"
+       id="test-input"
+       name="testInput"
+>
+
+`;
