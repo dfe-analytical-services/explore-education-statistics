@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'react-testing-library';
-import { FormTextInput } from '../FormTextInput';
+import FormTextInput from '../FormTextInput';
 
 describe('FormTextInput', () => {
   test('renders correctly with required props', () => {

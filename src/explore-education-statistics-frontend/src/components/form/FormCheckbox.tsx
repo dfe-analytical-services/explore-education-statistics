@@ -14,7 +14,7 @@ interface Props {
   value: string | string[] | number;
 }
 
-export const FormCheckbox: FunctionComponent<Props> = ({
+const FormCheckbox: FunctionComponent<Props> = ({
   checked,
   id,
   hint,

@@ -1,7 +1,6 @@
 import React from 'react';
-import { Accordion } from '../../components/Accordion';
-import { AccordionSection } from '../../components/AccordionSection';
-import Details from '../../components/Details';
+import Accordion from '../../components/Accordion';
+import AccordionSection from '../../components/AccordionSection';
 import Link from '../../components/Link';
 import PrototypeDownloadDropdown from '../components/PrototypeDownloadDropdown';
 import PrototypePage from '../components/PrototypePage';

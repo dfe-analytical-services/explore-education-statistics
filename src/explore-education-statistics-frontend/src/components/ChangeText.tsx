@@ -6,7 +6,7 @@ export interface ChangeTextProps {
   value: number;
 }
 
-export const ChangeText = ({ description, units, value }: ChangeTextProps) => {
+const ChangeText = ({ description, units, value }: ChangeTextProps) => {
   let diff = 'same as';
   let marker = '\u2BC8';
 
@@ -28,3 +28,5 @@ export const ChangeText = ({ description, units, value }: ChangeTextProps) => {
     </>
   );
 };
+
+export default ChangeText;

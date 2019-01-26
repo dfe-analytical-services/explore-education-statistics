@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Helmet } from 'react-helmet';
 import ButtonLink from '../../components/ButtonLink';
-import { KeyIndicatorTile } from '../../components/KeyIndicatorTile';
+import KeyIndicatorTile from '../../components/KeyIndicatorTile';
 import Link from '../../components/Link';
 import PageHeading from '../../components/PageHeading';
-import { PublicationSummary } from './components/PublicationSummary';
+import PublicationSummary from './components/PublicationSummary';
 import SearchForm from './components/SearchForm';
 import styles from './LocalAuthorityPage.module.scss';
 import keyIndicatorTestData from './test-data/keyIndicatorTestData';

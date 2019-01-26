@@ -16,7 +16,7 @@ export interface AccordionSectionProps {
   goToTopLink: boolean;
 }
 
-export class AccordionSection extends Component<AccordionSectionProps> {
+class AccordionSection extends Component<AccordionSectionProps> {
   public static defaultProps: Partial<AccordionSectionProps> = {
     goToTopLink: true,
     headingTag: 'h2',
@@ -70,3 +70,5 @@ export class AccordionSection extends Component<AccordionSectionProps> {
     );
   }
 }
+
+export default AccordionSection;

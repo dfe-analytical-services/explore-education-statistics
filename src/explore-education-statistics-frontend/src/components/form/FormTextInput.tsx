@@ -10,7 +10,7 @@ interface Props {
   width?: 20 | 10 | 5 | 4 | 3 | 2;
 }
 
-export class FormTextInput extends Component<Props> {
+class FormTextInput extends Component<Props> {
   private handleChange: ChangeEventHandler<HTMLInputElement> = event => {
     if (this.props.onChange) {
       this.props.onChange(event);
@@ -44,3 +44,5 @@ export class FormTextInput extends Component<Props> {
     );
   }
 }
+
+export default FormTextInput;

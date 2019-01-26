@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'react-testing-library';
-import { AccordionSection } from '../AccordionSection';
+import AccordionSection from '../AccordionSection';
 
 describe('AccordionSection', () => {
   test('renders correctly with required props', () => {

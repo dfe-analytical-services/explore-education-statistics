@@ -6,7 +6,7 @@ interface Props {
   hasError?: boolean;
 }
 
-export const FormGroup: FunctionComponent<Props> = ({
+const FormGroup: FunctionComponent<Props> = ({
   children,
   hasError = false,
 }) => {
@@ -20,3 +20,5 @@ export const FormGroup: FunctionComponent<Props> = ({
     </div>
   );
 };
+
+export default FormGroup;
