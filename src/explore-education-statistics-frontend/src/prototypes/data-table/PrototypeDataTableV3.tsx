@@ -80,7 +80,7 @@ class PrototypeDataTableV3 extends Component<{}, State> {
     tableData: [],
   };
 
-  private characteristicsRef = createRef<HTMLDivElement>();
+  private filtersRef = createRef<HTMLDivElement>();
   private dataTableRef = createRef<HTMLDivElement>();
 
   private handleMenuChange: MenuChangeEventHandler = menuOption => {
@@ -94,9 +94,10 @@ class PrototypeDataTableV3 extends Component<{}, State> {
         publicationName: menuOptionLabels[menuOption],
       },
       () => {
-        if (this.characteristicsRef.current) {
-          this.characteristicsRef.current.scrollIntoView({
+        if (this.filtersRef.current) {
+          this.filtersRef.current.scrollIntoView({
             behavior: 'smooth',
+            block: 'start',
           });
         }
       },
@@ -226,11 +227,11 @@ class PrototypeDataTableV3 extends Component<{}, State> {
     const filterErrors: FilterErrors = {};
 
     if (!hasCheckedFilters(this.state.attributes)) {
-      filterErrors.attributes = 'Select some options below';
+      filterErrors.attributes = 'Select at least one option';
     }
 
     if (!hasCheckedFilters(this.state.characteristics)) {
-      filterErrors.characteristics = 'Select some options below';
+      filterErrors.characteristics = 'Select at least one option';
     }
 
     this.setState({
@@ -238,6 +239,12 @@ class PrototypeDataTableV3 extends Component<{}, State> {
     });
 
     if (Object.keys(filterErrors).length > 0) {
+      if (this.filtersRef.current) {
+        this.filtersRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
       return;
     }
 
@@ -247,7 +254,10 @@ class PrototypeDataTableV3 extends Component<{}, State> {
       },
       () => {
         if (this.dataTableRef.current) {
-          this.dataTableRef.current.scrollIntoView({ behavior: 'smooth' });
+          this.dataTableRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
         }
       },
     );
@@ -370,7 +380,7 @@ class PrototypeDataTableV3 extends Component<{}, State> {
         </div>
 
         {publicationName && (
-          <div className="govuk-grid-row" ref={this.characteristicsRef}>
+          <div className="govuk-grid-row" ref={this.filtersRef}>
             <div className="govuk-grid-column-full">
               <h2>
                 2. Filter statistics from '{publicationName}'
