@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import React, { ChangeEventHandler, Component, ReactNode } from 'react';
 
 interface Props {
@@ -6,9 +7,10 @@ interface Props {
   label: ReactNode | string;
   name: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
+  width?: 20 | 10 | 5 | 4 | 3 | 2;
 }
 
-export class FormTextInput extends Component<Props> {
+class FormTextInput extends Component<Props> {
   private handleChange: ChangeEventHandler<HTMLInputElement> = event => {
     if (this.props.onChange) {
       this.props.onChange(event);
@@ -16,7 +18,7 @@ export class FormTextInput extends Component<Props> {
   };
 
   public render() {
-    const { hint, id, label, name } = this.props;
+    const { hint, id, label, name, width } = this.props;
 
     return (
       <>
@@ -31,7 +33,9 @@ export class FormTextInput extends Component<Props> {
         <input
           aria-describedby={hint ? `${id}-hint` : undefined}
           type="text"
-          className="govuk-input"
+          className={classNames('govuk-input', {
+            [`govuk-input--width-${width}`]: width !== undefined,
+          })}
           id={id}
           name={name}
           onChange={this.handleChange}
@@ -40,3 +44,5 @@ export class FormTextInput extends Component<Props> {
     );
   }
 }
+
+export default FormTextInput;

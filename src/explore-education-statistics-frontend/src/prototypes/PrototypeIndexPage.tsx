@@ -71,7 +71,7 @@ export const PrototypeRoutes = () => (
   </>
 );
 
-export const PrototypeIndexPage = () => {
+const PrototypeIndexPage = () => {
   return (
     <>
       <PageHeader />
@@ -139,3 +139,5 @@ export const PrototypeIndexPage = () => {
     </>
   );
 };
+
+export default PrototypeIndexPage;

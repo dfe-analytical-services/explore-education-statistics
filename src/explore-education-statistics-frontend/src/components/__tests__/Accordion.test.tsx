@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, render } from 'react-testing-library';
-import { Accordion } from '../Accordion';
-import { AccordionSection } from '../AccordionSection';
+import Accordion from '../Accordion';
+import AccordionSection from '../AccordionSection';
 
 describe('Accordion', () => {
   test('renders with hidden content by default', () => {

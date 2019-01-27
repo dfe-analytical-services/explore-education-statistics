@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import {
-  KeyIndicatorTile,
+import KeyIndicatorTile, {
   KeyIndicatorTileProps,
 } from '../../../components/KeyIndicatorTile';
 import Link from '../../../components/Link';
@@ -14,7 +13,7 @@ export interface PublicationSummaryProps {
   title: string;
 }
 
-export const PublicationSummary = ({
+const PublicationSummary = ({
   keyIndicator,
   link,
   summary,
@@ -54,3 +53,5 @@ export const PublicationSummary = ({
     </div>
   );
 };
+
+export default PublicationSummary;

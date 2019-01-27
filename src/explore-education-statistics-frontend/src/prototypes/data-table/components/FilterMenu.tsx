@@ -1,5 +1,5 @@
 import React, { ChangeEventHandler, FunctionComponent, ReactNode } from 'react';
-import FormCheckboxGroup from '../../../components/FormCheckboxGroup';
+import FormCheckboxGroup from '../../../components/form/FormCheckboxGroup';
 import styles from './FilterMenu.module.scss';
 import MenuDetails from './MenuDetails';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChangeText, ChangeTextProps } from './ChangeText';
+import ChangeText, { ChangeTextProps } from './ChangeText';
 import styles from './KeyIndicatorTile.module.scss';
 import Link from './Link';
 
@@ -15,7 +15,7 @@ export interface KeyIndicatorTileProps {
   value: number;
 }
 
-export const KeyIndicatorTile = ({
+const KeyIndicatorTile = ({
   changes = [],
   link,
   reference,
@@ -44,3 +44,5 @@ export const KeyIndicatorTile = ({
     )}
   </div>
 );
+
+export default KeyIndicatorTile;

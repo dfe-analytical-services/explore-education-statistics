@@ -1,14 +1,14 @@
 import GovUkAccordion from 'govuk-frontend/components/accordion/accordion';
 import React, { cloneElement, Component, createRef, ReactNode } from 'react';
 import isComponentType from '../lib/type-guards/components/isComponentType';
-import { AccordionSection, AccordionSectionProps } from './AccordionSection';
+import AccordionSection, { AccordionSectionProps } from './AccordionSection';
 
 interface Props {
   children: ReactNode;
   id: string;
 }
 
-export class Accordion extends Component<Props> {
+class Accordion extends Component<Props> {
   private ref = createRef<HTMLDivElement>();
 
   public componentDidMount(): void {
@@ -38,3 +38,5 @@ export class Accordion extends Component<Props> {
     );
   }
 }
+
+export default Accordion;

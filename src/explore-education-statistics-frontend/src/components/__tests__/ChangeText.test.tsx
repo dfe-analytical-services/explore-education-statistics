@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'react-testing-library';
-import { ChangeText } from '../ChangeText';
+import ChangeText from '../ChangeText';
 
 describe('ChangeText', () => {
   test('text is correct for a positive change', () => {
