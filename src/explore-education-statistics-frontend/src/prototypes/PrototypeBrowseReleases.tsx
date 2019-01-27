@@ -39,12 +39,12 @@ const BrowseReleasesPage = () => {
             <ul className="govuk-list-bullet">
               <li>
                 {' '}
-                <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
                   <Link to="/prototypes/publication">
                     View pupil absence statistics
                   </Link>
                 </h4>
-                <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
+                <p className="govuk-caption-m govuk-!-margin-top-1 govuk-!-margin-bottom-1">
                   Includes authorised, overall, persistent and unauthorised
                   absence statistics
                 </p>
@@ -53,12 +53,12 @@ const BrowseReleasesPage = () => {
                 </div>
               </li>
               <li className="govuk-!-margin-top-6">
-                <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
                   <Link to="publication">
                     View permanent and fixed-period exclusions statistics
                   </Link>
                 </h4>
-                <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
+                <p className="govuk-caption-m govuk-!-margin-top-1 govuk-!-margin-bottom-1">
                   Includes fixed period and permanent exclusion statistics
                 </p>
                 <div className="govuk-!-margin-top-0">

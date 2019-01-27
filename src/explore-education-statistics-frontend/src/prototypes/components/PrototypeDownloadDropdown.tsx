@@ -17,10 +17,6 @@ const PrototypeDownloadDropdown = ({ viewType, topic }: Props) => {
           </span>
         </summary>
         <div className="govuk-details__text">
-          <p>
-            Includes authorised, overall, persistent and unauthorised absence
-            data
-          </p>
           <ul className="govuk-list-bullet">
             <li>
               <a href="#" className="govuk-link">
