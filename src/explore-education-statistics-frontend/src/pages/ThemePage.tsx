@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Helmet } from 'react-helmet';
 import { match } from 'react-router';
-import api from '../api';
 import ContentItemList from '../components/ContentItemList';
 import Link from '../components/Link';
 import PageHeading from '../components/PageHeading';
+import { contentApi } from '../services/api';
 
 interface Props {
   match: match<{
@@ -30,11 +30,11 @@ class ThemePage extends Component<Props, State> {
   public componentDidMount() {
     const { theme } = this.props.match.params;
 
-    api
+    contentApi
       .get(`theme/${theme}`)
       .then(({ data }) => this.setState({ data }))
       .catch(error => alert(error));
-    api
+    contentApi
       .get(`theme/${theme}/topics`)
       .then(({ data }) => this.setState({ topics: data }))
       .catch(error => alert(error));
