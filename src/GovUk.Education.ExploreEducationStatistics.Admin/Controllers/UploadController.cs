@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Queue;
@@ -19,15 +20,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
     public class UploadController : Controller
     {
         private readonly string _storageConnectionString;
-        public UploadController(IConfiguration config)
+        private readonly ILogger _logger;
+        
+        public UploadController(IConfiguration config, ILogger<UploadController> logger)
         {
             _storageConnectionString = config.GetConnectionString("AzureStorage");
+            _logger = logger;
         }
         
         [HttpPost("Upload/{publicationId}")]
         public async Task<IActionResult> Post(IFormFile file, string publicationId)
         {
-            Console.WriteLine("Received file for upload");
+            _logger.LogInformation("Received file for upload");
             // full path to file in temp location
             var filePath = Path.GetTempFileName();
             if (file.Length > 0)
@@ -44,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 
         private async Task ProcessAsync(string sourceFile, Guid publicationId)
         {
-            Console.WriteLine("Starting processing of file");
+            _logger.LogInformation("Starting processing of file");
 
             if (CloudStorageAccount.TryParse(_storageConnectionString, out var storageAccount))
             {
@@ -56,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                     var blobContainer = blobClient.GetContainerReference("releases");
                     var queue = queueClient.GetQueueReference("releases");
 
-                    Console.WriteLine("Create blob containers if not exist");
+                    _logger.LogInformation("Create blob containers if not exist");
                     await blobContainer.CreateIfNotExistsAsync();
                     await queue.CreateIfNotExistsAsync();
                     
@@ -66,22 +70,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                         PublicAccess = BlobContainerPublicAccessType.Blob
                     };
 
-                    Console.WriteLine("Set blob permissions");
+                    _logger.LogInformation("Set blob permissions");
                     await blobContainer.SetPermissionsAsync(permissions);
 
                     var releaseId = Guid.NewGuid();
 
-                    Console.WriteLine("Starting file upload to blob stroage");
+                    _logger.LogInformation("Starting file upload to blob stroage");
                     var cloudBlockBlob = blobContainer.GetBlockBlobReference(releaseId.ToString());
                     await cloudBlockBlob.UploadFromFileAsync(sourceFile);
 
-                    Console.WriteLine("Add message to queue");
+                    _logger.LogInformation("Add message to queue");
                     var message = new CloudQueueMessage(getReleaseMessage(publicationId, releaseId));
                     await queue.AddMessageAsync(message);
                 }
                 catch (StorageException ex)
                 {
-                    Console.WriteLine("Error returned from the service: {0}", ex.Message);
+                    _logger.LogInformation("Error returned from the service: {0}", ex.Message);
                 }
             }
         }

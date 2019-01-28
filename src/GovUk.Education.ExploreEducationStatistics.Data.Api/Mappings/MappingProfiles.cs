@@ -1,6 +1,5 @@
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using Characteristic = GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Characteristic;
 

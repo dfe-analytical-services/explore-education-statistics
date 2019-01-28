@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
             var headerValues = new[]
             {
                 "term", "year", "level", "country_code", "country_name", "region_code", "region_name", "old_la_code",
-                "new_la_code", "la_name", "estab", "laestab", "urn", "acad_type", "acad_opendate", "school_type"
+                "new_la_code", "la_name", "estab", "laestab", "urn", "academy_type", "academy_open_date", "school_type"
             };
             var values = csvLine.Split(',');
 
@@ -52,8 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 {
                     Estab = values[headers.FindIndex(h => h.Equals("estab"))],
                     LaEstab = values[headers.FindIndex(h => h.Equals("laestab"))],
-                    AcademyOpenDate = values[headers.FindIndex(h => h.Equals("acad_opendate"))],
-                    AcademyType = values[headers.FindIndex(h => h.Equals("acad_type"))]
+                    AcademyOpenDate = values[headers.FindIndex(h => h.Equals("academy_open_date"))],
+                    AcademyType = values[headers.FindIndex(h => h.Equals("academy_type"))]
                 },
                 SchoolType = SchoolTypes.EnumFromStringForImport(values[headers.FindIndex(h => h.Equals("school_type"))])
                     .ToString(),

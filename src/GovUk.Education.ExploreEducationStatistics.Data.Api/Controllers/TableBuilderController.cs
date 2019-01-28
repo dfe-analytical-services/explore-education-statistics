@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
@@ -17,11 +18,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     {
         private readonly TableBuilderService _tableBuilderService;
         private readonly MetaService _metaService;
+        private readonly IMapper _mapper;
 
-        public TableBuilderController(TableBuilderService tableBuilderService, MetaService metaService)
+        public TableBuilderController(TableBuilderService tableBuilderService, MetaService metaService, IMapper mapper)
         {
             _tableBuilderService = tableBuilderService;
             _metaService = metaService;
+            _mapper = mapper;
         }
 
         [HttpGet("geographic/{publicationId}/{level}")]
@@ -80,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
             return _tableBuilderService.GetNational(query);
         }
-        
+
         [HttpGet("meta/{publicationId}")]
         public ActionResult<PublicationMetaViewModel> GetMeta(Guid publicationId)
         {
@@ -91,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                     .GroupBy(o => o.Group)
                     .ToDictionary(
                         metas => metas.Key,
-                        metas => metas.Select(ToNameLabelViewModel).ToList()),
+                        metas => metas.Select(ToAttributeMetaViewModel).ToList()),
                 Characteristics = _metaService.GetCharacteristicMeta(publicationId)
                     .GroupBy(o => o.Group)
                     .ToDictionary(
@@ -100,13 +103,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             };
         }
 
-        private static NameLabelViewModel ToNameLabelViewModel(IMeta characteristicMeta)
+        private AttributeMetaViewModel ToAttributeMetaViewModel(AttributeMeta attributeMeta)
         {
-            return new NameLabelViewModel
-            {
-                Name = characteristicMeta.Name,
-                Label = characteristicMeta.Label
-            };
+            return _mapper.Map<AttributeMetaViewModel>(attributeMeta);
+        }
+
+        private NameLabelViewModel ToNameLabelViewModel(CharacteristicMeta characteristicMeta)
+        {
+            return _mapper.Map<NameLabelViewModel>(characteristicMeta);
         }
     }
 }

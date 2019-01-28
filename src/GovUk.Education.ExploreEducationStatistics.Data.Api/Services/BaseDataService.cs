@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
@@ -17,19 +18,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _database = database;
         }
 
-        private IMongoCollection<TidyData> Collection(string collectionName)
+        private IMongoCollection<TidyData> Collection(TQueryContext queryContext)
         {
-            return _database.Collection(collectionName);
+            return _database.Collection(queryContext.PublicationId.ToString());
         }
 
-        private IMongoQueryable<TCollection> Queryable(string collectionName)
+        private IMongoQueryable<TCollection> Queryable(TQueryContext queryContext)
         {
-            return Collection(collectionName).AsQueryable().OfType<TCollection>();
+            return Collection(queryContext).AsQueryable().OfType<TCollection>();
         }
 
         public IEnumerable<TCollection> FindMany(TQueryContext queryContext)
         {
-            return Queryable(queryContext.PublicationId.ToString()).Where(queryContext.FindExpression()).ToList();
+            var mostRecentReleaseId = FindMostRecentReleaseId(queryContext);
+            
+            return Queryable(queryContext)
+                .Where(collection => collection.ReleaseId == mostRecentReleaseId)
+                .Where(queryContext.FindExpression())
+                .ToList();
+        }
+
+        private Guid FindMostRecentReleaseId(TQueryContext queryContext)
+        {
+            var options = new FindOptions<TidyData, TidyData>
+            {
+                Limit = 1,
+                Sort = Builders<TidyData>.Sort.Descending(o => o.ReleaseDate)
+            };
+
+            var mostRecentRelease = Collection(queryContext).FindSync(FilterDefinition<TidyData>.Empty, options).FirstOrDefault();
+
+            return mostRecentRelease.ReleaseId;
         }
     }
 }
