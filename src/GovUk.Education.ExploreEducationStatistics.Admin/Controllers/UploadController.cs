@@ -21,17 +21,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
     {
         private readonly string _storageConnectionString;
         private readonly ILogger _logger;
-        
+
         public UploadController(IConfiguration config, ILogger<UploadController> logger)
         {
             _storageConnectionString = config.GetConnectionString("AzureStorage");
             _logger = logger;
         }
-        
+
         [HttpPost("Upload/{publicationId}")]
         public async Task<IActionResult> Post(IFormFile file, string publicationId)
         {
             _logger.LogInformation("Received file for upload");
+            
             // full path to file in temp location
             var filePath = Path.GetTempFileName();
             if (file.Length > 0)
@@ -41,12 +42,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                     await file.CopyToAsync(stream);
                 }
             }
-            
-            ProcessAsync(filePath, Guid.Parse(publicationId)).GetAwaiter().GetResult();
+
+            ProcessAsync(filePath, publicationId, file.FileName).GetAwaiter().GetResult();
             return Ok(new {count = 1, file.Length, filePath});
         }
 
-        private async Task ProcessAsync(string sourceFile, Guid publicationId)
+        private async Task ProcessAsync(string sourceFile, string publicationId, string fileName)
         {
             _logger.LogInformation("Starting processing of file");
 
@@ -63,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                     _logger.LogInformation("Create blob containers if not exist");
                     await blobContainer.CreateIfNotExistsAsync();
                     await queue.CreateIfNotExistsAsync();
-                    
+
                     // Set the permissions so the blobs are public. 
                     var permissions = new BlobContainerPermissions
                     {
@@ -75,8 +76,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 
                     var releaseId = Guid.NewGuid();
 
-                    _logger.LogInformation("Starting file upload to blob stroage");
-                    var cloudBlockBlob = blobContainer.GetBlockBlobReference(releaseId.ToString());
+                    _logger.LogInformation("Starting file upload to blob storage");
+
+                    var releaseDirectory = publicationId;
+                    
+                    var cloudBlockBlob = blobContainer.GetBlockBlobReference(releaseDirectory + "/" + releaseId + "/" + fileName);
                     await cloudBlockBlob.UploadFromFileAsync(sourceFile);
 
                     _logger.LogInformation("Add message to queue");
@@ -85,16 +89,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                 }
                 catch (StorageException ex)
                 {
-                    _logger.LogInformation("Error returned from the service: {0}", ex.Message);
+                    _logger.LogError("Error returned from the service: {0}", ex.Message);
                 }
             }
         }
 
-        private string getReleaseMessage(Guid publicationId, Guid releaseId)
+        private string getReleaseMessage(string publicationId, Guid releaseId)
         {
             var jsonSerializer = new DataContractJsonSerializer(typeof(ReleaseMessage));
             var ms = new MemoryStream();
-            
+
             jsonSerializer.WriteObject(ms, new ReleaseMessage()
             {
                 Publication = publicationId,

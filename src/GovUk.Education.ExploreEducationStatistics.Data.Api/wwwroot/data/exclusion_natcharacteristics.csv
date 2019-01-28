@@ -110,18 +110,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201617,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,59345,90,0.15,3465,5.84,2075,3.5
 201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,30250,70,0.22,2665,8.81,1520,5.03
 201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,29100,20,0.07,800,2.75,555,1.91
-201617,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Chinese,Total,35130,x,x,195,0.56,125,0.36
-201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,17800,x,x,170,0.95,105,0.58
-201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,17335,0,0,30,0.16,25,0.13
-201617,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,146855,100,0.07,4570,3.11,2780,1.89
-201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,75835,80,0.11,3555,4.69,2130,2.81
-201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,71020,20,0.03,1015,1.43,650,0.92
-201617,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,2498930,2095,0.08,91140,3.65,52825,2.11
-201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,1271065,1685,0.13,69160,5.44,39285,3.09
-201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,1227865,405,0.03,21980,1.79,13540,1.1
-201617,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Unclassified,Total,86185,155,0.18,6460,7.49,3205,3.72
-201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Unclassified,Male,44345,125,0.28,4670,10.53,2300,5.19
-201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Unclassified,Female,41840,30,0.07,1785,4.27,905,2.16
+201617,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Chinese,Total,35130,x,x,195,0.56,125,0.36
+201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Chinese,Male,17800,x,x,170,0.95,105,0.58
+201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Chinese,Female,17335,0,0,30,0.16,25,0.13
+201617,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,146855,100,0.07,4570,3.11,2780,1.89
+201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,75835,80,0.11,3555,4.69,2130,2.81
+201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,71020,20,0.03,1015,1.43,650,0.92
+201617,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minority_ethnic_group,Total,2498930,2095,0.08,91140,3.65,52825,2.11
+201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,1271065,1685,0.13,69160,5.44,39285,3.09
+201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,1227865,405,0.03,21980,1.79,13540,1.1
+201617,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Unclassified,Total,86185,155,0.18,6460,7.49,3205,3.72
+201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,44345,125,0.28,4670,10.53,2300,5.19
+201617,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,41840,30,0.07,1785,4.27,905,2.16
 201617,NATIONAL,E92000001,England,Total,NC_year,NC_Year_Nursery,Total,309295,0,0,130,0.04,75,0.02
 201617,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Nursery,Male,157055,0,0,105,0.07,60,0.04
 201617,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Nursery,Female,152240,0,0,25,0.02,15,0.01
@@ -171,20 +171,20 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201617,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Unclassified,Male,0,130,.,1820,.,1125,.
 201617,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Unclassified,Female,0,45,.,645,.,420,.
 201617,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Eligible,Total,1118520,3085,0.28,140225,12.54,58930,5.27
-201617,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_NotEligible,Total,6906555,4630,0.07,241590,3.5,124510,1.8
+201617,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Not_eligible,Total,6906555,4630,0.07,241590,3.5,124510,1.8
 201617,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Unclassified,Total,0,0,.,50,.,35,.
 201617,NATIONAL,E92000001,England,Total,FSM_eligible_in_last_6_years,FSM_eligible_in_last_6_years,Total,1881590,4780,0.25,231735,12.32,100985,5.37
 201617,NATIONAL,E92000001,England,Total,FSM_eligible_in_last_6_years,FSM_not_eligible_in_last_6_years,Total,5394525,2335,0.04,142460,2.64,77525,1.44
 201617,NATIONAL,E92000001,England,Total,FSM_eligible_in_last_6_years,FSM_unclassified_in_last_6_years,Total,748960,600,0.08,7670,1.02,4965,0.66
-201617,NATIONAL,E92000001,England,Total,SEN_provision,SEN_Provision_No_SEN,Total,6880850,4115,0.06,210280,3.06,112185,1.63
-201617,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,225955,370,0.16,36005,15.93,14555,6.44
-201617,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_without_statement,Total,918270,3235,0.35,135575,14.76,56735,6.18
+201617,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_No_identified_SEN,Total,6880850,4115,0.06,210280,3.06,112185,1.63
+201617,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_Statement_or_EHCP,Total,225955,370,0.16,36005,15.93,14555,6.44
+201617,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_Support,Total,918270,3235,0.35,135575,14.76,56735,6.18
 201617,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,108405,125,0.12,10365,9.56,4840,4.46
 201617,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,21165,25,0.11,1155,5.46,590,2.8
 201617,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,259715,465,0.18,27210,10.48,11695,4.5
-201617,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,2720,x,x,90,3.27,50,1.88
+201617,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,2720,x,x,90,3.27,50,1.88
 201617,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_No_specialist_assessment,Total,41245,95,0.23,3520,8.53,1495,3.62
-201617,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,54340,130,0.24,6075,11.18,2775,5.11
+201617,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,54340,130,0.24,6075,11.18,2775,5.11
 201617,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Physical_disability,Total,33685,15,0.04,915,2.71,485,1.43
 201617,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,10980,5,0.04,105,0.97,50,0.45
 201617,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Social_emotional_and_mental_health,Total,186795,2030,1.09,86560,46.34,32605,17.46
@@ -302,18 +302,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,36000,15,0.04,620,1.72,325,0.91
 201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,18310,15,0.08,560,3.07,280,1.54
 201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,17690,x,x,55,0.32,45,0.25
-201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Chinese,Total,21880,0,0,45,0.2,20,0.1
-201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,11135,0,0,45,0.39,20,0.2
-201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,10745,0,0,0,0,0,0
-201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,89745,5,0.01,515,0.57,300,0.34
-201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,46315,5,0.01,455,0.99,270,0.58
-201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,43425,x,x,55,0.13,35,0.08
-201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,1526485,280,0.02,14755,0.97,7640,0.5
-201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,776595,245,0.03,12875,1.66,6640,0.86
-201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,749890,40,0.01,1880,0.25,1000,0.13
-201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Unclassified,Total,37910,15,0.04,500,1.32,250,0.66
-201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Unclassified,Male,19240,10,0.06,425,2.2,215,1.13
-201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Unclassified,Female,18675,x,x,75,0.41,35,0.18
+201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Chinese,Total,21880,0,0,45,0.2,20,0.1
+201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Chinese,Male,11135,0,0,45,0.39,20,0.2
+201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Chinese,Female,10745,0,0,0,0,0,0
+201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,89745,5,0.01,515,0.57,300,0.34
+201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,46315,5,0.01,455,0.99,270,0.58
+201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,43425,x,x,55,0.13,35,0.08
+201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minority_ethnic_group,Total,1526485,280,0.02,14755,0.97,7640,0.5
+201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,776595,245,0.03,12875,1.66,6640,0.86
+201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,749890,40,0.01,1880,0.25,1000,0.13
+201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Unclassified,Total,37910,15,0.04,500,1.32,250,0.66
+201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,19240,10,0.06,425,2.2,215,1.13
+201617,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,18675,x,x,75,0.41,35,0.18
 201617,NATIONAL,E92000001,England,State-funded primary,NC_year,NC_Year_Nursery,Total,303460,0,0,125,0.04,75,0.03
 201617,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Nursery,Male,153825,0,0,105,0.07,60,0.04
 201617,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Nursery,Female,149635,0,0,25,0.02,15,0.01
@@ -357,20 +357,20 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201617,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Unclassified,Male,0,20,.,330,.,200,.
 201617,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Unclassified,Female,0,5,.,35,.,25,.
 201617,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Eligible,Total,663435,635,0.1,27290,4.11,11600,1.75
-201617,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_NotEligible,Total,4026220,620,0.02,37040,0.92,17340,0.43
+201617,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Not_eligible,Total,4026220,620,0.02,37040,0.92,17340,0.43
 201617,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Unclassified,Total,0,0,.,5,.,5,.
 201617,NATIONAL,E92000001,England,State-funded primary,FSM_eligible_in_last_6_years,FSM_eligible_in_last_6_years,Total,1047055,835,0.08,39495,3.77,17215,1.64
 201617,NATIONAL,E92000001,England,State-funded primary,FSM_eligible_in_last_6_years,FSM_not_eligible_in_last_6_years,Total,3336420,345,0.01,24055,0.72,11330,0.34
 201617,NATIONAL,E92000001,England,State-funded primary,FSM_eligible_in_last_6_years,FSM_unclassified_in_last_6_years,Total,306185,75,0.02,790,0.26,395,0.13
-201617,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_Provision_No_SEN,Total,4056555,215,0.01,15460,0.38,8750,0.22
-201617,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,62390,125,0.2,7915,12.68,3160,5.06
-201617,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_without_statement,Total,570715,910,0.16,40960,7.18,17030,2.98
+201617,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_No_identified_SEN,Total,4056555,215,0.01,15460,0.38,8750,0.22
+201617,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_Statement_or_EHCP,Total,62390,125,0.2,7915,12.68,3160,5.06
+201617,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_Support,Total,570715,910,0.16,40960,7.18,17030,2.98
 201617,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,42495,50,0.11,3420,8.04,1475,3.47
 201617,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,10665,5,0.07,170,1.59,75,0.68
 201617,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,147685,80,0.06,4425,3,2105,1.43
-201617,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,1815,x,x,45,2.42,25,1.32
+201617,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,1815,x,x,45,2.42,25,1.32
 201617,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_No_specialist_assessment,Total,29315,15,0.06,880,3,380,1.29
-201617,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,26600,25,0.09,1210,4.54,515,1.93
+201617,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,26600,25,0.09,1210,4.54,515,1.93
 201617,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Physical_disability,Total,18130,5,0.02,235,1.29,100,0.54
 201617,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,1785,x,x,50,2.8,20,1.23
 201617,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Social_emotional_and_mental_health,Total,99475,690,0.69,28825,28.98,11125,11.19
@@ -500,18 +500,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,22125,70,0.33,2650,11.98,1675,7.58
 201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,11025,55,0.48,1915,17.39,1170,10.61
 201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,11100,20,0.17,735,6.6,505,4.56
-201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Chinese,Total,12880,x,x,155,1.19,105,0.8
-201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,6385,x,x,125,1.96,80,1.25
-201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,6495,0,0,30,0.43,25,0.35
-201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,55355,90,0.17,3960,7.16,2445,4.41
-201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,28285,75,0.26,3005,10.62,1830,6.47
-201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,27075,20,0.07,960,3.54,615,2.27
-201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,940770,1790,0.19,73360,7.8,44060,4.68
-201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,472095,1420,0.3,53540,11.34,31620,6.7
-201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,468675,370,0.08,19815,4.23,12435,2.65
-201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Unclassified,Total,46850,140,0.3,5740,12.25,2870,6.13
-201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Unclassified,Male,24075,110,0.46,4040,16.78,2010,8.34
-201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Unclassified,Female,22775,30,0.12,1700,7.46,860,3.78
+201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Chinese,Total,12880,x,x,155,1.19,105,0.8
+201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Chinese,Male,6385,x,x,125,1.96,80,1.25
+201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Chinese,Female,6495,0,0,30,0.43,25,0.35
+201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,55355,90,0.17,3960,7.16,2445,4.41
+201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,28285,75,0.26,3005,10.62,1830,6.47
+201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,27075,20,0.07,960,3.54,615,2.27
+201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minority_ethnic_group,Total,940770,1790,0.19,73360,7.8,44060,4.68
+201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,472095,1420,0.3,53540,11.34,31620,6.7
+201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,468675,370,0.08,19815,4.23,12435,2.65
+201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Unclassified,Total,46850,140,0.3,5740,12.25,2870,6.13
+201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,24075,110,0.46,4040,16.78,2010,8.34
+201617,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,22775,30,0.12,1700,7.46,860,3.78
 201617,NATIONAL,E92000001,England,State-funded secondary,NC_year,NC_Year_Nursery,Total,3955,0,0,x,x,x,x
 201617,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Nursery,Male,2010,0,0,x,x,x,x
 201617,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Nursery,Female,1950,0,0,0,0,0,0
@@ -561,20 +561,20 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201617,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Unclassified,Male,0,110,.,1425,.,885,.
 201617,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Unclassified,Female,0,40,.,595,.,380,.
 201617,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Eligible,Total,414310,2410,0.58,105420,25.44,44400,10.72
-201617,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_NotEligible,Total,2808780,3975,0.14,197430,7.03,104390,3.72
+201617,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Not_eligible,Total,2808780,3975,0.14,197430,7.03,104390,3.72
 201617,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Unclassified,Total,0,0,.,40,.,25,.
 201617,NATIONAL,E92000001,England,State-funded secondary,FSM_eligible_in_last_6_years,FSM_eligible_in_last_6_years,Total,785855,3905,0.5,181325,23.07,79640,10.13
 201617,NATIONAL,E92000001,England,State-funded secondary,FSM_eligible_in_last_6_years,FSM_not_eligible_in_last_6_years,Total,2011170,1980,0.1,115195,5.73,64915,3.23
 201617,NATIONAL,E92000001,England,State-funded secondary,FSM_eligible_in_last_6_years,FSM_unclassified_in_last_6_years,Total,426065,500,0.12,6370,1.5,4265,1
-201617,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_Provision_No_SEN,Total,2824085,3895,0.14,194730,6.9,103405,3.66
-201617,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,53865,165,0.31,14350,26.64,5955,11.05
-201617,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_without_statement,Total,345140,2320,0.67,93810,27.18,39460,11.43
+201617,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_No_identified_SEN,Total,2824085,3895,0.14,194730,6.9,103405,3.66
+201617,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_Statement_or_EHCP,Total,53865,165,0.31,14350,26.64,5955,11.05
+201617,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_Support,Total,345140,2320,0.67,93810,27.18,39460,11.43
 201617,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,35705,65,0.18,5765,16.14,2740,7.68
 201617,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,9095,15,0.16,875,9.61,460,5.04
 201617,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,95740,375,0.39,21600,22.56,8995,9.39
-201617,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,635,x,x,45,6.77,25,3.94
+201617,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,635,x,x,45,6.77,25,3.94
 201617,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_No_specialist_assessment,Total,11735,75,0.64,2550,21.72,1080,9.2
-201617,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,26080,105,0.4,4700,18.03,2190,8.4
+201617,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,26080,105,0.4,4700,18.03,2190,8.4
 201617,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Physical_disability,Total,11735,10,0.09,650,5.56,370,3.14
 201617,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,425,0,0,55,12.5,25,5.66
 201617,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Social_emotional_and_mental_health,Total,73325,1295,1.77,46910,63.98,17695,24.13
@@ -704,18 +704,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201617,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,1220,x,x,195,16.04,75,5.97
 201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,915,x,x,185,20.26,70,7.45
 201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,310,0,0,10,3.56,5,1.62
-201617,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Chinese,Total,370,0,0,x,x,x,x
-201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,275,0,0,x,x,x,x
-201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,95,0,0,0,0,0,0
-201617,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,1755,x,x,95,5.42,35,2.05
-201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,1235,x,x,95,7.53,35,2.75
-201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,520,0,0,x,x,x,x
-201617,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,31675,25,0.07,3025,9.55,1125,3.56
-201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,22375,25,0.1,2745,12.26,1020,4.57
-201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,9300,0,0,280,3.03,105,1.13
-201617,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Unclassified,Total,1420,5,0.21,220,15.42,85,6.06
-201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Unclassified,Male,1030,5,0.29,205,20.08,75,7.47
-201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Unclassified,Female,390,0,0,10,3.08,10,2.31
+201617,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Chinese,Total,370,0,0,x,x,x,x
+201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Chinese,Male,275,0,0,x,x,x,x
+201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Chinese,Female,95,0,0,0,0,0,0
+201617,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,1755,x,x,95,5.42,35,2.05
+201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,1235,x,x,95,7.53,35,2.75
+201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,520,0,0,x,x,x,x
+201617,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minority_ethnic_group,Total,31675,25,0.07,3025,9.55,1125,3.56
+201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,22375,25,0.1,2745,12.26,1020,4.57
+201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,9300,0,0,280,3.03,105,1.13
+201617,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Unclassified,Total,1420,5,0.21,220,15.42,85,6.06
+201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,1030,5,0.29,205,20.08,75,7.47
+201617,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,390,0,0,10,3.08,10,2.31
 201617,NATIONAL,E92000001,England,Special,NC_year,NC_Year_Nursery,Total,1880,0,0,0,0,0,0
 201617,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Nursery,Male,1220,0,0,0,0,0,0
 201617,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Nursery,Female,655,0,0,0,0,0,0
@@ -765,20 +765,20 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201617,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Unclassified,Male,0,x,.,65,.,40,.
 201617,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Unclassified,Female,0,0,.,15,.,10,.
 201617,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_Eligible,Total,40775,45,0.11,7515,18.43,2930,7.18
-201617,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_NotEligible,Total,71550,40,0.05,7115,9.94,2780,3.89
+201617,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_Not_eligible,Total,71550,40,0.05,7115,9.94,2780,3.89
 201617,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_Unclassified,Total,0,0,.,5,.,5,.
 201617,NATIONAL,E92000001,England,Special,FSM_eligible_in_last_6_years,FSM_eligible_in_last_6_years,Total,48675,40,0.08,10915,22.43,4130,8.48
 201617,NATIONAL,E92000001,England,Special,FSM_eligible_in_last_6_years,FSM_not_eligible_in_last_6_years,Total,46935,10,0.03,3210,6.83,1280,2.73
 201617,NATIONAL,E92000001,England,Special,FSM_eligible_in_last_6_years,FSM_unclassified_in_last_6_years,Total,16715,30,0.17,510,3.05,305,1.83
-201617,NATIONAL,E92000001,England,Special,SEN_provision,SEN_Provision_No_SEN,Total,210,0,0,90,41.51,30,13.21
-201617,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,109695,80,0.07,13745,12.53,5445,4.96
-201617,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_without_statement,Total,2420,5,0.12,805,33.25,245,10.05
+201617,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_No_identified_SEN,Total,210,0,0,90,41.51,30,13.21
+201617,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_Statement_or_EHCP,Total,109695,80,0.07,13745,12.53,5445,4.96
+201617,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_Support,Total,2420,5,0.12,805,33.25,245,10.05
 201617,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,30205,10,0.04,1185,3.92,620,2.06
 201617,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,1405,x,x,110,7.97,60,4.34
 201617,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,16290,10,0.05,1185,7.26,595,3.65
-201617,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,270,0,0,x,x,x,x
+201617,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,270,0,0,x,x,x,x
 201617,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_No_specialist_assessment,Total,195,5,1.52,90,45.69,35,17.77
-201617,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,1660,0,0,165,9.82,75,4.4
+201617,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,1660,0,0,165,9.82,75,4.4
 201617,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Physical_disability,Total,3820,x,x,30,0.73,15,0.42
 201617,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,8775,x,x,5,0.03,5,0.03
 201617,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Social_emotional_and_mental_health,Total,13995,45,0.33,10820,77.33,3785,27.06
@@ -907,18 +907,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201516,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,49820,65,0.13,3090,6.2,1860,3.73
 201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,25340,50,0.2,2240,8.83,1330,5.25
 201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,24480,15,0.06,855,3.48,525,2.15
-201516,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Chinese,Total,28905,5,0.01,160,0.56,115,0.4
-201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,14530,x,x,140,0.95,100,0.67
-201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,14375,x,x,25,0.16,20,0.13
-201516,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,119415,90,0.07,3645,3.05,2305,1.93
-201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,61575,75,0.12,2860,4.64,1780,2.89
-201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,57840,15,0.02,785,1.36,530,0.91
-201516,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,2059410,1785,0.09,79935,3.88,46840,2.27
-201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,1046415,1450,0.14,60335,5.77,34760,3.32
-201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,1012995,335,0.03,19600,1.93,12085,1.19
-201516,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Unclassified,Total,68365,110,0.16,4520,6.61,2400,3.51
-201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Unclassified,Male,35505,90,0.25,3295,9.27,1730,4.87
-201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Unclassified,Female,32855,25,0.07,1230,3.74,675,2.05
+201516,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Chinese,Total,28905,5,0.01,160,0.56,115,0.4
+201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Chinese,Male,14530,x,x,140,0.95,100,0.67
+201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Chinese,Female,14375,x,x,25,0.16,20,0.13
+201516,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,119415,90,0.07,3645,3.05,2305,1.93
+201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,61575,75,0.12,2860,4.64,1780,2.89
+201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,57840,15,0.02,785,1.36,530,0.91
+201516,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minority_ethnic_group,Total,2059410,1785,0.09,79935,3.88,46840,2.27
+201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,1046415,1450,0.14,60335,5.77,34760,3.32
+201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,1012995,335,0.03,19600,1.93,12085,1.19
+201516,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Unclassified,Total,68365,110,0.16,4520,6.61,2400,3.51
+201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,35505,90,0.25,3295,9.27,1730,4.87
+201516,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,32855,25,0.07,1230,3.74,675,2.05
 201516,NATIONAL,E92000001,England,Total,NC_year,NC_Year_Nursery,Total,315980,x,x,115,0.04,65,0.02
 201516,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Nursery,Male,159905,x,x,95,0.06,55,0.03
 201516,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Nursery,Female,156075,0,0,20,0.01,15,0.01
@@ -968,20 +968,20 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201516,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Unclassified,Male,0,100,.,970,.,635,.
 201516,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Unclassified,Female,0,25,.,375,.,260,.
 201516,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Eligible,Total,1132065,2835,0.25,128575,11.36,55945,4.94
-201516,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_NotEligible,Total,6784165,3850,0.06,210770,3.11,111165,1.64
+201516,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Not_eligible,Total,6784165,3850,0.06,210770,3.11,111165,1.64
 201516,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Unclassified,Total,0,0,.,15,.,15,.
 201516,NATIONAL,E92000001,England,Total,FSM_eligible_in_last_6_years,FSM_eligible_in_last_6_years,Total,1907315,4305,0.23,211030,11.06,95130,4.99
 201516,NATIONAL,E92000001,England,Total,FSM_eligible_in_last_6_years,FSM_not_eligible_in_last_6_years,Total,5247380,1885,0.04,122030,2.33,67795,1.29
 201516,NATIONAL,E92000001,England,Total,FSM_eligible_in_last_6_years,FSM_unclassified_in_last_6_years,Total,761530,495,0.07,6300,0.83,4200,0.55
-201516,NATIONAL,E92000001,England,Total,SEN_provision,SEN_Provision_No_SEN,Total,6783320,3405,0.05,181010,2.67,99130,1.46
-201516,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,221225,370,0.17,33265,15.04,13940,6.3
-201516,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_without_statement,Total,911685,2915,0.32,125090,13.72,54055,5.93
+201516,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_No_identified_SEN,Total,6783320,3405,0.05,181010,2.67,99130,1.46
+201516,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_Statement_or_EHCP,Total,221225,370,0.17,33265,15.04,13940,6.3
+201516,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_Support,Total,911685,2915,0.32,125090,13.72,54055,5.93
 201516,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,100010,150,0.15,9040,9.04,4340,4.34
 201516,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,20500,10,0.06,1070,5.22,520,2.53
 201516,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,273625,450,0.17,27060,9.89,11920,4.36
-201516,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,2300,x,x,60,2.69,40,1.74
+201516,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,2300,x,x,60,2.69,40,1.74
 201516,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_No_specialist_assessment,Total,36025,100,0.27,2880,8,1290,3.58
-201516,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,55195,120,0.22,5815,10.53,2645,4.79
+201516,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,55195,120,0.22,5815,10.53,2645,4.79
 201516,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Physical_disability,Total,32895,5,0.02,820,2.49,435,1.33
 201516,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,10915,0,0,90,0.83,35,0.32
 201516,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Social_emotional_and_mental_health,Total,184930,1840,0.99,79935,43.23,31490,17.03
@@ -1091,18 +1091,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,27620,10,0.04,515,1.87,275,1
 201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,14030,10,0.07,445,3.18,230,1.63
 201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,13590,x,x,70,0.52,45,0.35
-201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Chinese,Total,15830,x,x,40,0.26,20,0.13
-201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,7965,x,x,40,0.5,20,0.24
-201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,7860,0,0,x,x,x,x
-201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,66530,10,0.02,445,0.67,275,0.41
-201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,34190,10,0.03,405,1.18,245,0.71
-201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,32340,0,0,40,0.12,30,0.1
-201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,1146100,250,0.02,11910,1.04,6320,0.55
-201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,582640,225,0.04,10470,1.8,5495,0.94
-201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,563460,25,0,1445,0.26,825,0.15
-201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Unclassified,Total,26480,10,0.04,380,1.44,200,0.76
-201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Unclassified,Male,13590,10,0.08,325,2.39,170,1.27
-201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Unclassified,Female,12890,0,0,55,0.43,30,0.22
+201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Chinese,Total,15830,x,x,40,0.26,20,0.13
+201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Chinese,Male,7965,x,x,40,0.5,20,0.24
+201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Chinese,Female,7860,0,0,x,x,x,x
+201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,66530,10,0.02,445,0.67,275,0.41
+201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,34190,10,0.03,405,1.18,245,0.71
+201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,32340,0,0,40,0.12,30,0.1
+201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minority_ethnic_group,Total,1146100,250,0.02,11910,1.04,6320,0.55
+201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,582640,225,0.04,10470,1.8,5495,0.94
+201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,563460,25,0,1445,0.26,825,0.15
+201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Unclassified,Total,26480,10,0.04,380,1.44,200,0.76
+201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,13590,10,0.08,325,2.39,170,1.27
+201516,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,12890,0,0,55,0.43,30,0.22
 201516,NATIONAL,E92000001,England,State-funded primary,NC_year,NC_Year_Nursery,Total,310165,x,x,115,0.04,65,0.02
 201516,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Nursery,Male,156680,x,x,95,0.06,55,0.03
 201516,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Nursery,Female,153485,0,0,20,0.01,15,0.01
@@ -1137,20 +1137,20 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201516,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Unclassified,Male,0,25,.,185,.,130,.
 201516,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Unclassified,Female,0,0,.,25,.,15,.
 201516,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Eligible,Total,672295,550,0.08,24340,3.62,10650,1.58
-201516,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_NotEligible,Total,3942875,595,0.02,31395,0.8,15110,0.38
+201516,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Not_eligible,Total,3942875,595,0.02,31395,0.8,15110,0.38
 201516,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Unclassified,Total,0,0,.,x,.,x,.
 201516,NATIONAL,E92000001,England,State-funded primary,FSM_eligible_in_last_6_years,FSM_eligible_in_last_6_years,Total,1070460,720,0.07,35090,3.28,15790,1.47
 201516,NATIONAL,E92000001,England,State-funded primary,FSM_eligible_in_last_6_years,FSM_not_eligible_in_last_6_years,Total,3234540,335,0.01,20040,0.62,9650,0.3
 201516,NATIONAL,E92000001,England,State-funded primary,FSM_eligible_in_last_6_years,FSM_unclassified_in_last_6_years,Total,310170,90,0.03,605,0.2,330,0.11
-201516,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_Provision_No_SEN,Total,3996080,190,0,13490,0.34,7700,0.19
-201516,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,60445,130,0.22,6855,11.34,2860,4.73
-201516,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_without_statement,Total,558650,830,0.15,35395,6.34,15205,2.72
+201516,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_No_identified_SEN,Total,3996080,190,0,13490,0.34,7700,0.19
+201516,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_Statement_or_EHCP,Total,60445,130,0.22,6855,11.34,2860,4.73
+201516,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_Support,Total,558650,830,0.15,35395,6.34,15205,2.72
 201516,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,38945,65,0.17,3020,7.76,1305,3.36
 201516,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,10085,x,x,155,1.53,70,0.68
 201516,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,154485,95,0.06,4250,2.75,2005,1.3
-201516,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,1495,x,x,25,1.61,10,0.8
+201516,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,1495,x,x,25,1.61,10,0.8
 201516,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_No_specialist_assessment,Total,25395,20,0.08,735,2.89,330,1.3
-201516,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,26910,20,0.07,1005,3.73,415,1.54
+201516,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,26910,20,0.07,1005,3.73,415,1.54
 201516,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Physical_disability,Total,17565,5,0.02,195,1.1,100,0.56
 201516,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,1730,0,0,60,3.41,15,0.98
 201516,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Social_emotional_and_mental_health,Total,96180,610,0.63,25080,26.07,10150,10.55
@@ -1279,18 +1279,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,21130,55,0.25,2445,11.56,1525,7.22
 201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,10515,40,0.39,1680,15.97,1050,10
 201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,10615,10,0.11,765,7.2,475,4.46
-201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Chinese,Total,12765,x,x,120,0.93,95,0.75
-201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,6340,x,x,95,1.53,80,1.23
-201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,6425,x,x,20,0.34,20,0.28
-201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,51400,75,0.15,3120,6.07,2000,3.89
-201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,26365,65,0.24,2370,8.99,1500,5.69
-201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,25040,15,0.06,750,2.99,495,1.98
-201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,885965,1505,0.17,65535,7.4,39490,4.46
-201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,444485,1200,0.27,47635,10.72,28335,6.37
-201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,441480,305,0.07,17895,4.05,11155,2.53
-201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Unclassified,Total,40410,100,0.25,4000,9.9,2130,5.28
-201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Unclassified,Male,20790,75,0.37,2840,13.66,1495,7.19
-201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Unclassified,Female,19620,25,0.12,1165,5.93,635,3.25
+201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Chinese,Total,12765,x,x,120,0.93,95,0.75
+201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Chinese,Male,6340,x,x,95,1.53,80,1.23
+201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Chinese,Female,6425,x,x,20,0.34,20,0.28
+201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,51400,75,0.15,3120,6.07,2000,3.89
+201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,26365,65,0.24,2370,8.99,1500,5.69
+201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,25040,15,0.06,750,2.99,495,1.98
+201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minority_ethnic_group,Total,885965,1505,0.17,65535,7.4,39490,4.46
+201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,444485,1200,0.27,47635,10.72,28335,6.37
+201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,441480,305,0.07,17895,4.05,11155,2.53
+201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Unclassified,Total,40410,100,0.25,4000,9.9,2130,5.28
+201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,20790,75,0.37,2840,13.66,1495,7.19
+201516,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,19620,25,0.12,1165,5.93,635,3.25
 201516,NATIONAL,E92000001,England,State-funded secondary,NC_year,NC_Year_Nursery,Total,3750,0,0,0,0,0,0
 201516,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Nursery,Male,1895,0,0,0,0,0,0
 201516,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Nursery,Female,1855,0,0,0,0,0,0
@@ -1340,20 +1340,20 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201516,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Unclassified,Male,0,75,.,735,.,475,.
 201516,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Unclassified,Female,0,25,.,340,.,235,.
 201516,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Eligible,Total,420515,2235,0.53,97060,23.08,42440,10.09
-201516,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_NotEligible,Total,2772900,3210,0.12,173060,6.24,93470,3.37
+201516,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Not_eligible,Total,2772900,3210,0.12,173060,6.24,93470,3.37
 201516,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Unclassified,Total,0,0,.,15,.,15,.
 201516,NATIONAL,E92000001,England,State-funded secondary,FSM_eligible_in_last_6_years,FSM_eligible_in_last_6_years,Total,790000,3540,0.45,165670,20.97,75380,9.54
 201516,NATIONAL,E92000001,England,State-funded secondary,FSM_eligible_in_last_6_years,FSM_not_eligible_in_last_6_years,Total,1968700,1530,0.08,99190,5.04,56945,2.89
 201516,NATIONAL,E92000001,England,State-funded secondary,FSM_eligible_in_last_6_years,FSM_unclassified_in_last_6_years,Total,434720,375,0.09,5275,1.21,3600,0.83
-201516,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_Provision_No_SEN,Total,2786985,3215,0.12,167445,6.01,91395,3.28
-201516,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,55740,150,0.27,13865,24.88,5920,10.62
-201516,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_without_statement,Total,350695,2085,0.59,88825,25.33,38610,11.01
+201516,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_No_identified_SEN,Total,2786985,3215,0.12,167445,6.01,91395,3.28
+201516,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_Statement_or_EHCP,Total,55740,150,0.27,13865,24.88,5920,10.62
+201516,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_Support,Total,350695,2085,0.59,88825,25.33,38610,11.01
 201516,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,33595,60,0.18,5015,14.92,2455,7.31
 201516,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,9005,10,0.1,825,9.16,400,4.42
 201516,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,102440,350,0.34,21675,21.16,9315,9.09
-201516,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,580,0,0,35,5.88,25,4.33
+201516,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,580,0,0,35,5.88,25,4.33
 201516,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_No_specialist_assessment,Total,10445,75,0.73,2010,19.26,920,8.8
-201516,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,27005,100,0.37,4720,17.48,2185,8.1
+201516,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,27005,100,0.37,4720,17.48,2185,8.1
 201516,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Physical_disability,Total,11615,5,0.03,605,5.19,325,2.79
 201516,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,395,0,0,30,7.58,15,4.04
 201516,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Social_emotional_and_mental_health,Total,75255,1190,1.58,44670,59.36,17660,23.46
@@ -1482,18 +1482,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201516,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,1070,0,0,130,12.32,60,5.42
 201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,800,0,0,115,14.14,50,6.38
 201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,270,0,0,20,6.99,5,2.57
-201516,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Chinese,Total,310,0,0,x,x,x,x
-201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,225,0,0,x,x,x,x
-201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,85,0,0,0,0,0,0
-201516,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,1485,x,x,85,5.66,35,2.29
-201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,1025,x,x,85,8.21,35,3.32
-201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,460,0,0,0,0,0,0
-201516,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,27345,25,0.1,2490,9.11,1035,3.78
-201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,19290,25,0.12,2230,11.57,930,4.82
-201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,8055,5,0.04,260,3.2,105,1.29
-201516,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Unclassified,Total,1475,x,x,140,9.37,70,4.62
-201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Unclassified,Male,1125,x,x,130,11.46,60,5.42
-201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Unclassified,Female,345,0,0,10,2.59,5,2.02
+201516,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Chinese,Total,310,0,0,x,x,x,x
+201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Chinese,Male,225,0,0,x,x,x,x
+201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Chinese,Female,85,0,0,0,0,0,0
+201516,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,1485,x,x,85,5.66,35,2.29
+201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,1025,x,x,85,8.21,35,3.32
+201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,460,0,0,0,0,0,0
+201516,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minority_ethnic_group,Total,27345,25,0.1,2490,9.11,1035,3.78
+201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,19290,25,0.12,2230,11.57,930,4.82
+201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,8055,5,0.04,260,3.2,105,1.29
+201516,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Unclassified,Total,1475,x,x,140,9.37,70,4.62
+201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,1125,x,x,130,11.46,60,5.42
+201516,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,345,0,0,10,2.59,5,2.02
 201516,NATIONAL,E92000001,England,Special,NC_year,NC_Year_Nursery,Total,2065,0,0,0,0,0,0
 201516,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Nursery,Male,1330,0,0,0,0,0,0
 201516,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Nursery,Female,735,0,0,0,0,0,0
@@ -1543,20 +1543,20 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201516,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Unclassified,Male,0,x,.,50,.,35,.
 201516,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Unclassified,Female,0,x,.,10,.,5,.
 201516,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_Eligible,Total,39250,50,0.12,7170,18.27,2855,7.27
-201516,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_NotEligible,Total,68385,45,0.06,6315,9.23,2580,3.78
+201516,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_Not_eligible,Total,68385,45,0.06,6315,9.23,2580,3.78
 201516,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_Unclassified,Total,0,0,.,5,.,x,.
 201516,NATIONAL,E92000001,England,Special,FSM_eligible_in_last_6_years,FSM_eligible_in_last_6_years,Total,46855,45,0.09,10270,21.91,3965,8.46
 201516,NATIONAL,E92000001,England,Special,FSM_eligible_in_last_6_years,FSM_not_eligible_in_last_6_years,Total,44140,15,0.04,2800,6.35,1200,2.72
 201516,NATIONAL,E92000001,England,Special,FSM_eligible_in_last_6_years,FSM_unclassified_in_last_6_years,Total,16640,30,0.18,415,2.51,275,1.64
-201516,NATIONAL,E92000001,England,Special,SEN_provision,SEN_Provision_No_SEN,Total,255,0,0,75,29.8,35,14.12
-201516,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,105040,90,0.09,12545,11.94,5165,4.92
-201516,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_without_statement,Total,2345,x,x,865,36.96,240,10.16
+201516,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_No_identified_SEN,Total,255,0,0,75,29.8,35,14.12
+201516,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_Statement_or_EHCP,Total,105040,90,0.09,12545,11.94,5165,4.92
+201516,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_Support,Total,2345,x,x,865,36.96,240,10.16
 201516,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,27470,25,0.08,1005,3.66,575,2.09
 201516,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,1405,x,x,90,6.47,50,3.7
 201516,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,16705,5,0.04,1130,6.77,600,3.58
-201516,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,230,0,0,5,1.74,5,1.3
+201516,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,230,0,0,5,1.74,5,1.3
 201516,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_No_specialist_assessment,Total,190,x,x,135,71.43,40,21.69
-201516,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,1280,x,x,85,6.8,45,3.52
+201516,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,1280,x,x,85,6.8,45,3.52
 201516,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Physical_disability,Total,3715,0,0,25,0.62,15,0.38
 201516,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,8790,0,0,x,x,x,x
 201516,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Social_emotional_and_mental_health,Total,13495,45,0.33,10190,75.51,3680,27.29
@@ -1685,18 +1685,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201415,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,47215,50,0.11,2720,5.76,1645,3.48
 201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,24165,40,0.17,2060,8.52,1210,5.02
 201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,23050,10,0.05,660,2.87,430,1.87
-201415,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Chinese,Total,27725,x,x,130,0.47,100,0.36
-201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,13890,x,x,115,0.81,85,0.6
-201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,13835,0,0,20,0.13,15,0.12
-201415,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,112300,75,0.07,3325,2.96,2135,1.9
-201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,57990,70,0.12,2665,4.6,1675,2.89
-201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,54310,10,0.01,660,1.21,460,0.85
-201415,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,1957210,1550,0.08,71270,3.64,42580,2.18
-201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,994730,1290,0.13,54235,5.45,31955,3.21
-201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,962480,260,0.03,17040,1.77,10625,1.1
-201415,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Unclassified,Total,66780,105,0.16,4140,6.2,2175,3.26
-201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Unclassified,Male,34525,85,0.25,3120,9.04,1590,4.6
-201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Unclassified,Female,32255,15,0.05,1020,3.16,585,1.82
+201415,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Chinese,Total,27725,x,x,130,0.47,100,0.36
+201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Chinese,Male,13890,x,x,115,0.81,85,0.6
+201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Chinese,Female,13835,0,0,20,0.13,15,0.12
+201415,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,112300,75,0.07,3325,2.96,2135,1.9
+201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,57990,70,0.12,2665,4.6,1675,2.89
+201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,54310,10,0.01,660,1.21,460,0.85
+201415,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minority_ethnic_group,Total,1957210,1550,0.08,71270,3.64,42580,2.18
+201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,994730,1290,0.13,54235,5.45,31955,3.21
+201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,962480,260,0.03,17040,1.77,10625,1.1
+201415,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Unclassified,Total,66780,105,0.16,4140,6.2,2175,3.26
+201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,34525,85,0.25,3120,9.04,1590,4.6
+201415,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,32255,15,0.05,1020,3.16,585,1.82
 201415,NATIONAL,E92000001,England,Total,NC_year,NC_Year_Nursery,Total,307455,0,0,90,0.03,60,0.02
 201415,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Nursery,Male,156335,0,0,75,0.05,55,0.03
 201415,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Nursery,Female,151120,0,0,10,0.01,5,0
@@ -1746,20 +1746,20 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201415,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Unclassified,Male,0,95,.,850,.,585,.
 201415,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Unclassified,Female,0,25,.,350,.,240,.
 201415,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Eligible,Total,1186340,2585,0.22,119950,10.11,54270,4.57
-201415,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_NotEligible,Total,6612665,3210,0.05,183010,2.77,99780,1.51
+201415,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Not_eligible,Total,6612665,3210,0.05,183010,2.77,99780,1.51
 201415,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Unclassified,Total,0,x,.,15,.,10,.
 201415,NATIONAL,E92000001,England,Total,FSM_eligible_in_last_6_years,FSM_eligible_in_last_6_years,Total,1924740,3745,0.19,189350,9.84,88530,4.6
 201415,NATIONAL,E92000001,England,Total,FSM_eligible_in_last_6_years,FSM_not_eligible_in_last_6_years,Total,5112915,1675,0.03,107880,2.11,61625,1.21
 201415,NATIONAL,E92000001,England,Total,FSM_eligible_in_last_6_years,FSM_unclassified_in_last_6_years,Total,761350,375,0.05,5745,0.75,3905,0.51
-201415,NATIONAL,E92000001,England,Total,SEN_provision,SEN_Provision_No_SEN,Total,6591550,2580,0.04,148170,2.25,85085,1.29
-201415,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,221650,345,0.16,33545,15.13,14010,6.32
-201415,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_without_statement,Total,985805,2870,0.29,121260,12.3,54960,5.58
+201415,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_No_identified_SEN,Total,6591550,2580,0.04,148170,2.25,85085,1.29
+201415,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_Statement_or_EHCP,Total,221650,345,0.16,33545,15.13,14010,6.32
+201415,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_Support,Total,985805,2870,0.29,121260,12.3,54960,5.58
 201415,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,90775,110,0.12,7250,7.99,3610,3.97
 201415,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,19350,10,0.05,820,4.24,470,2.43
 201415,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,241125,315,0.13,20185,8.37,9635,4
-201415,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,1845,0,0,60,3.25,30,1.73
+201415,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,1845,0,0,60,3.25,30,1.73
 201415,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_No_specialist_assessment,Total,28490,40,0.14,1715,6.03,865,3.03
-201415,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,50215,65,0.13,4780,9.52,2270,4.52
+201415,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,50215,65,0.13,4780,9.52,2270,4.52
 201415,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Physical_disability,Total,30790,5,0.02,750,2.43,380,1.24
 201415,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,10915,x,x,65,0.61,35,0.34
 201415,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Social_emotional_and_mental_health,Total,169110,1295,0.77,69140,40.89,27775,16.42
@@ -1870,18 +1870,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,26535,5,0.02,440,1.67,300,1.13
 201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,13610,5,0.03,385,2.84,265,1.94
 201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,12925,0,0,55,0.43,35,0.28
-201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Chinese,Total,14590,x,x,35,0.25,20,0.12
-201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,7270,x,x,35,0.5,20,0.25
-201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,7320,0,0,0,0,0,0
-201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,62730,5,0.01,380,0.6,230,0.37
-201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,32265,5,0.02,345,1.07,205,0.64
-201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,30465,0,0,35,0.11,25,0.08
-201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,1086955,190,0.02,10555,0.97,5835,0.54
-201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,552595,175,0.03,9415,1.7,5150,0.93
-201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,534360,15,0,1140,0.21,685,0.13
-201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Unclassified,Total,25215,15,0.07,490,1.94,205,0.81
-201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Unclassified,Male,12965,15,0.12,430,3.32,175,1.37
-201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Unclassified,Female,12245,x,x,60,0.48,30,0.23
+201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Chinese,Total,14590,x,x,35,0.25,20,0.12
+201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Chinese,Male,7270,x,x,35,0.5,20,0.25
+201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Chinese,Female,7320,0,0,0,0,0,0
+201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,62730,5,0.01,380,0.6,230,0.37
+201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,32265,5,0.02,345,1.07,205,0.64
+201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,30465,0,0,35,0.11,25,0.08
+201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minority_ethnic_group,Total,1086955,190,0.02,10555,0.97,5835,0.54
+201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,552595,175,0.03,9415,1.7,5150,0.93
+201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,534360,15,0,1140,0.21,685,0.13
+201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Unclassified,Total,25215,15,0.07,490,1.94,205,0.81
+201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,12965,15,0.12,430,3.32,175,1.37
+201415,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,12245,x,x,60,0.48,30,0.23
 201415,NATIONAL,E92000001,England,State-funded primary,NC_year,NC_Year_Nursery,Total,302160,0,0,90,0.03,60,0.02
 201415,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Nursery,Male,153345,0,0,75,0.05,55,0.03
 201415,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Nursery,Female,148810,0,0,10,0.01,5,0
@@ -1916,20 +1916,20 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201415,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Unclassified,Male,0,15,.,155,.,110,.
 201415,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Unclassified,Female,0,0,.,15,.,10,.
 201415,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Eligible,Total,705345,515,0.07,23035,3.27,10275,1.46
-201415,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_NotEligible,Total,3804965,400,0.01,26615,0.7,13350,0.35
+201415,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Not_eligible,Total,3804965,400,0.01,26615,0.7,13350,0.35
 201415,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Unclassified,Total,0,0,.,5,.,5,.
 201415,NATIONAL,E92000001,England,State-funded primary,FSM_eligible_in_last_6_years,FSM_eligible_in_last_6_years,Total,1091665,635,0.06,31925,2.92,14745,1.35
 201415,NATIONAL,E92000001,England,State-funded primary,FSM_eligible_in_last_6_years,FSM_not_eligible_in_last_6_years,Total,3116475,225,0.01,17115,0.55,8570,0.28
 201415,NATIONAL,E92000001,England,State-funded primary,FSM_eligible_in_last_6_years,FSM_unclassified_in_last_6_years,Total,302170,55,0.02,615,0.2,310,0.1
-201415,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_Provision_No_SEN,Total,3860700,130,0,11670,0.3,6830,0.18
-201415,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,61970,95,0.16,6750,10.89,2835,4.58
-201415,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_without_statement,Total,587635,690,0.12,31235,5.32,13960,2.38
+201415,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_No_identified_SEN,Total,3860700,130,0,11670,0.3,6830,0.18
+201415,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_Statement_or_EHCP,Total,61970,95,0.16,6750,10.89,2835,4.58
+201415,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_Support,Total,587635,690,0.12,31235,5.32,13960,2.38
 201415,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,35030,35,0.09,2250,6.42,1040,2.97
 201415,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,9275,x,x,110,1.16,55,0.58
 201415,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,131530,65,0.05,3220,2.45,1580,1.2
-201415,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,1120,0,0,20,1.88,10,1.07
+201415,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,1120,0,0,20,1.88,10,1.07
 201415,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_No_specialist_assessment,Total,19265,10,0.06,340,1.76,170,0.89
-201415,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,23680,10,0.04,680,2.87,320,1.36
+201415,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,23680,10,0.04,680,2.87,320,1.36
 201415,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Physical_disability,Total,16075,x,x,170,1.06,85,0.53
 201415,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,1675,0,0,25,1.49,10,0.72
 201415,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Social_emotional_and_mental_health,Total,83595,365,0.43,20395,24.4,8360,10
@@ -2058,18 +2058,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,19670,45,0.23,2100,10.69,1275,6.49
 201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,9800,35,0.35,1510,15.42,890,9.06
 201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,9870,10,0.12,590,5.99,390,3.94
-201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Chinese,Total,12865,x,x,90,0.72,80,0.62
-201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,6420,x,x,75,1.15,65,0.98
-201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,6445,0,0,20,0.28,15,0.26
-201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,48195,70,0.15,2865,5.95,1870,3.88
-201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,24775,65,0.25,2245,9.06,1435,5.8
-201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,23420,10,0.03,620,2.66,435,1.86
-201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,844900,1340,0.16,58225,6.89,35725,4.23
-201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,424290,1095,0.26,42580,10.04,25895,6.1
-201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,420610,245,0.06,15640,3.72,9830,2.34
-201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Unclassified,Total,40265,85,0.21,3485,8.66,1905,4.73
-201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Unclassified,Male,20575,70,0.35,2535,12.31,1345,6.55
-201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Unclassified,Female,19690,15,0.08,950,4.84,555,2.82
+201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Chinese,Total,12865,x,x,90,0.72,80,0.62
+201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Chinese,Male,6420,x,x,75,1.15,65,0.98
+201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Chinese,Female,6445,0,0,20,0.28,15,0.26
+201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,48195,70,0.15,2865,5.95,1870,3.88
+201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,24775,65,0.25,2245,9.06,1435,5.8
+201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,23420,10,0.03,620,2.66,435,1.86
+201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minority_ethnic_group,Total,844900,1340,0.16,58225,6.89,35725,4.23
+201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,424290,1095,0.26,42580,10.04,25895,6.1
+201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,420610,245,0.06,15640,3.72,9830,2.34
+201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Unclassified,Total,40265,85,0.21,3485,8.66,1905,4.73
+201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,20575,70,0.35,2535,12.31,1345,6.55
+201415,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,19690,15,0.08,950,4.84,555,2.82
 201415,NATIONAL,E92000001,England,State-funded secondary,NC_year,NC_Year_Nursery,Total,3160,0,0,0,0,0,0
 201415,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Nursery,Male,1600,0,0,0,0,0,0
 201415,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Nursery,Female,1560,0,0,0,0,0,0
@@ -2119,20 +2119,20 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201415,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Unclassified,Male,0,80,.,650,.,445,.
 201415,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Unclassified,Female,0,25,.,315,.,215,.
 201415,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Eligible,Total,442340,2020,0.46,89480,20.23,41145,9.3
-201415,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_NotEligible,Total,2742385,2765,0.1,149750,5.46,83840,3.06
+201415,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Not_eligible,Total,2742385,2765,0.1,149750,5.46,83840,3.06
 201415,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Unclassified,Total,0,x,.,10,.,10,.
 201415,NATIONAL,E92000001,England,State-funded secondary,FSM_eligible_in_last_6_years,FSM_eligible_in_last_6_years,Total,787640,3060,0.39,146625,18.62,69790,8.86
 201415,NATIONAL,E92000001,England,State-funded secondary,FSM_eligible_in_last_6_years,FSM_not_eligible_in_last_6_years,Total,1954110,1435,0.07,87990,4.5,51890,2.66
 201415,NATIONAL,E92000001,England,State-funded secondary,FSM_eligible_in_last_6_years,FSM_unclassified_in_last_6_years,Total,442980,295,0.07,4630,1.04,3315,0.75
-201415,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_Provision_No_SEN,Total,2730590,2450,0.09,136310,4.99,78215,2.86
-201415,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,58100,160,0.27,13830,23.8,6045,10.4
-201415,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_without_statement,Total,396035,2180,0.55,89095,22.5,40735,10.29
+201415,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_No_identified_SEN,Total,2730590,2450,0.09,136310,4.99,78215,2.86
+201415,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_Statement_or_EHCP,Total,58100,160,0.27,13830,23.8,6045,10.4
+201415,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_Support,Total,396035,2180,0.55,89095,22.5,40735,10.29
 201415,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,30845,55,0.18,4170,13.52,2115,6.86
 201415,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,8705,5,0.05,600,6.92,350,4
 201415,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,92770,245,0.26,15775,17,7475,8.06
-201415,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,505,0,0,35,7.31,20,3.56
+201415,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,505,0,0,35,7.31,20,3.56
 201415,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_No_specialist_assessment,Total,9060,30,0.31,1305,14.43,665,7.33
-201415,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,25450,55,0.22,4005,15.74,1905,7.49
+201415,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,25450,55,0.22,4005,15.74,1905,7.49
 201415,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Physical_disability,Total,11115,5,0.04,545,4.92,285,2.55
 201415,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,370,x,x,35,9.19,20,5.68
 201415,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Social_emotional_and_mental_health,Total,72065,890,1.24,38275,53.11,15725,21.82
@@ -2261,18 +2261,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201415,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,1005,x,x,175,17.48,65,6.55
 201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,755,x,x,160,21.46,60,7.95
 201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,250,0,0,15,5.56,5,2.38
-201415,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Chinese,Total,275,0,0,5,1.1,5,1.1
-201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,205,0,0,5,1.47,5,1.47
-201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,70,0,0,0,0,0,0
-201415,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,1375,0,0,80,5.82,35,2.55
-201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,950,0,0,80,8.2,35,3.47
-201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,425,0,0,x,x,x,x
-201415,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,25355,25,0.09,2495,9.84,1015,4.01
-201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,17840,25,0.13,2240,12.54,905,5.08
-201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,7515,x,x,260,3.43,110,1.46
-201415,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Unclassified,Total,1305,x,x,165,12.64,65,5.13
-201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Unclassified,Male,985,x,x,155,15.84,65,6.5
-201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Unclassified,Female,320,0,0,10,2.81,5,0.94
+201415,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Chinese,Total,275,0,0,5,1.1,5,1.1
+201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Chinese,Male,205,0,0,5,1.47,5,1.47
+201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Chinese,Female,70,0,0,0,0,0,0
+201415,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,1375,0,0,80,5.82,35,2.55
+201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,950,0,0,80,8.2,35,3.47
+201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,425,0,0,x,x,x,x
+201415,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minority_ethnic_group,Total,25355,25,0.09,2495,9.84,1015,4.01
+201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,17840,25,0.13,2240,12.54,905,5.08
+201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,7515,x,x,260,3.43,110,1.46
+201415,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Unclassified,Total,1305,x,x,165,12.64,65,5.13
+201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,985,x,x,155,15.84,65,6.5
+201415,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,320,0,0,10,2.81,5,0.94
 201415,NATIONAL,E92000001,England,Special,NC_year,NC_Year_Nursery,Total,2140,0,0,0,0,0,0
 201415,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Nursery,Male,1390,0,0,0,0,0,0
 201415,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Nursery,Female,750,0,0,0,0,0,0
@@ -2322,20 +2322,20 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201415,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Unclassified,Male,0,x,.,45,.,30,.
 201415,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Unclassified,Female,0,x,.,20,.,10,.
 201415,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_Eligible,Total,38655,50,0.12,7435,19.23,2845,7.36
-201415,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_NotEligible,Total,65315,45,0.07,6650,10.18,2590,3.97
+201415,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_Not_eligible,Total,65315,45,0.07,6650,10.18,2590,3.97
 201415,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_Unclassified,Total,0,0,.,x,.,x,.
 201415,NATIONAL,E92000001,England,Special,FSM_eligible_in_last_6_years,FSM_eligible_in_last_6_years,Total,45440,50,0.11,10805,23.78,3995,8.79
 201415,NATIONAL,E92000001,England,Special,FSM_eligible_in_last_6_years,FSM_not_eligible_in_last_6_years,Total,42330,15,0.04,2775,6.55,1160,2.74
 201415,NATIONAL,E92000001,England,Special,FSM_eligible_in_last_6_years,FSM_unclassified_in_last_6_years,Total,16200,25,0.15,505,3.11,280,1.73
-201415,NATIONAL,E92000001,England,Special,SEN_provision,SEN_Provision_No_SEN,Total,260,0,0,185,71.92,45,16.54
-201415,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,101575,90,0.09,12965,12.76,5135,5.05
-201415,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_without_statement,Total,2135,x,x,930,43.6,260,12.24
+201415,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_No_identified_SEN,Total,260,0,0,185,71.92,45,16.54
+201415,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_Statement_or_EHCP,Total,101575,90,0.09,12965,12.76,5135,5.05
+201415,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_Support,Total,2135,x,x,930,43.6,260,12.24
 201415,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,24900,20,0.08,830,3.34,450,1.82
 201415,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,1370,5,0.29,110,8.04,70,4.97
 201415,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,16825,5,0.04,1195,7.1,585,3.48
-201415,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,220,0,0,x,x,x,x
+201415,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,220,0,0,x,x,x,x
 201415,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_No_specialist_assessment,Total,170,x,x,70,41.67,25,16.07
-201415,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,1080,x,x,95,8.88,40,3.89
+201415,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,1080,x,x,95,8.88,40,3.89
 201415,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Physical_disability,Total,3600,0,0,30,0.86,15,0.39
 201415,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,8865,0,0,10,0.09,5,0.05
 201415,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Social_emotional_and_mental_health,Total,13450,40,0.31,10475,77.86,3690,27.42
@@ -2464,18 +2464,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201314,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,44415,50,0.11,2210,4.98,1385,3.12
 201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,22750,40,0.17,1680,7.38,1015,4.47
 201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,21665,10,0.05,530,2.45,370,1.71
-201314,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Chinese,Total,26690,x,x,110,0.41,85,0.31
-201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,13340,x,x,90,0.67,70,0.52
-201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,13345,0,0,20,0.14,15,0.11
-201314,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,105740,50,0.05,2710,2.56,1800,1.7
-201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,54620,45,0.08,2145,3.93,1415,2.59
-201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,51115,5,0.01,565,1.11,385,0.76
-201314,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,1856320,1280,0.07,60125,3.24,37115,2
-201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,943675,1060,0.11,45685,4.84,27815,2.95
-201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,912645,220,0.02,14440,1.58,9305,1.02
-201314,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Unclassified,Total,63280,90,0.14,3480,5.5,1945,3.07
-201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Unclassified,Male,32740,70,0.21,2605,7.95,1430,4.37
-201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Unclassified,Female,30540,20,0.07,880,2.88,515,1.68
+201314,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Chinese,Total,26690,x,x,110,0.41,85,0.31
+201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Chinese,Male,13340,x,x,90,0.67,70,0.52
+201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Chinese,Female,13345,0,0,20,0.14,15,0.11
+201314,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,105740,50,0.05,2710,2.56,1800,1.7
+201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,54620,45,0.08,2145,3.93,1415,2.59
+201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,51115,5,0.01,565,1.11,385,0.76
+201314,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minority_ethnic_group,Total,1856320,1280,0.07,60125,3.24,37115,2
+201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,943675,1060,0.11,45685,4.84,27815,2.95
+201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,912645,220,0.02,14440,1.58,9305,1.02
+201314,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Unclassified,Total,63280,90,0.14,3480,5.5,1945,3.07
+201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,32740,70,0.21,2605,7.95,1430,4.37
+201314,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,30540,20,0.07,880,2.88,515,1.68
 201314,NATIONAL,E92000001,England,Total,NC_year,NC_Year_Nursery,Total,306640,0,0,70,0.02,45,0.01
 201314,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Nursery,Male,155840,0,0,60,0.04,35,0.02
 201314,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Nursery,Female,150800,0,0,10,0.01,5,0
@@ -2525,20 +2525,20 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201314,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Unclassified,Male,0,70,.,710,.,545,.
 201314,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Unclassified,Female,0,10,.,300,.,230,.
 201314,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Eligible,Total,1254215,2260,0.18,110635,8.82,53035,4.23
-201314,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_NotEligible,Total,6444095,2685,0.04,158820,2.46,89795,1.39
+201314,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Not_eligible,Total,6444095,2685,0.04,158820,2.46,89795,1.39
 201314,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Unclassified,Total,0,x,.,20,.,15,.
 201314,NATIONAL,E92000001,England,Total,FSM_eligible_in_last_6_years,FSM_eligible_in_last_6_years,Total,1922115,3240,0.17,167290,8.7,82295,4.28
 201314,NATIONAL,E92000001,England,Total,FSM_eligible_in_last_6_years,FSM_not_eligible_in_last_6_years,Total,5020150,1405,0.03,97505,1.94,57180,1.14
 201314,NATIONAL,E92000001,England,Total,FSM_eligible_in_last_6_years,FSM_unclassified_in_last_6_years,Total,756045,300,0.04,4675,0.62,3370,0.45
-201314,NATIONAL,E92000001,England,Total,SEN_provision,SEN_Provision_No_SEN,Total,6298525,1705,0.03,108870,1.73,67765,1.08
-201314,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,218475,335,0.15,33190,15.19,14020,6.42
-201314,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_without_statement,Total,1181310,2910,0.25,127410,10.79,61060,5.17
+201314,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_No_identified_SEN,Total,6298525,1705,0.03,108870,1.73,67765,1.08
+201314,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_Statement_or_EHCP,Total,218475,335,0.15,33190,15.19,14020,6.42
+201314,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_Support,Total,1181310,2910,0.25,127410,10.79,61060,5.17
 201314,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_Unclassified,Total,0,0,.,5,.,x,.
 201314,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,76015,85,0.11,6145,8.09,3035,3.99
 201314,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,16470,5,0.02,605,3.66,360,2.17
 201314,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,129830,225,0.17,13545,10.43,6420,4.94
-201314,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,1110,x,x,35,3.33,20,1.98
-201314,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,29040,40,0.13,2825,9.72,1320,4.55
+201314,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,1110,x,x,35,3.33,20,1.98
+201314,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,29040,40,0.13,2825,9.72,1320,4.55
 201314,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Physical_disability,Total,26765,5,0.02,560,2.1,300,1.12
 201314,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,10585,x,x,65,0.6,35,0.32
 201314,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Behavioural_emotional_and_social_difficulties,Total,138655,1515,1.09,65780,47.44,26595,19.18
@@ -2645,18 +2645,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,25100,5,0.02,430,1.71,250,1
 201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,12815,5,0.04,375,2.93,215,1.67
 201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,12285,0,0,55,0.45,40,0.31
-201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Chinese,Total,13465,0,0,15,0.13,10,0.07
-201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,6695,0,0,15,0.25,10,0.13
-201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,6770,0,0,0,0,0,0
-201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,58765,5,0.01,330,0.56,200,0.34
-201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,30195,5,0.01,295,0.97,180,0.59
-201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,28570,0,0,40,0.13,20,0.07
-201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,1029190,185,0.02,9490,0.92,5200,0.51
-201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,523465,170,0.03,8405,1.61,4550,0.87
-201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,505725,15,0,1085,0.21,650,0.13
-201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Unclassified,Total,23695,10,0.03,360,1.52,175,0.74
-201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Unclassified,Male,12290,10,0.07,320,2.59,150,1.23
-201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Unclassified,Female,11405,0,0,40,0.37,25,0.22
+201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Chinese,Total,13465,0,0,15,0.13,10,0.07
+201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Chinese,Male,6695,0,0,15,0.25,10,0.13
+201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Chinese,Female,6770,0,0,0,0,0,0
+201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,58765,5,0.01,330,0.56,200,0.34
+201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,30195,5,0.01,295,0.97,180,0.59
+201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,28570,0,0,40,0.13,20,0.07
+201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minority_ethnic_group,Total,1029190,185,0.02,9490,0.92,5200,0.51
+201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,523465,170,0.03,8405,1.61,4550,0.87
+201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,505725,15,0,1085,0.21,650,0.13
+201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Unclassified,Total,23695,10,0.03,360,1.52,175,0.74
+201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,12290,10,0.07,320,2.59,150,1.23
+201314,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,11405,0,0,40,0.37,25,0.22
 201314,NATIONAL,E92000001,England,State-funded primary,NC_year,NC_Year_Nursery,Total,301745,0,0,70,0.02,40,0.01
 201314,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Nursery,Male,153020,0,0,60,0.04,35,0.02
 201314,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Nursery,Female,148725,0,0,10,0.01,5,0
@@ -2700,19 +2700,19 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201314,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Unclassified,Male,0,15,.,190,.,135,.
 201314,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Unclassified,Female,0,0,.,35,.,25,.
 201314,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Eligible,Total,752090,490,0.06,21800,2.9,9955,1.32
-201314,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_NotEligible,Total,3664620,385,0.01,23200,0.63,11690,0.32
+201314,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Not_eligible,Total,3664620,385,0.01,23200,0.63,11690,0.32
 201314,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Unclassified,Total,0,0,.,5,.,5,.
 201314,NATIONAL,E92000001,England,State-funded primary,FSM_eligible_in_last_6_years,FSM_eligible_in_last_6_years,Total,1096495,595,0.05,29405,2.68,13725,1.25
 201314,NATIONAL,E92000001,England,State-funded primary,FSM_eligible_in_last_6_years,FSM_not_eligible_in_last_6_years,Total,3018455,225,0.01,15135,0.5,7680,0.25
 201314,NATIONAL,E92000001,England,State-funded primary,FSM_eligible_in_last_6_years,FSM_unclassified_in_last_6_years,Total,301760,55,0.02,465,0.15,245,0.08
-201314,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_Provision_No_SEN,Total,3682965,90,0,8275,0.22,5230,0.14
-201314,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,60830,100,0.16,6505,10.69,2720,4.47
-201314,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_without_statement,Total,672910,680,0.1,30225,4.49,13700,2.04
+201314,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_No_identified_SEN,Total,3682965,90,0,8275,0.22,5230,0.14
+201314,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_Statement_or_EHCP,Total,60830,100,0.16,6505,10.69,2720,4.47
+201314,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_Support,Total,672910,680,0.1,30225,4.49,13700,2.04
 201314,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,28435,30,0.11,1930,6.79,855,3.01
 201314,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,7915,x,x,85,1.09,45,0.59
 201314,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,65115,60,0.09,2480,3.81,1145,1.76
-201314,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,640,x,x,10,1.72,5,0.94
-201314,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,14580,10,0.05,400,2.75,185,1.26
+201314,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,640,x,x,10,1.72,5,0.94
+201314,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,14580,10,0.05,400,2.75,185,1.26
 201314,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Physical_disability,Total,13900,x,x,105,0.76,60,0.42
 201314,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,1515,x,x,40,2.64,20,1.32
 201314,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Behavioural_emotional_and_social_difficulties,Total,62735,475,0.76,18920,30.16,7655,12.2
@@ -2831,18 +2831,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,18375,45,0.24,1635,8.89,1080,5.87
 201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,9225,35,0.36,1175,12.71,750,8.15
 201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,9150,10,0.12,460,5.04,325,3.57
-201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Chinese,Total,12960,x,x,90,0.69,75,0.57
-201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,6455,x,x,70,1.08,60,0.91
-201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,6505,0,0,20,0.29,15,0.23
-201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,45800,45,0.1,2315,5.05,1575,3.44
-201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,23610,40,0.17,1790,7.58,1210,5.13
-201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,22190,5,0.02,525,2.37,365,1.64
-201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,803805,1075,0.13,48135,5.99,30900,3.84
-201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,403855,870,0.22,35020,8.67,22360,5.54
-201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,399950,205,0.05,13115,3.28,8545,2.14
-201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Unclassified,Total,38445,80,0.2,2905,7.56,1685,4.38
-201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Unclassified,Male,19605,60,0.3,2090,10.67,1205,6.14
-201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Unclassified,Female,18845,20,0.11,815,4.33,480,2.54
+201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Chinese,Total,12960,x,x,90,0.69,75,0.57
+201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Chinese,Male,6455,x,x,70,1.08,60,0.91
+201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Chinese,Female,6505,0,0,20,0.29,15,0.23
+201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,45800,45,0.1,2315,5.05,1575,3.44
+201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,23610,40,0.17,1790,7.58,1210,5.13
+201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,22190,5,0.02,525,2.37,365,1.64
+201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minority_ethnic_group,Total,803805,1075,0.13,48135,5.99,30900,3.84
+201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,403855,870,0.22,35020,8.67,22360,5.54
+201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,399950,205,0.05,13115,3.28,8545,2.14
+201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Unclassified,Total,38445,80,0.2,2905,7.56,1685,4.38
+201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,19605,60,0.3,2090,10.67,1205,6.14
+201314,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,18845,20,0.11,815,4.33,480,2.54
 201314,NATIONAL,E92000001,England,State-funded secondary,NC_year,NC_Year_Nursery,Total,2580,0,0,5,0.12,5,0.12
 201314,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Nursery,Male,1305,0,0,5,0.23,5,0.23
 201314,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Nursery,Female,1275,0,0,0,0,0,0
@@ -2892,20 +2892,20 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201314,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Unclassified,Male,0,55,.,480,.,375,.
 201314,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Unclassified,Female,0,10,.,255,.,200,.
 201314,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Eligible,Total,464850,1730,0.37,81320,17.49,40180,8.64
-201314,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_NotEligible,Total,2716515,2270,0.08,129240,4.76,75480,2.78
+201314,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Not_eligible,Total,2716515,2270,0.08,129240,4.76,75480,2.78
 201314,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Unclassified,Total,0,x,.,15,.,10,.
 201314,NATIONAL,E92000001,England,State-funded secondary,FSM_eligible_in_last_6_years,FSM_eligible_in_last_6_years,Total,782030,2595,0.33,127300,16.28,64530,8.25
 201314,NATIONAL,E92000001,England,State-funded secondary,FSM_eligible_in_last_6_years,FSM_not_eligible_in_last_6_years,Total,1960430,1180,0.06,79540,4.06,48280,2.46
 201314,NATIONAL,E92000001,England,State-funded secondary,FSM_eligible_in_last_6_years,FSM_unclassified_in_last_6_years,Total,438900,230,0.05,3740,0.85,2860,0.65
-201314,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_Provision_No_SEN,Total,2615240,1615,0.06,100485,3.84,62475,2.39
-201314,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,59700,160,0.27,13340,22.34,5985,10.02
-201314,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_without_statement,Total,506420,2230,0.44,96750,19.1,47210,9.32
+201314,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_No_identified_SEN,Total,2615240,1615,0.06,100485,3.84,62475,2.39
+201314,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_Statement_or_EHCP,Total,59700,160,0.27,13340,22.34,5985,10.02
+201314,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_Support,Total,506420,2230,0.44,96750,19.1,47210,9.32
 201314,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_Unclassified,Total,0,0,.,5,.,x,.
 201314,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,25090,40,0.16,3385,13.5,1730,6.9
 201314,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,7125,5,0.04,440,6.16,255,3.58
 201314,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,47590,160,0.34,9655,20.29,4560,9.58
-201314,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,265,0,0,20,7.2,15,5.3
-201314,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,13575,30,0.22,2340,17.24,1100,8.1
+201314,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,265,0,0,20,7.2,15,5.3
+201314,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,13575,30,0.22,2340,17.24,1100,8.1
 201314,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Physical_disability,Total,9360,5,0.04,430,4.58,230,2.44
 201314,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,280,0,0,15,5.38,5,2.51
 201314,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Behavioural_emotional_and_social_difficulties,Total,62575,1000,1.6,36265,57.95,15170,24.24
@@ -3024,18 +3024,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201314,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,935,x,x,145,15.61,55,5.99
 201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,705,x,x,130,18.67,50,7.07
 201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,230,0,0,15,6.14,5,2.63
-201314,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Chinese,Total,265,0,0,5,1.13,x,x
-201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,190,0,0,5,1.56,x,x
-201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,75,0,0,0,0,0,0
-201314,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,1175,0,0,65,5.54,30,2.39
-201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,820,0,0,60,7.57,25,3.17
-201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,355,0,0,5,0.85,x,x
-201314,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,23325,15,0.07,2500,10.72,1015,4.35
-201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,16355,15,0.1,2260,13.81,905,5.54
-201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,6970,x,x,240,3.46,110,1.56
-201314,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Unclassified,Total,1140,x,x,215,18.98,85,7.47
-201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Unclassified,Male,845,x,x,195,22.99,75,8.89
-201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Unclassified,Female,295,0,0,20,7.48,10,3.4
+201314,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Chinese,Total,265,0,0,5,1.13,x,x
+201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Chinese,Male,190,0,0,5,1.56,x,x
+201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Chinese,Female,75,0,0,0,0,0,0
+201314,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,1175,0,0,65,5.54,30,2.39
+201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,820,0,0,60,7.57,25,3.17
+201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,355,0,0,5,0.85,x,x
+201314,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minority_ethnic_group,Total,23325,15,0.07,2500,10.72,1015,4.35
+201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,16355,15,0.1,2260,13.81,905,5.54
+201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,6970,x,x,240,3.46,110,1.56
+201314,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Unclassified,Total,1140,x,x,215,18.98,85,7.47
+201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,845,x,x,195,22.99,75,8.89
+201314,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,295,0,0,20,7.48,10,3.4
 201314,NATIONAL,E92000001,England,Special,NC_year,NC_Year_Nursery,Total,2320,0,0,0,0,0,0
 201314,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Nursery,Male,1520,0,0,0,0,0,0
 201314,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Nursery,Female,800,0,0,0,0,0,0
@@ -3085,18 +3085,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201314,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Unclassified,Male,0,x,.,40,.,35,.
 201314,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Unclassified,Female,0,0,.,5,.,5,.
 201314,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_Eligible,Total,37275,40,0.11,7515,20.16,2900,7.78
-201314,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_NotEligible,Total,62965,30,0.05,6375,10.13,2625,4.17
+201314,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_Not_eligible,Total,62965,30,0.05,6375,10.13,2625,4.17
 201314,NATIONAL,E92000001,England,Special,FSM_eligible_in_last_6_years,FSM_eligible_in_last_6_years,Total,43590,50,0.11,10585,24.29,4040,9.26
 201314,NATIONAL,E92000001,England,Special,FSM_eligible_in_last_6_years,FSM_not_eligible_in_last_6_years,Total,41265,5,0.01,2830,6.86,1215,2.95
 201314,NATIONAL,E92000001,England,Special,FSM_eligible_in_last_6_years,FSM_unclassified_in_last_6_years,Total,15385,20,0.12,470,3.07,265,1.74
-201314,NATIONAL,E92000001,England,Special,SEN_provision,SEN_Provision_No_SEN,Total,315,0,0,105,33.86,55,17.41
-201314,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,97945,75,0.07,13345,13.63,5315,5.43
-201314,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_without_statement,Total,1975,0,0,435,22.12,150,7.59
+201314,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_No_identified_SEN,Total,315,0,0,105,33.86,55,17.41
+201314,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_Statement_or_EHCP,Total,97945,75,0.07,13345,13.63,5315,5.43
+201314,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_Support,Total,1975,0,0,435,22.12,150,7.59
 201314,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,22490,15,0.07,830,3.69,445,1.99
 201314,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,1430,0,0,80,5.46,55,3.92
 201314,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,17125,10,0.05,1410,8.23,715,4.18
-201314,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,210,0,0,5,3.35,x,x
-201314,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,885,0,0,80,9.24,35,4.06
+201314,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,210,0,0,5,3.35,x,x
+201314,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,885,0,0,80,9.24,35,4.06
 201314,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Physical_disability,Total,3500,0,0,25,0.77,15,0.4
 201314,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,8795,0,0,10,0.1,5,0.08
 201314,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Behavioural_emotional_and_social_difficulties,Total,13345,40,0.29,10595,79.39,3770,28.27
@@ -3217,18 +3217,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201213,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,42330,55,0.13,2180,5.15,1395,3.3
 201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,21635,45,0.21,1630,7.53,1000,4.63
 201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,20695,10,0.05,555,2.67,395,1.9
-201213,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Chinese,Total,25930,5,0.02,105,0.41,85,0.33
-201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,12985,5,0.02,90,0.68,70,0.54
-201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,12945,x,x,20,0.14,15,0.12
-201213,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,100385,60,0.06,2770,2.76,1865,1.86
-201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,51985,45,0.09,2225,4.28,1470,2.83
-201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,48400,15,0.03,545,1.13,395,0.82
-201213,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,1762710,1240,0.07,59550,3.38,37405,2.12
-201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,896535,985,0.11,45375,5.06,28120,3.14
-201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,866175,255,0.03,14175,1.64,9285,1.07
-201213,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Unclassified,Total,60325,70,0.11,3205,5.31,1840,3.05
-201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Unclassified,Male,31265,50,0.16,2330,7.45,1350,4.32
-201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Unclassified,Female,29055,20,0.07,875,3.01,490,1.69
+201213,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Chinese,Total,25930,5,0.02,105,0.41,85,0.33
+201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Chinese,Male,12985,5,0.02,90,0.68,70,0.54
+201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Chinese,Female,12945,x,x,20,0.14,15,0.12
+201213,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,100385,60,0.06,2770,2.76,1865,1.86
+201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,51985,45,0.09,2225,4.28,1470,2.83
+201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,48400,15,0.03,545,1.13,395,0.82
+201213,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minority_ethnic_group,Total,1762710,1240,0.07,59550,3.38,37405,2.12
+201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,896535,985,0.11,45375,5.06,28120,3.14
+201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,866175,255,0.03,14175,1.64,9285,1.07
+201213,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Unclassified,Total,60325,70,0.11,3205,5.31,1840,3.05
+201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,31265,50,0.16,2330,7.45,1350,4.32
+201213,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,29055,20,0.07,875,3.01,490,1.69
 201213,NATIONAL,E92000001,England,Total,NC_year,NC_Year_Nursery,Total,303430,0,0,55,0.02,40,0.01
 201213,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Nursery,Male,154175,0,0,45,0.03,35,0.02
 201213,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Nursery,Female,149250,0,0,10,0.01,5,0
@@ -3278,16 +3278,16 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201213,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Unclassified,Male,0,75,.,720,.,545,.
 201213,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Unclassified,Female,0,15,.,265,.,210,.
 201213,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Eligible,Total,1304185,2105,0.16,109425,8.39,54585,4.19
-201213,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_NotEligible,Total,6312685,2525,0.04,158070,2.5,91470,1.45
+201213,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Not_eligible,Total,6312685,2525,0.04,158070,2.5,91470,1.45
 201213,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Unclassified,Total,0,x,.,25,.,20,.
-201213,NATIONAL,E92000001,England,Total,SEN_provision,SEN_Provision_No_SEN,Total,6161875,1480,0.02,102925,1.67,66005,1.07
-201213,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,216030,325,0.15,32210,14.91,14040,6.5
-201213,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_without_statement,Total,1238970,2825,0.23,132385,10.69,66025,5.33
+201213,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_No_identified_SEN,Total,6161875,1480,0.02,102925,1.67,66005,1.07
+201213,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_Statement_or_EHCP,Total,216030,325,0.15,32210,14.91,14040,6.5
+201213,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_Support,Total,1238970,2825,0.23,132385,10.69,66025,5.33
 201213,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,70780,65,0.09,5405,7.64,2720,3.84
 201213,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,16270,5,0.04,710,4.36,390,2.4
 201213,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,138355,210,0.15,13795,9.97,6965,5.03
-201213,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,1025,0,0,25,2.54,15,1.37
-201213,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,29015,55,0.19,2710,9.33,1325,4.57
+201213,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,1025,0,0,25,2.54,15,1.37
+201213,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,29015,55,0.19,2710,9.33,1325,4.57
 201213,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Physical_disability,Total,26685,5,0.02,490,1.84,300,1.12
 201213,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,10525,x,x,65,0.63,40,0.39
 201213,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Behavioural_emotional_and_social_difficulties,Total,143050,1445,1.01,66790,46.69,28020,19.59
@@ -3396,18 +3396,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,23785,5,0.03,330,1.38,205,0.86
 201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,12150,5,0.05,285,2.35,175,1.42
 201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,11635,0,0,45,0.37,30,0.27
-201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Chinese,Total,12390,0,0,20,0.15,15,0.11
-201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,6120,0,0,20,0.31,15,0.23
-201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,6275,0,0,0,0,0,0
-201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,54845,5,0.01,325,0.59,205,0.37
-201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,28180,5,0.01,300,1.07,185,0.66
-201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,26665,0,0,20,0.08,20,0.07
-201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,965110,145,0.01,8295,0.86,4830,0.5
-201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,490950,130,0.03,7405,1.51,4300,0.88
-201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,474160,15,0,890,0.19,530,0.11
-201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Unclassified,Total,23230,5,0.03,285,1.22,160,0.7
-201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Unclassified,Male,11925,5,0.05,255,2.13,140,1.19
-201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Unclassified,Female,11310,0,0,30,0.27,20,0.18
+201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Chinese,Total,12390,0,0,20,0.15,15,0.11
+201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Chinese,Male,6120,0,0,20,0.31,15,0.23
+201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Chinese,Female,6275,0,0,0,0,0,0
+201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,54845,5,0.01,325,0.59,205,0.37
+201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,28180,5,0.01,300,1.07,185,0.66
+201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,26665,0,0,20,0.08,20,0.07
+201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minority_ethnic_group,Total,965110,145,0.01,8295,0.86,4830,0.5
+201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,490950,130,0.03,7405,1.51,4300,0.88
+201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,474160,15,0,890,0.19,530,0.11
+201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Unclassified,Total,23230,5,0.03,285,1.22,160,0.7
+201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,11925,5,0.05,255,2.13,140,1.19
+201213,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,11310,0,0,30,0.27,20,0.18
 201213,NATIONAL,E92000001,England,State-funded primary,NC_year,NC_Year_Nursery,Total,298940,0,0,55,0.02,40,0.01
 201213,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Nursery,Male,151640,0,0,45,0.03,35,0.02
 201213,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Nursery,Female,147295,0,0,10,0.01,5,0
@@ -3451,16 +3451,16 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201213,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Unclassified,Male,0,15,.,140,.,105,.
 201213,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Unclassified,Female,0,0,.,20,.,15,.
 201213,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Eligible,Total,782270,375,0.05,18845,2.41,9180,1.17
-201213,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_NotEligible,Total,3527315,290,0.01,19015,0.54,10200,0.29
+201213,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Not_eligible,Total,3527315,290,0.01,19015,0.54,10200,0.29
 201213,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Unclassified,Total,0,0,.,5,.,5,.
-201213,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_Provision_No_SEN,Total,3559810,80,0,6925,0.19,4525,0.13
-201213,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,59710,110,0.19,5740,9.61,2535,4.25
-201213,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_without_statement,Total,690060,475,0.07,25205,3.65,12320,1.79
+201213,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_No_identified_SEN,Total,3559810,80,0,6925,0.19,4525,0.13
+201213,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_Statement_or_EHCP,Total,59710,110,0.19,5740,9.61,2535,4.25
+201213,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_Support,Total,690060,475,0.07,25205,3.65,12320,1.79
 201213,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,25880,25,0.1,1645,6.36,730,2.83
 201213,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,7610,x,x,70,0.89,40,0.5
 201213,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,67670,40,0.06,2275,3.36,1115,1.65
-201213,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,565,0,0,5,1.06,5,1.06
-201213,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,14125,x,x,280,1.98,140,0.99
+201213,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,565,0,0,5,1.06,5,1.06
+201213,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,14125,x,x,280,1.98,140,0.99
 201213,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Physical_disability,Total,13510,0,0,110,0.8,60,0.44
 201213,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,1530,0,0,30,1.83,20,1.24
 201213,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Behavioural_emotional_and_social_difficulties,Total,61390,340,0.55,15865,25.85,6880,11.21
@@ -3581,18 +3581,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,17705,50,0.28,1745,9.86,1145,6.46
 201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,8850,40,0.45,1245,14.05,785,8.89
 201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,8855,10,0.11,500,5.67,355,4.02
-201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Chinese,Total,13290,5,0.04,85,0.65,70,0.53
-201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,6685,5,0.04,70,1.02,55,0.82
-201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,6605,x,x,20,0.27,15,0.24
-201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,44440,55,0.12,2395,5.38,1640,3.69
-201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,23065,40,0.18,1880,8.15,1260,5.47
-201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,21375,15,0.06,510,2.4,375,1.76
-201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,775710,1085,0.14,48900,6.3,31635,4.08
-201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,390310,850,0.22,35800,9.17,22970,5.88
-201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,385395,235,0.06,13095,3.4,8665,2.25
-201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Unclassified,Total,36035,60,0.17,2755,7.65,1610,4.47
-201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Unclassified,Male,18545,40,0.22,1940,10.45,1150,6.2
-201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Unclassified,Female,17490,20,0.11,820,4.68,460,2.64
+201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Chinese,Total,13290,5,0.04,85,0.65,70,0.53
+201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Chinese,Male,6685,5,0.04,70,1.02,55,0.82
+201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Chinese,Female,6605,x,x,20,0.27,15,0.24
+201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,44440,55,0.12,2395,5.38,1640,3.69
+201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,23065,40,0.18,1880,8.15,1260,5.47
+201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,21375,15,0.06,510,2.4,375,1.76
+201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minority_ethnic_group,Total,775710,1085,0.14,48900,6.3,31635,4.08
+201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,390310,850,0.22,35800,9.17,22970,5.88
+201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,385395,235,0.06,13095,3.4,8665,2.25
+201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Unclassified,Total,36035,60,0.17,2755,7.65,1610,4.47
+201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,18545,40,0.22,1940,10.45,1150,6.2
+201213,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,17490,20,0.11,820,4.68,460,2.64
 201213,NATIONAL,E92000001,England,State-funded secondary,NC_year,NC_Year_Nursery,Total,2145,0,0,0,0,0,0
 201213,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Nursery,Male,1030,0,0,0,0,0,0
 201213,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Nursery,Female,1110,0,0,0,0,0,0
@@ -3639,16 +3639,16 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201213,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Unclassified,Male,0,60,.,550,.,410,.
 201213,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Unclassified,Female,0,10,.,235,.,185,.
 201213,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Eligible,Total,486260,1700,0.35,82975,17.06,42410,8.72
-201213,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_NotEligible,Total,2723860,2205,0.08,132560,4.87,78630,2.89
+201213,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Not_eligible,Total,2723860,2205,0.08,132560,4.87,78630,2.89
 201213,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Unclassified,Total,0,x,.,20,.,15,.
-201213,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_Provision_No_SEN,Total,2601715,1400,0.05,95875,3.69,61425,2.36
-201213,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,61615,150,0.24,13010,21.11,6095,9.89
-201213,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_without_statement,Total,546790,2350,0.43,106675,19.51,53540,9.79
+201213,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_No_identified_SEN,Total,2601715,1400,0.05,95875,3.69,61425,2.36
+201213,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_Statement_or_EHCP,Total,61615,150,0.24,13010,21.11,6095,9.89
+201213,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_Support,Total,546790,2350,0.43,106675,19.51,53540,9.79
 201213,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,24165,30,0.12,3015,12.48,1585,6.56
 201213,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,7225,5,0.04,545,7.57,290,4.04
 201213,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,53455,160,0.3,10065,18.83,5115,9.57
-201213,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,245,0,0,20,8.2,10,3.28
-201213,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,14070,55,0.38,2330,16.58,1150,8.16
+201213,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,245,0,0,20,8.2,10,3.28
+201213,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,14070,55,0.38,2330,16.58,1150,8.16
 201213,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Physical_disability,Total,9635,5,0.05,360,3.74,225,2.32
 201213,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,300,0,0,25,8.72,10,4.03
 201213,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Behavioural_emotional_and_social_difficulties,Total,68530,1085,1.58,40105,58.52,17210,25.11
@@ -3767,18 +3767,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201213,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,835,0,0,105,12.66,50,5.73
 201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,630,0,0,100,15.56,40,6.67
 201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,205,0,0,10,3.86,5,2.9
-201213,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Chinese,Total,245,0,0,x,x,x,x
-201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,180,0,0,x,x,x,x
-201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,65,0,0,0,0,0,0
-201213,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,1095,0,0,55,4.83,25,2.19
-201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,740,0,0,40,5.56,20,2.98
-201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,360,0,0,10,3.34,x,x
-201213,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,21890,15,0.06,2360,10.77,945,4.32
-201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,15275,10,0.07,2170,14.19,855,5.59
-201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,6615,x,x,190,2.87,90,1.38
-201213,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Unclassified,Total,1060,x,x,165,15.6,70,6.52
-201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Unclassified,Male,800,x,x,140,17.27,60,7.51
-201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Unclassified,Female,260,0,0,25,10.42,10,3.47
+201213,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Chinese,Total,245,0,0,x,x,x,x
+201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Chinese,Male,180,0,0,x,x,x,x
+201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Chinese,Female,65,0,0,0,0,0,0
+201213,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,1095,0,0,55,4.83,25,2.19
+201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,740,0,0,40,5.56,20,2.98
+201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,360,0,0,10,3.34,x,x
+201213,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minority_ethnic_group,Total,21890,15,0.06,2360,10.77,945,4.32
+201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,15275,10,0.07,2170,14.19,855,5.59
+201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,6615,x,x,190,2.87,90,1.38
+201213,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Unclassified,Total,1060,x,x,165,15.6,70,6.52
+201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,800,x,x,140,17.27,60,7.51
+201213,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,260,0,0,25,10.42,10,3.47
 201213,NATIONAL,E92000001,England,Special,NC_year,NC_Year_Nursery,Total,2345,0,0,0,0,0,0
 201213,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Nursery,Male,1505,0,0,0,0,0,0
 201213,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Nursery,Female,840,0,0,0,0,0,0
@@ -3828,15 +3828,15 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201213,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Unclassified,Male,0,x,.,35,.,30,.
 201213,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Unclassified,Female,0,x,.,10,.,5,.
 201213,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_Eligible,Total,35660,35,0.09,7600,21.32,2995,8.4
-201213,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_NotEligible,Total,61510,30,0.05,6495,10.56,2640,4.29
-201213,NATIONAL,E92000001,England,Special,SEN_provision,SEN_Provision_No_SEN,Total,350,0,0,125,36,60,16.57
-201213,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,94705,65,0.07,13465,14.22,5410,5.71
-201213,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_without_statement,Total,2115,0,0,505,23.92,165,7.71
+201213,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_Not_eligible,Total,61510,30,0.05,6495,10.56,2640,4.29
+201213,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_No_identified_SEN,Total,350,0,0,125,36,60,16.57
+201213,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_Statement_or_EHCP,Total,94705,65,0.07,13465,14.22,5410,5.71
+201213,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_Support,Total,2115,0,0,505,23.92,165,7.71
 201213,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,20735,10,0.06,745,3.58,405,1.94
 201213,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,1435,x,x,95,6.62,60,4.25
 201213,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,17225,10,0.06,1460,8.47,730,4.24
-201213,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,215,0,0,0,0,0,0
-201213,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,825,0,0,95,11.77,40,4.73
+201213,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,215,0,0,0,0,0,0
+201213,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,825,0,0,95,11.77,40,4.73
 201213,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Physical_disability,Total,3540,0,0,20,0.62,15,0.45
 201213,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,8695,x,x,10,0.14,10,0.12
 201213,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Behavioural_emotional_and_social_difficulties,Total,13130,25,0.19,10815,82.37,3930,29.95
@@ -3955,18 +3955,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201112,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,40355,55,0.13,2570,6.37,1570,3.9
 201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,20575,40,0.19,1965,9.55,1155,5.62
 201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,19780,15,0.07,605,3.06,415,2.1
-201112,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Chinese,Total,25420,5,0.01,115,0.45,90,0.36
-201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,12660,5,0.02,95,0.74,75,0.6
-201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,12755,0,0,20,0.16,15,0.13
-201112,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,96795,55,0.06,2985,3.08,1965,2.03
-201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,50065,45,0.09,2460,4.91,1595,3.19
-201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,46730,10,0.02,525,1.12,365,0.78
-201112,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,1682000,1270,0.08,65120,3.87,40030,2.38
-201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,855315,1045,0.12,50405,5.89,30575,3.57
-201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,826685,225,0.03,14715,1.78,9455,1.14
-201112,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Unclassified,Total,58850,110,0.18,4300,7.3,2375,4.04
-201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Unclassified,Male,30325,85,0.27,3230,10.66,1765,5.81
-201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Unclassified,Female,28520,25,0.09,1065,3.74,615,2.15
+201112,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Chinese,Total,25420,5,0.01,115,0.45,90,0.36
+201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Chinese,Male,12660,5,0.02,95,0.74,75,0.6
+201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Chinese,Female,12755,0,0,20,0.16,15,0.13
+201112,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,96795,55,0.06,2985,3.08,1965,2.03
+201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,50065,45,0.09,2460,4.91,1595,3.19
+201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,46730,10,0.02,525,1.12,365,0.78
+201112,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Minority_ethnic_group,Total,1682000,1270,0.08,65120,3.87,40030,2.38
+201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,855315,1045,0.12,50405,5.89,30575,3.57
+201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,826685,225,0.03,14715,1.78,9455,1.14
+201112,NATIONAL,E92000001,England,Total,Ethnicity,Ethnicity_Major_Unclassified,Total,58850,110,0.18,4300,7.3,2375,4.04
+201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,30325,85,0.27,3230,10.66,1765,5.81
+201112,NATIONAL,E92000001,England,Total,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,28520,25,0.09,1065,3.74,615,2.15
 201112,NATIONAL,E92000001,England,Total,NC_year,NC_Year_Nursery,Total,308720,x,x,55,0.02,40,0.01
 201112,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Nursery,Male,156785,x,x,55,0.03,35,0.02
 201112,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Nursery,Female,151935,x,x,5,0,5,0
@@ -4016,16 +4016,16 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201112,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Unclassified,Male,0,70,.,915,.,655,.
 201112,NATIONAL,E92000001,England,Total,NC_year_gender,NC_Year_Unclassified,Female,0,25,.,305,.,230,.
 201112,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Eligible,Total,1279355,2330,0.18,120950,9.45,58895,4.6
-201112,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_NotEligible,Total,6267100,2805,0.04,182410,2.91,102790,1.64
+201112,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Not_eligible,Total,6267100,2805,0.04,182410,2.91,102790,1.64
 201112,NATIONAL,E92000001,England,Total,FSM_Eligible,FSM_Unclassified,Total,0,30,.,1010,.,715,.
-201112,NATIONAL,E92000001,England,Total,SEN_provision,SEN_Provision_No_SEN,Total,6017970,1385,0.02,110935,1.84,69740,1.16
-201112,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,213385,380,0.18,35640,16.7,15170,7.11
-201112,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_without_statement,Total,1315100,3400,0.26,157795,12,77495,5.89
+201112,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_No_identified_SEN,Total,6017970,1385,0.02,110935,1.84,69740,1.16
+201112,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_Statement_or_EHCP,Total,213385,380,0.18,35640,16.7,15170,7.11
+201112,NATIONAL,E92000001,England,Total,SEN_provision,SEN_provision_SEN_Support,Total,1315100,3400,0.26,157795,12,77495,5.89
 201112,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,66195,70,0.1,5440,8.22,2755,4.16
 201112,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,16130,10,0.06,790,4.91,430,2.65
 201112,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,149520,245,0.16,16855,11.27,8020,5.37
-201112,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,970,0,0,25,2.69,10,1.24
-201112,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,29485,40,0.13,2960,10.04,1410,4.78
+201112,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,970,0,0,25,2.69,10,1.24
+201112,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,29485,40,0.13,2960,10.04,1410,4.78
 201112,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Physical_disability,Total,26625,5,0.01,535,2.01,310,1.17
 201112,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,10255,0,0,45,0.46,30,0.27
 201112,NATIONAL,E92000001,England,Total,SEN_primary_need,SEN_primary_need_Behavioural_emotional_and_social_difficulties,Total,151150,1210,0.8,75075,49.67,30465,20.16
@@ -4132,18 +4132,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,22375,5,0.02,365,1.62,230,1.03
 201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,11355,5,0.04,315,2.77,195,1.7
 201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,11020,x,x,50,0.44,40,0.34
-201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Chinese,Total,11770,0,0,10,0.1,5,0.06
-201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,5790,0,0,10,0.19,5,0.1
-201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,5980,0,0,x,x,x,x
-201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,52560,x,x,280,0.54,185,0.35
-201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,27040,x,x,265,0.97,170,0.62
-201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,25515,0,0,20,0.07,15,0.06
-201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,911570,140,0.02,8315,0.91,4840,0.53
-201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,464010,125,0.03,7460,1.61,4295,0.93
-201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,447560,15,0,855,0.19,540,0.12
-201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Unclassified,Total,21840,5,0.02,235,1.08,145,0.67
-201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Unclassified,Male,11120,5,0.04,215,1.94,130,1.19
-201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Unclassified,Female,10720,x,x,20,0.19,15,0.14
+201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Chinese,Total,11770,0,0,10,0.1,5,0.06
+201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Chinese,Male,5790,0,0,10,0.19,5,0.1
+201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Chinese,Female,5980,0,0,x,x,x,x
+201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,52560,x,x,280,0.54,185,0.35
+201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,27040,x,x,265,0.97,170,0.62
+201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,25515,0,0,20,0.07,15,0.06
+201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Minority_ethnic_group,Total,911570,140,0.02,8315,0.91,4840,0.53
+201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,464010,125,0.03,7460,1.61,4295,0.93
+201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,447560,15,0,855,0.19,540,0.12
+201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity,Ethnicity_Major_Unclassified,Total,21840,5,0.02,235,1.08,145,0.67
+201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,11120,5,0.04,215,1.94,130,1.19
+201112,NATIONAL,E92000001,England,State-funded primary,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,10720,x,x,20,0.19,15,0.14
 201112,NATIONAL,E92000001,England,State-funded primary,NC_year,NC_Year_Nursery,Total,304530,x,x,55,0.02,40,0.01
 201112,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Nursery,Male,154335,x,x,55,0.03,35,0.02
 201112,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Nursery,Female,150195,x,x,5,0,5,0
@@ -4190,16 +4190,16 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201112,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Unclassified,Male,0,15,.,185,.,135,.
 201112,NATIONAL,E92000001,England,State-funded primary,NC_year_gender,NC_Year_Unclassified,Female,0,x,.,20,.,15,.
 201112,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Eligible,Total,766530,370,0.05,19145,2.5,9465,1.23
-201112,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_NotEligible,Total,3450475,315,0.01,18490,0.54,10055,0.29
+201112,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Not_eligible,Total,3450475,315,0.01,18490,0.54,10055,0.29
 201112,NATIONAL,E92000001,England,State-funded primary,FSM_Eligible,FSM_Unclassified,Total,0,5,.,155,.,110,.
-201112,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_Provision_No_SEN,Total,3437345,50,0,6105,0.18,4170,0.12
-201112,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,58535,110,0.19,5630,9.62,2475,4.23
-201112,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_without_statement,Total,721120,530,0.07,26055,3.61,12985,1.8
+201112,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_No_identified_SEN,Total,3437345,50,0,6105,0.18,4170,0.12
+201112,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_Statement_or_EHCP,Total,58535,110,0.19,5630,9.62,2475,4.23
+201112,NATIONAL,E92000001,England,State-funded primary,SEN_provision,SEN_provision_SEN_Support,Total,721120,530,0.07,26055,3.61,12985,1.8
 201112,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,24445,25,0.11,1505,6.15,685,2.81
 201112,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,7510,x,x,60,0.77,35,0.47
 201112,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,72325,40,0.05,2300,3.18,1130,1.56
-201112,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,540,0,0,10,2.03,5,0.74
-201112,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,13735,5,0.04,230,1.67,115,0.84
+201112,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,540,0,0,10,2.03,5,0.74
+201112,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,13735,5,0.04,230,1.67,115,0.84
 201112,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Physical_disability,Total,13365,0,0,85,0.64,50,0.37
 201112,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,1520,0,0,30,2.1,20,1.25
 201112,NATIONAL,E92000001,England,State-funded primary,SEN_primary_need,SEN_primary_need_Behavioural_emotional_and_social_difficulties,Total,61665,265,0.43,15530,25.19,6680,10.83
@@ -4318,18 +4318,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,17180,45,0.27,2085,12.15,1295,7.54
 201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,8630,35,0.41,1555,18.04,930,10.76
 201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,8545,10,0.14,530,6.2,365,4.28
-201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Chinese,Total,13415,5,0.02,105,0.77,85,0.63
-201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,6695,5,0.04,85,1.24,70,1.05
-201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,6715,0,0,20,0.3,15,0.22
-201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,43255,55,0.12,2645,6.12,1755,4.05
-201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,22365,45,0.2,2145,9.6,1405,6.29
-201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,20890,10,0.04,500,2.39,345,1.66
-201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,749870,1110,0.15,54390,7.25,34225,4.56
-201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,377025,895,0.24,40745,10.81,25415,6.74
-201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,372850,215,0.06,13650,3.66,8815,2.36
-201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Unclassified,Total,35965,90,0.26,3810,10.6,2105,5.86
-201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Unclassified,Male,18425,70,0.37,2805,15.21,1525,8.27
-201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Unclassified,Female,17540,25,0.14,1010,5.75,580,3.32
+201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Chinese,Total,13415,5,0.02,105,0.77,85,0.63
+201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Chinese,Male,6695,5,0.04,85,1.24,70,1.05
+201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Chinese,Female,6715,0,0,20,0.3,15,0.22
+201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,43255,55,0.12,2645,6.12,1755,4.05
+201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,22365,45,0.2,2145,9.6,1405,6.29
+201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,20890,10,0.04,500,2.39,345,1.66
+201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Minority_ethnic_group,Total,749870,1110,0.15,54390,7.25,34225,4.56
+201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,377025,895,0.24,40745,10.81,25415,6.74
+201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,372850,215,0.06,13650,3.66,8815,2.36
+201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity,Ethnicity_Major_Unclassified,Total,35965,90,0.26,3810,10.6,2105,5.86
+201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,18425,70,0.37,2805,15.21,1525,8.27
+201112,NATIONAL,E92000001,England,State-funded secondary,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,17540,25,0.14,1010,5.75,580,3.32
 201112,NATIONAL,E92000001,England,State-funded secondary,NC_year,NC_Year_Nursery,Total,1870,0,0,0,0,0,0
 201112,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Nursery,Male,935,0,0,0,0,0,0
 201112,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Nursery,Female,935,0,0,0,0,0,0
@@ -4379,16 +4379,16 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201112,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Unclassified,Male,0,55,.,680,.,485,.
 201112,NATIONAL,E92000001,England,State-funded secondary,NC_year_gender,NC_Year_Unclassified,Female,0,25,.,270,.,205,.
 201112,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Eligible,Total,478985,1930,0.4,94060,19.64,46455,9.7
-201112,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_NotEligible,Total,2755890,2440,0.09,157345,5.71,90040,3.27
+201112,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Not_eligible,Total,2755890,2440,0.09,157345,5.71,90040,3.27
 201112,NATIONAL,E92000001,England,State-funded secondary,FSM_Eligible,FSM_Unclassified,Total,0,25,.,805,.,575,.
-201112,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_Provision_No_SEN,Total,2580260,1335,0.05,104725,4.06,65520,2.54
-201112,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,62630,185,0.3,16270,25.98,7190,11.48
-201112,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_without_statement,Total,591985,2870,0.48,131215,22.17,64355,10.87
+201112,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_No_identified_SEN,Total,2580260,1335,0.05,104725,4.06,65520,2.54
+201112,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_Statement_or_EHCP,Total,62630,185,0.3,16270,25.98,7190,11.48
+201112,NATIONAL,E92000001,England,State-funded secondary,SEN_provision,SEN_provision_SEN_Support,Total,591985,2870,0.48,131215,22.17,64355,10.87
 201112,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,22570,30,0.13,3220,14.27,1660,7.36
 201112,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,7125,5,0.1,650,9.14,335,4.73
 201112,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,59680,200,0.33,13035,21.84,6135,10.28
-201112,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,210,0,0,15,7.08,10,3.77
-201112,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,15045,30,0.21,2695,17.93,1275,8.46
+201112,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,210,0,0,15,7.08,10,3.77
+201112,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,15045,30,0.21,2695,17.93,1275,8.46
 201112,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Physical_disability,Total,9710,x,x,425,4.39,250,2.55
 201112,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,305,0,0,10,2.62,5,1.64
 201112,NATIONAL,E92000001,England,State-funded secondary,SEN_primary_need,SEN_primary_need_Behavioural_emotional_and_social_difficulties,Total,76240,915,1.2,48860,64.08,20005,26.24
@@ -4507,18 +4507,18 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201112,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Any_other_black_background,Total,800,x,x,120,14.96,45,5.74
 201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Male,590,x,x,90,15.59,35,5.93
 201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_other_black_background,Female,210,0,0,30,13.21,10,5.19
-201112,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Chinese,Total,235,0,0,0,0,0,0
-201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Chinese,Male,175,0,0,0,0,0,0
-201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Chinese,Female,60,0,0,0,0,0,0
-201112,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minor_Any_Other_Ethnic_Group,Total,985,0,0,55,5.59,25,2.64
-201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Male,660,0,0,50,7.56,20,3.33
-201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minor_Any_Other_Ethnic_Group,Female,325,0,0,5,1.55,5,1.24
-201112,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minority_ethnic_pupil,Total,20560,20,0.11,2415,11.74,965,4.69
-201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Male,14285,20,0.15,2200,15.41,865,6.04
-201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_pupil,Female,6275,0,0,210,3.38,100,1.61
-201112,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Unclassified,Total,1045,10,1.05,250,24.07,125,11.89
-201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Unclassified,Male,785,10,1.4,215,27.17,105,13.65
-201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Unclassified,Female,260,0,0,40,14.67,15,6.56
+201112,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Chinese,Total,235,0,0,0,0,0,0
+201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Chinese,Male,175,0,0,0,0,0,0
+201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Chinese,Female,60,0,0,0,0,0,0
+201112,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Any_Other_Ethnic_Group,Total,985,0,0,55,5.59,25,2.64
+201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Male,660,0,0,50,7.56,20,3.33
+201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Any_Other_Ethnic_Group,Female,325,0,0,5,1.55,5,1.24
+201112,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Minority_ethnic_group,Total,20560,20,0.11,2415,11.74,965,4.69
+201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Male,14285,20,0.15,2200,15.41,865,6.04
+201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Minority_ethnic_group,Female,6275,0,0,210,3.38,100,1.61
+201112,NATIONAL,E92000001,England,Special,Ethnicity,Ethnicity_Major_Unclassified,Total,1045,10,1.05,250,24.07,125,11.89
+201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Unclassified,Male,785,10,1.4,215,27.17,105,13.65
+201112,NATIONAL,E92000001,England,Special,Ethnicity_gender,Ethnicity_Major_Unclassified,Female,260,0,0,40,14.67,15,6.56
 201112,NATIONAL,E92000001,England,Special,NC_year,NC_Year_Nursery,Total,2320,0,0,0,0,0,0
 201112,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Nursery,Male,1510,0,0,0,0,0,0
 201112,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Nursery,Female,810,0,0,0,0,0,0
@@ -4568,16 +4568,16 @@ year,level,country_code,country_name,school_type,characteristic_desc,characteris
 201112,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Unclassified,Male,0,x,.,45,.,30,.
 201112,NATIONAL,E92000001,England,Special,NC_year_gender,NC_Year_Unclassified,Female,0,0,.,10,.,5,.
 201112,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_Eligible,Total,33840,35,0.1,7745,22.89,2975,8.79
-201112,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_NotEligible,Total,60740,50,0.08,6575,10.82,2695,4.44
+201112,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_Not_eligible,Total,60740,50,0.08,6575,10.82,2695,4.44
 201112,NATIONAL,E92000001,England,Special,FSM_Eligible,FSM_Unclassified,Total,0,x,.,50,.,35,.
-201112,NATIONAL,E92000001,England,Special,SEN_provision,SEN_Provision_No_SEN,Total,365,x,x,105,29.12,50,13.74
-201112,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_with_statement_EHC,Total,92220,85,0.09,13735,14.9,5505,5.97
-201112,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_without_statement,Total,1995,0,0,530,26.45,155,7.67
+201112,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_No_identified_SEN,Total,365,x,x,105,29.12,50,13.74
+201112,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_Statement_or_EHCP,Total,92220,85,0.09,13735,14.9,5505,5.97
+201112,NATIONAL,E92000001,England,Special,SEN_provision,SEN_provision_SEN_Support,Total,1995,0,0,530,26.45,155,7.67
 201112,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Autistic_spectrum_disorder,Total,19185,10,0.06,720,3.74,410,2.13
 201112,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Hearing_impairment,Total,1500,x,x,85,5.53,55,3.73
 201112,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Moderate_learning_difficulty,Total,17515,5,0.03,1525,8.7,760,4.34
-201112,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Multisensory_impairment,Total,215,0,0,0,0,0,0
-201112,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Other_difficulty_disability,Total,705,0,0,35,4.67,20,2.69
+201112,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Multi-sensory_impairment,Total,215,0,0,0,0,0,0
+201112,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Other_difficulty/disability,Total,705,0,0,35,4.67,20,2.69
 201112,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Physical_disability,Total,3545,x,x,20,0.62,15,0.37
 201112,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Profound_and_multiple_learning_difficulty,Total,8430,0,0,5,0.08,5,0.05
 201112,NATIONAL,E92000001,England,Special,SEN_primary_need,SEN_primary_need_Behavioural_emotional_and_social_difficulties,Total,13245,35,0.25,10690,80.7,3785,28.56
