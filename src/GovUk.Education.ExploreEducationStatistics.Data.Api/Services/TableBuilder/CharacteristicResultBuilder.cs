@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder
 {
