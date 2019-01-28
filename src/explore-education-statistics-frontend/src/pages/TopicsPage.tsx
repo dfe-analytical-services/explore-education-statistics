@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Helmet } from 'react-helmet';
 import { RouteComponentProps } from 'react-router';
-import api from '../api';
 import ContentItemList from '../components/ContentItemList';
 import PageHeading from '../components/PageHeading';
+import { contentApi } from '../services/api';
 
 interface Props extends RouteComponentProps<{}> {}
 
@@ -17,7 +17,7 @@ class TopicsPage extends Component<Props, State> {
   };
 
   public componentDidMount() {
-    api
+    contentApi
       .get('topic')
       .then(({ data }) => this.setState({ items: data }))
       .catch(error => alert(error));

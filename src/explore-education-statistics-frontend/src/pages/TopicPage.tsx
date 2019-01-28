@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Helmet } from 'react-helmet';
-import { match, RouteComponentProps } from 'react-router';
-import api from '../api';
+import { RouteComponentProps } from 'react-router';
 import ContentItemList from '../components/ContentItemList';
 import Link from '../components/Link';
 import PageHeading from '../components/PageHeading';
+import { contentApi } from '../services/api';
 
 interface Props
   extends RouteComponentProps<{
@@ -29,11 +29,11 @@ class TopicPage extends Component<Props, State> {
   public componentDidMount() {
     const { topic } = this.props.match.params;
 
-    api
+    contentApi
       .get(`topic/${topic}`)
       .then(json => this.setState({ data: json.data }))
       .catch(error => alert(error));
-    api
+    contentApi
       .get(`topic/${topic}/publications`)
       .then(json => this.setState({ publications: json.data }))
       .catch(error => alert(error));

@@ -3,12 +3,12 @@ import { Helmet } from 'react-helmet';
 import ReactMarkdown from 'react-markdown';
 import { match } from 'react-router';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
-import api, { baseUrl } from '../api';
 import Date from '../components/Date';
 import Details from '../components/Details';
 import Link from '../components/Link';
 import StepByStepNavigation from '../components/StepByStepNavigation';
 import StepByStepNavigationStep from '../components/StepByStepNavigationStep';
+import { baseUrl, contentApi } from '../services/api';
 
 interface Props {
   match: match<{
@@ -312,7 +312,7 @@ class PublicationPage extends Component<Props, State> {
       ? `release/${release}`
       : `publication/${publication}/latest`;
 
-    api
+    contentApi
       .get(url)
       .then(({ data }) => this.setState({ data }))
       .catch(error => alert(error));
