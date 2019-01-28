@@ -24,7 +24,7 @@ const PrototypeDownloadDropdown = ({ viewType, topic }: Props) => {
             className="govuk-link govuk-!-margin-right-9 "
             to="/prototypes/data-table-v1/national"
           >
-            Explore statistics and data
+            Create charts and tables
           </Link>
         </div>
         <div className="govuk-grid-column-one-third">

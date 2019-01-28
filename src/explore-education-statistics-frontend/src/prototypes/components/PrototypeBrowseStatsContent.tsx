@@ -18,16 +18,17 @@ const PrototypeBrowseStatsContent = ({ viewType }: Props) => {
         <>
           <h1 className="govuk-heading-xl">Find statistics and data</h1>
           <p className="govuk-body-l">
-            Browse to find the relevant statistical subject and open the section
-            to get links to:
+            Browse to find the statistics and data you’re looking for and open
+            the section to get links to:
           </p>
           <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
             <li>
-              up-to-date statistical headlines, breakdowns and definitions
+              up-to-date national statistical headlines, breakdowns and
+              explanations
             </li>
             <li>
-              charts and tables to help you compare, contrast and view
-              statistical data and trends
+              charts and tables to help you compare, contrast and view national
+              and regional statistical data and trends
             </li>
           </ul>
         </>
@@ -35,10 +36,10 @@ const PrototypeBrowseStatsContent = ({ viewType }: Props) => {
 
       {viewType === 'DOWNLOAD' && (
         <>
-          <h1 className="govuk-heading-xl">Download underlying data files</h1>
+          <h1 className="govuk-heading-xl">Download data files</h1>
           <p className="govuk-body-l">
-            Browse to find the relevant statistical subject and open the section
-            to get links to:
+            Browse to find the statistics and data you’re looking for and open
+            the section to get links to:
           </p>
           <ul className="govuk-bulllet-list">
             <li>download data files in.csv or Excel format</li>
@@ -56,11 +57,7 @@ const PrototypeBrowseStatsContent = ({ viewType }: Props) => {
       <Accordion id="schools">
         <AccordionSection
           heading="Absence and exclusions"
-          caption={
-            viewType === 'FIND'
-              ? 'Pupil absence and permanent and fixed-period exclusions statistics and data'
-              : 'Latest pupil absence and permanent and fixed-period exclusions statistics and data'
-          }
+          caption="Pupil absence and permanent and fixed-period exclusions statistics and data"
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <ul className="govuk-list-bullet">
@@ -70,8 +67,9 @@ const PrototypeBrowseStatsContent = ({ viewType }: Props) => {
                   Pupil absence statistics
                 </h4>
                 <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
-                  Includes authorised, overall, persistent and unauthorised
-                  absence statistics
+                  View statistics, create charts and tables and download data
+                  files for authorised, overall, persistent and unauthorised
+                  absence
                 </p>
                 <div className="govuk-!-margin-top-0">
                   <PrototypeDownloadDropdown viewType={viewType} />
@@ -82,7 +80,8 @@ const PrototypeBrowseStatsContent = ({ viewType }: Props) => {
                   Permanent and fixed-period exclusions statistics
                 </h4>
                 <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
-                  Includes fixed period and permanent exclusion statistics
+                  View statistics, create charts and tables and download data
+                  files for fixed-period and permanent exclusion statistics
                 </p>
                 <div className="govuk-!-margin-top-0">
                   <PrototypeDownloadDropdown />

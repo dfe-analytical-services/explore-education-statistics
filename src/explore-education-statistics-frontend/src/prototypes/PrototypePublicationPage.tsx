@@ -11,7 +11,7 @@ const PublicationPage = () => {
     <PrototypePage
       breadcrumbs={[
         {
-          link: '/prototypes/browse-releases',
+          link: '/prototypes/browse-releases-find',
           text: 'Find statistics and download data',
         },
         { text: 'Absence statistics for schools in England', link: '#' },
@@ -27,9 +27,13 @@ const PublicationPage = () => {
             Pupil absence statistics and data for schools in England
           </h1>
           <p className="govuk-body-l">
-            Read statistical summaries and definitions, view charts and tables
-            and download data files across a range of pupil absence subject
-            areas.
+            Read national statistical summaries and definitions, view charts and
+            tables and download data files across a range of pupil absence
+            subject areas.
+          </p>
+          <p className="govuk-body">
+            You can also view a regional breakdown of statistics and data within
+            the <a href="#">local authorities section</a>
           </p>
 
           <Details summary="Read more">
@@ -645,27 +649,6 @@ const PublicationPage = () => {
       </h2>
 
       <Accordion id="extra-information-sections">
-        <AccordionSection
-          heading="Local authorities"
-          caption="Find absence facts and figures for an individual LA or compare rates between LAs"
-          headingTag="h3"
-        >
-          Local authorities text here.
-        </AccordionSection>
-        <AccordionSection
-          heading="Pupil characteristics"
-          caption="Figures for age, gender, ethnicity, and more"
-          headingTag="h3"
-        >
-          Pupil characteristics text here.
-        </AccordionSection>
-        <AccordionSection
-          heading="Types of school"
-          caption="Figures for different types of state school"
-          headingTag="h3"
-        >
-          Types of school text here.
-        </AccordionSection>
         <AccordionSection
           heading="Where does this data come from"
           caption="How we collect and process the data"

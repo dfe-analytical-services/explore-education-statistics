@@ -12,39 +12,39 @@ const HomePage = () => {
         Choose how to explore our statistics and data
       </h1>
       <p className="govuk-body-l">
-        Select an option to browse through our range of national and regional
-        level statistical subjects and find what you’re looking for.
+        Select an option to find the national and regional level statistical and
+        data you’re looking for.
       </p>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-half">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
             <Link to="/prototypes/browse-releases">
-              Find statistics and download data
+              Find statistics and download data files
             </Link>
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">
-            Browse to find statistical summaries and download underlying data
-            files to help you understand and analyse our range of education
-            statistics.
+            Browse to find statistical summaries and download data to help you
+            understand and analyse our range of national and regional statistics
+            and data.
           </p>
         </div>
         <div className="govuk-grid-column-one-half">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
             <Link to="/prototypes/data-table-v1/national">
-              Explore statistics and data online
+              Create your own charts and tables online
             </Link>
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">
-            Use our online chart and table builder tool to view, compare and
-            contrast our range of education statistics and data.
+            Use our tool to build charts and tables using our range of national
+            and regional statistics and data.
           </p>
         </div>
       </div>
       <hr />
       <h3 className="govuk-heading-m govuk-!-margin-top-9">Related services</h3>
       <p className="govuk-body">
-        Use these services to find information about individual schools and
-        colleges
+        Use these services to find and compare and contrast performance and
+        other information about schools and colleges near you:
       </p>
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
         <div className="govuk-grid-column-one-half">

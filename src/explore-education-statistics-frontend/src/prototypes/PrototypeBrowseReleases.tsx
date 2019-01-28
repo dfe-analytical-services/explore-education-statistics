@@ -15,14 +15,16 @@ const BrowseReleasesPage = () => {
     >
       <h1 className="govuk-heading-xl">Find statistics and download data</h1>
       <p className="govuk-body-l">
-        Browse to find the relevant statistical subject and open the section to
-        get links to:
+        Browse to find the statistics and data you’re looking for and open the
+        section to get links to:
       </p>
       <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
-        <li>up-to-date statistical headlines, breakdowns and explanations</li>
         <li>
-          charts and tables to help you compare, contrast and view statistical
-          data and trends
+          up-to-date national statistical headlines, breakdowns and explanations
+        </li>
+        <li>
+          charts and tables to help you compare, contrast and view national and
+          regional statistical data and trends
         </li>
         <li>
           links to underlying data so you can download files and carry out your
@@ -33,7 +35,7 @@ const BrowseReleasesPage = () => {
       <Accordion id="schools">
         <AccordionSection
           heading="Absence and exclusions"
-          caption="Latest pupil absence and permanent and fixed-period exclusions statistics and data"
+          caption="Pupil absence and permanent and fixed-period exclusions statistics and data"
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <ul className="govuk-list-bullet">
@@ -41,12 +43,13 @@ const BrowseReleasesPage = () => {
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
                   <Link to="/prototypes/publication">
-                    View pupil absence statistics
+                    Pupil absence statistics
                   </Link>
                 </h4>
                 <p className="govuk-caption-m govuk-!-margin-top-1 govuk-!-margin-bottom-1">
-                  Includes authorised, overall, persistent and unauthorised
-                  absence statistics
+                  View statistics, create charts and tables and download data
+                  files for authorised, overall, persistent and unauthorised
+                  absence
                 </p>
                 <div className="govuk-!-margin-top-0">
                   <PrototypeDownloadDropdown />
@@ -55,11 +58,12 @@ const BrowseReleasesPage = () => {
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
                   <Link to="publication">
-                    View permanent and fixed-period exclusions statistics
+                    Permanent and fixed-period exclusions statistics
                   </Link>
                 </h4>
                 <p className="govuk-caption-m govuk-!-margin-top-1 govuk-!-margin-bottom-1">
-                  Includes fixed period and permanent exclusion statistics
+                  View statistics, create charts and tables and download data
+                  files for fixed-period and permanent exclusion statistics
                 </p>
                 <div className="govuk-!-margin-top-0">
                   <PrototypeDownloadDropdown />

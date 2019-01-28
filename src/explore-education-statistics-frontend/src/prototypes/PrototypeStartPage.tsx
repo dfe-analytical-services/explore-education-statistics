@@ -24,7 +24,7 @@ const StartPage = () => {
           <ul className="govuk-bulllet-list">
             <li>view annual statistical headlines and trends</li>
             <li>view statistical charts and tables</li>
-            <li>compare and contrast statistics and data online</li>
+            <li>create your own charts and tables</li>
             <li>download underlying data files for your own analysis</li>
           </ul>
           <div className="govuk-inset-text">
@@ -63,8 +63,8 @@ const StartPage = () => {
             The service contains statistics and data going as far back as 2009.
           </p>
           <p className="govuk-body">
-            To find specific performance information about schools and colleges
-            near you use:
+            To find and compare and contrast performance and other information
+            about schools and colleges near you use:
           </p>
           <ul className="govuk-list-bullet">
             <li>
