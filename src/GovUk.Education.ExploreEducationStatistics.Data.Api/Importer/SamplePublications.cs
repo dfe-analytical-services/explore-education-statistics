@@ -786,7 +786,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                             Label = "Percentage of enrolments with one or more fixed period exclusions",
                             Group = "Exclusion fields",
                             KeyIndicator = true,
-                            Unit = Unit.Number
+                            Unit = Unit.Percent
                         }
                     },
                     CharacteristicMetas = new[]
