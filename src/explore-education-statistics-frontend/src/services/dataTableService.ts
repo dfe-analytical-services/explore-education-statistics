@@ -1,6 +1,28 @@
 import { AxiosPromise } from 'axios';
 import { dataApi } from './api';
 
+export interface PublicationCharacteristicsMeta {
+  publicationId: string;
+  attributes: {
+    [group: string]: {
+      name: string;
+      label: string;
+      unit?: string;
+    }[];
+  };
+  characteristics: {
+    [group: string]: {
+      name: string;
+      label: string;
+    }[];
+  };
+}
+
+export const getCharacteristicsMeta = (
+  publicationUuid: string,
+): AxiosPromise<PublicationCharacteristicsMeta> =>
+  dataApi.get(`/tablebuilder/meta/${publicationUuid}`);
+
 export enum SchoolType {
   Dummy = 'Dummy',
   Total = 'Total',

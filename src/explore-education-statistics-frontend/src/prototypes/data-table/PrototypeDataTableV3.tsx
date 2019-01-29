@@ -19,7 +19,9 @@ import Tabs from '../../components/Tabs';
 import TabsSection from '../../components/TabsSection';
 import {
   DataTableResult,
+  getCharacteristicsMeta,
   getNationalCharacteristicsData,
+  PublicationCharacteristicsMeta,
   SchoolType,
 } from '../../services/dataTableService';
 import { KeysWithType } from '../../types/util';
@@ -29,28 +31,8 @@ import FilterMenuRadios, {
   MenuChangeEventHandler,
 } from './components/FilterMenuRadios';
 import MenuDetails from './components/MenuDetails';
-import { pupilAbsenceAttributes } from './test-data/pupilAbsenceAttributes';
-import { pupilAbsenceCharacteristics } from './test-data/pupilAbsenceCharacteristics';
 
-const mapGroupedData = (groupedData: {
-  [group: string]: {
-    value: string;
-    label: string;
-  }[];
-}) =>
-  Object.entries(groupedData).reduce((allGroups, [group, items]) => {
-    return {
-      ...allGroups,
-      [group]: items.reduce((groupItems, item) => {
-        return {
-          ...groupItems,
-          [item.value]: false,
-        };
-      }, {}),
-    };
-  }, {});
-
-interface GroupedOptions {
+interface GroupedCheckboxOptions {
   [group: string]: {
     [value: string]: boolean;
   };
@@ -62,8 +44,8 @@ interface FilterErrors {
 }
 
 interface State {
-  attributes: GroupedOptions;
-  characteristics: GroupedOptions;
+  attributes: GroupedCheckboxOptions;
+  characteristics: GroupedCheckboxOptions;
   chartData: {
     [key: string]: number;
   }[];
@@ -74,6 +56,11 @@ interface State {
     characteristics: string[];
   };
   filtersSubmitted: boolean;
+  publicationId: string;
+  publicationMeta: Pick<
+    PublicationCharacteristicsMeta,
+    'attributes' | 'characteristics'
+  >;
   publicationName: string;
   schoolTypes: SchoolType[];
   tableData: DataTableResult[];
@@ -82,8 +69,8 @@ interface State {
 
 class PrototypeDataTableV3 extends Component<{}, State> {
   public state: State = {
-    attributes: mapGroupedData(pupilAbsenceAttributes),
-    characteristics: mapGroupedData(pupilAbsenceCharacteristics),
+    attributes: {},
+    characteristics: {},
     chartData: [],
     filterErrors: {},
     filterSearch: '',
@@ -92,6 +79,11 @@ class PrototypeDataTableV3 extends Component<{}, State> {
       characteristics: [],
     },
     filtersSubmitted: false,
+    publicationId: '',
+    publicationMeta: {
+      attributes: {},
+      characteristics: {},
+    },
     publicationName: '',
     schoolTypes: [
       SchoolType.Total,
@@ -105,22 +97,60 @@ class PrototypeDataTableV3 extends Component<{}, State> {
   private filtersRef = createRef<HTMLDivElement>();
   private dataTableRef = createRef<HTMLDivElement>();
 
-  private getCheckedValues(groupedData: GroupedOptions): string[] {
+  private getCheckedValues(groupedData: GroupedCheckboxOptions): string[] {
     return Object.entries(groupedData)
       .flatMap(([_, group]) => Object.entries(group))
       .filter(([_, isChecked]) => isChecked)
       .map(([key]) => key);
   }
 
-  private handleMenuChange: MenuChangeEventHandler = menuOption => {
-    const menuOptionLabels: any = {
-      EXCLUSIONS: 'Exclusions',
-      PUPIL_ABSENCE: 'Pupil absence',
+  private handleMenuChange: MenuChangeEventHandler = async menuOption => {
+    if (!menuOption) {
+      return;
+    }
+
+    const menuOptions = {
+      EXCLUSIONS: {
+        id: 'bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9',
+        label: 'Exclusions',
+      },
+      PUPIL_ABSENCE: {
+        id: 'cbbd299f-8297-44bc-92ac-558bcf51f8ad',
+        label: 'Pupil absence',
+      },
     };
+
+    const chosenOption = menuOptions[menuOption];
+
+    const { data } = await getCharacteristicsMeta(chosenOption.id);
+
+    interface GroupedData {
+      [group: string]: {
+        name: string;
+        label: string;
+      }[];
+    }
+
+    const mapGroupedDataToCheckboxOptions = (groupedData: GroupedData) =>
+      Object.entries(groupedData).reduce((allGroups, [group, items]) => {
+        return {
+          ...allGroups,
+          [group]: items.reduce((groupItems, item) => {
+            return {
+              ...groupItems,
+              [item.name]: false,
+            };
+          }, {}),
+        };
+      }, {});
 
     this.setState(
       {
-        publicationName: menuOptionLabels[menuOption],
+        attributes: mapGroupedDataToCheckboxOptions(data.attributes),
+        characteristics: mapGroupedDataToCheckboxOptions(data.characteristics),
+        publicationId: chosenOption.id,
+        publicationMeta: data,
+        publicationName: chosenOption.label,
       },
       () => {
         if (this.filtersRef.current) {
@@ -148,7 +178,7 @@ class PrototypeDataTableV3 extends Component<{}, State> {
   );
 
   private handleOptionGroupChange = (
-    stateKey: KeysWithType<State, GroupedOptions>,
+    stateKey: KeysWithType<State, GroupedCheckboxOptions>,
     groupKey: string,
     { target }: ChangeEvent<HTMLInputElement>,
   ) => {
@@ -165,7 +195,7 @@ class PrototypeDataTableV3 extends Component<{}, State> {
   };
 
   private handleOptionGroupAllChange(
-    stateKey: KeysWithType<State, GroupedOptions>,
+    stateKey: KeysWithType<State, GroupedCheckboxOptions>,
     groupKey: string,
     { target }: ChangeEvent<HTMLInputElement>,
   ) {
@@ -189,7 +219,7 @@ class PrototypeDataTableV3 extends Component<{}, State> {
   private handleFilterSubmit: FormEventHandler = async event => {
     event.preventDefault();
 
-    const hasCheckedFilters = (groupedOptions: GroupedOptions) =>
+    const hasCheckedFilters = (groupedOptions: GroupedCheckboxOptions) =>
       Object.entries(groupedOptions).some(([_, groupedOption]) =>
         Object.values(groupedOption).some(Boolean),
       );
@@ -222,7 +252,7 @@ class PrototypeDataTableV3 extends Component<{}, State> {
     const characteristics = this.getCheckedValues(this.state.characteristics);
 
     const { data } = await getNationalCharacteristicsData(
-      'cbbd299f-8297-44bc-92ac-558bcf51f8ad',
+      this.state.publicationId,
       attributes,
       characteristics,
       this.state.schoolTypes,
@@ -252,11 +282,11 @@ class PrototypeDataTableV3 extends Component<{}, State> {
   private renderGroupedOptions(
     groupData: {
       [group: string]: {
-        value: string;
+        name: string;
         label: string;
       }[];
     },
-    stateKey: KeysWithType<State, GroupedOptions>,
+    stateKey: KeysWithType<State, GroupedCheckboxOptions>,
   ) {
     const containSearchTerm = (value: string) =>
       value.search(new RegExp(this.state.filterSearch, 'i')) > -1;
@@ -268,14 +298,14 @@ class PrototypeDataTableV3 extends Component<{}, State> {
           groupData[groupKey].some(
             item =>
               containSearchTerm(item.label) ||
-              this.state[stateKey][groupKey][item.value],
+              this.state[stateKey][groupKey][item.name],
           ),
       )
       .map(([groupKey, items]) => {
         const isMenuOpen = groupData[groupKey].some(
           item =>
             (this.state.filterSearch !== '' && containSearchTerm(item.label)) ||
-            this.state[stateKey][groupKey][item.value],
+            this.state[stateKey][groupKey][item.name],
         );
 
         const options = sortBy(
@@ -284,12 +314,13 @@ class PrototypeDataTableV3 extends Component<{}, State> {
               item =>
                 this.state.filterSearch === '' ||
                 containSearchTerm(item.label) ||
-                this.state[stateKey][groupKey][item.value],
+                this.state[stateKey][groupKey][item.name],
             )
             .map(item => {
               return {
-                ...item,
-                id: item.value,
+                id: item.name,
+                label: item.label,
+                value: item.name,
               };
             }),
           ['label'],
@@ -330,6 +361,7 @@ class PrototypeDataTableV3 extends Component<{}, State> {
       filterErrors,
       filters,
       filtersSubmitted,
+      publicationMeta,
       publicationName,
       schoolTypes,
       tableData,
@@ -406,7 +438,7 @@ class PrototypeDataTableV3 extends Component<{}, State> {
                           )}
 
                           {this.renderGroupedOptions(
-                            pupilAbsenceAttributes,
+                            publicationMeta.attributes,
                             'attributes',
                           )}
                         </FormGroup>
@@ -424,7 +456,7 @@ class PrototypeDataTableV3 extends Component<{}, State> {
                           )}
 
                           {this.renderGroupedOptions(
-                            pupilAbsenceCharacteristics,
+                            publicationMeta.characteristics,
                             'characteristics',
                           )}
                         </FormGroup>
