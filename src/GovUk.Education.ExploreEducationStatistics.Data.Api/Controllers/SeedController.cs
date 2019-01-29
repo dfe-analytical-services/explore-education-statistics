@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,14 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpGet]
-        public string Seed()
+        public async Task<string> Seed()
         {
-            if (_seedService.CanSeed())
-            {
-                return "Inserted " + _seedService.Seed() + " rows";
-            }
-
-            return "Cannot seed. Database is not empty";
+            return "Inserted " + await _seedService.Seed() + " rows";
         }
 
         [HttpDelete("DropAllCollections")]

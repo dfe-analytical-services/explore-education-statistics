@@ -89,9 +89,7 @@ const PrototypeTableSample = ({ caption }: Props) => {
             </tr>
           </tbody>
         </table>
-        <p className="govuk-body-s">
-          Source: Education Prototype Statistics Table Footer
-        </p>
+        <p className="govuk-body-s">Source: Education Prototype Statistics</p>
       </div>
     </>
   );

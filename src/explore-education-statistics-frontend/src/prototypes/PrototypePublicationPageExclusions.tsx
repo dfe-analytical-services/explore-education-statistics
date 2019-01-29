@@ -700,7 +700,7 @@ const PublicationPageExclusions = () => {
         download as excel or .csv files . The data can also be accessed via an
         API. <a href="#">What is an API?</a>
       </p>
-      <Link to="/prototypes/data-table-v1/national" className="govuk-button">
+      <Link to="/prototypes/data-table-v3" className="govuk-button">
         Explore pupil absence statistics
       </Link>
       <br />
