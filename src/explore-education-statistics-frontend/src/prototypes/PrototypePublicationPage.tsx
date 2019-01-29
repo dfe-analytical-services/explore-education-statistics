@@ -3,6 +3,7 @@ import Accordion from '../components/Accordion';
 import AccordionSection from '../components/AccordionSection';
 import Details from '../components/Details';
 import Link from '../components/Link';
+import mapImage from '../images/map_overall_absence_rates.png';
 import PrototypeDataSample from './components/PrototypeDataSample';
 import PrototypePage from './components/PrototypePage';
 
@@ -624,6 +625,50 @@ const PublicationPage = () => {
           </p>
         </AccordionSection>
         <AccordionSection heading="Pupil absence by local authority">
+          <h3 className="govuk-heading-s">
+            Select a region on the map below to show pupil absence figures by
+            local authority
+          </h3>
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-two-thirds">
+              <img
+                src={mapImage}
+                alt="Interactive map of England, showing pupil absence rate by local authority"
+                className="dfe-interactive-map"
+              />
+            </div>
+            <div className="govuk-grid-column-one-third">
+              <span className="govuk-caption-m">Selected local authority</span>
+              <h3 className="govuk-heading-m">Sheffield</h3>
+              <div className="dfe-dash-tiles__tile">
+                <h3 className="govuk-heading-m dfe-dash-tiles__heading">
+                  Overall absence
+                </h3>
+                <div>
+                  <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
+                    4.7%
+                  </span>
+                  <p className="govuk-body dfe-dash-tiles__tile--hidden">
+                    <strong className="increase">
+                      +0.4
+                      <abbr
+                        aria-label="Percentage points"
+                        title="Percentage points"
+                      >
+                        ppt
+                      </abbr>
+                    </strong>
+                    more than 2015/16
+                  </p>
+                </div>
+                <Details summary="What does this mean?">
+                  Overall absence is the adipisicing elit. Dolorum hic nobis
+                  voluptas quidem fugiat enim ipsa reprehenderit nulla.
+                </Details>
+              </div>
+            </div>
+          </div>
+
           <p>
             There is variation in overall and persistent absence rates across
             state-funded primary, secondary and special schools by region and

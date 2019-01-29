@@ -57,7 +57,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  <Link to="publication">
+                  <Link to="/prototypes/publication-exclusions">
                     Permanent and fixed-period exclusions statistics
                   </Link>
                 </h4>
@@ -66,7 +66,7 @@ const BrowseReleasesPage = () => {
                   files for fixed-period and permanent exclusion statistics
                 </p>
                 <div className="govuk-!-margin-top-0">
-                  <PrototypeDownloadDropdown />
+                  <PrototypeDownloadDropdown link="/prototypes/publication-exclusions" />
                 </div>
               </li>
             </ul>
