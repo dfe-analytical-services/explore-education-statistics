@@ -37,7 +37,7 @@ const HomePage = () => {
             national and regional statistics for your own analysis.
           </p>
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="/prototypes/data-table-v1/national">
+            <Link to="/prototypes/data-table-v3">
               Create your own charts and tables online
             </Link>
           </h2>
