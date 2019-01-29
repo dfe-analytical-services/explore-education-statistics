@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
         public MappingProfiles()
         {
             CreateMap<GeographicModel, GeographicData>();
-            CreateMap<CharacteristicViewModel, Characteristic>();
+            CreateMap<Characteristic, CharacteristicViewModel>();
             CreateMap<CharacteristicMeta, NameLabelViewModel>();
             CreateMap<AttributeMeta, AttributeMetaViewModel>()
                 .ForMember(dest => dest.Unit,
