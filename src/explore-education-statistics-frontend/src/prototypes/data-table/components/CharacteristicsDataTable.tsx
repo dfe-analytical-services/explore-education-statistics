@@ -101,11 +101,17 @@ class CharacteristicsDataTable extends Component<Props> {
             rows: attributes.map(attribute => ({
               columns: years.map(year => {
                 if (dataByYear[year].length > 0) {
-                  const unit = attributesByName[attribute].unit;
-                  return `${dataByYear[year][0].attributes[attribute]}${unit}`;
+                  if (dataByYear[year][0].attributes[attribute]) {
+                    const unit = attributesByName[attribute].unit;
+                    return `${
+                      dataByYear[year][0].attributes[attribute]
+                    }${unit}`;
+                  }
+
+                  return '--';
                 }
 
-                return '';
+                return '--';
               }),
               name: attributesByName[attribute].label,
             })),
