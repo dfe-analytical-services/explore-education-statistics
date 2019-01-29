@@ -290,3 +290,14 @@ export const pupilAbsenceCharacteristics = {
     },
   ],
 };
+
+export const ungroupedPupilAbsenceCharacteristics: {
+  [attribute: string]: string;
+} = Object.values(pupilAbsenceCharacteristics)
+  .flatMap(groups => groups)
+  .reduce((acc, characteristic) => {
+    return {
+      ...acc,
+      [characteristic.value]: characteristic.label,
+    };
+  }, {});

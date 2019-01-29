@@ -17,8 +17,14 @@ import {
 import PageHeading from '../../components/PageHeading';
 import Tabs from '../../components/Tabs';
 import TabsSection from '../../components/TabsSection';
+import {
+  DataTableResult,
+  getNationalCharacteristicsData,
+  SchoolType,
+} from '../../services/dataTableService';
 import { KeysWithType } from '../../types/util';
 import PrototypePage from '../components/PrototypePage';
+import CharacteristicsDataTable from './components/CharacteristicsDataTable';
 import FilterMenuRadios, {
   MenuChangeEventHandler,
 } from './components/FilterMenuRadios';
@@ -63,9 +69,15 @@ interface State {
   }[];
   filterErrors: FilterErrors;
   filterSearch: string;
+  filters: {
+    attributes: string[];
+    characteristics: string[];
+  };
   filtersSubmitted: boolean;
   publicationName: string;
-  tableData: string[][];
+  schoolTypes: SchoolType[];
+  tableData: DataTableResult[];
+  years: number[];
 }
 
 class PrototypeDataTableV3 extends Component<{}, State> {
@@ -75,13 +87,30 @@ class PrototypeDataTableV3 extends Component<{}, State> {
     chartData: [],
     filterErrors: {},
     filterSearch: '',
+    filters: {
+      attributes: [],
+      characteristics: [],
+    },
     filtersSubmitted: false,
     publicationName: '',
+    schoolTypes: [
+      SchoolType.Total,
+      SchoolType.State_Funded_Primary,
+      SchoolType.State_Funded_Secondary,
+    ],
     tableData: [],
+    years: [201213, 201314, 201415, 201516, 201617],
   };
 
   private filtersRef = createRef<HTMLDivElement>();
   private dataTableRef = createRef<HTMLDivElement>();
+
+  private getCheckedValues(groupedData: GroupedOptions): string[] {
+    return Object.entries(groupedData)
+      .flatMap(([_, group]) => Object.entries(group))
+      .filter(([_, isChecked]) => isChecked)
+      .map(([key]) => key);
+  }
 
   private handleMenuChange: MenuChangeEventHandler = menuOption => {
     const menuOptionLabels: any = {
@@ -103,65 +132,6 @@ class PrototypeDataTableV3 extends Component<{}, State> {
       },
     );
   };
-
-  // private handleFilterCheckboxChange = (
-  //   filterGroupName: 'pupilAbsence' | 'exclusions',
-  //   subFilterGroupName: 'exclusions' | 'general' | 'sessions',
-  //   event: ChangeEvent<HTMLInputElement>,
-  // ) => {
-  // const filterGroup = this.state.filters[filterGroupName] as any;
-  // const subFilterGroup = filterGroup[subFilterGroupName];
-  //
-  // let filters: any;
-  //
-  // if (event.target.value === 'all') {
-  //   filters = {
-  //     ...this.state.filters,
-  //     [filterGroupName]: {
-  //       ...filterGroup,
-  //       [subFilterGroupName]: Object.keys(subFilterGroup).reduce(
-  //         (acc, key) => {
-  //           return {
-  //             ...acc,
-  //             [key]: event.target.checked,
-  //           };
-  //         },
-  //         {},
-  //       ),
-  //     },
-  //   };
-  // } else {
-  //   filters = {
-  //     ...this.state.filters,
-  //     [filterGroupName]: {
-  //       ...filterGroup,
-  //       [subFilterGroupName]: {
-  //         ...subFilterGroup,
-  //         [event.target.value]: event.target.checked,
-  //       },
-  //     },
-  //   };
-  // }
-  //
-  // const tableData = Object.entries(filters).flatMap(
-  //   ([publicationKey, publication]) => {
-  //     return Object.entries(publication)
-  //       .flatMap(([groupKey, group]) => {
-  //         return Object.entries(group)
-  //           .filter(([_, isChecked]) => isChecked)
-  //           .map(([filterKey]) => {
-  //             return allTableData[publicationKey][groupKey][filterKey];
-  //           });
-  //       })
-  //       .filter(row => row.length > 0);
-  //   },
-  // );
-  //
-  // this.setState({
-  //   filters,
-  //   tableData,
-  // });
-  // };
 
   private handleSearchChange: ChangeEventHandler<HTMLInputElement> = event => {
     event.persist();
@@ -216,7 +186,7 @@ class PrototypeDataTableV3 extends Component<{}, State> {
     });
   }
 
-  private handleFilterSubmit: FormEventHandler = event => {
+  private handleFilterSubmit: FormEventHandler = async event => {
     event.preventDefault();
 
     const hasCheckedFilters = (groupedOptions: GroupedOptions) =>
@@ -248,9 +218,25 @@ class PrototypeDataTableV3 extends Component<{}, State> {
       return;
     }
 
+    const attributes = this.getCheckedValues(this.state.attributes);
+    const characteristics = this.getCheckedValues(this.state.characteristics);
+
+    const { data } = await getNationalCharacteristicsData(
+      'cbbd299f-8297-44bc-92ac-558bcf51f8ad',
+      attributes,
+      characteristics,
+      this.state.schoolTypes,
+      this.state.years,
+    );
+
     this.setState(
       {
+        filters: {
+          attributes,
+          characteristics,
+        },
         filtersSubmitted: true,
+        tableData: data.result,
       },
       () => {
         if (this.dataTableRef.current) {
@@ -342,9 +328,12 @@ class PrototypeDataTableV3 extends Component<{}, State> {
   public render() {
     const {
       filterErrors,
+      filters,
       filtersSubmitted,
       publicationName,
+      schoolTypes,
       tableData,
+      years,
     } = this.state;
 
     return (
@@ -454,29 +443,13 @@ class PrototypeDataTableV3 extends Component<{}, State> {
           <div ref={this.dataTableRef}>
             <h2>3. Explore statistics from '{publicationName}'</h2>
 
-            <table className="govuk-table">
-              <caption>Comparing statistics between 2012 and 2017</caption>
-              <thead>
-                <tr>
-                  <th />
-                  <th scope="col">2012/13</th>
-                  <th scope="col">2013/14</th>
-                  <th scope="col">2014/15</th>
-                  <th scope="col">2015/16</th>
-                  <th scope="col">2016/17</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tableData.map(([firstCell, ...cells], rowIndex) => (
-                  <tr key={rowIndex}>
-                    <td scope="row">{firstCell}</td>
-                    {cells.map((cell, cellIndex) => (
-                      <td key={cellIndex}>{cell}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <CharacteristicsDataTable
+              attributes={filters.attributes}
+              characteristics={filters.characteristics}
+              results={tableData}
+              schoolTypes={schoolTypes}
+              years={years}
+            />
 
             <ul className="govuk-list">
               <li>

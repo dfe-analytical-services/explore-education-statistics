@@ -66,15 +66,15 @@ export const pupilAbsenceAttributes = {
     },
     {
       value: 'sess_overall_percent_pa_10_exact',
-      label: 'Overall absence rate',
+      label: 'Overall absence rate for persistent absentees',
     },
     {
       value: 'sess_authorised_percent_pa_10_exact',
-      label: 'Authorised absence rate',
+      label: 'Authorised absence rate for persistent absentees',
     },
     {
       value: 'sess_unauthorised_percent_pa_10_exact',
-      label: 'Unauthorised absence rate',
+      label: 'Unauthorised absence rate for persistent absentees',
     },
   ],
   'Absence by reason': [
@@ -144,3 +144,14 @@ export const pupilAbsenceAttributes = {
     },
   ],
 };
+
+export const ungroupedPupilAbsenceAttributes: {
+  [attribute: string]: string;
+} = Object.values(pupilAbsenceAttributes)
+  .flatMap(groups => groups)
+  .reduce((acc, attribute) => {
+    return {
+      ...acc,
+      [attribute.value]: attribute.label,
+    };
+  }, {});
