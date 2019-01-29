@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { noBrackets } from '../util/paramSerializers';
+import { commaSeparated } from '../util/paramSerializers';
 
 export const baseUrl = {
   content: process.env.CONTENT_API_BASE_URL,
@@ -8,10 +8,10 @@ export const baseUrl = {
 
 export const contentApi = axios.create({
   baseURL: `${baseUrl.content}/api/`,
-  paramsSerializer: noBrackets,
+  paramsSerializer: commaSeparated,
 });
 
 export const dataApi = axios.create({
   baseURL: `${baseUrl.data}/api/`,
-  paramsSerializer: noBrackets,
+  paramsSerializer: commaSeparated,
 });

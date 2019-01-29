@@ -33,9 +33,9 @@ export const getNationalCharacteristicsData = (
 ): AxiosPromise<CharacteristicsData> =>
   dataApi.get(`/tablebuilder/characteristics/national/${publicationUuid}`, {
     params: {
-      attribute: attributes,
-      characteristic: characteristics,
-      schoolType: schoolTypes,
-      year: years,
+      attributes,
+      characteristics,
+      schoolTypes,
+      years,
     },
   });
