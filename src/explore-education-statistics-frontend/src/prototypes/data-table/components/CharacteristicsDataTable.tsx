@@ -37,10 +37,13 @@ class CharacteristicsDataTable extends Component<Props> {
     const yearString = year.toString();
 
     if (yearString.length === 6) {
-      return yearString.substring(0, 4);
+      const parsedYear = yearString.substring(0, 4);
+      const nextYear = Number(parsedYear) + 1;
+
+      return `${parsedYear}/${nextYear}`;
     }
 
-    return yearString;
+    return `${year}/${year + 1}`;
   }
 
   public render() {
