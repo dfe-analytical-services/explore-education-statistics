@@ -1,26 +1,30 @@
 import { AxiosPromise } from 'axios';
 import { dataApi } from './api';
 
-export interface PublicationCharacteristicsMeta {
+export interface AttributesMeta {
+  [group: string]: {
+    name: string;
+    label: string;
+    unit?: string;
+  }[];
+}
+
+export interface CharacteristicsMeta {
+  [group: string]: {
+    name: string;
+    label: string;
+  }[];
+}
+
+export interface PublicationMeta {
   publicationId: string;
-  attributes: {
-    [group: string]: {
-      name: string;
-      label: string;
-      unit?: string;
-    }[];
-  };
-  characteristics: {
-    [group: string]: {
-      name: string;
-      label: string;
-    }[];
-  };
+  attributes: AttributesMeta;
+  characteristics: CharacteristicsMeta;
 }
 
 export const getCharacteristicsMeta = (
   publicationUuid: string,
-): AxiosPromise<PublicationCharacteristicsMeta> =>
+): AxiosPromise<PublicationMeta> =>
   dataApi.get(`/tablebuilder/meta/${publicationUuid}`);
 
 export enum SchoolType {

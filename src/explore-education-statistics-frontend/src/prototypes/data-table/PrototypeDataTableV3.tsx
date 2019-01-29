@@ -21,7 +21,7 @@ import {
   DataTableResult,
   getCharacteristicsMeta,
   getNationalCharacteristicsData,
-  PublicationCharacteristicsMeta,
+  PublicationMeta,
   SchoolType,
 } from '../../services/dataTableService';
 import { KeysWithType } from '../../types/util';
@@ -57,10 +57,7 @@ interface State {
   };
   filtersSubmitted: boolean;
   publicationId: string;
-  publicationMeta: Pick<
-    PublicationCharacteristicsMeta,
-    'attributes' | 'characteristics'
-  >;
+  publicationMeta: Pick<PublicationMeta, 'attributes' | 'characteristics'>;
   publicationName: string;
   schoolTypes: SchoolType[];
   tableData: DataTableResult[];
@@ -375,7 +372,6 @@ class PrototypeDataTableV3 extends Component<{}, State> {
           { text: 'National level' },
           { text: 'Explore statistics' },
         ]}
-        wide
       >
         <PageHeading caption="National level" heading="Explore statistics" />
 
@@ -477,7 +473,9 @@ class PrototypeDataTableV3 extends Component<{}, State> {
 
             <CharacteristicsDataTable
               attributes={filters.attributes}
+              attributesMeta={publicationMeta.attributes}
               characteristics={filters.characteristics}
+              characteristicsMeta={publicationMeta.characteristics}
               results={tableData}
               schoolTypes={schoolTypes}
               years={years}
