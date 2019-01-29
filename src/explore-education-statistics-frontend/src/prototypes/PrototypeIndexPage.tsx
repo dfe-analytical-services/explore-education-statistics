@@ -8,6 +8,7 @@ import PrototypeDataTableV1LocalAuthority from './data-table/PrototypeDataTableV
 import PrototypeDataTableV1National from './data-table/PrototypeDataTableV1National';
 import PrototypeDataTableV1VerticalLayout from './data-table/PrototypeDataTableV1VerticalLayout';
 import PrototypeDataTableV2 from './data-table/PrototypeDataTableV2';
+import PrototypeDataTableV3 from './data-table/PrototypeDataTableV3';
 import BrowseReleases from './PrototypeBrowseReleases';
 import BrowseReleasesDownload from './PrototypeBrowseReleasesDownload';
 import BrowseReleasesFind from './PrototypeBrowseReleasesFind';
@@ -73,6 +74,11 @@ export const PrototypeRoutes = () => (
       exact
       path="/prototypes/data-table-v2"
       component={PrototypeDataTableV2}
+    />
+    <Route
+      exact
+      path="/prototypes/data-table-v3"
+      component={PrototypeDataTableV3}
     />
   </>
 );
@@ -140,11 +146,11 @@ const PrototypeIndexPage = () => {
                 Data table v1 - vertical layout
               </Link>
             </li>
-          </ul>
-
-          <ul>
             <li>
               <Link to="/prototypes/data-table-v2">Data table v2</Link>
+            </li>
+            <li>
+              <Link to="/prototypes/data-table-v3">Data table v3</Link>
             </li>
           </ul>
         </main>
