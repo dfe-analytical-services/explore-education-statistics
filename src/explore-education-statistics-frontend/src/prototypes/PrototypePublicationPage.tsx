@@ -230,7 +230,7 @@ const PublicationPage = () => {
       <h2 className="govuk-heading-l">Contents</h2>
       <Accordion id="contents-sections">
         <AccordionSection heading="About this release">
-          <p>
+          <p className="govuk-body">
             This statistical first release (SFR) reports on absence of pupils of
             compulsory school age in state-funded primary, secondary and special
             schools during the 2016/17 academic year. Information on absence in

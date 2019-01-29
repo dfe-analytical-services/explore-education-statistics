@@ -59,36 +59,37 @@ const PrototypeBrowseStatsContent = ({ viewType }: Props) => {
           heading="Absence and exclusions"
           caption="Pupil absence and permanent and fixed-period exclusions statistics and data"
         >
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-list-bullet">
-              <li>
-                {' '}
-                <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Pupil absence statistics
-                </h3>
-                <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
-                  View statistics, create charts and tables and download data
-                  files for authorised, overall, persistent and unauthorised
-                  absence
-                </p>
-                <div className="govuk-!-margin-top-0">
-                  <PrototypeDownloadDropdown viewType={viewType} />
-                </div>
-              </li>
-              <li className="govuk-!-margin-top-6">
-                <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Permanent and fixed-period exclusions statistics
-                </h3>
-                <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
-                  View statistics, create charts and tables and download data
-                  files for fixed-period and permanent exclusion statistics
-                </p>
-                <div className="govuk-!-margin-top-0">
-                  <PrototypeDownloadDropdown />
-                </div>
-              </li>
-            </ul>
-          </div>
+          <ul className="govuk-list-bullet">
+            <li>
+              {' '}
+              <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
+                Pupil absence statistics
+              </h3>
+              <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
+                View statistics, create charts and tables and download data
+                files for authorised, overall, persistent and unauthorised
+                absence
+              </p>
+              <div className="govuk-!-margin-top-0">
+                <PrototypeDownloadDropdown viewType={viewType} />
+              </div>
+            </li>
+            <li className="govuk-!-margin-top-6">
+              <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
+                Permanent and fixed-period exclusions statistics
+              </h3>
+              <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
+                View statistics, create charts and tables and download data
+                files for fixed-period and permanent exclusion statistics
+              </p>
+              <div className="govuk-!-margin-top-0">
+                <PrototypeDownloadDropdown
+                  link="/prototypes/publication-exclusions"
+                  viewType={viewType}
+                />
+              </div>
+            </li>
+          </ul>
         </AccordionSection>
         <AccordionSection
           heading="Capacity and exclusions"

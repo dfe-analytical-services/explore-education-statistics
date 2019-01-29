@@ -15,6 +15,7 @@ import HomePage2Options from './PrototypeHomePage2Options';
 import HomePage3Options from './PrototypeHomePage3Options';
 import HomePageOriginal from './PrototypeHomePageOriginal';
 import PublicationPage from './PrototypePublicationPage';
+import PublicationPageExclusions from './PrototypePublicationPageExclusions';
 import StartPage from './PrototypeStartPage';
 import ThemePage from './PrototypeThemePage';
 import TopicPage from './PrototypeTopicPage';
@@ -46,6 +47,11 @@ export const PrototypeRoutes = () => (
       component={BrowseReleasesDownload}
     />
     <Route exact path="/prototypes/publication" component={PublicationPage} />
+    <Route
+      exact
+      path="/prototypes/publication-exclusions"
+      component={PublicationPageExclusions}
+    />
     <Route exact path="/prototypes/theme" component={ThemePage} />
     <Route exact path="/prototypes/topic" component={TopicPage} />
     <Route
@@ -105,7 +111,14 @@ const PrototypeIndexPage = () => {
               <Link to="/prototypes/browse-releases">Browse releases</Link>
             </li>
             <li>
-              <Link to="/prototypes/publication">Publication page</Link>
+              <Link to="/prototypes/publication">
+                Publication page (pupil absence)
+              </Link>
+            </li>
+            <li>
+              <Link to="/prototypes/publication-exclusions">
+                Publication page (exclusions)
+              </Link>
             </li>
           </ul>
 
