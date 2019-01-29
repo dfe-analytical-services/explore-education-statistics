@@ -31,11 +31,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public IEnumerable<TCollection> FindMany(TQueryContext queryContext)
         {
             var mostRecentReleaseId = FindMostRecentReleaseId(queryContext);
+
+            var queryable = Queryable(queryContext);
             
-            return Queryable(queryContext)
-                .Where(collection => collection.ReleaseId == mostRecentReleaseId)
-                .Where(queryContext.FindExpression())
-                .ToList();
+            queryable = queryable.Where(collection => collection.ReleaseId == mostRecentReleaseId);
+            
+            queryable = queryContext.FindExpression(queryable);
+            return queryable.ToList();
         }
 
         private Guid FindMostRecentReleaseId(TQueryContext queryContext)

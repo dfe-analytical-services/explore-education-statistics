@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
+using MongoDB.Driver.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 {
@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
     {
         Guid PublicationId { get; set; }
         ICollection<string> Attributes { get; set; }
-        Expression<Func<TCollection, bool>> FindExpression();
+        IMongoQueryable<TCollection> FindExpression(IMongoQueryable<TCollection> queryable);
     }
 }
