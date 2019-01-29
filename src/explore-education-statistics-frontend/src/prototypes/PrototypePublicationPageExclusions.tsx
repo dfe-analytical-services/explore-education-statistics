@@ -107,72 +107,74 @@ const PublicationPageExclusions = () => {
             <Details summary="See previous 7 releases">
               <ul className="govuk-list">
                 <li>
-                  <a
-                    className="govuk-link"
-                    href="/themes/schools/absence-and-exclusions/pupil-absence-in-schools-in-england/2015-16"
-                  >
+                  <a href="https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2015-to-2016">
                     2015 to 2016
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015">
+                  <a href="https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2014-to-2015">
                     2014 to 2015
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014">
+                  <a href="https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2013-to-2014">
                     2013 to 2014
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013">
+                  <a href="https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2012-to-2013">
                     2012 to 2013
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics">
+                  <a href="https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-2011-to-2012-academic-year">
                     2011 to 2012
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011">
+                  <a href="https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2010-to-2011">
                     2010 to 2011
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010">
+                  <a href="https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2009-to-2010">
                     2009 to 2010
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-academic-year-2008-to-2009">
+                    2008 to 2009
                   </a>
                 </li>
               </ul>
             </Details>
 
             <h3 className="govuk-heading-s">
-              <span className="govuk-caption-m">Published: </span>22 March 2018
+              <span className="govuk-caption-m">Published: </span>19 July 2018
             </h3>
 
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <span className="govuk-caption-m">Last updated: </span>20 June
+              <span className="govuk-caption-m">Last updated: </span>6 August
               2018
             </h3>
 
             <Details summary="See all 2 updates">
               <div data-testid="publication-page--update-element">
-                <h3 className="govuk-heading-s">19 April 2017</h3>
+                <h3 className="govuk-heading-s">6 August 2018</h3>
                 <p>
-                  Underlying data file updated to include absence data by pupil
-                  residency and school location, andupdated metadata document.
+                  Updated exclusion rates for Gypsy/Roma pupils, to include
+                  extended ethnicity categories within the headcount (Gypsy,
+                  Roma and other Gypsy/Roma).
                 </p>
               </div>
               <div data-testid="publication-page--update-element">
-                <h3 className="govuk-heading-s">22 March 2017</h3>
+                <h3 className="govuk-heading-s">19 July 2018</h3>
                 <p>First published.</p>
               </div>
             </Details>
 
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <span className="govuk-caption-m">Next update: </span>22 March
-              2019
+              <span className="govuk-caption-m">Next update: </span>19 July 2019
             </h3>
             <p className="govuk-caption-m govuk-!-margin-top-0">
               <a href="#">Notify me</a>
@@ -189,42 +191,47 @@ const PublicationPageExclusions = () => {
 
       <PrototypeDataSample
         sectionId="headlines"
-        chartTitle="change in absence types in England"
+        chartTitle="change in permanent exclusion percentage in England"
         xAxisLabel="School Year"
-        yAxisLabel="Absence Rate"
+        yAxisLabel="Permanent Exclusion %"
         chartData={[
           {
-            authorised: 4.2,
             name: '2012/13',
-            overall: 5.3,
-            unauthorised: 1.1,
+            primary: 0.02,
+            secondary: 0.23,
+            special: 0.18,
+            total: 0.12,
           },
           {
-            authorised: 3.5,
             name: '2013/14',
-            overall: 4.5,
-            unauthorised: 1.1,
+            primary: 0.02,
+            secondary: 0.23,
+            special: 0.18,
+            total: 0.12,
           },
           {
-            authorised: 3.5,
             name: '2014/15',
-            overall: 4.6,
-            unauthorised: 1.1,
+            primary: 0.03,
+            secondary: 0.2,
+            special: 0.07,
+            total: 0.1,
           },
           {
-            authorised: 3.4,
             name: '2015/16',
-            overall: 4.6,
-            unauthorised: 1.1,
+            primary: 0.03,
+            secondary: 0.21,
+            special: 0.04,
+            total: 0.09,
           },
           {
-            authorised: 3.4,
             name: '2016/17',
-            overall: 4.7,
-            unauthorised: 1.3,
+            primary: 0.03,
+            secondary: 0.2,
+            special: 0.07,
+            total: 0.1,
           },
         ]}
-        chartDataKeys={['unauthorised', 'authorised', 'overall']}
+        chartDataKeys={['total', 'primary', 'secondary', 'special']}
       />
 
       <h2 className="govuk-heading-l">Contents</h2>
@@ -504,17 +511,14 @@ const PublicationPageExclusions = () => {
         </AccordionSection>
         <AccordionSection heading="Exclusions by pupil characteristics">
           <p>
-            The patterns of absence rates for pupils with different
-            characteristics have been consistent across recent years.
-          </p>
-          <p>
             In 2016/17 we saw a similar pattern by pupil characteristics to
             previous years. The groups that we usually expect to have higher
             rates are the ones that have increased exclusions since last year
             e.g. boys, pupils with special educational needs, pupils known to be
             eligible for and claiming free school meals and national curriculum
-            years 9 and 10. Age, national curriculum year group and gender
+            years 9 and 10.
           </p>
+          <strong>Age, national curriculum year group and gender</strong>
           <ul className="govuk-list-bullet">
             <li>
               Over half of all permanent (57.2 per cent) and fixed period (52.6
@@ -530,8 +534,11 @@ const PublicationPageExclusions = () => {
               The permanent exclusion rate for boys (0.15 per cent) was over
               three times higher than that for girls (0.04 per cent) and the
               fixed period exclusion rate was almost three times higher (6.91
-              compared with 2.53 per cent). Free school meals (FSM) eligibility
+              compared with 2.53 per cent).
             </li>
+          </ul>
+          <strong>Free school meals (FSM) eligibility</strong>
+          <ul className="govuk-list-bullet">
             <li>
               Pupils known to be eligible for and claiming free school meals
               (FSM) had a permanent exclusion rate of 0.28 per cent and fixed
@@ -559,8 +566,11 @@ const PublicationPageExclusions = () => {
               Pupils with an Education, Health and Care (EHC) plan or with a
               statement of SEN had the highest fixed period exclusion rate at
               15.93 per cent - over five times higher than pupils with no SEN
-              (3.06 per cent). Ethnic group
+              (3.06 per cent).
             </li>
+          </ul>
+          <strong>Ethnic group</strong>
+          <ul className="govuk-list-bullet">
             <li>
               Pupils of Gypsy/Roma and Traveller of Irish Heritage ethnic groups
               had the highest rates of both permanent and fixed period
