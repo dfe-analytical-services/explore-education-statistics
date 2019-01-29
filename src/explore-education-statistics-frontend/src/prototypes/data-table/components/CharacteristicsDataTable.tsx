@@ -3,11 +3,12 @@ import max from 'lodash/max';
 import min from 'lodash/min';
 import React, { Component } from 'react';
 import {
+  AttributesMeta,
+  CharacteristicsMeta,
   DataTableResult,
   SchoolType,
 } from '../../../services/dataTableService';
 import { ungroupedPupilAbsenceAttributes } from '../test-data/pupilAbsenceAttributes';
-import { ungroupedPupilAbsenceCharacteristics } from '../test-data/pupilAbsenceCharacteristics';
 import GroupedDataTable, { GroupedDataSet } from './GroupedDataTable';
 
 const schoolKeys: {
@@ -22,7 +23,9 @@ const schoolKeys: {
 
 interface Props {
   attributes: string[];
+  attributesMeta: AttributesMeta;
   characteristics: string[];
+  characteristicsMeta: CharacteristicsMeta;
   results: DataTableResult[];
   schoolTypes: string[];
   years: number[];
@@ -46,16 +49,38 @@ class CharacteristicsDataTable extends Component<Props> {
     return `${year}/${year + 1}`;
   }
 
+  private groupByName(groupedValues: {
+    [group: string]: {
+      name: string;
+    }[];
+  }): any {
+    return Object.values(groupedValues)
+      .flatMap(groups => groups)
+      .reduce((acc, attribute) => {
+        return {
+          ...acc,
+          [attribute.name]: {
+            ...attribute,
+          },
+        };
+      }, {});
+  }
+
   public render() {
     const {
       attributes,
+      attributesMeta,
       characteristics,
+      characteristicsMeta,
       results,
       schoolTypes,
       years,
     } = this.props;
     const firstYear = this.parseYear(min(years));
     const lastYear = this.parseYear(max(years));
+
+    const attributesByName = this.groupByName(attributesMeta);
+    const characteristicsByName = this.groupByName(characteristicsMeta);
 
     const dataBySchool = groupBy(results, 'schoolType');
 
@@ -73,11 +98,12 @@ class CharacteristicsDataTable extends Component<Props> {
           );
 
           return {
-            name: ungroupedPupilAbsenceCharacteristics[characteristic],
+            name: characteristicsByName[characteristic].label,
             rows: attributes.map(attribute => ({
               columns: years.map(year => {
                 if (dataByYear[year].length > 0) {
-                  return dataByYear[year][0].attributes[attribute];
+                  const unit = attributesByName[attribute].unit;
+                  return `${dataByYear[year][0].attributes[attribute]}${unit}`;
                 }
 
                 return '';
