@@ -372,7 +372,6 @@ class PrototypeDataTableV3 extends Component<{}, State> {
           { text: 'National level' },
           { text: 'Explore statistics' },
         ]}
-        wide
       >
         <PageHeading caption="National level" heading="Explore statistics" />
 
