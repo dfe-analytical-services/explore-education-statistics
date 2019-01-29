@@ -8,7 +8,6 @@ import {
   DataTableResult,
   SchoolType,
 } from '../../../services/dataTableService';
-import { ungroupedPupilAbsenceAttributes } from '../test-data/pupilAbsenceAttributes';
 import GroupedDataTable, { GroupedDataSet } from './GroupedDataTable';
 
 const schoolKeys: {
@@ -108,7 +107,7 @@ class CharacteristicsDataTable extends Component<Props> {
 
                 return '';
               }),
-              name: ungroupedPupilAbsenceAttributes[attribute],
+              name: attributesByName[attribute].label,
             })),
           };
         },
