@@ -145,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                         new AttributeMeta
                         {
                             Name = "sess_overall_percent_pa_10_exact",
-                            Label = "Overall absence rate",
+                            Label = "Overall absence rate for persistent absentees",
                             Group = "Absence for persistent absentees",
                             KeyIndicator = false,
                             Unit = Unit.Percent
@@ -153,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                         new AttributeMeta
                         {
                             Name = "sess_authorised_percent_pa_10_exact",
-                            Label = "Authorised absence rate",
+                            Label = "Authorised absence rate for persistent absentees",
                             Group = "Absence for persistent absentees",
                             KeyIndicator = false,
                             Unit = Unit.Percent
@@ -161,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                         new AttributeMeta
                         {
                             Name = "sess_unauthorised_percent_pa_10_exact",
-                            Label = "Unauthorised absence rate",
+                            Label = "Unauthorised absence rate for persistent absentees",
                             Group = "Absence for persistent absentees",
                             KeyIndicator = false,
                             Unit = Unit.Percent
@@ -786,7 +786,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                             Label = "Percentage of enrolments with one or more fixed period exclusions",
                             Group = "Exclusion fields",
                             KeyIndicator = true,
-                            Unit = Unit.Number
+                            Unit = Unit.Percent
                         }
                     },
                     CharacteristicMetas = new[]
