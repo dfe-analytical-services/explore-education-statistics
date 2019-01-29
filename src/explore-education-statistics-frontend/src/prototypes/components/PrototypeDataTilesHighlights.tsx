@@ -6,7 +6,6 @@ const PrototypeDataTileHighlights = () => (
     <div className="dfe-dash-tiles__tile">
       <h3 className="govuk-heading-m dfe-dash-tiles__heading">
         Overall absence
-        <span className="govuk-caption-m date-range govuk-tag">2016/17</span>
       </h3>
       <div>
         <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
@@ -31,7 +30,6 @@ const PrototypeDataTileHighlights = () => (
     <div className="dfe-dash-tiles__tile">
       <h3 className="govuk-heading-m dfe-dash-tiles__heading">
         Authorised absence
-        <span className="govuk-caption-m date-range govuk-tag">2016/17</span>
       </h3>
       <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
         3.4%
@@ -54,7 +52,6 @@ const PrototypeDataTileHighlights = () => (
     <div className="dfe-dash-tiles__tile">
       <h3 className="govuk-heading-m dfe-dash-tiles__heading">
         Unauthorised absence
-        <span className="govuk-caption-m date-range govuk-tag">2016/17</span>
       </h3>
       <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
         1.3%

@@ -31,9 +31,10 @@ const PublicationPage = () => {
             tables and download data files across a range of pupil absence
             subject areas.
           </p>
-          <p className="govuk-body">
+          <p className="govuk-body-l">
             You can also view a regional breakdown of statistics and data within
-            the <a href="#">local authorities section</a>
+            the{' '}
+            <a href="#contents-sections-heading-9">local authorities section</a>
           </p>
 
           <Details summary="Read more">

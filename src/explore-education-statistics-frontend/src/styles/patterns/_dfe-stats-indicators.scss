@@ -28,7 +28,7 @@
 
   .dfe-dash-tiles__tile {
     flex-basis: 32%;
-    margin: 2% 1% 2% 0;
+    margin: 1% 1% 2% 0;
     @include govuk-media-query($until: tablet) {
       flex-basis: 100%;
     }
@@ -40,7 +40,7 @@
 
 .dfe-dash-tiles__tile {
   background: govuk-colour('grey-4');
-  border-top: 1px solid $govuk-border-colour;
+  // border-top: 1px solid $govuk-border-colour;
   box-sizing: border-box;
   display: flex;
   flex-basis: 23%;
