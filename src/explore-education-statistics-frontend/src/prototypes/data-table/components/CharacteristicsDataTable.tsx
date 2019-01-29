@@ -39,13 +39,10 @@ class CharacteristicsDataTable extends Component<Props> {
     const yearString = year.toString();
 
     if (yearString.length === 6) {
-      const parsedYear = yearString.substring(0, 4);
-      const nextYear = Number(parsedYear) + 1;
-
-      return `${parsedYear}/${nextYear}`;
+      return `${yearString.substring(0, 4)}/${yearString.substring(4, 6)}`;
     }
 
-    return `${year}/${year + 1}`;
+    return `${year}/${Number(yearString.substring(2, 4)) + 1}`;
   }
 
   private groupByName(groupedValues: {
