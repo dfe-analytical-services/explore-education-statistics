@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
@@ -29,9 +30,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
         [HttpGet("geographic/{publicationId}/{level}")]
         public ActionResult<TableBuilderResult> GetGeographic(Guid publicationId,
-            [FromQuery(Name = "year")] ICollection<int> years,
-            [FromQuery(Name = "schoolType")] ICollection<SchoolType> schoolTypes,
-            [FromQuery(Name = "attribute")] ICollection<string> attributes,
+            [CommaSeparatedQueryString] ICollection<int> years,
+            [CommaSeparatedQueryString] ICollection<SchoolType> schoolTypes,
+            [CommaSeparatedQueryString] ICollection<string> attributes,
             Level level = Level.National)
         {
             var query = new GeographicQueryContext
@@ -48,10 +49,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
         [HttpGet("characteristics/local-authority/{publicationId}")]
         public ActionResult<TableBuilderResult> GetLocalAuthority(Guid publicationId,
-            [FromQuery(Name = "year")] ICollection<int> years,
-            [FromQuery(Name = "schoolType")] ICollection<SchoolType> schoolTypes,
-            [FromQuery(Name = "attribute")] ICollection<string> attributes,
-            [FromQuery(Name = "characteristic")] ICollection<string> characteristics)
+            [CommaSeparatedQueryString] ICollection<int> years,
+            [CommaSeparatedQueryString] ICollection<SchoolType> schoolTypes,
+            [CommaSeparatedQueryString] ICollection<string> attributes,
+            [CommaSeparatedQueryString] ICollection<string> characteristics)
         {
             var query = new LaQueryContext
             {
@@ -67,10 +68,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
         [HttpGet("characteristics/national/{publicationId}")]
         public ActionResult<TableBuilderResult> GetNational(Guid publicationId,
-            [FromQuery(Name = "year")] ICollection<int> years,
-            [FromQuery(Name = "schoolType")] ICollection<SchoolType> schoolTypes,
-            [FromQuery(Name = "attribute")] ICollection<string> attributes,
-            [FromQuery(Name = "characteristic")] ICollection<string> characteristics)
+            [CommaSeparatedQueryString] ICollection<int> years,
+            [CommaSeparatedQueryString] ICollection<SchoolType> schoolTypes,
+            [CommaSeparatedQueryString] ICollection<string> attributes,
+            [CommaSeparatedQueryString] ICollection<string> characteristics)
         {
             var query = new NationalQueryContext
             {

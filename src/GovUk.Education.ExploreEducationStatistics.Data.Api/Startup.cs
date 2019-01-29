@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer.Old;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder;
 using Microsoft.AspNetCore.Builder;
@@ -25,11 +27,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {
+        {            
             services.AddMvc(config =>
-            {
+            {       
                 config.RespectBrowserAcceptHeader = true;
                 config.ReturnHttpNotAcceptable = true;
+                config.Conventions.Add(new CommaSeparatedQueryStringConvention());
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             // Adds Brotli and Gzip compressing
