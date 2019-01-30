@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
+using MongoDB.Driver.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 {
@@ -13,14 +13,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public ICollection<string> Attributes { get; set; }
         public ICollection<string> Characteristics { get; set; }
 
-        public Expression<Func<CharacteristicDataNational, bool>> FindExpression()
+        public IMongoQueryable<CharacteristicDataNational> FindExpression(
+            IMongoQueryable<CharacteristicDataNational> queryable)
         {
-            return x =>
-                x.Level == Level.National.ToString() &&
-                (SchoolTypes.Count == 0 ||
-                 SchoolTypes.Select(Query.SchoolTypes.EnumToString).Contains(x.SchoolType)) &&
-                (Years.Count == 0 || Years.Contains(x.Year)) &&
-                (Characteristics.Count == 0 || Characteristics.Contains(x.Characteristic.Name));
+            queryable = queryable.Where(x => x.Level == Level.National.ToString());
+
+            if (SchoolTypes.Count > 0)
+            {
+                queryable = queryable.Where(x => SchoolTypes.First().ToString() == x.SchoolType);
+            }
+
+            if (Years.Count > 0)
+            {
+                queryable = queryable.Where(x => Years.First() == x.Year);
+            }
+
+            if (Characteristics.Count > 0)
+            {
+                queryable = queryable.Where(x => Characteristics.First() == x.Characteristic.Name);
+            }
+
+            return queryable;
         }
     }
 }

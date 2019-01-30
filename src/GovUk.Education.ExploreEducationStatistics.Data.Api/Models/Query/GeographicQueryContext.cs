@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
+using MongoDB.Driver.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 {
@@ -13,13 +13,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public ICollection<int> Years { get; set; }
         public ICollection<string> Attributes { get; set; }
 
-        public Expression<Func<GeographicData, bool>> FindExpression()
+        public IMongoQueryable<GeographicData> FindExpression(IMongoQueryable<GeographicData> queryable)
         {
-            return x =>
-                x.Level == Level.ToString() &&
-                (SchoolTypes.Count == 0 ||
-                 SchoolTypes.Select(Query.SchoolTypes.EnumToString).Contains(x.SchoolType)) &&
-                (Years.Count == 0 || Years.Contains(x.Year));
+            queryable = queryable.Where(x => x.Level == Level.ToString());
+
+            if (SchoolTypes.Count > 0)
+            {
+                queryable = queryable.Where(x => SchoolTypes.First().ToString() == x.SchoolType);
+            }
+
+            if (Years.Count > 0)
+            {
+                queryable = queryable.Where(x => Years.First() == x.Year);
+            }
+
+            return queryable;
         }
+
+//
+//        private ICollection<int> ShortYears()
+//        {
+//            return Years.Select(ShortYear()).ToList();
+//        }
+//
+//        /**
+//         * Format an academic year in the format YYYYYY e.g. 201920 as the academic start year e.g. 2019
+//         */
+//        private static Func<int, int> ShortYear()
+//        {
+//            return year => year > 10000 ? int.Parse(year.ToString().Substring(0, 4)) : year;
+//        }
     }
 }
