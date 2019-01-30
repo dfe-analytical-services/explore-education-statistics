@@ -80,46 +80,62 @@ class CharacteristicsDataTable extends Component<Props> {
 
     const dataBySchool = groupBy(results, 'schoolType');
 
-    const schoolGroups = schoolTypes.map(schoolType => {
-      const dataByCharacteristic = groupBy(
-        dataBySchool[schoolType],
-        'characteristic.name',
-      );
+    const schoolGroups = schoolTypes
+      .filter(schoolType => dataBySchool[schoolType])
+      .map(schoolType => {
+        const dataByCharacteristic = groupBy(
+          dataBySchool[schoolType],
+          'characteristic.name',
+        );
 
-      const groupedData: GroupedDataSet[] = characteristics.map(
-        characteristic => {
-          const dataByYear = groupBy(
-            dataByCharacteristic[characteristic],
-            'year',
-          );
+        const groupedData: GroupedDataSet[] = characteristics.map(
+          characteristic => {
+            if (!dataByCharacteristic[characteristic]) {
+              return {
+                name: characteristicsByName[characteristic].label,
+                rows: attributes.map(attribute => ({
+                  columns: years.map(() => '--'),
+                  name: attributesByName[attribute].label,
+                })),
+              };
+            }
 
-          return {
-            name: characteristicsByName[characteristic].label,
-            rows: attributes.map(attribute => ({
-              columns: years.map(year => {
-                if (dataByYear[year].length > 0) {
-                  if (dataByYear[year][0].attributes[attribute]) {
-                    const unit = attributesByName[attribute].unit;
-                    return `${
-                      dataByYear[year][0].attributes[attribute]
-                    }${unit}`;
+            const dataByYear = groupBy(
+              dataByCharacteristic[characteristic],
+              'year',
+            );
+
+            return {
+              name: characteristicsByName[characteristic].label,
+              rows: attributes.map(attribute => ({
+                columns: years.map(year => {
+                  if (!dataByYear[year]) {
+                    return '--';
+                  }
+
+                  if (dataByYear[year].length > 0) {
+                    if (dataByYear[year][0].attributes[attribute]) {
+                      const unit = attributesByName[attribute].unit;
+
+                      return `${
+                        dataByYear[year][0].attributes[attribute]
+                      }${unit}`;
+                    }
                   }
 
                   return '--';
-                }
+                }),
+                name: attributesByName[attribute].label,
+              })),
+            };
+          },
+        );
 
-                return '--';
-              }),
-              name: attributesByName[attribute].label,
-            })),
-          };
-        },
-      );
-      return {
-        data: groupedData,
-        name: schoolKeys[schoolType],
-      };
-    });
+        return {
+          data: groupedData,
+          name: schoolKeys[schoolType],
+        };
+      });
 
     return (
       <div>
