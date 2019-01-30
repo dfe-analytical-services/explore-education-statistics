@@ -19,29 +19,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 
             if (SchoolTypes.Count > 0)
             {
-                queryable = queryable.Where(x => SchoolTypes.First().ToString() == x.SchoolType);
+                queryable = queryable.Where(x =>
+                    SchoolTypes.Select(Query.SchoolTypes.EnumToString).Contains(x.SchoolType));
             }
 
             if (Years.Count > 0)
             {
-                queryable = queryable.Where(x => Years.First() == x.Year);
+                queryable = queryable.Where(x => Years.Contains(x.Year));
             }
 
             return queryable;
         }
-
-//
-//        private ICollection<int> ShortYears()
-//        {
-//            return Years.Select(ShortYear()).ToList();
-//        }
-//
-//        /**
-//         * Format an academic year in the format YYYYYY e.g. 201920 as the academic start year e.g. 2019
-//         */
-//        private static Func<int, int> ShortYear()
-//        {
-//            return year => year > 10000 ? int.Parse(year.ToString().Substring(0, 4)) : year;
-//        }
     }
 }

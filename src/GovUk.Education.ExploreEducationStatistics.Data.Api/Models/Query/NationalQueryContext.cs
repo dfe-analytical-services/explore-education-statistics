@@ -20,17 +20,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 
             if (SchoolTypes.Count > 0)
             {
-                queryable = queryable.Where(x => SchoolTypes.First().ToString() == x.SchoolType);
+                queryable = queryable.Where(x =>
+                    SchoolTypes.Select(Query.SchoolTypes.EnumToString).Contains(x.SchoolType));
             }
 
             if (Years.Count > 0)
             {
-                queryable = queryable.Where(x => Years.First() == x.Year);
+                queryable = queryable.Where(x => Years.Contains(x.Year));
             }
 
             if (Characteristics.Count > 0)
             {
-                queryable = queryable.Where(x => Characteristics.First() == x.Characteristic.Name);
+                queryable = queryable.Where(x => Characteristics.Contains(x.Characteristic.Name));
             }
 
             return queryable;
