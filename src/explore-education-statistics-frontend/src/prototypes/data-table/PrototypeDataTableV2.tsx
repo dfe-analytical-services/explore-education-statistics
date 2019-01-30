@@ -10,10 +10,10 @@ import PrototypeAbsenceGeneralChart from './charts/PrototypeAbsenceGeneralChart'
 import PrototypeAbsenceRateChart from './charts/PrototypeAbsenceRateChart';
 import PrototypeFixedPeriodExclusionsChart from './charts/PrototypeFixedPeriodExclusionsChart';
 import PrototypePermanentExclusionsChart from './charts/PrototypePermanentExclusionsChart';
-import FilterMenuRadios, {
+import PublicationMenu, {
   MenuChangeEventHandler,
   MenuOption,
-} from './components/FilterMenuRadios';
+} from './components/PublicationMenu';
 import { allTableData as exclusionTableData } from './test-data/exclusionsDataV1';
 import { allTableData as absenceTableData } from './test-data/pupilAbsenceDataV1';
 
@@ -254,7 +254,7 @@ class PrototypeDataTableV2 extends Component<{}, State> {
 
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-full">
-            <FilterMenuRadios onChange={this.handleMenuChange} />
+            <PublicationMenu onChange={this.handleMenuChange} />
           </div>
         </div>
 

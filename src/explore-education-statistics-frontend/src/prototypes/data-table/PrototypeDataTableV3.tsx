@@ -27,10 +27,10 @@ import {
 import { KeysWithType } from '../../types/util';
 import PrototypePage from '../components/PrototypePage';
 import CharacteristicsDataTable from './components/CharacteristicsDataTable';
-import FilterMenuRadios, {
-  MenuChangeEventHandler,
-} from './components/FilterMenuRadios';
 import MenuDetails from './components/MenuDetails';
+import PublicationMenu, {
+  MenuChangeEventHandler,
+} from './components/PublicationMenu';
 
 interface GroupedCheckboxOptions {
   [group: string]: {
@@ -392,7 +392,7 @@ class PrototypeDataTableV3 extends Component<{}, State> {
 
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-full">
-            <FilterMenuRadios onChange={this.handleMenuChange} />
+            <PublicationMenu onChange={this.handleMenuChange} />
           </div>
         </div>
 

@@ -1,8 +1,8 @@
 import React, { Component, ReactNode } from 'react';
 import { RadioChangeEventHandler } from '../../../components/form/FormRadio';
 import FormRadioGroup from '../../../components/form/FormRadioGroup';
-import styles from './FilterMenuRadios.module.scss';
 import MenuDetails from './MenuDetails';
+import styles from './PublicationMenu.module.scss';
 
 export type MenuOption = 'EXCLUSIONS' | 'PUPIL_ABSENCE' | '';
 
@@ -17,7 +17,7 @@ interface State {
   menuOption: MenuOption;
 }
 
-class FilterMenuRadios extends Component<Props, State> {
+class PublicationMenu extends Component<Props, State> {
   public state: State = {
     menuOption: '',
   };
@@ -94,4 +94,4 @@ class FilterMenuRadios extends Component<Props, State> {
   }
 }
 
-export default FilterMenuRadios;
+export default PublicationMenu;
