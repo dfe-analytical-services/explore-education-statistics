@@ -31,7 +31,7 @@ const PublicationPageExclusions = () => {
             tables and download data files across a range of permanent and
             fixed-period exclusion subject areas.
           </p>
-          <p className="govuk-body-l">
+          <p className="govuk-body">
             You can also view a regional breakdown of statistics and data within
             the{' '}
             <a href="#contents-sections-heading-9">local authorities section</a>
