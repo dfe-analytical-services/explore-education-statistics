@@ -5,12 +5,13 @@ import FormFieldSet from '../FormFieldSet';
 describe('FormFieldSet', () => {
   test('renders correctly with required props', () => {
     const { container } = render(
-      <FormFieldSet id="the-fieldset" legend="Fill the form">
+      <FormFieldSet id="test-fieldset" legend="Fill the form">
         <input type="text" name="test-input-1" />
         <input type="text" name="test-input-2" />
       </FormFieldSet>,
     );
 
+    expect(container.querySelector('#test-fieldset')).not.toBeNull();
     expect(container.innerHTML).toMatchSnapshot();
   });
 
@@ -93,26 +94,6 @@ describe('FormFieldSet', () => {
 
     expect(ariaDescribedBy).toContain('test-fieldset-error');
     expect(ariaDescribedBy).toContain('test-fieldset-hint');
-  });
-  test('auto-generates element ids when no `id` is set', () => {
-    const { getByText } = render(
-      <FormFieldSet
-        legend="Fill the form"
-        hint="All fields required"
-        error="There was an error"
-      >
-        <input type="text" name="test-input-1" />
-        <input type="text" name="test-input-2" />
-      </FormFieldSet>,
-    );
-
-    const hintId = getByText('All fields required').id;
-    expect(hintId).toContain('formFieldSet');
-    expect(hintId).toContain('hint');
-
-    const errorId = getByText('There was an error').id;
-    expect(errorId).toContain('formFieldSet');
-    expect(errorId).toContain('error');
   });
 
   test('setting `legendSize` to xl applies class correctly', () => {

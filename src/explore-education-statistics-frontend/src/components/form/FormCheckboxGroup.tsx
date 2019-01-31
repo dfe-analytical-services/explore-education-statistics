@@ -19,7 +19,7 @@ type Props = {
   onAllChange?: CheckboxChangeEventHandler;
   onChange?: CheckboxChangeEventHandler<any>;
   options: CheckboxOption[];
-} & Partial<FieldSetProps>;
+} & FieldSetProps;
 
 interface State {
   checkedCount: number;

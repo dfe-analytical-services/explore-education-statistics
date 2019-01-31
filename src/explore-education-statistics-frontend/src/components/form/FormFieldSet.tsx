@@ -7,18 +7,16 @@ import createDescribedBy from './util/createDescribedBy';
 export interface FieldSetProps {
   error?: string;
   hint?: string;
-  id?: string;
+  id: string;
   legend?: string | ReactNode;
   legendSize?: 'xl' | 'l' | 'm' | 's';
 }
-
-let idCounter = 0;
 
 const FormFieldSet: FunctionComponent<FieldSetProps> = ({
   children,
   error,
   hint,
-  id = `formFieldSet-${(idCounter += 1)}`,
+  id,
   legend,
   legendSize = 'm',
 }) => {
@@ -26,6 +24,7 @@ const FormFieldSet: FunctionComponent<FieldSetProps> = ({
     <FormGroup hasError={error !== undefined}>
       <fieldset
         className="govuk-fieldset"
+        id={id}
         aria-describedby={createDescribedBy({
           id,
           error: error !== undefined,

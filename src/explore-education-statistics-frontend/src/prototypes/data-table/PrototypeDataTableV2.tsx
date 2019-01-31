@@ -289,6 +289,7 @@ class PrototypeDataTableV2 extends Component<{}, State> {
                       <FormCheckboxGroup
                         checkedValues={this.state.filters.pupilAbsence.general}
                         name="pupilAbsenceGeneral"
+                        id="pupilAbsenceGeneral"
                         legend="General"
                         onAllChange={this.handleAllFilterCheckboxChange.bind(
                           this,
@@ -319,6 +320,7 @@ class PrototypeDataTableV2 extends Component<{}, State> {
                       <FormCheckboxGroup
                         checkedValues={this.state.filters.pupilAbsence.sessions}
                         name="pupilAbsenceSessions"
+                        id="pupilAbsenceSessions"
                         legend="Sessions absent"
                         onAllChange={this.handleAllFilterCheckboxChange.bind(
                           this,
@@ -356,6 +358,7 @@ class PrototypeDataTableV2 extends Component<{}, State> {
                   <FormCheckboxGroup
                     checkedValues={this.state.filters.exclusions.exclusions}
                     name="exclusions"
+                    id="exclusions"
                     legend="Exclusions"
                     onAllChange={this.handleAllFilterCheckboxChange.bind(
                       this,
@@ -398,6 +401,7 @@ class PrototypeDataTableV2 extends Component<{}, State> {
                   <FormRadioGroup
                     checkedValue={this.state.dataToggle}
                     inline
+                    id="dataToggle"
                     name="dataToggle"
                     legend="What do you want to see?"
                     legendSize="m"

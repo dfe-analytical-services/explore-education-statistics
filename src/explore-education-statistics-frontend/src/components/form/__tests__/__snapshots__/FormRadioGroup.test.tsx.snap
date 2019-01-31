@@ -3,7 +3,9 @@
 exports[`FormRadioGroup renders correctly with legend 1`] = `
 
 <div class="govuk-form-group">
-  <fieldset class="govuk-fieldset">
+  <fieldset class="govuk-fieldset"
+            id="test-radios"
+  >
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
       Choose a radio
     </legend>
@@ -56,7 +58,9 @@ exports[`FormRadioGroup renders correctly with legend 1`] = `
 exports[`FormRadioGroup renders list of radios in correct order 1`] = `
 
 <div class="govuk-form-group">
-  <fieldset class="govuk-fieldset">
+  <fieldset class="govuk-fieldset"
+            id="test-radios"
+  >
     <div class="govuk-radios">
       <div class="govuk-radios__item">
         <input class="govuk-radios__input"

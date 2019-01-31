@@ -3,7 +3,9 @@
 exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
 
 <div class="govuk-form-group">
-  <fieldset class="govuk-fieldset">
+  <fieldset class="govuk-fieldset"
+            id="test-checkboxes"
+  >
     <div class="govuk-checkboxes">
       <div class="govuk-checkboxes__item">
         <input class="govuk-checkboxes__input"
@@ -54,7 +56,9 @@ exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
 exports[`FormCheckboxGroup renders correctly with legend 1`] = `
 
 <div class="govuk-form-group">
-  <fieldset class="govuk-fieldset">
+  <fieldset class="govuk-fieldset"
+            id="test-checkboxes"
+  >
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
       Choose some checkboxes
     </legend>
@@ -107,7 +111,9 @@ exports[`FormCheckboxGroup renders correctly with legend 1`] = `
 exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
 
 <div class="govuk-form-group">
-  <fieldset class="govuk-fieldset">
+  <fieldset class="govuk-fieldset"
+            id="test-checkboxes"
+  >
     <div class="govuk-checkboxes">
       <div class="govuk-checkboxes__item">
         <input class="govuk-checkboxes__input"
@@ -157,7 +163,9 @@ exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
 exports[`FormCheckboxGroup renders with \`Select all\` checkbox when \`onAllChange\` is set 1`] = `
 
 <div class="govuk-form-group">
-  <fieldset class="govuk-fieldset">
+  <fieldset class="govuk-fieldset"
+            id="test-checkboxes"
+  >
     <div class="govuk-checkboxes">
       <div class="govuk-checkboxes__item">
         <input class="govuk-checkboxes__input"
