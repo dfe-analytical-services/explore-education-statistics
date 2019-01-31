@@ -10,7 +10,7 @@ exports[`ErrorSummary renders correctly with some errors 1`] = `
   <h2 class="govuk-error-summary__title"
       id="test-errors-title"
   >
-    There was a problem
+    There is a problem
   </h2>
   <div class="govuk-error-summary__body">
     <ul class="govuk-list govuk-error-summary__list">

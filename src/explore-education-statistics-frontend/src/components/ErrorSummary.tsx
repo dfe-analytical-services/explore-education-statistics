@@ -1,18 +1,20 @@
 import GovUkErrorSummary from 'govuk-frontend/components/error-summary/error-summary';
 import React, { Component, createRef } from 'react';
 
+export interface ErrorSummaryMessage {
+  id: string;
+  message: string;
+}
+
 interface Props {
-  errors: {
-    id: string;
-    message: string;
-  }[];
+  errors: ErrorSummaryMessage[];
   id: string;
   title?: string;
 }
 
 class ErrorSummary extends Component<Props> {
   public static defaultProps = {
-    title: 'There was a problem',
+    title: 'There is a problem',
   };
 
   private ref = createRef<HTMLDivElement>();
