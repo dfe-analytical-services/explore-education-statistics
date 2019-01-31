@@ -1,16 +1,18 @@
 import classNames from 'classnames';
-import React, { ReactNode } from 'react';
+import React, { MouseEventHandler, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
   className?: string;
   disabled?: boolean;
+  onClick?: MouseEventHandler;
   type?: 'button' | 'submit' | 'reset';
 }
 
 const Button = ({
   children,
   className,
+  onClick,
   disabled = false,
   type = 'button',
 }: Props) => {
@@ -27,6 +29,7 @@ const Button = ({
       aria-disabled={disabled}
       className={classes}
       disabled={disabled}
+      onClick={onClick}
       type={type}
     >
       {children}
