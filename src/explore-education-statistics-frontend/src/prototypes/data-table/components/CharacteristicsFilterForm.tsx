@@ -210,6 +210,16 @@ class CharacteristicsFilterForm extends Component<Props, State> {
             });
           }
 
+          const getError = (value: keyof FormValues): string | undefined => {
+            if (!touched[value]) {
+              return;
+            }
+
+            if (typeof errors[value] === 'string') {
+              return errors[value];
+            }
+          };
+
           return (
             <div ref={this.ref}>
               <ErrorSummary errors={summaryErrors} id="filter-errors" />
@@ -233,12 +243,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                     <FormFieldSet
                       id="attributes-filters"
                       legend="Attributes"
-                      error={
-                        touched.attributes &&
-                        typeof errors.attributes === 'string'
-                          ? errors.attributes
-                          : undefined
-                      }
+                      error={getError('attributes')}
                     >
                       {this.renderGroupedOptions(
                         publicationMeta.attributes,
