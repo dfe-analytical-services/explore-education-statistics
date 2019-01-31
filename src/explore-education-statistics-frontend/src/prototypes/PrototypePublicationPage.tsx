@@ -341,7 +341,7 @@ const PublicationPage = () => {
         </AccordionSection>
 
         <AccordionSection heading="Persistent absence">
-          <Details summary="Persistent bsence definition">
+          <Details summary="Persistent absence definition">
             <p>
               A pupil enrolment is identified as a persistent absentee if they
               miss 10% or more of their possible sessions
