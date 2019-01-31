@@ -1,15 +1,38 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`FormFieldSet renders correctly with error 1`] = `
+
+<fieldset class="govuk-fieldset"
+          aria-describedby="test-fieldset-error"
+>
+  <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+    Fill the form
+  </legend>
+  <span class="govuk-error-message"
+        id="test-fieldset-error"
+  >
+    There was an error
+  </span>
+  <input type="text"
+         name="test-input-1"
+  >
+  <input type="text"
+         name="test-input-2"
+  >
+</fieldset>
+
+`;
+
 exports[`FormFieldSet renders correctly with hint 1`] = `
 
 <fieldset class="govuk-fieldset"
-          aria-describedby="the-hint"
+          aria-describedby="test-fieldset-hint"
 >
   <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
     Fill the form
   </legend>
   <span class="govuk-hint"
-        id="the-hint"
+        id="test-fieldset-hint"
   >
     All fields are required
   </span>

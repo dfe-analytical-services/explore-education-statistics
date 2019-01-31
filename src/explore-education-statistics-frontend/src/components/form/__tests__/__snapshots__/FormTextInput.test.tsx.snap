@@ -1,5 +1,26 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`FormTextInput renders correctly with error 1`] = `
+
+<label class="govuk-label"
+       for="test-input"
+>
+  Test input
+</label>
+<span class="govuk-error-message"
+      id="test-input-error"
+>
+  Field is required
+</span>
+<input aria-describedby="test-input-error"
+       type="text"
+       class="govuk-input"
+       id="test-input"
+       name="testInput"
+>
+
+`;
+
 exports[`FormTextInput renders correctly with hint 1`] = `
 
 <label class="govuk-label"

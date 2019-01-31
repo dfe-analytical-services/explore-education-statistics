@@ -1,7 +1,10 @@
 import classNames from 'classnames';
 import React, { ChangeEventHandler, Component, ReactNode } from 'react';
+import ErrorMessage from '../ErrorMessage';
+import createDescribedBy from './util/createDescribedBy';
 
 interface Props {
+  error?: string;
   hint?: ReactNode | string;
   id: string;
   label: ReactNode | string;
@@ -18,7 +21,7 @@ class FormTextInput extends Component<Props> {
   };
 
   public render() {
-    const { hint, id, label, name, width } = this.props;
+    const { error, hint, id, label, name, width } = this.props;
 
     return (
       <>
@@ -30,8 +33,13 @@ class FormTextInput extends Component<Props> {
             {hint}
           </span>
         )}
+        {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
         <input
-          aria-describedby={hint ? `${id}-hint` : undefined}
+          aria-describedby={createDescribedBy({
+            id,
+            error: error !== undefined,
+            hint: hint !== undefined,
+          })}
           type="text"
           className={classNames('govuk-input', {
             [`govuk-input--width-${width}`]: width !== undefined,
