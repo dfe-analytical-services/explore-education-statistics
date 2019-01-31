@@ -1,19 +1,4 @@
-import camelCase from 'lodash/camelCase';
-import debounce from 'lodash/debounce';
-import sortBy from 'lodash/sortBy';
-import React, {
-  ChangeEvent,
-  ChangeEventHandler,
-  Component,
-  createRef,
-  FormEventHandler,
-} from 'react';
-import Button from '../../components/Button';
-import {
-  FormCheckboxGroup,
-  FormGroup,
-  FormTextInput,
-} from '../../components/form';
+import React, { Component, createRef } from 'react';
 import PageHeading from '../../components/PageHeading';
 import Tabs from '../../components/Tabs';
 import TabsSection from '../../components/TabsSection';
@@ -24,38 +9,20 @@ import {
   PublicationMeta,
   SchoolType,
 } from '../../services/dataTableService';
-import { KeysWithType } from '../../types/util';
 import PrototypePage from '../components/PrototypePage';
 import CharacteristicsDataTable from './components/CharacteristicsDataTable';
-import MenuDetails from './components/MenuDetails';
+import CharacteristicsFilterForm, {
+  CharacteristicsFilterFormSubmitHandler,
+} from './components/CharacteristicsFilterForm';
 import PublicationMenu, {
   MenuChangeEventHandler,
 } from './components/PublicationMenu';
 
-interface GroupedCheckboxOptions {
-  [group: string]: {
-    [value: string]: boolean;
-  };
-}
-
-interface FilterErrors {
-  attributes?: string;
-  characteristics?: string;
-}
-
 interface State {
-  attributes: GroupedCheckboxOptions;
-  characteristics: GroupedCheckboxOptions;
-  chartData: {
-    [key: string]: number;
-  }[];
-  filterErrors: FilterErrors;
-  filterSearch: string;
   filters: {
     attributes: string[];
     characteristics: string[];
   };
-  filtersSubmitted: boolean;
   publicationId: string;
   publicationMeta: Pick<PublicationMeta, 'attributes' | 'characteristics'>;
   publicationName: string;
@@ -66,16 +33,10 @@ interface State {
 
 class PrototypeDataTableV3 extends Component<{}, State> {
   public state: State = {
-    attributes: {},
-    characteristics: {},
-    chartData: [],
-    filterErrors: {},
-    filterSearch: '',
     filters: {
       attributes: [],
       characteristics: [],
     },
-    filtersSubmitted: false,
     publicationId: '',
     publicationMeta: {
       attributes: {},
@@ -94,13 +55,6 @@ class PrototypeDataTableV3 extends Component<{}, State> {
   private filtersRef = createRef<HTMLDivElement>();
   private dataTableRef = createRef<HTMLDivElement>();
 
-  private getCheckedValues(groupedData: GroupedCheckboxOptions): string[] {
-    return Object.entries(groupedData)
-      .flatMap(([_, group]) => Object.entries(group))
-      .filter(([_, isChecked]) => isChecked)
-      .map(([key]) => key);
-  }
-
   private handleMenuChange: MenuChangeEventHandler = async menuOption => {
     if (!menuOption) {
       return;
@@ -117,37 +71,15 @@ class PrototypeDataTableV3 extends Component<{}, State> {
       },
     };
 
-    const chosenOption = menuOptions[menuOption];
+    const publication = menuOptions[menuOption];
 
-    const { data } = await getCharacteristicsMeta(chosenOption.id);
-
-    interface GroupedData {
-      [group: string]: {
-        name: string;
-        label: string;
-      }[];
-    }
-
-    const mapGroupedDataToCheckboxOptions = (groupedData: GroupedData) =>
-      Object.entries(groupedData).reduce((allGroups, [group, items]) => {
-        return {
-          ...allGroups,
-          [group]: items.reduce((groupItems, item) => {
-            return {
-              ...groupItems,
-              [item.name]: false,
-            };
-          }, {}),
-        };
-      }, {});
+    const { data } = await getCharacteristicsMeta(publication.id);
 
     this.setState(
       {
-        attributes: mapGroupedDataToCheckboxOptions(data.attributes),
-        characteristics: mapGroupedDataToCheckboxOptions(data.characteristics),
-        publicationId: chosenOption.id,
+        publicationId: publication.id,
         publicationMeta: data,
-        publicationName: chosenOption.label,
+        publicationName: publication.label,
       },
       () => {
         if (this.filtersRef.current) {
@@ -160,94 +92,10 @@ class PrototypeDataTableV3 extends Component<{}, State> {
     );
   };
 
-  private handleSearchChange: ChangeEventHandler<HTMLInputElement> = event => {
-    event.persist();
-    this.setDebouncedFilterSearch(event);
-  };
-
-  private setDebouncedFilterSearch = debounce(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      this.setState({
-        filterSearch: event.target.value,
-      });
-    },
-    300,
-  );
-
-  private handleOptionGroupChange = (
-    stateKey: KeysWithType<State, GroupedCheckboxOptions>,
-    groupKey: string,
-    { target }: ChangeEvent<HTMLInputElement>,
-  ) => {
-    this.setState({
-      ...this.state,
-      [stateKey]: {
-        ...this.state[stateKey],
-        [groupKey]: {
-          ...this.state[stateKey][groupKey],
-          [target.value]: target.checked,
-        },
-      },
-    });
-  };
-
-  private handleOptionGroupAllChange(
-    stateKey: KeysWithType<State, GroupedCheckboxOptions>,
-    groupKey: string,
-    { target }: ChangeEvent<HTMLInputElement>,
-  ) {
-    this.setState({
-      ...this.state,
-      [stateKey]: {
-        ...this.state[stateKey],
-        [groupKey]: {
-          ...Object.keys(this.state[stateKey][groupKey]).reduce(
-            (acc, item) => ({
-              ...acc,
-              [item]: target.checked,
-            }),
-            {},
-          ),
-        },
-      },
-    });
-  }
-
-  private handleFilterSubmit: FormEventHandler = async event => {
-    event.preventDefault();
-
-    const hasCheckedFilters = (groupedOptions: GroupedCheckboxOptions) =>
-      Object.entries(groupedOptions).some(([_, groupedOption]) =>
-        Object.values(groupedOption).some(Boolean),
-      );
-
-    const filterErrors: FilterErrors = {};
-
-    if (!hasCheckedFilters(this.state.attributes)) {
-      filterErrors.attributes = 'Select at least one option';
-    }
-
-    if (!hasCheckedFilters(this.state.characteristics)) {
-      filterErrors.characteristics = 'Select at least one option';
-    }
-
-    this.setState({
-      filterErrors,
-    });
-
-    if (Object.keys(filterErrors).length > 0) {
-      if (this.filtersRef.current) {
-        this.filtersRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      }
-      return;
-    }
-
-    const attributes = this.getCheckedValues(this.state.attributes);
-    const characteristics = this.getCheckedValues(this.state.characteristics);
-
+  private handleFilterFormSubmit: CharacteristicsFilterFormSubmitHandler = async ({
+    attributes,
+    characteristics,
+  }) => {
     const { data } = await getNationalCharacteristicsData(
       this.state.publicationId,
       attributes,
@@ -262,7 +110,6 @@ class PrototypeDataTableV3 extends Component<{}, State> {
           attributes,
           characteristics,
         },
-        filtersSubmitted: true,
         tableData: data.result,
       },
       () => {
@@ -276,88 +123,9 @@ class PrototypeDataTableV3 extends Component<{}, State> {
     );
   };
 
-  private renderGroupedOptions(
-    groupData: {
-      [group: string]: {
-        name: string;
-        label: string;
-      }[];
-    },
-    stateKey: KeysWithType<State, GroupedCheckboxOptions>,
-  ) {
-    const containSearchTerm = (value: string) =>
-      value.search(new RegExp(this.state.filterSearch, 'i')) > -1;
-
-    const groups = Object.entries(groupData)
-      .filter(
-        ([groupKey]) =>
-          this.state.filterSearch === '' ||
-          groupData[groupKey].some(
-            item =>
-              containSearchTerm(item.label) ||
-              this.state[stateKey][groupKey][item.name],
-          ),
-      )
-      .map(([groupKey, items]) => {
-        const isMenuOpen = groupData[groupKey].some(
-          item =>
-            (this.state.filterSearch !== '' && containSearchTerm(item.label)) ||
-            this.state[stateKey][groupKey][item.name],
-        );
-
-        const options = sortBy(
-          items
-            .filter(
-              item =>
-                this.state.filterSearch === '' ||
-                containSearchTerm(item.label) ||
-                this.state[stateKey][groupKey][item.name],
-            )
-            .map(item => {
-              return {
-                id: item.name,
-                label: item.label,
-                value: item.name,
-              };
-            }),
-          ['label'],
-        );
-
-        return (
-          <MenuDetails summary={groupKey} key={groupKey} open={isMenuOpen}>
-            <FormCheckboxGroup
-              checkedValues={this.state[stateKey][groupKey]}
-              name={`${stateKey}-${camelCase(groupKey)}`}
-              onAllChange={
-                this.state.filterSearch === ''
-                  ? this.handleOptionGroupAllChange.bind(
-                      this,
-                      stateKey,
-                      groupKey,
-                    )
-                  : undefined
-              }
-              onChange={this.handleOptionGroupChange.bind(
-                this,
-                stateKey,
-                groupKey,
-              )}
-              options={options}
-            />
-          </MenuDetails>
-        );
-      });
-
-    return groups.length > 0
-      ? groups
-      : `No options matching '${this.state.filterSearch}'.`;
-  }
-
   public render() {
     const {
-      filterErrors,
       filters,
-      filtersSubmitted,
       publicationMeta,
       publicationName,
       schoolTypes,
@@ -409,65 +177,17 @@ class PrototypeDataTableV3 extends Component<{}, State> {
 
               <Tabs>
                 <TabsSection id="characteristics" title="Characteristics">
-                  <form onSubmit={this.handleFilterSubmit}>
-                    <FormGroup>
-                      <FormTextInput
-                        id="characteristic-search"
-                        label="Search for a characteristic or attribute"
-                        name="characteristicSearch"
-                        onChange={this.handleSearchChange}
-                        width={20}
-                      />
-                    </FormGroup>
-
-                    <div className="govuk-grid-row">
-                      <div className="govuk-grid-column-one-half">
-                        <FormGroup
-                          hasError={filterErrors.attributes !== undefined}
-                        >
-                          <h3>Attributes</h3>
-
-                          {filterErrors.attributes && (
-                            <span className="govuk-error-message">
-                              {filterErrors.attributes}
-                            </span>
-                          )}
-
-                          {this.renderGroupedOptions(
-                            publicationMeta.attributes,
-                            'attributes',
-                          )}
-                        </FormGroup>
-                      </div>
-                      <div className="govuk-grid-column-one-half">
-                        <FormGroup
-                          hasError={filterErrors.characteristics !== undefined}
-                        >
-                          <h3>Characteristics</h3>
-
-                          {filterErrors.characteristics && (
-                            <span className="govuk-error-message">
-                              {filterErrors.characteristics}
-                            </span>
-                          )}
-
-                          {this.renderGroupedOptions(
-                            publicationMeta.characteristics,
-                            'characteristics',
-                          )}
-                        </FormGroup>
-                      </div>
-                    </div>
-
-                    <Button type="submit">Confirm filters</Button>
-                  </form>
+                  <CharacteristicsFilterForm
+                    publicationMeta={publicationMeta}
+                    onSubmit={this.handleFilterFormSubmit}
+                  />
                 </TabsSection>
               </Tabs>
             </div>
           </div>
         )}
 
-        {filtersSubmitted && (
+        {tableData.length > 0 && (
           <div ref={this.dataTableRef}>
             <h2>3. Explore statistics from '{publicationName}'</h2>
 

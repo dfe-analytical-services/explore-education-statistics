@@ -11,6 +11,7 @@
   "rules": {
     "array-type": [true, "array"],
     "jsx-boolean-value": false,
+    "jsx-no-lambda": false,
     "import-name": false,
     "interface-name": [true, "never-prefix"],
     "max-classes-per-file": false,
