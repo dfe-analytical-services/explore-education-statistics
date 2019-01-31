@@ -341,7 +341,7 @@ const PublicationPage = () => {
         </AccordionSection>
 
         <AccordionSection heading="Persistent absence">
-          <Details summary="absence definition">
+          <Details summary="Persistent bsence definition">
             <p>
               A pupil enrolment is identified as a persistent absentee if they
               miss 10% or more of their possible sessions
@@ -640,7 +640,7 @@ const PublicationPage = () => {
             <div className="govuk-grid-column-one-third">
               <span className="govuk-caption-m">Selected local authority</span>
               <h3 className="govuk-heading-m">Sheffield</h3>
-              <div className="dfe-dash-tiles__tile">
+              <div className="dfe-dash-tiles__tile govuk-!-margin-bottom-6">
                 <h3 className="govuk-heading-m dfe-dash-tiles__heading">
                   Overall absence
                 </h3>
@@ -648,18 +648,34 @@ const PublicationPage = () => {
                   <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
                     4.7%
                   </span>
-                  <p className="govuk-body dfe-dash-tiles__tile--hidden">
-                    <strong className="increase">
-                      +0.4
-                      <abbr
-                        aria-label="Percentage points"
-                        title="Percentage points"
-                      >
-                        ppt
-                      </abbr>
-                    </strong>
-                    more than 2015/16
-                  </p>
+                </div>
+                <Details summary="What does this mean?">
+                  Overall absence is the adipisicing elit. Dolorum hic nobis
+                  voluptas quidem fugiat enim ipsa reprehenderit nulla.
+                </Details>
+              </div>
+              <div className="dfe-dash-tiles__tile govuk-!-margin-bottom-6">
+                <h3 className="govuk-heading-m dfe-dash-tiles__heading">
+                  Authorised absence
+                </h3>
+                <div>
+                  <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
+                    3.2%
+                  </span>
+                </div>
+                <Details summary="What does this mean?">
+                  Overall absence is the adipisicing elit. Dolorum hic nobis
+                  voluptas quidem fugiat enim ipsa reprehenderit nulla.
+                </Details>
+              </div>
+              <div className="dfe-dash-tiles__tile govuk-!-margin-bottom-6">
+                <h3 className="govuk-heading-m dfe-dash-tiles__heading">
+                  Unauthorised absence
+                </h3>
+                <div>
+                  <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
+                    1.5%
+                  </span>
                 </div>
                 <Details summary="What does this mean?">
                   Overall absence is the adipisicing elit. Dolorum hic nobis
