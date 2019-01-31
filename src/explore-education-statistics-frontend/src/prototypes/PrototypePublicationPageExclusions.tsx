@@ -235,7 +235,7 @@ const PublicationPageExclusions = () => {
       />
 
       <h2 className="govuk-heading-l">Contents</h2>
-      <Accordion id="contents-sections">
+      <Accordion id="contents-exclusions-sections">
         <AccordionSection heading="About this release">
           <p className="govuk-body">
             This National Statistics release reports on permanent and fixed
@@ -647,7 +647,7 @@ const PublicationPageExclusions = () => {
         Extra information
       </h2>
 
-      <Accordion id="extra-information-sections">
+      <Accordion id="extra-information-exclusions-sections">
         <AccordionSection
           heading="Where does this data come from"
           caption="How we collect and process the data"
@@ -689,6 +689,38 @@ const PublicationPageExclusions = () => {
               </a>
             </li>
           </ul>
+        </AccordionSection>
+        <AccordionSection heading="Contact us" headingTag="h3">
+          <h4 className="govuk-heading-">Media enquiries</h4>
+          <address className="govuk-body dfe-font-style-normal">
+            Press Office News Desk
+            <br />
+            Department for Education <br />
+            Sanctuary Buildings <br />
+            Great Smith Street <br />
+            London
+            <br />
+            SW1P 3BT <br />
+            Telephone: 020 7783 8300
+          </address>
+
+          <h4 className="govuk-heading-">Other enquiries</h4>
+          <address className="govuk-body dfe-font-style-normal">
+            Data Insight and Statistics Division
+            <br />
+            Level 1<br />
+            Department for Education
+            <br />
+            Sanctuary Buildings <br />
+            Great Smith Street
+            <br />
+            London
+            <br />
+            SW1P 3BT <br />
+            Telephone: 020 7783 8300
+            <br />
+            Email: <a href="#">Schools.statistics@education.gov.uk</a>
+          </address>
         </AccordionSection>
       </Accordion>
 

@@ -753,6 +753,38 @@ const PublicationPage = () => {
             </li>
           </ul>
         </AccordionSection>
+        <AccordionSection heading="Contact us" headingTag="h3">
+          <h4 className="govuk-heading-">Media enquiries</h4>
+          <address className="govuk-body dfe-font-style-normal">
+            Press Office News Desk
+            <br />
+            Department for Education <br />
+            Sanctuary Buildings <br />
+            Great Smith Street <br />
+            London
+            <br />
+            SW1P 3BT <br />
+            Telephone: 020 7783 8300
+          </address>
+
+          <h4 className="govuk-heading-">Other enquiries</h4>
+          <address className="govuk-body dfe-font-style-normal">
+            Data Insight and Statistics Division
+            <br />
+            Level 1<br />
+            Department for Education
+            <br />
+            Sanctuary Buildings <br />
+            Great Smith Street
+            <br />
+            London
+            <br />
+            SW1P 3BT <br />
+            Telephone: 020 7783 8300
+            <br />
+            Email: <a href="#">Schools.statistics@education.gov.uk</a>
+          </address>
+        </AccordionSection>
       </Accordion>
 
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
