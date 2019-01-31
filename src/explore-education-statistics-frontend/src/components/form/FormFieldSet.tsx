@@ -1,26 +1,34 @@
 import classNames from 'classnames';
 import React, { FunctionComponent, ReactNode } from 'react';
+import ErrorMessage from '../ErrorMessage';
+import createDescribedBy from './util/createDescribedBy';
 
 export interface FieldSetProps {
+  error?: string;
+  hint?: string;
+  id?: string;
   legend?: string | ReactNode;
   legendSize?: 'xl' | 'l' | 'm' | 's';
-  hint?: string;
-  hintId?: string;
 }
 
 let idCounter = 0;
 
 const FormFieldSet: FunctionComponent<FieldSetProps> = ({
   children,
+  error,
   hint,
-  hintId = `formFieldSetHint-${(idCounter += 1)}`,
+  id = `formFieldSet-${(idCounter += 1)}`,
   legend,
   legendSize = 'm',
 }) => {
   return (
     <fieldset
       className="govuk-fieldset"
-      aria-describedby={hint ? hintId : undefined}
+      aria-describedby={createDescribedBy({
+        id,
+        error: error !== undefined,
+        hint: hint !== undefined,
+      })}
     >
       {legend && (
         <legend
@@ -33,10 +41,11 @@ const FormFieldSet: FunctionComponent<FieldSetProps> = ({
         </legend>
       )}
       {hint && (
-        <span className="govuk-hint" id={hintId}>
+        <span className="govuk-hint" id={`${id}-hint`}>
           {hint}
         </span>
       )}
+      {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
       {children}
     </fieldset>
   );
