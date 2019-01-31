@@ -5,11 +5,15 @@ import sortBy from 'lodash/sortBy';
 import React, { ChangeEvent, Component, createRef } from 'react';
 import * as Yup from 'yup';
 import Button from '../../../components/Button';
+import ErrorSummary, {
+  ErrorSummaryMessage,
+} from '../../../components/ErrorSummary';
 import {
   FormCheckboxGroup,
   FormGroup,
   FormTextInput,
 } from '../../../components/form';
+import FormFieldSet from '../../../components/form/FormFieldSet';
 import { PublicationMeta } from '../../../services/dataTableService';
 import MenuDetails from './MenuDetails';
 
@@ -33,16 +37,14 @@ interface Props {
 interface State {
   isSubmitted: boolean;
   searchTerm: string;
+  submitError: string;
 }
 
 class CharacteristicsFilterForm extends Component<Props, State> {
   public state = {
-    errors: {
-      attributes: '',
-      characteristics: '',
-    },
     isSubmitted: false,
     searchTerm: '',
+    submitError: '',
   };
 
   private ref = createRef<HTMLDivElement>();
@@ -117,6 +119,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                 <FormCheckboxGroup
                   checkedValues={checkedState}
                   name={fieldKey}
+                  id={`${fieldKey}-${groupKey}`}
                   onAllChange={event => {
                     if (this.state.searchTerm !== '') {
                       return;
@@ -162,6 +165,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
 
   public render() {
     const { publicationMeta } = this.props;
+    const { submitError } = this.state;
 
     return (
       <Formik
@@ -174,7 +178,13 @@ class CharacteristicsFilterForm extends Component<Props, State> {
           characteristics: Yup.array().required('Select at least one option'),
         })}
         onSubmit={async ({ attributes, characteristics }, actions) => {
-          await this.props.onSubmit({ attributes, characteristics });
+          try {
+            await this.props.onSubmit({ attributes, characteristics });
+          } catch (error) {
+            this.setState({
+              submitError: error.message,
+            });
+          }
 
           actions.setSubmitting(false);
         }}
@@ -183,101 +193,112 @@ class CharacteristicsFilterForm extends Component<Props, State> {
           touched,
           values,
           ...form
-        }: FormikProps<FormValues>) => (
-          <div ref={this.ref}>
-            <Form>
-              <FormGroup>
-                <FormTextInput
-                  id="characteristic-search"
-                  label="Search for a characteristic or attribute"
-                  name="characteristicSearch"
-                  onChange={event => {
-                    event.persist();
-                    this.setDebouncedFilterSearch(event);
+        }: FormikProps<FormValues>) => {
+          const summaryErrors: ErrorSummaryMessage[] = Object.entries(errors)
+            .filter(([errorName]) => {
+              return (touched as { [key: string]: boolean })[errorName];
+            })
+            .map(([errorName, message]) => ({
+              id: `${errorName}-filters`,
+              message: typeof message === 'string' ? message : '',
+            }));
+
+          if (submitError) {
+            summaryErrors.push({
+              id: 'submit-button',
+              message: 'Could not submit filters. Please try again later.',
+            });
+          }
+
+          return (
+            <div ref={this.ref}>
+              <ErrorSummary errors={summaryErrors} id="filter-errors" />
+
+              <Form>
+                <FormGroup>
+                  <FormTextInput
+                    id="characteristic-search"
+                    label="Search for a characteristic or attribute"
+                    name="characteristicSearch"
+                    onChange={event => {
+                      event.persist();
+                      this.setDebouncedFilterSearch(event);
+                    }}
+                    width={20}
+                  />
+                </FormGroup>
+
+                <div className="govuk-grid-row">
+                  <div className="govuk-grid-column-one-half">
+                    <FormFieldSet
+                      id="attributes-filters"
+                      legend="Attributes"
+                      error={
+                        touched.attributes &&
+                        typeof errors.attributes === 'string'
+                          ? errors.attributes
+                          : undefined
+                      }
+                    >
+                      {this.renderGroupedOptions(
+                        publicationMeta.attributes,
+                        'attributes',
+                        values.attributes,
+                      )}
+                    </FormFieldSet>
+                  </div>
+                  <div className="govuk-grid-column-one-half">
+                    <FormFieldSet
+                      id="characteristics-filters"
+                      legend="Characteristics"
+                      error={
+                        touched.characteristics &&
+                        typeof errors.characteristics === 'string'
+                          ? errors.characteristics
+                          : undefined
+                      }
+                    >
+                      {this.renderGroupedOptions(
+                        publicationMeta.characteristics,
+                        'characteristics',
+                        values.characteristics,
+                      )}
+                    </FormFieldSet>
+                  </div>
+                </div>
+
+                <Button
+                  disabled={form.isSubmitting}
+                  id="submit-button"
+                  onClick={event => {
+                    event.preventDefault();
+
+                    // Manually validate/submit so we can scroll
+                    // back to the top of the form if there are errors
+                    form.validateForm().then(validationErrors => {
+                      form.submitForm();
+
+                      if (
+                        Object.keys(validationErrors).length > 0 &&
+                        this.ref.current
+                      ) {
+                        this.ref.current.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start',
+                        });
+                      }
+                    });
                   }}
-                  width={20}
-                />
-              </FormGroup>
-
-              <div className="govuk-grid-row">
-                <div className="govuk-grid-column-one-half">
-                  <FormGroup
-                    hasError={
-                      errors.attributes !== undefined &&
-                      touched.attributes !== undefined
-                    }
-                  >
-                    <h3>Attributes</h3>
-
-                    {typeof errors.attributes === 'string' &&
-                      touched.attributes !== undefined && (
-                        <span className="govuk-error-message">
-                          {errors.attributes}
-                        </span>
-                      )}
-
-                    {this.renderGroupedOptions(
-                      publicationMeta.attributes,
-                      'attributes',
-                      values.attributes,
-                    )}
-                  </FormGroup>
-                </div>
-                <div className="govuk-grid-column-one-half">
-                  <FormGroup
-                    hasError={
-                      errors.characteristics !== undefined &&
-                      touched.characteristics !== undefined
-                    }
-                  >
-                    <h3>Characteristics</h3>
-
-                    {typeof errors.characteristics === 'string' &&
-                      touched.characteristics !== undefined && (
-                        <span className="govuk-error-message">
-                          {errors.characteristics}
-                        </span>
-                      )}
-
-                    {this.renderGroupedOptions(
-                      publicationMeta.characteristics,
-                      'characteristics',
-                      values.characteristics,
-                    )}
-                  </FormGroup>
-                </div>
-              </div>
-
-              <Button
-                disabled={form.isSubmitting}
-                onClick={event => {
-                  event.preventDefault();
-
-                  // Manually validate/submit so we can scroll
-                  // back to the top of the form if there are errors
-                  form.validateForm().then(validationErrors => {
-                    form.submitForm();
-
-                    if (
-                      Object.keys(validationErrors).length > 0 &&
-                      this.ref.current
-                    ) {
-                      this.ref.current.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start',
-                      });
-                    }
-                  });
-                }}
-                type="submit"
-              >
-                {form.isSubmitting && form.isValid
-                  ? 'Submitting'
-                  : 'Confirm filters'}
-              </Button>
-            </Form>
-          </div>
-        )}
+                  type="submit"
+                >
+                  {form.isSubmitting && form.isValid
+                    ? 'Submitting'
+                    : 'Confirm filters'}
+                </Button>
+              </Form>
+            </div>
+          );
+        }}
       />
     );
   }
