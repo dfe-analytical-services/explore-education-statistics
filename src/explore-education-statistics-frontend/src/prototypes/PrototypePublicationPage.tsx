@@ -38,7 +38,7 @@ const PublicationPage = () => {
             <a href="#contents-sections-heading-9">local authorities section</a>
           </p>
 
-          <Details summary="Read more">
+          <Details summary="Read more about our methodology">
             <p>
               To help you analyse and understand the statistics the following
               sections include:
@@ -51,23 +51,8 @@ const PublicationPage = () => {
               </Link>
             </div>
           </Details>
-          <Details summary="Download data files">
+          <Details summary="Download underlying data files">
             <ul className="govuk-list">
-              <li>
-                <a href="#" className="govuk-link">
-                  View by graphs and charts
-                </a>
-              </li>
-              <li>
-                <a href="#" className="govuk-link">
-                  View by tables and numbers
-                </a>
-              </li>
-              <li>
-                <a href="#" className="govuk-link">
-                  Create your own tables and charts
-                </a>
-              </li>
               <li>
                 <a href="#" className="govuk-link">
                   Download pdf files

@@ -37,7 +37,7 @@ const PublicationPageExclusions = () => {
             <a href="#contents-sections-heading-9">local authorities section</a>
           </p>
 
-          <Details summary="Read more">
+          <Details summary="Read more about our methodology">
             <p>
               To help you analyse and understand the statistics the following
               sections include:
@@ -45,28 +45,13 @@ const PublicationPageExclusions = () => {
 
             <div className="govuk-inset-text">
               <Link to="#">
-                Find out more about our pupil absence data and statistics
-                methodology and terminology
+                Find out more about our permanent and fixed-period exclusions
+                data and statistics methodology and terminology
               </Link>
             </div>
           </Details>
-          <Details summary="Download data files">
+          <Details summary="Download underlying data files">
             <ul className="govuk-list">
-              <li>
-                <a href="#" className="govuk-link">
-                  View by graphs and charts
-                </a>
-              </li>
-              <li>
-                <a href="#" className="govuk-link">
-                  View by tables and numbers
-                </a>
-              </li>
-              <li>
-                <a href="#" className="govuk-link">
-                  Create your own tables and charts
-                </a>
-              </li>
               <li>
                 <a href="#" className="govuk-link">
                   Download pdf files
@@ -243,7 +228,7 @@ const PublicationPageExclusions = () => {
             and special schools during the 2016/17 academic year as reported in
             the School Census. This release also includes school level
             exclusions figures for state-funded primary, secondary and special
-            schools and national level figures on permanent and fixed period
+            schools and national level figures on permanent and fixed-period
             exclusions from pupil referral units. All figures in this release
             are based on unrounded data; therefore, constituent parts may not
             add up due to rounding.
@@ -351,21 +336,21 @@ const PublicationPageExclusions = () => {
           </p>
         </AccordionSection>
 
-        <AccordionSection heading="Fixed period exclusions">
+        <AccordionSection heading="Fixed-period exclusions">
           <div className="govuk-inset-text">
             <h3 className="govuk-heading-s">
               Fixed-period exclusion rate definition
             </h3>{' '}
             <p className="govuk-body">
-              Fixed period exclusion refers to a pupil who is excluded from a
-              school for a set period of time. A fixed period exclusion can
+              Fixed-period exclusion refers to a pupil who is excluded from a
+              school for a set period of time. A fixed-period exclusion can
               involve a part of the school day and it does not have to be for a
               continuous period. A pupil may be excluded for one or more fixed
               periods up to a maximum of 45 school days in a single academic
               year. This total includes exclusions from previous schools covered
               by the exclusion legislation. A pupil may receive more than one
-              fixed period exclusion, so pupils with repeat exclusions can
-              inflate fixed period exclusion rates.
+              fixed-period exclusion, so pupils with repeat exclusions can
+              inflate fixed-period exclusion rates.
             </p>
           </div>
           <PrototypeDataSample
@@ -408,48 +393,48 @@ const PublicationPageExclusions = () => {
             chartDataKeys={['primary', 'secondary', 'primary and secondary']}
           />
           <p>
-            The number of fixed period exclusions across all state-funded
+            The number of fixed-period exclusions across all state-funded
             primary, secondary and special schools has increased from 339,360 in
             2015/16 to 381,865 in 2016/17. This corresponds to around 2,010
-            fixed period exclusions per day1 in 2016/17, up from an average of
+            fixed-period exclusions per day1 in 2016/17, up from an average of
             1,786 per day in 2015/16.
           </p>
           <p>
-            There were increases in the number and rate of fixed period
+            There were increases in the number and rate of fixed-period
             exclusions for state-funded primary and secondary schools and
             special schools:
           </p>
           <ul className="govuk-list-bullet">
             <li>
-              in state-funded primary schools, the number of fixed period
+              in state-funded primary schools, the number of fixed-period
               exclusions increased from 55,740 in 2015/16 to 64,340 in 2016/17,
-              whilst the rate of fixed period exclusions increased from 1.21 per
+              whilst the rate of fixed-period exclusions increased from 1.21 per
               cent to 1.37 per cent
             </li>
             <li>
-              in state-funded secondary schools, the number of fixed period
+              in state-funded secondary schools, the number of fixed-period
               exclusions increased from 270,135 in 2015/16 to 302,890 in
               2016/17, which corresponded to an increase in the rate of fixed
               period exclusions from 8.46 per cent to 9.4 per cent
             </li>
             <li>
-              in special schools, the number of fixed period exclusions
+              in special schools, the number of fixed-period exclusions
               increased in special schools from 13,485 in 2015/16 to 14,635 in
-              2016/17, an increase in the rate of fixed period exclusions from
+              2016/17, an increase in the rate of fixed-period exclusions from
               12.53 per cent to 13.03 per cent
             </li>
           </ul>
         </AccordionSection>
 
-        <AccordionSection heading="Number and length of fixed period exclusions">
+        <AccordionSection heading="Number and length of fixed-period exclusions">
           <div className="govuk-inset-text">
             <h3 className="govuk-heading-s">
-              Enrolments with one or more fixed period exclusion definition
+              Enrolments with one or more fixed-period exclusion definition
             </h3>{' '}
             <p>
-              Pupils with one or more fixed period exclusion refer to pupil
-              enrolments that had at least one fixed period exclusion across the
-              full academic year. It includes those with repeated fixed period
+              Pupils with one or more fixed-period exclusion refer to pupil
+              enrolments that had at least one fixed-period exclusion across the
+              full academic year. It includes those with repeated fixed-period
               exclusions.
             </p>
           </div>
@@ -460,21 +445,21 @@ const PublicationPageExclusions = () => {
             per cent, in 2015/16.
           </p>
           <p>
-            Of those pupils with at least one fixed period exclusion, 59.1 per
+            Of those pupils with at least one fixed-period exclusion, 59.1 per
             cent were excluded only on one occasion, and 1.5 per cent received
-            10 or more fixed period exclusions during the year. The percentage
-            of pupils with at least one fixed period exclusion that went on to
+            10 or more fixed-period exclusions during the year. The percentage
+            of pupils with at least one fixed-period exclusion that went on to
             receive a permanent one was 3.5 per cent.
           </p>
           <p>
-            The average length of fixed period exclusions across state-funded
+            The average length of fixed-period exclusions across state-funded
             primary, secondary and special schools in 2016/17 was 2.1 days,
             slightly shorter than in 2015/16.
           </p>
           <p>
-            The highest proportion of fixed period exclusions (46.6 per cent)
-            lasted for only one day. Only 2.0 per cent of fixed period
-            exclusions lasted for longer than one week and longer fixed period
+            The highest proportion of fixed-period exclusions (46.6 per cent)
+            lasted for only one day. Only 2.0 per cent of fixed-period
+            exclusions lasted for longer than one week and longer fixed-period
             exclusions were more prevalent in secondary schools.
           </p>
         </AccordionSection>
@@ -487,7 +472,7 @@ const PublicationPageExclusions = () => {
             per 10,000 pupils. However, in special schools alone, the most
             common reason for exclusion was physical assault against and adult,
             which made up 37.8 per cent of all permanent exclusions and 28.1 per
-            cent of all fixed period exclusions.
+            cent of all fixed-period exclusions.
           </p>
           <p>
             All reasons except bullying and theft saw an increase in permanent
@@ -497,14 +482,14 @@ const PublicationPageExclusions = () => {
           </p>
           <p>
             Persistent disruptive behaviour is also the most common reason for
-            fixed period exclusions. The 108,640 fixed period exclusions for
+            fixed-period exclusions. The 108,640 fixed-period exclusions for
             persistent disruptive behaviour in state-funded primary, secondary
-            and special schools made up 28.4 per cent of all fixed period
+            and special schools made up 28.4 per cent of all fixed-period
             exclusions, up from 27.7 per cent in 2015/16. This is equivalent to
-            around 135 fixed period exclusions per 10,000 pupils.
+            around 135 fixed-period exclusions per 10,000 pupils.
           </p>
           <p>
-            All reasons saw an increase in fixed period exclusions since last
+            All reasons saw an increase in fixed-period exclusions since last
             year. Persistent disruptive behaviour and other reasons saw the
             biggest increases.
           </p>
@@ -521,19 +506,19 @@ const PublicationPageExclusions = () => {
           <strong>Age, national curriculum year group and gender</strong>
           <ul className="govuk-list-bullet">
             <li>
-              Over half of all permanent (57.2 per cent) and fixed period (52.6
+              Over half of all permanent (57.2 per cent) and fixed-period (52.6
               per cent) exclusions occur in national curriculum year 9 or above.
             </li>
             <li>
               A quarter (25.0 per cent) of all permanent exclusions were for
               pupils aged 14, and pupils of this age group also had the highest
-              rate of fixed period exclusion, and the highest rate of pupils
-              receiving one or more fixed period exclusion.
+              rate of fixed-period exclusion, and the highest rate of pupils
+              receiving one or more fixed-period exclusion.
             </li>
             <li>
               The permanent exclusion rate for boys (0.15 per cent) was over
               three times higher than that for girls (0.04 per cent) and the
-              fixed period exclusion rate was almost three times higher (6.91
+              fixed-period exclusion rate was almost three times higher (6.91
               compared with 2.53 per cent).
             </li>
           </ul>
@@ -549,13 +534,13 @@ const PublicationPageExclusions = () => {
             <li>
               Pupils known to be eligible for and claiming free school meals
               (FSM) accounted for 40.0 per cent of all permanent exclusions and
-              36.7 per cent of all fixed period exclusions. Special educational
+              36.7 per cent of all fixed-period exclusions. Special educational
               need (SEN)
             </li>
             <li>
               Pupils with identified special educational needs (SEN) accounted
               for around half of all permanent exclusions (46.7 per cent) and
-              fixed period exclusions (44.9 per cent).
+              fixed-period exclusions (44.9 per cent).
             </li>
             <li>
               Pupils with SEN support had the highest permanent exclusion rate
@@ -564,7 +549,7 @@ const PublicationPageExclusions = () => {
             </li>
             <li>
               Pupils with an Education, Health and Care (EHC) plan or with a
-              statement of SEN had the highest fixed period exclusion rate at
+              statement of SEN had the highest fixed-period exclusion rate at
               15.93 per cent - over five times higher than pupils with no SEN
               (3.06 per cent).
             </li>
@@ -573,7 +558,7 @@ const PublicationPageExclusions = () => {
           <ul className="govuk-list-bullet">
             <li>
               Pupils of Gypsy/Roma and Traveller of Irish Heritage ethnic groups
-              had the highest rates of both permanent and fixed period
+              had the highest rates of both permanent and fixed-period
               exclusions, but as the population is relatively small these
               figures should be treated with some caution.
             </li>
@@ -581,7 +566,7 @@ const PublicationPageExclusions = () => {
               Black Caribbean pupils had a permanent exclusion rate nearly three
               times higher (0.28 per cent) than the school population as a whole
               (0.10 per cent). Pupils of Asian ethnic groups had the lowest
-              rates of permanent and fixed period exclusion.
+              rates of permanent and fixed-period exclusion.
             </li>
           </ul>
         </AccordionSection>
@@ -608,19 +593,19 @@ const PublicationPageExclusions = () => {
             The rate of permanent exclusion in pupil referral units decreased
             from 0.14 per cent in 2015/16 to 0.13 in 2016/17. After an increase
             from 2013/14 to 2014/15, permanent exclusions rates have remained
-            fairly steady. There were 25,815 fixed period exclusions in pupil
+            fairly steady. There were 25,815 fixed-period exclusions in pupil
             referral units in 2016/17, up from 23,400 in 2015/16. The fixed
             period exclusion rate has been steadily increasing since 2013/14.
           </p>
           <p>
             The percentage of pupil enrolments in pupil referral units who one
-            or more fixed period exclusion was 59.17 per cent in 2016/17, up
+            or more fixed-period exclusion was 59.17 per cent in 2016/17, up
             from 58.15 per cent in 2015/16.
           </p>
         </AccordionSection>
         <AccordionSection heading="Exclusions by local authority">
           <p>
-            There is considerable variation in the permanent and fixed period
+            There is considerable variation in the permanent and fixed-period
             exclusion rate at local authority level (see accompanying maps on
             the web page).
           </p>
@@ -632,7 +617,7 @@ const PublicationPageExclusions = () => {
             Yorkshire and the Humber (at 0.07 per cent).
           </p>
           <p>
-            The region with the highest fixed period exclusion rate is Yorkshire
+            The region with the highest fixed-period exclusion rate is Yorkshire
             and the Humber (at 7.22 per cent), whilst the lowest rate was seen
             in Outer London (3.49 per cent).
           </p>
