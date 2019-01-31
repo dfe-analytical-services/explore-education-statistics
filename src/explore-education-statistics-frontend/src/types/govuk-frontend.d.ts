@@ -7,6 +7,7 @@ declare module 'govuk-frontend' {
   export const Accordion = GovUkModule;
   export const Checkboxes = GovUkModule;
   export const Details = GovUkModule;
+  export const ErrorSummary = GovUkModule;
   export const Radios = GovUkModule;
   export const Tabs = GovUkModule;
 
@@ -22,6 +23,10 @@ declare module 'govuk-frontend/components/checkboxes/checkboxes' {
 }
 
 declare module 'govuk-frontend/components/details/details' {
+  export default GovUkModule;
+}
+
+declare module 'govuk-frontend/components/error-summary/error-summary' {
   export default GovUkModule;
 }
 

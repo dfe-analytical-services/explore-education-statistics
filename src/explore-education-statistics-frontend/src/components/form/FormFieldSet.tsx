@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import React, { FunctionComponent, ReactNode } from 'react';
 import ErrorMessage from '../ErrorMessage';
+import FormGroup from './FormGroup';
 import createDescribedBy from './util/createDescribedBy';
 
 export interface FieldSetProps {
@@ -22,32 +23,34 @@ const FormFieldSet: FunctionComponent<FieldSetProps> = ({
   legendSize = 'm',
 }) => {
   return (
-    <fieldset
-      className="govuk-fieldset"
-      aria-describedby={createDescribedBy({
-        id,
-        error: error !== undefined,
-        hint: hint !== undefined,
-      })}
-    >
-      {legend && (
-        <legend
-          className={classNames(
-            'govuk-fieldset__legend',
-            `govuk-fieldset__legend--${legendSize}`,
-          )}
-        >
-          {legend}
-        </legend>
-      )}
-      {hint && (
-        <span className="govuk-hint" id={`${id}-hint`}>
-          {hint}
-        </span>
-      )}
-      {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
-      {children}
-    </fieldset>
+    <FormGroup hasError={error !== undefined}>
+      <fieldset
+        className="govuk-fieldset"
+        aria-describedby={createDescribedBy({
+          id,
+          error: error !== undefined,
+          hint: hint !== undefined,
+        })}
+      >
+        {legend && (
+          <legend
+            className={classNames(
+              'govuk-fieldset__legend',
+              `govuk-fieldset__legend--${legendSize}`,
+            )}
+          >
+            {legend}
+          </legend>
+        )}
+        {hint && (
+          <span className="govuk-hint" id={`${id}-hint`}>
+            {hint}
+          </span>
+        )}
+        {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
+        {children}
+      </fieldset>
+    </FormGroup>
   );
 };
 
