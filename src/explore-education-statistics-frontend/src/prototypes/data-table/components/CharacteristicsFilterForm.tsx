@@ -65,7 +65,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
         label: string;
       }[];
     },
-    fieldKey: 'characteristics' | 'attributes',
+    fieldKey: keyof FormValues,
     values: string[],
   ) {
     const containSearchTerm = (value: string) =>
@@ -195,9 +195,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
           ...form
         }: FormikProps<FormValues>) => {
           const summaryErrors: ErrorSummaryMessage[] = Object.entries(errors)
-            .filter(([errorName]) => {
-              return (touched as { [key: string]: boolean })[errorName];
-            })
+            .filter(([errorName]) => touched[errorName as keyof FormValues])
             .map(([errorName, message]) => ({
               id: `${errorName}-filters`,
               message: typeof message === 'string' ? message : '',
@@ -210,14 +208,14 @@ class CharacteristicsFilterForm extends Component<Props, State> {
             });
           }
 
-          const getError = (value: keyof FormValues): string | undefined => {
+          const getError = (value: keyof FormValues): string => {
             if (!touched[value]) {
-              return;
+              return '';
             }
 
-            if (typeof errors[value] === 'string') {
-              return errors[value];
-            }
+            return typeof errors[value] === 'string'
+              ? (errors[value] as any)
+              : '';
           };
 
           return (
@@ -256,12 +254,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                     <FormFieldSet
                       id="characteristics-filters"
                       legend="Characteristics"
-                      error={
-                        touched.characteristics &&
-                        typeof errors.characteristics === 'string'
-                          ? errors.characteristics
-                          : undefined
-                      }
+                      error={getError('characteristics')}
                     >
                       {this.renderGroupedOptions(
                         publicationMeta.characteristics,
