@@ -2,99 +2,107 @@
 
 exports[`FormRadioGroup renders correctly with legend 1`] = `
 
-<fieldset class="govuk-fieldset">
-  <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-    Choose a radio
-  </legend>
-  <div class="govuk-radios">
-    <div class="govuk-radios__item">
-      <input class="govuk-radios__input"
-             id="radio-1"
-             name="test-radios"
-             type="radio"
-             value="1"
-      >
-      <label class="govuk-label govuk-radios__label"
-             for="radio-1"
-      >
-        Test radio 1
-      </label>
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset"
+            id="test-radios"
+  >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+      Choose a radio
+    </legend>
+    <div class="govuk-radios">
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input"
+               id="radio-1"
+               name="test-radios"
+               type="radio"
+               value="1"
+        >
+        <label class="govuk-label govuk-radios__label"
+               for="radio-1"
+        >
+          Test radio 1
+        </label>
+      </div>
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input"
+               id="radio-2"
+               name="test-radios"
+               type="radio"
+               value="2"
+        >
+        <label class="govuk-label govuk-radios__label"
+               for="radio-2"
+        >
+          Test radio 2
+        </label>
+      </div>
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input"
+               id="radio-3"
+               name="test-radios"
+               type="radio"
+               value="3"
+        >
+        <label class="govuk-label govuk-radios__label"
+               for="radio-3"
+        >
+          Test radio 3
+        </label>
+      </div>
     </div>
-    <div class="govuk-radios__item">
-      <input class="govuk-radios__input"
-             id="radio-2"
-             name="test-radios"
-             type="radio"
-             value="2"
-      >
-      <label class="govuk-label govuk-radios__label"
-             for="radio-2"
-      >
-        Test radio 2
-      </label>
-    </div>
-    <div class="govuk-radios__item">
-      <input class="govuk-radios__input"
-             id="radio-3"
-             name="test-radios"
-             type="radio"
-             value="3"
-      >
-      <label class="govuk-label govuk-radios__label"
-             for="radio-3"
-      >
-        Test radio 3
-      </label>
-    </div>
-  </div>
-</fieldset>
+  </fieldset>
+</div>
 
 `;
 
 exports[`FormRadioGroup renders list of radios in correct order 1`] = `
 
-<fieldset class="govuk-fieldset">
-  <div class="govuk-radios">
-    <div class="govuk-radios__item">
-      <input class="govuk-radios__input"
-             id="radio-1"
-             name="test-radios"
-             type="radio"
-             value="1"
-      >
-      <label class="govuk-label govuk-radios__label"
-             for="radio-1"
-      >
-        Test radio 1
-      </label>
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset"
+            id="test-radios"
+  >
+    <div class="govuk-radios">
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input"
+               id="radio-1"
+               name="test-radios"
+               type="radio"
+               value="1"
+        >
+        <label class="govuk-label govuk-radios__label"
+               for="radio-1"
+        >
+          Test radio 1
+        </label>
+      </div>
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input"
+               id="radio-2"
+               name="test-radios"
+               type="radio"
+               value="2"
+        >
+        <label class="govuk-label govuk-radios__label"
+               for="radio-2"
+        >
+          Test radio 2
+        </label>
+      </div>
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input"
+               id="radio-3"
+               name="test-radios"
+               type="radio"
+               value="3"
+        >
+        <label class="govuk-label govuk-radios__label"
+               for="radio-3"
+        >
+          Test radio 3
+        </label>
+      </div>
     </div>
-    <div class="govuk-radios__item">
-      <input class="govuk-radios__input"
-             id="radio-2"
-             name="test-radios"
-             type="radio"
-             value="2"
-      >
-      <label class="govuk-label govuk-radios__label"
-             for="radio-2"
-      >
-        Test radio 2
-      </label>
-    </div>
-    <div class="govuk-radios__item">
-      <input class="govuk-radios__input"
-             id="radio-3"
-             name="test-radios"
-             type="radio"
-             value="3"
-      >
-      <label class="govuk-label govuk-radios__label"
-             for="radio-3"
-      >
-        Test radio 3
-      </label>
-    </div>
-  </div>
-</fieldset>
+  </fieldset>
+</div>
 
 `;

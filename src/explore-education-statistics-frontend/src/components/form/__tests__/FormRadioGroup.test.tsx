@@ -8,6 +8,7 @@ describe('FormRadioGroup', () => {
     const { container, getAllByLabelText } = render(
       <FormRadioGroup
         checkedValue={null}
+        id="test-radios"
         name="test-radios"
         options={[
           { id: 'radio-1', label: 'Test radio 1', value: '1' },
@@ -44,6 +45,7 @@ describe('FormRadioGroup', () => {
           <FormRadioGroup
             checkedValue={this.state.value}
             onChange={this.handleChange}
+            id="test-radios"
             name="test-radios"
             options={[{ id: 'radio-1', label: 'Test radio', value: '1' }]}
           />
@@ -79,6 +81,7 @@ describe('FormRadioGroup', () => {
           <FormRadioGroup
             checkedValue={this.state.value}
             onChange={this.handleChange}
+            id="test-radios"
             name="test-radios"
             options={[
               { id: 'radio-1', label: 'Test radio 1', value: '1' },
@@ -110,6 +113,7 @@ describe('FormRadioGroup', () => {
       <FormRadioGroup
         checkedValue={null}
         legend="Choose a radio"
+        id="test-radios"
         name="test-radios"
         options={[
           { id: 'radio-1', label: 'Test radio 1', value: '1' },

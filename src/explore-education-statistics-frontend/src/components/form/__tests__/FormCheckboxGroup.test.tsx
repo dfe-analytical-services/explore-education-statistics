@@ -30,6 +30,7 @@ describe('FormCheckboxGroup', () => {
   test('renders list of checkboxes in correct order', () => {
     const { container, getAllByLabelText } = render(
       <FormCheckboxGroup
+        id="test-checkboxes"
         name="test-checkboxes"
         options={[
           { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
@@ -57,6 +58,7 @@ describe('FormCheckboxGroup', () => {
           2: true,
           3: false,
         }}
+        id="test-checkboxes"
         name="test-checkboxes"
         options={[
           { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
@@ -89,6 +91,7 @@ describe('FormCheckboxGroup', () => {
             checkedValues={state}
             onChange={handleChange}
             options={[{ id: 'checkbox-1', label: 'Test checkbox', value: '1' }]}
+            id="test-checkboxes"
             name="test-checkboxes"
           />
         )}
@@ -112,6 +115,7 @@ describe('FormCheckboxGroup', () => {
             checkedValues={state}
             onChange={handleChange}
             options={[{ id: 'checkbox-1', label: 'Test checkbox', value: '1' }]}
+            id="test-checkboxes"
             name="test-checkboxes"
           />
         )}
@@ -133,6 +137,7 @@ describe('FormCheckboxGroup', () => {
         {(state, handleChange) => (
           <FormCheckboxGroup
             checkedValues={state}
+            id="test-checkboxes"
             name="test-checkboxes"
             onChange={handleChange}
             options={[
@@ -165,6 +170,7 @@ describe('FormCheckboxGroup', () => {
     const { container, getByText } = render(
       <FormCheckboxGroup
         legend="Choose some checkboxes"
+        id="test-checkboxes"
         name="test-checkboxes"
         options={[
           { id: 'radio-1', label: 'Test radio 1', value: '1' },
@@ -184,6 +190,7 @@ describe('FormCheckboxGroup', () => {
     const { container, getByLabelText } = render(
       <FormCheckboxGroup
         checkedValues={{}}
+        id="test-checkboxes"
         name="test-checkboxes"
         onAllChange={noop}
         options={[
@@ -212,6 +219,7 @@ describe('FormCheckboxGroup', () => {
         {(state, handleChange) => (
           <FormCheckboxGroup
             checkedValues={state}
+            id="test-checkboxes"
             name="test-checkboxes"
             onAllChange={noop}
             onChange={handleChange}
@@ -251,6 +259,7 @@ describe('FormCheckboxGroup', () => {
         {(state, handleChange) => (
           <FormCheckboxGroup
             checkedValues={state}
+            id="test-checkboxes"
             name="test-checkboxes"
             onAllChange={noop}
             onChange={handleChange}

@@ -39,7 +39,7 @@ const PublicationPage = () => {
             <a href="#contents-sections-heading-9">local authorities section</a>
           </p>
 
-          <Details summary="Read more">
+          <Details summary="Read more about our methodology">
             <p>
               To help you analyse and understand the statistics the following
               sections include:
@@ -52,23 +52,8 @@ const PublicationPage = () => {
               </Link>
             </div>
           </Details>
-          <Details summary="Download data files">
+          <Details summary="Download underlying data files">
             <ul className="govuk-list">
-              <li>
-                <a href="#" className="govuk-link">
-                  View by graphs and charts
-                </a>
-              </li>
-              <li>
-                <a href="#" className="govuk-link">
-                  View by tables and numbers
-                </a>
-              </li>
-              <li>
-                <a href="#" className="govuk-link">
-                  Create your own tables and charts
-                </a>
-              </li>
               <li>
                 <a href="#" className="govuk-link">
                   Download pdf files
@@ -342,7 +327,7 @@ const PublicationPage = () => {
         </AccordionSection>
 
         <AccordionSection heading="Persistent absence">
-          <Details summary="absence definition">
+          <Details summary="Persistent absence definition">
             <p>
               A pupil enrolment is identified as a persistent absentee if they
               miss 10% or more of their possible sessions
@@ -637,7 +622,7 @@ const PublicationPage = () => {
             <div className="govuk-grid-column-one-third">
               <span className="govuk-caption-m">Selected local authority</span>
               <h3 className="govuk-heading-m">Sheffield</h3>
-              <div className="dfe-dash-tiles__tile">
+              <div className="dfe-dash-tiles__tile govuk-!-margin-bottom-6">
                 <h3 className="govuk-heading-m dfe-dash-tiles__heading">
                   Overall absence
                 </h3>
@@ -645,18 +630,34 @@ const PublicationPage = () => {
                   <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
                     4.7%
                   </span>
-                  <p className="govuk-body dfe-dash-tiles__tile--hidden">
-                    <strong className="increase">
-                      +0.4
-                      <abbr
-                        aria-label="Percentage points"
-                        title="Percentage points"
-                      >
-                        ppt
-                      </abbr>
-                    </strong>
-                    more than 2015/16
-                  </p>
+                </div>
+                <Details summary="What does this mean?">
+                  Overall absence is the adipisicing elit. Dolorum hic nobis
+                  voluptas quidem fugiat enim ipsa reprehenderit nulla.
+                </Details>
+              </div>
+              <div className="dfe-dash-tiles__tile govuk-!-margin-bottom-6">
+                <h3 className="govuk-heading-m dfe-dash-tiles__heading">
+                  Authorised absence
+                </h3>
+                <div>
+                  <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
+                    3.2%
+                  </span>
+                </div>
+                <Details summary="What does this mean?">
+                  Overall absence is the adipisicing elit. Dolorum hic nobis
+                  voluptas quidem fugiat enim ipsa reprehenderit nulla.
+                </Details>
+              </div>
+              <div className="dfe-dash-tiles__tile govuk-!-margin-bottom-6">
+                <h3 className="govuk-heading-m dfe-dash-tiles__heading">
+                  Unauthorised absence
+                </h3>
+                <div>
+                  <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
+                    1.5%
+                  </span>
                 </div>
                 <Details summary="What does this mean?">
                   Overall absence is the adipisicing elit. Dolorum hic nobis
@@ -733,6 +734,38 @@ const PublicationPage = () => {
               </a>
             </li>
           </ul>
+        </AccordionSection>
+        <AccordionSection heading="Contact us" headingTag="h3">
+          <h4 className="govuk-heading-">Media enquiries</h4>
+          <address className="govuk-body dfe-font-style-normal">
+            Press Office News Desk
+            <br />
+            Department for Education <br />
+            Sanctuary Buildings <br />
+            Great Smith Street <br />
+            London
+            <br />
+            SW1P 3BT <br />
+            Telephone: 020 7783 8300
+          </address>
+
+          <h4 className="govuk-heading-">Other enquiries</h4>
+          <address className="govuk-body dfe-font-style-normal">
+            Data Insight and Statistics Division
+            <br />
+            Level 1<br />
+            Department for Education
+            <br />
+            Sanctuary Buildings <br />
+            Great Smith Street
+            <br />
+            London
+            <br />
+            SW1P 3BT <br />
+            Telephone: 020 7783 8300
+            <br />
+            Email: <a href="#">Schools.statistics@education.gov.uk</a>
+          </address>
         </AccordionSection>
       </Accordion>
 

@@ -112,6 +112,7 @@ class PrototypeDataTableV1VerticalLayout extends Component<{}, State> {
                     <FormRadioGroup
                       checkedValue={this.state.dataToggle}
                       inline
+                      id="dataToggle"
                       name="dataToggle"
                       legend="What do you want to see?"
                       legendSize="s"

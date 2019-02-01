@@ -5,6 +5,7 @@ interface Props {
   children: ReactNode;
   className?: string;
   disabled?: boolean;
+  id?: string;
   onClick?: MouseEventHandler;
   type?: 'button' | 'submit' | 'reset';
 }
@@ -12,6 +13,7 @@ interface Props {
 const Button = ({
   children,
   className,
+  id,
   onClick,
   disabled = false,
   type = 'button',
@@ -29,6 +31,7 @@ const Button = ({
       aria-disabled={disabled}
       className={classes}
       disabled={disabled}
+      id={id}
       onClick={onClick}
       type={type}
     >

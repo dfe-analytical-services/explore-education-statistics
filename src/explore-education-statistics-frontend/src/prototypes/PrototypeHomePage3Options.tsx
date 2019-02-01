@@ -28,15 +28,6 @@ const HomePage = () => {
             and data.
           </p>
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="/prototypes/browse-releases-download">
-              Download data files
-            </Link>
-          </h2>
-          <p className="govuk-caption-m govuk-!-margin-top-2">
-            Browse to find and download the data files behind our range of
-            national and regional statistics for your own analysis.
-          </p>
-          <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
             <Link to="/prototypes/data-table-v3">
               Create your own charts and tables online
             </Link>
@@ -44,6 +35,15 @@ const HomePage = () => {
           <p className="govuk-caption-m govuk-!-margin-top-2">
             Use our tool to build charts and tables using our range of national
             and regional statistics and data.
+          </p>
+          <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
+            <Link to="/prototypes/browse-releases-download">
+              Download data files
+            </Link>
+          </h2>
+          <p className="govuk-caption-m govuk-!-margin-top-2">
+            Browse to find and download the data files behind our range of
+            national and regional statistics for your own analysis.
           </p>
         </div>
       </div>

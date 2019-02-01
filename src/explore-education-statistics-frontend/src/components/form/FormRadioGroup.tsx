@@ -17,7 +17,7 @@ type Props = {
   name: string;
   onChange?: RadioChangeEventHandler<any>;
   options: RadioOption[];
-} & Partial<FieldSetProps>;
+} & FieldSetProps;
 
 class FormRadioGroup extends Component<Props> {
   public static defaultProps = {

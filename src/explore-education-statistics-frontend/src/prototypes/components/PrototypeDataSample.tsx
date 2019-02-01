@@ -41,6 +41,9 @@ const PrototypeDataSample = ({
             </ul>
           </TabsSection>
         )}
+        <TabsSection id={`${sectionId}TableData`} title="Data tables">
+          <PrototypeTableSample caption={`Table showing ${chartTitle}`} />
+        </TabsSection>
         <TabsSection id={`${sectionId}ChartData`} title="Charts">
           <h2 className="govuk-heading-s">{`Chart showing ${chartTitle}`}</h2>
           <PrototypeChartSample
@@ -49,9 +52,6 @@ const PrototypeDataSample = ({
             chartData={chartData}
             chartDataKeys={chartDataKeys}
           />
-        </TabsSection>
-        <TabsSection id={`${sectionId}TableData`} title="Data tables">
-          <PrototypeTableSample caption={`Table showing ${chartTitle}`} />
         </TabsSection>
         <TabsSection id={`${sectionId}Downloads`} title="Data downloads">
           <h2 className="govuk-heading-s">
