@@ -6,17 +6,31 @@ import styles from './PrototypeMap.module.scss';
 
 import { Boundaries } from './PrototypeMapBoundaries';
 
-import { Feature, FeatureCollection, GeoJsonObject } from 'geojson';
+import { FeatureCollection } from 'geojson';
+
 import { GeoJSON, Map } from 'react-leaflet';
 
 export interface PrototypeMapProps {
   OnFeatureSelect?: any;
+  map: (map: PrototypeMap) => void;
 }
 
 class PrototypeMap extends Component<PrototypeMapProps> {
+  private mapNode: any;
+
   public static defaultProps: Partial<PrototypeMapProps> = {
     OnFeatureSelect: undefined,
   };
+
+  constructor(props: PrototypeMapProps) {
+    super(props);
+
+    if (props.map) props.map(this);
+  }
+
+  public refresh() {
+    this.mapNode.leafletElement.invalidateSize();
+  }
 
   public render() {
     const { OnFeatureSelect } = this.props;
@@ -26,12 +40,8 @@ class PrototypeMap extends Component<PrototypeMapProps> {
       lng: -3.2524038,
     };
 
-    let mapNode: any;
-
-    const i = () => mapNode.leafletElement.invalidateSize();
-
     // force a refresh to fix a bug
-    requestAnimationFrame(i);
+    requestAnimationFrame(() => this.refresh());
 
     // @ts-ignore
     const onEachFeature = (f, layer) => {
@@ -48,7 +58,7 @@ class PrototypeMap extends Component<PrototypeMapProps> {
       if (e.sourceTarget.feature) {
         //  && props.onClickFeature) {
 
-        if (OnFeatureSelect) {
+        if (OnFeatureSelect && e.sourceTarget.feature.properties) {
           OnFeatureSelect(e.sourceTarget.feature.properties);
         }
       }
@@ -100,7 +110,7 @@ class PrototypeMap extends Component<PrototypeMapProps> {
     return (
       <div>
         <Map
-          ref={(n: any) => (mapNode = n)}
+          ref={(n: any) => (this.mapNode = n)}
           center={position}
           className={styles.map}
           zoom={6}

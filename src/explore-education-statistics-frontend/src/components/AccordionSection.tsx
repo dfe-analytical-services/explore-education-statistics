@@ -20,14 +20,13 @@ export interface AccordionSectionProps {
   id?: string;
   open?: boolean;
   goToTopLink: boolean;
-  onClick: MouseEventHandler;
+  onToggle: (open: boolean) => void;
 }
 
 class AccordionSection extends Component<AccordionSectionProps> {
   public static defaultProps: Partial<AccordionSectionProps> = {
     goToTopLink: true,
     headingTag: 'h2',
-    onClick: () => null,
     open: false,
   };
 
@@ -42,12 +41,18 @@ class AccordionSection extends Component<AccordionSectionProps> {
       headingTag,
       open,
       goToTopLink,
-      onClick,
+      onToggle,
     } = this.props;
 
     return (
       <div
-        onClick={e => onClick(e)}
+        onClick={e =>
+          onToggle(
+            e.currentTarget.classList.contains(
+              'govuk-accordion__section--expanded',
+            ),
+          )
+        }
         className={classNames('govuk-accordion__section', className, {
           'govuk-accordion__section--expanded': open,
         })}

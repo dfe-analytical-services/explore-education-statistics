@@ -5,9 +5,12 @@ import Details from '../components/Details';
 import Link from '../components/Link';
 import PrototypeAbsenceData from './components/PrototypeAbsenceData';
 import PrototypeDataSample from './components/PrototypeDataSample';
+import PrototypeMap from './components/PrototypeMap';
 import PrototypePage from './components/PrototypePage';
 
 const PublicationPage = () => {
+  let mapRef: PrototypeMap;
+
   return (
     <PrototypePage
       breadcrumbs={[
@@ -609,13 +612,20 @@ const PublicationPage = () => {
             was 73.9 per cent in 2016/17, compared to 72.5 per cent in 2015/16.
           </p>
         </AccordionSection>
-        <AccordionSection heading="Pupil absence by local authority">
+        <AccordionSection
+          heading="Pupil absence by local authority"
+          onToggle={isOpen => mapRef && mapRef.refresh()}
+        >
           <h3 className="govuk-heading-s">
             Select a region on the map below to show pupil absence figures by
             local authority
           </h3>
 
-          <PrototypeAbsenceData />
+          <PrototypeAbsenceData
+            map={m => {
+              mapRef = m;
+            }}
+          />
 
           <p>
             There is variation in overall and persistent absence rates across

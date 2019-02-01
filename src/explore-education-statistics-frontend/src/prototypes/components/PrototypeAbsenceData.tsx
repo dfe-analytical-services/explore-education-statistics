@@ -6,9 +6,20 @@ interface PrototypeAbsenceDataState {
   absenceData?: any;
 }
 
-class PrototypeAbsenceData extends Component<{}, PrototypeAbsenceDataState> {
-  constructor() {
-    super({});
+interface PrototypeAbsenceDataProps {
+  map: (map: PrototypeMap) => void;
+}
+
+class PrototypeAbsenceData extends Component<
+  PrototypeAbsenceDataProps,
+  PrototypeAbsenceDataState
+> {
+  private map: (map: PrototypeMap) => void;
+
+  constructor(props: PrototypeAbsenceDataProps) {
+    super(props);
+
+    this.map = props.map;
 
     this.state = {
       absenceData: undefined,
@@ -28,7 +39,10 @@ class PrototypeAbsenceData extends Component<{}, PrototypeAbsenceDataState> {
     return (
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <PrototypeMap OnFeatureSelect={this.OnFeatureSelect} />
+          <PrototypeMap
+            OnFeatureSelect={this.OnFeatureSelect}
+            map={m => this.map(m)}
+          />
         </div>
         {this.state.absenceData ? (
           <div className="govuk-grid-column-one-third">
