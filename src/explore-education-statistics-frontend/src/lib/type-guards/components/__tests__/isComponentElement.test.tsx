@@ -25,6 +25,7 @@ describe('isComponentElement', () => {
     expect(isComponentElement(123)).toBe(false);
     expect(isComponentElement(true)).toBe(false);
     expect(isComponentElement(null)).toBe(false);
+    expect(isComponentElement(undefined)).toBe(false);
     expect(isComponentElement([])).toBe(false);
     expect(isComponentElement({})).toBe(false);
   });
