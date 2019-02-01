@@ -32,3 +32,8 @@ declare module 'govuk-frontend/components/radios/radios' {
 declare module 'govuk-frontend/components/tabs/tabs' {
   export default GovUkModule;
 }
+
+declare module '*.json' {
+  const value: any;
+  export default value;
+}

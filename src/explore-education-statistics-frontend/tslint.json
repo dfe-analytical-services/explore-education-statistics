@@ -8,6 +8,11 @@
     "tslint-config-prettier"
   ],
   "jsRules": {},
+  "linterOptions": {
+    "exclude": [
+      "src/prototypes/components/PrototypeMapBoundaries.ts"
+      ]
+  },
   "rules": {
     "array-type": [true, "array"],
     "jsx-boolean-value": false,

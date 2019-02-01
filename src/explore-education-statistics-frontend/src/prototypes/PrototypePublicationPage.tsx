@@ -5,6 +5,7 @@ import Details from '../components/Details';
 import Link from '../components/Link';
 import mapImage from '../images/map_overall_absence_rates.png';
 import PrototypeDataSample from './components/PrototypeDataSample';
+import PrototypeMap from './components/PrototypeMap';
 import PrototypePage from './components/PrototypePage';
 
 const PublicationPage = () => {
@@ -631,11 +632,7 @@ const PublicationPage = () => {
           </h3>
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
-              <img
-                src={mapImage}
-                alt="Interactive map of England, showing pupil absence rate by local authority"
-                className="dfe-interactive-map"
-              />
+              <PrototypeMap />
             </div>
             <div className="govuk-grid-column-one-third">
               <span className="govuk-caption-m">Selected local authority</span>

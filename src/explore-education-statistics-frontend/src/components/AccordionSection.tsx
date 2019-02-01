@@ -1,5 +1,11 @@
 import classNames from 'classnames';
-import React, { Component, createElement, ReactNode } from 'react';
+import React, {
+  Component,
+  createElement,
+  MouseEventHandler,
+  ReactEventHandler,
+  ReactNode,
+} from 'react';
 
 export interface AccordionSectionProps {
   caption?: string;
@@ -14,6 +20,7 @@ export interface AccordionSectionProps {
   id?: string;
   open?: boolean;
   goToTopLink: boolean;
+  onClick: MouseEventHandler;
 }
 
 class AccordionSection extends Component<AccordionSectionProps> {
@@ -34,10 +41,12 @@ class AccordionSection extends Component<AccordionSectionProps> {
       headingTag,
       open,
       goToTopLink,
+      onClick,
     } = this.props;
 
     return (
       <div
+        onClick={e => onClick(e)}
         className={classNames('govuk-accordion__section', className, {
           'govuk-accordion__section--expanded': open,
         })}
