@@ -27,6 +27,7 @@ class AccordionSection extends Component<AccordionSectionProps> {
   public static defaultProps: Partial<AccordionSectionProps> = {
     goToTopLink: true,
     headingTag: 'h2',
+    onClick: () => null,
     open: false,
   };
 

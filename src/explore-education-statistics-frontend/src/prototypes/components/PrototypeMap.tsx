@@ -32,6 +32,20 @@ const PrototypeMap = ({}) => {
     });
   };
 
+  /**
+   * lad17cd - code
+   * lad17nm - name
+   */
+  const data = {
+    ...Boundaries,
+    features: Boundaries.features.filter(g => {
+      return g.properties !== null && g.properties.lad17cd[0] === 'E';
+    }),
+  } as FeatureCollection;
+
+  // @ts-ignore
+  // console.log(data);
+
   return (
     <div>
       <Map
@@ -40,7 +54,7 @@ const PrototypeMap = ({}) => {
         className={styles.map}
         zoom={6}
       >
-        <GeoJSON data={Boundaries} onEachFeature={onEachFeature} />
+        <GeoJSON data={data} onEachFeature={onEachFeature} />
       </Map>
     </div>
   );
