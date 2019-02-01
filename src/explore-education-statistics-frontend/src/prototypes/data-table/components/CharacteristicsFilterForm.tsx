@@ -29,10 +29,12 @@ interface FormValues {
   characteristics: string[];
 }
 
-export type CharacteristicsFilterFormSubmitHandler = (values: {
-  attributes: string[];
-  characteristics: string[];
-}) => void;
+export type CharacteristicsFilterFormSubmitHandler = (
+  values: {
+    attributes: string[];
+    characteristics: string[];
+  },
+) => void;
 
 interface Props {
   publicationMeta: Pick<PublicationMeta, 'attributes' | 'characteristics'>;
@@ -238,9 +240,36 @@ class CharacteristicsFilterForm extends Component<Props, State> {
 
               <Form>
                 <FormGroup>
+                  <div className="govuk-grid-row">
+                    <div className="govuk-grid-column-one-half">
+                      <FormFieldSet
+                        id="attributes-filters"
+                        legend="Attributes"
+                        hint="Choose at least one statistical attribute from the publication"
+                        error={getError('attributes')}
+                      >
+                        {this.renderGroupedOptions('attributes', values)}
+                      </FormFieldSet>
+                    </div>
+                    <div className="govuk-grid-column-one-half">
+                      <FormFieldSet
+                        id="characteristics-filters"
+                        legend="Characteristics"
+                        hint="Choose at least one pupil characteristic from the publication"
+                        error={getError('characteristics')}
+                      >
+                        {this.renderGroupedOptions('characteristics', values)}
+                      </FormFieldSet>
+                    </div>
+                  </div>
+                </FormGroup>
+
+                <FormGroup>
+                  <h3>Can't find what you're looking for?</h3>
+
                   <FormTextInput
                     id="characteristic-search"
-                    label="Search for a characteristic or attribute"
+                    label="Search for an attribute or characteristic"
                     name="characteristicSearch"
                     onChange={event => {
                       event.persist();
@@ -249,27 +278,6 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                     width={20}
                   />
                 </FormGroup>
-
-                <div className="govuk-grid-row">
-                  <div className="govuk-grid-column-one-half">
-                    <FormFieldSet
-                      id="attributes-filters"
-                      legend="Attributes"
-                      error={getError('attributes')}
-                    >
-                      {this.renderGroupedOptions('attributes', values)}
-                    </FormFieldSet>
-                  </div>
-                  <div className="govuk-grid-column-one-half">
-                    <FormFieldSet
-                      id="characteristics-filters"
-                      legend="Characteristics"
-                      error={getError('characteristics')}
-                    >
-                      {this.renderGroupedOptions('characteristics', values)}
-                    </FormFieldSet>
-                  </div>
-                </div>
 
                 <Button
                   disabled={form.isSubmitting}
