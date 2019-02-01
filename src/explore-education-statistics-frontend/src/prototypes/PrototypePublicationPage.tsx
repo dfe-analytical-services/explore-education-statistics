@@ -3,9 +3,8 @@ import Accordion from '../components/Accordion';
 import AccordionSection from '../components/AccordionSection';
 import Details from '../components/Details';
 import Link from '../components/Link';
-import mapImage from '../images/map_overall_absence_rates.png';
+import PrototypeAbsenceData from './components/PrototypeAbsenceData';
 import PrototypeDataSample from './components/PrototypeDataSample';
-import PrototypeMap from './components/PrototypeMap';
 import PrototypePage from './components/PrototypePage';
 
 const PublicationPage = () => {
@@ -615,57 +614,8 @@ const PublicationPage = () => {
             Select a region on the map below to show pupil absence figures by
             local authority
           </h3>
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-two-thirds">
-              <PrototypeMap />
-            </div>
-            <div className="govuk-grid-column-one-third">
-              <span className="govuk-caption-m">Selected local authority</span>
-              <h3 className="govuk-heading-m">Sheffield</h3>
-              <div className="dfe-dash-tiles__tile govuk-!-margin-bottom-6">
-                <h3 className="govuk-heading-m dfe-dash-tiles__heading">
-                  Overall absence
-                </h3>
-                <div>
-                  <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
-                    4.7%
-                  </span>
-                </div>
-                <Details summary="What does this mean?">
-                  Overall absence is the adipisicing elit. Dolorum hic nobis
-                  voluptas quidem fugiat enim ipsa reprehenderit nulla.
-                </Details>
-              </div>
-              <div className="dfe-dash-tiles__tile govuk-!-margin-bottom-6">
-                <h3 className="govuk-heading-m dfe-dash-tiles__heading">
-                  Authorised absence
-                </h3>
-                <div>
-                  <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
-                    3.2%
-                  </span>
-                </div>
-                <Details summary="What does this mean?">
-                  Overall absence is the adipisicing elit. Dolorum hic nobis
-                  voluptas quidem fugiat enim ipsa reprehenderit nulla.
-                </Details>
-              </div>
-              <div className="dfe-dash-tiles__tile govuk-!-margin-bottom-6">
-                <h3 className="govuk-heading-m dfe-dash-tiles__heading">
-                  Unauthorised absence
-                </h3>
-                <div>
-                  <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
-                    1.5%
-                  </span>
-                </div>
-                <Details summary="What does this mean?">
-                  Overall absence is the adipisicing elit. Dolorum hic nobis
-                  voluptas quidem fugiat enim ipsa reprehenderit nulla.
-                </Details>
-              </div>
-            </div>
-          </div>
+
+          <PrototypeAbsenceData />
 
           <p>
             There is variation in overall and persistent absence rates across

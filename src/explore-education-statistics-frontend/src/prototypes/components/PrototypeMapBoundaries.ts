@@ -43708,5 +43708,17 @@ export const Boundaries: FeatureCollection = {
         ],
       },
     },
-  ],
+  ].map(g => {
+    const authorised = 3.2 + Math.random() * 3,
+      unauthorised = 1.5 + Math.random();
+
+    // @ts-ignore
+    g.properties.absence = {
+      authorised: authorised.toFixed(1),
+      overall: (authorised + unauthorised).toFixed(1),
+      unauthorised: unauthorised.toFixed(1),
+    };
+
+    return g;
+  }),
 };

@@ -1,4 +1,28 @@
 .map {
+  background-color: #fff;
+
   height: 865px;
   width: 630px;
+
+  path {
+    fill: #cfdce3;
+    stroke: #081b26;
+    stroke-width: 1px;
+  }
+
+  .rate0 {
+    fill: #cfdce3;
+  }
+  .rate1 {
+    fill: #9fb9c8;
+  }
+  .rate2 {
+    fill: #7095ac;
+  }
+  .rate3 {
+    fill: #407291;
+  }
+  .rate4 {
+    fill: #104f75;
+  }
 }
