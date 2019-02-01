@@ -8,7 +8,7 @@ export interface FieldSetProps {
   error?: string;
   hint?: string;
   id: string;
-  legend?: string | ReactNode;
+  legend?: ReactNode | string;
   legendSize?: 'xl' | 'l' | 'm' | 's';
 }
 
@@ -21,14 +21,14 @@ const FormFieldSet: FunctionComponent<FieldSetProps> = ({
   legendSize = 'm',
 }) => {
   return (
-    <FormGroup hasError={error !== undefined}>
+    <FormGroup hasError={!!error}>
       <fieldset
         className="govuk-fieldset"
         id={id}
         aria-describedby={createDescribedBy({
           id,
-          error: error !== undefined,
-          hint: hint !== undefined,
+          error: !!error,
+          hint: !!hint,
         })}
       >
         {legend && (

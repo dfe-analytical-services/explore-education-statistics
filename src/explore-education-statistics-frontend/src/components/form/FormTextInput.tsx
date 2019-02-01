@@ -4,8 +4,8 @@ import ErrorMessage from '../ErrorMessage';
 import createDescribedBy from './util/createDescribedBy';
 
 interface Props {
-  error?: string;
-  hint?: ReactNode | string;
+  error?: ReactNode | string;
+  hint?: string;
   id: string;
   label: ReactNode | string;
   name: string;
@@ -37,8 +37,8 @@ class FormTextInput extends Component<Props> {
         <input
           aria-describedby={createDescribedBy({
             id,
-            error: error !== undefined,
-            hint: hint !== undefined,
+            error: !!error,
+            hint: !!hint,
           })}
           type="text"
           className={classNames('govuk-input', {

@@ -1,10 +1,10 @@
 import { ComponentElement, ComponentType, ReactElement } from 'react';
 
 export default function isComponentType<P>(
-  value: any,
+  value: unknown,
   componentType: ComponentType<P>,
 ): value is ComponentElement<P, any> {
-  if (value === null) {
+  if (!value) {
     return false;
   }
 
