@@ -2,6 +2,7 @@ import React from 'react';
 import Accordion from '../components/Accordion';
 import AccordionSection from '../components/AccordionSection';
 import Details from '../components/Details';
+import GoToTopLink from '../components/GoToTopLink';
 import Link from '../components/Link';
 import PrototypeAbsenceData from './components/PrototypeAbsenceData';
 import PrototypeDataSample from './components/PrototypeDataSample';
@@ -740,8 +741,8 @@ const PublicationPage = () => {
       <Link to="/prototypes/data-table-v3" className="govuk-button">
         Explore pupil absence statistics
       </Link>
-      <br />
-      <a href="#application">Go to Top</a>
+
+      <GoToTopLink />
     </PrototypePage>
   );
 };

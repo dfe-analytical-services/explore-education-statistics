@@ -5,6 +5,7 @@ import Details from '../components/Details';
 import Link from '../components/Link';
 import PrototypeDataSample from './components/PrototypeDataSampleExclusions';
 import PrototypePage from './components/PrototypePage';
+import GoToTopLink from './PrototypePublicationPage';
 
 const PublicationPageExclusions = () => {
   return (
@@ -721,7 +722,7 @@ const PublicationPageExclusions = () => {
         Explore pupil absence statistics
       </Link>
       <br />
-      <a href="#application">Go to Top</a>
+      <GoToTopLink />
     </PrototypePage>
   );
 };
