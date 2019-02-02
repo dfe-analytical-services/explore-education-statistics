@@ -1,4 +1,3 @@
-console.log('swag');
 if (typeof Promise === 'undefined') {
   require('core-js/es6/promise');
 }
