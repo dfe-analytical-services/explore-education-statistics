@@ -22,10 +22,14 @@ const PageFooter = ({ wide }: Props) => (
                 Cookies
               </Link>
             </li>
-
             <li className="govuk-footer__inline-list-item">
               <Link className="govuk-footer__link" to="/privacy-policy/">
                 Privacy policy
+              </Link>
+            </li>
+            <li className="govuk-footer__inline-list-item">
+              <Link className="govuk-footer__link" to="/prototypes/">
+                Prototypes
               </Link>
             </li>
           </ul>
