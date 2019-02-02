@@ -1,4 +1,11 @@
-import { FieldArray, Form, Formik, FormikProps } from 'formik';
+import {
+  FieldArray,
+  Form,
+  Formik,
+  FormikErrors,
+  FormikProps,
+  FormikTouched,
+} from 'formik';
 import debounce from 'lodash/debounce';
 import difference from 'lodash/difference';
 import sortBy from 'lodash/sortBy';
@@ -58,17 +65,35 @@ class CharacteristicsFilterForm extends Component<Props, State> {
     300,
   );
 
-  private renderGroupedOptions(
-    groupData: {
-      [group: string]: {
-        name: string;
-        label: string;
-      }[];
-    },
-    fieldKey: keyof FormValues,
-    values: string[],
+  private getSummaryErrors(
+    errors: FormikErrors<FormValues>,
+    touched: FormikTouched<FormValues>,
+    submitError: string,
   ) {
-    const containSearchTerm = (value: string) =>
+    const summaryErrors: ErrorSummaryMessage[] = Object.entries(errors)
+      .filter(([errorName]) => touched[errorName as keyof FormValues])
+      .map(([errorName, message]) => ({
+        id: `${errorName}-filters`,
+        message: typeof message === 'string' ? message : '',
+      }));
+
+    if (submitError) {
+      summaryErrors.push({
+        id: 'submit-button',
+        message: 'Could not submit filters. Please try again later.',
+      });
+    }
+    return summaryErrors;
+  }
+
+  private renderGroupedOptions(
+    formKey: keyof FormValues,
+    formValues: FormValues,
+  ) {
+    const groupData = this.props.publicationMeta[formKey];
+    const values = formValues[formKey];
+
+    const containsSearchTerm = (value: string) =>
       value.search(new RegExp(this.state.searchTerm, 'i')) > -1;
 
     const groups = Object.entries(groupData)
@@ -77,13 +102,13 @@ class CharacteristicsFilterForm extends Component<Props, State> {
           this.state.searchTerm === '' ||
           groupData[groupKey].some(
             item =>
-              containSearchTerm(item.label) || values.indexOf(item.name) > -1,
+              containsSearchTerm(item.label) || values.indexOf(item.name) > -1,
           ),
       )
       .map(([groupKey, items]) => {
         const isMenuOpen = groupData[groupKey].some(
           item =>
-            (this.state.searchTerm !== '' && containSearchTerm(item.label)) ||
+            (this.state.searchTerm !== '' && containsSearchTerm(item.label)) ||
             values.indexOf(item.name) > -1,
         );
 
@@ -92,16 +117,14 @@ class CharacteristicsFilterForm extends Component<Props, State> {
             .filter(
               item =>
                 this.state.searchTerm === '' ||
-                containSearchTerm(item.label) ||
+                containsSearchTerm(item.label) ||
                 values.indexOf(item.name) > -1,
             )
-            .map(item => {
-              return {
-                id: item.name,
-                label: item.label,
-                value: item.name,
-              };
-            }),
+            .map(item => ({
+              id: item.name,
+              label: item.label,
+              value: item.name,
+            })),
           ['label'],
         );
 
@@ -114,36 +137,41 @@ class CharacteristicsFilterForm extends Component<Props, State> {
 
         return (
           <MenuDetails summary={groupKey} key={groupKey} open={isMenuOpen}>
-            <FieldArray name={fieldKey}>
+            <FieldArray name={formKey}>
               {({ form, ...helpers }) => (
                 <FormCheckboxGroup
                   checkedValues={checkedState}
-                  name={fieldKey}
-                  id={`${fieldKey}-${groupKey}`}
+                  name={formKey}
+                  id={`${formKey}-${groupKey}`}
                   onAllChange={event => {
                     if (this.state.searchTerm !== '') {
                       return;
                     }
 
-                    const currentValues = (form.values as FormValues)[fieldKey];
-                    const allValues = groupData[groupKey].map(
+                    const allOptionValues = groupData[groupKey].map(
                       value => value.name,
                     );
-                    const diff = difference(currentValues, allValues);
+                    const restValues = difference(
+                      form.values[formKey],
+                      allOptionValues,
+                    );
 
                     if (event.target.checked) {
-                      form.setFieldValue(fieldKey, [...diff, ...allValues]);
+                      form.setFieldValue(formKey, [
+                        ...restValues,
+                        ...allOptionValues,
+                      ]);
                     } else {
-                      form.setFieldValue(fieldKey, diff);
+                      form.setFieldValue(formKey, restValues);
                     }
                   }}
                   onChange={event => {
-                    const currentValues = (form.values as FormValues)[fieldKey];
-
                     if (event.target.checked) {
                       helpers.push(event.target.value);
                     } else {
-                      const index = currentValues.indexOf(event.target.value);
+                      const index = form.values[formKey].indexOf(
+                        event.target.value,
+                      );
 
                       if (index > -1) {
                         helpers.remove(index);
@@ -164,7 +192,6 @@ class CharacteristicsFilterForm extends Component<Props, State> {
   }
 
   public render() {
-    const { publicationMeta } = this.props;
     const { submitError } = this.state;
 
     return (
@@ -194,20 +221,6 @@ class CharacteristicsFilterForm extends Component<Props, State> {
           values,
           ...form
         }: FormikProps<FormValues>) => {
-          const summaryErrors: ErrorSummaryMessage[] = Object.entries(errors)
-            .filter(([errorName]) => touched[errorName as keyof FormValues])
-            .map(([errorName, message]) => ({
-              id: `${errorName}-filters`,
-              message: typeof message === 'string' ? message : '',
-            }));
-
-          if (submitError) {
-            summaryErrors.push({
-              id: 'submit-button',
-              message: 'Could not submit filters. Please try again later.',
-            });
-          }
-
           const getError = (value: keyof FormValues): string => {
             if (!touched[value]) {
               return '';
@@ -220,7 +233,10 @@ class CharacteristicsFilterForm extends Component<Props, State> {
 
           return (
             <div ref={this.ref}>
-              <ErrorSummary errors={summaryErrors} id="filter-errors" />
+              <ErrorSummary
+                errors={this.getSummaryErrors(errors, touched, submitError)}
+                id="filter-errors"
+              />
 
               <Form>
                 <FormGroup>
@@ -243,11 +259,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                       legend="Attributes"
                       error={getError('attributes')}
                     >
-                      {this.renderGroupedOptions(
-                        publicationMeta.attributes,
-                        'attributes',
-                        values.attributes,
-                      )}
+                      {this.renderGroupedOptions('attributes', values)}
                     </FormFieldSet>
                   </div>
                   <div className="govuk-grid-column-one-half">
@@ -256,11 +268,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                       legend="Characteristics"
                       error={getError('characteristics')}
                     >
-                      {this.renderGroupedOptions(
-                        publicationMeta.characteristics,
-                        'characteristics',
-                        values.characteristics,
-                      )}
+                      {this.renderGroupedOptions('characteristics', values)}
                     </FormFieldSet>
                   </div>
                 </div>
