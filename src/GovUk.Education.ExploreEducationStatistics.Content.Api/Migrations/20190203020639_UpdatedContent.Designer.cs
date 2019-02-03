@@ -118,12 +118,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                     b.ToTable("Releases");
 
                     b.HasData(
-                        new { Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"), PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Published = new DateTime(2017, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), ReleaseName = "2016 to 2017", Slug = "2016-17", Summary = "This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools.
-
-It allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:", Title = "Pupil absence data and statistics for schools in England" },
-                        new { Id = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"), PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Published = new DateTime(2016, 3, 25, 0, 0, 0, 0, DateTimeKind.Unspecified), ReleaseName = "2015 to 2016", Slug = "2015-16", Summary = "This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools.
-
-It allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:", Title = "Pupil absence data and statistics for schools in England" }
+                        new { Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"), PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Published = new DateTime(2017, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), ReleaseName = "2016 to 2017", Slug = "2016-17", Summary = "This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools. It allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:", Title = "Pupil absence data and statistics for schools in England" },
+                        new { Id = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"), PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Published = new DateTime(2016, 3, 25, 0, 0, 0, 0, DateTimeKind.Unspecified), ReleaseName = "2015 to 2016", Slug = "2015-16", Summary = "This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools. It allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:", Title = "Pupil absence data and statistics for schools in England" }
                     );
                 });
 
