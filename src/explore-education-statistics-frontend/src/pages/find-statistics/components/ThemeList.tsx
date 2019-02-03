@@ -1,7 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import Accordion from '../components/Accordion';
-interface ContentItem {
+import Accordion from '../../../components/Accordion';
+import TopicList from './TopicList';
+interface ThemeItem {
   id: string;
   slug: string;
   summary: string;
@@ -9,11 +9,11 @@ interface ContentItem {
 }
 
 interface Props {
-  items: ContentItem[];
+  items: ThemeItem[];
   linkIdentifier: string;
 }
 
-const ContentItemList = ({ linkIdentifier = '', items = [] }: Props) => (
+const ThemeList = ({ items = [] }: Props) => (
   <>
     {items.length > 0 ? (
       <>
@@ -21,15 +21,15 @@ const ContentItemList = ({ linkIdentifier = '', items = [] }: Props) => (
           <>
           <h2 className="govuk-heading-l">{title}</h2>
           <Accordion id="{slug}">
-            <p>TODO: fetch publications</p>
+            <TopicList theme={slug} />
           </Accordion>
           </>
         ))}
       </>
     ) : (
-      <div className="govuk-inset-text">None data currently published.</div>
+      <div className="govuk-inset-text">No data currently published.</div>
     )}
   </>
 );
 
-export default ContentItemList;
+export default ThemeList;

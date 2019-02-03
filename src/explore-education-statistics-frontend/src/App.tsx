@@ -14,11 +14,7 @@ import LocalAuthorityPage from './pages/local-authority/LocalAuthorityPage';
 import NotFoundPage from './pages/NotFoundPage';
 import PrivacyPage from './pages/PrivacyPage';
 import PublicationPage from './pages/PublicationPage';
-import PublicationsPage from './pages/PublicationsPage';
-import ThemePage from './pages/ThemePage';
-import ThemesPage from './pages/ThemesPage';
-import TopicPage from './pages/TopicPage';
-import TopicsPage from './pages/TopicsPage';
+import FindStatisticsPage from './pages/find-statistics/FindStatisticsPage';
 import { PrototypeRoutes } from './prototypes/PrototypeIndexPage';
 
 const AppRoutes = () => (
@@ -35,45 +31,13 @@ const AppRoutes = () => (
       component={LocalAuthorityPage}
     />
 
-    <Route exact path="/themes" component={ThemesPage} />
-    <Route exact path="/themes/:theme" component={ThemePage} />
-    <Route exact path="/themes/:theme/:topic" component={TopicPage} />
+    <Route exact path="/find-statistics-and-data" component={FindStatisticsPage} />
+    <Route exact path="/find-statistics-and-data/:publication" component={PublicationPage} />
     <Route
       exact
-      path="/themes/:theme/:topic/:publication"
+      path="/find-statistics-and-data/:publication/:release"
       component={PublicationPage}
     />
-    <Route
-      exact
-      path="/themes/:theme/:topic/:publication/:release"
-      component={PublicationPage}
-    />
-
-    <Route exact path="/topics" component={TopicsPage} />
-    <Route exact path="/topics/:topic" component={TopicPage} />
-    <Route
-      exact
-      path="/topics/:topic/:publication"
-      component={PublicationPage}
-    />
-    <Route
-      exact
-      path="/topics/:topic/:publication/:release"
-      component={PublicationPage}
-    />
-
-    <Route exact path="/publications/" component={PublicationsPage} />
-    <Route
-      exact
-      path="/publications/:publication"
-      component={PublicationPage}
-    />
-    <Route
-      exact
-      path="/publications/:publication/:release"
-      component={PublicationPage}
-    />
-
     <Route component={NotFoundPage} />
   </Switch>
 );

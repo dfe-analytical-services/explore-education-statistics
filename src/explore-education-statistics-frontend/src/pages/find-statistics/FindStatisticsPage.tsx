@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { Helmet } from 'react-helmet';
 import { RouteComponentProps } from 'react-router';
-import ContentItemList from '../components/ContentItemList';
-import PageHeading from '../components/PageHeading';
-import { contentApi } from '../services/api';
+import { contentApi } from '../../services/api';
+import ThemeList from './components/ThemeList';
 
 interface Props extends RouteComponentProps<{}> {}
 
@@ -11,7 +10,7 @@ interface State {
   items: any[];
 }
 
-class ThemesPage extends Component<Props, State> {
+class FindStatisticsPage extends Component<Props, State> {
   public state = {
     items: [],
   };
@@ -29,7 +28,7 @@ class ThemesPage extends Component<Props, State> {
     return (
         <>
         <Helmet>
-          <title>Themes - GOV.UK</title>
+          <title>Find statistics and data - GOV.UK</title>
         </Helmet>
           <h1 className="govuk-heading-xl">Find statistics and data</h1>
           <p className="govuk-body-l">
@@ -46,8 +45,7 @@ class ThemesPage extends Component<Props, State> {
               and regional statistical data and trends
             </li>
           </ul>
-
-          <ContentItemList
+          <ThemeList
             items={items}
             linkIdentifier={this.props.match.url}
           />
@@ -56,4 +54,4 @@ class ThemesPage extends Component<Props, State> {
   }
 }
 
-export default ThemesPage;
+export default FindStatisticsPage;
