@@ -18,12 +18,12 @@ const ThemeList = ({ items = [] }: Props) => (
     {items.length > 0 ? (
       <>
         {items.map(({ id, slug, title, summary }) => (
-          <>
+          <div key={id}>
             <h2 className="govuk-heading-l">{title}</h2>
             <Accordion id="{slug}">
               <TopicList theme={slug} />
             </Accordion>
-          </>
+          </div>
         ))}
       </>
     ) : (

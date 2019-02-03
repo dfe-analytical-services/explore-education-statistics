@@ -35,13 +35,15 @@ class TopicList extends Component<Props> {
         {topics.length > 0 ? (
           <>
             {topics.map(({ id, slug, title, summary }) => (
-              <AccordionSection id={id} heading={title} caption={summary}>
-                <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-                  <ul className="govuk-list-bullet">
-                    <PublicationList topic={slug} />
-                  </ul>
-                </div>
-              </AccordionSection>
+              <div key={id}>
+                <AccordionSection id={id} heading={title} caption={summary}>
+                  <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+                    <ul className="govuk-list-bullet">
+                      <PublicationList topic={slug} />
+                    </ul>
+                  </div>
+                </AccordionSection>
+              </div>
             ))}
           </>
         ) : (
