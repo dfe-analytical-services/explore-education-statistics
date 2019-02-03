@@ -3,15 +3,15 @@ import { Helmet } from 'react-helmet';
 import ReactMarkdown from 'react-markdown';
 import { match } from 'react-router';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
-import Accordion from '../components/Accordion';
-import AccordionSection from '../components/AccordionSection';
-import Date from '../components/Date';
-import Details from '../components/Details';
-import GoToTopLink from '../components/GoToTopLink';
-import Link from '../components/Link';
-import StepByStepNavigation from '../components/StepByStepNavigation';
-import StepByStepNavigationStep from '../components/StepByStepNavigationStep';
-import { baseUrl, contentApi } from '../services/api';
+import Accordion from '../../components/Accordion';
+import AccordionSection from '../../components/AccordionSection';
+import Date from '../../components/Date';
+import Details from '../../components/Details';
+import GoToTopLink from '../../components/GoToTopLink';
+import Link from '../../components/Link';
+import StepByStepNavigation from '../../components/StepByStepNavigation';
+import StepByStepNavigationStep from '../../components/StepByStepNavigationStep';
+import { baseUrl, contentApi } from '../../services/api';
 
 interface Props {
   match: match<{
@@ -107,14 +107,6 @@ class PublicationPage extends Component<Props, State> {
       data.publication.releases.slice(1).length +
       data.publication.legacyReleases.length;
 
-    const chartData = [
-      { name: '2012/13', unauthorised: 1.1, authorised: 4.2, overall: 5.3 },
-      { name: '2013/14', unauthorised: 1.1, authorised: 3.5, overall: 4.5 },
-      { name: '2014/15', unauthorised: 1.1, authorised: 3.5, overall: 4.6 },
-      { name: '2015/16', unauthorised: 1.1, authorised: 3.4, overall: 4.6 },
-      { name: '2016/17', unauthorised: 1.3, authorised: 3.4, overall: 4.7 },
-    ];
-
     return (
       <>
         <Helmet>
@@ -180,11 +172,7 @@ class PublicationPage extends Component<Props, State> {
                   >
                     {data.publication.releases.slice(1).map((elem, index) => (
                       <li key={elem.id} data-testid="item-internal">
-                        <Link
-                          to={`/themes/${theme}/${topic}/${
-                            data.publication.slug
-                          }/${elem.slug}`}
-                        >
+                        <Link to={`/find-statistics-and-data/${data.publication.slug}/${elem.slug}`}>
                           {elem.releaseName}
                         </Link>
                       </li>

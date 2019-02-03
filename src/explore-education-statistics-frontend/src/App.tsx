@@ -14,7 +14,7 @@ import HomePage from './pages/HomePage';
 import LocalAuthorityPage from './pages/local-authority/LocalAuthorityPage';
 import NotFoundPage from './pages/NotFoundPage';
 import PrivacyPage from './pages/PrivacyPage';
-import PublicationPage from './pages/PublicationPage';
+import PublicationPage from './pages/publication/PublicationPage';
 import { PrototypeRoutes } from './prototypes/PrototypeIndexPage';
 
 const AppRoutes = () => (
