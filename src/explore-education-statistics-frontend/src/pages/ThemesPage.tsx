@@ -27,19 +27,31 @@ class ThemesPage extends Component<Props, State> {
     const { items } = this.state;
 
     return (
-      <div className="govuk-grid-row">
+        <>
         <Helmet>
           <title>Themes - GOV.UK</title>
         </Helmet>
-        <div className="govuk-grid-column-two-thirds">
-          <PageHeading caption="Themes" heading="Find themes" />
+          <h1 className="govuk-heading-xl">Find statistics and data</h1>
+          <p className="govuk-body-l">
+            Browse to find the statistics and data you’re looking for and open
+            the section to get links to:
+          </p>
+          <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <li>
+              up-to-date national statistical headlines, breakdowns and
+              explanations
+            </li>
+            <li>
+              charts and tables to help you compare, contrast and view national
+              and regional statistical data and trends
+            </li>
+          </ul>
 
           <ContentItemList
             items={items}
             linkIdentifier={this.props.match.url}
           />
-        </div>
-      </div>
+        </>
     );
   }
 }

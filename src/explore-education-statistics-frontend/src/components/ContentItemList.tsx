@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
+import Accordion from '../components/Accordion';
 interface ContentItem {
   id: string;
   slug: string;
@@ -14,32 +14,22 @@ interface Props {
 }
 
 const ContentItemList = ({ linkIdentifier = '', items = [] }: Props) => (
-  <div>
+  <>
     {items.length > 0 ? (
-      <div className="govuk-grid-row">
+      <>
         {items.map(({ id, slug, title, summary }) => (
-          <div
-            className="govuk-grid-column-one-half"
-            key={id}
-            data-testid="content-item-list--element"
-          >
-            <h4>
-              <Link
-                to={`${linkIdentifier}/${slug}`}
-                className="govuk-link"
-                data-testid={`content-item-list--${slug}`}
-              >
-                {title}
-              </Link>
-            </h4>
-            <p>{summary}</p>
-          </div>
+          <>
+          <h2 className="govuk-heading-l">{title}</h2>
+          <Accordion id="{slug}">
+            <p>TODO: fetch publications</p>
+          </Accordion>
+          </>
         ))}
-      </div>
+      </>
     ) : (
-      <div className="govuk-inset-text">None currently published.</div>
+      <div className="govuk-inset-text">None data currently published.</div>
     )}
-  </div>
+  </>
 );
 
 export default ContentItemList;
