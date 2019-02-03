@@ -2,10 +2,10 @@ import React from 'react';
 import Accordion from '../components/Accordion';
 import AccordionSection from '../components/AccordionSection';
 import Details from '../components/Details';
+import GoToTopLink from '../components/GoToTopLink';
 import Link from '../components/Link';
 import PrototypeDataSample from './components/PrototypeDataSampleExclusions';
 import PrototypePage from './components/PrototypePage';
-import GoToTopLink from './PrototypePublicationPage';
 
 const PublicationPageExclusions = () => {
   return (
