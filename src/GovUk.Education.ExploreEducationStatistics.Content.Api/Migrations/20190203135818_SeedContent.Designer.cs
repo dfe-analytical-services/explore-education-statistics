@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190203020639_UpdatedContent")]
-    partial class UpdatedContent
+    [Migration("20190203135818_SeedContent")]
+    partial class SeedContent
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
