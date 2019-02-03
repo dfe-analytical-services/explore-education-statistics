@@ -38,7 +38,7 @@ class TopicList extends Component<Props> {
               <AccordionSection id={id} heading={title} caption={summary}>
                 <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
                   <ul className="govuk-list-bullet">
-                    <PublicationList topic={slug}/>
+                    <PublicationList topic={slug} />
                   </ul>
                 </div>
               </AccordionSection>

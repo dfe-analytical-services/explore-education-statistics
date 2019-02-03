@@ -9,12 +9,12 @@ import ScrollToTop from './components/ScrollToTop';
 import AlphaFeedbackPage from './pages/AlphaFeedbackPage';
 import CookiesPage from './pages/CookiesPage';
 import FeedbackPage from './pages/FeedbackPage';
+import FindStatisticsPage from './pages/find-statistics/FindStatisticsPage';
 import HomePage from './pages/HomePage';
 import LocalAuthorityPage from './pages/local-authority/LocalAuthorityPage';
 import NotFoundPage from './pages/NotFoundPage';
 import PrivacyPage from './pages/PrivacyPage';
 import PublicationPage from './pages/PublicationPage';
-import FindStatisticsPage from './pages/find-statistics/FindStatisticsPage';
 import { PrototypeRoutes } from './prototypes/PrototypeIndexPage';
 
 const AppRoutes = () => (
@@ -31,8 +31,16 @@ const AppRoutes = () => (
       component={LocalAuthorityPage}
     />
 
-    <Route exact path="/find-statistics-and-data" component={FindStatisticsPage} />
-    <Route exact path="/find-statistics-and-data/:publication" component={PublicationPage} />
+    <Route
+      exact
+      path="/find-statistics-and-data"
+      component={FindStatisticsPage}
+    />
+    <Route
+      exact
+      path="/find-statistics-and-data/:publication"
+      component={PublicationPage}
+    />
     <Route
       exact
       path="/find-statistics-and-data/:publication/:release"
