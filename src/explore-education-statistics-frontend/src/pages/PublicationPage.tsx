@@ -237,8 +237,8 @@ class PublicationPage extends Component<Props, State> {
         <hr />
 
         <h2 className="govuk-heading-l">
-          {!release ? <>Latest headline </>: <>Headline </>}
-          facts and figures - {data.releaseName} 
+          {!release ? <>Latest headline </> : <>Headline </>}
+          facts and figures - {data.releaseName}
         </h2>
 
         <h2 className="govuk-heading-l">Contents</h2>
