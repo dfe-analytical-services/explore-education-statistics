@@ -3,8 +3,11 @@ import { Helmet } from 'react-helmet';
 import ReactMarkdown from 'react-markdown';
 import { match } from 'react-router';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
+import Accordion from '../components/Accordion';
+import AccordionSection from '../components/AccordionSection';
 import Date from '../components/Date';
 import Details from '../components/Details';
+import GoToTopLink from '../components/GoToTopLink';
 import Link from '../components/Link';
 import StepByStepNavigation from '../components/StepByStepNavigation';
 import StepByStepNavigationStep from '../components/StepByStepNavigationStep';
@@ -113,112 +116,62 @@ class PublicationPage extends Component<Props, State> {
     ];
 
     return (
-      <div>
+      <>
         <Helmet>
           <title>{data.title} - GOV.UK</title>
         </Helmet>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             {!release && (
-              <strong
-                className="govuk-tag"
-                data-testid="publication-page--latest-data-heading"
-              >
-                This is the latest data
+              <strong className="govuk-tag govuk-!-margin-bottom-2">
+                {' '}
+                This is the latest data{' '}
               </strong>
             )}
 
-            <h2>{data.title}</h2>
+            <h1 className="govuk-heading-xl">{data.title}</h1>
 
-            <ReactMarkdown className="govuk-body" source={data.summary} />
+            <ReactMarkdown className="govuk-body-l" source={data.summary} />
 
-            <StepByStepNavigation>
-              <StepByStepNavigationStep title="Headline pupil absence facts and figures for 2016/17">
-                <LineChart
-                  width={600}
-                  height={300}
-                  data={chartData}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="name"
-                    label={{
-                      offset: 5,
-                      position: 'bottom',
-                      value: 'School year',
-                    }}
-                    padding={{ left: 20, right: 20 }}
-                    tickMargin={10}
-                  />
-                  <YAxis
-                    label={{
-                      angle: -90,
-                      offset: 0,
-                      position: 'left',
-                      value: 'Absence rate',
-                    }}
-                    scale="auto"
-                    unit="%"
-                  />
-                  <Line
-                    type="linear"
-                    dataKey="unauthorised"
-                    stroke="#28A197"
-                    strokeWidth="1"
-                    unit="%"
-                    activeDot={{ r: 3 }}
-                  />
-                  <Line
-                    type="linear"
-                    dataKey="authorised"
-                    stroke="#6F72AF"
-                    strokeWidth="1"
-                    unit="%"
-                    activeDot={{ r: 3 }}
-                  />
-                  <Line
-                    type="linear"
-                    dataKey="overall"
-                    stroke="#DF3034"
-                    strokeWidth="1"
-                    unit="%"
-                    activeDot={{ r: 3 }}
-                  />
-                </LineChart>
-              </StepByStepNavigationStep>
-              <StepByStepNavigationStep
-                title="Where does this data come from?"
-                caption="How we collect an process the data"
-              >
-                <ReactMarkdown
-                  className="govuk-body"
-                  source={data.publication.dataSource}
-                />
-              </StepByStepNavigationStep>
-              <StepByStepNavigationStep title="Feedback and questions">
-                <ul className="govuk-list">
-                  <li>
-                    <Link to="/feedback?type=page">Feedback on this page</Link>
-                  </li>
-                  <li>
-                    <Link to="/feedback?type=suggestion">
-                      Make a suggestion
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/feedback?type=question">Ask a question</Link>
-                  </li>
-                </ul>
-              </StepByStepNavigationStep>
-            </StepByStepNavigation>
+            <Details summary="Read more about our methodology">
+              <p>
+                To help you analyse and understand the statistics the following
+                sections include:
+              </p>
+
+              <div className="govuk-inset-text">
+                <Link to="#">
+                  Find out more about our pupil absence data and statistics
+                  methodology and terminology
+                </Link>
+              </div>
+            </Details>
+            <Details summary="Download underlying data files">
+              <ul className="govuk-list">
+                <li>
+                  <a
+                    href={`${baseUrl.data}/downloads/${
+                      data.publication.slug
+                    }/csv/`}
+                    className="govuk-link"
+                  >
+                    Download .csv files
+                  </a>
+                </li>
+                <li>
+                  <a href={baseUrl.data} className="govuk-link">
+                    Access API
+                  </a>
+                </li>
+              </ul>
+            </Details>
           </div>
           <div className="govuk-grid-column-one-third">
             <aside className="app-related-items">
-              <h3 id="subsection-title">About this data</h3>
+              <h3 id="subsection-title">About these statistics</h3>
 
               <h4 data-testid="publication-page--release-name">
-                <span className="govuk-caption-m">Release name: </span>
+                <span className="govuk-caption-m">For school year: </span>
                 {data.releaseName} {!release && <span>(latest data)</span>}
                 <Details summary={`See previous ${releaseCount} releases`}>
                   <ul
@@ -277,30 +230,120 @@ class PublicationPage extends Component<Props, State> {
                   </Link>
                 </span>
               </h4>
-
-              <hr />
-
-              <h3 id="getting-the-data">Getting the data</h3>
-
-              <ul className="govuk-list">
-                <li>
-                  <a
-                    href={`${baseUrl.data}/downloads/${
-                      data.publication.slug
-                    }/csv/`}
-                    data-testid="publication-page--download-csvs"
-                  >
-                    Download .csv files
-                  </a>
-                </li>
-                <li>
-                  <a href={baseUrl.data}>Access API</a>
-                </li>
-              </ul>
             </aside>
           </div>
         </div>
-      </div>
+
+        <hr />
+
+        <h2 className="govuk-heading-l">
+          {!release ? <>Latest headline </>: <>Headline </>}
+          facts and figures - {data.releaseName} 
+        </h2>
+
+        <h2 className="govuk-heading-l">Contents</h2>
+        <Accordion id="contents-sections">
+          <AccordionSection heading="About this release">
+            <p className="govuk-body">
+              TODO: Implement about this release content
+            </p>
+          </AccordionSection>
+        </Accordion>
+
+        <h2 className="govuk-heading-m govuk-!-margin-top-9">
+          Extra information
+        </h2>
+        <Accordion id="extra-information-sections">
+          <AccordionSection
+            heading="Where does this data come from"
+            caption="How we collect and process the data"
+            headingTag="h3"
+          >
+            <ul className="govuk-list">
+              <li>
+                <a href="#" className="govuk-link">
+                  How do we collect it?
+                </a>
+              </li>
+              <li>
+                <a href="#" className="govuk-link">
+                  What do we do with it?
+                </a>
+              </li>
+              <li>
+                <a href="#" className="govuk-link">
+                  Related policies
+                </a>
+              </li>
+            </ul>
+          </AccordionSection>
+          <AccordionSection heading="Feedback and questions" headingTag="h3">
+            <ul className="govuk-list">
+              <li>
+                <a href="#" className="govuk-link">
+                  Feedback on this page
+                </a>
+              </li>
+              <li>
+                <a href="#" className="govuk-link">
+                  Make a suggestion
+                </a>
+              </li>
+              <li>
+                <a href="#" className="govuk-link">
+                  Ask a question
+                </a>
+              </li>
+            </ul>
+          </AccordionSection>
+          <AccordionSection heading="Contact us" headingTag="h3">
+            <h4 className="govuk-heading-">Media enquiries</h4>
+            <address className="govuk-body dfe-font-style-normal">
+              Press Office News Desk
+              <br />
+              Department for Education <br />
+              Sanctuary Buildings <br />
+              Great Smith Street <br />
+              London
+              <br />
+              SW1P 3BT <br />
+              Telephone: 020 7783 8300
+            </address>
+
+            <h4 className="govuk-heading-">Other enquiries</h4>
+            <address className="govuk-body dfe-font-style-normal">
+              Data Insight and Statistics Division
+              <br />
+              Level 1<br />
+              Department for Education
+              <br />
+              Sanctuary Buildings <br />
+              Great Smith Street
+              <br />
+              London
+              <br />
+              SW1P 3BT <br />
+              Telephone: 020 7783 8300
+              <br />
+              Email: <a href="#">Schools.statistics@education.gov.uk</a>
+            </address>
+          </AccordionSection>
+        </Accordion>
+
+        <h2 className="govuk-heading-m govuk-!-margin-top-9">
+          Exploring the data
+        </h2>
+        <p>
+          The statistics can be viewed as reports, or you can customise and
+          download as excel or .csv files . The data can also be accessed via an
+          API. <a href="#">What is an API?</a>
+        </p>
+        <Link to="/prototypes/data-table-v3" className="govuk-button">
+          Explore pupil absence statistics
+        </Link>
+
+        <GoToTopLink />
+      </>
     );
   }
 
