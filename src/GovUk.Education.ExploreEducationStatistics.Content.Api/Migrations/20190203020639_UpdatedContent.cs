@@ -7,28 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Links_Publications_PublicationId",
-                table: "Links");
-
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Links",
-                table: "Links");
-
-            migrationBuilder.RenameTable(
-                name: "Links",
-                newName: "Link");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_Links_PublicationId",
-                table: "Link",
-                newName: "IX_Link_PublicationId");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_Link",
-                table: "Link",
-                column: "Id");
-
             migrationBuilder.UpdateData(
                 table: "Publications",
                 keyColumn: "Id",
@@ -91,40 +69,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                 keyValue: new Guid("d5288137-e703-43a1-b634-d50fc9785cb9"),
                 column: "Summary",
                 value: "The number and characteristics of teachers");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Link_Publications_PublicationId",
-                table: "Link",
-                column: "PublicationId",
-                principalTable: "Publications",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Link_Publications_PublicationId",
-                table: "Link");
-
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Link",
-                table: "Link");
-
-            migrationBuilder.RenameTable(
-                name: "Link",
-                newName: "Links");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_Link_PublicationId",
-                table: "Links",
-                newName: "IX_Links_PublicationId");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_Links",
-                table: "Links",
-                column: "Id");
-
             migrationBuilder.UpdateData(
                 table: "Publications",
                 keyColumn: "Id",
@@ -187,14 +135,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                 keyValue: new Guid("d5288137-e703-43a1-b634-d50fc9785cb9"),
                 column: "Summary",
                 value: "School capacity, Admission appeals");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Links_Publications_PublicationId",
-                table: "Links",
-                column: "PublicationId",
-                principalTable: "Publications",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
         }
     }
 }
