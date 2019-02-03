@@ -172,7 +172,11 @@ class PublicationPage extends Component<Props, State> {
                   >
                     {data.publication.releases.slice(1).map((elem, index) => (
                       <li key={elem.id} data-testid="item-internal">
-                        <Link to={`/find-statistics-and-data/${data.publication.slug}/${elem.slug}`}>
+                        <Link
+                          to={`/find-statistics-and-data/${
+                            data.publication.slug
+                          }/${elem.slug}`}
+                        >
                           {elem.releaseName}
                         </Link>
                       </li>
