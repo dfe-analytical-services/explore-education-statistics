@@ -29,12 +29,10 @@ interface FormValues {
   characteristics: string[];
 }
 
-export type CharacteristicsFilterFormSubmitHandler = (
-  values: {
-    attributes: string[];
-    characteristics: string[];
-  },
-) => void;
+export type CharacteristicsFilterFormSubmitHandler = (values: {
+  attributes: string[];
+  characteristics: string[];
+}) => void;
 
 interface Props {
   publicationMeta: Pick<PublicationMeta, 'attributes' | 'characteristics'>;

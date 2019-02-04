@@ -38,12 +38,24 @@ class PublicationList extends Component<Props, State> {
         {publications.length > 0 ? (
           publications.map(({ id, slug, summary, title }) => (
             <li key={id}>
-              <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                <Link to={`/find-statistics-and-data/${slug}`}>{title}</Link>
-              </h4>
-              <p className="govuk-caption-m govuk-!-margin-top-1 govuk-!-margin-bottom-1">
+              <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
+                {title}
+              </h3>
+              <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
                 {summary}
               </p>
+              <div className="govuk-!-margin-top-0 govuk-!-margin-bottom-9">
+                <div className="govuk-grid-row">
+                  <div className="govuk-grid-column-one-third">
+                    <Link
+                      className="govuk-link govuk-!-margin-right-9 "
+                      to={`/find-statistics-and-data/${slug}`}
+                    >
+                      View statistics
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </li>
           ))
         ) : (
