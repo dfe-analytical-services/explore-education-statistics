@@ -1,4 +1,9 @@
-import React, { Component, ReactEventHandler } from 'react';
+import React, {
+  ChangeEvent,
+  Component,
+  FormEvent,
+  ReactEventHandler,
+} from 'react';
 
 import 'leaflet/dist/leaflet.css';
 
@@ -6,7 +11,7 @@ import styles from './PrototypeMap.module.scss';
 
 import { Boundaries } from './PrototypeMapBoundaries';
 
-import { FeatureCollection } from 'geojson';
+import { Feature, FeatureCollection } from 'geojson';
 
 import { GeoJSON, Map } from 'react-leaflet';
 
@@ -15,7 +20,11 @@ export interface PrototypeMapProps {
   map: (map: PrototypeMap) => void;
 }
 
-class PrototypeMap extends Component<PrototypeMapProps> {
+interface PrototypeMapState {
+  selectedAuthority: string;
+}
+
+class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
   private mapNode: any;
 
   public static defaultProps: Partial<PrototypeMapProps> = {
@@ -26,6 +35,10 @@ class PrototypeMap extends Component<PrototypeMapProps> {
     super(props);
 
     if (props.map) props.map(this);
+
+    this.state = {
+      selectedAuthority: '',
+    };
   }
 
   public refresh() {
@@ -51,21 +64,6 @@ class PrototypeMap extends Component<PrototypeMapProps> {
         direction: 'center',
         opacity: 1.0,
       });
-    };
-
-    // @ts-ignore
-    const click = (e: any) => {
-      if (e.sourceTarget.feature) {
-        //  && props.onClickFeature) {
-
-        if (OnFeatureSelect && e.sourceTarget.feature.properties) {
-          OnFeatureSelect(e.sourceTarget.feature.properties);
-        }
-      }
-    };
-
-    const styleFeature = (f: any) => {
-      return { className: f.properties && f.properties.className };
     };
 
     /**
@@ -107,8 +105,61 @@ class PrototypeMap extends Component<PrototypeMapProps> {
       return feature;
     });
 
+    data.features.sort((a, b) => {
+      const c = [
+        a.properties ? a.properties.lad17nm : '',
+        b.properties ? b.properties.lad17nm : '',
+      ];
+
+      return c[0] < c[1] ? -1 : c[1] > c[0] ? 1 : 0;
+    });
+
+    const selectFeature = (feature: Feature) => {
+      if (OnFeatureSelect && feature.properties) {
+        OnFeatureSelect(feature.properties);
+      }
+
+      const featureIndex = data.features.findIndex(f => f === feature);
+
+      this.setState({
+        selectedAuthority: `${featureIndex}`,
+      });
+    };
+
+    // @ts-ignore
+    const click = (e: any) => {
+      if (e.sourceTarget.feature) {
+        selectFeature(e.sourceTarget.feature);
+      }
+    };
+
+    const selectAuthority = (e: ChangeEvent<HTMLSelectElement>) => {
+      const feature = data.features[parseInt(e.currentTarget.value, 10)];
+      selectFeature(feature);
+    };
+
+    const styleFeature = (f: any) => {
+      return { className: f.properties && f.properties.className };
+    };
+
     return (
       <div>
+        <form>
+          <select
+            value={this.state.selectedAuthority}
+            onChange={e => selectAuthority(e)}
+          >
+            <option>Select a local authority</option>
+            {data.features.map((feature, idx) => (
+              <option
+                value={idx}
+                key={feature.properties ? feature.properties.lad17cd : ''}
+              >
+                {feature.properties ? feature.properties.lad17nm : ''}
+              </option>
+            ))}
+          </select>
+        </form>
         <Map
           ref={(n: any) => (this.mapNode = n)}
           center={position}
