@@ -187,21 +187,35 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
     return (
       <div>
         <form>
-          <select
-            value={this.state.selectedAuthority}
-            onChange={this.selectAuthority}
-          >
-            <option>Select a local authority</option>
-            {this.data.features.map((feature, idx) => (
-              <option
-                value={idx}
-                key={feature.properties ? feature.properties.lad17cd : ''}
-              >
-                {feature.properties ? feature.properties.lad17nm : ''}
-              </option>
-            ))}
-          </select>
+          <div className="govuk-form-group govuk-!-margin-bottom-6">
+            <label
+              className="govuk-label govuk-label--s"
+              htmlFor="selectedAuthority"
+            >
+              Select a local authority
+            </label>
+            <select
+              id="selectedAuthority"
+              value={this.state.selectedAuthority}
+              onChange={this.selectAuthority}
+              className="govuk-select"
+            >
+              <option>Select a local authority</option>
+              {this.data.features.map((feature, idx) => (
+                <option
+                  value={idx}
+                  key={feature.properties ? feature.properties.lad17cd : ''}
+                >
+                  {feature.properties ? feature.properties.lad17nm : ''}
+                </option>
+              ))}
+            </select>
+          </div>
         </form>
+        <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+          Or choose a region on the map below to show pupil absence figures by
+          local authority
+        </h3>
         <Map
           ref={(n: any) => (this.mapNode = n)}
           center={position}
@@ -218,8 +232,8 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
           />
         </Map>
         <div className={styles.legend}>
-          <h3>Overall absence rate</h3>
-          <dl>
+          <h3 className="govuk-heading-s">Key to overall absence rate</h3>
+          <dl className="govuk-list">
             {this.legend.map(({ min, max }: any, idx: number) => (
               <dd key={idx}>
                 <span className={styles[`rate${idx}`]}>&nbsp;</span> {min}% to{' '}

@@ -617,11 +617,6 @@ const PublicationPage = () => {
           heading="Pupil absence by local authority"
           onToggle={isOpen => mapRef && mapRef.refresh()}
         >
-          <h3 className="govuk-heading-s">
-            Select a region on the map below to show pupil absence figures by
-            local authority
-          </h3>
-
           <PrototypeAbsenceData
             map={m => {
               mapRef = m;
