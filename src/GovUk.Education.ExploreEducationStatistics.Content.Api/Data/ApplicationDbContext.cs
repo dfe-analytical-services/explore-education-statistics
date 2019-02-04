@@ -258,13 +258,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
                     Content = new List<ContentSection>
                     {
-                        new ContentSection { Heading = "About this release", Caption = ""},
-                        new ContentSection { Heading = "Absence rates", Caption = ""},
-                        new ContentSection { Heading = "Persistent absence", Caption = ""},
-                        new ContentSection { Heading = "Distribution of absence", Caption = ""},
-                        new ContentSection { Heading = "Absence for four year olds", Caption = ""},
-                        new ContentSection { Heading = "Pupil referral unit absence", Caption = ""},
-                        new ContentSection { Heading = "Pupil absence by local authority", Caption = ""}
+                        new ContentSection { Order = 1, Heading = "About this release", Caption = ""},
+                        new ContentSection { Order = 2, Heading = "Absence rates", Caption = ""},
+                        new ContentSection { Order = 3, Heading = "Persistent absence", Caption = ""},
+                        new ContentSection { Order = 4, Heading = "Distribution of absence", Caption = ""},
+                        new ContentSection { Order = 5, Heading = "Absence for four year olds", Caption = ""},
+                        new ContentSection { Order = 6, Heading = "Pupil referral unit absence", Caption = ""},
+                        new ContentSection { Order = 7, Heading = "Pupil absence by local authority", Caption = ""}
                     }
                 },
                 new Release
@@ -278,13 +278,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
                     Content = new List<ContentSection>
                     {
-                        new ContentSection { Heading = "About this release", Caption = ""},
-                        new ContentSection { Heading = "Absence rates", Caption = ""},
-                        new ContentSection { Heading = "Persistent absence", Caption = ""},
-                        new ContentSection { Heading = "Distribution of absence", Caption = ""},
-                        new ContentSection { Heading = "Absence for four year olds", Caption = ""},
-                        new ContentSection { Heading = "Pupil referral unit absence", Caption = ""},
-                        new ContentSection { Heading = "Pupil absence by local authority", Caption = ""}
+                        new ContentSection { Order =  1, Heading = "About this release", Caption = ""},
+                        new ContentSection { Order =  2, Heading = "Absence rates", Caption = ""},
+                        new ContentSection { Order =  3, Heading = "Persistent absence", Caption = ""},
+                        new ContentSection { Order =  4, Heading = "Distribution of absence", Caption = ""},
+                        new ContentSection { Order =  5, Heading = "Absence for four year olds", Caption = ""},
+                        new ContentSection { Order =  6, Heading = "Pupil referral unit absence", Caption = ""},
+                        new ContentSection { Order =  7, Heading = "Pupil absence by local authority", Caption = ""}
                     }
                 },
                 
@@ -300,15 +300,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     Summary ="Read national statistical summaries and definitions, view charts and tables and download data files across a range of permanent and fixed-period exclusion subject areas.",
                     Content = new List<ContentSection>
                     {
-                        new ContentSection { Heading = "About this release", Caption = ""},
-                        new ContentSection { Heading = "Permanent exclusions", Caption = ""},
-                        new ContentSection { Heading = "Fixed-period exclusions", Caption = ""},
-                        new ContentSection { Heading = "Number and length of fixed-period exclusions", Caption = ""},
-                        new ContentSection { Heading = "Reasons for exclusions", Caption = ""},
-                        new ContentSection { Heading = "Exclusions by pupil; characteristics", Caption = ""},
-                        new ContentSection { Heading = "Independent exclusion reviews", Caption = ""},
-                        new ContentSection { Heading = "Exclusions from pupil referral units", Caption = ""},
-                        new ContentSection { Heading = "Exclusions by local authority", Caption = ""}
+                        new ContentSection { Order = 1, Heading = "About this release", Caption = ""},
+                        new ContentSection { Order = 2, Heading = "Permanent exclusions", Caption = ""},
+                        new ContentSection { Order = 3, Heading = "Fixed-period exclusions", Caption = ""},
+                        new ContentSection { Order = 4, Heading = "Number and length of fixed-period exclusions", Caption = ""},
+                        new ContentSection { Order = 5, Heading = "Reasons for exclusions", Caption = ""},
+                        new ContentSection { Order = 6, Heading = "Exclusions by pupil; characteristics", Caption = ""},
+                        new ContentSection { Order = 7, Heading = "Independent exclusion reviews", Caption = ""},
+                        new ContentSection { Order = 8, Heading = "Exclusions from pupil referral units", Caption = ""},
+                        new ContentSection { Order = 9, Heading = "Exclusions by local authority", Caption = ""}
                     }
                 },
                 
@@ -324,15 +324,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     Summary ="Statistics on pupils in schools in England as collected in the January 2018 school census.",
                     Content = new List<ContentSection>
                     {
-                        new ContentSection { Heading = "About this release", Caption = ""},
-                        new ContentSection { Heading = "Permanent exclusions", Caption = ""},
-                        new ContentSection { Heading = "Fixed-period exclusions", Caption = ""},
-                        new ContentSection { Heading = "Number and length of fixed-period exclusions", Caption = ""},
-                        new ContentSection { Heading = "Reasons for exclusions", Caption = ""},
-                        new ContentSection { Heading = "Exclusions by pupil; characteristics", Caption = ""},
-                        new ContentSection { Heading = "Independent exclusion reviews", Caption = ""},
-                        new ContentSection { Heading = "Exclusions from pupil referral units", Caption = ""},
-                        new ContentSection { Heading = "Exclusions by local authority", Caption = ""}
+                        new ContentSection { Order = 1, Heading = "About this release", Caption = ""},
                     }
                 }
             );
