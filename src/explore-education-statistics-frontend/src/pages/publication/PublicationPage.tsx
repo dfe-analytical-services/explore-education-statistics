@@ -37,7 +37,7 @@ interface Release {
 interface ContentSection {
   caption: string;
   heading: string;
-  order: number ;
+  order: number;
 }
 
 interface Publication {
@@ -243,14 +243,16 @@ class PublicationPage extends Component<Props, State> {
 
         <h2 className="govuk-heading-l">Contents</h2>
         {data.content.length > 0 ? (
-        <Accordion id="contents-sections">
-          {data.content.map(({ heading, caption, order }) => (
-            <AccordionSection heading={heading} caption={caption} key={order}>
-              <p className="govuk-body">TODO: Implement content</p>
-            </AccordionSection>
-          ))}
-        </Accordion>
-        ) :(<></>)}
+          <Accordion id="contents-sections">
+            {data.content.map(({ heading, caption, order }) => (
+              <AccordionSection heading={heading} caption={caption} key={order}>
+                <p className="govuk-body">TODO: Implement content</p>
+              </AccordionSection>
+            ))}
+          </Accordion>
+        ) : (
+          <></>
+        )}
 
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Extra information
