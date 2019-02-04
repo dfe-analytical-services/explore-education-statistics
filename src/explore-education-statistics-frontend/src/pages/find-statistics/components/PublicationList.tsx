@@ -1,5 +1,4 @@
-import React, { Component, HTMLAttributes, ReactNode } from 'react';
-import AccordionSection from '../../../components/AccordionSection';
+import React, { Component } from 'react';
 import Link from '../../../components/Link';
 import { contentApi } from '../../../services/api';
 
@@ -8,11 +7,15 @@ interface Props {
 }
 
 interface State {
-  publications: object[];
-  topic: string;
+  publications: {
+    id: string;
+    slug: string;
+    summary: string;
+    title: string;
+  }[];
 }
 
-class PublicationList extends Component<Props> {
+class PublicationList extends Component<Props, State> {
   public state = {
     publications: [],
     topic: '',
@@ -28,23 +31,21 @@ class PublicationList extends Component<Props> {
   }
 
   public render() {
-    const { topic, publications } = this.state;
+    const { publications } = this.state;
 
     return (
       <>
         {publications.length > 0 ? (
-          <>
-            {publications.map(({ id, slug, title, summary }) => (
-              <li key={id}>
-                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  <Link to={`/find-statistics-and-data/${slug}`}>{title}</Link>
-                </h4>
-                <p className="govuk-caption-m govuk-!-margin-top-1 govuk-!-margin-bottom-1">
-                  {summary}
-                </p>
-              </li>
-            ))}
-          </>
+          publications.map(({ id, slug, summary, title }) => (
+            <li key={id}>
+              <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                <Link to={`/find-statistics-and-data/${slug}`}>{title}</Link>
+              </h4>
+              <p className="govuk-caption-m govuk-!-margin-top-1 govuk-!-margin-bottom-1">
+                {summary}
+              </p>
+            </li>
+          ))
         ) : (
           <div className="govuk-inset-text">
             No publications currently released.
