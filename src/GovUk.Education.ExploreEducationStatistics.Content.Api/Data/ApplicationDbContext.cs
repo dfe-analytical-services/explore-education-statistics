@@ -21,8 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
             modelBuilder.Entity<Theme>().HasData(
                 new Theme
                 {
-                    Id = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Title = "Schools",
-                    Summary = "Lorem ipsum dolor sit amet.", Slug = "schools"
+                    Id = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Title = "Early years and schools",
+                    Summary = "Lorem ipsum dolor sit amet.", Slug = "early-years-and-schools"
                 },
                 new Theme
                 {
@@ -31,8 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                 },
                 new Theme
                 {
-                    Id = new Guid("bc08839f-2970-4f34-af2d-29608a48082f"), Title = "16+",
-                    Summary = "Lorem ipsum dolor sit amet.", Slug = "16+"
+                    Id = new Guid("bc08839f-2970-4f34-af2d-29608a48082f"), Title = "Higher education",
+                    Summary = "Lorem ipsum dolor sit amet.", Slug = "higher-education"
                 }
             );
 
@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                 new Topic
                 {
                     Id = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Title = "Absence and exclusions",
-                    Summary = "Pupil absence, permanent and fixed period exlusions",
+                    Summary = "Pupil absence and permanent and fixed-period exclusions statistics and data",
                     ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Slug = "absence-and-exclusions"
                 },
                 new Topic
@@ -52,25 +52,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                 new Topic
                 {
                     Id = new Guid("734820b7-f80e-45c3-bb92-960edcc6faa5"), Title = "Capacity and admissions",
-                    Summary = "School capacity, Admission appeals",
+                    Summary = "School capacity, admission appeals",
                     ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Slug = "capacity-admissions"
                 },
                 new Topic
                 {
                     Id = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"), Title = "Results",
-                    Summary = "Schools, pupils and their characteristics, SEN and EHC plans, SEN in England",
+                    Summary = "Local authority and school finance",
                     ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Slug = "results"
                 },
                 new Topic
                 {
                     Id = new Guid("66ff5e67-36cf-4210-9ad2-632baeb4eca7"), Title = "School finance",
-                    Summary = "Schools, pupils and their characteristics, SEN and EHC plans, SEN in England",
+                    Summary = "Local authority and school finance",
                     ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Slug = "school-finance"
                 },
                 new Topic
                 {
                     Id = new Guid("d5288137-e703-43a1-b634-d50fc9785cb9"), Title = "Teacher Numbers",
-                    Summary = "School capacity, Admission appeals",
+                    Summary = "The number and characteristics of teachers",
                     ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Slug = "teacher-numbers"
                 },
                 new Topic
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                 {
                     Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Title = "Pupil absence in schools in England",
-                    Summary = "Overall absence, Authorised absence, Unauthorised absence, Persistence absence",
+                    Summary = "View statistics, create charts and tables and download data files for authorised, overall, persistent and unauthorised absence",
                     TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"),
                     Slug = "pupil-absence-in-schools-in-england",
                     NextUpdate = new DateTime(2018, 3, 22),
@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                 {
                     Id = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Title = "Permanent and fixed period exclusions",
-                    Summary = "Permanent exclusions, fixed period exclusions",
+                    Summary = "View statistics, create charts and tables and download data files for fixed-period and permanent exclusion statistics",
                     TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"),
                     Slug = "permanent-and-fixed-period-exclusions"
                 },

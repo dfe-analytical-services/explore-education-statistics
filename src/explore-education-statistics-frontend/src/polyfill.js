@@ -1,6 +1,5 @@
 if (typeof Promise === 'undefined') {
-  require('promise/lib/rejection-tracking').enable();
-  window.Promise = require('promise/lib/es6-extensions.js');
+  require('core-js/es6/promise');
 }
 
 export const loadPolyfills = () => {

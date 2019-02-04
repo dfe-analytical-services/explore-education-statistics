@@ -170,7 +170,7 @@ class PrototypeDataTableV3 extends Component<{}, State> {
               <h2>
                 2. Filter statistics from '{publicationName}'
                 <span className="govuk-hint">
-                  Select any options you are interested in from the checkboxes
+                  Select any options you are interested in from the groups
                   below.
                 </span>
               </h2>

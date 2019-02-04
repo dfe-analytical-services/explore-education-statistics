@@ -25,6 +25,7 @@ describe('isComponentType', () => {
     expect(isComponentType(123, TestClassComponent)).toBe(false);
     expect(isComponentType(true, TestClassComponent)).toBe(false);
     expect(isComponentType(null, TestClassComponent)).toBe(false);
+    expect(isComponentType(undefined, TestClassComponent)).toBe(false);
     expect(isComponentType([], TestClassComponent)).toBe(false);
     expect(isComponentType({}, TestClassComponent)).toBe(false);
   });

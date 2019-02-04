@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 
                     b.HasIndex("PublicationId");
 
-                    b.ToTable("Links");
+                    b.ToTable("Link");
 
                     b.HasData(
                         new { Id = new Guid("45bc02ff-de90-489b-b78e-cdc7db662353"), Description = "2014 to 2015", PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015" },
@@ -70,8 +70,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                     b.ToTable("Publications");
 
                     b.HasData(
-                        new { Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), DataSource = "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)", NextUpdate = new DateTime(2018, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), Slug = "pupil-absence-in-schools-in-england", Summary = "Overall absence, Authorised absence, Unauthorised absence, Persistence absence", Title = "Pupil absence in schools in England", TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852") },
-                        new { Id = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"), Slug = "permanent-and-fixed-period-exclusions", Summary = "Permanent exclusions, fixed period exclusions", Title = "Permanent and fixed period exclusions", TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852") },
+                        new { Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), DataSource = "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)", NextUpdate = new DateTime(2018, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), Slug = "pupil-absence-in-schools-in-england", Summary = "View statistics, create charts and tables and download data files for authorised, overall, persistent and unauthorised absence", Title = "Pupil absence in schools in England", TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852") },
+                        new { Id = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"), Slug = "permanent-and-fixed-period-exclusions", Summary = "View statistics, create charts and tables and download data files for fixed-period and permanent exclusion statistics", Title = "Permanent and fixed period exclusions", TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852") },
                         new { Id = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"), Slug = "schools-pupils-and-their-characteristics", Summary = "Lorem ipsum dolor sit amet.", Title = "Schools, pupils and their characteristics", TopicId = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd") },
                         new { Id = new Guid("d04142bd-f448-456b-97bc-03863143836b"), Slug = "school-capacity", Summary = "Lorem ipsum dolor sit amet.", Title = "School capacity", TopicId = new Guid("734820b7-f80e-45c3-bb92-960edcc6faa5") },
                         new { Id = new Guid("a20ea465-d2d0-4fc1-96ee-6b2ca4e0520e"), Slug = "admission-appeals-in-England", Summary = "Lorem ipsum dolor sit amet.", Title = "Admission appeals in England", TopicId = new Guid("734820b7-f80e-45c3-bb92-960edcc6faa5") },
@@ -116,12 +116,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                     b.ToTable("Releases");
 
                     b.HasData(
-                        new { Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"), PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Published = new DateTime(2017, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), ReleaseName = "2016 to 2017", Slug = "2016-17", Summary = @"This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools.
-
-It allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:", Title = "Pupil absence data and statistics for schools in England" },
-                        new { Id = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"), PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Published = new DateTime(2016, 3, 25, 0, 0, 0, 0, DateTimeKind.Unspecified), ReleaseName = "2015 to 2016", Slug = "2015-16", Summary = @"This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools.
-
-It allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:", Title = "Pupil absence data and statistics for schools in England" }
+                        new { Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"), PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Published = new DateTime(2017, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), ReleaseName = "2016 to 2017", Slug = "2016-17", Summary = "This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools. It allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:", Title = "Pupil absence data and statistics for schools in England" },
+                        new { Id = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"), PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"), Published = new DateTime(2016, 3, 25, 0, 0, 0, 0, DateTimeKind.Unspecified), ReleaseName = "2015 to 2016", Slug = "2015-16", Summary = "This service helps parents, specialists and the public find different kinds of pupil absence facts and figures for state-funded schools. It allows you to find out about, view and download overall, authorised and unauthorised absence data and statistics going back to 2006/07 on the following levels:", Title = "Pupil absence data and statistics for schools in England" }
                     );
                 });
 
@@ -142,9 +138,9 @@ It allows you to find out about, view and download overall, authorised and unaut
                     b.ToTable("Themes");
 
                     b.HasData(
-                        new { Id = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Slug = "schools", Summary = "Lorem ipsum dolor sit amet.", Title = "Schools" },
+                        new { Id = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Slug = "early-years-and-schools", Summary = "Lorem ipsum dolor sit amet.", Title = "Early years and schools" },
                         new { Id = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"), Slug = "social-care", Summary = "Lorem ipsum dolor sit amet.", Title = "Social Care" },
-                        new { Id = new Guid("bc08839f-2970-4f34-af2d-29608a48082f"), Slug = "16+", Summary = "Lorem ipsum dolor sit amet.", Title = "16+" }
+                        new { Id = new Guid("bc08839f-2970-4f34-af2d-29608a48082f"), Slug = "higher-education", Summary = "Lorem ipsum dolor sit amet.", Title = "Higher education" }
                     );
                 });
 
@@ -171,12 +167,12 @@ It allows you to find out about, view and download overall, authorised and unaut
                     b.ToTable("Topics");
 
                     b.HasData(
-                        new { Id = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Slug = "absence-and-exclusions", Summary = "Pupil absence, permanent and fixed period exlusions", ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Title = "Absence and exclusions" },
+                        new { Id = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Slug = "absence-and-exclusions", Summary = "Pupil absence and permanent and fixed-period exclusions statistics and data", ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Title = "Absence and exclusions" },
                         new { Id = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"), Slug = "school-and-pupil-numbers", Summary = "Schools, pupils and their characteristics, SEN and EHC plans, SEN in England", ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Title = "School & pupil numbers" },
-                        new { Id = new Guid("734820b7-f80e-45c3-bb92-960edcc6faa5"), Slug = "capacity-admissions", Summary = "School capacity, Admission appeals", ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Title = "Capacity and admissions" },
-                        new { Id = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"), Slug = "results", Summary = "Schools, pupils and their characteristics, SEN and EHC plans, SEN in England", ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Title = "Results" },
-                        new { Id = new Guid("66ff5e67-36cf-4210-9ad2-632baeb4eca7"), Slug = "school-finance", Summary = "Schools, pupils and their characteristics, SEN and EHC plans, SEN in England", ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Title = "School finance" },
-                        new { Id = new Guid("d5288137-e703-43a1-b634-d50fc9785cb9"), Slug = "teacher-numbers", Summary = "School capacity, Admission appeals", ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Title = "Teacher Numbers" },
+                        new { Id = new Guid("734820b7-f80e-45c3-bb92-960edcc6faa5"), Slug = "capacity-admissions", Summary = "School capacity, admission appeals", ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Title = "Capacity and admissions" },
+                        new { Id = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"), Slug = "results", Summary = "Local authority and school finance", ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Title = "Results" },
+                        new { Id = new Guid("66ff5e67-36cf-4210-9ad2-632baeb4eca7"), Slug = "school-finance", Summary = "Local authority and school finance", ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Title = "School finance" },
+                        new { Id = new Guid("d5288137-e703-43a1-b634-d50fc9785cb9"), Slug = "teacher-numbers", Summary = "The number and characteristics of teachers", ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Title = "Teacher Numbers" },
                         new { Id = new Guid("0b920c62-ff67-4cf1-89ec-0c74a364e6b4"), Slug = "number-of-children", Summary = "Lorem ipsum dolor sit amet.", ThemeId = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"), Title = "Number of Children" },
                         new { Id = new Guid("3bef5b2b-76a1-4be1-83b1-a3269245c610"), Slug = "vulnerable-children", Summary = "Lorem ipsum dolor sit amet.", ThemeId = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"), Title = "Vulnerable Children" },
                         new { Id = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"), Slug = "further-education", Summary = "Lorem ipsum dolor sit amet.", ThemeId = new Guid("bc08839f-2970-4f34-af2d-29608a48082f"), Title = "Further Education" },
