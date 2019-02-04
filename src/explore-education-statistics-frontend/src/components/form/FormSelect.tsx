@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import React, { ChangeEventHandler, ReactNode } from 'react';
 import ErrorMessage from '../ErrorMessage';
+import styles from './FormSelect.module.scss';
 
 export interface SelectOption {
   text: string;
@@ -33,7 +34,7 @@ const FormSelect = ({
       </label>
       {error && <ErrorMessage>{error}</ErrorMessage>}
       <select
-        className={classNames('govuk-select', {
+        className={classNames(styles.select, {
           'govuk-select--error': !!error,
         })}
         id={id}
