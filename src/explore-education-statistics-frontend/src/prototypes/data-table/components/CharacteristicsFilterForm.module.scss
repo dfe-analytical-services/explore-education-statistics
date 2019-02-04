@@ -1,0 +1,7 @@
+@import '~govuk-frontend/settings/all';
+@import '~govuk-frontend/helpers/all';
+
+.year {
+  display: inline-block;
+  margin-right: govuk-spacing(6);
+}

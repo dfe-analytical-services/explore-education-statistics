@@ -1,5 +1,7 @@
 import {
+  Field,
   FieldArray,
+  FieldProps,
   Form,
   Formik,
   FormikErrors,
@@ -10,23 +12,26 @@ import debounce from 'lodash/debounce';
 import difference from 'lodash/difference';
 import sortBy from 'lodash/sortBy';
 import React, { ChangeEvent, Component, createRef } from 'react';
-import * as Yup from 'yup';
 import Button from '../../../components/Button';
 import ErrorSummary, {
   ErrorSummaryMessage,
 } from '../../../components/ErrorSummary';
 import {
   FormCheckboxGroup,
+  FormFieldSet,
   FormGroup,
+  FormSelect,
   FormTextInput,
 } from '../../../components/form';
-import FormFieldSet from '../../../components/form/FormFieldSet';
+import Yup from '../../../lib/validation/yup';
 import { PublicationMeta } from '../../../services/dataTableService';
 import MenuDetails from './MenuDetails';
 
 interface FormValues {
   attributes: string[];
   characteristics: string[];
+  endYear: number;
+  startYear: number;
 }
 
 export type CharacteristicsFilterFormSubmitHandler = (values: {
@@ -66,26 +71,26 @@ class CharacteristicsFilterForm extends Component<Props, State> {
   private getSummaryErrors(
     errors: FormikErrors<FormValues>,
     touched: FormikTouched<FormValues>,
-    submitError: string,
   ) {
     const summaryErrors: ErrorSummaryMessage[] = Object.entries(errors)
       .filter(([errorName]) => touched[errorName as keyof FormValues])
       .map(([errorName, message]) => ({
-        id: `${errorName}-filters`,
+        id: `filter-${errorName}`,
         message: typeof message === 'string' ? message : '',
       }));
 
-    if (submitError) {
+    if (this.state.submitError) {
       summaryErrors.push({
         id: 'submit-button',
         message: 'Could not submit filters. Please try again later.',
       });
     }
+
     return summaryErrors;
   }
 
   private renderGroupedOptions(
-    formKey: keyof FormValues,
+    formKey: 'characteristics' | 'attributes',
     formValues: FormValues,
   ) {
     const groupData = this.props.publicationMeta[formKey];
@@ -192,15 +197,42 @@ class CharacteristicsFilterForm extends Component<Props, State> {
   public render() {
     const { submitError } = this.state;
 
+    const yearOptions = [
+      { value: 201112, text: '2011/12' },
+      { value: 201213, text: '2012/13' },
+      { value: 201314, text: '2013/14' },
+      { value: 201415, text: '2014/15' },
+      { value: 201516, text: '2015/16' },
+      { value: 201617, text: '2016/17' },
+    ];
+
+    const yearValues = yearOptions.map(({ value }) => value);
+
     return (
       <Formik
         initialValues={{
           attributes: [],
           characteristics: [],
+          endYear: 201617,
+          startYear: 201213,
         }}
         validationSchema={Yup.object({
           attributes: Yup.array().required('Select at least one option'),
           characteristics: Yup.array().required('Select at least one option'),
+          endYear: Yup.number()
+            .required('End year is required')
+            .oneOf(yearValues, 'Must be one of provided years')
+            .moreThanOrEqual(
+              Yup.ref('startYear'),
+              'Must be after or same as start year',
+            ),
+          startYear: Yup.number()
+            .required('Start year is required')
+            .oneOf(yearValues, 'Must be one of provided years')
+            .lessThanOrEqual(
+              Yup.ref('endYear'),
+              'Must be before or same as end year',
+            ),
         })}
         onSubmit={async ({ attributes, characteristics }, actions) => {
           try {
@@ -232,18 +264,51 @@ class CharacteristicsFilterForm extends Component<Props, State> {
           return (
             <div ref={this.ref}>
               <ErrorSummary
-                errors={this.getSummaryErrors(errors, touched, submitError)}
+                errors={this.getSummaryErrors(errors, touched)}
                 id="filter-errors"
               />
 
               <Form>
+                <FormFieldSet
+                  id="years"
+                  legend="Academic years"
+                  hint="Filter statistics by a given start and end date"
+                >
+                  <Field name="startYear">
+                    {({ field }: FieldProps) => (
+                      <FormGroup hasError={!!getError('startYear')}>
+                        <FormSelect
+                          {...field}
+                          error={getError('startYear')}
+                          id="filter-startYear"
+                          label="Start year"
+                          options={yearOptions}
+                        />
+                      </FormGroup>
+                    )}
+                  </Field>
+                  <Field name="endYear">
+                    {({ field }: FieldProps) => (
+                      <FormGroup hasError={!!getError('endYear')}>
+                        <FormSelect
+                          {...field}
+                          error={getError('endYear')}
+                          id="filter-endYear"
+                          label="End year"
+                          options={yearOptions}
+                        />
+                      </FormGroup>
+                    )}
+                  </Field>
+                </FormFieldSet>
+
                 <FormGroup>
                   <div className="govuk-grid-row">
                     <div className="govuk-grid-column-one-half">
                       <FormFieldSet
-                        id="attributes-filters"
+                        id="filter-attributes"
                         legend="Attributes"
-                        hint="Choose at least one statistical attribute from the publication"
+                        hint="Filter by at least one statistical attribute from the publication"
                         error={getError('attributes')}
                       >
                         {this.renderGroupedOptions('attributes', values)}
@@ -251,9 +316,9 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                     </div>
                     <div className="govuk-grid-column-one-half">
                       <FormFieldSet
-                        id="characteristics-filters"
+                        id="filter-characteristics"
                         legend="Characteristics"
-                        hint="Choose at least one pupil characteristic from the publication"
+                        hint="Filter by at least one pupil characteristic from the publication"
                         error={getError('characteristics')}
                       >
                         {this.renderGroupedOptions('characteristics', values)}
