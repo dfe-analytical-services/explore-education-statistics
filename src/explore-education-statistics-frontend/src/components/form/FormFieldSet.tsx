@@ -5,6 +5,7 @@ import FormGroup from './FormGroup';
 import createDescribedBy from './util/createDescribedBy';
 
 export interface FieldSetProps {
+  children?: ReactNode;
   error?: string;
   hint?: string;
   id: string;
@@ -19,7 +20,7 @@ const FormFieldSet: FunctionComponent<FieldSetProps> = ({
   id,
   legend,
   legendSize = 'm',
-}) => {
+}: FieldSetProps) => {
   return (
     <FormGroup hasError={!!error}>
       <fieldset
