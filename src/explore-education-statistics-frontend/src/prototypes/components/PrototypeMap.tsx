@@ -13,7 +13,7 @@ import { Boundaries } from './PrototypeMapBoundaries';
 
 import { Feature, FeatureCollection } from 'geojson';
 
-import { Path } from 'leaflet';
+import { LatLngBounds, Path } from 'leaflet';
 import { GeoJSON, Map } from 'react-leaflet';
 
 export interface PrototypeMapProps {
@@ -171,6 +171,11 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
       lng: -3.2524038,
     };
 
+    const bounds = new LatLngBounds(
+      { lat: 48, lng: -6.5 },
+      { lat: 60, lng: 2 },
+    );
+
     return (
       <div>
         <form>
@@ -194,6 +199,8 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
           center={position}
           className={styles.map}
           zoom={6}
+          minZoom={6}
+          maxBounds={bounds}
         >
           <GeoJSON
             data={this.data}
