@@ -35,6 +35,7 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
 
   private data: FeatureCollection;
   private OnFeatureSelect: any | undefined;
+  private legend: any;
 
   constructor(props: PrototypeMapProps) {
     super(props);
@@ -58,14 +59,14 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
       }),
     } as FeatureCollection;
 
-    const minOverall = this.data.features.reduce(
+    const minOverall = +this.data.features.reduce(
       (min, next) =>
         next.properties && next.properties.absence.overall < min
           ? next.properties.absence.overall
           : min,
       100,
     );
-    const maxOverall = this.data.features.reduce(
+    const maxOverall = +this.data.features.reduce(
       (max, next) =>
         next.properties && next.properties.absence.overall > max
           ? next.properties.absence.overall
@@ -74,6 +75,13 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
     );
 
     const range = (maxOverall - minOverall) / 5;
+
+    this.legend = [4, 3, 2, 1, 0].map(value => {
+      return {
+        max: (minOverall + (value + 1) / range - 0.1).toFixed(1),
+        min: (minOverall + value / range).toFixed(1),
+      };
+    });
 
     this.data.features = this.data.features.map(feature => {
       if (feature.properties) {
@@ -115,7 +123,7 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
       opacity: 1.0,
     });
 
-    layer.setStyle({ weight: 1 });
+    layer.setStyle({ weight: 1, opacity: 1.0 });
   };
 
   private selectFeature = (feature: Feature) => {
@@ -209,6 +217,17 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
             onClick={this.click}
           />
         </Map>
+        <div className={styles.legend}>
+          <h3>Overall absence rate</h3>
+          <dl>
+            {this.legend.map(({ min, max }: any, idx: number) => (
+              <dd key={idx}>
+                <span className={styles[`rate${idx}`]}>&nbsp;</span> {min}% to{' '}
+                {max}%{' '}
+              </dd>
+            ))}
+          </dl>
+        </div>
       </div>
     );
   }
