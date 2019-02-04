@@ -1,3 +1,4 @@
+import range from 'lodash/range';
 import React, { Component, createRef } from 'react';
 import PageHeading from '../../components/PageHeading';
 import Tabs from '../../components/Tabs';
@@ -22,13 +23,13 @@ interface State {
   filters: {
     attributes: string[];
     characteristics: string[];
+    schoolTypes: SchoolType[];
+    years: number[];
   };
   publicationId: string;
   publicationMeta: Pick<PublicationMeta, 'attributes' | 'characteristics'>;
   publicationName: string;
-  schoolTypes: SchoolType[];
   tableData: DataTableResult[];
-  years: number[];
 }
 
 class PrototypeDataTableV3 extends Component<{}, State> {
@@ -36,6 +37,8 @@ class PrototypeDataTableV3 extends Component<{}, State> {
     filters: {
       attributes: [],
       characteristics: [],
+      schoolTypes: [],
+      years: [],
     },
     publicationId: '',
     publicationMeta: {
@@ -43,13 +46,7 @@ class PrototypeDataTableV3 extends Component<{}, State> {
       characteristics: {},
     },
     publicationName: '',
-    schoolTypes: [
-      SchoolType.Total,
-      SchoolType.State_Funded_Primary,
-      SchoolType.State_Funded_Secondary,
-    ],
     tableData: [],
-    years: [201213, 201314, 201415, 201516, 201617],
   };
 
   private filtersRef = createRef<HTMLDivElement>();
@@ -95,13 +92,20 @@ class PrototypeDataTableV3 extends Component<{}, State> {
   private handleFilterFormSubmit: CharacteristicsFilterFormSubmitHandler = async ({
     attributes,
     characteristics,
+    schoolTypes,
+    startYear,
+    endYear,
   }) => {
+    const years = range(startYear, endYear + 1).map(year => {
+      return parseInt(`${year}${`${year + 1}`.substring(2, 4)}`, 0);
+    });
+
     const { data } = await getNationalCharacteristicsData(
       this.state.publicationId,
       attributes,
       characteristics,
-      this.state.schoolTypes,
-      this.state.years,
+      schoolTypes,
+      years,
     );
 
     this.setState(
@@ -109,6 +113,8 @@ class PrototypeDataTableV3 extends Component<{}, State> {
         filters: {
           attributes,
           characteristics,
+          schoolTypes,
+          years,
         },
         tableData: data.result,
       },
@@ -124,14 +130,7 @@ class PrototypeDataTableV3 extends Component<{}, State> {
   };
 
   public render() {
-    const {
-      filters,
-      publicationMeta,
-      publicationName,
-      schoolTypes,
-      tableData,
-      years,
-    } = this.state;
+    const { filters, publicationMeta, publicationName, tableData } = this.state;
 
     return (
       <PrototypePage
@@ -197,8 +196,8 @@ class PrototypeDataTableV3 extends Component<{}, State> {
               characteristics={filters.characteristics}
               characteristicsMeta={publicationMeta.characteristics}
               results={tableData}
-              schoolTypes={schoolTypes}
-              years={years}
+              schoolTypes={filters.schoolTypes}
+              years={filters.years}
             />
 
             <ul className="govuk-list">

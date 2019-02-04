@@ -1,11 +1,14 @@
 import {
+  ArrayHelpers,
   Field,
   FieldArray,
   FieldProps,
   Form,
   Formik,
+  FormikActions,
   FormikErrors,
   FormikProps,
+  FormikState,
   FormikTouched,
 } from 'formik';
 import debounce from 'lodash/debounce';
@@ -24,20 +27,24 @@ import {
   FormTextInput,
 } from '../../../components/form';
 import Yup from '../../../lib/validation/yup';
-import { PublicationMeta } from '../../../services/dataTableService';
+import {
+  PublicationMeta,
+  SchoolType,
+} from '../../../services/dataTableService';
+import { KeysWithType } from '../../../types/util';
 import MenuDetails from './MenuDetails';
 
 interface FormValues {
   attributes: string[];
   characteristics: string[];
   endYear: number;
+  schoolTypes: SchoolType[];
   startYear: number;
 }
 
-export type CharacteristicsFilterFormSubmitHandler = (values: {
-  attributes: string[];
-  characteristics: string[];
-}) => void;
+export type CharacteristicsFilterFormSubmitHandler = (
+  values: FormValues,
+) => void;
 
 interface Props {
   publicationMeta: Pick<PublicationMeta, 'attributes' | 'characteristics'>;
@@ -88,6 +95,37 @@ class CharacteristicsFilterForm extends Component<Props, State> {
 
     return summaryErrors;
   }
+
+  private handleCheckboxChange = (
+    event: ChangeEvent<HTMLInputElement>,
+    values: string[],
+    helpers: ArrayHelpers,
+  ) => {
+    if (event.target.checked) {
+      helpers.push(event.target.value);
+    } else {
+      const index = values.indexOf(event.target.value);
+
+      if (index > -1) {
+        helpers.remove(index);
+      }
+    }
+  };
+
+  private handleAllCheckboxChange = (
+    event: ChangeEvent<HTMLInputElement>,
+    allOptionValues: string[],
+    fieldKey: KeysWithType<FormValues, string[]>,
+    form: FormikState<FormValues> & FormikActions<FormValues>,
+  ) => {
+    const restValues = difference(form.values[fieldKey], allOptionValues);
+
+    if (event.target.checked) {
+      form.setFieldValue(fieldKey, [...restValues, ...allOptionValues]);
+    } else {
+      form.setFieldValue(fieldKey, restValues);
+    }
+  };
 
   private renderGroupedOptions(
     formKey: 'characteristics' | 'attributes',
@@ -154,33 +192,21 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                     const allOptionValues = groupData[groupKey].map(
                       value => value.name,
                     );
-                    const restValues = difference(
-                      form.values[formKey],
+
+                    this.handleAllCheckboxChange(
+                      event,
                       allOptionValues,
+                      formKey,
+                      form,
                     );
-
-                    if (event.target.checked) {
-                      form.setFieldValue(formKey, [
-                        ...restValues,
-                        ...allOptionValues,
-                      ]);
-                    } else {
-                      form.setFieldValue(formKey, restValues);
-                    }
                   }}
-                  onChange={event => {
-                    if (event.target.checked) {
-                      helpers.push(event.target.value);
-                    } else {
-                      const index = form.values[formKey].indexOf(
-                        event.target.value,
-                      );
-
-                      if (index > -1) {
-                        helpers.remove(index);
-                      }
-                    }
-                  }}
+                  onChange={event =>
+                    this.handleCheckboxChange(
+                      event,
+                      form.values[formKey],
+                      helpers,
+                    )
+                  }
                   options={options}
                 />
               )}
@@ -195,15 +221,36 @@ class CharacteristicsFilterForm extends Component<Props, State> {
   }
 
   public render() {
-    const { submitError } = this.state;
-
     const yearOptions = [
-      { value: 201112, text: '2011/12' },
-      { value: 201213, text: '2012/13' },
-      { value: 201314, text: '2013/14' },
-      { value: 201415, text: '2014/15' },
-      { value: 201516, text: '2015/16' },
-      { value: 201617, text: '2016/17' },
+      { value: 2011, text: '2011/12' },
+      { value: 2012, text: '2012/13' },
+      { value: 2013, text: '2013/14' },
+      { value: 2014, text: '2014/15' },
+      { value: 2015, text: '2015/16' },
+      { value: 2016, text: '2016/17' },
+    ];
+
+    const schoolTypeOptions = [
+      {
+        id: 'filter-schoolTypes-total',
+        label: 'Total',
+        value: SchoolType.Total,
+      },
+      {
+        id: 'filter-schoolTypes-primary',
+        label: 'Primary',
+        value: SchoolType.State_Funded_Primary,
+      },
+      {
+        id: 'filter-schoolTypes-secondary',
+        label: 'Secondary',
+        value: SchoolType.State_Funded_Secondary,
+      },
+      {
+        id: 'filter-schoolTypes-special',
+        label: 'Special',
+        value: SchoolType.Special,
+      },
     ];
 
     const yearValues = yearOptions.map(({ value }) => value);
@@ -213,8 +260,9 @@ class CharacteristicsFilterForm extends Component<Props, State> {
         initialValues={{
           attributes: [],
           characteristics: [],
-          endYear: 201617,
-          startYear: 201213,
+          endYear: 2016,
+          schoolTypes: [],
+          startYear: 2012,
         }}
         validationSchema={Yup.object({
           attributes: Yup.array().required('Select at least one option'),
@@ -226,6 +274,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
               Yup.ref('startYear'),
               'Must be after or same as start year',
             ),
+          schoolTypes: Yup.array().required('Select at least one option'),
           startYear: Yup.number()
             .required('Start year is required')
             .oneOf(yearValues, 'Must be one of provided years')
@@ -234,9 +283,9 @@ class CharacteristicsFilterForm extends Component<Props, State> {
               'Must be before or same as end year',
             ),
         })}
-        onSubmit={async ({ attributes, characteristics }, actions) => {
+        onSubmit={async (form, actions) => {
           try {
-            await this.props.onSubmit({ attributes, characteristics });
+            await this.props.onSubmit(form);
           } catch (error) {
             this.setState({
               submitError: error.message,
@@ -269,63 +318,103 @@ class CharacteristicsFilterForm extends Component<Props, State> {
               />
 
               <Form>
-                <FormFieldSet
-                  id="years"
-                  legend="Academic years"
-                  hint="Filter statistics by a given start and end date"
-                >
-                  <Field name="startYear">
-                    {({ field }: FieldProps) => (
-                      <FormGroup hasError={!!getError('startYear')}>
-                        <FormSelect
-                          {...field}
-                          error={getError('startYear')}
-                          id="filter-startYear"
-                          label="Start year"
-                          options={yearOptions}
-                        />
-                      </FormGroup>
-                    )}
-                  </Field>
-                  <Field name="endYear">
-                    {({ field }: FieldProps) => (
-                      <FormGroup hasError={!!getError('endYear')}>
-                        <FormSelect
-                          {...field}
-                          error={getError('endYear')}
-                          id="filter-endYear"
-                          label="End year"
-                          options={yearOptions}
-                        />
-                      </FormGroup>
-                    )}
-                  </Field>
-                </FormFieldSet>
-
-                <FormGroup>
-                  <div className="govuk-grid-row">
-                    <div className="govuk-grid-column-one-half">
-                      <FormFieldSet
-                        id="filter-attributes"
-                        legend="Attributes"
-                        hint="Filter by at least one statistical attribute from the publication"
-                        error={getError('attributes')}
-                      >
-                        {this.renderGroupedOptions('attributes', values)}
-                      </FormFieldSet>
-                    </div>
-                    <div className="govuk-grid-column-one-half">
-                      <FormFieldSet
-                        id="filter-characteristics"
-                        legend="Characteristics"
-                        hint="Filter by at least one pupil characteristic from the publication"
-                        error={getError('characteristics')}
-                      >
-                        {this.renderGroupedOptions('characteristics', values)}
-                      </FormFieldSet>
-                    </div>
+                <div className="govuk-grid-row">
+                  <div className="govuk-grid-column-one-half govuk-form-group">
+                    <FormFieldSet
+                      id="years"
+                      legend="Academic years"
+                      hint="Filter statistics by a given start and end date"
+                    >
+                      <Field name="startYear">
+                        {({ field }: FieldProps) => (
+                          <FormGroup hasError={!!getError('startYear')}>
+                            <FormSelect
+                              {...field}
+                              error={getError('startYear')}
+                              id="filter-startYear"
+                              label="Start year"
+                              options={yearOptions}
+                            />
+                          </FormGroup>
+                        )}
+                      </Field>
+                      <Field name="endYear">
+                        {({ field }: FieldProps) => (
+                          <FormGroup hasError={!!getError('endYear')}>
+                            <FormSelect
+                              {...field}
+                              error={getError('endYear')}
+                              id="filter-endYear"
+                              label="End year"
+                              options={yearOptions}
+                            />
+                          </FormGroup>
+                        )}
+                      </Field>
+                    </FormFieldSet>
                   </div>
-                </FormGroup>
+                  <div className="govuk-grid-column-one-half govuk-form-group">
+                    <FieldArray name="schoolTypes">
+                      {({ name, form: fieldForm, ...helpers }) => (
+                        <FormCheckboxGroup
+                          id="filter-schoolTypes"
+                          legend="School types"
+                          error={getError('schoolTypes')}
+                          hint="Filter statistics by number of pupils in school type(s)"
+                          checkedValues={values.schoolTypes.reduce(
+                            (acc, schoolType) => ({
+                              ...acc,
+                              [schoolType]:
+                                values.schoolTypes.indexOf(schoolType) > -1,
+                            }),
+                            {},
+                          )}
+                          name={name}
+                          options={schoolTypeOptions}
+                          onAllChange={event => {
+                            const allOptionValues = schoolTypeOptions.map(
+                              value => value.value,
+                            );
+
+                            this.handleAllCheckboxChange(
+                              event,
+                              allOptionValues,
+                              'schoolTypes',
+                              fieldForm,
+                            );
+                          }}
+                          onChange={event =>
+                            this.handleCheckboxChange(
+                              event,
+                              values.schoolTypes,
+                              helpers,
+                            )
+                          }
+                        />
+                      )}
+                    </FieldArray>
+                  </div>
+                  <div className="govuk-grid-column-one-half govuk-form-group">
+                    <FormFieldSet
+                      id="filter-attributes"
+                      legend="Attributes"
+                      hint="Filter by at least one statistical attribute from the publication"
+                      error={getError('attributes')}
+                    >
+                      {this.renderGroupedOptions('attributes', values)}
+                    </FormFieldSet>
+                  </div>
+                  <div className="govuk-grid-column-one-half govuk-form-group">
+                    <FormFieldSet
+                      id="filter-characteristics"
+                      legend="Characteristics"
+                      hint="Filter by at least one pupil characteristic from the publication"
+                      error={getError('characteristics')}
+                    >
+                      {this.renderGroupedOptions('characteristics', values)}
+                    </FormFieldSet>
+                  </div>
+                </div>
 
                 <FormGroup>
                   <h3>Can't find what you're looking for?</h3>
