@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer.Old;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ModelBinding;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Azure;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -13,14 +14,18 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IHostingEnvironment _env;
+        
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             Configuration = configuration;
+            _env = env;
         }
 
         public IConfiguration Configuration { get; }
@@ -64,8 +69,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddScoped<LaCharacteristicService>();
             services.AddScoped<NationalCharacteristicService>();
 
+            if (_env.IsDevelopment())
+            {
+                services.AddScoped<IAzureDocumentService, DummyAzureDocumentService>();
+            }
+            else
+            {
+                services.AddScoped<IAzureDocumentService, AzureDocumentService>();
+            }
+            
             services.AddCors();
             services.AddAutoMapper();
+
+            services.AddOptions();
+            services.Configure<AzureStorageConfigurationOptions>(Configuration.GetSection("AzureStorageConfig"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

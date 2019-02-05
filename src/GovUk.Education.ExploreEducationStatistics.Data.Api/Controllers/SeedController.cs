@@ -16,15 +16,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<string> Seed()
+        public void Seed()
         {
-            return "Inserted " + await _seedService.Seed() + " rows";
+           _seedService.Seed();
         }
 
-        [HttpDelete("DropAllCollections")]
-        public void DropAllCollections()
+        [HttpDelete("EmptyAllCollectionsExceptMeta")]
+        public async Task<string> EmptyAllCollectionsExceptMeta()
         {
-            _seedService.DropAllCollections();
+            return "Deleted " + await _seedService.EmptyAllCollectionsExceptMeta() + " documents";
         }
     }
 }

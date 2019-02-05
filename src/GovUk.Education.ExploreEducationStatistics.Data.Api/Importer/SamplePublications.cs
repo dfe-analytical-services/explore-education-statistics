@@ -12,6 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 "absence", new Publication
                 {
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+                    Name = "Pupil absence in schools in England",
                     AttributeMetas = new[]
                     {
                         new AttributeMeta
@@ -722,6 +723,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 "exclusion", new Publication
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+                    Name = "Permanent and fixed period exclusions",
                     AttributeMetas = new[]
                     {
                         new AttributeMeta
@@ -1366,6 +1368,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 "schpupnum", new Publication
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+                    Name = "Schools, pupils and their characteristics",
                     AttributeMetas = new[]
                     {
                         new AttributeMeta
