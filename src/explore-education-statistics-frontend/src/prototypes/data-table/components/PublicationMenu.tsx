@@ -50,7 +50,7 @@ class PublicationMenu extends Component<Props, State> {
         <MenuDetails summary="Schools (under 16)" open>
           <MenuDetails summary="Absence and exclusions" open>
             <FormRadioGroup
-              checkedValue={this.state.menuOption}
+              value={this.state.menuOption}
               name="absenceAndExclusions"
               id="absenceAndExclusions"
               onChange={this.handleRadioChange}

@@ -105,7 +105,7 @@ class PrototypeDataTableV1LocalAuthority extends Component<{}, State> {
                   this.state.filters.PUPIL_ABSENCE) && (
                   <>
                     <FormRadioGroup
-                      checkedValue={this.state.dataToggle}
+                      value={this.state.dataToggle}
                       inline
                       id="dataToggle"
                       name="dataToggle"

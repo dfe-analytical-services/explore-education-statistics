@@ -12,7 +12,7 @@ interface RadioOption {
 }
 
 type Props = {
-  checkedValue: string | null;
+  value: string | null;
   inline?: boolean;
   name: string;
   onChange?: RadioChangeEventHandler<any>;
@@ -50,7 +50,7 @@ class FormRadioGroup extends Component<Props> {
         {options.map(option => (
           <FormRadio
             {...option}
-            checked={this.props.checkedValue === option.value}
+            checked={this.props.value === option.value}
             key={option.id}
             name={name}
             onChange={this.handleChange}

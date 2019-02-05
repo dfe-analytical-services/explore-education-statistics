@@ -411,7 +411,7 @@ class PrototypeDataTableV2 extends Component<{}, State> {
               {this.hasAnyFilters() && (
                 <div className="govuk-grid-column-three-quarters">
                   <FormRadioGroup
-                    checkedValue={this.state.dataToggle}
+                    value={this.state.dataToggle}
                     inline
                     id="dataToggle"
                     name="dataToggle"
