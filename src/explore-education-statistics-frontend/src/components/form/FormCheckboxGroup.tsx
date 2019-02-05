@@ -36,8 +36,9 @@ class FormCheckboxGroup extends Component<Props, State> {
 
   public render() {
     const { value, onAllChange, name, options } = this.props;
-
-    const checkedCount = Object.values(value).filter(Boolean).length;
+    const isAllChecked = options.every(
+      option => value.indexOf(option.value) > -1,
+    );
 
     return (
       <FormFieldSet {...this.props}>
@@ -48,7 +49,7 @@ class FormCheckboxGroup extends Component<Props, State> {
               label="Select all"
               name={name}
               value="select-all"
-              checked={checkedCount === options.length}
+              checked={isAllChecked}
               onChange={event => {
                 if (this.props.onAllChange) {
                   this.props.onAllChange(event);

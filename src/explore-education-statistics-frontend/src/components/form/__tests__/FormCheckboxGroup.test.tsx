@@ -186,7 +186,7 @@ describe('FormCheckboxGroup', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('renders with `Select all` checkbox when `onAllChange` is set', () => {
+  test('renders unchecked `Select all` checkbox when `onAllChange` is set', () => {
     const noop = () => null;
 
     const { container, getByLabelText } = render(
@@ -203,8 +203,55 @@ describe('FormCheckboxGroup', () => {
       />,
     );
 
-    expect(getByLabelText('Select all')).toBeDefined();
+    const selectAllCheckbox = getByLabelText('Select all') as HTMLInputElement;
+
+    expect(selectAllCheckbox.checked).toBe(false);
+
     expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('checks `Select all` checkbox when all options are checked', () => {
+    const noop = () => null;
+
+    const { getByLabelText } = render(
+      <FormCheckboxGroup
+        value={['1', '2', '3']}
+        id="test-checkboxes"
+        name="test-checkboxes"
+        onAllChange={noop}
+        options={[
+          { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
+          { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
+          { id: 'checkbox-3', label: 'Test checkbox 3', value: '3' },
+        ]}
+      />,
+    );
+
+    const selectAllCheckbox = getByLabelText('Select all') as HTMLInputElement;
+
+    expect(selectAllCheckbox.checked).toBe(true);
+  });
+
+  test('does not check `Select all` checkbox when checked values do not match options', () => {
+    const noop = () => null;
+
+    const { getByLabelText } = render(
+      <FormCheckboxGroup
+        value={['4', '5', '6']}
+        id="test-checkboxes"
+        name="test-checkboxes"
+        onAllChange={noop}
+        options={[
+          { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
+          { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
+          { id: 'checkbox-3', label: 'Test checkbox 3', value: '3' },
+        ]}
+      />,
+    );
+
+    const selectAllCheckbox = getByLabelText('Select all') as HTMLInputElement;
+
+    expect(selectAllCheckbox.checked).toBe(false);
   });
 
   test('checking all options checks the `Select all` checkbox', () => {
