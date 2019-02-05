@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder;
 using MongoDB.Driver.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
@@ -10,6 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public Guid PublicationId { get; set; }
         public ICollection<SchoolType> SchoolTypes { get; set; }
         public ICollection<int> Years { get; set; }
+        public int StartYear { get; set; }
+        public int EndYear { get; set; }
         public ICollection<string> Attributes { get; set; }
         public ICollection<string> Characteristics { get; set; }
 
@@ -24,9 +27,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
                     SchoolTypes.Select(Query.SchoolTypes.EnumToString).Contains(x.SchoolType));
             }
 
-            if (Years.Count > 0)
+            var yearsQuery = QueryUtil.YearsQuery(Years, StartYear, EndYear);
+            if (yearsQuery.Any())
             {
-                queryable = queryable.Where(x => Years.Contains(x.Year));
+                queryable = queryable.Where(x => yearsQuery.Contains(x.Year));
             }
 
             if (Characteristics.Count > 0)

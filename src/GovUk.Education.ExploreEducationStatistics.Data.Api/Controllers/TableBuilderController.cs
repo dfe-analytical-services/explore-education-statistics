@@ -31,6 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("geographic/{publicationId}/{level}")]
         public ActionResult<TableBuilderResult> GetGeographic(Guid publicationId,
             [CommaSeparatedQueryString] ICollection<int> years,
+            [FromQuery(Name = "startYear")] int startYear,
+            [FromQuery(Name = "endYear")] int endYear,
             [CommaSeparatedQueryString] ICollection<SchoolType> schoolTypes,
             [CommaSeparatedQueryString] ICollection<string> attributes,
             Level level = Level.National)
@@ -41,7 +43,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 Level = level,
                 PublicationId = publicationId,
                 SchoolTypes = schoolTypes,
-                Years = years
+                Years = years,
+                StartYear = startYear,
+                EndYear = endYear
             };
 
             return _tableBuilderService.GetGeographic(query);
@@ -50,6 +54,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("characteristics/local-authority/{publicationId}")]
         public ActionResult<TableBuilderResult> GetLocalAuthority(Guid publicationId,
             [CommaSeparatedQueryString] ICollection<int> years,
+            [FromQuery(Name = "startYear")] int startYear,
+            [FromQuery(Name = "endYear")] int endYear,
             [CommaSeparatedQueryString] ICollection<SchoolType> schoolTypes,
             [CommaSeparatedQueryString] ICollection<string> attributes,
             [CommaSeparatedQueryString] ICollection<string> characteristics)
@@ -60,7 +66,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 Characteristics = characteristics,
                 PublicationId = publicationId,
                 SchoolTypes = schoolTypes,
-                Years = years
+                Years = years,
+                StartYear = startYear,
+                EndYear = endYear
             };
 
             return _tableBuilderService.GetLocalAuthority(query);
@@ -69,6 +77,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("characteristics/national/{publicationId}")]
         public ActionResult<TableBuilderResult> GetNational(Guid publicationId,
             [CommaSeparatedQueryString] ICollection<int> years,
+            [FromQuery(Name = "startYear")] int startYear,
+            [FromQuery(Name = "endYear")] int endYear,
             [CommaSeparatedQueryString] ICollection<SchoolType> schoolTypes,
             [CommaSeparatedQueryString] ICollection<string> attributes,
             [CommaSeparatedQueryString] ICollection<string> characteristics)
@@ -79,7 +89,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 Characteristics = characteristics,
                 PublicationId = publicationId,
                 SchoolTypes = schoolTypes,
-                Years = years
+                Years = years,
+                StartYear = startYear,
+                EndYear = endYear
             };
 
             return _tableBuilderService.GetNational(query);
