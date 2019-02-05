@@ -26,7 +26,11 @@ class GroupedDataTable extends Component<Props> {
           <tr>
             <th />
             {header.map(column => (
-              <th scope="col" key={column}>
+              <th
+                className="govuk-table__header--numeric"
+                scope="col"
+                key={column}
+              >
                 {column}
               </th>
             ))}
@@ -51,6 +55,7 @@ class GroupedDataTable extends Component<Props> {
                       {row.columns.map((column, columnIndex) => {
                         return (
                           <td
+                            className="govuk-table__cell--numeric"
                             key={`${group.name}-${
                               row.name
                             }-${column}-${columnIndex}`}
