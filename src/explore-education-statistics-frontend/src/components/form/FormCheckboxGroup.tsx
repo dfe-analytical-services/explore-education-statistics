@@ -11,13 +11,11 @@ export interface CheckboxOption {
 }
 
 type Props = {
-  checkedValues: {
-    [value: string]: boolean;
-  };
   name: string;
   onAllChange?: CheckboxChangeEventHandler;
   onChange?: CheckboxChangeEventHandler<any>;
   options: CheckboxOption[];
+  value: string[];
 } & FieldSetProps;
 
 interface State {
@@ -26,8 +24,8 @@ interface State {
 
 class FormCheckboxGroup extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
-    checkedValues: {},
     legendSize: 'm',
+    value: [],
   };
 
   private ref = createRef<HTMLDivElement>();
@@ -36,52 +34,44 @@ class FormCheckboxGroup extends Component<Props, State> {
     new Checkboxes(this.ref.current).init();
   }
 
-  private handleChange: CheckboxChangeEventHandler = event => {
-    if (this.props.onChange) {
-      this.props.onChange(event);
-    }
-  };
-
-  private handleAllChange: CheckboxChangeEventHandler = event => {
-    if (this.props.onAllChange) {
-      this.props.onAllChange(event);
-    }
-  };
-
-  private renderCheckboxes() {
-    const { checkedValues, onAllChange, name, options } = this.props;
-
-    const checkedCount = Object.values(checkedValues).filter(Boolean).length;
-
-    return (
-      <div className="govuk-checkboxes" ref={this.ref}>
-        {onAllChange && (
-          <FormCheckbox
-            id={`${name}-all`}
-            label="Select all"
-            name={name}
-            value="select-all"
-            checked={checkedCount === options.length}
-            onChange={this.handleAllChange}
-          />
-        )}
-
-        {options.map(option => (
-          <FormCheckbox
-            {...option}
-            name={name}
-            key={option.id}
-            onChange={this.handleChange}
-            checked={Boolean(checkedValues[option.value])}
-          />
-        ))}
-      </div>
-    );
-  }
-
   public render() {
+    const { value, onAllChange, name, options } = this.props;
+
+    const checkedCount = Object.values(value).filter(Boolean).length;
+
     return (
-      <FormFieldSet {...this.props}>{this.renderCheckboxes()}</FormFieldSet>
+      <FormFieldSet {...this.props}>
+        <div className="govuk-checkboxes" ref={this.ref}>
+          {onAllChange && (
+            <FormCheckbox
+              id={`${name}-all`}
+              label="Select all"
+              name={name}
+              value="select-all"
+              checked={checkedCount === options.length}
+              onChange={event => {
+                if (this.props.onAllChange) {
+                  this.props.onAllChange(event);
+                }
+              }}
+            />
+          )}
+
+          {options.map(option => (
+            <FormCheckbox
+              {...option}
+              name={name}
+              key={option.id}
+              checked={value.indexOf(option.value) > -1}
+              onChange={event => {
+                if (this.props.onChange) {
+                  this.props.onChange(event);
+                }
+              }}
+            />
+          ))}
+        </div>
+      </FormFieldSet>
     );
   }
 }

@@ -81,7 +81,9 @@ class PrototypeDataTableV1LocalAuthority extends Component<{}, State> {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-one-quarter">
             <FilterMenu
-              filters={this.state.filters}
+              filters={Object.entries(this.state.filters)
+                .filter(([_, isChecked]) => isChecked)
+                .map(([key]) => key)}
               onChange={this.handleCheckboxChange}
               beforeMenu={
                 <form>

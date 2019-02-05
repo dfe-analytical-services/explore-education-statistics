@@ -80,7 +80,9 @@ class PrototypeDataTableV1VerticalLayout extends Component<{}, State> {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-full">
             <FilterMenu
-              filters={this.state.filters}
+              filters={Object.entries(this.state.filters)
+                .filter(([_, isChecked]) => isChecked)
+                .map(([key]) => key)}
               onChange={this.handleCheckboxChange}
               beforeMenu={
                 <form>
