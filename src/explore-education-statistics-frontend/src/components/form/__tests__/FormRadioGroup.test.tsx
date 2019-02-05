@@ -7,7 +7,7 @@ describe('FormRadioGroup', () => {
   test('renders list of radios in correct order', () => {
     const { container, getAllByLabelText } = render(
       <FormRadioGroup
-        checkedValue={null}
+        value={null}
         id="test-radios"
         name="test-radios"
         options={[
@@ -43,7 +43,7 @@ describe('FormRadioGroup', () => {
       public render() {
         return (
           <FormRadioGroup
-            checkedValue={this.state.value}
+            value={this.state.value}
             onChange={this.handleChange}
             id="test-radios"
             name="test-radios"
@@ -79,7 +79,7 @@ describe('FormRadioGroup', () => {
       public render() {
         return (
           <FormRadioGroup
-            checkedValue={this.state.value}
+            value={this.state.value}
             onChange={this.handleChange}
             id="test-radios"
             name="test-radios"
@@ -111,7 +111,7 @@ describe('FormRadioGroup', () => {
   test('renders correctly with legend', () => {
     const { container, getByText } = render(
       <FormRadioGroup
-        checkedValue={null}
+        value={null}
         legend="Choose a radio"
         id="test-radios"
         name="test-radios"

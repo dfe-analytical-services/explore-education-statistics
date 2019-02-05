@@ -169,19 +169,12 @@ class CharacteristicsFilterForm extends Component<Props, State> {
           ['label'],
         );
 
-        const checkedState = groupData[groupKey].reduce((acc, option) => {
-          return {
-            ...acc,
-            [option.name]: values.indexOf(option.name) > -1,
-          };
-        }, {});
-
         return (
           <MenuDetails summary={groupKey} key={groupKey} open={isMenuOpen}>
             <FieldArray name={formKey}>
               {({ form, ...helpers }) => (
                 <FormCheckboxGroup
-                  checkedValues={checkedState}
+                  value={values}
                   name={formKey}
                   id={`${formKey}-${groupKey}`}
                   onAllChange={event => {
@@ -361,14 +354,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                           legend="School types"
                           error={getError('schoolTypes')}
                           hint="Filter statistics by number of pupils in school type(s)"
-                          checkedValues={values.schoolTypes.reduce(
-                            (acc, schoolType) => ({
-                              ...acc,
-                              [schoolType]:
-                                values.schoolTypes.indexOf(schoolType) > -1,
-                            }),
-                            {},
-                          )}
+                          value={values.schoolTypes}
                           name={name}
                           options={schoolTypeOptions}
                           onAllChange={event => {

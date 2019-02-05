@@ -80,7 +80,9 @@ class PrototypeDataTableV1VerticalLayout extends Component<{}, State> {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-full">
             <FilterMenu
-              filters={this.state.filters}
+              filters={Object.entries(this.state.filters)
+                .filter(([_, isChecked]) => isChecked)
+                .map(([key]) => key)}
               onChange={this.handleCheckboxChange}
               beforeMenu={
                 <form>
@@ -110,7 +112,7 @@ class PrototypeDataTableV1VerticalLayout extends Component<{}, State> {
                   this.state.filters.PUPIL_ABSENCE) && (
                   <>
                     <FormRadioGroup
-                      checkedValue={this.state.dataToggle}
+                      value={this.state.dataToggle}
                       inline
                       id="dataToggle"
                       name="dataToggle"

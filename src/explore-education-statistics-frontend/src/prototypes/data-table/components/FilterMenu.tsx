@@ -5,10 +5,7 @@ import MenuDetails from './MenuDetails';
 
 interface Props {
   beforeMenu?: ReactNode;
-  filters: {
-    EXCLUSIONS: boolean;
-    PUPIL_ABSENCE: boolean;
-  };
+  filters: string[];
   onChange: ChangeEventHandler<HTMLInputElement>;
 }
 
@@ -25,7 +22,7 @@ const FilterMenu: FunctionComponent<Props> = ({
         <MenuDetails summary="Schools (under 16)" open>
           <MenuDetails summary="Absence and exclusions" open>
             <FormCheckboxGroup
-              checkedValues={filters}
+              value={filters}
               name="absenceAndExclusions"
               onChange={onChange}
               options={[

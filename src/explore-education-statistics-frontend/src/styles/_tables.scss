@@ -10,6 +10,7 @@
     @extend .govuk-table__cell;
   }
 
+  .govuk-table__header--numeric,
   .govuk-table__cell--numeric {
     text-align: right;
   }

@@ -223,6 +223,12 @@ class PrototypeDataTableV2 extends Component<{}, State> {
     );
   }
 
+  private getFilterValues(filters: { [key: string]: boolean }) {
+    return Object.entries(filters)
+      .filter(([_, isChecked]) => isChecked)
+      .map(([key]) => key);
+  }
+
   public render() {
     const { filters } = this.state;
 
@@ -287,7 +293,9 @@ class PrototypeDataTableV2 extends Component<{}, State> {
                   <>
                     <div className="govuk-form-group">
                       <FormCheckboxGroup
-                        checkedValues={this.state.filters.pupilAbsence.general}
+                        value={this.getFilterValues(
+                          this.state.filters.pupilAbsence.general,
+                        )}
                         name="pupilAbsenceGeneral"
                         id="pupilAbsenceGeneral"
                         legend="General"
@@ -318,7 +326,9 @@ class PrototypeDataTableV2 extends Component<{}, State> {
 
                     <div className="govuk-form-group">
                       <FormCheckboxGroup
-                        checkedValues={this.state.filters.pupilAbsence.sessions}
+                        value={this.getFilterValues(
+                          this.state.filters.pupilAbsence.sessions,
+                        )}
                         name="pupilAbsenceSessions"
                         id="pupilAbsenceSessions"
                         legend="Sessions absent"
@@ -356,7 +366,9 @@ class PrototypeDataTableV2 extends Component<{}, State> {
 
                 {this.state.menuOption === 'EXCLUSIONS' && (
                   <FormCheckboxGroup
-                    checkedValues={this.state.filters.exclusions.exclusions}
+                    value={this.getFilterValues(
+                      this.state.filters.exclusions.exclusions,
+                    )}
                     name="exclusions"
                     id="exclusions"
                     legend="Exclusions"
@@ -399,7 +411,7 @@ class PrototypeDataTableV2 extends Component<{}, State> {
               {this.hasAnyFilters() && (
                 <div className="govuk-grid-column-three-quarters">
                   <FormRadioGroup
-                    checkedValue={this.state.dataToggle}
+                    value={this.state.dataToggle}
                     inline
                     id="dataToggle"
                     name="dataToggle"

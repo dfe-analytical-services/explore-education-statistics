@@ -5,25 +5,36 @@ import FormCheckboxGroup from '../FormCheckboxGroup';
 
 describe('FormCheckboxGroup', () => {
   // Stateful container component to wrap our checkbox groups with
-  class CheckboxWrapper extends Component<{
-    children: (
-      state: {},
-      handleChange: CheckboxChangeEventHandler,
-    ) => ReactNode;
-    initialState: {};
-  }> {
+  class CheckboxWrapper extends Component<
+    {
+      children: (
+        state: string[],
+        handleChange: CheckboxChangeEventHandler,
+      ) => ReactNode;
+      initialState: string[];
+    },
+    {
+      values: string[];
+    }
+  > {
     public state = {
-      ...this.props.initialState,
+      values: [...this.props.initialState],
     };
 
     private handleChange: CheckboxChangeEventHandler = event => {
-      this.setState({
-        [event.target.value]: event.target.checked,
-      });
+      const values: string[] = [...this.state.values];
+
+      if (event.target.checked) {
+        values.push(event.target.value);
+      } else {
+        values.splice(values.indexOf(event.target.value), 1);
+      }
+
+      this.setState({ values });
     };
 
     public render() {
-      return this.props.children(this.state, this.handleChange);
+      return this.props.children(this.state.values, this.handleChange);
     }
   }
 
@@ -53,11 +64,6 @@ describe('FormCheckboxGroup', () => {
   test('renders checkboxes with some pre-checked', () => {
     const { container, getAllByLabelText } = render(
       <FormCheckboxGroup
-        checkedValues={{
-          1: false,
-          2: true,
-          3: false,
-        }}
         id="test-checkboxes"
         name="test-checkboxes"
         options={[
@@ -65,6 +71,7 @@ describe('FormCheckboxGroup', () => {
           { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
           { id: 'checkbox-3', label: 'Test checkbox 3', value: '3' },
         ]}
+        value={['2']}
       />,
     );
 
@@ -80,10 +87,10 @@ describe('FormCheckboxGroup', () => {
 
   test('clicking an unchecked checkbox checks it', () => {
     const { getByLabelText } = render(
-      <CheckboxWrapper initialState={{}}>
+      <CheckboxWrapper initialState={[]}>
         {(state, handleChange) => (
           <FormCheckboxGroup
-            checkedValues={state}
+            value={state}
             onChange={handleChange}
             options={[{ id: 'checkbox-1', label: 'Test checkbox', value: '1' }]}
             id="test-checkboxes"
@@ -104,10 +111,10 @@ describe('FormCheckboxGroup', () => {
 
   test('clicking a pre-checked checkbox un-checks it', () => {
     const { getByLabelText } = render(
-      <CheckboxWrapper initialState={{ 1: true }}>
+      <CheckboxWrapper initialState={['1']}>
         {(state, handleChange) => (
           <FormCheckboxGroup
-            checkedValues={state}
+            value={state}
             onChange={handleChange}
             options={[{ id: 'checkbox-1', label: 'Test checkbox', value: '1' }]}
             id="test-checkboxes"
@@ -128,10 +135,10 @@ describe('FormCheckboxGroup', () => {
 
   test('clicking multiple checkboxes checks them all', () => {
     const { getByLabelText } = render(
-      <CheckboxWrapper initialState={{}}>
+      <CheckboxWrapper initialState={[]}>
         {(state, handleChange) => (
           <FormCheckboxGroup
-            checkedValues={state}
+            value={state}
             id="test-checkboxes"
             name="test-checkboxes"
             onChange={handleChange}
@@ -179,12 +186,12 @@ describe('FormCheckboxGroup', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('renders with `Select all` checkbox when `onAllChange` is set', () => {
+  test('renders unchecked `Select all` checkbox when `onAllChange` is set', () => {
     const noop = () => null;
 
     const { container, getByLabelText } = render(
       <FormCheckboxGroup
-        checkedValues={{}}
+        value={[]}
         id="test-checkboxes"
         name="test-checkboxes"
         onAllChange={noop}
@@ -196,24 +203,65 @@ describe('FormCheckboxGroup', () => {
       />,
     );
 
-    expect(getByLabelText('Select all')).toBeDefined();
+    const selectAllCheckbox = getByLabelText('Select all') as HTMLInputElement;
+
+    expect(selectAllCheckbox.checked).toBe(false);
+
     expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('checks `Select all` checkbox when all options are checked', () => {
+    const noop = () => null;
+
+    const { getByLabelText } = render(
+      <FormCheckboxGroup
+        value={['1', '2', '3']}
+        id="test-checkboxes"
+        name="test-checkboxes"
+        onAllChange={noop}
+        options={[
+          { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
+          { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
+          { id: 'checkbox-3', label: 'Test checkbox 3', value: '3' },
+        ]}
+      />,
+    );
+
+    const selectAllCheckbox = getByLabelText('Select all') as HTMLInputElement;
+
+    expect(selectAllCheckbox.checked).toBe(true);
+  });
+
+  test('does not check `Select all` checkbox when checked values do not match options', () => {
+    const noop = () => null;
+
+    const { getByLabelText } = render(
+      <FormCheckboxGroup
+        value={['4', '5', '6']}
+        id="test-checkboxes"
+        name="test-checkboxes"
+        onAllChange={noop}
+        options={[
+          { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
+          { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
+          { id: 'checkbox-3', label: 'Test checkbox 3', value: '3' },
+        ]}
+      />,
+    );
+
+    const selectAllCheckbox = getByLabelText('Select all') as HTMLInputElement;
+
+    expect(selectAllCheckbox.checked).toBe(false);
   });
 
   test('checking all options checks the `Select all` checkbox', () => {
     const noop = () => null;
 
     const { getByLabelText } = render(
-      <CheckboxWrapper
-        initialState={{
-          1: false,
-          2: true,
-          3: true,
-        }}
-      >
+      <CheckboxWrapper initialState={['2', '3']}>
         {(state, handleChange) => (
           <FormCheckboxGroup
-            checkedValues={state}
+            value={state}
             id="test-checkboxes"
             name="test-checkboxes"
             onAllChange={noop}
@@ -244,16 +292,10 @@ describe('FormCheckboxGroup', () => {
     const noop = () => null;
 
     const { getByLabelText } = render(
-      <CheckboxWrapper
-        initialState={{
-          1: true,
-          2: true,
-          3: true,
-        }}
-      >
+      <CheckboxWrapper initialState={['1', '2', '3']}>
         {(state, handleChange) => (
           <FormCheckboxGroup
-            checkedValues={state}
+            value={state}
             id="test-checkboxes"
             name="test-checkboxes"
             onAllChange={noop}

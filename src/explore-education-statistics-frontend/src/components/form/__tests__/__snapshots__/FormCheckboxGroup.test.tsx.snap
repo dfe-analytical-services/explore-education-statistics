@@ -160,7 +160,7 @@ exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
 
 `;
 
-exports[`FormCheckboxGroup renders with \`Select all\` checkbox when \`onAllChange\` is set 1`] = `
+exports[`FormCheckboxGroup renders unchecked \`Select all\` checkbox when \`onAllChange\` is set 1`] = `
 
 <div class="govuk-form-group">
   <fieldset class="govuk-fieldset"
