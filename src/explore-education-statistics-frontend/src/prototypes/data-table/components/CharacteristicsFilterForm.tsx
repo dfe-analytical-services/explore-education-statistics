@@ -53,13 +53,17 @@ interface Props {
 
 interface State {
   isSubmitted: boolean;
+  openFilters: {
+    [key: string]: boolean;
+  };
   searchTerm: string;
   submitError: string;
 }
 
 class CharacteristicsFilterForm extends Component<Props, State> {
-  public state = {
+  public state: State = {
     isSubmitted: false,
+    openFilters: {},
     searchTerm: '',
     submitError: '',
   };
@@ -147,10 +151,15 @@ class CharacteristicsFilterForm extends Component<Props, State> {
           ),
       )
       .map(([groupKey, items]) => {
-        const isMenuOpen = groupData[groupKey].some(
-          item =>
-            (this.state.searchTerm !== '' && containsSearchTerm(item.label)) ||
-            values.indexOf(item.name) > -1,
+        const compositeKey = `${formKey}-${groupKey}`;
+
+        const isMenuOpen = Boolean(
+          groupData[groupKey].some(
+            item =>
+              (this.state.searchTerm !== '' &&
+                containsSearchTerm(item.label)) ||
+              values.indexOf(item.name) > -1,
+          ) || this.state.openFilters[compositeKey],
         );
 
         const options = sortBy(
@@ -170,29 +179,43 @@ class CharacteristicsFilterForm extends Component<Props, State> {
         );
 
         return (
-          <MenuDetails summary={groupKey} key={groupKey} open={isMenuOpen}>
+          <MenuDetails
+            summary={groupKey}
+            key={compositeKey}
+            open={isMenuOpen}
+            onToggle={event => {
+              event.preventDefault();
+
+              this.setState({
+                openFilters: {
+                  ...this.state.openFilters,
+                  [compositeKey]: !event.currentTarget.open,
+                },
+              });
+            }}
+          >
             <FieldArray name={formKey}>
               {({ form, ...helpers }) => (
                 <FormCheckboxGroup
                   value={values}
                   name={formKey}
-                  id={`${formKey}-${groupKey}`}
-                  onAllChange={event => {
-                    if (this.state.searchTerm !== '') {
-                      return;
-                    }
+                  id={compositeKey}
+                  onAllChange={
+                    !this.state.searchTerm
+                      ? event => {
+                          const allOptionValues = groupData[groupKey].map(
+                            value => value.name,
+                          );
 
-                    const allOptionValues = groupData[groupKey].map(
-                      value => value.name,
-                    );
-
-                    this.handleAllCheckboxChange(
-                      event,
-                      allOptionValues,
-                      formKey,
-                      form,
-                    );
-                  }}
+                          this.handleAllCheckboxChange(
+                            event,
+                            allOptionValues,
+                            formKey,
+                            form,
+                          );
+                        }
+                      : undefined
+                  }
                   onChange={event =>
                     this.handleCheckboxChange(
                       event,
