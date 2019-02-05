@@ -30,13 +30,11 @@ const FilterMenu: FunctionComponent<Props> = ({
               onChange={onChange}
               options={[
                 {
-                  checked: filters.PUPIL_ABSENCE,
                   id: 'pupilAbsence',
                   label: 'Pupil absence',
                   value: 'PUPIL_ABSENCE',
                 },
                 {
-                  checked: filters.EXCLUSIONS,
                   id: 'exclusions',
                   label: 'Exclusions',
                   value: 'EXCLUSIONS',

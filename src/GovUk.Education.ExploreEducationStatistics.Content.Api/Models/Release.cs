@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
 {
@@ -23,5 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
         public Publication Publication { get; set; }
         
         public List<Update> Updates { get; set; }
+
+        public List<ContentSection> Content { get; set; }
     }
 }

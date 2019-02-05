@@ -1,6 +1,6 @@
-import React from 'react';
-import Accordion from '../../../components/Accordion';
+import React, { Component } from 'react';
 import TopicList from './TopicList';
+
 interface ThemeItem {
   id: string;
   slug: string;
@@ -13,23 +13,31 @@ interface Props {
   linkIdentifier: string;
 }
 
-const ThemeList = ({ items = [] }: Props) => (
-  <>
-    {items.length > 0 ? (
+class ThemeList extends Component<Props> {
+  public static defaultProps = {
+    items: [],
+  };
+
+  public render() {
+    const { items } = this.props;
+
+    return (
       <>
-        {items.map(({ id, slug, title, summary }) => (
-          <div key={id}>
-            <h2 className="govuk-heading-l">{title}</h2>
-            <Accordion id="{slug}">
-              <TopicList theme={slug} />
-            </Accordion>
-          </div>
-        ))}
+        {items.length > 0 ? (
+          <>
+            {items.map(({ id, slug, title }) => (
+              <div key={id}>
+                <h2 className="govuk-heading-l">{title}</h2>
+                <TopicList theme={slug} />
+              </div>
+            ))}
+          </>
+        ) : (
+          <div className="govuk-inset-text">No data currently published.</div>
+        )}
       </>
-    ) : (
-      <div className="govuk-inset-text">No data currently published.</div>
-    )}
-  </>
-);
+    );
+  }
+}
 
 export default ThemeList;

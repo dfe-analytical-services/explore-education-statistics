@@ -81,6 +81,14 @@
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
               "value": "6.9.1"
+            },
+            {
+              "name": "AzureStorageConfig:CosmosEndpointUrl",
+              "value": "[Concat('https://',  parameters('cosmosAccountName'), '.documents.azure.com:443')]"
+            },
+            {
+              "name": "AzureStorageConfig:CosmosAuthorizationKey",
+              "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('cosmosAccountName')), '2015-04-08').primaryMasterKey]"
             }
           ],
           "connectionStrings": [

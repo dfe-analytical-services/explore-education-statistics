@@ -13,19 +13,34 @@ const PrototypeTableSample = ({ caption }: Props) => {
           <thead className="govuk-table__head">
             <tr className="tableizer-firstrow">
               <th className="govuk-table__header" />
-              <th className="govuk-table__header" scope="col">
+              <th
+                className="govuk-table__header govuk-table__cell--numeric"
+                scope="col"
+              >
                 2012/13
               </th>
-              <th className="govuk-table__header" scope="col">
+              <th
+                className="govuk-table__header govuk-table__cell--numeric"
+                scope="col"
+              >
                 2013/14
               </th>
-              <th className="govuk-table__header" scope="col">
+              <th
+                className="govuk-table__header govuk-table__cell--numeric"
+                scope="col"
+              >
                 2014/15
               </th>
-              <th className="govuk-table__header" scope="col">
+              <th
+                className="govuk-table__header govuk-table__cell--numeric"
+                scope="col"
+              >
                 2015/16
               </th>
-              <th className="govuk-table__header" scope="col">
+              <th
+                className="govuk-table__header govuk-table__cell--numeric"
+                scope="col"
+              >
                 2016/17
               </th>
             </tr>
@@ -36,21 +51,43 @@ const PrototypeTableSample = ({ caption }: Props) => {
               <th className="govuk-table__header" scope="row">
                 Number of schools
               </th>
-              <td className="govuk-table__cell">21,130</td>
-              <td className="govuk-table__cell">21,151</td>
-              <td className="govuk-table__cell">21,178</td>
-              <td className="govuk-table__cell">21,163</td>
-              <td className="govuk-table__cell"> 21,247 </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                21,130
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                21,151
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                21,178
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                21,163
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                {' '}
+                21,247{' '}
+              </td>
             </tr>
             <tr className="govuk-table__row">
               <th className="govuk-table__header" scope="row">
                 Number of pupil enrolments
               </th>
-              <td className="govuk-table__cell">6,477,725</td>
-              <td className="govuk-table__cell">6,554,005</td>
-              <td className="govuk-table__cell">6,642,755</td>
-              <td className="govuk-table__cell">6,737,190</td>
-              <td className="govuk-table__cell"> 6,899,770 </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                6,477,725
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                6,554,005
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                6,642,755
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                6,737,190
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                {' '}
+                6,899,770{' '}
+              </td>
             </tr>
             <tr className="govuk-table__row">
               <th className="govuk-table__header">
@@ -61,31 +98,61 @@ const PrototypeTableSample = ({ caption }: Props) => {
               <th className="govuk-table__header" scope="row">
                 Overall absence
               </th>
-              <td className="govuk-table__cell">5.3</td>
-              <td className="govuk-table__cell">4.5</td>
-              <td className="govuk-table__cell">4.6</td>
-              <td className="govuk-table__cell">4.6</td>
-              <td className="govuk-table__cell">4.7</td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                5.3
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                4.5
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                4.6
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                4.6
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                4.7
+              </td>
             </tr>
             <tr className="govuk-table__row">
               <th className="govuk-table__header" scope="row">
                 Authorised absence
               </th>
-              <td className="govuk-table__cell">4.2</td>
-              <td className="govuk-table__cell">3.5</td>
-              <td className="govuk-table__cell">3.5</td>
-              <td className="govuk-table__cell">3.4</td>
-              <td className="govuk-table__cell">3.4</td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                4.2
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                3.5
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                3.5
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                3.4
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                3.4
+              </td>
             </tr>
             <tr className="govuk-table__row">
               <th className="govuk-table__header" scope="row">
                 Unauthorised absence
               </th>
-              <td className="govuk-table__cell">1.1</td>
-              <td className="govuk-table__cell">1.1</td>
-              <td className="govuk-table__cell">1.1</td>
-              <td className="govuk-table__cell">1.1</td>
-              <td className="govuk-table__cell">1.3</td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                1.1
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                1.1
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                1.1
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                1.1
+              </td>
+              <td className="govuk-table__cell govuk-table__cell--numeric">
+                1.3
+              </td>
             </tr>
           </tbody>
         </table>

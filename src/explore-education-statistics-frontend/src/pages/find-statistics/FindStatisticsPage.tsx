@@ -35,7 +35,7 @@ class FindStatisticsPage extends Component<Props, State> {
           Browse to find the statistics and data you’re looking for and open the
           section to get links to:
         </p>
-        <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+        <ul className="govuk-!-margin-bottom-9">
           <li>
             up-to-date national statistical headlines, breakdowns and
             explanations

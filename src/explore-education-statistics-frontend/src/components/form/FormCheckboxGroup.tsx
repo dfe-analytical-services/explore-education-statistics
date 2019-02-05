@@ -4,7 +4,6 @@ import FormCheckbox, { CheckboxChangeEventHandler } from './FormCheckbox';
 import FormFieldSet, { FieldSetProps } from './FormFieldSet';
 
 export interface CheckboxOption {
-  checked?: boolean;
   hint?: string;
   id: string;
   label: string;

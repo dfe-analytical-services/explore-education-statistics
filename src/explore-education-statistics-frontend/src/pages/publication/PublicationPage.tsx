@@ -34,6 +34,12 @@ interface Release {
   slug: string;
 }
 
+interface ContentSection {
+  caption: string;
+  heading: string;
+  order: number;
+}
+
 interface Publication {
   dataSource: string;
   nextUpdate: string;
@@ -49,12 +55,14 @@ interface State {
     summary: string;
     releaseName: string;
     publication: Publication;
+    content: ContentSection[];
   };
 }
 
 class PublicationPage extends Component<Props, State> {
   public state = {
     data: {
+      content: [],
       publication: {
         dataSource: '',
         legacyReleases: [
@@ -234,13 +242,17 @@ class PublicationPage extends Component<Props, State> {
         </h2>
 
         <h2 className="govuk-heading-l">Contents</h2>
-        <Accordion id="contents-sections">
-          <AccordionSection heading="About this release">
-            <p className="govuk-body">
-              TODO: Implement about this release content
-            </p>
-          </AccordionSection>
-        </Accordion>
+        {data.content.length > 0 ? (
+          <Accordion id="contents-sections">
+            {data.content.map(({ heading, caption, order }) => (
+              <AccordionSection heading={heading} caption={caption} key={order}>
+                <p className="govuk-body">TODO: Implement content</p>
+              </AccordionSection>
+            ))}
+          </Accordion>
+        ) : (
+          <></>
+        )}
 
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Extra information

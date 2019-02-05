@@ -1,4 +1,5 @@
-import React, { Component, HTMLAttributes, ReactNode } from 'react';
+import React, { Component } from 'react';
+import Accordion from '../../../components/Accordion';
 import AccordionSection from '../../../components/AccordionSection';
 import { contentApi } from '../../../services/api';
 import PublicationList from '../components/PublicationList';
@@ -8,18 +9,22 @@ interface Props {
 }
 
 interface State {
-  publications: object[];
-  theme: string;
+  topics: {
+    id: string;
+    slug: string;
+    summary: string;
+    title: string;
+  }[];
 }
 
-class TopicList extends Component<Props> {
+class TopicList extends Component<Props, State> {
   public state = {
-    theme: '',
     topics: [],
   };
 
   public componentDidMount() {
     const { theme } = this.props;
+
     contentApi
       .get(`theme/${theme}/topics`)
       .then(json => this.setState({ topics: json.data }))
@@ -28,24 +33,21 @@ class TopicList extends Component<Props> {
   }
 
   public render() {
-    const { theme, topics } = this.state;
+    const { theme } = this.props;
+    const { topics } = this.state;
 
     return (
       <>
         {topics.length > 0 ? (
-          <>
+          <Accordion id={theme}>
             {topics.map(({ id, slug, title, summary }) => (
-              <div key={id}>
-                <AccordionSection id={id} heading={title} caption={summary}>
-                  <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-                    <ul className="govuk-list-bullet">
-                      <PublicationList topic={slug} />
-                    </ul>
-                  </div>
-                </AccordionSection>
-              </div>
+              <AccordionSection heading={title} caption={summary} key={id}>
+                <ul className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+                  <PublicationList topic={slug} />
+                </ul>
+              </AccordionSection>
             ))}
-          </>
+          </Accordion>
         ) : (
           <div className="govuk-inset-text">No data currently published.</div>
         )}

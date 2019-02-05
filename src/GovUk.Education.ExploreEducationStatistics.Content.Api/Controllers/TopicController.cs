@@ -40,8 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         public ActionResult<List<Publication>> GetPublications(string id)
         {
             return Guid.TryParse(id, out var newGuid) ? 
-                _context.Publications.Where(t => t.TopicId == newGuid).ToList() : 
-                _context.Publications.Where(t => t.Topic.Slug == id).ToList();
+                _context.Publications.Where(t => t.TopicId == newGuid && t.Releases.Any()).ToList() : 
+                _context.Publications.Where(t => t.Topic.Slug == id && t.Releases.Any()).ToList();
         }
     }
 }
