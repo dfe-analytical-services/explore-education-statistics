@@ -91,7 +91,7 @@ const PublicationPage = () => {
               <span className="govuk-caption-m govuk-caption-inline">
                 For school year:{' '}
               </span>
-              2016-2017 (latest data)
+              2016/17 (latest data)
             </h3>
 
             <Details summary="See previous 7 releases">
@@ -650,8 +650,8 @@ const PublicationPage = () => {
 
       <Accordion id="extra-information-sections">
         <AccordionSection
-          heading="Where does this data come from"
-          caption="How we collect and process the data"
+          heading="Where does this data come from?"
+          caption="Our methodology, how we collect and process the data"
           headingTag="h3"
         >
           <ul className="govuk-list">

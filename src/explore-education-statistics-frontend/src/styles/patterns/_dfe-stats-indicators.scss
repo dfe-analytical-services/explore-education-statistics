@@ -33,9 +33,6 @@
       flex-basis: 100%;
     }
   }
-  .dfe-dash-tiles__heading {
-    margin-bottom: 0;
-  }
 }
 
 .dfe-dash-tiles__tile {
@@ -49,6 +46,15 @@
   margin: 2% 2% 1% 0;
   padding: 20px 20px 0;
   position: relative;
+
+  .dfe-dash-tiles__heading {
+    margin-bottom: 0;
+  }
+
+  .govuk-details__summary-text {
+    font-size: 1rem;
+    line-height: 0.8rem;
+  }
 
   .referenceLink {
     @include govuk-font(14);

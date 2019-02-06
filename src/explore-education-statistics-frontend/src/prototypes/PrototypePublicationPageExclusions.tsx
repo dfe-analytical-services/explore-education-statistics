@@ -35,7 +35,9 @@ const PublicationPageExclusions = () => {
           <p className="govuk-body">
             You can also view a regional breakdown of statistics and data within
             the{' '}
-            <a href="#contents-sections-heading-9">local authorities section</a>
+            <a href="#contents-exclusions-sections-heading-9">
+              local authorities section
+            </a>
           </p>
 
           <Details summary="Read more about our methodology">
@@ -87,7 +89,7 @@ const PublicationPageExclusions = () => {
               <span className="govuk-caption-m govuk-caption-inline">
                 For school year:{' '}
               </span>
-              2016-2017 (latest data)
+              2016/17 (latest data)
             </h3>
 
             <Details summary="See previous 7 releases">
@@ -635,8 +637,8 @@ const PublicationPageExclusions = () => {
 
       <Accordion id="extra-information-exclusions-sections">
         <AccordionSection
-          heading="Where does this data come from"
-          caption="How we collect and process the data"
+          heading="Where does this data come from?"
+          caption="Our methodology, how we collect and process the data"
           headingTag="h3"
         >
           <ul className="govuk-list">
