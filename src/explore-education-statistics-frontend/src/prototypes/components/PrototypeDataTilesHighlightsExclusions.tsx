@@ -8,11 +8,9 @@ const PrototypeDataTileHighlights = () => (
         Overall permanent exclusions
       </h3>
       <div>
-        <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-positive">
-          0.10%
-        </span>
+        <span className="govuk-heading-xl govuk-!-margin-bottom-2">0.10%</span>
       </div>
-      <Details summary="What does this mean?">
+      <Details summary="What is overall permanent exclusions?">
         Overall permanent exclusions is the adipisicing elit. Dolorum hic nobis
         voluptas quidem fugiat enim ipsa reprehenderit nulla.
       </Details>
@@ -22,10 +20,8 @@ const PrototypeDataTileHighlights = () => (
       <h3 className="govuk-heading-m dfe-dash-tiles__heading">
         Number of exclusions
       </h3>
-      <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
-        7,720
-      </span>
-      <Details summary="What does this mean?">
+      <span className="govuk-heading-xl govuk-!-margin-bottom-2">7,720</span>
+      <Details summary="What is number of exclusions?">
         Number of exclusions is the adipisicing elit. Dolorum hic nobis voluptas
         quidem fugiat enim ipsa reprehenderit nulla.
       </Details>
@@ -35,12 +31,10 @@ const PrototypeDataTileHighlights = () => (
       <h3 className="govuk-heading-m dfe-dash-tiles__heading">
         Overall rate of fixed-period exclusions
       </h3>
-      <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
-        4.76%
-      </span>
-      <Details summary="What does this mean?">
-        Unauthorised absence is the adipisicing elit. Dolorum hic nobis voluptas
-        quidem fugiat enim ipsa reprehenderit nulla.
+      <span className="govuk-heading-xl govuk-!-margin-bottom-2">4.76%</span>
+      <Details summary="What is overall rate of fixed-period exclusions?">
+        Overall rate of fixed-period exclusionsis the adipisicing elit. Dolorum
+        hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
       </Details>
     </div>
   </div>

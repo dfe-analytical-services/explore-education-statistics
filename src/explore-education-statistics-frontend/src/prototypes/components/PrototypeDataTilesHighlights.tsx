@@ -8,20 +8,9 @@ const PrototypeDataTileHighlights = () => (
         Overall absence
       </h3>
       <div>
-        <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
-          4.7%
-        </span>
-        <p className="govuk-body dfe-dash-tiles__tile--hidden">
-          <strong className="increase">
-            +0.4
-            <abbr aria-label="Percentage points" title="Percentage points">
-              ppt
-            </abbr>
-          </strong>
-          more than 2015/16
-        </p>
+        <span className="govuk-heading-xl govuk-!-margin-bottom-2">4.7%</span>
       </div>
-      <Details summary="What does this mean?">
+      <Details summary="What is overall absence?">
         Overall absence is the adipisicing elit. Dolorum hic nobis voluptas
         quidem fugiat enim ipsa reprehenderit nulla.
       </Details>
@@ -31,19 +20,8 @@ const PrototypeDataTileHighlights = () => (
       <h3 className="govuk-heading-m dfe-dash-tiles__heading">
         Authorised absence
       </h3>
-      <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
-        3.4%
-      </span>
-      <p className="govuk-body dfe-dash-tiles__tile--hidden">
-        <strong className="level">
-          0
-          <abbr aria-label="Percentage points" title="Percentage points">
-            ppt
-          </abbr>
-        </strong>
-        the same as 2015/16
-      </p>
-      <Details summary="What does this mean?">
+      <span className="govuk-heading-xl govuk-!-margin-bottom-2">3.4%</span>
+      <Details summary="What is authorised absence?">
         Authorised absence is the adipisicing elit. Dolorum hic nobis voluptas
         quidem fugiat enim ipsa reprehenderit nulla.
       </Details>
@@ -53,19 +31,8 @@ const PrototypeDataTileHighlights = () => (
       <h3 className="govuk-heading-m dfe-dash-tiles__heading">
         Unauthorised absence
       </h3>
-      <span className="govuk-heading-xl govuk-!-margin-bottom-2 govuk-caption-increase-negative">
-        1.3%
-      </span>
-      <p className="govuk-body dfe-dash-tiles__tile--hidden">
-        <strong className="decrease">
-          -0.4
-          <abbr aria-label="Percentage points" title="Percentage points">
-            ppt
-          </abbr>
-        </strong>
-        less than 2015/16
-      </p>
-      <Details summary="What does this mean?">
+      <span className="govuk-heading-xl govuk-!-margin-bottom-2">1.3%</span>
+      <Details summary="What is unauthorised absence?">
         Unauthorised absence is the adipisicing elit. Dolorum hic nobis voluptas
         quidem fugiat enim ipsa reprehenderit nulla.
       </Details>
