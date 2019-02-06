@@ -10,11 +10,12 @@ export interface CheckboxOption {
   value: string;
 }
 
-type Props = {
+export type FormCheckboxGroupProps = {
   name: string;
   onAllChange?: CheckboxChangeEventHandler;
   onChange?: CheckboxChangeEventHandler<any>;
   options: CheckboxOption[];
+  selectAll?: boolean;
   value: string[];
 } & FieldSetProps;
 
@@ -22,9 +23,14 @@ interface State {
   checkedCount: number;
 }
 
-class FormCheckboxGroup extends Component<Props, State> {
-  public static defaultProps: Partial<Props> = {
+/**
+ * Basic checkbox group that should be used as a controlled component.
+ * When using Formik, use {@see FormFieldCheckboxGroup} instead.
+ */
+class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
+  public static defaultProps: Partial<FormCheckboxGroupProps> = {
     legendSize: 'm',
+    selectAll: false,
     value: [],
   };
 
@@ -35,7 +41,7 @@ class FormCheckboxGroup extends Component<Props, State> {
   }
 
   public render() {
-    const { value, onAllChange, name, options } = this.props;
+    const { value, onAllChange, name, options, selectAll } = this.props;
     const isAllChecked = options.every(
       option => value.indexOf(option.value) > -1,
     );
@@ -43,7 +49,7 @@ class FormCheckboxGroup extends Component<Props, State> {
     return (
       <FormFieldSet {...this.props}>
         <div className="govuk-checkboxes" ref={this.ref}>
-          {onAllChange && (
+          {selectAll && (
             <FormCheckbox
               id={`${name}-all`}
               label="Select all"
@@ -51,8 +57,8 @@ class FormCheckboxGroup extends Component<Props, State> {
               value="select-all"
               checked={isAllChecked}
               onChange={event => {
-                if (this.props.onAllChange) {
-                  this.props.onAllChange(event);
+                if (onAllChange) {
+                  onAllChange(event);
                 }
               }}
             />
