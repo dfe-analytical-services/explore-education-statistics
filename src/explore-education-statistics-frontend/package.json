@@ -88,7 +88,7 @@
     "*.{ts,tsx}": [
       "node hooks/exec.js  'tsc --noEmit'",
       "tslint --project tsconfig.json",
-      "cross-env CI=true npm run test"
+      "cross-env CI=true npm run test --findRelatedTests"
     ],
     "*.{scss,css}": [
       "stylelint"
