@@ -47,7 +47,12 @@ class PrototypeAbsenceData extends Component<
         {this.state.absenceData ? (
           <div className="govuk-grid-column-one-third" aria-live="assertive">
             <span className="govuk-caption-m">Selected local authority</span>
-            <h3 className="govuk-heading-m">{this.state.absenceData.title}</h3>
+            <h3
+              className="govuk-heading-m"
+              aria-label={this.state.absenceData.title}
+            >
+              {this.state.absenceData.title}
+            </h3>
             <div className="dfe-dash-tiles__tile govuk-!-margin-bottom-6">
               <h3 className="govuk-heading-m dfe-dash-tiles__heading">
                 Overall absence

@@ -7,7 +7,7 @@ const GoToTopLink: FunctionComponent = () => {
         href="#application"
         className="govuk-link govuk-link--no-visited-state"
       >
-        Go to Top
+        Go to top
       </a>
     </div>
   );

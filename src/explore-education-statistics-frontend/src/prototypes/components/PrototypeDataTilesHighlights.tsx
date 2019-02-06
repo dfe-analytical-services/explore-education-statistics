@@ -7,9 +7,7 @@ const PrototypeDataTileHighlights = () => (
       <h3 className="govuk-heading-m dfe-dash-tiles__heading">
         Overall absence
       </h3>
-      <div>
-        <span className="govuk-heading-xl govuk-!-margin-bottom-2">4.7%</span>
-      </div>
+      <p className="govuk-heading-xl govuk-!-margin-bottom-2">4.7%</p>
       <Details summary="What is overall absence?">
         Overall absence is the adipisicing elit. Dolorum hic nobis voluptas
         quidem fugiat enim ipsa reprehenderit nulla.
@@ -20,7 +18,7 @@ const PrototypeDataTileHighlights = () => (
       <h3 className="govuk-heading-m dfe-dash-tiles__heading">
         Authorised absence
       </h3>
-      <span className="govuk-heading-xl govuk-!-margin-bottom-2">3.4%</span>
+      <p className="govuk-heading-xl govuk-!-margin-bottom-2">3.4%</p>
       <Details summary="What is authorised absence?">
         Authorised absence is the adipisicing elit. Dolorum hic nobis voluptas
         quidem fugiat enim ipsa reprehenderit nulla.
@@ -31,7 +29,7 @@ const PrototypeDataTileHighlights = () => (
       <h3 className="govuk-heading-m dfe-dash-tiles__heading">
         Unauthorised absence
       </h3>
-      <span className="govuk-heading-xl govuk-!-margin-bottom-2">1.3%</span>
+      <p className="govuk-heading-xl govuk-!-margin-bottom-2">1.3%</p>
       <Details summary="What is unauthorised absence?">
         Unauthorised absence is the adipisicing elit. Dolorum hic nobis voluptas
         quidem fugiat enim ipsa reprehenderit nulla.

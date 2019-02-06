@@ -650,8 +650,8 @@ const PublicationPage = () => {
 
       <Accordion id="extra-information-sections">
         <AccordionSection
-          heading="Where does this data come from"
-          caption="How we collect and process the data"
+          heading="Where does this data come from?"
+          caption="Our methodology, how we collect and process the data"
           headingTag="h3"
         >
           <ul className="govuk-list">
