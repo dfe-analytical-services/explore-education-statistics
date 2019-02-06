@@ -235,6 +235,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                       hint="Filter statistics by number of pupils in school type(s)"
                       options={this.schoolTypeOptions}
                       value={values.schoolTypes}
+                      selectAll
                     />
                   </div>
                   <div className="govuk-grid-column-one-half govuk-form-group">

@@ -91,6 +91,7 @@ class SearchableFilterMenus<
               name={name as string}
               options={options}
               value={values}
+              selectAll
             />
           </MenuDetails>
         );
