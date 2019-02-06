@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer.Old;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -27,13 +28,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
         [HttpGet]
         public ActionResult<List<CountryGeographicModel>> List(string publication,
-            [FromQuery(Name = "schoolType")] string schoolType,
+            [FromQuery(Name = "schoolType")] SchoolType schoolType,
             [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            var data = _dataService.Get(publication, "national").Where(x =>
-                (string.IsNullOrEmpty(schoolType) ||
-                 string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
+            var data = _dataService.Get(publication, Level.National).Where(x => schoolType == x.SchoolType &&
                 (!year.HasValue || x.Year == year)
             ).ToList();
 
@@ -45,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 var g = new CountryGeographicModel();
                 g.Years = new List<YearItem>();
 
-                foreach (var y in c.Where(x => x.SchoolType == "Total"))
+                foreach (var y in c.Where(x => x.SchoolType == SchoolType.Total))
                 {
                     g.Years.Add(new YearItem {Year = y.Year, Attributes = y.Attributes});
                 }
@@ -61,13 +60,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
         [HttpGet("{countryId}")]
         public ActionResult<CountryGeographicModel> Get(string publication, string countryId,
-            [FromQuery(Name = "schoolType")] string schoolType,
+            [FromQuery(Name = "schoolType")] SchoolType schoolType,
             [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            var data = _dataService.Get(publication, "national").Where(x =>
-                (string.IsNullOrEmpty(schoolType) ||
-                 string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
+            var data = _dataService.Get(publication, Level.National).Where(x => schoolType == x.SchoolType &&
                 (!year.HasValue || x.Year == year)
             ).ToList();
 
@@ -76,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
             model.Years = new List<YearItem>();
 
-            foreach (var y in data.Where(x => x.SchoolType == "Total"))
+            foreach (var y in data.Where(x => x.SchoolType == SchoolType.Total))
             {
                 model.Years.Add(new YearItem {Year = y.Year, Attributes = y.Attributes});
             }

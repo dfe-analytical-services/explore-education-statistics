@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
@@ -15,9 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
             DateTime releaseDate,
             string term,
             int year,
-            string level,
+            Level level,
             Country country,
-            string schoolType,
+            SchoolType schoolType,
             Dictionary<string, string> attributes,
             Region region,
             LocalAuthority localAuthority,

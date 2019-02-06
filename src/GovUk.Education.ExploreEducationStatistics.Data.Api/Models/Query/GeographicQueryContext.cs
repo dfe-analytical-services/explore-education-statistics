@@ -18,12 +18,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 
         public IMongoQueryable<GeographicData> FindExpression(IMongoQueryable<GeographicData> queryable)
         {
-            queryable = queryable.Where(x => x.Level == Level.ToString());
+            queryable = queryable.Where(x => x.Level == Level);
 
             if (SchoolTypes.Count > 0)
             {
-                queryable = queryable.Where(x =>
-                    SchoolTypes.Select(Query.SchoolTypes.EnumToString).Contains(x.SchoolType));
+                queryable = queryable.Where(x => SchoolTypes.Contains(x.SchoolType));
             }
 
             var yearsQuery = QueryUtil.YearsQuery(Years, StartYear, EndYear);
@@ -31,7 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
             {
                 queryable = queryable.Where(x => yearsQuery.Contains(x.Year));
             }
-
 
             return queryable;
         }

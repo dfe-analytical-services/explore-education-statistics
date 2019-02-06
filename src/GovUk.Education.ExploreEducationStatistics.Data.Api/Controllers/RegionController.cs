@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer.Old;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -26,23 +27,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
         [HttpGet]
         public ActionResult<List<GeographicModel>> List(string publication,
-            [FromQuery(Name = "schoolType")] string schoolType,
+            [FromQuery(Name = "schoolType")] SchoolType schoolType,
             [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            var data = _dataService.Get(publication, "regional").Where(x =>
-                (string.IsNullOrEmpty(schoolType) ||
-                 string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
+            var data = _dataService.Get(publication, Level.Region).Where(x => schoolType == x.SchoolType &&
                 (!year.HasValue || x.Year == year)
             ).ToList();
-
 
             return _mapper.Map<List<GeographicModel>>(data);
         }
 
         [HttpGet("{regionId}")]
         public ActionResult<GeographicModel> Get(string publication, string regionId,
-            [FromQuery(Name = "schoolType")] string schoolType,
+            [FromQuery(Name = "schoolType")] SchoolType schoolType,
             [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
@@ -59,9 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
             return _csvReader.GeoLevels(publication + "_geoglevels", attributes)
-                .Where(x =>
-                    (string.IsNullOrEmpty(schoolType) ||
-                     string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
+                .Where(x => schoolType == x.SchoolType &&
                     (!year.HasValue || x.Year == year) &&
                     x.Region.Code == regionId &&
                     x.Level.ToLower() == "local authority"

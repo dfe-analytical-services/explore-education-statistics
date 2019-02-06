@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer.Old;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -26,13 +27,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
         [HttpGet]
         public ActionResult<List<GeographicModel>> List(string publication,
-            [FromQuery(Name = "schoolType")] string schoolType,
+            [FromQuery(Name = "schoolType")] SchoolType schoolType,
             [FromQuery(Name = "year")] int? year,
             [FromQuery(Name = "attributes")] List<string> attributes)
         {
-            var data = _dataService.Get(publication, "local authority").Where(x =>
-                (string.IsNullOrEmpty(schoolType) ||
-                 string.Equals(x.SchoolType, schoolType, StringComparison.OrdinalIgnoreCase)) &&
+            var data = _dataService.Get(publication, Level.Local_Authority).Where(x => schoolType == x.SchoolType &&
                 (!year.HasValue || x.Year == year)
             ).ToList();
 

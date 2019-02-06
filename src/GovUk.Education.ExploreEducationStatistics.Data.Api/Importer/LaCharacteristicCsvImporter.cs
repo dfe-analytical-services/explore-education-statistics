@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 ReleaseId = releaseId,
                 ReleaseDate = releaseDate,
                 Year = int.Parse(values[headers.FindIndex(h => h.Equals("year"))]),
-                Level = Levels.EnumFromStringForImport(values[headers.FindIndex(h => h.Equals("level"))]).ToString(),
+                Level = Levels.EnumFromStringForImport(values[headers.FindIndex(h => h.Equals("level"))]),
                 Country = new Country
                 {
                     Code = values[headers.FindIndex(h => h.Equals("country_code"))],
@@ -47,8 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                     Code = values[headers.FindIndex(h => h.Equals("new_la_code"))],
                     Name = values[headers.FindIndex(h => h.Equals("la_name"))]
                 },
-                SchoolType = SchoolTypes
-                    .EnumFromStringForImport(values[headers.FindIndex(h => h.Equals("school_type"))]).ToString(),
+                SchoolType =
+                    SchoolTypes.EnumFromStringForImport(values[headers.FindIndex(h => h.Equals("school_type"))]),
                 Attributes = new Dictionary<string, string>(),
                 Characteristic = new Characteristic
                 {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -18,9 +19,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
             DateTime releaseDate,
             string term,
             int year,
-            string level,
+            Level level,
             Country country,
-            string schoolType,
+            SchoolType schoolType,
             Dictionary<string, string> attributes)
         {
             PublicationId = publicationId;
@@ -40,9 +41,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
         public DateTime ReleaseDate { get; set; }
         [BsonElement("term")] public string Term { get; set; }
         [BsonElement("year")] public int Year { get; set; }
-        [BsonElement("level")] public string Level { get; set; }
+
+        [BsonRepresentation(BsonType.String)]
+        [BsonElement("level")]
+        public Level Level { get; set; }
+
         public Country Country { get; set; }
-        [BsonElement("school_type")] public string SchoolType { get; set; }
+
+        [BsonRepresentation(BsonType.String)]
+        [BsonElement("school_type")]
+        public SchoolType SchoolType { get; set; }
+
         public Dictionary<string, string> Attributes { get; set; }
     }
 }

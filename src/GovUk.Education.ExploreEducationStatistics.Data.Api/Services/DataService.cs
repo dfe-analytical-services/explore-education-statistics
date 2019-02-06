@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 
@@ -16,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _database = database;
         }
 
-        public IEnumerable<GeographicData> Get(string publication, string level = "")
+        public IEnumerable<GeographicData> Get(string publication, Level level)
         {
             return Queryable(publication).Where(x => x.Level == level).ToList();
         }

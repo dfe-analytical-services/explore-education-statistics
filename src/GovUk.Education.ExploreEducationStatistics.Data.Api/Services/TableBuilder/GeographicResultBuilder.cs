@@ -12,6 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             {
                 Year = data.Year,
                 SchoolType = data.SchoolType,
+                Country = data.Country,
                 Attributes = attributeFilter.Count > 0
                     ? QueryUtil.FilterAttributes(data.Attributes, attributeFilter)
                     : data.Attributes

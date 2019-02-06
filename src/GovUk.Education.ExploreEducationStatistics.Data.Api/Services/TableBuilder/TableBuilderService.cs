@@ -14,7 +14,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
         private readonly GeographicResultBuilder _geographicResultBuilder;
         private readonly CharacteristicResultBuilder _characteristicResultBuilder;
 
-        public TableBuilderService(GeographicDataService geographicDataService, LaCharacteristicService laCharacteristicService,
+        public TableBuilderService(GeographicDataService geographicDataService,
+            LaCharacteristicService laCharacteristicService,
             NationalCharacteristicService nationalCharacteristicService,
             GeographicResultBuilder geographicResultBuilder,
             CharacteristicResultBuilder characteristicResultBuilder)
@@ -33,7 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 
         public TableBuilderResult GetLocalAuthority(LaQueryContext query)
         {
-            return BuildResult(_laCharacteristicService.FindMany(query), query.Attributes, _characteristicResultBuilder);
+            return BuildResult(_laCharacteristicService.FindMany(query), query.Attributes,
+                _characteristicResultBuilder);
         }
 
         public TableBuilderResult GetNational(NationalQueryContext query)
@@ -41,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             return BuildResult(_nationalCharacteristicService.FindMany(query), query.Attributes,
                 _characteristicResultBuilder);
         }
-        
+
         private static TableBuilderResult BuildResult(IEnumerable<ITidyData> data, ICollection<string> attributes,
             IResultBuilder<ITidyData, ITableBuilderData> resultBuilder)
         {
@@ -56,11 +58,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
                 PublicationId = first.PublicationId,
                 ReleaseId = first.ReleaseId,
                 ReleaseDate = first.ReleaseDate,
+                Level = first.Level,
                 Result = data.Select(tidyData => resultBuilder.BuildResult(tidyData, attributes))
             };
         }
-        
-        private static TableBuilderResult BuildResult(IEnumerable<ICharacteristicData> data, ICollection<string> attributes,
+
+        private static TableBuilderResult BuildResult(IEnumerable<ICharacteristicData> data,
+            ICollection<string> attributes,
             IResultBuilder<ICharacteristicData, ITableBuilderData> resultBuilder)
         {
             if (!data.Any())

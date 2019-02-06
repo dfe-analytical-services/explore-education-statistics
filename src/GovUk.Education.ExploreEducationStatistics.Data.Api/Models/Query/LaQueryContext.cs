@@ -19,12 +19,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public IMongoQueryable<CharacteristicDataLa> FindExpression(
             IMongoQueryable<CharacteristicDataLa> queryable)
         {
-            queryable = queryable.Where(x => x.Level == Level.Local_Authority.ToString());
+            queryable = queryable.Where(x => x.Level == Level.Local_Authority);
 
             if (SchoolTypes.Count > 0)
             {
-                queryable = queryable.Where(x =>
-                    SchoolTypes.Select(Query.SchoolTypes.EnumToString).Contains(x.SchoolType));
+                queryable = queryable.Where(x => SchoolTypes.Contains(x.SchoolType));
             }
 
             var yearsQuery = QueryUtil.YearsQuery(Years, StartYear, EndYear);
