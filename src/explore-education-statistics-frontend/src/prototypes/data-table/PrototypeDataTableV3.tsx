@@ -66,6 +66,10 @@ class PrototypeDataTableV3 extends Component<{}, State> {
         id: 'cbbd299f-8297-44bc-92ac-558bcf51f8ad',
         label: 'Pupil absence',
       },
+      SCHOOLS_PUPILS_CHARACTERISTICS: {
+        id: 'a91d9e05-be82-474c-85ae-4913158406d0',
+        label: 'Schools, pupils and their characteristics',
+      },
     };
 
     const publication = menuOptions[menuOption];

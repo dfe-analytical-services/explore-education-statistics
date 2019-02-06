@@ -70,7 +70,21 @@ class PublicationMenu extends Component<Props, State> {
           </MenuDetails>
           <MenuDetails summary="Capacity and admissions" />
           <MenuDetails summary="Results" />
-          <MenuDetails summary="School and pupil numbers" />
+          <MenuDetails summary="School and pupil numbers" open>
+            <FormRadioGroup
+              value={this.state.menuOption}
+              name="schoolAndPupilNumbers"
+              id="schoolAndPupilNumbers"
+              onChange={this.handleRadioChange}
+              options={[
+                {
+                  id: 'schoolsPupilsAndTheirCharacteristics',
+                  label: 'Schools, pupils and their characteristics',
+                  value: 'SCHOOLS_PUPILS_CHARACTERISTICS',
+                },
+              ]}
+            />
+          </MenuDetails>
           <MenuDetails summary="School finance" />
           <MenuDetails summary="Teacher numbers" />
         </MenuDetails>
