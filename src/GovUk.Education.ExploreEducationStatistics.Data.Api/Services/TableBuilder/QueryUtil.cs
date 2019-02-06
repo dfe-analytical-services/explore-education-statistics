@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
         
         public static IEnumerable<int> YearsQuery(ICollection<int> specificYears, int start, int end)
         {
-            if (specificYears.Count > 0)
+            if (specificYears != null && specificYears.Count > 0)
             {
                 // Years have been specified. Ignore any StartYear and EndYear
                 return specificYears;
