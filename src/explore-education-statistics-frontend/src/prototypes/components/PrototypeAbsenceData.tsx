@@ -52,7 +52,10 @@ class PrototypeAbsenceData extends Component<
               <h3 className="govuk-heading-m dfe-dash-tiles__heading">
                 Overall absence
               </h3>
-              <p className="govuk-heading-xl govuk-!-margin-bottom-2">
+              <p
+                className="govuk-heading-xl govuk-!-margin-bottom-2"
+                aria-label="Overall absence"
+              >
                 {this.state.absenceData.values.overall}%
               </p>
               <Details summary="What is overall absence?">
@@ -64,7 +67,10 @@ class PrototypeAbsenceData extends Component<
               <h3 className="govuk-heading-m dfe-dash-tiles__heading">
                 Authorised absence
               </h3>
-              <p className="govuk-heading-xl govuk-!-margin-bottom-2">
+              <p
+                className="govuk-heading-xl govuk-!-margin-bottom-2"
+                aria-label="Authorised absence"
+              >
                 {this.state.absenceData.values.authorised}%
               </p>
               <Details summary="What is authorised absence?">
@@ -76,7 +82,10 @@ class PrototypeAbsenceData extends Component<
               <h3 className="govuk-heading-m dfe-dash-tiles__heading">
                 Unauthorised absence
               </h3>
-              <p className="govuk-heading-xl govuk-!-margin-bottom-2">
+              <p
+                className="govuk-heading-xl govuk-!-margin-bottom-2"
+                aria-label="Unauthorised absence"
+              >
                 {this.state.absenceData.values.unauthorised}%
               </p>
               <Details summary="What is unauthorised absence?">
