@@ -30,7 +30,7 @@ import Yup from '../../../lib/validation/yup';
 import {
   PublicationMeta,
   SchoolType,
-} from '../../../services/dataTableService';
+} from '../../../services/tableBuilderService';
 import { KeysWithType } from '../../../types/util';
 import MenuDetails from './MenuDetails';
 
