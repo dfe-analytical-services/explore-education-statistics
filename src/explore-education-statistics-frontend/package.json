@@ -17,6 +17,7 @@
     "axios": "^0.18.0",
     "classnames": "^2.2.6",
     "core-js": "^2.6.3",
+    "cross-env": "^5.2.0",
     "dotenv-webpack": "^1.7.0",
     "formik": "^1.4.3",
     "govuk-frontend": "^2.6.0",
@@ -74,7 +75,7 @@
     "lint:js": "tslint --project tsconfig.json 'src/**/*.{ts,tsx}'",
     "lint:style": "stylelint 'src/**/*.{scss,css}'",
     "test": "react-app-rewired test",
-    "test:snapshot": "react-app-rewired test -u",
+    "test:snapshot": "cross-env CI=true react-app-rewired test --updateSnapshot",
     "type-check": "tsc --noEmit",
     "eject": "react-app-rewired eject"
   },
@@ -87,7 +88,7 @@
     "*.{ts,tsx}": [
       "node hooks/exec.js  'tsc --noEmit'",
       "tslint --project tsconfig.json",
-      "jest --findRelatedTests"
+      "cross-env CI=true npm run test"
     ],
     "*.{scss,css}": [
       "stylelint"

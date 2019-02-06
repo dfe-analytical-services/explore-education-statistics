@@ -59,7 +59,7 @@ exports[`Accordion renders with hidden content by default 1`] = `
             class="govuk-link govuk-link--no-visited-state"
             href="#application"
           >
-            Go to Top
+            Go to top
           </a>
         </div>
       </div>
@@ -127,7 +127,7 @@ exports[`Accordion renders with visible content when \`open\` is true 1`] = `
             class="govuk-link govuk-link--no-visited-state"
             href="#application"
           >
-            Go to Top
+            Go to top
           </a>
         </div>
       </div>

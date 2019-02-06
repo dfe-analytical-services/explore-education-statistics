@@ -18,7 +18,7 @@ exports[`AccordionSection renders correctly with required props 1`] = `
       <a href="#application"
          class="govuk-link govuk-link--no-visited-state"
       >
-        Go to Top
+        Go to top
       </a>
     </div>
   </div>
@@ -47,7 +47,7 @@ exports[`AccordionSection renders with caption 1`] = `
       <a href="#application"
          class="govuk-link govuk-link--no-visited-state"
       >
-        Go to Top
+        Go to top
       </a>
     </div>
   </div>
@@ -73,7 +73,7 @@ exports[`AccordionSection renders with different heading size 1`] = `
       <a href="#application"
          class="govuk-link govuk-link--no-visited-state"
       >
-        Go to Top
+        Go to top
       </a>
     </div>
   </div>
