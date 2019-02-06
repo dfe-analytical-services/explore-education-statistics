@@ -51,6 +51,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return _tableBuilderService.GetGeographic(query);
         }
 
+        [HttpPost("geographic")]
+        public ActionResult<TableBuilderResult> GetGeographic([FromBody] GeographicQueryContext query)
+        {
+            return _tableBuilderService.GetGeographic(query);
+        }
+
         [HttpGet("characteristics/local-authority/{publicationId}")]
         public ActionResult<TableBuilderResult> GetLocalAuthority(Guid publicationId,
             [CommaSeparatedQueryString] ICollection<int> years,
@@ -74,6 +80,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return _tableBuilderService.GetLocalAuthority(query);
         }
 
+        [HttpPost("characteristics/local-authority")]
+        public ActionResult<TableBuilderResult> GetLocalAuthority([FromBody] LaQueryContext query)
+        {
+            return _tableBuilderService.GetLocalAuthority(query);
+        }
+
         [HttpGet("characteristics/national/{publicationId}")]
         public ActionResult<TableBuilderResult> GetNational(Guid publicationId,
             [CommaSeparatedQueryString] ICollection<int> years,
@@ -94,6 +106,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 EndYear = endYear
             };
 
+            return _tableBuilderService.GetNational(query);
+        }
+
+        [HttpPost("characteristics/national")]
+        public ActionResult<TableBuilderResult> GetNational(NationalQueryContext query)
+        {
             return _tableBuilderService.GetNational(query);
         }
 

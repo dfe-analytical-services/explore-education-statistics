@@ -1,4 +1,4 @@
-import range from 'lodash/range';
+import { range } from 'lodash-es';
 import React, { Component, createRef } from 'react';
 import PageHeading from '../../components/PageHeading';
 import Tabs from '../../components/Tabs';
@@ -9,7 +9,7 @@ import {
   getNationalCharacteristicsData,
   PublicationMeta,
   SchoolType,
-} from '../../services/dataTableService';
+} from '../../services/tableBuilderService';
 import PrototypePage from '../components/PrototypePage';
 import CharacteristicsDataTable from './components/CharacteristicsDataTable';
 import CharacteristicsFilterForm, {
@@ -66,6 +66,10 @@ class PrototypeDataTableV3 extends Component<{}, State> {
         id: 'cbbd299f-8297-44bc-92ac-558bcf51f8ad',
         label: 'Pupil absence',
       },
+      SCHOOLS_PUPILS_CHARACTERISTICS: {
+        id: 'a91d9e05-be82-474c-85ae-4913158406d0',
+        label: 'Schools, pupils and their characteristics',
+      },
     };
 
     const publication = menuOptions[menuOption];
@@ -96,17 +100,19 @@ class PrototypeDataTableV3 extends Component<{}, State> {
     startYear,
     endYear,
   }) => {
-    const years = range(startYear, endYear + 1).map(year => {
-      return parseInt(`${year}${`${year + 1}`.substring(2, 4)}`, 0);
-    });
+    const formatToAcademicYear = (year: number) =>
+      parseInt(`${year}${`${year + 1}`.substring(2, 4)}`, 0);
 
     const { data } = await getNationalCharacteristicsData(
       this.state.publicationId,
       attributes,
       characteristics,
       schoolTypes,
-      years,
+      formatToAcademicYear(startYear),
+      formatToAcademicYear(endYear),
     );
+
+    const years = range(startYear, endYear + 1).map(formatToAcademicYear);
 
     this.setState(
       {
