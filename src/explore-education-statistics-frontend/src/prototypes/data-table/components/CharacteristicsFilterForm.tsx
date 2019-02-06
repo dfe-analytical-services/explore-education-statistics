@@ -183,13 +183,11 @@ class CharacteristicsFilterForm extends Component<Props, State> {
             summary={groupKey}
             key={compositeKey}
             open={isMenuOpen}
-            onToggle={event => {
-              event.preventDefault();
-
+            onToggle={isOpen => {
               this.setState({
                 openFilters: {
                   ...this.state.openFilters,
-                  [compositeKey]: !event.currentTarget.open,
+                  [compositeKey]: isOpen,
                 },
               });
             }}
