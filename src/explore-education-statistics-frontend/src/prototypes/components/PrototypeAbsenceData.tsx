@@ -178,7 +178,7 @@ class PrototypeAbsenceData extends Component<
                   className="govuk-heading-xl govuk-!-margin-bottom-2"
                   aria-label="Overall absence"
                 >
-                  {this.state.absenceData.values.overall}%
+                  <span> {this.state.absenceData.values.overall}% </span>
                 </p>
                 <Details summary="What is overall absence?">
                   Overall absence is the adipisicing elit. Dolorum hic nobis
@@ -193,7 +193,7 @@ class PrototypeAbsenceData extends Component<
                   className="govuk-heading-xl govuk-!-margin-bottom-2"
                   aria-label="Authorised absence"
                 >
-                  {this.state.absenceData.values.authorised}%
+                  <span> {this.state.absenceData.values.authorised}% </span>
                 </p>
                 <Details summary="What is authorised absence?">
                   Authorised absence is the adipisicing elit. Dolorum hic nobis
@@ -208,7 +208,7 @@ class PrototypeAbsenceData extends Component<
                   className="govuk-heading-xl govuk-!-margin-bottom-2"
                   aria-label="Unauthorised absence"
                 >
-                  {this.state.absenceData.values.unauthorised}%
+                  <span> {this.state.absenceData.values.unauthorised}% </span>
                 </p>
                 <Details summary="What is unauthorised absence?">
                   Unauthorised absence is the adipisicing elit. Dolorum hic
