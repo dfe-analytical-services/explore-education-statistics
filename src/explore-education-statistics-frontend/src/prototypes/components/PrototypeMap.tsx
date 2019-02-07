@@ -22,8 +22,8 @@ export interface PrototypeMapProps {
 }
 
 interface PrototypeMapState {
-  selectedAuthority: number;
-  selectedLayer: any;
+  selectedAuthority: string;
+  selectedFeature?: Feature;
 }
 
 class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
@@ -36,6 +36,7 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
   private data: FeatureCollection;
   private OnFeatureSelect: any | undefined;
   private legend: any;
+  private geoRef: any;
 
   constructor(props: PrototypeMapProps) {
     super(props);
@@ -43,8 +44,8 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
     if (props.map) props.map(this);
 
     this.state = {
-      selectedAuthority: -1,
-      selectedLayer: undefined,
+      selectedAuthority: '',
+      selectedFeature: undefined,
     };
 
     /**
@@ -54,8 +55,12 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
 
     this.data = {
       ...Boundaries,
-      features: Boundaries.features.filter(g => {
-        return g.properties !== null && g.properties.lad17cd[0] === 'E';
+      features: Boundaries.features.map(g => {
+        if (g.properties) {
+          g.properties.selectable = g.properties.lad17cd[0] === 'E';
+        }
+
+        return g;
       }),
     } as FeatureCollection;
 
@@ -85,10 +90,14 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
 
     this.data.features = this.data.features.map(feature => {
       if (feature.properties) {
-        const rate = Math.trunc(
-          (feature.properties.absence.overall - minOverall) / range,
-        );
-        feature.properties.className = styles[`rate${rate}`];
+        if (feature.properties.selectable) {
+          const rate = Math.trunc(
+            (feature.properties.absence.overall - minOverall) / range,
+          );
+          feature.properties.className = styles[`rate${rate}`];
+        } else {
+          feature.properties.className = styles.unselectable;
+        }
       }
 
       return feature;
@@ -111,44 +120,64 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
   }
 
   private onEachFeature = (feature: Feature, layer: Path) => {
-    const featureIndex = this.data.features.findIndex(f => f === feature);
+    if (feature.properties && feature.properties.selectable) {
+      const featureIndex = this.data.features.findIndex(f => f === feature);
 
-    // @ts-ignore
-    this.data.features[featureIndex].properties.layer = layer;
+      // @ts-ignore
+      this.data.features[featureIndex].properties.layer = layer;
 
-    // @ts-ignore
-    layer.bindTooltip(feature.properties.lad17nm, {
-      // className: f.properties.toolTipClass,
-      direction: 'center',
-      opacity: 1.0,
-    });
+      // @ts-ignore
+      layer.bindTooltip(feature.properties.lad17nm, {
+        // className: f.properties.toolTipClass,
+        direction: 'center',
+        opacity: 1.0,
+      });
 
-    layer.setStyle({ weight: 1, opacity: 1.0 });
+      layer.setStyle({ weight: 1, opacity: 1.0 });
+    }
   };
 
-  private selectFeature = (feature: Feature) => {
-    if (this.state.selectedAuthority !== -1) {
-      // @ts-ignore
-      this.data.features[this.state.selectedAuthority].properties.layer
-        .getElement()
-        .classList.remove(styles.selected);
-    }
+  private selectFeature = (feature?: Feature) => {
+    // @ts-ignore
+    if (feature.properties.selectable) {
+      if (this.state.selectedAuthority !== '') {
+        // @ts-ignore
+        const currentSelectedLayer = this.state.selectedFeature.properties
+          .layer;
 
-    const featureIndex = this.data.features.findIndex(f => f === feature);
+        currentSelectedLayer.getElement().classList.remove(styles.selected);
+      }
 
-    this.setState({
-      selectedAuthority: featureIndex,
-    });
+      if (this.OnFeatureSelect && feature && feature.properties) {
+        this.OnFeatureSelect(feature.properties);
+      }
 
-    if (this.OnFeatureSelect && feature.properties) {
-      this.OnFeatureSelect(feature.properties);
-    }
+      if (feature !== undefined) {
+        // @ts-ignore
+        const selectedLayer = feature.properties.layer;
 
-    if (featureIndex !== -1) {
-      // @ts-ignore
-      this.data.features[featureIndex].properties.layer
-        .getElement()
-        .classList.add(styles.selected);
+        selectedLayer.getElement().classList.add(styles.selected);
+
+        this.mapNode.leafletElement.fitBounds(selectedLayer.getBounds(), {
+          padding: [200, 200],
+        });
+        selectedLayer.bringToFront();
+
+        this.setState({
+          // @ts-ignore
+          selectedAuthority: feature.properties.lad17nm,
+          selectedFeature: feature,
+        });
+      } else {
+        this.setState({
+          selectedAuthority: '',
+          selectedFeature: undefined,
+        });
+
+        this.mapNode.leafletElement.fitBounds(
+          this.geoRef.leafletElement.getBounds(),
+        );
+      }
     }
   };
 
@@ -160,7 +189,13 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
   };
 
   private selectAuthority = (e: ChangeEvent<HTMLSelectElement>) => {
-    const feature = this.data.features[parseInt(e.currentTarget.value, 10)];
+    const selectedFeatureName = e.currentTarget.value;
+
+    const feature = this.data.features.find(
+      // @ts-ignore
+      f => f.properties.lad17nm === selectedFeatureName,
+    );
+
     this.selectFeature(feature);
   };
 
@@ -171,6 +206,8 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
   public componentDidMount() {
     // force a refresh to fix a bug
     requestAnimationFrame(() => this.refresh());
+
+    //    const bounds:LatLngBounds = this.geoRef.getBounds();
   }
 
   public render() {
@@ -201,14 +238,19 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
               className="govuk-select"
             >
               <option>Select a local authority</option>
-              {this.data.features.map((feature, idx) => (
-                <option
-                  value={idx}
-                  key={feature.properties ? feature.properties.lad17cd : ''}
-                >
-                  {feature.properties ? feature.properties.lad17nm : ''}
-                </option>
-              ))}
+              {this.data.features
+                .filter(
+                  feature =>
+                    feature.properties && feature.properties.selectable,
+                )
+                .map((feature, idx) => (
+                  <option
+                    value={feature.properties ? feature.properties.lad17nm : ''}
+                    key={feature.properties ? feature.properties.lad17cd : ''}
+                  >
+                    {feature.properties ? feature.properties.lad17nm : ''}
+                  </option>
+                ))}
             </select>
           </div>
         </form>
@@ -220,11 +262,12 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
           ref={(n: any) => (this.mapNode = n)}
           center={position}
           className={styles.map}
-          zoom={6}
-          minZoom={6}
-          maxBounds={bounds}
+          zoom={6.5}
+          minZoom={6.5}
+          zoomSnap={0.5}
         >
           <GeoJSON
+            ref={(geo: any) => (this.geoRef = geo)}
             data={this.data}
             onEachFeature={this.onEachFeature}
             style={this.styleFeature}
