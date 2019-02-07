@@ -85,12 +85,17 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
       this.data.features[featureIndex].properties.layer = layer;
 
       // @ts-ignore
-      layer.bindTooltip(feature.properties.lad17nm, {
-        // className: f.properties.toolTipClass,
-        direction: 'auto',
-        opacity: 1.0,
-        sticky: true,
-      });
+      layer.bindTooltip(
+        `${feature.properties.lad17nm}<br /> overall absence ${
+          feature.properties.absence.overall
+        }%`,
+        {
+          // className: f.properties.toolTipClass,
+          direction: 'auto',
+          opacity: 1.0,
+          sticky: true,
+        },
+      );
 
       layer.setStyle({ weight: 1, opacity: 1.0 });
     }
