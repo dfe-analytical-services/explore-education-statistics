@@ -5,7 +5,6 @@
   width: 630px;
 
   path {
-    fill: #cfdce3;
     fill-opacity: 1;
     stroke: #081b26;
     stroke-width: 1px;
@@ -14,51 +13,5 @@
   .selected {
     fill: #ffbf47 !important;
     stroke-width: 3px;
-  }
-
-  .unselectable {
-    fill: #bfbfbf;
-    opacity: 0.15;
-    stroke: #7f7f7f;
-  }
-
-  .rate0 {
-    fill: #cfdce3;
-  }
-  .rate1 {
-    fill: #9fb9c8;
-  }
-  .rate2 {
-    fill: #7095ac;
-  }
-  .rate3 {
-    fill: #407291;
-  }
-  .rate4 {
-    fill: #104f75;
-  }
-}
-
-.legend {
-  dl span {
-    background-color: #000;
-    display: inline-block;
-    width: 20px;
-  }
-
-  .rate0 {
-    background-color: #cfdce3;
-  }
-  .rate1 {
-    background-color: #9fb9c8;
-  }
-  .rate2 {
-    background-color: #7095ac;
-  }
-  .rate3 {
-    background-color: #407291;
-  }
-  .rate4 {
-    background-color: #104f75;
   }
 }

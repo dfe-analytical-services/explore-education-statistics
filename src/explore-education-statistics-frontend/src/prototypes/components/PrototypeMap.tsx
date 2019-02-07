@@ -41,7 +41,7 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
 
   private data: FeatureCollection;
   private OnFeatureSelect: any | undefined;
-  private legend: any;
+
   private geoRef: any;
 
   constructor(props: PrototypeMapProps) {
@@ -69,45 +69,6 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
         return g;
       }),
     } as FeatureCollection;
-
-    const minOverall = +this.data.features.reduce(
-      (min, next) =>
-        next.properties && next.properties.absence.overall < min
-          ? next.properties.absence.overall
-          : min,
-      100,
-    );
-    const maxOverall = +this.data.features.reduce(
-      (max, next) =>
-        next.properties && next.properties.absence.overall > max
-          ? next.properties.absence.overall
-          : max,
-      0,
-    );
-
-    const range = (maxOverall - minOverall) / 5;
-
-    this.legend = [4, 3, 2, 1, 0].map(value => {
-      return {
-        max: (minOverall + (value + 1) / range - 0.1).toFixed(1),
-        min: (minOverall + value / range).toFixed(1),
-      };
-    });
-
-    this.data.features = this.data.features.map(feature => {
-      if (feature.properties) {
-        if (feature.properties.selectable) {
-          const rate = Math.trunc(
-            (feature.properties.absence.overall - minOverall) / range,
-          );
-          feature.properties.className = styles[`rate${rate}`];
-        } else {
-          feature.properties.className = styles.unselectable;
-        }
-      }
-
-      return feature;
-    });
 
     this.OnFeatureSelect = this.props.OnFeatureSelect;
   }
@@ -249,17 +210,6 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
             onClick={this.click}
           />
         </Map>
-        <div className={styles.legend}>
-          <h3 className="govuk-heading-s">Key to overall absence rate</h3>
-          <dl className="govuk-list">
-            {this.legend.map(({ min, max }: any, idx: number) => (
-              <dd key={idx}>
-                <span className={styles[`rate${idx}`]}>&nbsp;</span> {min}% to{' '}
-                {max}%{' '}
-              </dd>
-            ))}
-          </dl>
-        </div>
       </div>
     );
   }

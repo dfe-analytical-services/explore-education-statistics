@@ -4,6 +4,8 @@ import Details from '../../components/Details';
 import PrototypeMap from './PrototypeMap';
 import { Boundaries } from './PrototypeMapBoundaries';
 
+import styles from './PrototypeAbsenceData.module.scss';
+
 interface PrototypeAbsenceDataState {
   absenceData?: any;
   selectedAuthority: string;
@@ -19,6 +21,7 @@ class PrototypeAbsenceData extends Component<
 > {
   private map: (map: PrototypeMap) => void;
   private data: FeatureCollection;
+  private legend: any;
 
   constructor(props: PrototypeAbsenceDataProps) {
     super(props);
@@ -30,10 +33,12 @@ class PrototypeAbsenceData extends Component<
       selectedAuthority: '',
     };
 
-    this.data = PrototypeAbsenceData.preprocessBoundaryData(Boundaries);
+    this.data = this.generateLegendData(
+      this.preprocessBoundaryData(Boundaries),
+    );
   }
 
-  private static preprocessBoundaryData(data: FeatureCollection) {
+  private preprocessBoundaryData(data: FeatureCollection) {
     const dataParsed = {
       ...data,
       features: data.features.map(g => {
@@ -55,6 +60,50 @@ class PrototypeAbsenceData extends Component<
     });
 
     return dataParsed;
+  }
+
+  private generateLegendData(data: FeatureCollection) {
+    const minOverall = +data.features.reduce(
+      (min, next) =>
+        next.properties && next.properties.absence.overall < min
+          ? next.properties.absence.overall
+          : min,
+      100,
+    );
+    const maxOverall = +data.features.reduce(
+      (max, next) =>
+        next.properties && next.properties.absence.overall > max
+          ? next.properties.absence.overall
+          : max,
+      0,
+    );
+
+    const range = (maxOverall - minOverall) / 4;
+
+    this.legend = [4, 3, 2, 1, 0].map(value => {
+      return {
+        max: (minOverall + (value + 1) / range - 0.1).toFixed(1),
+        min: (minOverall + value / range).toFixed(1),
+      };
+    });
+
+    return {
+      ...data,
+      features: data.features.map(feature => {
+        if (feature.properties) {
+          if (feature.properties.selectable) {
+            const rate = Math.floor(
+              (feature.properties.absence.overall - minOverall) / range,
+            );
+            feature.properties.className = styles[`rate${rate}`];
+          } else {
+            feature.properties.className = styles.unselectable;
+          }
+        }
+
+        return feature;
+      }),
+    };
   }
 
   public OnFeatureSelect = (properties: any) => {
@@ -162,8 +211,19 @@ class PrototypeAbsenceData extends Component<
               </div>
             </div>
           ) : (
-            ''
+            <div />
           )}
+          <div className={styles.legend}>
+            <h3 className="govuk-heading-s">Key to overall absence rate</h3>
+            <dl className="govuk-list">
+              {this.legend.map(({ min, max }: any, idx: number) => (
+                <dd key={idx}>
+                  <span className={styles[`rate${idx}`]}>&nbsp;</span> {min}% to{' '}
+                  {max}%{' '}
+                </dd>
+              ))}
+            </dl>
+          </div>
         </div>
         <div className="govuk-grid-column-two-thirds">
           <PrototypeMap
