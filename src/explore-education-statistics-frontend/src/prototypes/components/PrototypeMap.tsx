@@ -9,16 +9,16 @@ import 'leaflet/dist/leaflet.css';
 
 import styles from './PrototypeMap.module.scss';
 
-import { Boundaries } from './PrototypeMapBoundaries';
-
 import { Feature, FeatureCollection } from 'geojson';
 
 import { LatLngBounds, Path } from 'leaflet';
 import { GeoJSON, Map } from 'react-leaflet';
 
 export interface PrototypeMapProps {
+  Boundaries: FeatureCollection;
   OnFeatureSelect?: any;
   map: (map: PrototypeMap) => void;
+  selectedAuthority?: string;
 }
 
 interface PrototypeMapState {
@@ -29,8 +29,14 @@ interface PrototypeMapState {
 class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
   private mapNode: any;
 
+  private static DEFAULT_BOUNDS = new LatLngBounds(
+    { lat: 48, lng: -6.5 },
+    { lat: 60, lng: 2 },
+  );
+
   public static defaultProps: Partial<PrototypeMapProps> = {
     OnFeatureSelect: undefined,
+    selectedAuthority: '',
   };
 
   private data: FeatureCollection;
@@ -44,7 +50,7 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
     if (props.map) props.map(this);
 
     this.state = {
-      selectedAuthority: '',
+      selectedAuthority: props.selectedAuthority || '',
       selectedFeature: undefined,
     };
 
@@ -54,8 +60,8 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
      */
 
     this.data = {
-      ...Boundaries,
-      features: Boundaries.features.map(g => {
+      ...props.Boundaries,
+      features: props.Boundaries.features.map(g => {
         if (g.properties) {
           g.properties.selectable = g.properties.lad17cd[0] === 'E';
         }
@@ -103,15 +109,6 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
       return feature;
     });
 
-    this.data.features.sort((a, b) => {
-      const c = [
-        a.properties ? a.properties.lad17nm : '',
-        b.properties ? b.properties.lad17nm : '',
-      ];
-
-      return c[0] < c[1] ? -1 : c[1] > c[0] ? 1 : 0;
-    });
-
     this.OnFeatureSelect = this.props.OnFeatureSelect;
   }
 
@@ -139,16 +136,15 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
   };
 
   private selectFeature = (feature?: Feature) => {
+    if (this.state.selectedAuthority !== '') {
+      // @ts-ignore
+      const currentSelectedLayer = this.state.selectedFeature.properties.layer;
+
+      currentSelectedLayer.getElement().classList.remove(styles.selected);
+    }
+
     // @ts-ignore
-    if (feature.properties.selectable) {
-      if (this.state.selectedAuthority !== '') {
-        // @ts-ignore
-        const currentSelectedLayer = this.state.selectedFeature.properties
-          .layer;
-
-        currentSelectedLayer.getElement().classList.remove(styles.selected);
-      }
-
+    if (feature && feature.properties.selectable) {
       if (this.OnFeatureSelect && feature && feature.properties) {
         this.OnFeatureSelect(feature.properties);
       }
@@ -169,16 +165,16 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
           selectedAuthority: feature.properties.lad17nm,
           selectedFeature: feature,
         });
-      } else {
-        this.setState({
-          selectedAuthority: '',
-          selectedFeature: undefined,
-        });
-
-        this.mapNode.leafletElement.fitBounds(
-          this.geoRef.leafletElement.getBounds(),
-        );
       }
+    } else {
+      this.setState({
+        selectedAuthority: '',
+        selectedFeature: undefined,
+      });
+
+      this.mapNode.leafletElement.fitBounds(PrototypeMap.DEFAULT_BOUNDS, {
+        padding: [200, 200],
+      });
     }
   };
 
@@ -207,8 +203,21 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
   public componentDidMount() {
     // force a refresh to fix a bug
     requestAnimationFrame(() => this.refresh());
+  }
 
-    //    const bounds:LatLngBounds = this.geoRef.getBounds();
+  public componentDidUpdate(
+    prevProps: Readonly<PrototypeMapProps>,
+    prevState: Readonly<PrototypeMapState>,
+    snapshot?: any,
+  ): void {
+    if (prevProps.selectedAuthority !== this.props.selectedAuthority) {
+      const feature = this.data.features.find(
+        // @ts-ignore
+        f => f.properties.lad17nm === this.props.selectedAuthority,
+      );
+
+      this.selectFeature(feature);
+    }
   }
 
   public render() {
@@ -217,44 +226,8 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
       lng: -3.2524038,
     };
 
-    const bounds = new LatLngBounds(
-      { lat: 48, lng: -6.5 },
-      { lat: 60, lng: 2 },
-    );
-
     return (
       <div>
-        <form>
-          <div className="govuk-form-group govuk-!-margin-bottom-6">
-            <label
-              className="govuk-label govuk-label--s"
-              htmlFor="selectedAuthority"
-            >
-              Select a local authority
-            </label>
-            <select
-              id="selectedAuthority"
-              value={this.state.selectedAuthority}
-              onChange={this.selectAuthority}
-              className="govuk-select"
-            >
-              <option>Select a local authority</option>
-              {this.data.features
-                .filter(
-                  feature =>
-                    feature.properties && feature.properties.selectable,
-                )
-                .map((feature, idx) => (
-                  <option
-                    value={feature.properties ? feature.properties.lad17nm : ''}
-                    key={feature.properties ? feature.properties.lad17cd : ''}
-                  >
-                    {feature.properties ? feature.properties.lad17nm : ''}
-                  </option>
-                ))}
-            </select>
-          </div>
-        </form>
         <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
           Or choose a region on the map below to show pupil absence figures by
           local authority
@@ -266,6 +239,7 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
           zoom={6.5}
           minZoom={6.5}
           zoomSnap={0.5}
+          maxBounds={PrototypeMap.DEFAULT_BOUNDS}
         >
           <GeoJSON
             ref={(geo: any) => (this.geoRef = geo)}
