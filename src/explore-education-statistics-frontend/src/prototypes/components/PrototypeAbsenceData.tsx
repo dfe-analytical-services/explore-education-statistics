@@ -107,13 +107,19 @@ class PrototypeAbsenceData extends Component<
   }
 
   public OnFeatureSelect = (properties: any) => {
-    this.setState({
-      absenceData: {
-        title: properties.lad17nm,
-        values: properties.absence,
-      },
-      selectedAuthority: properties.lad17nm,
-    });
+    if (properties) {
+      this.setState({
+        absenceData: {
+          values: properties.absence,
+        },
+        selectedAuthority: properties.lad17nm,
+      });
+    } else {
+      this.setState({
+        absenceData: undefined,
+        selectedAuthority: '',
+      });
+    }
   };
 
   public selectAuthority = (e: any) => {

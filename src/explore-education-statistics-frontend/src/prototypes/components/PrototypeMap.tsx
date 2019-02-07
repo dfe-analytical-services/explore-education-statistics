@@ -128,6 +128,8 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
         });
       }
     } else {
+      this.OnFeatureSelect(undefined);
+
       this.setState({
         selectedAuthority: '',
         selectedFeature: undefined,
