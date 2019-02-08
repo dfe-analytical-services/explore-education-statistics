@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
-            
+
             modelBuilder.Entity<Theme>().HasData(
                 new Theme
                 {
@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                 new Publication
                 {
                     Id = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
-                    Title = "Schools, pupils and their characteristics", 
+                    Title = "Schools, pupils and their characteristics",
                     Summary = "Statistics on the number and characteristics of schools and pupils.",
                     TopicId = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
                     Slug = "schools-pupils-and-their-characteristics"
@@ -255,16 +255,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Published = new DateTime(2017, 3, 22),
                     Slug = "2016-17",
-                    Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
+                    Summary =
+                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
                     Content = new List<ContentSection>
                     {
-                        new ContentSection { Order = 1, Heading = "About this release", Caption = ""},
-                        new ContentSection { Order = 2, Heading = "Absence rates", Caption = ""},
-                        new ContentSection { Order = 3, Heading = "Persistent absence", Caption = ""},
-                        new ContentSection { Order = 4, Heading = "Distribution of absence", Caption = ""},
-                        new ContentSection { Order = 5, Heading = "Absence for four year olds", Caption = ""},
-                        new ContentSection { Order = 6, Heading = "Pupil referral unit absence", Caption = ""},
-                        new ContentSection { Order = 7, Heading = "Pupil absence by local authority", Caption = ""}
+                        new ContentSection {Order = 1, Heading = "About this release", Caption = ""},
+                        new ContentSection {Order = 2, Heading = "Absence rates", Caption = ""},
+                        new ContentSection {Order = 3, Heading = "Persistent absence", Caption = ""},
+                        new ContentSection {Order = 4, Heading = "Distribution of absence", Caption = ""},
+                        new ContentSection {Order = 5, Heading = "Absence for four year olds", Caption = ""},
+                        new ContentSection {Order = 6, Heading = "Pupil referral unit absence", Caption = ""},
+                        new ContentSection {Order = 7, Heading = "Pupil absence by local authority", Caption = ""}
                     }
                 },
                 new Release
@@ -275,19 +276,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Published = new DateTime(2016, 3, 25),
                     Slug = "2015-16",
-                    Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
+                    Summary =
+                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
                     Content = new List<ContentSection>
                     {
-                        new ContentSection { Order =  1, Heading = "About this release", Caption = ""},
-                        new ContentSection { Order =  2, Heading = "Absence rates", Caption = ""},
-                        new ContentSection { Order =  3, Heading = "Persistent absence", Caption = ""},
-                        new ContentSection { Order =  4, Heading = "Distribution of absence", Caption = ""},
-                        new ContentSection { Order =  5, Heading = "Absence for four year olds", Caption = ""},
-                        new ContentSection { Order =  6, Heading = "Pupil referral unit absence", Caption = ""},
-                        new ContentSection { Order =  7, Heading = "Pupil absence by local authority", Caption = ""}
+                        new ContentSection {Order = 1, Heading = "About this release", Caption = ""},
+                        new ContentSection {Order = 2, Heading = "Absence rates", Caption = ""},
+                        new ContentSection {Order = 3, Heading = "Persistent absence", Caption = ""},
+                        new ContentSection {Order = 4, Heading = "Distribution of absence", Caption = ""},
+                        new ContentSection {Order = 5, Heading = "Absence for four year olds", Caption = ""},
+                        new ContentSection {Order = 6, Heading = "Pupil referral unit absence", Caption = ""},
+                        new ContentSection {Order = 7, Heading = "Pupil absence by local authority", Caption = ""}
                     }
                 },
-                
+
                 // exclusions
                 new Release
                 {
@@ -297,21 +299,128 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Published = new DateTime(2018, 7, 19),
                     Slug = "2016-17",
-                    Summary ="Read national statistical summaries and definitions, view charts and tables and download data files across a range of permanent and fixed-period exclusion subject areas.",
+                    Summary =
+                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of permanent and fixed-period exclusion subject areas.",
                     Content = new List<ContentSection>
                     {
-                        new ContentSection { Order = 1, Heading = "About this release", Caption = ""},
-                        new ContentSection { Order = 2, Heading = "Permanent exclusions", Caption = ""},
-                        new ContentSection { Order = 3, Heading = "Fixed-period exclusions", Caption = ""},
-                        new ContentSection { Order = 4, Heading = "Number and length of fixed-period exclusions", Caption = ""},
-                        new ContentSection { Order = 5, Heading = "Reasons for exclusions", Caption = ""},
-                        new ContentSection { Order = 6, Heading = "Exclusions by pupil; characteristics", Caption = ""},
-                        new ContentSection { Order = 7, Heading = "Independent exclusion reviews", Caption = ""},
-                        new ContentSection { Order = 8, Heading = "Exclusions from pupil referral units", Caption = ""},
-                        new ContentSection { Order = 9, Heading = "Exclusions by local authority", Caption = ""}
+                        new ContentSection
+                        {
+                            Order = 1, Heading = "About this release", Caption = "",
+                            Content = new List<IContentBlock>
+                            {
+                                new MarkDownBlock
+                                {
+                                    Body =
+                                        "This National Statistics release reports on permanent and fixed period exclusions from state-funded primary, state-funded secondary and special schools during the 2016/17 academic year as reported in the School Census. This release also includes school level exclusions figures for state-funded primary, secondary and special schools and national level figures on permanent and fixed-period exclusions from pupil referral units. All figures in this release are based on unrounded data; therefore, constituent parts may not add up due to rounding.\n\nAn Exclusions statistics guide, which provides historical information on exclusion statistics, technical background information to the figures and data collection, and definitions of key terms should be referenced alongside this release.\n\nIn this publication: The following tables are included in the statistical publication\n\n*   national tables (Excel .xls and open format)*   local authority (LA) tables*   underlying data (open format .csv and metadata .txt)\n\nThe underlying data is accompanied by a metadata document that describes underlying data files.\n\nWe welcome feedback on any aspect of this document at [schools.statistics@education.gov.uk](#)"
+                                }
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Order = 2, Heading = "Permanent exclusions", Caption = "",
+                            Content = new List<IContentBlock>
+                            {
+                                new InsetTextBlock
+                                {
+                                  Heading  = "Permanent exclusion rate definition",
+                                  Body = "A permanent exclusion refers to a pupil who is excluded and who will not come back to that school (unless the exclusion is overturned). The number of permanent exclusions across all state-funded primary, secondary and special schools has increased from 6,685 in 2015/16 to 7,720 in 2016/17. This corresponds to around 40.6 permanent exclusions per day in 2016/17, up from an average of 35.2 per day in 2015/16."
+                                },
+                                new MarkDownBlock
+                                {
+                                    Body = "The rate of permanent exclusions across all state-funded primary, secondary and special schools has also increased from 0.08 per cent to 0.10 per cent of pupil enrolments, which is equivalent to around 10 pupils per 10,000.\n\nMost (83 per cent) permanent exclusions occurred in secondary schools. The rate of permanent exclusions in secondary schools increased from 0.17 per cent in 2015/16 to 0.20 per cent in 2016/17, which is equivalent to around 20 pupils per 10,000.\n\nThe rate of permanent exclusions also rose in primary schools, at 0.03 per cent, but decreased in special schools from 0.08 per cent in 2015/16 to 0.07 per cent in 2016/17. Looking at longer-term trends, the rate of permanent exclusions across all state-funded primary, secondary and special schools followed a generally downward trend from 2006/07 when the rate was 0.12 per cent until 2012/13, and has been rising again since then, although rates are still lower now than in 2006/07."
+                                }
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Order = 3, Heading = "Fixed-period exclusions", Caption = "",
+                            Content = new List<IContentBlock>
+                            {
+                                new InsetTextBlock
+                                {
+                                    Heading  = "Fixed-period exclusion rate definition",
+                                    Body = "Fixed-period exclusion refers to a pupil who is excluded from a school for a set period of time. A fixed-period exclusion can involve a part of the school day and it does not have to be for a continuous period. A pupil may be excluded for one or more fixed periods up to a maximum of 45 school days in a single academic year. This total includes exclusions from previous schools covered by the exclusion legislation. A pupil may receive more than one fixed-period exclusion, so pupils with repeat exclusions can inflate fixed-period exclusion rates."
+                                },
+                                new MarkDownBlock
+                                {
+                                    Body = "The number of fixed-period exclusions across all state-funded primary, secondary and special schools has increased from 339,360 in 2015/16 to 381,865 in 2016/17. This corresponds to around 2,010 fixed-period exclusions per day1 in 2016/17, up from an average of 1,786 per day in 2015/16.\n\nThere were increases in the number and rate of fixed-period exclusions for state-funded primary and secondary schools and special schools:"
+                                }
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Order = 4, Heading = "Number and length of fixed-period exclusions", Caption = "",
+                            Content = new List<IContentBlock>
+                            {
+                                new InsetTextBlock
+                                {
+                                    Heading  = "Enrolments with one or more fixed-period exclusion definition",
+                                    Body = "Pupils with one or more fixed-period exclusion refer to pupil enrolments that had at least one fixed-period exclusion across the full academic year. It includes those with repeated fixed-period exclusions."
+                                },
+                                new MarkDownBlock
+                                {
+                                    Body = "In state-funded primary, secondary and special schools, there were 183,475 pupil enrolments, 2.29 per cent, with at least one fixed term exclusion in 2016/17, up from 167,125 pupil enrolments, 2.11 per cent, in 2015/16.\n\nOf those pupils with at least one fixed-period exclusion, 59.1 per cent were excluded only on one occasion, and 1.5 per cent received 10 or more fixed-period exclusions during the year. The percentage of pupils with at least one fixed-period exclusion that went on to receive a permanent one was 3.5 per cent.\n\nThe average length of fixed-period exclusions across state-funded primary, secondary and special schools in 2016/17 was 2.1 days, slightly shorter than in 2015/16.\n\nThe highest proportion of fixed-period exclusions (46.6 per cent) lasted for only one day. Only 2.0 per cent of fixed-period exclusions lasted for longer than one week and longer fixed-period exclusions were more prevalent in secondary schools."
+                                }
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Order = 5, Heading = "Reasons for exclusions", Caption = "",
+                            Content = new List<IContentBlock>
+                            {
+                                new MarkDownBlock
+                                {
+                                    Body = "Persistent disruptive behaviour remained the most common reason for permanent exclusions in state-funded primary, secondary and special schools - accounting for 2,755 (35.7 per cent) of all permanent exclusions in 2016/17. This is equivalent to 3 permanent exclusions per 10,000 pupils. However, in special schools alone, the most common reason for exclusion was physical assault against and adult, which made up 37.8 per cent of all permanent exclusions and 28.1 per cent of all fixed-period exclusions.\n\nAll reasons except bullying and theft saw an increase in permanent exclusions since last year. The most common reasons - persistent disruptive behaviour, physical assault against a pupil and other reasons had the largest increases.\n\nPersistent disruptive behaviour is also the most common reason for fixed-period exclusions. The 108,640 fixed-period exclusions for persistent disruptive behaviour in state-funded primary, secondary and special schools made up 28.4 per cent of all fixed-period exclusions, up from 27.7 per cent in 2015/16. This is equivalent to around 135 fixed-period exclusions per 10,000 pupils.\n\nAll reasons saw an increase in fixed-period exclusions since last year. Persistent disruptive behaviour and other reasons saw the biggest increases."
+                                }
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Order = 6, Heading = "Exclusions by pupil characteristics", Caption = "",
+                            Content = new List<IContentBlock>
+                            {
+                                new MarkDownBlock
+                                {
+                                    Body = "In 2016/17 we saw a similar pattern by pupil characteristics to previous years. The groups that we usually expect to have higher rates are the ones that have increased exclusions since last year e.g. boys, pupils with special educational needs, pupils known to be eligible for and claiming free school meals and national curriculum years 9 and 10.\n\n**Age, national curriculum year group and gender**\n\n*   Over half of all permanent (57.2 per cent) and fixed-period (52.6 per cent) exclusions occur in national curriculum year 9 or above.\n\n*   A quarter (25.0 per cent) of all permanent exclusions were for pupils aged 14, and pupils of this age group also had the highest rate of fixed-period exclusion, and the highest rate of pupils receiving one or more fixed-period exclusion.\n\n*   The permanent exclusion rate for boys (0.15 per cent) was over three times higher than that for girls (0.04 per cent) and the fixed-period exclusion rate was almost three times higher (6.91 compared with 2.53 per cent).\n\n**Free school meals (FSM) eligibility**\n\n*   Pupils known to be eligible for and claiming free school meals (FSM) had a permanent exclusion rate of 0.28 per cent and fixed period exclusion rate of 12.54 per cent - around four times higher than those who are not eligible (0.07 and 3.50 per cent respectively).\n\n*   Pupils known to be eligible for and claiming free school meals (FSM) accounted for 40.0 per cent of all permanent exclusions and 36.7 per cent of all fixed-period exclusions. Special educational need (SEN)\n\n*   Pupils with identified special educational needs (SEN) accounted for around half of all permanent exclusions (46.7 per cent) and fixed-period exclusions (44.9 per cent).\n\n*   Pupils with SEN support had the highest permanent exclusion rate at 0.35 per cent. This was six times higher than the rate for pupils with no SEN (0.06 per cent).\n\n*   Pupils with an Education, Health and Care (EHC) plan or with a statement of SEN had the highest fixed-period exclusion rate at 15.93 per cent - over five times higher than pupils with no SEN (3.06 per cent).\n\n**Ethnic group**\n\n*   Pupils of Gypsy/Roma and Traveller of Irish Heritage ethnic groups had the highest rates of both permanent and fixed-period exclusions, but as the population is relatively small these figures should be treated with some caution.\n\n*   Black Caribbean pupils had a permanent exclusion rate nearly three times higher (0.28 per cent) than the school population as a whole (0.10 per cent). Pupils of Asian ethnic groups had the lowest rates of permanent and fixed-period exclusion."
+                                }
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Order = 7, Heading = "Independent exclusion reviews", Caption = "",
+                            Content = new List<IContentBlock>
+                            {
+                                new MarkDownBlock
+                                {
+                                    Body = "Independent review Panel definition: Parents (and pupils if aged over 18) are able to request a review of a permanent exclusion. An independent review panel’s role is to review the decision of the governing body not to reinstate a permanently excluded pupil. The panel must consider the interests and circumstances of the excluded pupil, including the circumstances in which the pupil was excluded and have regard to the interests of other pupils and people working at the school.\n\nIn 2016/17 in maintained primary, secondary and special schools and academies there were 560 reviews lodged with independent review panels of which 525 (93.4%) were determined and 45 (8.0%) resulted in an offer of reinstatement."
+                                }
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Order = 8, Heading = "Exclusions from pupil referral units", Caption = "",
+                            Content = new List<IContentBlock>
+                            {
+                                new MarkDownBlock
+                                {
+                                    Body = "The rate of permanent exclusion in pupil referral units decreased from 0.14 per cent in 2015/16 to 0.13 in 2016/17. After an increase from 2013/14 to 2014/15, permanent exclusions rates have remained fairly steady. There were 25,815 fixed-period exclusions in pupil referral units in 2016/17, up from 23,400 in 2015/16. The fixed period exclusion rate has been steadily increasing since 2013/14.\n\nThe percentage of pupil enrolments in pupil referral units who one or more fixed-period exclusion was 59.17 per cent in 2016/17, up from 58.15 per cent in 2015/16."
+                                }
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Order = 9, Heading = "Exclusions by local authority", Caption = "",
+                            Content = new List<IContentBlock>
+                            {
+                                new MarkDownBlock
+                                {
+                                    Body = "There is considerable variation in the permanent and fixed-period exclusion rate at local authority level (see accompanying maps on the web page).\n\nThe regions with the highest overall rates of permanent exclusion across state-funded primary, secondary and special schools are the West Midlands and the North West (at 0.14 per cent). The regions with the lowest rates are the South East (at 0.06 per cent) and Yorkshire and the Humber (at 0.07 per cent).\n\nThe region with the highest fixed-period exclusion rate is Yorkshire and the Humber (at 7.22 per cent), whilst the lowest rate was seen in Outer London (3.49 per cent).\n\nThese regions also had the highest and lowest rates of exclusion in the previous academic year."
+                                }
+                            }
+                        }
                     }
                 },
-                
+
                 // school pupil numbers
                 new Release
                 {
@@ -321,10 +430,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Published = new DateTime(2018, 5, 28),
                     Slug = "january-2018",
-                    Summary ="Statistics on pupils in schools in England as collected in the January 2018 school census.",
+                    Summary =
+                        "Statistics on pupils in schools in England as collected in the January 2018 school census.",
                     Content = new List<ContentSection>
                     {
-                        new ContentSection { Order = 1, Heading = "About this release", Caption = ""},
+                        new ContentSection {Order = 1, Heading = "About this release", Caption = ""},
                     }
                 }
             );
@@ -352,7 +462,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     On = new DateTime(2016, 3, 25),
                     Reason = "First published."
                 },
-                
                 new Update
                 {
                     Id = new Guid("4fca874d-98b8-4c79-ad20-d698fb0af7dc"),
@@ -365,9 +474,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     Id = new Guid("33ff3f17-0671-41e9-b404-5661ab8a9476"),
                     ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                     On = new DateTime(2018, 8, 25),
-                    Reason = " Updated exclusion rates for Gypsy/Roma pupils, to include extended ethnicity categories within the headcount (Gypsy, Roma and other Gypsy/Roma). "
+                    Reason =
+                        " Updated exclusion rates for Gypsy/Roma pupils, to include extended ethnicity categories within the headcount (Gypsy, Roma and other Gypsy/Roma). "
                 },
-                
                 new Update
                 {
                     Id = new Guid("9aab1af8-27d4-43c4-a7cd-afb375c8809c"),
@@ -380,14 +489,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     Id = new Guid("aa4c0f33-cdf4-4df9-9540-18472d46a301"),
                     ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
                     On = new DateTime(2018, 6, 13),
-                    Reason = "Amended title of table 8e in attachment 'Schools pupils and their characteristics 2018 - LA tables'."
+                    Reason =
+                        "Amended title of table 8e in attachment 'Schools pupils and their characteristics 2018 - LA tables'."
                 },
                 new Update
                 {
                     Id = new Guid("4bd0f73b-ef2b-4901-839a-80cbf8c0871f"),
                     ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
                     On = new DateTime(2018, 7, 23),
-                    Reason = "Removed unrelated extra material from table 7c in attachment 'Schools pupils and their characteristics 2018 - LA tables'."
+                    Reason =
+                        "Removed unrelated extra material from table 7c in attachment 'Schools pupils and their characteristics 2018 - LA tables'."
                 },
                 new Update
                 {
@@ -401,7 +512,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     Id = new Guid("d008b331-af29-4c7e-bb8a-5a2005aa0131"),
                     ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
                     On = new DateTime(2018, 9, 11),
-                    Reason = "Added open document version of 'Schools pupils and their characteristics 2018 - Cross-border movement local authority tables'."
+                    Reason =
+                        "Added open document version of 'Schools pupils and their characteristics 2018 - Cross-border movement local authority tables'."
                 }
             );
 
@@ -450,116 +562,131 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("e3a532c4-df72-4daf-b621-5d04418fd521"),
                     Description = "2015 to 2016",
-                    Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2015-to-2016"
+                    Url =
+                        "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2015-to-2016"
                 },
                 new Link
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("a0a8999a-9580-48b8-b443-61446ea579e4"),
                     Description = "2014 to 2015",
-                    Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2014-to-2015"
+                    Url =
+                        "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2014-to-2015"
                 },
                 new Link
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("97c8ee35-4c62-406c-880a-cdfc92590490"),
                     Description = "2013 to 2014",
-                    Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2013-to-2014"
+                    Url =
+                        "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2013-to-2014"
                 },
                 new Link
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("d76afaed-a665-4366-8897-78e9b90aa28a"),
                     Description = "2012 to 2013",
-                    Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2012-to-2013"
+                    Url =
+                        "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2012-to-2013"
                 },
                 new Link
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("7f6c5499-640a-44c7-afdc-41e78c7e8b24"),
                     Description = "2011 to 2012",
-                    Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-2011-to-2012-academic-year"
+                    Url =
+                        "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-2011-to-2012-academic-year"
                 },
                 new Link
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("8c12b38a-a071-4c47-ba16-dffa734849ed"),
                     Description = "2010 to 2011",
-                    Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2010-to-2011"
+                    Url =
+                        "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2010-to-2011"
                 },
                 new Link
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("04ebb3e6-67fd-41f3-89e4-ed9566bcbe96"),
                     Description = "2009 to 2010",
-                    Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2009-to-2010"
+                    Url =
+                        "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2009-to-2010"
                 },
                 new Link
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Id = new Guid("1b9375dd-06c7-4391-8265-447d6992a853"),
                     Description = "2008 to 2009",
-                    Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-academic-year-2008-to-2009"
+                    Url =
+                        "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-academic-year-2008-to-2009"
                 },
-                
+
                 //school pupil numbers
                 new Link
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("6404a25c-7352-4887-aa0e-c62948d45b57"),
                     Description = "January 2017",
-                    Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2017"
+                    Url =
+                        "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2017"
                 },
                 new Link
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("31b06d27-7e31-491f-bd5d-89105369ac60"),
                     Description = "January 2016",
-                    Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2016"
+                    Url =
+                        "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2016"
                 },
                 new Link
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("e764ef78-97f6-406c-aaaf-d3a5c847b362"),
                     Description = "January 2015",
-                    Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2015"
+                    Url =
+                        "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2015"
                 },
                 new Link
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("1479a18c-b5a6-47c5-bb48-c8d60084b1a4"),
                     Description = "January 2014",
-                    Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2014"
+                    Url =
+                        "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2014"
                 },
                 new Link
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("86893fdd-4a24-4fe9-9902-02ad8bbf8632"),
                     Description = "January 2013",
-                    Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2013"
+                    Url =
+                        "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2013"
                 },
                 new Link
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("95c24ea7-4ebe-4f73-88f1-91ea33ec00bf"),
                     Description = "January 2012",
-                    Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2012"
+                    Url =
+                        "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2012"
                 },
                 new Link
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("758b83d6-bd47-44aa-8ee2-359f350fef0a"),
                     Description = "January 2011",
-                    Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2011"
+                    Url =
+                        "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2011"
                 },
                 new Link
                 {
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Id = new Guid("acbef79a-7b53-492e-a679-ca994edfc892"),
                     Description = "January 2010",
-                    Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2010"
+                    Url =
+                        "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2010"
                 }
-                
             );
         }
     }

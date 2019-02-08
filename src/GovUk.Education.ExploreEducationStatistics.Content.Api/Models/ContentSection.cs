@@ -1,5 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
 {
@@ -10,5 +14,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
         public string Heading { get; set; }
         
         public string Caption { get; set; }
+        
+        public List<IContentBlock> Content { get; set; }
+    }
+
+    public interface IContentBlock
+    {
+         string Type { get; }
+    }
+
+    public class MarkDownBlock : IContentBlock
+    {
+        public string Type => "MarkDownBlock";
+
+        public string Body { get; set; }
+    }
+    
+    public class InsetTextBlock : IContentBlock
+    {
+        public string Type => "InsetTextBlock";
+
+        public string Heading { get; set; }
+        
+        public string Body { get; set; }
     }
 }
