@@ -1,3 +1,7 @@
+@import '~govuk-frontend/settings/all';
+@import '~govuk-frontend/tools/all';
+@import '~govuk-frontend/helpers/all';
+
 .legend {
   dl span {
     display: inline-block;
@@ -34,4 +38,10 @@
   fill: #bfbfbf;
   opacity: 0.15;
   stroke: #7f7f7f;
+}
+
+.hideMobile {
+  @include govuk-media-query($until: tablet) {
+    @include govuk-visually-hidden();
+  }
 }
