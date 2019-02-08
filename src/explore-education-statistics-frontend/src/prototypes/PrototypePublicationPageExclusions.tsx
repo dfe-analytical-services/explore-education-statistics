@@ -723,8 +723,11 @@ const PublicationPageExclusions = () => {
       <Link to="/prototypes/data-table-v3" className="govuk-button">
         Explore pupil absence statistics
       </Link>
-      <br />
-      <GoToTopLink />
+      <div className="govuk-!-margin-top-9">
+        <a href="#print" className="govuk-link">
+          Print this page
+        </a>
+      </div>
     </PrototypePage>
   );
 };

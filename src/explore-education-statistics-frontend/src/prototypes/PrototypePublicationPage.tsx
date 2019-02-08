@@ -170,13 +170,10 @@ const PublicationPage = () => {
           </aside>
         </div>
       </div>
-
       <hr />
-
       <h2 className="govuk-heading-l">
         Latest headline facts and figures - 2016/17
       </h2>
-
       <PrototypeDataSample
         sectionId="headlines"
         chartTitle="change in absence types in England"
@@ -216,7 +213,6 @@ const PublicationPage = () => {
         ]}
         chartDataKeys={['unauthorised', 'authorised', 'overall']}
       />
-
       <h2 className="govuk-heading-l">Contents</h2>
       <Accordion id="contents-sections">
         <AccordionSection heading="About this release">
@@ -643,11 +639,9 @@ const PublicationPage = () => {
           </p>
         </AccordionSection>
       </Accordion>
-
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
         Extra information
       </h2>
-
       <Accordion id="extra-information-sections">
         <AccordionSection
           heading="Where does this data come from?"
@@ -724,7 +718,6 @@ const PublicationPage = () => {
           </address>
         </AccordionSection>
       </Accordion>
-
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
         Exploring the data
       </h2>
@@ -736,8 +729,11 @@ const PublicationPage = () => {
       <Link to="/prototypes/data-table-v3" className="govuk-button">
         Explore pupil absence statistics
       </Link>
-
-      <GoToTopLink />
+      <div className="govuk-!-margin-top-9">
+        <a href="#print" className="govuk-link">
+          Print this page
+        </a>
+      </div>
     </PrototypePage>
   );
 };
