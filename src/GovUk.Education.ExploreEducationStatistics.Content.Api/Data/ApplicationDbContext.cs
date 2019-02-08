@@ -26,6 +26,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
 
+            modelBuilder.Entity<Release>()
+                .Property(b => b.KeyStatistics)
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<List<KeyStatistic>>(v));
+            
             modelBuilder.Entity<Theme>().HasData(
                 new Theme
                 {
@@ -255,8 +261,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Published = new DateTime(2017, 3, 22),
                     Slug = "2016-17",
-                    Summary =
-                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
+                    Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
+                    KeyStatistics = new List<KeyStatistic>
+                    {
+                        new KeyStatistic {Title = "Overall absence", Description = "Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."},
+                        new KeyStatistic {Title = "Authorised absence", Description = "Authorised absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."},
+                        new KeyStatistic {Title = "Unauthorised absence", Description = "Unauthorised absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."}
+                    },
                     Content = new List<ContentSection>
                     {
                         new ContentSection {Order = 1, Heading = "About this release", Caption = ""},
@@ -276,8 +287,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Published = new DateTime(2016, 3, 25),
                     Slug = "2015-16",
-                    Summary =
-                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
+                    Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
+                    KeyStatistics = new List<KeyStatistic>
+                    {
+                        new KeyStatistic {Title = "Overall absence", Description = "Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."},
+                        new KeyStatistic {Title = "Authorised absence", Description = "Authorised absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."},
+                        new KeyStatistic {Title = "Unauthorised absence", Description = "Unauthorised absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."}
+                    },
                     Content = new List<ContentSection>
                     {
                         new ContentSection {Order = 1, Heading = "About this release", Caption = ""},
@@ -299,8 +315,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Published = new DateTime(2018, 7, 19),
                     Slug = "2016-17",
-                    Summary =
-                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of permanent and fixed-period exclusion subject areas.",
+                    Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of permanent and fixed-period exclusion subject areas.",
+                    KeyStatistics = new List<KeyStatistic>
+                    {
+                        new KeyStatistic {Title = "Overall permanent exclusions", Description = "Overall permanent exclusions is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."},
+                        new KeyStatistic {Title = "Number of exclusions", Description = "Number of exclusions is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."},
+                        new KeyStatistic {Title = "Overall rate of fixed-period exclusions", Description = "Overall rate of fixed-period exclusionsis the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."}
+                    },
                     Content = new List<ContentSection>
                     {
                         new ContentSection
@@ -310,8 +331,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                             {
                                 new MarkDownBlock
                                 {
-                                    Body =
-                                        "This National Statistics release reports on permanent and fixed period exclusions from state-funded primary, state-funded secondary and special schools during the 2016/17 academic year as reported in the School Census. This release also includes school level exclusions figures for state-funded primary, secondary and special schools and national level figures on permanent and fixed-period exclusions from pupil referral units. All figures in this release are based on unrounded data; therefore, constituent parts may not add up due to rounding.\n\nAn Exclusions statistics guide, which provides historical information on exclusion statistics, technical background information to the figures and data collection, and definitions of key terms should be referenced alongside this release.\n\nIn this publication: The following tables are included in the statistical publication\n\n*   national tables (Excel .xls and open format)*   local authority (LA) tables*   underlying data (open format .csv and metadata .txt)\n\nThe underlying data is accompanied by a metadata document that describes underlying data files.\n\nWe welcome feedback on any aspect of this document at [schools.statistics@education.gov.uk](#)"
+                                    Body = "This National Statistics release reports on permanent and fixed period exclusions from state-funded primary, state-funded secondary and special schools during the 2016/17 academic year as reported in the School Census. This release also includes school level exclusions figures for state-funded primary, secondary and special schools and national level figures on permanent and fixed-period exclusions from pupil referral units. All figures in this release are based on unrounded data; therefore, constituent parts may not add up due to rounding.\n\nAn Exclusions statistics guide, which provides historical information on exclusion statistics, technical background information to the figures and data collection, and definitions of key terms should be referenced alongside this release.\n\nIn this publication: The following tables are included in the statistical publication\n\n*   national tables (Excel .xls and open format)*   local authority (LA) tables*   underlying data (open format .csv and metadata .txt)\n\nThe underlying data is accompanied by a metadata document that describes underlying data files.\n\nWe welcome feedback on any aspect of this document at [schools.statistics@education.gov.uk](#)"
                                 }
                             }
                         },
@@ -430,8 +450,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                     Published = new DateTime(2018, 5, 28),
                     Slug = "january-2018",
-                    Summary =
-                        "Statistics on pupils in schools in England as collected in the January 2018 school census.",
+                    Summary = "Statistics on pupils in schools in England as collected in the January 2018 school census.",
+                    KeyStatistics = new List<KeyStatistic>
+                    {
+                    },
                     Content = new List<ContentSection>
                     {
                         new ContentSection {Order = 1, Heading = "About this release", Caption = ""},
