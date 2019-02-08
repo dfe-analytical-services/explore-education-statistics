@@ -2,16 +2,15 @@ import React, { Component } from 'react';
 import { Helmet } from 'react-helmet';
 import ReactMarkdown from 'react-markdown';
 import { match } from 'react-router';
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 import Accordion from '../../components/Accordion';
 import AccordionSection from '../../components/AccordionSection';
 import Date from '../../components/Date';
 import Details from '../../components/Details';
 import GoToTopLink from '../../components/GoToTopLink';
 import Link from '../../components/Link';
-import StepByStepNavigation from '../../components/StepByStepNavigation';
-import StepByStepNavigationStep from '../../components/StepByStepNavigationStep';
 import { baseUrl, contentApi } from '../../services/api';
+import TabsSection from '../../components/TabsSection';
+import Tabs from '../../components/Tabs';
 
 interface Props {
   match: match<{
@@ -40,6 +39,10 @@ interface ContentSection {
   order: number;
 }
 
+interface KeyStatistic {
+  title: string;
+  description: string;
+}
 interface Publication {
   dataSource: string;
   nextUpdate: string;
@@ -56,6 +59,7 @@ interface State {
     releaseName: string;
     publication: Publication;
     content: ContentSection[];
+    keyStatistics: KeyStatistic[];
   };
 }
 
@@ -63,6 +67,7 @@ class PublicationPage extends Component<Props, State> {
   public state = {
     data: {
       content: [],
+      keyStatistics: [],
       publication: {
         dataSource: '',
         legacyReleases: [
@@ -240,6 +245,30 @@ class PublicationPage extends Component<Props, State> {
           {!release ? <>Latest headline </> : <>Headline </>}
           facts and figures - {data.releaseName}
         </h2>
+
+        <Tabs>
+          <TabsSection id="Summary" title="summary">
+            {data.keyStatistics.length > 0 ? (
+              <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">
+                {data.keyStatistics.map(({ title, description }) => (
+                  <div className="dfe-dash-tiles__tile">
+                    <h3 className="govuk-heading-m dfe-dash-tiles__heading">
+                      {title}
+                    </h3>
+                    <p className="govuk-heading-xl govuk-!-margin-bottom-2">
+                      ###
+                    </p>
+                    <Details summary={`What is ${title}?`}>
+                      {description}
+                    </Details>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <></>
+            )}
+          </TabsSection>
+        </Tabs>
 
         <h2 className="govuk-heading-l">Contents</h2>
         {data.content.length > 0 ? (
