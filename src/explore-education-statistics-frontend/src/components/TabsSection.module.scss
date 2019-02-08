@@ -1,0 +1,6 @@
+@import '~govuk-frontend/components/tabs/tabs';
+@import '~govuk-frontend/helpers/all';
+
+.panel {
+  @include govuk-focusable;
+}
