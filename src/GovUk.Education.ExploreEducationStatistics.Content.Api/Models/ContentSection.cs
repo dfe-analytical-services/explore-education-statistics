@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Converters;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
 {
@@ -18,6 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
         public List<IContentBlock> Content { get; set; }
     }
 
+    [JsonConverter(typeof(ContentBlockConverter))]
     public interface IContentBlock
     {
          string Type { get; }
