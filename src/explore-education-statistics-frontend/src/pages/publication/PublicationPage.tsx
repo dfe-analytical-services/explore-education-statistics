@@ -242,44 +242,51 @@ class PublicationPage extends Component<Props, State> {
 
         <hr />
 
-        <h2 className="govuk-heading-l">
-          {!release ? <>Latest headline </> : <>Headline </>}
-          facts and figures - {data.releaseName}
-        </h2>
+        {data.keyStatistics.length > 0 ? (
+          <>
+            <h2 className="govuk-heading-l">
+              {!release ? <>Latest headline </> : <>Headline </>}
+              facts and figures - {data.releaseName}
+            </h2>
+            <Tabs>
+              <TabsSection id="summary" title="Summary">
+                <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">
+                  {data.keyStatistics.map(({ title, description }) => (
+                    <div className="dfe-dash-tiles__tile">
+                      <h3 className="govuk-heading-m dfe-dash-tiles__heading">
+                        {title}
+                      </h3>
+                      <p className="govuk-heading-xl govuk-!-margin-bottom-2">
+                        0
+                      </p>
+                      <Details summary={`What is ${title}?`}>
+                        {description}
+                      </Details>
+                    </div>
+                  ))}
+                </div>
+              </TabsSection>
+            </Tabs>
+          </>
+        ) : (
+          <></>
+        )}
 
-        <Tabs>
-          <TabsSection id="summary" title="Summary">
-            {data.keyStatistics.length > 0 ? (
-              <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">
-                {data.keyStatistics.map(({ title, description }) => (
-                  <div className="dfe-dash-tiles__tile">
-                    <h3 className="govuk-heading-m dfe-dash-tiles__heading">
-                      {title}
-                    </h3>
-                    <p className="govuk-heading-xl govuk-!-margin-bottom-2">
-                      0
-                    </p>
-                    <Details summary={`What is ${title}?`}>
-                      {description}
-                    </Details>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <></>
-            )}
-          </TabsSection>
-        </Tabs>
-
-        <h2 className="govuk-heading-l">Contents</h2>
         {data.content.length > 0 ? (
-          <Accordion id="contents-sections">
-            {data.content.map(({ heading, caption, order, content }) => (
-              <AccordionSection heading={heading} caption={caption} key={order}>
-                <ContentBlock content={content} />
-              </AccordionSection>
-            ))}
-          </Accordion>
+          <>
+            <h2 className="govuk-heading-l">Contents</h2>
+            <Accordion id="contents-sections">
+              {data.content.map(({ heading, caption, order, content }) => (
+                <AccordionSection
+                  heading={heading}
+                  caption={caption}
+                  key={order}
+                >
+                  <ContentBlock content={content} />
+                </AccordionSection>
+              ))}
+            </Accordion>
+          </>
         ) : (
           <></>
         )}

@@ -22,19 +22,22 @@ class ContentBlock extends Component<Props> {
   public render() {
     const { content } = this.props;
 
-    return (
-      <>
-        {content.length > 0 ? (
-          <>
-            {content.map(block => (
-              <ContentBlockRenderer block={block} />
-            ))}
-          </>
-        ) : (
-          <div className="govuk-inset-text">No content.</div>
-        )}
-      </>
-    );
+    if (content != null) {
+      return (
+        <>
+          {content.length > 0 ? (
+            <>
+              {content.map(block => (
+                <ContentBlockRenderer block={block} />
+              ))}
+            </>
+          ) : (
+            <div className="govuk-inset-text">No content.</div>
+          )}
+        </>
+      );
+    }
+    return null;
   }
 }
 
