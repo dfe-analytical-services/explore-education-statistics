@@ -8,9 +8,10 @@ import Date from '../../components/Date';
 import Details from '../../components/Details';
 import GoToTopLink from '../../components/GoToTopLink';
 import Link from '../../components/Link';
-import { baseUrl, contentApi } from '../../services/api';
-import TabsSection from '../../components/TabsSection';
 import Tabs from '../../components/Tabs';
+import TabsSection from '../../components/TabsSection';
+import { baseUrl, contentApi } from '../../services/api';
+import ContentBlock from './components/ContentBlock';
 
 interface Props {
   match: match<{
@@ -247,7 +248,7 @@ class PublicationPage extends Component<Props, State> {
         </h2>
 
         <Tabs>
-          <TabsSection id="Summary" title="summary">
+          <TabsSection id="summary" title="Summary">
             {data.keyStatistics.length > 0 ? (
               <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">
                 {data.keyStatistics.map(({ title, description }) => (
@@ -256,7 +257,7 @@ class PublicationPage extends Component<Props, State> {
                       {title}
                     </h3>
                     <p className="govuk-heading-xl govuk-!-margin-bottom-2">
-                      ###
+                      0
                     </p>
                     <Details summary={`What is ${title}?`}>
                       {description}
@@ -273,9 +274,9 @@ class PublicationPage extends Component<Props, State> {
         <h2 className="govuk-heading-l">Contents</h2>
         {data.content.length > 0 ? (
           <Accordion id="contents-sections">
-            {data.content.map(({ heading, caption, order }) => (
+            {data.content.map(({ heading, caption, order, content }) => (
               <AccordionSection heading={heading} caption={caption} key={order}>
-                <p className="govuk-body">TODO: Implement content</p>
+                <ContentBlock content={content}/>
               </AccordionSection>
             ))}
           </Accordion>
