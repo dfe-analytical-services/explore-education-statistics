@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import { FeatureCollection } from 'geojson';
 import React, { Component } from 'react';
 import Details from '../../components/Details';
@@ -219,7 +220,7 @@ class PrototypeAbsenceData extends Component<
           ) : (
             <div />
           )}
-          <div className={styles.legend}>
+          <div className={classNames(styles.legend, styles.hideMobile)}>
             <h3 className="govuk-heading-s">Key to overall absence rate</h3>
             <dl className="govuk-list">
               {this.legend.map(({ min, max }: any, idx: number) => (
@@ -231,7 +232,12 @@ class PrototypeAbsenceData extends Component<
             </dl>
           </div>
         </div>
-        <div className="govuk-grid-column-two-thirds">
+        <div
+          className={classNames(
+            'govuk-grid-column-two-thirds',
+            styles.hideMobile,
+          )}
+        >
           <PrototypeMap
             Boundaries={Boundaries}
             OnFeatureSelect={this.OnFeatureSelect}

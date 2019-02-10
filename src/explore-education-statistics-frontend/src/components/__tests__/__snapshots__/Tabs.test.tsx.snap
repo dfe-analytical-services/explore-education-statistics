@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Tabs multiple tabs renders correctly 1`] = `
+exports[`Tabs renders multiple tabs correctly 1`] = `
 
 <div class="govuk-tabs">
   <ul class="govuk-tabs__list"
@@ -9,13 +9,12 @@ exports[`Tabs multiple tabs renders correctly 1`] = `
     <li class="govuk-tabs__list-item"
         role="presentation"
     >
-      <a class="govuk-tabs__tab govuk-tabs__tab--selected"
-         href="#tab-1"
-         id="tab_tab-1"
-         role="tab"
-         aria-controls="tab-1"
-         tabindex="0"
+      <a aria-controls="tab-1"
          aria-selected="true"
+         class="govuk-tabs__tab govuk-tabs__tab--selected"
+         href="#tab-1"
+         id="tab-1-tab"
+         role="tab"
       >
         Tab 1
       </a>
@@ -23,41 +22,44 @@ exports[`Tabs multiple tabs renders correctly 1`] = `
     <li class="govuk-tabs__list-item"
         role="presentation"
     >
-      <a class="govuk-tabs__tab"
-         href="#tab-2"
-         id="tab_tab-2"
-         role="tab"
-         aria-controls="tab-2"
-         tabindex="-1"
+      <a aria-controls="tab-2"
          aria-selected="false"
+         class="govuk-tabs__tab"
+         href="#tab-2"
+         id="tab-2-tab"
+         role="tab"
+         tabindex="-1"
       >
         Tab 2
       </a>
     </li>
   </ul>
-  <div class="govuk-tabs__panel"
-       id="tab-1"
-       role="tabpanel"
-       aria-labelledby="tab_tab-1"
+  <section aria-labelledby="tab-1-tab"
+           class="govuk-tabs__panel panel"
+           id="tab-1"
+           role="tabpanel"
+           tabindex="-1"
   >
     <p>
       Test section 1 content
     </p>
-  </div>
-  <div class="govuk-tabs__panel govuk-tabs__panel--hidden"
-       id="tab-2"
-       role="tabpanel"
-       aria-labelledby="tab_tab-2"
+  </section>
+  <section aria-labelledby="tab-2-tab"
+           class="govuk-tabs__panel panel govuk-tabs__panel--hidden"
+           id="tab-2"
+           hidden
+           role="tabpanel"
+           tabindex="-1"
   >
     <p>
       Test section 2 content
     </p>
-  </div>
+  </section>
 </div>
 
 `;
 
-exports[`Tabs single tab renders correctly 1`] = `
+exports[`Tabs renders single tab correctly 1`] = `
 
 <div class="govuk-tabs">
   <ul class="govuk-tabs__list"
@@ -66,27 +68,27 @@ exports[`Tabs single tab renders correctly 1`] = `
     <li class="govuk-tabs__list-item"
         role="presentation"
     >
-      <a class="govuk-tabs__tab govuk-tabs__tab--selected"
-         href="#tab-1"
-         id="tab_tab-1"
-         role="tab"
-         aria-controls="tab-1"
-         tabindex="0"
+      <a aria-controls="tab-1"
          aria-selected="true"
+         class="govuk-tabs__tab govuk-tabs__tab--selected"
+         href="#tab-1"
+         id="tab-1-tab"
+         role="tab"
       >
         Tab 1
       </a>
     </li>
   </ul>
-  <div class="govuk-tabs__panel"
-       id="tab-1"
-       role="tabpanel"
-       aria-labelledby="tab_tab-1"
+  <section aria-labelledby="tab-1-tab"
+           class="govuk-tabs__panel panel"
+           id="tab-1"
+           role="tabpanel"
+           tabindex="-1"
   >
     <p>
       Test section 1 content
     </p>
-  </div>
+  </section>
 </div>
 
 `;
