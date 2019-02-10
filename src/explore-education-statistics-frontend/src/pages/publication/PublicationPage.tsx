@@ -257,7 +257,7 @@ class PublicationPage extends Component<Props, State> {
                         {title}
                       </h3>
                       <p className="govuk-heading-xl govuk-!-margin-bottom-2">
-                        0
+                        --
                       </p>
                       <Details summary={`What is ${title}?`}>
                         {description}
