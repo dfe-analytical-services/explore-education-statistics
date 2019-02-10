@@ -276,7 +276,7 @@ class PublicationPage extends Component<Props, State> {
           <Accordion id="contents-sections">
             {data.content.map(({ heading, caption, order, content }) => (
               <AccordionSection heading={heading} caption={caption} key={order}>
-                <ContentBlock content={content}/>
+                <ContentBlock content={content} />
               </AccordionSection>
             ))}
           </Accordion>
