@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
-import Accordion from '../../../components/Accordion';
-import AccordionSection from '../../../components/AccordionSection';
-import { contentApi } from '../../../services/api';
 
 interface Props {
   content: Block[];
