@@ -1,7 +1,9 @@
+using System.Threading.Tasks;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Azure
 {
     public interface IAzureDocumentService
     {
-        void CreatePartitionedCollectionIfNotExists(string id, string partitionKey);
+        Task CreatePartitionedCollectionIfNotExists(string id, string partitionKey);
     }
 }

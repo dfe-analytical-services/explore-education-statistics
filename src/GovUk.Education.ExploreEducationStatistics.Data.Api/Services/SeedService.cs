@@ -6,10 +6,12 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Azure;
+using Microsoft.AspNetCore.Mvc.Razor.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
@@ -72,56 +74,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public async void Seed()
         {
-            CreatePartitionedCollectionIfNotExists(attributeMetaCollectionName);
-            CreatePartitionedCollectionIfNotExists(characteristicMetaCollectionName);
+            await CreatePartitionedCollectionIfNotExists(attributeMetaCollectionName);
+            await CreatePartitionedCollectionIfNotExists(characteristicMetaCollectionName);
 
-            await Task.WhenAll(SamplePublications.Publications.Values.SelectMany(Seed));
+            foreach (var publication in SamplePublications.Publications.Values)
+            {
+                await Seed(publication);
+            }
         }
 
-        private IEnumerable<Task> Seed(Publication publication)
+        private async Task Seed(Publication publication)
         {
             _logger.LogInformation("Seeding Publication {Publication}", publication.PublicationId);
 
-            var tasks = new List<Task> {SeedAttributes(publication), SeedCharacteristics(publication)};
+            // seed publication attributes and characteristics
+            await SeedAttributes(publication);
+            await SeedCharacteristics(publication);
 
-            CreatePartitionedCollectionIfNotExists(publication.PublicationId.ToString());
+            // create collection if it does not exist
+            await CreatePartitionedCollectionIfNotExists(publication.PublicationId.ToString());
 
+            // get the collection
             var collection = _database.GetCollection<TidyData>(publication.PublicationId.ToString());
 
             if (collection.CountDocuments(data => data.PublicationId == publication.PublicationId) == 0)
             {
-                tasks.AddRange(publication.Releases.SelectMany(release => SeedRelease(release, collection)));
+                foreach (var release in publication.Releases)
+                {
+                    await SeedRelease(release, collection);
+                }
             }
-
-            _logger.LogWarning("Not seeding {Name}. Collection is not empty for publication {Publication}",
-                publication.Name, publication.PublicationId);
-
-            return tasks;
+            else
+            {
+                _logger.LogWarning("Not seeding {Name}. Collection is not empty for publication {Publication}", publication.Name, publication.PublicationId);
+            }
         }
 
-        private IEnumerable<Task> SeedRelease(Release release, IMongoCollection<TidyData> collection)
+        private async Task SeedRelease(Release release, IMongoCollection<TidyData> collection)
         {
-            _logger.LogInformation("Seeding Publication {Publication}, Released {Release}", release.PublicationId,
-                release.ReleaseId);
+            _logger.LogInformation("Seeding Publication {Publication}, Released {Release}", release.PublicationId,release.ReleaseId);
 
             var tasks = new List<Task>();
 
             foreach (var dataCsvFilename in release.Filenames)
             {
                 var importer = _csvImporterFactory.Importer(dataCsvFilename);
-                var data = importer.Data(dataCsvFilename, release.PublicationId, release.ReleaseId,
-                    release.ReleaseDate);
+                
+                var data = importer.Data(dataCsvFilename, release.PublicationId, release.ReleaseId,release.ReleaseDate);
 
-                var batches = data.Batch(100000);
-                tasks.AddRange(batches
-                    .Select((batch, i) => InsertManyAsync(collection, batch, i + 1, batches.Count(), release))
-                    .ToList());
+                var batches = data.Batch(50);
+
+                var i = 0;
+                foreach (var batch in batches)
+                {
+                    await InsertManyAsync(collection, batch, i + 1, batches.Count(), release);
+                    i++;
+                }
             }
-
-            return tasks;
         }
 
-        private Task SeedAttributes(Publication publication)
+        private async Task SeedAttributes(Publication publication)
         {
             _logger.LogInformation("Seeding {Collection}", attributeMetaCollectionName);
 
@@ -134,16 +146,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     attributeMeta.PublicationId = publication.PublicationId;
                 }
 
-                return collection.InsertManyAsync(publication.AttributeMetas);
+                await collection.InsertManyAsync(publication.AttributeMetas);
             }
 
             _logger.LogWarning("Not seeding {Collection}. Collection is not empty for publication {Publication}",
                 attributeMetaCollectionName, publication.PublicationId);
-
-            return Task.CompletedTask;
         }
 
-        private Task SeedCharacteristics(Publication publication)
+        private async Task SeedCharacteristics(Publication publication)
         {
             _logger.LogInformation("Seeding {Collection}", characteristicMetaCollectionName);
 
@@ -156,28 +166,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     characteristicMeta.PublicationId = publication.PublicationId;
                 }
 
-                return collection.InsertManyAsync(publication.CharacteristicMetas);
+                await collection.InsertManyAsync(publication.CharacteristicMetas);
             }
 
             _logger.LogWarning("Not seeding {Collection}. Collection is not empty for publication {Publication}",
                 characteristicMetaCollectionName, publication.PublicationId);
-
-            return Task.CompletedTask;
         }
 
-        private Task InsertManyAsync(IMongoCollection<TidyData> collection, IEnumerable<TidyData> tidyData, int index,
+        private async Task InsertManyAsync(IMongoCollection<TidyData> collection, IEnumerable<TidyData> tidyData, int index,
             int totalCount, Release release)
         {
-            _logger.LogInformation(
-                "Seeding batch {Index} of {TotalCount} for Publication {Publication}, Release {Release}", index,
-                totalCount, release.PublicationId, release.ReleaseId);
+            _logger.LogInformation("Seeding batch {Index} of {TotalCount} for Publication {Publication}, Release {Release}", index,totalCount, release.PublicationId, release.ReleaseId);
 
-            return collection.InsertManyAsync(tidyData);
+            try
+            {
+                await collection.InsertManyAsync(tidyData);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
-        private void CreatePartitionedCollectionIfNotExists(string name)
+        private async Task CreatePartitionedCollectionIfNotExists(string name)
         {
-            _azureDocumentService.CreatePartitionedCollectionIfNotExists(name, "/'$v'/PublicationId/'$v'");
+            await _azureDocumentService.CreatePartitionedCollectionIfNotExists(name, "/'$v'/PublicationId/'$v'");
         }
     }
 }
