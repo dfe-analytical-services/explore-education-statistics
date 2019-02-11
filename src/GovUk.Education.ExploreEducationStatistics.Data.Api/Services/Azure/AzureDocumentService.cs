@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Configuration;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
@@ -20,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Azure
             _client = new DocumentClient(new Uri(cosmosEndpointUrl), cosmosAuthKey);
         }
 
-        public async void CreatePartitionedCollectionIfNotExists(string id, string partitionKey)
+        public async Task CreatePartitionedCollectionIfNotExists(string id, string partitionKey)
         {
             var collectionDefinition = new DocumentCollection
             {

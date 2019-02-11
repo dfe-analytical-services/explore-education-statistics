@@ -69,13 +69,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddScoped<LaCharacteristicService>();
             services.AddScoped<NationalCharacteristicService>();
 
-            if (_env.IsDevelopment())
+            if (Configuration.GetSection("AzureStorageConfig").Exists())
             {
-                services.AddScoped<IAzureDocumentService, DummyAzureDocumentService>();
+                services.AddScoped<IAzureDocumentService, AzureDocumentService>();
             }
             else
             {
-                services.AddScoped<IAzureDocumentService, AzureDocumentService>();
+                services.AddScoped<IAzureDocumentService, DummyAzureDocumentService>();
             }
             
             services.AddCors();
