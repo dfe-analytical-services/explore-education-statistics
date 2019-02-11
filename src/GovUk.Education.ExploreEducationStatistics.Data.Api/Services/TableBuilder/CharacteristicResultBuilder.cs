@@ -21,6 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             {
                 Year = data.Year,
                 SchoolType = data.SchoolType,
+                // TODO Label is not currently set in CharacteristicViewModel. Not sure if it needs to be?
+                // TODO If Label is not used then is CharacteristicViewModel needed?
                 Characteristic = _mapper.Map<CharacteristicViewModel>(data.Characteristic),
                 Attributes = attributeFilter.Count > 0
                     ? QueryUtil.FilterAttributes(data.Attributes, attributeFilter)

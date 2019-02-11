@@ -16,5 +16,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilde
         public Level Level { get; set; }
 
         public IEnumerable<ITableBuilderData> Result { get; set; }
+
+        public TableBuilderResult()
+        {
+            Result = new List<ITableBuilderData>();
+        }
     }
 }

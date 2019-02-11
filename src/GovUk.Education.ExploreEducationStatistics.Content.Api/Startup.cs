@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Data;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Converters;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +28,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddJsonOptions(options => {
                     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                });;
+                    options.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
+                    options.SerializerSettings.Converters.Add(new ContentBlockConverter());
+                });
 
             var connection = "Data Source=dfe-meta.db";
             services.AddDbContext<ApplicationDbContext>

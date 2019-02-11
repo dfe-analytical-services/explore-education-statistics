@@ -19,13 +19,10 @@ using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 {
     public class Startup
-    {
-        private readonly IHostingEnvironment _env;
-        
-        public Startup(IConfiguration configuration, IHostingEnvironment env)
+    {   
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            _env = env;
         }
 
         public IConfiguration Configuration { get; }
@@ -69,13 +66,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddScoped<LaCharacteristicService>();
             services.AddScoped<NationalCharacteristicService>();
 
-            if (_env.IsDevelopment())
+            if (Configuration.GetSection("AzureStorageConfig").Exists())
             {
-                services.AddScoped<IAzureDocumentService, DummyAzureDocumentService>();
+                services.AddScoped<IAzureDocumentService, AzureDocumentService>();
             }
             else
             {
-                services.AddScoped<IAzureDocumentService, AzureDocumentService>();
+                services.AddScoped<IAzureDocumentService, DummyAzureDocumentService>();
             }
             
             services.AddCors();
