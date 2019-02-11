@@ -11,11 +11,19 @@ import styles from './TabsSection.module.scss';
 export interface TabsSectionProps {
   children: ReactNode;
   id: string;
+  /**
+   * Set to true if children should not be
+   * rendered until tab has been selected.
+   */
+  lazy?: boolean;
   title: string;
 }
 
 const TabsSection: FunctionComponent<TabsSectionProps> = forwardRef(
-  ({ children, id, ...restProps }: TabsSectionProps, ref: Ref<HTMLElement>) => {
+  (
+    { children, id, lazy = false, ...restProps }: TabsSectionProps,
+    ref: Ref<HTMLElement>,
+  ) => {
     // Hide additional props from the component's public API to
     // avoid any confusion over this component's usage as
     // it should only be used in combination with Tabs.

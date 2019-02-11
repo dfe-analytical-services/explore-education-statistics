@@ -15,16 +15,25 @@ interface Props {
 }
 
 interface State {
+  loadedSections: Set<number>;
   selectedTabIndex: number;
 }
 
 class Tabs extends Component<Props, State> {
   public state = {
+    loadedSections: new Set<number>(),
     selectedTabIndex: 0,
   };
 
   private tabElements: HTMLAnchorElement[] = [];
   private sectionElements: HTMLElement[] = [];
+
+  private setSelectedTab(index: number) {
+    this.setState({
+      loadedSections: this.state.loadedSections.add(index),
+      selectedTabIndex: index,
+    });
+  }
 
   public render() {
     const { children } = this.props;
@@ -55,7 +64,7 @@ class Tabs extends Component<Props, State> {
                 role="tab"
                 onClick={event => {
                   event.preventDefault();
-                  this.setState({ selectedTabIndex: index });
+                  this.setSelectedTab(index);
                 }}
                 onKeyDown={event => {
                   switch (event.key) {
@@ -65,7 +74,7 @@ class Tabs extends Component<Props, State> {
                           ? selectedTabIndex - 1
                           : sections.length - 1;
 
-                      this.setState({ selectedTabIndex: nextTabIndex });
+                      this.setSelectedTab(nextTabIndex);
                       this.tabElements[nextTabIndex].focus();
 
                       break;
@@ -76,7 +85,7 @@ class Tabs extends Component<Props, State> {
                           ? selectedTabIndex + 1
                           : 0;
 
-                      this.setState({ selectedTabIndex: nextTabIndex });
+                      this.setSelectedTab(nextTabIndex);
                       this.tabElements[nextTabIndex].focus();
 
                       break;
@@ -95,37 +104,43 @@ class Tabs extends Component<Props, State> {
         </ul>
 
         {sections.map((section, index) => {
-          const { id } = section.props;
+          const { id, lazy } = section.props;
 
           return cloneElement<
             TabsSectionProps &
               HTMLAttributes<HTMLElement> &
               RefAttributes<HTMLElement>
-          >(section, {
-            'aria-labelledby': `${id}-tab`,
-            hidden: selectedTabIndex !== index,
-            key: id,
-            ref: (element: HTMLElement) => this.sectionElements.push(element),
-          });
+          >(
+            section,
+            {
+              'aria-labelledby': `${id}-tab`,
+              hidden: selectedTabIndex !== index,
+              key: id,
+              ref: (element: HTMLElement) => this.sectionElements.push(element),
+            },
+            lazy && !this.state.loadedSections.has(index)
+              ? null
+              : section.props.children,
+          );
         })}
       </div>
     );
   }
 
-  private filterSections(children: ReactNode) {
-    let sections: ReactElement<TabsSectionProps>[] = [];
-
+  private filterSections(
+    children: ReactNode,
+  ): ReactElement<TabsSectionProps>[] {
     if (Array.isArray(children)) {
-      sections = children.filter(child =>
+      return children.filter(child =>
         isComponentType(child, TabsSection),
       ) as ReactElement<TabsSectionProps>[];
     }
 
     if (isComponentType(children, TabsSection)) {
-      sections = [children];
+      return [children];
     }
 
-    return sections;
+    return [];
   }
 }
 

@@ -7,7 +7,7 @@ describe('Tabs', () => {
   test('renders single tab correctly', () => {
     const { container } = render(
       <Tabs>
-        <TabsSection id="tab-1" title="Tab 1">
+        <TabsSection id="section-1" title="Tab 1">
           <p>Test section 1 content</p>
         </TabsSection>
       </Tabs>,
@@ -15,51 +15,68 @@ describe('Tabs', () => {
 
     expect(container.innerHTML).toMatchSnapshot();
   });
+
   test('renders multiple tabs correctly', () => {
     const { container } = render(
       <Tabs>
-        <TabsSection id="tab-1" title="Tab 1">
+        <TabsSection id="section-1" title="Tab 1">
           <p>Test section 1 content</p>
         </TabsSection>
-        <TabsSection id="tab-2" title="Tab 2">
+        <TabsSection id="section-2" title="Tab 2">
           <p>Test section 2 content</p>
         </TabsSection>
       </Tabs>,
     );
 
     expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('does not immediately render lazy tab section', () => {
+    const { queryByText } = render(
+      <Tabs>
+        <TabsSection id="section-1" title="Tab 1">
+          <p>Test section 1 content</p>
+        </TabsSection>
+        <TabsSection id="section-2" title="Tab 2" lazy>
+          <p>Test section 2 content</p>
+        </TabsSection>
+      </Tabs>,
+    );
+
+    expect(queryByText('Test section 1 content')).not.toBeNull();
+    expect(queryByText('Test section 2 content')).toBeNull();
   });
 
   test('tab links match section ids', () => {
     const { getByText } = render(
       <Tabs>
-        <TabsSection id="tab-1" title="Tab 1">
+        <TabsSection id="section-1" title="Tab 1">
           <p>Test section 1 content</p>
         </TabsSection>
-        <TabsSection id="tab-2" title="Tab 2">
+        <TabsSection id="section-2" title="Tab 2">
           <p>Test section 2 content</p>
         </TabsSection>
       </Tabs>,
     );
 
-    expect(getByText('Tab 1')).toHaveAttribute('href', '#tab-1');
-    expect(getByText('Tab 2')).toHaveAttribute('href', '#tab-2');
+    expect(getByText('Tab 1')).toHaveAttribute('href', '#section-1');
+    expect(getByText('Tab 2')).toHaveAttribute('href', '#section-2');
   });
 
   test('clicking tab reveals correct section', () => {
     const { getByText, container } = render(
       <Tabs>
-        <TabsSection id="tab-1" title="Tab 1">
+        <TabsSection id="section-1" title="Tab 1">
           <p>Test section 1 content</p>
         </TabsSection>
-        <TabsSection id="tab-2" title="Tab 2">
+        <TabsSection id="section-2" title="Tab 2">
           <p>Test section 2 content</p>
         </TabsSection>
       </Tabs>,
     );
 
-    const tabSection1 = container.querySelector('#tab-1') as HTMLElement;
-    const tabSection2 = container.querySelector('#tab-2') as HTMLElement;
+    const tabSection1 = container.querySelector('#section-1') as HTMLElement;
+    const tabSection2 = container.querySelector('#section-2') as HTMLElement;
 
     expect(tabSection1.hidden).toBe(false);
     expect(tabSection2.hidden).toBe(true);
@@ -68,6 +85,25 @@ describe('Tabs', () => {
 
     expect(tabSection1.hidden).toBe(true);
     expect(tabSection2.hidden).toBe(false);
+  });
+
+  test('clicking tab renders lazy section', () => {
+    const { getByText, queryByText } = render(
+      <Tabs>
+        <TabsSection id="section-1" title="Tab 1">
+          <p>Test section 1 content</p>
+        </TabsSection>
+        <TabsSection id="section-2" title="Tab 2" lazy>
+          <p>Test section 2 content</p>
+        </TabsSection>
+      </Tabs>,
+    );
+
+    expect(queryByText('Test section 2 content')).toBeNull();
+
+    fireEvent.click(getByText('Tab 2'));
+
+    expect(queryByText('Test section 2 content')).not.toBeNull();
   });
 
   describe('keyboard interactions', () => {
@@ -81,13 +117,13 @@ describe('Tabs', () => {
     beforeEach(() => {
       const { getByText, container } = render(
         <Tabs>
-          <TabsSection id="tab-1" title="Tab 1">
+          <TabsSection id="section-1" title="Tab 1">
             <p>Test section 1 content</p>
           </TabsSection>
-          <TabsSection id="tab-2" title="Tab 2">
+          <TabsSection id="section-2" title="Tab 2">
             <p>Test section 2 content</p>
           </TabsSection>
-          <TabsSection id="tab-3" title="Tab 3">
+          <TabsSection id="section-3" title="Tab 3">
             <p>Test section 2 content</p>
           </TabsSection>
         </Tabs>,
@@ -97,9 +133,9 @@ describe('Tabs', () => {
       tab2 = getByText('Tab 2') as HTMLAnchorElement;
       tab3 = getByText('Tab 3') as HTMLAnchorElement;
 
-      tabSection1 = container.querySelector('#tab-1') as HTMLElement;
-      tabSection2 = container.querySelector('#tab-2') as HTMLElement;
-      tabSection3 = container.querySelector('#tab-3') as HTMLElement;
+      tabSection1 = container.querySelector('#section-1') as HTMLElement;
+      tabSection2 = container.querySelector('#section-2') as HTMLElement;
+      tabSection3 = container.querySelector('#section-3') as HTMLElement;
     });
 
     test('pressing left arrow key moves to previous tab', () => {
