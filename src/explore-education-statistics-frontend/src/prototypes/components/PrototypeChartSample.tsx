@@ -2,14 +2,10 @@ import React from 'react';
 import {
   CartesianGrid,
   Legend,
-  LegendPayload,
-  LegendProps,
-  LegendType,
   Line,
   LineChart,
   Symbols,
   Tooltip,
-  TooltipPayload,
   XAxis,
   YAxis,
 } from 'recharts';
