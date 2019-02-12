@@ -41,7 +41,13 @@
 }
 
 .hideMobile {
-  @include govuk-media-query($until: tablet) {
+  @include govuk-media-query($until: 950px) {
     @include govuk-visually-hidden();
+  }
+}
+
+.adjustMobile {
+  @include govuk-media-query($until: 950px) {
+    width: 100%;
   }
 }

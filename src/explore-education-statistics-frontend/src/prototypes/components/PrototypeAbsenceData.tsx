@@ -134,7 +134,13 @@ class PrototypeAbsenceData extends Component<
   public render() {
     return (
       <div className="govuk-grid-row">
-        <div className="govuk-grid-column-one-third" aria-live="assertive">
+        <div
+          className={classNames(
+            'govuk-grid-column-one-third',
+            styles.adjustMobile,
+          )}
+          aria-live="assertive"
+        >
           <form>
             <div className="govuk-form-group govuk-!-margin-bottom-6">
               <label
