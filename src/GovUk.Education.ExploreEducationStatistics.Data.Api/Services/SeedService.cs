@@ -4,14 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Azure;
-using Microsoft.AspNetCore.Mvc.Razor.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
@@ -21,17 +21,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly IMongoDatabase _database;
         private readonly IAzureDocumentService _azureDocumentService;
         private readonly CsvImporterFactory _csvImporterFactory = new CsvImporterFactory();
+        private readonly IOptions<SeedConfigurationOptions> _options;
 
         private const string attributeMetaCollectionName = "AttributeMeta";
         private const string characteristicMetaCollectionName = "CharacteristicMeta";
-
-        public SeedService(IConfiguration config, ILogger<SeedService> logger,
-            IAzureDocumentService azureDocumentService)
+        
+        public SeedService(IConfiguration config,
+            ILogger<SeedService> logger,
+            IAzureDocumentService azureDocumentService,
+            IOptions<SeedConfigurationOptions> options)
         {
             var client = new MongoClient(config.GetConnectionString("StatisticsDb"));
             _logger = logger;
             _database = client.GetDatabase("education-statistics");
             _azureDocumentService = azureDocumentService;
+            _options = options;
         }
 
         public async Task<long> EmptyAllCollectionsExceptMeta()
@@ -122,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 
                 var data = importer.Data(dataCsvFilename, release.PublicationId, release.ReleaseId,release.ReleaseDate);
 
-                var batches = data.Batch(50);
+                var batches = data.Batch(_options.Value.BatchSize);
 
                 var i = 0;
                 foreach (var batch in batches)
