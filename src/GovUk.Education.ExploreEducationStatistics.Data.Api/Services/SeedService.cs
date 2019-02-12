@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private const string attributeMetaCollectionName = "AttributeMeta";
         private const string characteristicMetaCollectionName = "CharacteristicMeta";
-        
+
         public SeedService(IConfiguration config,
             ILogger<SeedService> logger,
             IAzureDocumentService azureDocumentService,
@@ -78,6 +78,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public async void Seed()
         {
+            _logger.LogInformation("Seeding");
+
             await CreatePartitionedCollectionIfNotExists(attributeMetaCollectionName);
             await CreatePartitionedCollectionIfNotExists(characteristicMetaCollectionName);
 
@@ -85,6 +87,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             {
                 await Seed(publication);
             }
+
+            _logger.LogInformation("Seeding complete");
         }
 
         private async Task Seed(Publication publication)
@@ -110,21 +114,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
             else
             {
-                _logger.LogWarning("Not seeding {Name}. Collection is not empty for publication {Publication}", publication.Name, publication.PublicationId);
+                _logger.LogWarning("Not seeding {Name}. Collection is not empty for publication {Publication}",
+                    publication.Name, publication.PublicationId);
             }
         }
 
         private async Task SeedRelease(Release release, IMongoCollection<TidyData> collection)
         {
-            _logger.LogInformation("Seeding Publication {Publication}, Released {Release}", release.PublicationId,release.ReleaseId);
-
-            var tasks = new List<Task>();
+            _logger.LogInformation("Seeding Publication {Publication}, Release {Release}", release.PublicationId,
+                release.ReleaseId);
 
             foreach (var dataCsvFilename in release.Filenames)
             {
                 var importer = _csvImporterFactory.Importer(dataCsvFilename);
-                
-                var data = importer.Data(dataCsvFilename, release.PublicationId, release.ReleaseId,release.ReleaseDate);
+
+                var data = importer.Data(dataCsvFilename, release.PublicationId, release.ReleaseId,
+                    release.ReleaseDate);
 
                 var batches = data.Batch(_options.Value.BatchSize);
 
@@ -152,9 +157,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
                 await collection.InsertManyAsync(publication.AttributeMetas);
             }
-
-            _logger.LogWarning("Not seeding {Collection}. Collection is not empty for publication {Publication}",
-                attributeMetaCollectionName, publication.PublicationId);
+            else
+            {
+                _logger.LogWarning("Not seeding {Collection}. Collection is not empty for publication {Publication}",
+                    attributeMetaCollectionName, publication.PublicationId);
+            }
         }
 
         private async Task SeedCharacteristics(Publication publication)
@@ -172,15 +179,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
                 await collection.InsertManyAsync(publication.CharacteristicMetas);
             }
-
-            _logger.LogWarning("Not seeding {Collection}. Collection is not empty for publication {Publication}",
-                characteristicMetaCollectionName, publication.PublicationId);
+            else
+            {
+                _logger.LogWarning("Not seeding {Collection}. Collection is not empty for publication {Publication}",
+                    characteristicMetaCollectionName, publication.PublicationId);
+            }
         }
 
-        private async Task InsertManyAsync(IMongoCollection<TidyData> collection, IEnumerable<TidyData> tidyData, int index,
-            int totalCount, Release release)
+        private async Task InsertManyAsync(IMongoCollection<TidyData> collection, IEnumerable<TidyData> tidyData,
+            int index, int totalCount, Release release)
         {
-            _logger.LogInformation("Seeding batch {Index} of {TotalCount} for Publication {Publication}, Release {Release}", index,totalCount, release.PublicationId, release.ReleaseId);
+            _logger.LogInformation(
+                "Seeding batch {Index} of {TotalCount} for Publication {Publication}, Release {Release}", index,
+                totalCount, release.PublicationId, release.ReleaseId);
 
             try
             {

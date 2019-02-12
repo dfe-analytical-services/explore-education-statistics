@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Configuration;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Azure
@@ -10,11 +11,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Azure
     public class AzureDocumentService : IAzureDocumentService
     {
         private const string databaseName = "education-statistics";
+        private readonly ILogger _logger;
 
         private readonly DocumentClient _client;
 
-        public AzureDocumentService(IOptions<AzureStorageConfigurationOptions> options)
+        public AzureDocumentService(ILogger logger, IOptions<AzureStorageConfigurationOptions> options)
         {
+            _logger = logger;
             var cosmosEndpointUrl = options.Value.CosmosEndpointUrl;
             var cosmosAuthKey = options.Value.CosmosAuthorizationKey;
 
@@ -29,6 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Azure
             };
 
             collectionDefinition.PartitionKey.Paths.Add(partitionKey);
+         
+            _logger.LogInformation("Creating partitioned collection if not exists {Id}", id);
             
             await _client.CreateDocumentCollectionIfNotExistsAsync(
                 UriFactory.CreateDatabaseUri(databaseName),
