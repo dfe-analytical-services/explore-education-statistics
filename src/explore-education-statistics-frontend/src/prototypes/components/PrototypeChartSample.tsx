@@ -2,9 +2,14 @@ import React from 'react';
 import {
   CartesianGrid,
   Legend,
+  LegendPayload,
+  LegendProps,
+  LegendType,
   Line,
   LineChart,
+  Symbols,
   Tooltip,
+  TooltipPayload,
   XAxis,
   YAxis,
 } from 'recharts';
@@ -25,9 +30,12 @@ const colours: string[] = [
   '#C0C0C0',
 ];
 
+const symbols: any[] = ['circle', 'square', 'triangle', 'cross', 'star'];
+
 const CustomToolTip = (props: any) => {
   if (props.active) {
     const { payload, label } = props;
+
     return (
       <div className={styles.tooltip}>
         <p>{label}</p>
@@ -89,9 +97,12 @@ const PrototypeChartSample = ({
             type="linear"
             dataKey={dataKey}
             stroke={colours[index]}
+            fill={colours[index]}
             strokeWidth="5"
             unit="%"
+            legendType={symbols[index]}
             activeDot={{ r: 3 }}
+            dot={props => <Symbols {...props} type={symbols[index]} />}
           />
         ))}
       </LineChart>
