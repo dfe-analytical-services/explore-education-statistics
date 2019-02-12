@@ -83,6 +83,7 @@ class PrototypeAbsenceData extends Component<
 
     this.legend = [4, 3, 2, 1, 0].map(value => {
       return {
+        idx: value,
         max: (minOverall + (value + 1) / range - 0.1).toFixed(1),
         min: (minOverall + value / range).toFixed(1),
       };
@@ -229,7 +230,7 @@ class PrototypeAbsenceData extends Component<
           <div className={classNames(styles.legend, styles.hideMobile)}>
             <h3 className="govuk-heading-s">Key to overall absence rate</h3>
             <dl className="govuk-list">
-              {this.legend.map(({ min, max }: any, idx: number) => (
+              {this.legend.map(({ min, max, idx }: any) => (
                 <dd key={idx}>
                   <span className={styles[`rate${idx}`]}>&nbsp;</span> {min}% to{' '}
                   {max}%{' '}
