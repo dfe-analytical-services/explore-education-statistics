@@ -43,9 +43,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             return BuildResult(_nationalCharacteristicService.FindMany(query), query.Attributes,
                 _characteristicResultBuilder);
         }
-
-        private static TableBuilderResult BuildResult(IEnumerable<ITidyData> data, ICollection<string> attributes,
-            IResultBuilder<ITidyData, ITableBuilderData> resultBuilder)
+        
+        private static TableBuilderResult BuildResult(IEnumerable<IGeographicData> data, ICollection<string> attributes,
+            IResultBuilder<IGeographicData, ITableBuilderData> resultBuilder)
         {
             if (!data.Any())
             {

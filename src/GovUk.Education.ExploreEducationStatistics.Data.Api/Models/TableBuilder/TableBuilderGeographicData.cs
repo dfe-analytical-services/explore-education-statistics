@@ -9,6 +9,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilde
     {
         public int Year { get; set; }
         public Country Country { get; set; }
+        public Region Region { get; set; }
+        public LocalAuthority LocalAuthority { get; set; }
+        public School School { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public SchoolType SchoolType { get; set; }

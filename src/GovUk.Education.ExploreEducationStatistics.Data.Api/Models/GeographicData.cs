@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
-    public class GeographicData : TidyData
+    public class GeographicData : TidyData, IGeographicData
     {
         public GeographicData()
         {
