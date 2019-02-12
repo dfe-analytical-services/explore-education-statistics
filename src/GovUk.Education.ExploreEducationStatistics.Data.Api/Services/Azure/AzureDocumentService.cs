@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Azure
 
         private readonly DocumentClient _client;
 
-        public AzureDocumentService(ILogger logger, IOptions<AzureStorageConfigurationOptions> options)
+        public AzureDocumentService(ILogger<AzureDocumentService> logger, IOptions<AzureStorageConfigurationOptions> options)
         {
             _logger = logger;
             var cosmosEndpointUrl = options.Value.CosmosEndpointUrl;
