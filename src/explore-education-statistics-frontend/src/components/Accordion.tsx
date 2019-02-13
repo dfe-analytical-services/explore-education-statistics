@@ -1,22 +1,35 @@
 import GovUkAccordion from 'govuk-frontend/components/accordion/accordion';
 import React, { cloneElement, Component, createRef, ReactNode } from 'react';
+import { RouteComponentProps, withRouter } from 'react-router';
 import isComponentType from '../lib/type-guards/components/isComponentType';
 import AccordionSection, { AccordionSectionProps } from './AccordionSection';
 
-interface Props {
+export interface AccordionProps {
   children: ReactNode;
   id: string;
 }
 
-class Accordion extends Component<Props> {
+class Accordion extends Component<AccordionProps & RouteComponentProps> {
   private ref = createRef<HTMLDivElement>();
 
   public componentDidMount(): void {
-    new GovUkAccordion(this.ref.current).init();
+    if (this.ref.current) {
+      new GovUkAccordion(this.ref.current).init();
+
+      const { location } = this.props;
+
+      if (location && location.hash) {
+        const anchor = this.ref.current.querySelector(location.hash);
+
+        if (anchor) {
+          anchor.scrollIntoView();
+        }
+      }
+    }
   }
 
   public render() {
-    const { id } = this.props;
+    const { id, location } = this.props;
 
     let sectionId = 0;
 
@@ -26,9 +39,21 @@ class Accordion extends Component<Props> {
           if (isComponentType(child, AccordionSection)) {
             sectionId += 1;
 
+            const contentId = `${id}-content-${sectionId}`;
+            const headingId = `${id}-heading-${sectionId}`;
+
+            let isLocationHashMatching = false;
+
+            if (location) {
+              isLocationHashMatching =
+                location.hash === `#${headingId}` ||
+                location.hash === `#${contentId}`;
+            }
+
             return cloneElement<AccordionSectionProps>(child, {
-              contentId: `${id}-content-${sectionId}`,
-              headingId: `${id}-heading-${sectionId}`,
+              contentId,
+              headingId,
+              open: child.props.open || isLocationHashMatching,
             });
           }
 
@@ -39,4 +64,4 @@ class Accordion extends Component<Props> {
   }
 }
 
-export default Accordion;
+export default withRouter(Accordion);
