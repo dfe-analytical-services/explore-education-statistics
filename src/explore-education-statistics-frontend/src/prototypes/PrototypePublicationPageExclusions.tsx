@@ -36,7 +36,7 @@ const PublicationPageExclusions = () => {
             You can also view a regional breakdown of statistics and data within
             the{' '}
             <a href="#contents-exclusions-sections-heading-9">
-              local authorities section
+              <strong>local authorities section</strong>
             </a>
           </p>
 
@@ -721,7 +721,7 @@ const PublicationPageExclusions = () => {
         API. <a href="#">What is an API?</a>
       </p>
       <Link to="/prototypes/data-table-v3" className="govuk-button">
-        Explore pupil absence statistics
+        Create charts and tables
       </Link>
       <div className="govuk-!-margin-top-9">
         <a href="#print" className="govuk-link">

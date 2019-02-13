@@ -39,7 +39,9 @@ const PublicationPage = () => {
           <p className="govuk-body">
             You can also view a regional breakdown of statistics and data within
             the{' '}
-            <a href="#contents-sections-heading-9">local authorities section</a>
+            <a href="#contents-sections-heading-9">
+              <strong>local authorities section</strong>
+            </a>
           </p>
 
           <Details summary="Read more about our methodology">
@@ -727,7 +729,7 @@ const PublicationPage = () => {
         API. <a href="#">What is an API?</a>
       </p>
       <Link to="/prototypes/data-table-v3" className="govuk-button">
-        Explore pupil absence statistics
+        Create charts and tables
       </Link>
       <div className="govuk-!-margin-top-9">
         <a href="#print" className="govuk-link">
