@@ -89,6 +89,10 @@
             {
               "name": "AzureStorageConfig:CosmosAuthorizationKey",
               "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('cosmosAccountName')), '2015-04-08').primaryMasterKey]"
+            },
+            {
+              "name": "SeedConfig:BatchSize",
+              "value": "50"
             }
           ],
           "connectionStrings": [

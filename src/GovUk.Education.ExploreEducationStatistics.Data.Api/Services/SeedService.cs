@@ -4,14 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Azure;
-using Microsoft.AspNetCore.Mvc.Razor.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
@@ -21,17 +21,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly IMongoDatabase _database;
         private readonly IAzureDocumentService _azureDocumentService;
         private readonly CsvImporterFactory _csvImporterFactory = new CsvImporterFactory();
+        private readonly IOptions<SeedConfigurationOptions> _options;
 
         private const string attributeMetaCollectionName = "AttributeMeta";
         private const string characteristicMetaCollectionName = "CharacteristicMeta";
 
-        public SeedService(IConfiguration config, ILogger<SeedService> logger,
-            IAzureDocumentService azureDocumentService)
+        public SeedService(IConfiguration config,
+            ILogger<SeedService> logger,
+            IAzureDocumentService azureDocumentService,
+            IOptions<SeedConfigurationOptions> options)
         {
             var client = new MongoClient(config.GetConnectionString("StatisticsDb"));
             _logger = logger;
             _database = client.GetDatabase("education-statistics");
             _azureDocumentService = azureDocumentService;
+            _options = options;
         }
 
         public async Task<long> EmptyAllCollectionsExceptMeta()
@@ -74,6 +78,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public async void Seed()
         {
+            _logger.LogInformation("Seeding");
+
             await CreatePartitionedCollectionIfNotExists(attributeMetaCollectionName);
             await CreatePartitionedCollectionIfNotExists(characteristicMetaCollectionName);
 
@@ -81,6 +87,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             {
                 await Seed(publication);
             }
+
+            _logger.LogInformation("Seeding complete");
         }
 
         private async Task Seed(Publication publication)
@@ -106,23 +114,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
             else
             {
-                _logger.LogWarning("Not seeding {Name}. Collection is not empty for publication {Publication}", publication.Name, publication.PublicationId);
+                _logger.LogWarning("Not seeding {Name}. Collection is not empty for publication {Publication}",
+                    publication.Name, publication.PublicationId);
             }
         }
 
         private async Task SeedRelease(Release release, IMongoCollection<TidyData> collection)
         {
-            _logger.LogInformation("Seeding Publication {Publication}, Released {Release}", release.PublicationId,release.ReleaseId);
-
-            var tasks = new List<Task>();
+            _logger.LogInformation("Seeding Publication {Publication}, Release {Release}", release.PublicationId,
+                release.ReleaseId);
 
             foreach (var dataCsvFilename in release.Filenames)
             {
                 var importer = _csvImporterFactory.Importer(dataCsvFilename);
-                
-                var data = importer.Data(dataCsvFilename, release.PublicationId, release.ReleaseId,release.ReleaseDate);
 
-                var batches = data.Batch(50);
+                var data = importer.Data(dataCsvFilename, release.PublicationId, release.ReleaseId,
+                    release.ReleaseDate);
+
+                var batches = data.Batch(_options.Value.BatchSize);
 
                 var i = 0;
                 foreach (var batch in batches)
@@ -148,9 +157,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
                 await collection.InsertManyAsync(publication.AttributeMetas);
             }
-
-            _logger.LogWarning("Not seeding {Collection}. Collection is not empty for publication {Publication}",
-                attributeMetaCollectionName, publication.PublicationId);
+            else
+            {
+                _logger.LogWarning("Not seeding {Collection}. Collection is not empty for publication {Publication}",
+                    attributeMetaCollectionName, publication.PublicationId);
+            }
         }
 
         private async Task SeedCharacteristics(Publication publication)
@@ -168,15 +179,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
                 await collection.InsertManyAsync(publication.CharacteristicMetas);
             }
-
-            _logger.LogWarning("Not seeding {Collection}. Collection is not empty for publication {Publication}",
-                characteristicMetaCollectionName, publication.PublicationId);
+            else
+            {
+                _logger.LogWarning("Not seeding {Collection}. Collection is not empty for publication {Publication}",
+                    characteristicMetaCollectionName, publication.PublicationId);
+            }
         }
 
-        private async Task InsertManyAsync(IMongoCollection<TidyData> collection, IEnumerable<TidyData> tidyData, int index,
-            int totalCount, Release release)
+        private async Task InsertManyAsync(IMongoCollection<TidyData> collection, IEnumerable<TidyData> tidyData,
+            int index, int totalCount, Release release)
         {
-            _logger.LogInformation("Seeding batch {Index} of {TotalCount} for Publication {Publication}, Release {Release}", index,totalCount, release.PublicationId, release.ReleaseId);
+            _logger.LogInformation(
+                "Seeding batch {Index} of {TotalCount} for Publication {Publication}, Release {Release}", index,
+                totalCount, release.PublicationId, release.ReleaseId);
 
             try
             {

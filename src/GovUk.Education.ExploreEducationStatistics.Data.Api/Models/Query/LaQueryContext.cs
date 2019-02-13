@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         {
             queryable = queryable.Where(x => x.Level == Level.Local_Authority);
 
-            if (SchoolTypes.Count > 0)
+            if (SchoolTypes != null && SchoolTypes.Count > 0)
             {
                 queryable = queryable.Where(x => SchoolTypes.Contains(x.SchoolType));
             }
@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
                 queryable = queryable.Where(x => yearsQuery.Contains(x.Year));
             }
 
-            if (Characteristics.Count > 0)
+            if (Characteristics != null && Characteristics.Count > 0)
             {
                 queryable = queryable.Where(x => Characteristics.Contains(x.Characteristic.Name));
             }
