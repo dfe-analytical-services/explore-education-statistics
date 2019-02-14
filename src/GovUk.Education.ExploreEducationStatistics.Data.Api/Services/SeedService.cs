@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     }
                     catch (Exception e)
                     {
-                        _logger.LogError("Caught error deleting documents from collection", e);
+                        _logger.LogError(0, e, "Caught error deleting documents from collection {Collection}", name);
                     }
                 }
             });
@@ -197,9 +197,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             {
                 await collection.InsertManyAsync(tidyData);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw ex;
+                _logger.LogError(0, e,
+                    "Caught Exception Seeding batch {Index} of {TotalCount} for Publication {Publication}, Release {Release}",
+                    index, totalCount, release.PublicationId, release.ReleaseId);
             }
         }
 

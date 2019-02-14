@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { createElement, FunctionComponent, ReactNode } from 'react';
+import React, { createElement, ReactNode } from 'react';
 import GoToTopLink from './GoToTopLink';
 
 export interface AccordionSectionProps {
@@ -18,7 +18,7 @@ export interface AccordionSectionProps {
   onToggle?: (open: boolean) => void;
 }
 
-const AccordionSection: FunctionComponent<AccordionSectionProps> = ({
+const AccordionSection = ({
   caption,
   className,
   children,
@@ -47,7 +47,7 @@ const AccordionSection: FunctionComponent<AccordionSectionProps> = ({
     >
       <div className="govuk-accordion__section-header">
         {createElement(
-          `${headingTag}`,
+          headingTag,
           {
             className: 'govuk-accordion__section-heading',
           },
