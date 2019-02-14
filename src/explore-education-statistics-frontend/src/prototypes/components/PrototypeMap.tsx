@@ -74,7 +74,7 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
   }
 
   public refresh() {
-    this.mapNode.leafletElement.invalidateSize();
+    requestAnimationFrame(_ => this.mapNode.leafletElement.invalidateSize());
   }
 
   private onEachFeature = (feature: Feature, layer: Path) => {
