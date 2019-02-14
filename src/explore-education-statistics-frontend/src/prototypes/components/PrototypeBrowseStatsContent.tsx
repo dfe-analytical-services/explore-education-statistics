@@ -27,8 +27,9 @@ const PrototypeBrowseStatsContent = ({ viewType }: Props) => {
               explanations
             </li>
             <li>
-              charts and tables to help you compare, contrast and view national
-              and regional statistical data and trends
+              charts and tables to help you compare, contrast and view{' '}
+              <strong>national</strong> and <strong>regional</strong>{' '}
+              statistical data and trends
             </li>
           </ul>
         </>
