@@ -710,8 +710,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                             ReleaseDate = new DateTime(2018, 4, 25),
                             Filenames = new[]
                             {
-                                DataCsvFilename.absence_geoglevels,
-                                DataCsvFilename.absence_lacharacteristics,
+                                //DataCsvFilename.absence_geoglevels,
+                                //DataCsvFilename.absence_lacharacteristics,
                                 DataCsvFilename.absence_natcharacteristics
                             }
                         }
@@ -1355,15 +1355,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                             ReleaseDate = new DateTime(2018, 3, 22),
                             Filenames = new[]
                             {
-                                DataCsvFilename.exclusion_geoglevels,
-                                DataCsvFilename.exclusion_lacharacteristics,
+                                //DataCsvFilename.exclusion_geoglevels,
+                                //DataCsvFilename.exclusion_lacharacteristics,
                                 DataCsvFilename.exclusion_natcharacteristics
                             }
                         }
                     }
                 }
             },
-
             {
                 "schpupnum", new Publication
                 {
@@ -1952,8 +1951,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                             ReleaseDate = new DateTime(2018, 5, 30),
                             Filenames = new[]
                             {
-                                DataCsvFilename.schpupnum_geoglevels,
-                                DataCsvFilename.schpupnum_lacharacteristics,
+                                //DataCsvFilename.schpupnum_geoglevels,
+                                //DataCsvFilename.schpupnum_lacharacteristics,
                                 DataCsvFilename.schpupnum_natcharacteristics
                             }
                         }
