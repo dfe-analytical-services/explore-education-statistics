@@ -1,0 +1,14 @@
+﻿@model List<string>
+@{
+    ViewData["Title"] = "Files";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="govuk-heading-l">Files</h1>
+
+<ul>
+    @foreach (var file in Model)
+    {
+        <li>@file</li>
+    }
+</ul>
