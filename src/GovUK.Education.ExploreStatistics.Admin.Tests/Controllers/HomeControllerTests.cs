@@ -17,7 +17,7 @@ namespace GovUK.Education.ExploreStatistics.Admin.Tests.Controllers
             var controller = new HomeController();
 
             // Act
-            var result = controller.Index();
+            var result = await controller.Index();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -30,7 +30,7 @@ namespace GovUK.Education.ExploreStatistics.Admin.Tests.Controllers
             var controller = new HomeController();
 
             // Act
-            var result = controller.Privacy();
+            var result = await controller.Privacy();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);

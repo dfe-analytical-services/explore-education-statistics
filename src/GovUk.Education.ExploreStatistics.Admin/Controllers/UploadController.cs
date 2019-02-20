@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreStatistics.Admin.Controllers
             _fileStorageService = fileStorageService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var files = _fileStorageService.ListFiles("releases");
             
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreStatistics.Admin.Controllers
             return View(model);
         }
 
-        public IActionResult Upload()
+        public async Task<IActionResult> Upload()
         {
             return View();
         }

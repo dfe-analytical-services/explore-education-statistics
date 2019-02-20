@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreStatistics.Admin.Models;
 using Xunit;
 
 namespace GovUK.Education.ExploreStatistics.Admin.Tests.Controllers
@@ -29,11 +30,11 @@ namespace GovUK.Education.ExploreStatistics.Admin.Tests.Controllers
             var controller = new UploadController(logger.Object, mockRepo.Object);
 
             // Act
-            var result = controller.Index();
+            var result = await controller.Index();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
-            var model = Assert.IsAssignableFrom<IEnumerable<string>>(viewResult.ViewData.Model);
+            var model = Assert.IsAssignableFrom<IEnumerable<FileViewModel>>(viewResult.ViewData.Model);
             Assert.Equal(2, model.Count());
         }
 
@@ -49,10 +50,10 @@ namespace GovUK.Education.ExploreStatistics.Admin.Tests.Controllers
             var controller = new UploadController(logger.Object, mockRepo.Object);
 
             // Act
-            var result = controller.Upload();
+            var result = await controller.Upload();
 
             // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.IsType<ViewResult>(result);
         }
 
         [Fact]
@@ -70,14 +71,14 @@ namespace GovUK.Education.ExploreStatistics.Admin.Tests.Controllers
             var result = await controller.Post(TestFiles());
 
             // Assert
-            Assert.IsType<OkObjectResult>(result);
+            Assert.IsType<RedirectToActionResult>(result);
         }
 
         private List<string> GetTestFiles()
         {
             var files = new List<string>();
-            files.Add("File1");
-            files.Add("File2");
+            files.Add("drive/release-1/File1.csv");
+            files.Add("drive/release-1/File2.csv");
             return files;
         }
 
