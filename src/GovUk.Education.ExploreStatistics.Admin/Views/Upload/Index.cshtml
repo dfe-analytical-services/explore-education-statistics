@@ -1,4 +1,4 @@
-﻿@model List<string>
+﻿@model List<FileViewModel>
 @{
     ViewData["Title"] = "Files";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -6,9 +6,24 @@
 
 <h1 class="govuk-heading-l">Files</h1>
 
-<ul>
+<table class="govuk-table">
+    <caption class="govuk-table__caption">Dates and amounts</caption>
+    <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+        <th class="govuk-table__header" scope="col">Upload</th>
+        <th class="govuk-table__header" scope="col">File</th>
+        <th class="govuk-table__header" scope="col">Link</th>
+    </tr>
+    </thead>
+    <tbody class="govuk-table__body">
     @foreach (var file in Model)
     {
-        <li>@file</li>
+        <tr class="govuk-table__row">
+            <th class="govuk-table__cell">@file.UploadId</th>
+            <td class="govuk-table__cell">@file.FileName</td>
+            <td class="govuk-table__cell"><a class="govuk-link" href="@file.Path">link</a></td>
+
+        </tr>
     }
-</ul>
+    </tbody>
+</table>

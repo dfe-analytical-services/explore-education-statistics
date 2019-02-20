@@ -67,9 +67,7 @@ namespace GovUk.Education.ExploreStatistics.Admin.Services
             var list = blobContainer.ListBlobs(useFlatBlobListing: true);
             var listOfFileNames = new List<string>();
 
-            var blobs = blobContainer.ListBlobs();
-
-            foreach (var blob in blobs)
+            foreach (var blob in list)
             {
                 //string bName = blob.Name;
                 //long bSize = blob.Properties.Length;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreStatistics.Admin.Models;
 using GovUk.Education.ExploreStatistics.Admin.Services;
 using GovUk.Education.ExploreStatistics.Admin.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -28,7 +29,19 @@ namespace GovUk.Education.ExploreStatistics.Admin.Controllers
         public IActionResult Index()
         {
             var files = _fileStorageService.ListFiles("releases");
-            return View(files);
+            
+            var model = new List<FileViewModel>();
+
+            foreach (var file in files)
+            {
+                model.Add(new FileViewModel
+                {
+                    Path = file,
+                    FileName = file.Split('/').Last(),
+                    UploadId = file.Split('/').SkipLast(1).Last()
+                });
+            }
+            return View(model);
         }
 
         public IActionResult Upload()
