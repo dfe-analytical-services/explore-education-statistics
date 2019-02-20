@@ -9,7 +9,7 @@ To run the application you require:
 
 To develop the application you will require:
 - v9.0.0+ of Node.Js installed
-- Version 2.1.5 of the dotnet SDK installed
+- Version 2.2 of the dotnet SDK installed
 
 ### Running the service locally
 Create the frontend .env file, copy `src/explore-education-statistics-frontend/.env.example` to `src/explore-education-statistics-frontend/.env`.
