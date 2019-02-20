@@ -69,12 +69,6 @@ namespace GovUk.Education.ExploreStatistics.Admin.Services
 
             foreach (var blob in list)
             {
-                //string bName = blob.Name;
-                //long bSize = blob.Properties.Length;
-                //string bModifiedOn = blob.Properties.LastModified.ToString();
-
-
-
                 listOfFileNames.Add(blob.Uri.ToString());
             }
 

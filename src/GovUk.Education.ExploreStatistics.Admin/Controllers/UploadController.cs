@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreStatistics.Admin.Controllers
                 await _fileStorageService.UploadFileAsync(filePath, file.FileName, releaseId);
             }
 
-            return Ok(new { count = files.Count, size, filePath });
+            return RedirectToAction("Index");
         }
     }
 }
