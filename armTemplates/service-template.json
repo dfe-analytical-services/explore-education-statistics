@@ -361,10 +361,10 @@
           "apiVersion": "2015-01-01",
           "dependsOn": ["[variables('sqlserverName')]"],
           "properties": {
-            "edition": "Standard",
+            "edition": "Basic",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "1073741824",
-            "requestedServiceObjectiveName": "S0"
+            "requestedServiceObjectiveName": "Basic"
           }
         },
         {
