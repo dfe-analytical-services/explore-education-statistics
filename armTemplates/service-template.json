@@ -20,6 +20,18 @@
     },
     "cosmosAccountName": {
       "type": "string"
+    },
+    "sqlAdministratorLogin": {
+      "type": "string",
+      "metadata": {
+        "description": "The admin user of the SQL Server"
+      }
+    },
+    "sqlAdministratorLoginPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the admin user of the SQL Server"
+      }
     }
   },
   "variables": {
@@ -29,7 +41,8 @@
     "dataPlanName": "[concat('data-', parameters('hostingPlanName'))]",
     "contentPlanName": "[concat('content-', parameters('hostingPlanName'))]",
     "adminPlanName": "[concat('admin-', parameters('hostingPlanName'))]",
-    "importFunctionName": "[concat('data-', parameters('webAppName'))]"
+    "importFunctionName": "[concat('data-', parameters('webAppName'))]",
+    "sqlserverName": "[parameters('webAppName')]"
   },
   "resources": [
     {
@@ -306,6 +319,35 @@
         "name": "Standard_RAGRS"
       },
       "kind": "StorageV2"
+    },
+
+    {
+      "name": "[variables('sqlserverName')]",
+      "type": "Microsoft.Sql/servers",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "SqlServer"
+      },
+      "apiVersion": "2014-04-01",
+      "properties": {
+        "administratorLogin": "[parameters('sqlAdministratorLogin')]",
+        "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
+        "version": "12.0"
+      },
+      "resources": [
+        {
+          "type": "firewallrules",
+          "apiVersion": "2014-04-01",
+          "dependsOn": ["[variables('sqlserverName')]"],
+          "location": "[resourceGroup().location]",
+          "name": "AllowAllWindowsAzureIps",
+          "properties": {
+            "endIpAddress": "0.0.0.0",
+            "startIpAddress": "0.0.0.0"
+          }
+        }
+      ]
     }
+
   ]
 }
