@@ -25,6 +25,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             return DbSet().Count();
         }
+        
+        public int Count(Expression<Func<TEntity, bool>> expression)
+        {
+            return DbSet().Count(expression);
+        }
 
         public IEnumerable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression)
         {

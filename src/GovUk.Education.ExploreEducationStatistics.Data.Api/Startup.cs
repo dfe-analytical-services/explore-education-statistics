@@ -48,10 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Data API", Version = "v1"});
             });
 
-            services.AddScoped<GeographicTidyDataPersister>();
-            services.AddScoped<LaCharacteristicTidyDataPersister>();
-            services.AddScoped<NationalCharacteristicTidyDataPersister>();
-            services.AddScoped<TidyDataPersisterFactory>();
+            services.AddScoped<TidyDataReleaseCounter>();
 
             services.AddScoped<GeographicResultBuilder>();
             services.AddScoped<CharacteristicResultBuilder>();

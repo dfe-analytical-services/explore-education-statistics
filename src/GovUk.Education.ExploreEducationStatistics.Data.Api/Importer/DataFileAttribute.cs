@@ -5,11 +5,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
     [AttributeUsage(AttributeTargets.Field)]
     public class DataFileAttribute : Attribute
     {
-        public Type Type { get; }
+        public Type EntityType { get; }
 
-        public DataFileAttribute(Type type)
+        public DataFileAttribute(Type entityType)
         {
-            Type = type;
+            EntityType = entityType;
         }
     }
 }

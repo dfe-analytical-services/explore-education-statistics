@@ -6,22 +6,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
     {
         [DataFile(typeof(GeographicData))]
         absence_geoglevels,
-        [DataFile(typeof(CharacteristicDataLa))]
-        absence_lacharacteristics,
-        [DataFile(typeof(CharacteristicDataNational))]
-        absence_natcharacteristics,
-        
         [DataFile(typeof(GeographicData))]
         exclusion_geoglevels,
-        [DataFile(typeof(CharacteristicDataLa))]
-        exclusion_lacharacteristics,
-        [DataFile(typeof(CharacteristicDataNational))]
-        exclusion_natcharacteristics,
-        
         [DataFile(typeof(GeographicData))]
         schpupnum_geoglevels,
+        
+        [DataFile(typeof(CharacteristicDataLa))]
+        absence_lacharacteristics,
+        [DataFile(typeof(CharacteristicDataLa))]
+        exclusion_lacharacteristics,
         [DataFile(typeof(CharacteristicDataLa))]
         schpupnum_lacharacteristics,
+        
+        [DataFile(typeof(CharacteristicDataNational))]
+        absence_natcharacteristics,
+        [DataFile(typeof(CharacteristicDataNational))]
+        exclusion_natcharacteristics,
         [DataFile(typeof(CharacteristicDataNational))]
         schpupnum_natcharacteristics
     }

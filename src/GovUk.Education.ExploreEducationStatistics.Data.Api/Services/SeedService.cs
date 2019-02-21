@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly ILogger _logger;
         private readonly ApplicationDbContext _context;
         private readonly CsvImporterFactory _csvImporterFactory = new CsvImporterFactory();
-        private readonly TidyDataPersisterFactory _tidyDataPersisterFactory;
+        private readonly TidyDataReleaseCounter _tidyDataReleaseCounter;
         private readonly IOptions<SeedConfigurationOptions> _options;
 
         private const string attributeMetaTableName = "AttributeMeta";
@@ -23,15 +23,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public SeedService(ILogger<SeedService> logger,
             ApplicationDbContext context,
-            TidyDataPersisterFactory tidyDataPersisterFactory,
+            TidyDataReleaseCounter tidyDataReleaseCounter,
             IOptions<SeedConfigurationOptions> options)
         {
             _logger = logger;
             _context = context;
-            _tidyDataPersisterFactory = tidyDataPersisterFactory;
+            _tidyDataReleaseCounter = tidyDataReleaseCounter;
             _options = options;
         }
-
 
         public void DeleteAll()
         {
@@ -75,22 +74,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             foreach (var dataCsvFilename in release.Filenames)
             {
                 var importer = _csvImporterFactory.Importer(dataCsvFilename);
-                var persister = _tidyDataPersisterFactory.Persister(dataCsvFilename);
-
-                if (persister.Count(release.PublicationId) == 0)
+                if (_tidyDataReleaseCounter.Count(dataCsvFilename, release.PublicationId, release.ReleaseId) == 0)
                 {
                     var data = importer.Data(dataCsvFilename, release.PublicationId, release.ReleaseId,
                         release.ReleaseDate);
-                    Persist(data, release);
+                    SeedReleaseData(release, data);
                 }
                 else
                 {
-                    _logger.LogWarning("Not seeding {Release}. Data already exists for publication {Publication}",
-                        release.Name, release.PublicationId);
+                    _logger.LogWarning("Not seeding {Release}. Data already exists for Release {ReleaseId}",
+                        release.Name, release.ReleaseId);
                 }
             }
         }
-        
+
+        private void SeedReleaseData(Release release, IEnumerable<ITidyData> tidyData)
+        {
+            var index = 1;
+            var batches = tidyData.Batch(_options.Value.BatchSize);
+            foreach (var batch in batches)
+            {
+                _logger.LogInformation(
+                    "Seeding batch {Index} of {TotalCount} for Publication {Publication}, {Release}", index,
+                    batches.Count(), release.PublicationId, release.Name);
+
+                _context.Set<ITidyData>().AddRange(batch);
+                _context.SaveChanges();
+                index++;
+            }
+        }
+
         private void SeedAttributes(Publication publication)
         {
             _logger.LogInformation("Seeding {Table}", attributeMetaTableName);
@@ -130,22 +143,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             {
                 _logger.LogWarning("Not seeding {Table}. Table already contains meta for publication {Publication}",
                     characteristicMetaTableName, publication.PublicationId);
-            }
-        }
-
-        private void Persist(IEnumerable<ITidyData> tidyData, Release release)
-        {
-            var index = 1;
-            var batches = tidyData.Batch(_options.Value.BatchSize);
-            foreach (var batch in batches)
-            {
-                _logger.LogInformation(
-                    "Seeding batch {Index} of {TotalCount} for Publication {Publication}, {Release}", index,
-                    batches.Count(), release.PublicationId, release.Name);
-                
-                _context.Set<ITidyData>().AddRange(batch);
-                _context.SaveChanges();
-                index++;
             }
         }
     }
