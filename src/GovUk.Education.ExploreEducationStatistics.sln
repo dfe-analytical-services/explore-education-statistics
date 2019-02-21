@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEduc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreStatistics.Admin", "GovUk.Education.ExploreStatistics.Admin\GovUk.Education.ExploreStatistics.Admin.csproj", "{334F4A60-04CF-4A6B-9AA2-FF991682FCBA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreStatistics.Admin.Tests", "GovUK.Education.ExploreStatistics.Admin.Tests\GovUk.Education.ExploreStatistics.Admin.Tests.csproj", "{3D3C5420-6BC2-42C2-82BC-5953493C9827}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreStatistics.Admin.Tests", "GovUk.Education.ExploreStatistics.Admin.Tests\GovUk.Education.ExploreStatistics.Admin.Tests.csproj", "{3D3C5420-6BC2-42C2-82BC-5953493C9827}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
