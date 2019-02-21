@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreStatistics.Admin.Models;
 using Xunit;
 
-namespace GovUK.Education.ExploreStatistics.Admin.Tests.Controllers
+namespace GovUk.Education.ExploreStatistics.Admin.Tests.Controllers
 {
     public class UploadControllerTests
     {
