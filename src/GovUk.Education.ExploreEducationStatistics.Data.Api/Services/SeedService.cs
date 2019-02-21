@@ -1,213 +1,152 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Configuration;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Azure;
-using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
-using MongoDB.Driver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class SeedService
     {
         private readonly ILogger _logger;
-        private readonly IMongoDatabase _database;
-        private readonly IAzureDocumentService _azureDocumentService;
+        private readonly ApplicationDbContext _context;
         private readonly CsvImporterFactory _csvImporterFactory = new CsvImporterFactory();
+        private readonly TidyDataPersisterFactory _tidyDataPersisterFactory;
         private readonly IOptions<SeedConfigurationOptions> _options;
 
-        private const string attributeMetaCollectionName = "AttributeMeta";
-        private const string characteristicMetaCollectionName = "CharacteristicMeta";
+        private const string attributeMetaTableName = "AttributeMeta";
+        private const string characteristicMetaTableName = "CharacteristicMeta";
 
-        public SeedService(IConfiguration config,
-            ILogger<SeedService> logger,
-            IAzureDocumentService azureDocumentService,
+        public SeedService(ILogger<SeedService> logger,
+            ApplicationDbContext context,
+            TidyDataPersisterFactory tidyDataPersisterFactory,
             IOptions<SeedConfigurationOptions> options)
         {
-            var client = new MongoClient(config.GetConnectionString("StatisticsDb"));
             _logger = logger;
-            _database = client.GetDatabase("education-statistics");
-            _azureDocumentService = azureDocumentService;
+            _context = context;
+            _tidyDataPersisterFactory = tidyDataPersisterFactory;
             _options = options;
         }
 
-        public async Task<long> EmptyAllCollectionsExceptMeta()
+
+        public void DeleteAll()
         {
-            long count = 0;
-
-            var collectionsToExclude = new[] {attributeMetaCollectionName, characteristicMetaCollectionName};
-
-            await _database.ListCollectionNames().ForEachAsync(async name =>
-            {
-                if (!collectionsToExclude.Contains(name))
-                {
-                    var tasks = new List<Task<DeleteResult>>();
-                    try
-                    {
-                        tasks.Add(DeleteDocumentsFromPublicationCollection(name));
-                        var deleteResults = await Task.WhenAll(tasks);
-                        foreach (var deleteResult in deleteResults)
-                        {
-                            count += deleteResult.DeletedCount;
-                            _logger.LogInformation("Deleted {Count}", deleteResult.DeletedCount);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogError(0, e, "Caught error deleting documents from collection {Collection}", name);
-                    }
-                }
-            });
-
-            return count;
+            _context.Database.ExecuteSqlCommand("delete from AttributeMeta");
+            _context.Database.ExecuteSqlCommand("delete from CharacteristicMeta");
+            _context.Database.ExecuteSqlCommand("delete from GeographicData");
+            _context.Database.ExecuteSqlCommand("delete from CharacteristicDataLa");
+            _context.Database.ExecuteSqlCommand("delete from CharacteristicDataNational");
         }
 
-        private Task<DeleteResult> DeleteDocumentsFromPublicationCollection(string publicationId)
-        {
-            var collection = _database.GetCollection<BsonDocument>(publicationId);
-            return collection.DeleteManyAsync(
-                Builders<BsonDocument>.Filter.Eq("PublicationId", Guid.Parse(publicationId)));
-        }
-
-        public async void Seed()
+        public void Seed()
         {
             _logger.LogInformation("Seeding");
 
-            await CreatePartitionedCollectionIfNotExists(attributeMetaCollectionName);
-            await CreatePartitionedCollectionIfNotExists(characteristicMetaCollectionName);
-
             foreach (var publication in SamplePublications.Publications.Values)
             {
-                await Seed(publication);
+                Seed(publication);
             }
 
             _logger.LogInformation("Seeding complete");
         }
 
-        private async Task Seed(Publication publication)
+        private void Seed(Publication publication)
         {
             _logger.LogInformation("Seeding Publication {Publication}", publication.PublicationId);
 
-            // seed publication attributes and characteristics
-            await SeedAttributes(publication);
-            await SeedCharacteristics(publication);
+            SeedAttributes(publication);
+            SeedCharacteristics(publication);
 
-            // create collection if it does not exist
-            await CreatePartitionedCollectionIfNotExists(publication.PublicationId.ToString());
-
-            // get the collection
-            var collection = _database.GetCollection<TidyData>(publication.PublicationId.ToString());
-
-            if (collection.CountDocuments(data => data.PublicationId == publication.PublicationId) == 0)
+            foreach (var release in publication.Releases)
             {
-                foreach (var release in publication.Releases)
-                {
-                    await SeedRelease(release, collection);
-                }
-            }
-            else
-            {
-                _logger.LogWarning("Not seeding {Name}. Collection is not empty for publication {Publication}",
-                    publication.Name, publication.PublicationId);
+                SeedRelease(release);
             }
         }
 
-        private async Task SeedRelease(Release release, IMongoCollection<TidyData> collection)
+        private void SeedRelease(Release release)
         {
-            _logger.LogInformation("Seeding Publication {Publication}, Release {Release}", release.PublicationId,
-                release.ReleaseId);
+            _logger.LogInformation("Seeding Release for {Publication}, {Release}", release.PublicationId,
+                release.Name);
 
             foreach (var dataCsvFilename in release.Filenames)
             {
                 var importer = _csvImporterFactory.Importer(dataCsvFilename);
+                var persister = _tidyDataPersisterFactory.Persister(dataCsvFilename);
 
-                var data = importer.Data(dataCsvFilename, release.PublicationId, release.ReleaseId,
-                    release.ReleaseDate);
-
-                var batches = data.Batch(_options.Value.BatchSize);
-
-                var i = 0;
-                foreach (var batch in batches)
+                if (persister.Count(release.PublicationId) == 0)
                 {
-                    await InsertManyAsync(collection, batch, i + 1, batches.Count(), release);
-                    i++;
+                    var data = importer.Data(dataCsvFilename, release.PublicationId, release.ReleaseId,
+                        release.ReleaseDate);
+                    Persist(data, release);
+                }
+                else
+                {
+                    _logger.LogWarning("Not seeding {Release}. Data already exists for publication {Publication}",
+                        release.Name, release.PublicationId);
                 }
             }
         }
-
-        private async Task SeedAttributes(Publication publication)
+        
+        private void SeedAttributes(Publication publication)
         {
-            _logger.LogInformation("Seeding {Collection}", attributeMetaCollectionName);
+            _logger.LogInformation("Seeding {Table}", attributeMetaTableName);
 
-            var collection = _database.GetCollection<AttributeMeta>(attributeMetaCollectionName);
-
-            if (collection.CountDocuments(meta => meta.PublicationId == publication.PublicationId) == 0)
+            if (_context.CharacteristicMeta.Count(meta => meta.PublicationId == publication.PublicationId) == 0)
             {
                 foreach (var attributeMeta in publication.AttributeMetas)
                 {
                     attributeMeta.PublicationId = publication.PublicationId;
                 }
 
-                await collection.InsertManyAsync(publication.AttributeMetas);
+                _context.AttributeMeta.AddRange(publication.AttributeMetas);
+                _context.SaveChanges();
             }
             else
             {
-                _logger.LogWarning("Not seeding {Collection}. Collection is not empty for publication {Publication}",
-                    attributeMetaCollectionName, publication.PublicationId);
+                _logger.LogWarning("Not seeding {Table}. Table already contains meta for publication {Publication}",
+                    attributeMetaTableName, publication.PublicationId);
             }
         }
 
-        private async Task SeedCharacteristics(Publication publication)
+        private void SeedCharacteristics(Publication publication)
         {
-            _logger.LogInformation("Seeding {Collection}", characteristicMetaCollectionName);
+            _logger.LogInformation("Seeding {Table}", characteristicMetaTableName);
 
-            var collection = _database.GetCollection<CharacteristicMeta>(characteristicMetaCollectionName);
-
-            if (collection.CountDocuments(meta => meta.PublicationId == publication.PublicationId) == 0)
+            if (_context.CharacteristicMeta.Count(meta => meta.PublicationId == publication.PublicationId) == 0)
             {
                 foreach (var characteristicMeta in publication.CharacteristicMetas)
                 {
                     characteristicMeta.PublicationId = publication.PublicationId;
                 }
 
-                await collection.InsertManyAsync(publication.CharacteristicMetas);
+                _context.CharacteristicMeta.AddRange(publication.CharacteristicMetas);
+                _context.SaveChanges();
             }
             else
             {
-                _logger.LogWarning("Not seeding {Collection}. Collection is not empty for publication {Publication}",
-                    characteristicMetaCollectionName, publication.PublicationId);
+                _logger.LogWarning("Not seeding {Table}. Table already contains meta for publication {Publication}",
+                    characteristicMetaTableName, publication.PublicationId);
             }
         }
 
-        private async Task InsertManyAsync(IMongoCollection<TidyData> collection, IEnumerable<TidyData> tidyData,
-            int index, int totalCount, Release release)
+        private void Persist(IEnumerable<ITidyData> tidyData, Release release)
         {
-            _logger.LogInformation(
-                "Seeding batch {Index} of {TotalCount} for Publication {Publication}, Release {Release}", index,
-                totalCount, release.PublicationId, release.ReleaseId);
-
-            try
+            var index = 1;
+            var batches = tidyData.Batch(_options.Value.BatchSize);
+            foreach (var batch in batches)
             {
-                await collection.InsertManyAsync(tidyData);
+                _logger.LogInformation(
+                    "Seeding batch {Index} of {TotalCount} for Publication {Publication}, {Release}", index,
+                    batches.Count(), release.PublicationId, release.Name);
+                
+                _context.Set<ITidyData>().AddRange(batch);
+                _context.SaveChanges();
+                index++;
             }
-            catch (Exception e)
-            {
-                _logger.LogError(0, e,
-                    "Caught Exception Seeding batch {Index} of {TotalCount} for Publication {Publication}, Release {Release}",
-                    index, totalCount, release.PublicationId, release.ReleaseId);
-            }
-        }
-
-        private async Task CreatePartitionedCollectionIfNotExists(string name)
-        {
-            await _azureDocumentService.CreatePartitionedCollectionIfNotExists(name, "/'$v'/PublicationId/'$v'");
         }
     }
 }

@@ -8,6 +8,8 @@ services:
     - "5001:5001"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+    depends_on:
+    - db
   content-api:
     container_name: ees-content
     build: GovUk.Education.ExploreEducationStatistics.Content.Api
@@ -50,3 +52,11 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+  db:
+    container_name: ees-mssql
+    image: "mcr.microsoft.com/mssql/server"
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "Your_Password123"
+      ACCEPT_EULA: "Y"

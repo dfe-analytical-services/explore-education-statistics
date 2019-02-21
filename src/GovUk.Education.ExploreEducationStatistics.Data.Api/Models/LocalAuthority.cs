@@ -1,11 +1,16 @@
-using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
     public class LocalAuthority
     {
-        [BsonElement("new_la_code")] public string Code { get; set; }
-        [BsonElement("old_la_code")] public string Old_Code { get; set; }
-        [BsonElement("la_name")] public string Name { get; set; }
+        [JsonProperty(PropertyName = "new_la_code")]
+        public string Code { get; set; }
+
+        [JsonProperty(PropertyName = "old_la_code")]
+        public string Old_Code { get; set; }
+
+        [JsonProperty(PropertyName = "la_name")]
+        public string Name { get; set; }
     }
 }

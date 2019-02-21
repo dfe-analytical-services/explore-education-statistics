@@ -1,13 +1,20 @@
-using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
     public class School
     {
-        [BsonElement("acad_opendate")] public string AcademyOpenDate { get; set; }
-        [BsonElement("acad_type")] public string AcademyType { get; set; }
-        [BsonElement("estab")] public string Estab { get; set; }
-        [BsonElement("laestab")] public string LaEstab { get; set; }
-        [BsonElement("urn")] public string Urn { get; set; }
+        [JsonProperty(PropertyName = "acad_opendate")]
+        public string AcademyOpenDate { get; set; }
+
+        [JsonProperty(PropertyName = "acad_type")]
+        public string AcademyType { get; set; }
+
+        [JsonProperty(PropertyName = "estab")] public string Estab { get; set; }
+
+        [JsonProperty(PropertyName = "aestab")]
+        public string LaEstab { get; set; }
+
+        [JsonProperty(PropertyName = "urn")] public string Urn { get; set; }
     }
 }

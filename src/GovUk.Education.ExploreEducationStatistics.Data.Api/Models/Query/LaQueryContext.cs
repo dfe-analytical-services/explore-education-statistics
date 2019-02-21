@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder;
-using MongoDB.Driver.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 {
@@ -16,28 +15,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public ICollection<string> Attributes { get; set; }
         public ICollection<string> Characteristics { get; set; }
 
-        public IMongoQueryable<CharacteristicDataLa> FindExpression(
-            IMongoQueryable<CharacteristicDataLa> queryable)
+        public Expression<Func<CharacteristicDataLa, bool>> FindExpression()
         {
-            queryable = queryable.Where(x => x.Level == Level.Local_Authority);
-
-            if (SchoolTypes != null && SchoolTypes.Count > 0)
-            {
-                queryable = queryable.Where(x => SchoolTypes.Contains(x.SchoolType));
-            }
-
-            var yearsQuery = QueryUtil.YearsQuery(Years, StartYear, EndYear);
-            if (yearsQuery.Any())
-            {
-                queryable = queryable.Where(x => yearsQuery.Contains(x.Year));
-            }
-
-            if (Characteristics != null && Characteristics.Count > 0)
-            {
-                queryable = queryable.Where(x => Characteristics.Contains(x.Characteristic.Name));
-            }
-
-            return queryable;
+            return PredicateBuilder.True<CharacteristicDataLa>()
+                .And(QueryContextUtil.PublicationIdExpression<CharacteristicDataLa>(PublicationId))
+                .And(QueryContextUtil.LevelExpression<CharacteristicDataLa>(Level.Local_Authority))
+                .And(QueryContextUtil.SchoolTypeExpression<CharacteristicDataLa>(SchoolTypes))
+                .And(QueryContextUtil.YearExpression<CharacteristicDataLa>(
+                    QueryUtil.YearsQuery(Years, StartYear, EndYear)))
+                .And(QueryContextUtil.CharacteristicsQuery<CharacteristicDataLa>(Characteristics));
         }
     }
 }

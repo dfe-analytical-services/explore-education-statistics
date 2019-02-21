@@ -6,8 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
     public interface ITidyData
     {
+        long Id { get; set; }
         Guid PublicationId { get; set; }
-        Guid ReleaseId { get; set; }
+        int ReleaseId { get; set; }
         DateTime ReleaseDate { get; set; }
         string Term { get; set; }
         int Year { get; set; }

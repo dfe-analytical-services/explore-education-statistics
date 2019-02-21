@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
-    [BsonKnownTypes(typeof(GeographicData), typeof(CharacteristicDataLa),
-        typeof(CharacteristicDataNational))]
     public abstract class TidyData : ITidyData
     {
         protected TidyData()
@@ -15,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
         }
 
         protected TidyData(Guid publicationId,
-            Guid releaseId,
+            int releaseId,
             DateTime releaseDate,
             string term,
             int year,
@@ -35,21 +32,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
             Attributes = attributes;
         }
 
-        public ObjectId Id { get; set; }
+        public long Id { get; set; }
         public Guid PublicationId { get; set; }
-        public Guid ReleaseId { get; set; }
+        public int ReleaseId { get; set; }
         public DateTime ReleaseDate { get; set; }
-        [BsonElement("term")] public string Term { get; set; }
-        [BsonElement("year")] public int Year { get; set; }
-
-        [BsonRepresentation(BsonType.String)]
-        [BsonElement("level")]
+        [JsonProperty(PropertyName = "term")] public string Term { get; set; }
+        [JsonProperty(PropertyName = "year")] public int Year { get; set; }
         public Level Level { get; set; }
-
         public Country Country { get; set; }
 
-        [BsonRepresentation(BsonType.String)]
-        [BsonElement("school_type")]
+        [JsonProperty(PropertyName = "school_type")]
         public SchoolType SchoolType { get; set; }
 
         public Dictionary<string, string> Attributes { get; set; }

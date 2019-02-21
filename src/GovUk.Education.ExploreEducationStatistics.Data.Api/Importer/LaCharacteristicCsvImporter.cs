@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
         protected override TidyData TidyDataFromCsv(string csvLine,
             List<string> headers,
             Guid publicationId,
-            Guid releaseId,
+            int releaseId,
             DateTime releaseDate)
         {
             var headerValues = new[]

@@ -3,9 +3,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
-    public class GeographicDataService : AbstractDataService<GeographicData>
-    {   
-        public GeographicDataService(ApplicationDbContext context) : base(context)
+    public class LaCharacteristicDataService : AbstractDataService<CharacteristicDataLa>
+    {
+        public LaCharacteristicDataService(ApplicationDbContext context) : base(context)
         {
         }
     }

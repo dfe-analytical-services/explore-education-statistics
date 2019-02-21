@@ -1,7 +1,6 @@
 using System;
 using System.Linq.Expressions;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
@@ -13,7 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
     {
         public MappingProfiles()
         {
-            CreateMap<GeographicModel, GeographicData>();
             CreateMap<Characteristic, CharacteristicViewModel>();
             CreateMap<CharacteristicMeta, NameLabelViewModel>();
             CreateMap<AttributeMeta, AttributeMetaViewModel>()

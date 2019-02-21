@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilde
     public class TableBuilderResult
     {
         public Guid PublicationId { get; set; }
-        public Guid ReleaseId { get; set; }
+        public int ReleaseId { get; set; }
         public DateTime ReleaseDate { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]

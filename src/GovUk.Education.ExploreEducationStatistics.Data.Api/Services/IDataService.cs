@@ -1,13 +1,13 @@
+using System;
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
+using System.Linq.Expressions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
-    public interface IDataService<out TCollection, in TQueryContext>
-        where TCollection : ITidyData
-        where TQueryContext : IQueryContext<TCollection>
+    public interface IDataService<TEntity> where TEntity : class
     {
-        IEnumerable<TCollection> FindMany(TQueryContext queryContext);
+        int Count();
+
+        IEnumerable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression);
     }
 }

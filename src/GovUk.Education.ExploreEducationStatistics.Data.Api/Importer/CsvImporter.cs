@@ -15,9 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
             _path = path;
         }
 
-        public List<TidyData> Data(DataCsvFilename dataCsvFilename,
+        public IEnumerable<TidyData> Data(DataCsvFilename dataCsvFilename,
             Guid publicationId,
-            Guid releaseId,
+            int releaseId,
             DateTime releaseDate)
         {
             var file = dataCsvFilename + ".csv";
@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
         protected abstract TidyData TidyDataFromCsv(string csvLine,
             List<string> headers,
             Guid publicationId,
-            Guid releaseId,
+            int releaseId,
             DateTime releaseDate);
     }
 }

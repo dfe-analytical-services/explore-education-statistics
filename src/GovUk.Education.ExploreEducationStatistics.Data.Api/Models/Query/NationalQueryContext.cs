@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder;
-using MongoDB.Driver.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 {
@@ -16,28 +15,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public ICollection<string> Attributes { get; set; }
         public ICollection<string> Characteristics { get; set; }
 
-        public IMongoQueryable<CharacteristicDataNational> FindExpression(
-            IMongoQueryable<CharacteristicDataNational> queryable)
+        public Expression<Func<CharacteristicDataNational, bool>> FindExpression()
         {
-            queryable = queryable.Where(x => x.Level == Level.National);
-
-            if (SchoolTypes != null && SchoolTypes.Count > 0)
-            {
-                queryable = queryable.Where(x => SchoolTypes.Contains(x.SchoolType));
-            }
-
-            var yearsQuery = QueryUtil.YearsQuery(Years, StartYear, EndYear);
-            if (yearsQuery.Any())
-            {
-                queryable = queryable.Where(x => yearsQuery.Contains(x.Year));
-            }
-
-            if (Characteristics != null && Characteristics.Count > 0)
-            {
-                queryable = queryable.Where(x => Characteristics.Contains(x.Characteristic.Name));
-            }
-
-            return queryable;
+            return PredicateBuilder.True<CharacteristicDataNational>()
+                .And(QueryContextUtil.PublicationIdExpression<CharacteristicDataNational>(PublicationId))
+                .And(QueryContextUtil.LevelExpression<CharacteristicDataNational>(Level.National))
+                .And(QueryContextUtil.SchoolTypeExpression<CharacteristicDataNational>(SchoolTypes))
+                .And(QueryContextUtil.YearExpression<CharacteristicDataNational>(
+                    QueryUtil.YearsQuery(Years, StartYear, EndYear)))
+                .And(QueryContextUtil.CharacteristicsQuery<CharacteristicDataNational>(Characteristics));
         }
     }
 }

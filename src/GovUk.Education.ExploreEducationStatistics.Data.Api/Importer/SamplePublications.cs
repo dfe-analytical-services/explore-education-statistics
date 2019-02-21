@@ -6,6 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
 {
     public static class SamplePublications
     {
+        private static readonly SequenceGenerator ReleaseSequenceGenerator = new SequenceGenerator();
+        
         public static readonly Dictionary<string, Publication> Publications = new Dictionary<string, Publication>
         {
             {
@@ -706,12 +708,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                         new Release
                         {
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                            ReleaseId = new Guid("1d395b31-a68e-489c-a257-b3ab5c40bb01"),
+                            ReleaseId = ReleaseSequenceGenerator.Get(),
                             ReleaseDate = new DateTime(2018, 4, 25),
+                            Name = "Pupil absence in schools in England",
                             Filenames = new[]
                             {
-                                //DataCsvFilename.absence_geoglevels,
-                                //DataCsvFilename.absence_lacharacteristics,
+                                DataCsvFilename.absence_geoglevels,
+                                DataCsvFilename.absence_lacharacteristics,
                                 DataCsvFilename.absence_natcharacteristics
                             }
                         }
@@ -1351,12 +1354,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                         new Release
                         {
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                            ReleaseId = new Guid("ac602576-2d07-4324-8480-0cabb6294814"),
+                            ReleaseId = ReleaseSequenceGenerator.Get(),
                             ReleaseDate = new DateTime(2018, 3, 22),
+                            Name = "Permanent and fixed period exclusions",
                             Filenames = new[]
                             {
-                                //DataCsvFilename.exclusion_geoglevels,
-                                //DataCsvFilename.exclusion_lacharacteristics,
+                                DataCsvFilename.exclusion_geoglevels,
+                                DataCsvFilename.exclusion_lacharacteristics,
                                 DataCsvFilename.exclusion_natcharacteristics
                             }
                         }
@@ -1947,12 +1951,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                         new Release
                         {
                             PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
-                            ReleaseId = new Guid("be51f939-e9f9-4509-8851-e72b66a3515b"),
+                            ReleaseId = ReleaseSequenceGenerator.Get(),
                             ReleaseDate = new DateTime(2018, 5, 30),
+                            Name = "Schools, pupils and their characteristics",
                             Filenames = new[]
                             {
-                                //DataCsvFilename.schpupnum_geoglevels,
-                                //DataCsvFilename.schpupnum_lacharacteristics,
+                                DataCsvFilename.schpupnum_geoglevels,
+                                DataCsvFilename.schpupnum_lacharacteristics,
                                 DataCsvFilename.schpupnum_natcharacteristics
                             }
                         }

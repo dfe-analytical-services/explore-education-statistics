@@ -9,41 +9,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
     public class TableBuilderService
     {
         private readonly GeographicDataService _geographicDataService;
-        private readonly LaCharacteristicService _laCharacteristicService;
-        private readonly NationalCharacteristicService _nationalCharacteristicService;
+        private readonly LaCharacteristicDataService _laCharacteristicDataService;
+        private readonly NationalCharacteristicDataService _nationalCharacteristicDataService;
         private readonly GeographicResultBuilder _geographicResultBuilder;
         private readonly CharacteristicResultBuilder _characteristicResultBuilder;
 
         public TableBuilderService(GeographicDataService geographicDataService,
-            LaCharacteristicService laCharacteristicService,
-            NationalCharacteristicService nationalCharacteristicService,
+            LaCharacteristicDataService laCharacteristicDataService,
+            NationalCharacteristicDataService nationalCharacteristicDataService,
             GeographicResultBuilder geographicResultBuilder,
             CharacteristicResultBuilder characteristicResultBuilder)
         {
             _geographicDataService = geographicDataService;
-            _laCharacteristicService = laCharacteristicService;
-            _nationalCharacteristicService = nationalCharacteristicService;
+            _laCharacteristicDataService = laCharacteristicDataService;
+            _nationalCharacteristicDataService = nationalCharacteristicDataService;
             _geographicResultBuilder = geographicResultBuilder;
             _characteristicResultBuilder = characteristicResultBuilder;
         }
 
         public TableBuilderResult GetGeographic(GeographicQueryContext query)
         {
-            return BuildResult(_geographicDataService.FindMany(query), query.Attributes, _geographicResultBuilder);
+            return BuildResult(
+                _geographicDataService.FindMany(query.FindExpression()),
+                query.Attributes,
+                _geographicResultBuilder);
         }
 
         public TableBuilderResult GetLocalAuthority(LaQueryContext query)
         {
-            return BuildResult(_laCharacteristicService.FindMany(query), query.Attributes,
+            return BuildResult(
+                _laCharacteristicDataService.FindMany(query.FindExpression()),
+                query.Attributes,
                 _characteristicResultBuilder);
         }
 
         public TableBuilderResult GetNational(NationalQueryContext query)
         {
-            return BuildResult(_nationalCharacteristicService.FindMany(query), query.Attributes,
+            return BuildResult(
+                _nationalCharacteristicDataService.FindMany(query.FindExpression()),
+                query.Attributes,
                 _characteristicResultBuilder);
         }
-        
+
         private static TableBuilderResult BuildResult(IEnumerable<IGeographicData> data, ICollection<string> attributes,
             IResultBuilder<IGeographicData, ITableBuilderData> resultBuilder)
         {

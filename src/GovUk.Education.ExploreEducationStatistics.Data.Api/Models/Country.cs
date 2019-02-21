@@ -1,10 +1,10 @@
-using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
     public class Country
     {
-        [BsonElement("country_code")] public string Code { get; set; }
-        [BsonElement("country_name")] public string Name { get; set; }
+        [JsonProperty(PropertyName = "country_code")] public string Code { get; set; }
+        [JsonProperty(PropertyName = "country_name")] public string Name { get; set; }
     }
 }

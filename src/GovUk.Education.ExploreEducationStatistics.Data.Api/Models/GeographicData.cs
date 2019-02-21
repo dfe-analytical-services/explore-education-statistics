@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 
         public GeographicData(
             Guid publicationId,
-            Guid releaseId,
+            int releaseId,
             DateTime releaseDate,
             string term,
             int year,

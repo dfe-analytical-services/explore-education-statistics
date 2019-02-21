@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder;
-using MongoDB.Driver.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 {
@@ -19,37 +19,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public int EndYear { get; set; }
         public ICollection<string> Attributes { get; set; }
 
-        public IMongoQueryable<GeographicData> FindExpression(IMongoQueryable<GeographicData> queryable)
+        public Expression<Func<GeographicData, bool>> FindExpression()
         {
-            queryable = queryable.Where(x => x.Level == Level);
+            return PredicateBuilder.True<GeographicData>()
+                .And(QueryContextUtil.PublicationIdExpression<GeographicData>(PublicationId))
+                .And(QueryContextUtil.LevelExpression<GeographicData>(Level))
+                .And(QueryContextUtil.SchoolTypeExpression<GeographicData>(SchoolTypes))
+                .And(QueryContextUtil.YearExpression<GeographicData>(
+                    QueryUtil.YearsQuery(Years, StartYear, EndYear)))
+                .And(RegionsExpression())
+                .And(LocalAuthoritiesExpression())
+                .And(SchoolsExpression());
+        }
 
-            if (SchoolTypes != null && SchoolTypes.Count > 0)
-            {
-                queryable = queryable.Where(x => SchoolTypes.Contains(x.SchoolType));
-            }
+        private Expression<Func<GeographicData, bool>> RegionsExpression()
+        {
+            return x => Regions == null || !Regions.Any() || Regions.Contains(x.Region.Code);
+        }
 
-            var yearsQuery = QueryUtil.YearsQuery(Years, StartYear, EndYear);
-            if (yearsQuery.Any())
-            {
-                queryable = queryable.Where(x => yearsQuery.Contains(x.Year));
-            }
+        private Expression<Func<GeographicData, bool>> LocalAuthoritiesExpression()
+        {
+            return x => LocalAuthorities == null || !LocalAuthorities.Any() || Regions.Contains(x.LocalAuthority.Code);
+        }
 
-            if (Regions != null && Regions.Count > 0)
-            {
-                queryable = queryable.Where(x => Regions.Contains(x.Region.Code));
-            }
-
-            if (LocalAuthorities != null && LocalAuthorities.Count > 0)
-            {
-                queryable = queryable.Where(x => LocalAuthorities.Contains(x.LocalAuthority.Code));
-            }
-
-            if (Schools != null && Schools.Count > 0)
-            {
-                queryable = queryable.Where(x => Schools.Contains(x.School.LaEstab));
-            }
-
-            return queryable;
+        private Expression<Func<GeographicData, bool>> SchoolsExpression()
+        {
+            return x => Schools == null || !Schools.Any() || Regions.Contains(x.School.LaEstab);
         }
     }
 }

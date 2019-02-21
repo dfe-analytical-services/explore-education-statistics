@@ -1,25 +1,24 @@
-﻿using System;
-using System.IO;
-using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer.Old;
+﻿using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Data;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Azure;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 {
     public class Startup
-    {   
+    {
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -29,13 +28,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {            
+        {
             services.AddMvc(config =>
-            {       
+            {
                 config.RespectBrowserAcceptHeader = true;
                 config.ReturnHttpNotAcceptable = true;
                 config.Conventions.Add(new CommaSeparatedQueryStringConvention());
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("StatisticsDb")));
 
             // Adds Brotli and Gzip compressing
             services.AddResponseCompression();
@@ -44,48 +46,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Data API", Version = "v1"});
-
-                var filePath = Path.Combine(AppContext.BaseDirectory,
-                    "GovUk.Education.ExploreEducationStatistics.Data.Api.xml");
-                c.IncludeXmlComments(filePath);
             });
 
+            services.AddScoped<GeographicTidyDataPersister>();
+            services.AddScoped<LaCharacteristicTidyDataPersister>();
+            services.AddScoped<NationalCharacteristicTidyDataPersister>();
+            services.AddScoped<TidyDataPersisterFactory>();
 
             services.AddScoped<GeographicResultBuilder>();
             services.AddScoped<CharacteristicResultBuilder>();
-            
-            services.AddScoped<DataService>();
+
             services.AddScoped<SeedService>();
             services.AddScoped<TableBuilderService>();
-            services.AddSingleton<ICsvReader, CsvReader>();
 
-            services.AddSingleton<MDatabase>();
+            services.AddScoped<AttributeMetaService>();
+            services.AddScoped<CharacteristicMetaService>();
 
-            services.AddScoped<MetaService>();
             services.AddScoped<GeographicDataService>();
-            services.AddScoped<LaCharacteristicService>();
-            services.AddScoped<NationalCharacteristicService>();
+            services.AddScoped<LaCharacteristicDataService>();
+            services.AddScoped<NationalCharacteristicDataService>();
 
-            if (Configuration.GetSection("AzureStorageConfig").Exists())
-            {
-                services.AddScoped<IAzureDocumentService, AzureDocumentService>();
-            }
-            else
-            {
-                services.AddScoped<IAzureDocumentService, DummyAzureDocumentService>();
-            }
-            
             services.AddCors();
             services.AddAutoMapper();
 
             services.AddOptions();
-            services.Configure<AzureStorageConfigurationOptions>(Configuration.GetSection("AzureStorageConfig"));
             services.Configure<SeedConfigurationOptions>(Configuration.GetSection("SeedConfig"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            UpdateDatabase(app);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -116,6 +108,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             var option = new RewriteOptions();
             option.AddRedirect("^$", "docs");
             app.UseRewriter(option);
+        }
+
+        private static void UpdateDatabase(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
+                .CreateScope())
+            {
+                using (var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>())
+                {
+                    context.Database.Migrate();
+                }
+            }
         }
     }
 }

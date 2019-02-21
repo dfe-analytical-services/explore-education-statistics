@@ -6,16 +6,16 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
 {
-    public class GeoLevelsCsvImporter : CsvImporter
+    public class GeographicCsvImporter : CsvImporter
     {
-        public GeoLevelsCsvImporter(string path = "") : base(path)
+        public GeographicCsvImporter(string path = "") : base(path)
         {
         }
 
         protected override TidyData TidyDataFromCsv(string csvLine,
             List<string> headers,
             Guid publicationId,
-            Guid releaseId,
+            int releaseId,
             DateTime releaseDate)
         {
             var headerValues = new[]

@@ -6,9 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
 {
     public interface ICsvImporter
     {
-        List<TidyData> Data(DataCsvFilename dataCsvFilename,
-            Guid publicationId,
-            Guid releaseId,
+        IEnumerable<TidyData> Data(DataCsvFilename dataCsvFilename, 
+            Guid publicationId, 
+            int releaseId,
             DateTime releaseDate);
     }
 }

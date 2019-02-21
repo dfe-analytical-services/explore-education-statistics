@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,13 +17,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet]
         public void Seed()
         {
-           _seedService.Seed();
+            _seedService.Seed();
         }
 
-        [HttpDelete("EmptyAllCollectionsExceptMeta")]
-        public async Task<string> EmptyAllCollectionsExceptMeta()
+        [HttpDelete("DeleteAll")]
+        public string DeleteAll()
         {
-            return "Deleted " + await _seedService.EmptyAllCollectionsExceptMeta() + " documents";
+            _seedService.DeleteAll();
+            return "Deleted all rows";
         }
     }
 }
