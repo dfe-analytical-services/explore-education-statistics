@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Data.Api", "GovUk.Education.ExploreEducationStatistics.Data.Api\GovUk.Education.ExploreEducationStatistics.Data.Api.csproj", "{15519CD7-84C9-467D-9A1F-12AC044F3328}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Data.Api", "GovUk.Education.ExploreEducationStatistics.Data.Api\GovUk.Education.ExploreEducationStatistics.Data.Api.csproj", "{15519CD7-84C9-467D-9A1F-12AC044F3328}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Content.Api", "GovUk.Education.ExploreEducationStatistics.Content.Api\GovUk.Education.ExploreEducationStatistics.Content.Api.csproj", "{76F436E4-05AB-4E6E-9007-047937CE1A8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Content.Api", "GovUk.Education.ExploreEducationStatistics.Content.Api\GovUk.Education.ExploreEducationStatistics.Content.Api.csproj", "{76F436E4-05AB-4E6E-9007-047937CE1A8B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Data.Api.Tests", "GovUk.Education.ExploreEducationStatistics.Data.Api.Tests\GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.csproj", "{C6673886-11C0-49AA-A29A-1EA960D9F09C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Data.Api.Tests", "GovUk.Education.ExploreEducationStatistics.Data.Api.Tests\GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.csproj", "{C6673886-11C0-49AA-A29A-1EA960D9F09C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreStatistics.Admin", "GovUk.Education.ExploreStatistics.Admin\GovUk.Education.ExploreStatistics.Admin.csproj", "{334F4A60-04CF-4A6B-9AA2-FF991682FCBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreStatistics.Admin", "GovUk.Education.ExploreStatistics.Admin\GovUk.Education.ExploreStatistics.Admin.csproj", "{334F4A60-04CF-4A6B-9AA2-FF991682FCBA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUK.Education.ExploreStatistics.Admin.Tests", "GovUK.Education.ExploreStatistics.Admin.Tests\GovUK.Education.ExploreStatistics.Admin.Tests.csproj", "{3D3C5420-6BC2-42C2-82BC-5953493C9827}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreStatistics.Admin.Tests", "GovUk.Education.ExploreStatistics.Admin.Tests\GovUk.Education.ExploreStatistics.Admin.Tests.csproj", "{3D3C5420-6BC2-42C2-82BC-5953493C9827}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +21,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{15519CD7-84C9-467D-9A1F-12AC044F3328}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -86,5 +83,11 @@ Global
 		{3D3C5420-6BC2-42C2-82BC-5953493C9827}.Release|x64.Build.0 = Release|Any CPU
 		{3D3C5420-6BC2-42C2-82BC-5953493C9827}.Release|x86.ActiveCfg = Release|Any CPU
 		{3D3C5420-6BC2-42C2-82BC-5953493C9827}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0DABB090-F748-4529-95DA-80E640F824CE}
 	EndGlobalSection
 EndGlobal

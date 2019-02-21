@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace GovUK.Education.ExploreStatistics.Admin.Tests.Controllers
+namespace GovUk.Education.ExploreStatistics.Admin.Tests.Controllers
 {
     public class HomeControllerTests
     {
