@@ -111,7 +111,8 @@
           "connectionStrings": [
             {
               "name": "StatisticsDb",
-              "connectionString": "[concat('mongodb://', parameters('cosmosAccountName'), ':', listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('cosmosAccountName')), '2015-04-08').primaryMasterKey, '@', parameters('cosmosAccountName'), '.documents.azure.com:10255/?ssl=true&replicaSet=globaldb')]"
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
             }
           ],
           "phpVersion": "off"
@@ -184,6 +185,13 @@
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
               "value": "6.9.1"
+            }
+          ],
+          "connectionStrings": [
+            {
+              "name": "StatisticsDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
             }
           ],
           "phpVersion": "off"
