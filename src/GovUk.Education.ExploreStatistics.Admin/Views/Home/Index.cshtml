@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Education statistics publisher";
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    <h1 class="govuk-heading-l">Welcome @User.Identity.Name.Split('#').Last()</h1>
+}
+else
+{
+    <h1 class="govuk-heading-l">
+        <span class="govuk-caption-l">Education statistics publisher</span>
+        Sign-in
+    </h1>
+    <p class="govuk-body">
+        Use this service to publish official Department for Education (DfE) statistics and data for state-funded schools in England.
+    </p>
+
+    <a class="govuk-button govuk-button--start" asp-area="AzureAD" asp-controller="Account" asp-action="SignIn">Sign-in</a>
+}
