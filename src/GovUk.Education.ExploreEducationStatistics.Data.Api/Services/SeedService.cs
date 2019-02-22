@@ -34,11 +34,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public void DeleteAll()
         {
-            _context.Database.ExecuteSqlCommand("delete from AttributeMeta");
-            _context.Database.ExecuteSqlCommand("delete from CharacteristicMeta");
-            _context.Database.ExecuteSqlCommand("delete from GeographicData");
-            _context.Database.ExecuteSqlCommand("delete from CharacteristicDataLa");
-            _context.Database.ExecuteSqlCommand("delete from CharacteristicDataNational");
+            _context.Database.ExecuteSqlCommand("truncate table AttributeMeta");
+            _context.Database.ExecuteSqlCommand("truncate table CharacteristicMeta");
+            _context.Database.ExecuteSqlCommand("truncate table GeographicData");
+            _context.Database.ExecuteSqlCommand("truncate table CharacteristicDataLa");
+            _context.Database.ExecuteSqlCommand("truncate table CharacteristicDataNational");
         }
 
         public void Seed()
