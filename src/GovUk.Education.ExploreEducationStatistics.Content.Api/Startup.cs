@@ -22,24 +22,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services,  IHostingEnvironment env)
         {
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
-                .AddJsonOptions(options => {
+                .AddJsonOptions(options =>
+                {
                     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                     options.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
                     options.SerializerSettings.Converters.Add(new ContentBlockConverter());
                 });
 
-            var connection = "Data Source=dfe-meta.db";
-            services.AddDbContext<ApplicationDbContext>
-                (options => options.UseSqlite(connection));
+            if (env.IsDevelopment())
+            {
+                const string connection = "Data Source=dfe-meta.db";
+                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connection));
+            }
+            else
+            {
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("ContentDb")));
+            }
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(swag =>
             {
-                swag.SwaggerDoc("v1", new Info { Title = "Explore education statistics - Content API", Version = "v1" });
+                swag.SwaggerDoc("v1",
+                    new Info {Title = "Explore education statistics - Content API", Version = "v1"});
             });
 
             services.AddCors();
@@ -73,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             app.UseHttpsRedirection();
             app.UseCors(options => options.WithOrigins("http://localhost:3000").AllowAnyMethod());
             app.UseMvc();
-            
+
             var option = new RewriteOptions();
             option.AddRedirect("^$", "docs");
             app.UseRewriter(option);
