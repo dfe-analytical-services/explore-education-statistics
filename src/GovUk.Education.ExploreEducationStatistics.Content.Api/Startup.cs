@@ -33,9 +33,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                     options.SerializerSettings.Converters.Add(new ContentBlockConverter());
                 });
 
-                services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("ContentDb")));
+            var connectionString = Configuration.GetConnectionString("ContentDb");
+            
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                const string connection = "Data Source=dfe-meta.db";
+                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connection));
+            }
+            else
+            {
+                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+            }
 
+            // Adds Brotli and Gzip compressing
+            services.AddResponseCompression();
+            
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(swag =>
             {
