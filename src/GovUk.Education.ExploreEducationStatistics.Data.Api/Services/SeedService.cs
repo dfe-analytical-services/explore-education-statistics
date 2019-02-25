@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer;
@@ -45,9 +46,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             _logger.LogInformation("Seeding");
 
-            foreach (var publication in SamplePublications.Publications.Values)
+            try
             {
-                Seed(publication);
+                _context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                foreach (var publication in SamplePublications.Publications.Values)
+                {
+                    Seed(publication);
+                }
+            }
+            finally
+            {
+                _context.ChangeTracker.AutoDetectChangesEnabled = true;
             }
 
             _logger.LogInformation("Seeding complete");
@@ -92,6 +102,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             var index = 1;
             var batches = tidyData.Batch(_options.Value.BatchSize);
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
             foreach (var batch in batches)
             {
                 _logger.LogInformation(
@@ -101,7 +113,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 _context.Set<ITidyData>().AddRange(batch);
                 _context.SaveChanges();
                 index++;
+
+                _logger.LogInformation("Seeded {Count} in {Time} ms. {TimerPerRecord} per record", batch.Count(),
+                    stopWatch.Elapsed.TotalMilliseconds, stopWatch.Elapsed.TotalMilliseconds / batch.Count());
+                stopWatch.Restart();
             }
+
+            stopWatch.Stop();
         }
 
         private void SeedAttributes(Publication publication)
