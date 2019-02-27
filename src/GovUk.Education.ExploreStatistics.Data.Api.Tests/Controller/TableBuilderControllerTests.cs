@@ -58,14 +58,20 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
             
         }
 
-        [Fact]
-        public void GetMeta()
+        [Theory]
+        [InlineData("af3c435c-df6e-4ab8-aac0-53a0ad03f57e")]
+        [InlineData("8fe9c479-1ab5-4894-81cd-9f87882e20ed")]
+        public void GetMeta_KnownId_Returns_ActionResult_WithMetaData(string testId)
         {
-            var result = _controller.GetMeta(new Guid()); // PublicationId
+            var id = new Guid(testId);
+            
+            var result = _controller.GetMeta(id);
             
             var model = Assert.IsAssignableFrom<ActionResult<PublicationMetaViewModel>>(result);
+            
+            Assert.Equal(id, model.Value.PublicationId);
+            
+            // TODO: verify the meta data
         }
-        
-        
     }
 }
