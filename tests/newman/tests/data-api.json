@@ -1,0 +1,638 @@
+{
+	"info": {
+		"_postman_id": "b3910a6a-c174-4989-9e26-9ffb62dec554",
+		"name": "DfE",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Meta",
+			"item": [
+				{
+					"name": "Pupil absence in schools in England",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+								"exec": [
+									"pm.variables.set('publication_id', 'cbbd299f-8297-44bc-92ac-558bcf51f8ad')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{start_url}}/tablebuilder/meta/{{publication_id}}",
+							"host": [
+								"{{start_url}}"
+							],
+							"path": [
+								"tablebuilder",
+								"meta",
+								"{{publication_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Permanent and fixed period exclusions",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "172e5a61-30d3-454a-9a6c-d29b57b2aabd",
+								"exec": [
+									"pm.variables.set('publication_id', 'bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{start_url}}/tablebuilder/meta/{{publication_id}}",
+							"host": [
+								"{{start_url}}"
+							],
+							"path": [
+								"tablebuilder",
+								"meta",
+								"{{publication_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Schools, pupils and their characteristics",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1566cb5c-7ac9-4134-8be3-03a5184ae3da",
+								"exec": [
+									"pm.variables.set('publication_id', 'a91d9e05-be82-474c-85ae-4913158406d0')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{start_url}}/tablebuilder/meta/a91d9e05-be82-474c-85ae-4913158406d0",
+							"host": [
+								"{{start_url}}"
+							],
+							"path": [
+								"tablebuilder",
+								"meta",
+								"a91d9e05-be82-474c-85ae-4913158406d0"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ecb99d52-e5cd-4a4d-942b-eb37d390ca34",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "31fb4c96-88b3-4e61-8c97-88941525fc5a",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Fields are present\", function () {",
+							"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"attributes\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"characteristics\"));",
+							"});",
+							"",
+							"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().publicationId).to.equal(pm.variables.get(\"publication_id\")); });"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Data",
+			"item": [
+				{
+					"name": "Geographic",
+					"item": [
+						{
+							"name": "National",
+							"item": [
+								{
+									"name": "Schools, pupils and their characteristics",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{start_url}}/tablebuilder/geographic",
+											"host": [
+												"{{start_url}}"
+											],
+											"path": [
+												"tablebuilder",
+												"geographic"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Permanent and fixed period exclusions",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"perm_excl\",\n        \"fixed_excl\"\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{start_url}}/tablebuilder/geographic",
+											"host": [
+												"{{start_url}}"
+											],
+											"path": [
+												"tablebuilder",
+												"geographic"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Pupil absence in schools in England",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{start_url}}/tablebuilder/geographic",
+											"host": [
+												"{{start_url}}"
+											],
+											"path": [
+												"tablebuilder",
+												"geographic"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "43d09d0f-17e2-4302-8d7b-0ea1837a659c",
+										"type": "text/javascript",
+										"exec": [
+											"pm.environment.set(\"request_level\", \"National\");"
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "8ff1520f-f3b8-42ed-b489-0a274eff720a",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Level matches the request level\", function () { pm.expect(pm.response.json().level).to.equal(JSON.parse(request.data).level); });"
+										]
+									}
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Characteristics",
+					"item": [
+						{
+							"name": "National",
+							"item": [
+								{
+									"name": "Pupil absence in schools in England",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+											"host": [
+												"{{start_url}}"
+											],
+											"path": [
+												"tablebuilder",
+												"characteristics",
+												"{{request_level}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Permanent and fixed period exclusions",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"perm_excl\",\n        \"fixed_excl\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+											"host": [
+												"{{start_url}}"
+											],
+											"path": [
+												"tablebuilder",
+												"characteristics",
+												"{{request_level}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Schools, pupils and their characteristics",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"headcount\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+											"host": [
+												"{{start_url}}"
+											],
+											"path": [
+												"tablebuilder",
+												"characteristics",
+												"{{request_level}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "c7f133c8-1006-46da-a62d-96326613f544",
+										"type": "text/javascript",
+										"exec": [
+											"pm.environment.set(\"request_level\", \"national\");",
+											"pm.environment.set(\"response_level\", \"National\");"
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "9c5ce264-551a-42be-b7f5-f825ff28df2d",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Level matches the expected response level\", function () { pm.expect(pm.response.json().level).to.equal(pm.environment.get(\"response_level\")); });"
+										]
+									}
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Local Authority",
+							"item": [
+								{
+									"name": "Pupil absence in schools in England",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+											"host": [
+												"{{start_url}}"
+											],
+											"path": [
+												"tablebuilder",
+												"characteristics",
+												"{{request_level}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Schools, pupils and their characteristics",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"headcount\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+											"host": [
+												"{{start_url}}"
+											],
+											"path": [
+												"tablebuilder",
+												"characteristics",
+												"{{request_level}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Permanent and fixed period exclusions",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"perm_excl\",\n        \"fixed_excl\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+											"host": [
+												"{{start_url}}"
+											],
+											"path": [
+												"tablebuilder",
+												"characteristics",
+												"{{request_level}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "248499e6-5f02-4a61-92e9-3adfd0cdd8a1",
+										"type": "text/javascript",
+										"exec": [
+											"pm.environment.set(\"request_level\", \"local-authority\");",
+											"pm.environment.set(\"response_level\", \"Local_Authority\");"
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "ad0fa664-6167-4c63-ad41-444dd43132a7",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Level matches the expected response level\", function () { pm.expect(pm.response.json().level).to.equal(pm.environment.get(\"response_level\")); });"
+										]
+									}
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "fbc8c7a0-54dc-48b7-ac2f-ab840c45cc29",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "8141f36f-4bf9-49a4-822c-0c6087cadbbe",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Fields are present\", function () {",
+							"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"level\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+							"});",
+							"",
+							"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().publicationId).to.equal(JSON.parse(request.data).publicationId); });",
+							"",
+							"pm.test(\"Release id is not empty\", function () {",
+							"    pm.expect(pm.response.json().releaseId).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
+							"});",
+							"",
+							"pm.test(\"Release date is not empty\", function () {",
+							"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Debug",
+			"item": [
+				{
+					"name": "Debug",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "90830933-d7da-4502-b316-ed7887c913cf",
+								"exec": [
+									"pm.test(\"Geographic count matches the expected count\", function () {",
+									"    pm.expect(pm.response.json().geographicCount).to.equal(725845);",
+									"});",
+									"",
+									"pm.test(\"National characteristic count matches the expected count\", function () {",
+									"    pm.expect(pm.response.json().nationalCharacteristicCount).to.equal(10481);",
+									"});",
+									"",
+									"pm.test(\"LA characteristic count matches the expected count\", function () {",
+									"    pm.expect(pm.response.json().laCharacteristicCount).to.equal(580331);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{start_url}}/debug/report",
+							"host": [
+								"{{start_url}}"
+							],
+							"path": [
+								"debug",
+								"report"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "134cd34a-d839-401e-bc0b-88090d1b51c9",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "9279878e-d394-4bcd-a0d0-a638c88016dc",
+				"type": "text/javascript",
+				"exec": [
+					"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+					""
+				]
+			}
+		}
+	]
+}
