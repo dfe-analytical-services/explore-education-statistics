@@ -3,10 +3,11 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder
 {
-    public class TableBuilderService
+    public class TableBuilderService : ITableBuilderService
     {
         private readonly GeographicDataService _geographicDataService;
         private readonly LaCharacteristicDataService _laCharacteristicDataService;

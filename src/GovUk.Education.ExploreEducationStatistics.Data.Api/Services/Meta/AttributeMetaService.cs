@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Meta
 {
-    public class AttributeMetaService : AbstractDataService<AttributeMeta>
+    public class AttributeMetaService : AbstractDataService<AttributeMeta>, IAttributeMetaService
     {
         public AttributeMetaService(ApplicationDbContext context) : base(context)
         {

@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
@@ -7,9 +8,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     [ApiController]
     public class SeedController : ControllerBase
     {
-        private readonly SeedService _seedService;
+        private readonly ISeedService _seedService;
 
-        public SeedController(SeedService seedService)
+        
+        public SeedController(ISeedService seedService)
         {
             _seedService = seedService;
         }

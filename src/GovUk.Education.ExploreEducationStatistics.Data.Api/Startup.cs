@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder;
 using Microsoft.AspNetCore.Builder;
@@ -53,11 +54,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddScoped<GeographicResultBuilder>();
             services.AddScoped<CharacteristicResultBuilder>();
 
-            services.AddScoped<SeedService>();
-            services.AddScoped<TableBuilderService>();
+            services.AddTransient<ISeedService, SeedService>();
+            services.AddTransient<ITableBuilderService, TableBuilderService>();
 
-            services.AddScoped<AttributeMetaService>();
-            services.AddScoped<CharacteristicMetaService>();
+            services.AddTransient<IAttributeMetaService, AttributeMetaService>();
+            services.AddTransient<ICharacteristicMetaService, CharacteristicMetaService>();
 
             services.AddScoped<GeographicDataService>();
             services.AddScoped<LaCharacteristicDataService>();
