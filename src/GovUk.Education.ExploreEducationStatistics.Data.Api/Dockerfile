@@ -1,10 +1,10 @@
-FROM microsoft/dotnet:2.1-aspnetcore-runtime AS base
+FROM microsoft/dotnet:2.2-aspnetcore-runtime AS base
 WORKDIR /app
 EXPOSE 5000
 EXPOSE 5001
 ENV ASPNETCORE_URLS=http://+:5000
 
-FROM microsoft/dotnet:2.1-sdk AS build
+FROM microsoft/dotnet:2.2-sdk AS build
 WORKDIR /src
 COPY ["GovUk.Education.ExploreEducationStatistics.Data.Api.csproj", "GovUk.Education.ExploreEducationStatistics.Data.Api/"]
 RUN dotnet restore "GovUk.Education.ExploreEducationStatistics.Data.Api/GovUk.Education.ExploreEducationStatistics.Data.Api.csproj"
