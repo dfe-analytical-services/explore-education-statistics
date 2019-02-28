@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
@@ -70,12 +71,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         public ActionResult<TableBuilderResult> GetGeographic([FromBody] GeographicQueryContext query)
         {
             var result =_tableBuilderService.GetGeographic(query);
-            if (!result.Result.Any())
+            if (result.Result.Any())
             {
-                return new NotFoundResult();
+                return result;    
             }
-            
-            return result;
+            return NotFound();     
         }
 
         [HttpGet("characteristics/local-authority/{publicationId}")]
@@ -105,12 +105,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         public ActionResult<TableBuilderResult> GetLocalAuthority([FromBody] LaQueryContext query)
         {
             var result = _tableBuilderService.GetLocalAuthority(query);
-            if (!result.Result.Any())
+            if (result.Result.Any())
             {
-                return new NotFoundResult();
+                return result;    
             }
-            
-            return result;
+            return NotFound();
         }
 
         [HttpGet("characteristics/national/{publicationId}")]
@@ -133,25 +132,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 EndYear = endYear
             };
 
-            return _tableBuilderService.GetNational(query);
+            var result = _tableBuilderService.GetNational(query);
+            if (result.Result.Any())
+            {
+                return result;    
+            }
+            return NotFound();
         }
 
         [HttpPost("characteristics/national")]
         public ActionResult<TableBuilderResult> GetNational(NationalQueryContext query)
         {
             var result = _tableBuilderService.GetNational(query);
-            if (!result.Result.Any())
+            if (result.Result.Any())
             {
-                return new NotFoundResult();
+                return result;    
             }
-            
-            return result;
+            return NotFound();
         }
 
         [HttpGet("meta/{publicationId}")]
         public ActionResult<PublicationMetaViewModel> GetMeta(Guid publicationId)
         {
-            return new PublicationMetaViewModel
+            var result = new PublicationMetaViewModel
             {
                 PublicationId = publicationId,
                 Attributes = _attributeMetaService.Get(publicationId)
@@ -165,6 +168,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                         metas => metas.Key,
                         metas => metas.Select(ToNameLabelViewModel).ToList())
             };
+
+            if (result.Attributes.Any() && result.Characteristics.Any())
+            {
+                return result;
+            }
+
+            return NotFound();
         }
 
         private AttributeMetaViewModel ToAttributeMetaViewModel(AttributeMeta attributeMeta)

@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
@@ -10,14 +13,21 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
 {
     public class TableBuilderControllerTests
     {
-
-        private TableBuilderController _controller;
+        private readonly TableBuilderController _controller;
+        
+        private NationalQueryContext _testNationQuery = new NationalQueryContext();
+        private LaQueryContext _laQuery = new LaQueryContext();
+        private GeographicQueryContext _geographicQuery = new GeographicQueryContext();
 
         public TableBuilderControllerTests()
         {
             var tableBuilderService = new Mock<ITableBuilderService>();
             var attributeMetaService = new Mock<IAttributeMetaService>();
             var characteristicMetaService = new Mock<ICharacteristicMetaService>();
+
+            tableBuilderService.Setup(s => s.GetNational(_testNationQuery)).Returns(new TableBuilderResult { Result = new List<ITableBuilderData>()});
+            tableBuilderService.Setup(s => s.GetLocalAuthority(_laQuery)).Returns(new TableBuilderResult { Result = new List<ITableBuilderData>()});
+            tableBuilderService.Setup(s => s.GetGeographic(_geographicQuery)).Returns(new TableBuilderResult { Result = new List<ITableBuilderData>()});
             
             _controller = new TableBuilderController(tableBuilderService.Object, attributeMetaService.Object, characteristicMetaService.Object);
         }
@@ -31,7 +41,17 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
         [Fact]
         public void PostGeographic()
         {
+            var result = _controller.GetGeographic(_geographicQuery);
             
+            Assert.IsAssignableFrom<TableBuilderResult>(result.Result);
+        }
+        
+        [Fact]
+        public void PostGeographic_Returns_NotFound()
+        {
+            var result = _controller.GetGeographic(_geographicQuery);
+            
+            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
         }
         
         [Fact]
@@ -43,19 +63,31 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
         [Fact]
         public void PostLocalAuthority()
         {
+            var result = _controller.GetLocalAuthority(_laQuery);
             
+            Assert.IsAssignableFrom<TableBuilderResult>(result.Result);
         }
         
         [Fact]
-        public void GetNational()
+        public void PostLocalAuthority_Returns_NotFound()
+        {
+            var result = _controller.GetLocalAuthority(_laQuery);
+            
+            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
+        }
+        
+        [Fact]
+        public void GetNational_GetRequest_Returns_National_Data()
         {
             
         }
         
         [Fact]
-        public void PostNational()
+        public void GetNational_PostRequest_Returns_National_Data()
         {
+            var result = _controller.GetNational(_testNationQuery);
             
+            Assert.IsAssignableFrom<TableBuilderResult>(result.Result);
         }
 
         [Theory]
@@ -72,6 +104,14 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
             Assert.Equal(id, model.Value.PublicationId);
             
             // TODO: verify the meta data
+        }
+        
+        [Fact]
+        public void GetMeta_UnknownKnownId_Returns_NotFound()
+        {
+            var result = _controller.GetMeta(new Guid());
+            
+            Assert.IsType<NotFoundResult>(result.Result);
         }
     }
 }

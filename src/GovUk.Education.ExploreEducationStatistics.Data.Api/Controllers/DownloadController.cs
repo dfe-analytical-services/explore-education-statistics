@@ -36,12 +36,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
             var path = newPath + "/wwwroot/data/zip/" + file;
 
-            var result = new FileContentResult(System.IO.File.ReadAllBytes(path), contentType)
+            try
             {
-                FileDownloadName = $"{publication}.zip"
-            };
-
-            return result;
+                var result = new FileContentResult(System.IO.File.ReadAllBytes(path), contentType)
+                {
+                    FileDownloadName = $"{publication}.zip"
+                };
+                
+                return result;
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                return NotFound();
+            }
         }
     }
 }

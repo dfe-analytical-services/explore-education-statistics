@@ -24,12 +24,16 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
             _controller =  new DebugController(geographicDataService.Object, nationalCharacteristicDataService.Object, laCharacteristicDataService.Object);
         }
 
-//        [Fact]
-//        public void DebugReport()
-//        {
-//            var result = _controller.GetReport();
-//            
-//            Assert.IsType<ActionResult<DebugReport>>(result);
-//        }
+        [Fact]
+        public void DebugReport()
+        {
+            var result = _controller.GetReport();
+
+            Assert.IsType<ActionResult<DebugReport>>(result);
+
+            Assert.Equal(100, result.Value.geographicCount);
+            Assert.Equal(200, result.Value.nationalCharacteristicCount);
+            Assert.Equal(300, result.Value.laCharacteristicCount);
+        }
     }
 }
