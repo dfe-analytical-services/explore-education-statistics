@@ -7,11 +7,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Meta;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
@@ -23,15 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         private readonly IAttributeMetaService _attributeMetaService;
         private readonly ICharacteristicMetaService _characteristicMetaService;
         private readonly IMapper _mapper;
-
-        public TableBuilderController(ITableBuilderService tableBuilderService,
-            IAttributeMetaService attributeMetaService,
-            ICharacteristicMetaService characteristicMetaService)
-        {
-            _tableBuilderService = tableBuilderService;
-            _attributeMetaService = attributeMetaService;
-            _characteristicMetaService = characteristicMetaService;
-        }
         
         public TableBuilderController(ITableBuilderService tableBuilderService,
             IAttributeMetaService attributeMetaService,
@@ -146,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             var result = _tableBuilderService.GetNational(query);
             if (result.Result.Any())
             {
-                return result;    
+                return result;
             }
             return NotFound();
         }

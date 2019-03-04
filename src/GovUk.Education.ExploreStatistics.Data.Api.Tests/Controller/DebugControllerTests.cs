@@ -1,6 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Debug;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -9,19 +9,20 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
 {
     public class DebugControllerTests
     {
-        private DebugController _controller;
+        private readonly DebugController _controller;
 
         public DebugControllerTests()
         {
-            var geographicDataService = new Mock<GeographicDataService>();
-            var nationalCharacteristicDataService = new Mock<NationalCharacteristicDataService>();
-            var laCharacteristicDataService = new Mock<LaCharacteristicDataService>();
+            var geographicDataService = new Mock<IGeographicDataService>();
+            var nationalCharacteristicDataService = new Mock<INationalCharacteristicDataService>();
+            var laCharacteristicDataService = new Mock<ILaCharacteristicDataService>();
 
             geographicDataService.Setup(g => g.Count()).Returns(100);
             nationalCharacteristicDataService.Setup(g => g.Count()).Returns(200);
             laCharacteristicDataService.Setup(g => g.Count()).Returns(300);
-            
-            _controller =  new DebugController(geographicDataService.Object, nationalCharacteristicDataService.Object, laCharacteristicDataService.Object);
+
+            _controller = new DebugController(geographicDataService.Object, nationalCharacteristicDataService.Object,
+                laCharacteristicDataService.Object);
         }
 
         [Fact]

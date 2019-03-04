@@ -1,5 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Debug;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
@@ -8,13 +8,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     [ApiController]
     public class DebugController : ControllerBase
     {
-        private readonly GeographicDataService _geographicDataService;
-        private readonly NationalCharacteristicDataService _nationalCharacteristicDataService;
-        private readonly LaCharacteristicDataService _laCharacteristicDataService;
+        private readonly IGeographicDataService _geographicDataService;
+        private readonly INationalCharacteristicDataService _nationalCharacteristicDataService;
+        private readonly ILaCharacteristicDataService _laCharacteristicDataService;
 
-        public DebugController(GeographicDataService geographicDataService,
-            NationalCharacteristicDataService nationalCharacteristicDataService,
-            LaCharacteristicDataService laCharacteristicDataService)
+        public DebugController(IGeographicDataService geographicDataService,
+            INationalCharacteristicDataService nationalCharacteristicDataService,
+            ILaCharacteristicDataService laCharacteristicDataService)
         {
             _geographicDataService = geographicDataService;
             _nationalCharacteristicDataService = nationalCharacteristicDataService;
