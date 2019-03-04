@@ -7,34 +7,33 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
 {
     public class DownloadControllerTests
     {
-        private DownloadController _controller;
+        private readonly DownloadController _controller;
 
         public DownloadControllerTests()
         {
-            _controller = new DownloadController();
-            _controller.ControllerContext = new ControllerContext();
-            _controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            _controller = new DownloadController
+            {
+                ControllerContext = new ControllerContext {HttpContext = new DefaultHttpContext()}
+            };
         }
-        
-        [Theory(Skip="File path not relative")]
+
+        [Theory(Skip = "File path not relative")]
         [InlineData("pupil-absence-in-schools-in-england")]
         [InlineData("permanent-and-fixed-period-exclusions")]
         [InlineData("schools-pupils-and-their-characteristics")]
         public void GetCsvBundle(string query)
         {
             var result = _controller.GetCsvBundle(query);
-            
-            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.IsType<IActionResult>(result);
         }
-        
+
         [Theory]
         [InlineData("")]
         [InlineData("this-does-not-exist")]
         public void GetCsvBundle_NotFound(string query)
         {
             var result = _controller.GetCsvBundle(query);
-            
-            var viewResult = Assert.IsType<NotFoundResult>(result);
+            Assert.IsType<NotFoundResult>(result);
         }
     }
 }
