@@ -1,18 +1,18 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
 {
     public class TidyDataReleaseCounter
     {
-        private readonly GeographicDataService _geographicDataService;
-        private readonly LaCharacteristicDataService _laCharacteristicDataService;
-        private readonly NationalCharacteristicDataService _nationalCharacteristicDataService;
+        private readonly IGeographicDataService _geographicDataService;
+        private readonly ILaCharacteristicDataService _laCharacteristicDataService;
+        private readonly INationalCharacteristicDataService _nationalCharacteristicDataService;
 
-        public TidyDataReleaseCounter(GeographicDataService geographicDataService,
-            LaCharacteristicDataService laCharacteristicDataService,
-            NationalCharacteristicDataService nationalCharacteristicDataService)
+        public TidyDataReleaseCounter(IGeographicDataService geographicDataService,
+            ILaCharacteristicDataService laCharacteristicDataService,
+            INationalCharacteristicDataService nationalCharacteristicDataService)
         {
             _geographicDataService = geographicDataService;
             _laCharacteristicDataService = laCharacteristicDataService;

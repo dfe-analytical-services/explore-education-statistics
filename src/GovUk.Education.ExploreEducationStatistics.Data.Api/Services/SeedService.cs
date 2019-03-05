@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 _context.SaveChanges();
                 index++;
 
-                _logger.LogInformation("Seeded {Count} in {Time} ms. {TimerPerRecord} per record", batch.Count(),
+                _logger.LogInformation("Seeded {Count} in {Time}ms. {TimerPerRecord}ms per record", batch.Count(),
                     stopWatch.Elapsed.TotalMilliseconds, stopWatch.Elapsed.TotalMilliseconds / batch.Count());
                 stopWatch.Restart();
             }
