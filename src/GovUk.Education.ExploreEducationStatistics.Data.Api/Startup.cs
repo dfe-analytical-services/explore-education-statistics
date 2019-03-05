@@ -60,9 +60,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IAttributeMetaService, AttributeMetaService>();
             services.AddTransient<ICharacteristicMetaService, CharacteristicMetaService>();
 
-            services.AddScoped<GeographicDataService>();
-            services.AddScoped<LaCharacteristicDataService>();
-            services.AddScoped<NationalCharacteristicDataService>();
+            services.AddScoped<IGeographicDataService, GeographicDataService>();
+            services.AddScoped<ILaCharacteristicDataService, LaCharacteristicDataService>();
+            services.AddScoped<INationalCharacteristicDataService, NationalCharacteristicDataService>();
 
             services.AddCors();
             services.AddAutoMapper();

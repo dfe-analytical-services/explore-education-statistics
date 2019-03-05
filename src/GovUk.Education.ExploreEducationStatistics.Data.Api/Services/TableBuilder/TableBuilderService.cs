@@ -9,15 +9,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 {
     public class TableBuilderService : ITableBuilderService
     {
-        private readonly GeographicDataService _geographicDataService;
-        private readonly LaCharacteristicDataService _laCharacteristicDataService;
-        private readonly NationalCharacteristicDataService _nationalCharacteristicDataService;
+        private readonly IGeographicDataService _geographicDataService;
+        private readonly ILaCharacteristicDataService _laCharacteristicDataService;
+        private readonly INationalCharacteristicDataService _nationalCharacteristicDataService;
         private readonly GeographicResultBuilder _geographicResultBuilder;
         private readonly CharacteristicResultBuilder _characteristicResultBuilder;
 
-        public TableBuilderService(GeographicDataService geographicDataService,
-            LaCharacteristicDataService laCharacteristicDataService,
-            NationalCharacteristicDataService nationalCharacteristicDataService,
+        public TableBuilderService(IGeographicDataService geographicDataService,
+            ILaCharacteristicDataService laCharacteristicDataService,
+            INationalCharacteristicDataService nationalCharacteristicDataService,
             GeographicResultBuilder geographicResultBuilder,
             CharacteristicResultBuilder characteristicResultBuilder)
         {
