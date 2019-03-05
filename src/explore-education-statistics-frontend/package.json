@@ -77,7 +77,7 @@
     "test": "react-app-rewired test",
     "test:snapshot": "cross-env CI=true react-app-rewired test --updateSnapshot",
     "type-check": "tsc --noEmit",
-    "eject": "react-app-rewired eject"
+    "eject": "react-scripts eject"
   },
   "husky": {
     "hooks": {
