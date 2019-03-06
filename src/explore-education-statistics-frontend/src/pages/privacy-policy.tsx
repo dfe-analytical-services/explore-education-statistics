@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Helmet } from 'react-helmet';
 
-class PrivacyPage extends Component {
+class PrivacyPolicyPage extends Component {
   public render() {
     return (
       <div className="govuk-grid-row">
@@ -16,4 +16,4 @@ class PrivacyPage extends Component {
   }
 }
 
-export default PrivacyPage;
+export default PrivacyPolicyPage;
