@@ -1,0 +1,176 @@
+variables:
+  BuildConfiguration: 'Release'
+
+trigger: [ 'master' ]
+pr: [ 'master' ]
+
+jobs:
+  - job: 'Backend'
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Restore'
+        inputs:
+          command: 'restore'
+          projects: '**/GovUk.*/*csproj'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Build'
+        inputs:
+          projects: '**/GovUk.*/*csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Test'
+        inputs:
+          command: 'test'
+          projects: '**/GovUk.*[Tt]ests/*.csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+      
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.*/*.csproj'
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+          zipAfterPublish: True
+      - task: 'CopyFiles@2'
+        displayName: 'Copy ARM templates'
+        inputs:
+          SourceFolder: 'armTemplates'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Pipeline Artifact'
+        inputs:
+          artifactName: 'backend'
+          targetPath: '$(Build.ArtifactStagingDirectory)'
+
+  - job: 'Frontend_Test'
+    pool:
+      vmImage: 'ubuntu-16.04'
+      demands: 'npm'
+    steps:
+      - task: 'Npm@1'
+        displayName: 'npm ci'
+        inputs:
+          command: 'custom'
+          workingDir: 'src/explore-education-statistics-frontend'
+          verbose: false
+          customCommand: 'ci'
+      - task: 'Npm@1'
+        displayName: 'npm test'
+        inputs:
+          command: 'custom'
+          workingDir: 'src/explore-education-statistics-frontend'
+          verbose: false
+          customCommand: 'test'
+      - task: 'Npm@1'
+        displayName: 'npm run lint'
+        inputs:
+          command: 'custom'
+          workingDir: 'src/explore-education-statistics-frontend'
+          verbose: false
+          customCommand: 'run lint'
+      - task: 'Npm@1'
+        displayName: 'npm run format:check'
+        inputs:
+          command: 'custom'
+          workingDir: 'src/explore-education-statistics-frontend'
+          verbose: false
+          customCommand: 'run format:check'
+
+  - job: 'Frontend_Build_Test'
+    dependsOn: 'Frontend_Test'
+    pool:
+      vmImage: 'ubuntu-16.04'
+      demands: 'npm'
+    steps:
+    - task: 'Npm@1'
+      displayName: 'npm ci'
+      inputs:
+        command: 'custom'
+        workingDir: 'src/explore-education-statistics-frontend'
+        verbose: false
+        customCommand: 'ci'
+    - task: 'Npm@1'
+      displayName: 'npm run build:test'
+      inputs:
+        command: 'custom'
+        workingDir: 'src/explore-education-statistics-frontend'
+        verbose: false
+        customCommand: 'run build:test'
+    - task: 'ArchiveFiles@2'
+      displayName: 'Archive frontend - test'
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend/build'
+        includeRootFolder: false
+        archiveFile: '$(Build.ArtifactStagingDirectory)/explore-education-statistics-frontend-test.zip'
+    - task: 'PublishPipelineArtifact@0'
+      displayName: 'Publish Pipeline Artifact'
+      inputs:
+        artifactName: 'frontend-test'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+
+  - job: 'Frontend_Build_Stage'
+    dependsOn: 'Frontend_Test'
+    pool:
+      vmImage: 'ubuntu-16.04'
+      demands: 'npm'
+    steps:
+    - task: 'Npm@1'
+      displayName: 'npm ci'
+      inputs:
+        command: 'custom'
+        workingDir: 'src/explore-education-statistics-frontend'
+        verbose: false
+        customCommand: 'ci'
+    - task: 'Npm@1'
+      displayName: 'npm run build:stage'
+      inputs:
+        command: 'custom'
+        workingDir: 'src/explore-education-statistics-frontend'
+        verbose: false
+        customCommand: 'run build:stage'
+    - task: 'ArchiveFiles@2'
+      displayName: 'Archive frontend - stage'
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend/build'
+        includeRootFolder: false
+        archiveFile: '$(Build.ArtifactStagingDirectory)/explore-education-statistics-frontend-stage.zip'
+    - task: 'PublishPipelineArtifact@0'
+      displayName: 'Publish Pipeline Artifact'
+      inputs:
+        artifactName: 'frontend-stage'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+
+  - job: 'Frontend_Build_Live'
+    dependsOn: 'Frontend_Test'
+    pool:
+      vmImage: 'ubuntu-16.04'
+      demands: 'npm'
+    steps:
+    - task: 'Npm@1'
+      displayName: 'npm ci'
+      inputs:
+        command: 'custom'
+        workingDir: 'src/explore-education-statistics-frontend'
+        verbose: false
+        customCommand: 'ci'
+    - task: 'Npm@1'
+      displayName: 'npm run build:live'
+      inputs:
+        command: 'custom'
+        workingDir: 'src/explore-education-statistics-frontend'
+        verbose: false
+        customCommand: 'run build:live'
+    - task: 'ArchiveFiles@2'
+      displayName: 'Archive frontend - live'
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend/build'
+        includeRootFolder: false
+        archiveFile: '$(Build.ArtifactStagingDirectory)/explore-education-statistics-frontend-live.zip'
+    - task: 'PublishPipelineArtifact@0'
+      displayName: 'Publish Pipeline Artifact'
+      inputs:
+        artifactName: 'frontend-live'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
