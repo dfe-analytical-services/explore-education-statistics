@@ -18,6 +18,16 @@ async function startServer(port = 3000) {
 
   const server = express();
 
+  // Strip trailing slashes as these
+  // don't work well with Next
+  server.use((req, res, next) => {
+    if (req.path.endsWith('/')) {
+      res.redirect(301, req.url.slice(0, -1));
+    } else {
+      next();
+    }
+  });
+
   server.get('*', (req, res) => handleRequest(req, res));
 
   server.listen(port, err => {
