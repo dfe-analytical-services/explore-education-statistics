@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         {
             return x => characteristics == null ||
                         !characteristics.Any() ||
-                        characteristics.Contains(x.Characteristic.Name);
+                        characteristics.Contains(x.CharacteristicName);
         }
     }
 }

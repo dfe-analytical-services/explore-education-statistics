@@ -22,17 +22,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            registerConversionsLevel(modelBuilder);
-            registerConversionsSchoolType(modelBuilder);
-            registerConversionsSchool(modelBuilder);
-            registerConversionsAttributes(modelBuilder);
-            registerConversionsCountry(modelBuilder);
-            registerConversionsLocalAuthority(modelBuilder);
-            registerConversionsRegion(modelBuilder);
-            registerConversionsCharacteristic(modelBuilder);
+            RegisterConversionsLevel(modelBuilder);
+            RegisterConversionsSchoolType(modelBuilder);
+            RegisterConversionsSchool(modelBuilder);
+            RegisterConversionsAttributes(modelBuilder);
+            RegisterConversionsCountry(modelBuilder);
+            RegisterConversionsLocalAuthority(modelBuilder);
+            RegisterConversionsRegion(modelBuilder);
+            RegisterConversionsCharacteristic(modelBuilder);
         }
 
-        private void registerConversionsLevel(ModelBuilder modelBuilder)
+        private static void RegisterConversionsLevel(ModelBuilder modelBuilder)
         {
             var levelConverter = new EnumToStringConverter<Level>();
 
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
                 .HasConversion(levelConverter);
         }
 
-        private void registerConversionsSchoolType(ModelBuilder modelBuilder)
+        private static void RegisterConversionsSchoolType(ModelBuilder modelBuilder)
         {
             var schoolTypeConverter = new EnumToStringConverter<SchoolType>();
 
@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
                 .HasConversion(schoolTypeConverter);
         }
 
-        private void registerConversionsSchool(ModelBuilder modelBuilder)
+        private static void RegisterConversionsSchool(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GeographicData>()
                 .Property(data => data.School)
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
                     v => JsonConvert.DeserializeObject<School>(v));
         }
 
-        private void registerConversionsAttributes(ModelBuilder modelBuilder)
+        private static void RegisterConversionsAttributes(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GeographicData>()
                 .Property(data => data.Attributes)
@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
                     v => JsonConvert.DeserializeObject<Dictionary<string, string>>(v));
         }
 
-        private void registerConversionsCountry(ModelBuilder modelBuilder)
+        private static void RegisterConversionsCountry(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GeographicData>()
                 .Property(data => data.Country)
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
                     v => JsonConvert.DeserializeObject<Country>(v));
         }
 
-        private void registerConversionsLocalAuthority(ModelBuilder modelBuilder)
+        private static void RegisterConversionsLocalAuthority(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GeographicData>()
                 .Property(data => data.LocalAuthority)
@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
                     v => JsonConvert.DeserializeObject<LocalAuthority>(v));
         }
 
-        private void registerConversionsRegion(ModelBuilder modelBuilder)
+        private static void RegisterConversionsRegion(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GeographicData>()
                 .Property(data => data.Region)
@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
                     v => JsonConvert.DeserializeObject<Region>(v));
         }
 
-        private void registerConversionsCharacteristic(ModelBuilder modelBuilder)
+        private static void RegisterConversionsCharacteristic(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CharacteristicDataNational>()
                 .Property(data => data.Characteristic)
@@ -160,6 +160,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<Characteristic>(v));
+            
+            modelBuilder.Entity<CharacteristicDataNational>()
+                .Property(data => data.CharacteristicName)
+                .HasComputedColumnSql("JSON_VALUE(Characteristic, '$.characteristic_1')");
+
+            modelBuilder.Entity<CharacteristicDataNational>()
+                .HasIndex(data => data.CharacteristicName);
+            
+            modelBuilder.Entity<CharacteristicDataLa>()
+                .Property(data => data.CharacteristicName)
+                .HasComputedColumnSql("JSON_VALUE(Characteristic, '$.characteristic_1')");
+
+            modelBuilder.Entity<CharacteristicDataLa>()
+                .HasIndex(data => data.CharacteristicName);
         }
     }
 }

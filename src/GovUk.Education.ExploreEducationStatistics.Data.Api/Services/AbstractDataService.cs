@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public abstract class AbstractDataService<TEntity> : IDataService<TEntity> where TEntity : class
     {
-        private readonly ApplicationDbContext _context;
+        protected readonly ApplicationDbContext _context;
 
         protected AbstractDataService(ApplicationDbContext context)
         {
@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             return DbSet().Count();
         }
-        
+
         public int Count(Expression<Func<TEntity, bool>> expression)
         {
             return DbSet().Count(expression);
