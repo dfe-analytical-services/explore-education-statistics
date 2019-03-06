@@ -1,5 +1,6 @@
 const express = require('express');
 const next = require('next');
+const url = require('url');
 
 const app = next({
   dev: process.env.NODE_ENV !== 'production',
@@ -21,8 +22,11 @@ async function startServer(port = 3000) {
   // Strip trailing slashes as these
   // don't work well with Next
   server.use((req, res, next) => {
-    if (req.path.endsWith('/')) {
-      res.redirect(301, req.url.slice(0, -1));
+    if (req.path !== '/' && req.path.endsWith('/')) {
+      const parsedUrl = url.parse(req.url);
+      const redirectUrl = req.path.slice(0, -1) + (parsedUrl.search || '');
+
+      res.redirect(301, redirectUrl);
     } else {
       next();
     }
