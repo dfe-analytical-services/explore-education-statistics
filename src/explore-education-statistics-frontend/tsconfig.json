@@ -7,6 +7,7 @@
     "moduleResolution": "node",
     "noEmit": true,
     "noImplicitAny": true,
+    "strict": true,
     "strictNullChecks": true,
     "jsx": "preserve",
     "target": "es5",
@@ -17,9 +18,9 @@
     ],
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": "."
   },
   "include": [
     "src"
