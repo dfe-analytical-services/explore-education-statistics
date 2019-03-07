@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Debug;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
@@ -17,24 +18,26 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
             var nationalCharacteristicDataService = new Mock<INationalCharacteristicDataService>();
             var laCharacteristicDataService = new Mock<ILaCharacteristicDataService>();
 
-            geographicDataService.Setup(g => g.Count()).Returns(100);
-            nationalCharacteristicDataService.Setup(g => g.Count()).Returns(200);
-            laCharacteristicDataService.Setup(g => g.Count()).Returns(300);
+            geographicDataService.Setup(g => g.Count()).Returns(Task.FromResult(100));
+            nationalCharacteristicDataService.Setup(g => g.Count()).Returns(Task.FromResult(200));
+            laCharacteristicDataService.Setup(g => g.Count()).Returns(Task.FromResult(300));
 
             _controller = new DebugController(geographicDataService.Object, nationalCharacteristicDataService.Object,
                 laCharacteristicDataService.Object);
         }
 
         [Fact]
-        public void DebugReport()
+        public async void DebugReport()
         {
             var result = _controller.GetReport();
 
-            Assert.IsType<ActionResult<DebugReport>>(result);
+            Assert.IsType<Task<ActionResult<DebugReport>>>(result);
 
-            Assert.Equal(100, result.Value.geographicCount);
-            Assert.Equal(200, result.Value.nationalCharacteristicCount);
-            Assert.Equal(300, result.Value.laCharacteristicCount);
+            var actionResult = await result;
+            
+            Assert.Equal(100, actionResult.Value.geographicCount);
+            Assert.Equal(200, actionResult.Value.nationalCharacteristicCount);
+            Assert.Equal(300, actionResult.Value.laCharacteristicCount);
         }
     }
 }
