@@ -1,4 +1,3 @@
-import Checkboxes from 'govuk-frontend/components/checkboxes/checkboxes';
 import React, { Component, createRef } from 'react';
 import FormCheckbox, { CheckboxChangeEventHandler } from './FormCheckbox';
 import FormFieldSet, { FieldSetProps } from './FormFieldSet';
@@ -37,7 +36,13 @@ class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
   private ref = createRef<HTMLDivElement>();
 
   public componentDidMount(): void {
-    new Checkboxes(this.ref.current).init();
+    if (this.ref.current) {
+      import('govuk-frontend/components/checkboxes/checkboxes').then(
+        ({ default: GovUkCheckboxes }) => {
+          new GovUkCheckboxes(this.ref.current).init();
+        },
+      );
+    }
   }
 
   public render() {

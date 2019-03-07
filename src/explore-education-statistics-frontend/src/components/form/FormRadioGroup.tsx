@@ -1,5 +1,4 @@
 import classNames from 'classnames';
-import Radios from 'govuk-frontend/components/radios/radios';
 import React, { ChangeEventHandler, Component, createRef } from 'react';
 import FormFieldSet, { FieldSetProps } from './FormFieldSet';
 import FormRadio, { RadioChangeEventHandler } from './FormRadio';
@@ -28,7 +27,13 @@ class FormRadioGroup extends Component<Props> {
   private ref = createRef<HTMLInputElement>();
 
   public componentDidMount(): void {
-    new Radios(this.ref.current).init();
+    if (this.ref.current) {
+      import('govuk-frontend/components/checkboxes/checkboxes').then(
+        ({ default: GovUkRadios }) => {
+          new GovUkRadios(this.ref.current).init();
+        },
+      );
+    }
   }
 
   private handleChange: ChangeEventHandler<HTMLInputElement> = event => {
