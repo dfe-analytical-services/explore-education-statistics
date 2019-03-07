@@ -1,8 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import KeyIndicatorTile, {
-  KeyIndicatorTileProps,
-} from '../../../components/KeyIndicatorTile';
+import KeyIndicatorTile, { KeyIndicatorTileProps } from '../../../components/KeyIndicatorTile';
 import Link from '../../../components/Link';
 import styles from './PublicationSummary.module.scss';
 

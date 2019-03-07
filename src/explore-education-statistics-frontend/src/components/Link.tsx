@@ -26,6 +26,7 @@ const Link = ({
   return (
     <RouterLink {...props} href={href}>
       <a
+        {...props}
         className={classNames(
           'govuk-link',
           {

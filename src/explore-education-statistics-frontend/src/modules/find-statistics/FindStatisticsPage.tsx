@@ -1,40 +1,45 @@
 import React, { Component } from 'react';
 import { Helmet } from 'react-helmet';
-import { RouteComponentProps } from 'react-router';
-import { contentApi } from '../../services/api';
-import ThemeList from './components/ThemeList';
+import { contentApi } from 'src/services/api';
+import TopicList from './components/TopicList';
 
-interface Props extends RouteComponentProps<{}> {}
-
-interface State {
-  items: any[];
+interface Props {
+  themes: {
+    id: string;
+    slug: string;
+    title: string;
+  }[];
 }
 
-class FindStatisticsPage extends Component<Props, State> {
-  public state = {
-    items: [],
+class FindStatisticsPage extends Component<Props> {
+  public static defaultProps = {
+    themes: [],
   };
 
-  public componentDidMount() {
-    contentApi
-      .get('theme')
-      .then(({ data }) => this.setState({ items: data }))
-      .catch(error => alert(error));
+  public static async getInitialProps(): Promise<Props> {
+    const { data } = await contentApi.get('theme');
+
+    return {
+      themes: data,
+    };
   }
 
   public render() {
-    const { items } = this.state;
+    const { themes } = this.props;
 
     return (
       <>
         <Helmet>
           <title>Find statistics and data - GOV.UK</title>
         </Helmet>
+
         <h1 className="govuk-heading-xl">Find statistics and data</h1>
+
         <p className="govuk-body-l">
           Browse to find the statistics and data you’re looking for and open the
           section to get links to:
         </p>
+
         <ul className="govuk-!-margin-bottom-9">
           <li>
             up-to-date national statistical headlines, breakdowns and
@@ -45,7 +50,20 @@ class FindStatisticsPage extends Component<Props, State> {
             and regional statistical data and trends
           </li>
         </ul>
-        <ThemeList items={items} linkIdentifier={this.props.match.url} />
+
+        {themes.length > 0 ? (
+          <>
+            {themes.map(({ id, slug, title }) => (
+              <div key={id}>
+                <h2 className="govuk-heading-l">{title}</h2>
+
+                <TopicList theme={slug} />
+              </div>
+            ))}
+          </>
+        ) : (
+          <div className="govuk-inset-text">No data currently published.</div>
+        )}
       </>
     );
   }

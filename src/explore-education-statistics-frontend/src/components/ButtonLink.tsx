@@ -1,6 +1,5 @@
 import classNames from 'classnames';
-import React, { ReactNode } from 'react';
-import { LinkProps } from 'react-router-dom';
+import React, { AnchorHTMLAttributes, ReactNode } from 'react';
 import Link from './Link';
 
 type Props = {
@@ -8,7 +7,7 @@ type Props = {
   className?: string;
   disabled?: boolean;
   to: string;
-} & Partial<LinkProps>;
+} & AnchorHTMLAttributes<HTMLAnchorElement>
 
 const ButtonLink = ({
   children,

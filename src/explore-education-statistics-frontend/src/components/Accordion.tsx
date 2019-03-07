@@ -1,6 +1,5 @@
-import GovUkAccordion from 'govuk-frontend/components/accordion/accordion';
+import { withRouter } from 'next/router';
 import React, { cloneElement, Component, createRef, ReactNode } from 'react';
-import { RouteComponentProps, withRouter } from 'react-router';
 import isComponentType from '../lib/type-guards/components/isComponentType';
 import AccordionSection, { AccordionSectionProps } from './AccordionSection';
 
@@ -9,27 +8,33 @@ export interface AccordionProps {
   id: string;
 }
 
-class Accordion extends Component<AccordionProps & RouteComponentProps> {
+class Accordion extends Component<AccordionProps> {
   private ref = createRef<HTMLDivElement>();
 
   public componentDidMount(): void {
     if (this.ref.current) {
-      new GovUkAccordion(this.ref.current).init();
+      import('govuk-frontend/components/accordion/accordion')
+        .then(({ default: GovUkAccordion }) => {
+          new GovUkAccordion(this.ref.current).init()
+        });
 
-      const { location } = this.props;
-
-      if (location && location.hash) {
-        const anchor = this.ref.current.querySelector(location.hash);
-
-        if (anchor) {
-          anchor.scrollIntoView();
-        }
-      }
+      // const { location } = this.props;
+      //
+      // if (location && location.hash) {
+      //   const anchor = this.ref.current.querySelector(location.hash);
+      //
+      //   if (anchor) {
+      //     anchor.scrollIntoView();
+      //   }
+      // }
     }
   }
 
   public render() {
-    const { id, location } = this.props;
+    // TODO: Extract location from router
+    const location: any = undefined;
+
+    const { id } = this.props;
 
     let sectionId = 0;
 

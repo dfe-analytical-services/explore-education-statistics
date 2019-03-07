@@ -20,7 +20,7 @@ class HomePage extends Component {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-three-quarters">
             <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-              <Link to="/find-statistics-and-data/">
+              <Link to="/statistics">
                 Find statistics and data
               </Link>
             </h2>
@@ -39,7 +39,7 @@ class HomePage extends Component {
               national and regional statistics and data.
             </p>
             <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-              <Link to="/find-statistics-and-data/">Download data files</Link>
+              <Link to="/statistics">Download data files</Link>
             </h2>
             <p className="govuk-caption-m govuk-!-margin-top-2">
               Browse to find and download the data files behind our range of

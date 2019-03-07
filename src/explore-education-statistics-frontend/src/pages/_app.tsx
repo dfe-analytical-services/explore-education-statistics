@@ -18,6 +18,10 @@ class App extends BaseApp {
     return { pageProps };
   }
 
+  public componentDidMount(): void {
+    document.body.classList.add('js-enabled');
+  }
+
   public render() {
     const { Component, pageProps } = this.props;
 

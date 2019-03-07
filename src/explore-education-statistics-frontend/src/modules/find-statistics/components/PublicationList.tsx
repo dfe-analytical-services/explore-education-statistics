@@ -48,8 +48,9 @@ class PublicationList extends Component<Props, State> {
                 <div className="govuk-grid-row">
                   <div className="govuk-grid-column-one-third">
                     <Link
-                      className="govuk-link govuk-!-margin-right-9 "
-                      to={`/find-statistics-and-data/${slug}`}
+                      className="govuk-link govuk-!-margin-right-9"
+                      to={`/statistics/publication?publication=${slug}`}
+                      as={`/statistics/${slug}`}
                     >
                       View statistics
                     </Link>

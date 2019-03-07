@@ -1,5 +1,4 @@
-@import '~govuk-frontend/components/tabs/tabs';
-@import '~govuk-frontend/helpers/all';
+@import '../styles/govuk-base';
 
 .panel {
   @include govuk-focusable;

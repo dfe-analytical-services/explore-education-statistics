@@ -28,8 +28,6 @@ class TopicList extends Component<Props, State> {
     contentApi
       .get(`theme/${theme}/topics`)
       .then(json => this.setState({ topics: json.data }))
-      // tslint:disable-next-line:no-console
-      .catch(error => console.log(error));
   }
 
   public render() {

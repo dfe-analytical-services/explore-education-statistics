@@ -32,6 +32,13 @@ async function startServer(port = 3000) {
     }
   });
 
+  server.get('/statistics/:publication/:release?', (req, res) => {
+    return app.render(req, res, '/statistics/publication', {
+      publication: req.params.publication,
+      release: req.params.release,
+    });
+  });
+
   server.get('*', (req, res) => handleRequest(req, res));
 
   server.listen(port, err => {

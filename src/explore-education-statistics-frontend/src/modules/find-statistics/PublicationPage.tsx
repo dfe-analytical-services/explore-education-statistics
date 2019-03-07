@@ -1,7 +1,7 @@
+import { NextContext } from 'next';
 import React, { Component } from 'react';
 import { Helmet } from 'react-helmet';
 import ReactMarkdown from 'react-markdown';
-import { match } from 'react-router';
 import Accordion from '../../components/Accordion';
 import AccordionSection from '../../components/AccordionSection';
 import Date from '../../components/Date';
@@ -12,15 +12,6 @@ import Tabs from '../../components/Tabs';
 import TabsSection from '../../components/TabsSection';
 import { baseUrl, contentApi } from '../../services/api';
 import ContentBlock from './components/ContentBlock';
-
-interface Props {
-  match: match<{
-    publication: string;
-    release: string;
-    theme: string;
-    topic: string;
-  }>;
-}
 
 interface LegacyRelease {
   id: string;
@@ -36,6 +27,7 @@ interface Release {
 
 interface ContentSection {
   caption: string;
+  content: any[];
   heading: string;
   order: number;
 }
@@ -44,6 +36,7 @@ interface KeyStatistic {
   title: string;
   description: string;
 }
+
 interface Publication {
   dataSource: string;
   nextUpdate: string;
@@ -52,7 +45,9 @@ interface Publication {
   slug: string;
 }
 
-interface State {
+interface Props {
+  publication: string;
+  release: string;
   data: {
     title: string;
     published: string;
@@ -61,61 +56,37 @@ interface State {
     publication: Publication;
     content: ContentSection[];
     keyStatistics: KeyStatistic[];
+    updates: {
+      on: string;
+      reason: string;
+    }[];
   };
 }
 
-class PublicationPage extends Component<Props, State> {
-  public state = {
-    data: {
-      content: [],
-      keyStatistics: [],
-      publication: {
-        dataSource: '',
-        legacyReleases: [
-          {
-            description: '',
-            id: '',
-            url: '',
-          },
-        ],
-        nextUpdate: '',
-        releases: [
-          {
-            id: '',
-            releaseName: '',
-            slug: '',
-          },
-        ],
-        slug: '',
-      },
-      published: '',
-      releaseName: '',
-      summary: '',
-      title: '',
-      updates: [
-        {
-          on: '',
-          reason: '',
-        },
-      ],
-    },
-  };
+class PublicationPage extends Component<Props> {
+  public static async getInitialProps({
+    query,
+  }: NextContext<{
+    publication: string;
+    release: string;
+  }>) {
+    const { publication, release } = query;
 
-  public componentDidMount() {
-    this.fetchData();
-  }
+    const url = release
+      ? `release/${release}`
+      : `publication/${publication}/latest`;
 
-  public componentDidUpdate(prevProps: Props) {
-    if (this.props.match.params !== prevProps.match.params) {
-      this.fetchData();
-    }
+    const { data } = await contentApi.get(url);
+
+    return {
+      data,
+      publication,
+      release,
+    };
   }
 
   public render() {
-    const { data } = this.state;
-    const { theme } = this.props.match.params;
-    const { topic } = this.props.match.params;
-    const { release } = this.props.match.params;
+    const { data, release } = this.props;
 
     const releaseCount =
       data.publication.releases.slice(1).length +
@@ -184,12 +155,12 @@ class PublicationPage extends Component<Props, State> {
                     className="govuk-list"
                     data-testid="publication-page--release-name-list"
                   >
-                    {data.publication.releases.slice(1).map((elem, index) => (
+                    {data.publication.releases.slice(1).map(elem => (
                       <li key={elem.id} data-testid="item-internal">
                         <Link
-                          to={`/find-statistics-and-data/${
-                            data.publication.slug
-                          }/${elem.slug}`}
+                          to={`/statistics/${data.publication.slug}/${
+                            elem.slug
+                          }`}
                         >
                           {elem.releaseName}
                         </Link>
@@ -215,7 +186,10 @@ class PublicationPage extends Component<Props, State> {
 
                 <Details summary={`See all ${data.updates.length} updates`}>
                   {data.updates.map(elem => (
-                    <div data-testid="publication-page--update-element">
+                    <div
+                      data-testid="publication-page--update-element"
+                      key={elem.on}
+                    >
                       <Date
                         className="govuk-body govuk-!-font-weight-bold"
                         value={elem.on}
@@ -242,7 +216,7 @@ class PublicationPage extends Component<Props, State> {
 
         <hr />
 
-        {data.keyStatistics.length > 0 ? (
+        {data.keyStatistics.length > 0 && (
           <>
             <h2 className="govuk-heading-l">
               {!release ? <>Latest headline </> : <>Headline </>}
@@ -252,7 +226,7 @@ class PublicationPage extends Component<Props, State> {
               <TabsSection id="summary" title="Summary">
                 <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">
                   {data.keyStatistics.map(({ title, description }) => (
-                    <div className="dfe-dash-tiles__tile">
+                    <div className="dfe-dash-tiles__tile" key={title}>
                       <h3 className="govuk-heading-m dfe-dash-tiles__heading">
                         {title}
                       </h3>
@@ -268,13 +242,12 @@ class PublicationPage extends Component<Props, State> {
               </TabsSection>
             </Tabs>
           </>
-        ) : (
-          <></>
         )}
 
-        {data.content.length > 0 ? (
+        {data.content.length > 0 && (
           <>
             <h2 className="govuk-heading-l">Contents</h2>
+
             <Accordion id="contents-sections">
               {data.content.map(({ heading, caption, order, content }) => (
                 <AccordionSection
@@ -287,8 +260,6 @@ class PublicationPage extends Component<Props, State> {
               ))}
             </Accordion>
           </>
-        ) : (
-          <></>
         )}
 
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
@@ -386,20 +357,6 @@ class PublicationPage extends Component<Props, State> {
         <GoToTopLink />
       </>
     );
-  }
-
-  private fetchData() {
-    const { publication } = this.props.match.params;
-    const { release } = this.props.match.params;
-
-    const url = release
-      ? `release/${release}`
-      : `publication/${publication}/latest`;
-
-    contentApi
-      .get(url)
-      .then(({ data }) => this.setState({ data }))
-      .catch(error => alert(error));
   }
 }
 
