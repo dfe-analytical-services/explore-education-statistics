@@ -1,9 +1,6 @@
 import React from 'react';
-// import Details from '../components/Details';
 import Link from '../components/Link';
 import PrototypePage from './components/PrototypePage';
-import PrototypeSearchForm from './components/PrototypeSearchForm';
-// import PrototypeTileWithChart from './components/PrototypeTileWithChart';
 
 const HomePage = () => {
   return (
@@ -16,17 +13,19 @@ const HomePage = () => {
         data you’re looking for.
       </p>
       <div className="govuk-grid-row">
-        <div className="govuk-grid-column-three-quarters">
+        <div className="govuk-grid-column-one-half">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="/prototypes/browse-releases-find">
-              Find statistics and data
+            <Link to="/prototypes/browse-releases">
+              Find statistics and download data files
             </Link>
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">
-            Browse to find statistical summaries and explanations to help you
+            Browse to find statistical summaries and download data to help you
             understand and analyse our range of national and regional statistics
             and data.
           </p>
+        </div>
+        <div className="govuk-grid-column-one-half">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
             <Link to="/prototypes/data-table-v3">
               Create your own charts and tables online
@@ -35,15 +34,6 @@ const HomePage = () => {
           <p className="govuk-caption-m govuk-!-margin-top-2">
             Use our tool to build charts and tables using our range of national
             and regional statistics and data.
-          </p>
-          <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="/prototypes/browse-releases-download">
-              Download data files
-            </Link>
-          </h2>
-          <p className="govuk-caption-m govuk-!-margin-top-2">
-            Browse to find and download the data files behind our range of
-            national and regional statistics for your own analysis.
           </p>
         </div>
       </div>

@@ -23,7 +23,15 @@ class App extends BaseApp {
   }
 
   public render() {
-    const { Component, pageProps } = this.props;
+    const { Component, pageProps, router } = this.props;
+
+    if (router.route.startsWith('/prototypes')) {
+      return (
+        <Container>
+          <Component {...pageProps} />
+        </Container>
+      );
+    }
 
     return (
       <Container>
@@ -38,9 +46,7 @@ class App extends BaseApp {
             id="main-content"
             role="main"
           >
-            <Container>
-              <Component {...pageProps} />
-            </Container>
+            <Component {...pageProps} />
           </main>
         </div>
 
