@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Debug;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -22,13 +23,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpGet("report")]
-        public ActionResult<DebugReport> GetReport()
+        public async Task<ActionResult<DebugReport>> GetReport()
         {
+            Task<int> geographicCount = _geographicDataService.Count();
+            Task<int> nationalCharacteristicCount = _nationalCharacteristicDataService.Count();
+            Task<int> laCharacteristicCount = _laCharacteristicDataService.Count();
+            
+            var counts = await Task.WhenAll(
+                geographicCount, nationalCharacteristicCount, laCharacteristicCount
+            );
+            
             return new DebugReport
             {
-                geographicCount = _geographicDataService.Count(),
-                nationalCharacteristicCount = _nationalCharacteristicDataService.Count(),
-                laCharacteristicCount = _laCharacteristicDataService.Count()
+                geographicCount = counts[0],
+                nationalCharacteristicCount = counts[1],
+                laCharacteristicCount = counts[2]
             };
         }
     }

@@ -2,19 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public abstract class AbstractDataService<TEntity> : IDataService<TEntity> where TEntity : class
     {
-        protected readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        protected AbstractDataService(ApplicationDbContext context)
+        private readonly ILogger _logger;
+        
+        protected AbstractDataService(ApplicationDbContext context, ILogger logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         private DbSet<TEntity> DbSet()
@@ -22,9 +27,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return _context.Set<TEntity>();
         }
 
-        public int Count()
+        public Task<int> Count()
         {
-            return DbSet().Count();
+            return DbSet().CountAsync();
         }
 
         public int Count(Expression<Func<TEntity, bool>> expression)
