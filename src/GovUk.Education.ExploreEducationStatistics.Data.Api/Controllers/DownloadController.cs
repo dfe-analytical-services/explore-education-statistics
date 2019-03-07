@@ -16,16 +16,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 case "pupil-absence-in-schools-in-england":
                     filename = "absence";
                     break;
-                case "permanent-and-fixed-period-exclusions": 
+                case "permanent-and-fixed-period-exclusions":
                     filename = "exclusion";
                     break;
-                case "schools-pupils-and-their-characteristics": 
+                case "schools-pupils-and-their-characteristics":
                     filename = "schpupnum";
                     break;
                 default:
                     return NotFound();
             }
-            
+
             const string contentType = "application/zip";
             HttpContext.Response.ContentType = contentType;
 
@@ -42,10 +42,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 {
                     FileDownloadName = $"{publication}.zip"
                 };
-                
+
                 return result;
             }
-            catch (DirectoryNotFoundException ex)
+            catch (DirectoryNotFoundException)
             {
                 return NotFound();
             }
