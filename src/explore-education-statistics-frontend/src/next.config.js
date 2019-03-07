@@ -1,8 +1,9 @@
-const compose = require('lodash/fp/compose');
-const withTypescript = require('@zeit/next-typescript');
+const withCss = require('@zeit/next-css');
 const cssLoaderConfig = require('@zeit/next-css/css-loader-config');
-const withSass = require('@zeit/next-sass');
+const withTypescript = require('@zeit/next-typescript');
+const DotEnvPlugin = require('dotenv-webpack');
 const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin');
+const compose = require('lodash/fp/compose');
 const withImages = require('next-images');
 const path = require('path');
 
@@ -46,27 +47,39 @@ const withFonts = createPlugin((config, options) => {
 const withSassModules = createPlugin((config, options) => {
   const { dev, isServer } = options;
 
-  const sassModuleLoader = cssLoaderConfig(config, {
-    extensions: ['scss', 'sass'],
-    cssModules: true,
-    dev,
-    isServer,
-    loaders: [
-      {
-        loader: 'sass-loader',
-        options: {},
-      },
-    ],
-  });
+  const sassLoader = useModules =>
+    cssLoaderConfig(config, {
+      extensions: ['scss', 'sass'],
+      cssModules: useModules,
+      dev,
+      isServer,
+      loaders: [
+        {
+          loader: 'sass-loader',
+          options: {},
+        },
+      ],
+      cssLoaderOptions: {},
+    });
 
   config.module.rules.push(
     {
       test: /\.module.scss$/,
-      use: sassModuleLoader,
+      use: sassLoader(true),
     },
     {
       test: /\.module.sass$/,
-      use: sassModuleLoader,
+      use: sassLoader(true),
+    },
+    {
+      test: /\.scss$/,
+      exclude: /\.module.scss$/,
+      use: sassLoader(false),
+    },
+    {
+      test: /\.sass$/,
+      exclude: /\.module.scss$/,
+      use: sassLoader(false),
     },
   );
 
@@ -85,6 +98,13 @@ const config = {
       );
     }
 
+    config.plugins.push(
+      new DotEnvPlugin({
+        path: path.resolve(__dirname, '../.env'),
+        safe: true,
+      }),
+    );
+
     config.resolve.alias.src = path.resolve(__dirname);
 
     return config;
@@ -94,7 +114,7 @@ const config = {
 module.exports = compose(
   withFonts,
   withImages,
-  withSass,
+  withCss,
   withSassModules,
   withTypescript,
 )(config);
