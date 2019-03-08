@@ -34,17 +34,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 
         private Expression<Func<GeographicData, bool>> RegionsExpression()
         {
-            return x => Regions == null || !Regions.Any() || Regions.Contains(x.Region.Code);
+            return x => Regions == null || !Regions.Any() || Regions.Contains(x.RegionCode);
         }
 
         private Expression<Func<GeographicData, bool>> LocalAuthoritiesExpression()
         {
-            return x => LocalAuthorities == null || !LocalAuthorities.Any() || Regions.Contains(x.LocalAuthority.Code);
+            return x => LocalAuthorities == null || !LocalAuthorities.Any() || LocalAuthorities.Contains(x.LocalAuthorityCode);
         }
 
         private Expression<Func<GeographicData, bool>> SchoolsExpression()
         {
-            return x => Schools == null || !Schools.Any() || Regions.Contains(x.School.LaEstab);
+            return x => Schools == null || !Schools.Any() || Schools.Contains(x.SchoolLaEstab);
         }
     }
 }

@@ -117,6 +117,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<School>(v));
+            
+            modelBuilder.Entity<GeographicData>()
+                .Property(data => data.SchoolLaEstab)
+                .HasComputedColumnSql("JSON_VALUE(School, '$.laestab')");
         }
 
         private static void ConfigureAttributes(ModelBuilder modelBuilder)
@@ -168,12 +172,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<LocalAuthority>(v));
+            
+            modelBuilder.Entity<GeographicData>()
+                .Property(data => data.LocalAuthorityCode)
+                .HasComputedColumnSql("JSON_VALUE(LocalAuthority, '$.new_la_code')");
 
             modelBuilder.Entity<CharacteristicDataLa>()
                 .Property(data => data.LocalAuthority)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<LocalAuthority>(v));
+            
+            modelBuilder.Entity<CharacteristicDataLa>()
+                .Property(data => data.LocalAuthorityCode)
+                .HasComputedColumnSql("JSON_VALUE(LocalAuthority, '$.new_la_code')");
         }
 
         private static void ConfigureRegion(ModelBuilder modelBuilder)
@@ -183,12 +195,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<Region>(v));
+            
+            modelBuilder.Entity<GeographicData>()
+                .Property(data => data.RegionCode)
+                .HasComputedColumnSql("JSON_VALUE(Region, '$.region_code')");
 
             modelBuilder.Entity<CharacteristicDataLa>()
                 .Property(data => data.Region)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<Region>(v));
+            
+            modelBuilder.Entity<CharacteristicDataLa>()
+                .Property(data => data.RegionCode)
+                .HasComputedColumnSql("JSON_VALUE(Region, '$.region_code')");
         }
 
         private static void ConfigureCharacteristic(ModelBuilder modelBuilder)
