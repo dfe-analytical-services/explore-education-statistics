@@ -112,11 +112,8 @@
   },
   "scripts": {
     "start": "node server.js",
-    "prebuild": "npm-run-all assets",
-    "build": "react-app-rewired build",
-    "build:test": "DEPLOY_ENV=test react-app-rewired build",
-    "build:stage": "DEPLOY_ENV=stage react-app-rewired build",
-    "build:live": "DEPLOY_ENV=live react-app-rewired build",
+    "prod": "cross-env NODE_ENV=production node server.js",
+    "build": "next build ./src",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,scss,html}'",
     "format:check": "prettier --list-different 'src/**/*.{js,jsx,ts,tsx,css,scss,html}'",
     "lint": "npm-run-all lint:js lint:style",
