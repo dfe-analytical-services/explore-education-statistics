@@ -1,10 +1,9 @@
 variables:
   BuildConfiguration: 'Release'
+  CI: true
 
-  #trigger: [ 'master' ]
-  #pr: [ 'master' ]
-  trigger: none
-  pr: none
+trigger: [ 'master' ]
+pr: [ 'master' ]
 
 jobs:
   - job: 'Backend'
