@@ -124,7 +124,8 @@
     "lint:js": "tslint --project tsconfig.json 'src/**/*.{ts,tsx}'",
     "lint:style": "stylelint 'src/**/*.{scss,css}'",
     "test": "jest",
-    "test:snapshot": "cross-env CI=true jest --updateSnapshot",
+    "test:watch": "jest --watch",
+    "test:snapshot": "jest --updateSnapshot",
     "type-check": "tsc --noEmit"
   },
   "husky": {
@@ -136,7 +137,7 @@
     "*.{ts,tsx}": [
       "node hooks/exec.js  'tsc --noEmit'",
       "tslint --project tsconfig.json",
-      "cross-env CI=true jest --findRelatedTests"
+      "jest --findRelatedTests"
     ],
     "*.{scss,css}": [
       "stylelint"
