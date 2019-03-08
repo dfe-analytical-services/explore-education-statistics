@@ -9,7 +9,7 @@
 			"name": "Meta",
 			"item": [
 				{
-					"name": "Pupil absence in schools in England",
+					"name": "Meta - Pupil absence in schools in England",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -44,7 +44,7 @@
 					"response": []
 				},
 				{
-					"name": "Permanent and fixed period exclusions",
+					"name": "Meta - Permanent and fixed period exclusions",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -79,7 +79,7 @@
 					"response": []
 				},
 				{
-					"name": "Schools, pupils and their characteristics",
+					"name": "Meta - Schools, pupils and their characteristics",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -153,7 +153,7 @@
 							"name": "National",
 							"item": [
 								{
-									"name": "Schools, pupils and their characteristics",
+									"name": "Geographic - National - Schools, pupils and their characteristics",
 									"request": {
 										"method": "POST",
 										"header": [
@@ -182,7 +182,7 @@
 									"response": []
 								},
 								{
-									"name": "Permanent and fixed period exclusions",
+									"name": "Geographic - National - Permanent and fixed period exclusions",
 									"request": {
 										"method": "POST",
 										"header": [
@@ -211,7 +211,7 @@
 									"response": []
 								},
 								{
-									"name": "Pupil absence in schools in England",
+									"name": "Geographic - National - Pupil absence in schools in England",
 									"request": {
 										"method": "POST",
 										"header": [
@@ -274,7 +274,7 @@
 							"name": "National",
 							"item": [
 								{
-									"name": "Pupil absence in schools in England",
+									"name": "Characteristics - National - Pupil absence in schools in England",
 									"event": [
 										{
 											"listen": "test",
@@ -316,7 +316,7 @@
 									"response": []
 								},
 								{
-									"name": "Permanent and fixed period exclusions",
+									"name": "Characteristics - National - Permanent and fixed period exclusions",
 									"request": {
 										"method": "POST",
 										"header": [
@@ -346,7 +346,7 @@
 									"response": []
 								},
 								{
-									"name": "Schools, pupils and their characteristics",
+									"name": "Characteristics - National - Schools, pupils and their characteristics",
 									"request": {
 										"method": "POST",
 										"header": [
@@ -405,7 +405,7 @@
 							"name": "Local Authority",
 							"item": [
 								{
-									"name": "Pupil absence in schools in England",
+									"name": "Characteristics - LA - Pupil absence in schools in England",
 									"request": {
 										"method": "POST",
 										"header": [
@@ -435,7 +435,7 @@
 									"response": []
 								},
 								{
-									"name": "Schools, pupils and their characteristics",
+									"name": "Characteristics - LA - Schools, pupils and their characteristics",
 									"request": {
 										"method": "POST",
 										"header": [
@@ -465,7 +465,7 @@
 									"response": []
 								},
 								{
-									"name": "Permanent and fixed period exclusions",
+									"name": "Characteristics - LA - Permanent and fixed period exclusions",
 									"request": {
 										"method": "POST",
 										"header": [
