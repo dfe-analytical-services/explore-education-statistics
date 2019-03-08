@@ -125,7 +125,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:snapshot": "jest --updateSnapshot",
-    "type-check": "tsc --noEmit"
+    "tsc": "tsc --noEmit"
   },
   "husky": {
     "hooks": {
@@ -197,8 +197,8 @@
       "node"
     ],
     "watchPlugins": [
-      "/home/nick/Development/Javascript/explore-education-statistics/src/explore-education-statistics-frontend/node_modules/jest-watch-typeahead/filename.js",
-      "/home/nick/Development/Javascript/explore-education-statistics/src/explore-education-statistics-frontend/node_modules/jest-watch-typeahead/testname.js"
+      "<rootDir>/node_modules/jest-watch-typeahead/filename.js",
+      "<rootDir>/node_modules/jest-watch-typeahead/testname.js"
     ],
     "resetMocks": true,
     "snapshotSerializers": [

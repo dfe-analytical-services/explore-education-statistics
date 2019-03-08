@@ -23,7 +23,8 @@
     "baseUrl": "."
   },
   "include": [
-    "src"
+    "src",
+    "test"
   ],
   "exclude": [
     "build",
