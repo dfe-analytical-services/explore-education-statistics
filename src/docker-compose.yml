@@ -44,15 +44,6 @@ services:
 #      - "8080:80" 
 #    depends_on:
 #      - mongo
-#  mongo:
-#    container_name: ees-mongo
-#    image: mongo
-#    restart: always
-#    ports:
-#      - "27017:27017"
-#    environment:
-#      MONGO_INITDB_ROOT_USERNAME: root
-#      MONGO_INITDB_ROOT_PASSWORD: example
   db:
     container_name: ees-mssql
     image: "mcr.microsoft.com/mssql/server"
