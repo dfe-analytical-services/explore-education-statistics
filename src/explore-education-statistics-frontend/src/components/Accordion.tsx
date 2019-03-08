@@ -1,4 +1,3 @@
-import { withRouter } from 'next/router';
 import React, { cloneElement, Component, createRef, ReactNode } from 'react';
 import isComponentType from '../lib/type-guards/components/isComponentType';
 import AccordionSection, { AccordionSectionProps } from './AccordionSection';
@@ -12,28 +11,26 @@ class Accordion extends Component<AccordionProps> {
   private ref = createRef<HTMLDivElement>();
 
   public componentDidMount(): void {
-    if (this.ref.current) {
-      import('govuk-frontend/components/accordion/accordion')
-        .then(({ default: GovUkAccordion }) => {
-          new GovUkAccordion(this.ref.current).init()
-        });
+    import('govuk-frontend/components/accordion/accordion').then(
+      ({ default: GovUkAccordion }) => {
+        if (this.ref.current) {
+          new GovUkAccordion(this.ref.current).init();
 
-      // const { location } = this.props;
-      //
-      // if (location && location.hash) {
-      //   const anchor = this.ref.current.querySelector(location.hash);
-      //
-      //   if (anchor) {
-      //     anchor.scrollIntoView();
-      //   }
-      // }
-    }
+          if (location.hash) {
+            const anchor = this.ref.current.querySelector(
+              location.hash,
+            ) as HTMLButtonElement;
+
+            if (anchor) {
+              anchor.scrollIntoView();
+            }
+          }
+        }
+      },
+    );
   }
 
   public render() {
-    // TODO: Extract location from router
-    const location: any = undefined;
-
     const { id } = this.props;
 
     let sectionId = 0;
@@ -47,13 +44,9 @@ class Accordion extends Component<AccordionProps> {
             const contentId = `${id}-content-${sectionId}`;
             const headingId = `${id}-heading-${sectionId}`;
 
-            let isLocationHashMatching = false;
-
-            if (location) {
-              isLocationHashMatching =
-                location.hash === `#${headingId}` ||
-                location.hash === `#${contentId}`;
-            }
+            const isLocationHashMatching =
+              location.hash === `#${headingId}` ||
+              location.hash === `#${contentId}`;
 
             return cloneElement<AccordionSectionProps>(child, {
               contentId,
@@ -69,4 +62,4 @@ class Accordion extends Component<AccordionProps> {
   }
 }
 
-export default withRouter(Accordion);
+export default Accordion;

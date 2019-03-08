@@ -9,3 +9,7 @@ const localStorageMock = {
 global.localStorage = localStorageMock;
 
 Element.prototype.scrollIntoView = jest.fn();
+
+afterEach(() => {
+  location.hash = '';
+});
