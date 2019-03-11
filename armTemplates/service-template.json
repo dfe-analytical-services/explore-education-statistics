@@ -38,11 +38,11 @@
     "dataAppName": "[concat('data-', parameters('webAppName'))]",
     "contentAppName": "[concat('content-', parameters('webAppName'))]",
     "adminAppName": "[concat('admin-', parameters('webAppName'))]",
-    "frontendAppName": "[concat('frontend-', parameters('webAppName'))]",
+    "publicAppName": "[concat('public-', parameters('webAppName'))]",
     "dataPlanName": "[concat('data-', parameters('hostingPlanName'))]",
     "contentPlanName": "[concat('content-', parameters('hostingPlanName'))]",
     "adminPlanName": "[concat('admin-', parameters('hostingPlanName'))]",
-    "frontendPlanName": "[concat('frontend-', parameters('hostingPlanName'))]",
+    "publicPlanName": "[concat('public-', parameters('hostingPlanName'))]",
     "importFunctionName": "[concat('data-', parameters('webAppName'))]",
     "sqlserverName": "[parameters('webAppName')]"
   },
@@ -322,11 +322,11 @@
     },
     {
       "type": "Microsoft.Web/sites",
-      "name": "[variables('frontendAppName')]",
+      "name": "[variables('publicAppName')]",
       "apiVersion": "2016-08-01",
       "location": "[resourceGroup().location]",
       "tags": {
-        "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('frontendPlanName'))]": "empty"
+        "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]": "empty"
       },
       "resources": [
         {
@@ -334,7 +334,7 @@
           "name": "Microsoft.ApplicationInsights.AzureWebSites",
           "apiVersion": "2015-08-01",
           "dependsOn": [
-            "[resourceId('Microsoft.Web/Sites', variables('frontendAppName'))]"
+            "[resourceId('Microsoft.Web/Sites', variables('publicAppName'))]"
           ],
           "properties": {}
         }
@@ -344,7 +344,7 @@
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', variables('frontendAppName')), '2015-05-01').InstrumentationKey]"
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('publicAppName')), '2015-05-01').InstrumentationKey]"
             },
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
@@ -353,13 +353,13 @@
           ],
           "phpVersion": "off"
         },
-        "name": "[variables('frontendAppName')]",
-        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('frontendPlanName'))]",
+        "name": "[variables('publicAppName')]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
         "hostingEnvironment": ""
       },
       "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', variables('frontendPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('frontendAppName'))]"
+        "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
+        "[resourceId('microsoft.insights/components/', variables('publicAppName'))]"
       ]
     },
     {
@@ -368,11 +368,11 @@
         "Tier": "[first(skip(split(parameters('sku'), ' '), 1))]",
         "Name": "[first(split(parameters('sku'), ' '))]"
       },
-      "name": "[variables('frontendPlanName')]",
+      "name": "[variables('publicPlanName')]",
       "apiVersion": "2015-08-01",
       "location": "[resourceGroup().location]",
       "properties": {
-        "name": "[variables('frontendPlanName')]",
+        "name": "[variables('publicPlanName')]",
         "workerSizeId": "0",
         "reserved": false,
         "numberOfWorkers": "1",
@@ -381,14 +381,14 @@
     },
     {
       "type": "Microsoft.Insights/components",
-      "name": "[variables('frontendAppName')]",
+      "name": "[variables('publicAppName')]",
       "apiVersion": "2014-04-01",
       "location": "[parameters('appInsightsLocation')]",
       "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('frontendAppName'))]": "Resource"
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('publicAppName'))]": "Resource"
       },
       "properties": {
-        "applicationId": "[variables('frontendAppName')]",
+        "applicationId": "[variables('publicAppName')]",
         "Request_Source": "AzureTfsExtensionAzureProject"
       }
     },
