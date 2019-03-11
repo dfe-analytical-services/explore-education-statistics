@@ -45,8 +45,9 @@ class Accordion extends Component<AccordionProps> {
             const headingId = `${id}-heading-${sectionId}`;
 
             const isLocationHashMatching =
-              location.hash === `#${headingId}` ||
-              location.hash === `#${contentId}`;
+              process.browser &&
+              (location.hash === `#${headingId}` ||
+                location.hash === `#${contentId}`);
 
             return cloneElement<AccordionSectionProps>(child, {
               contentId,
