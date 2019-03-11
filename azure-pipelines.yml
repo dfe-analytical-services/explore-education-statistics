@@ -80,19 +80,19 @@ jobs:
           verbose: false
           customCommand: 'run format:check'
 
-#  - job: 'Frontend_Build'
-#    dependsOn: 'Frontend_Test'
-#    pool:
-#      vmImage: 'ubuntu-16.04'
-#      demands: 'npm'
-#    steps:
-#    - task: 'Npm@1'
-#      displayName: 'npm ci'
-#      inputs:
-#        command: 'custom'
-#        workingDir: 'src/explore-education-statistics-frontend'
-#        verbose: false
-#        customCommand: 'ci'
+  - job: 'Frontend_Build'
+    dependsOn: 'Frontend_Test'
+    pool:
+      vmImage: 'ubuntu-16.04'
+      demands: 'npm'
+    steps:
+    - task: 'Npm@1'
+      displayName: 'npm ci'
+      inputs:
+        command: 'custom'
+        workingDir: 'src/explore-education-statistics-frontend'
+        verbose: false
+        customCommand: 'ci'
 #    - task: 'Npm@1'
 #      displayName: 'npm run build:test'
 #      inputs:
@@ -100,14 +100,14 @@ jobs:
 #        workingDir: 'src/explore-education-statistics-frontend'
 #        verbose: false
 #        customCommand: 'run build:test'
-#    - task: 'ArchiveFiles@2'
-#      displayName: 'Archive frontend - test'
-#      inputs:
-#        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend/src/.next'
-#        includeRootFolder: false
-#        archiveFile: '$(Build.ArtifactStagingDirectory)/explore-education-statistics-frontend-test.zip'
-#    - task: 'PublishPipelineArtifact@0'
-#      displayName: 'Publish Pipeline Artifact - test'
-#      inputs:
-#        artifactName: 'frontend-test'
-#        targetPath: '$(Build.ArtifactStagingDirectory)'
+    - task: 'ArchiveFiles@2'
+      displayName: 'Archive frontend'
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
+        includeRootFolder: false
+        archiveFile: '$(Build.ArtifactStagingDirectory)/explore-education-statistics-frontend.zip'
+    - task: 'PublishPipelineArtifact@0'
+      displayName: 'Publish Pipeline Artifact'
+      inputs:
+        artifactName: 'frontend'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
