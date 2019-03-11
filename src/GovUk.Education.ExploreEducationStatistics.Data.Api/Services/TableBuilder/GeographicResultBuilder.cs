@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
                 Country = data.Country,
                 Region = data.Region,
                 LocalAuthority = data.LocalAuthority,
-                School = data.School,
+                School = /*TODO DFE-163 data.School*/null,
                 Attributes = attributeFilter.Count > 0
                     ? QueryUtil.FilterAttributes(data.Attributes, attributeFilter)
                     : data.Attributes
