@@ -35,7 +35,7 @@ from pabot.pabot import main as pabot_run_cli
 import cProfile
 import pstats
 import scripts.keyword_profile as kp
-import scripts.warm_up_servers as warm_up_servers
+# import scripts.warm_up_servers as warm_up_servers
 
 arguments = []
 headless = True
@@ -49,9 +49,13 @@ interp = "pabot"
 env = "test"  # by default, run tests against test environment
 url = "about:blank"
 localUrl = "http://localhost:3000"
+localAdminUrl = ""
 testUrl = "https://educationstatisticstest.z6.web.core.windows.net"
+testAdminUrl= "https://admin-explore-education-statistics-test.azurewebsites.net"
 stageUrl = "https://educationstatisticsstage.z6.web.core.windows.net"
+stageAdminUrl = "https://admin-explore-education-statistics-stage.azurewebsites.net"
 prodUrl = "https://educationstatistics.z6.web.core.windows.net"
+prodAdminUrl = ""
 
 timeout = 10
 implicit_wait = 10
@@ -91,23 +95,27 @@ else:
 
 if env == 'local':
     url = localUrl
+    urlAdmin = localAdminUrl
 elif env == 'test':
     url = testUrl
+    urlAdmin = testAdminUrl
 elif env == 'stage' or env == "staging":
     url = stageUrl
+    urlAdmin = stageAdminUrl
 elif env == "prod" or env == "live":
     url = prodUrl
+    urlAdmin = prodAdminUrl
 else:
     raise Exception('Invalid environment \"' + env + '\"! Must be \"local\", \"test\", \"stage\", or \"prod\"!')
 
 arguments += ["-v", "url:" + url]
-
+arguments += ["-v", "urlAdmin:" + urlAdmin]
 arguments += ["-v", "browser:" + browser]
 
 arguments += [tests]
 
 # Wait until environment is warmed up
-warm_up_servers.wait_for_server(url)
+# warm_up_servers.wait_for_server(url)
 
 # Run tests
 if interp == "robot":

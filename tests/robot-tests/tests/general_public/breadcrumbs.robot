@@ -12,7 +12,7 @@ Validate Home page breadcrumbs
     css should match x times  css:[data-testid="breadcrumbs--list"] li   1
 
 Validate Theme page breadcrumbs
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     user clicks element  css:[data-testid="home-page--themes-link"]
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)  Themes
 
@@ -27,7 +27,7 @@ Validate Theme page breadcrumbs
     css should match x times  css:[data-testid="breadcrumbs--list"] li   2
 
 Validate Schools page breadcrumbs
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     user clicks element  css:[data-testid="content-item-list--schools"]
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Themes
@@ -48,7 +48,7 @@ Validate Schools page breadcrumbs
     user goes back
 
 Validate that Pupil Absence in Schools in England page breadcrumbs
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     user clicks element  css:[data-testid="content-item-list--absence-and-exclusions"]
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Themes
