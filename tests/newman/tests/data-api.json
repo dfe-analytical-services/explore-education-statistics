@@ -946,94 +946,292 @@
 							"name": "Local Authority",
 							"item": [
 								{
-									"name": "Characteristics - LA - Pupil absence in schools in England",
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+									"name": "All",
+									"item": [
+										{
+											"name": "Characteristics - LA - All - Pupil absence in schools in England",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"name": "Content-Type",
+														"type": "text",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+												},
+												"url": {
+													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"host": [
+														"{{start_url}}"
+													],
+													"path": [
+														"tablebuilder",
+														"characteristics",
+														"{{request_level}}"
+													]
+												}
+											},
+											"response": []
 										},
-										"url": {
-											"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
-											"host": [
-												"{{start_url}}"
-											],
-											"path": [
-												"tablebuilder",
-												"characteristics",
-												"{{request_level}}"
-											]
+										{
+											"name": "Characteristics - LA - All - Schools, pupils and their characteristics",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"name": "Content-Type",
+														"type": "text",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"headcount\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+												},
+												"url": {
+													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"host": [
+														"{{start_url}}"
+													],
+													"path": [
+														"tablebuilder",
+														"characteristics",
+														"{{request_level}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Characteristics - LA - All - Permanent and fixed period exclusions",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"name": "Content-Type",
+														"type": "text",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"perm_excl\",\n        \"fixed_excl\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+												},
+												"url": {
+													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"host": [
+														"{{start_url}}"
+													],
+													"path": [
+														"tablebuilder",
+														"characteristics",
+														"{{request_level}}"
+													]
+												}
+											},
+											"response": []
 										}
-									},
-									"response": []
+									],
+									"_postman_isSubFolder": true
 								},
 								{
-									"name": "Characteristics - LA - Schools, pupils and their characteristics",
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"headcount\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+									"name": "Region",
+									"item": [
+										{
+											"name": "Characteristics - LA - North East - Pupil absence in schools in England Copy",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"name": "Content-Type",
+														"type": "text",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"regions\": [\"E12000001\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+												},
+												"url": {
+													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"host": [
+														"{{start_url}}"
+													],
+													"path": [
+														"tablebuilder",
+														"characteristics",
+														"{{request_level}}"
+													]
+												}
+											},
+											"response": []
 										},
-										"url": {
-											"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
-											"host": [
-												"{{start_url}}"
-											],
-											"path": [
-												"tablebuilder",
-												"characteristics",
-												"{{request_level}}"
-											]
+										{
+											"name": "Characteristics - LA - North East - Schools, pupils and their characteristics",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"name": "Content-Type",
+														"type": "text",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"regions\": [\"E12000001\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+												},
+												"url": {
+													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"host": [
+														"{{start_url}}"
+													],
+													"path": [
+														"tablebuilder",
+														"characteristics",
+														"{{request_level}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Characteristics - LA - North East - Permanent and fixed period exclusions",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"name": "Content-Type",
+														"type": "text",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"regions\": [\"E12000001\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+												},
+												"url": {
+													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"host": [
+														"{{start_url}}"
+													],
+													"path": [
+														"tablebuilder",
+														"characteristics",
+														"{{request_level}}"
+													]
+												}
+											},
+											"response": []
 										}
-									},
-									"response": []
+									],
+									"_postman_isSubFolder": true
 								},
 								{
-									"name": "Characteristics - LA - Permanent and fixed period exclusions",
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"perm_excl\",\n        \"fixed_excl\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+									"name": "Local Authority",
+									"item": [
+										{
+											"name": "Characteristics - LA - Wandsworth - Pupil absence in schools in England",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"name": "Content-Type",
+														"type": "text",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+												},
+												"url": {
+													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"host": [
+														"{{start_url}}"
+													],
+													"path": [
+														"tablebuilder",
+														"characteristics",
+														"{{request_level}}"
+													]
+												}
+											},
+											"response": []
 										},
-										"url": {
-											"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
-											"host": [
-												"{{start_url}}"
-											],
-											"path": [
-												"tablebuilder",
-												"characteristics",
-												"{{request_level}}"
-											]
+										{
+											"name": "Characteristics - LA - Wandsworth - Schools, pupils and their characteristics",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"name": "Content-Type",
+														"type": "text",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+												},
+												"url": {
+													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"host": [
+														"{{start_url}}"
+													],
+													"path": [
+														"tablebuilder",
+														"characteristics",
+														"{{request_level}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Characteristics - LA - Wandsworth - Permanent and fixed period exclusions",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"name": "Content-Type",
+														"type": "text",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+												},
+												"url": {
+													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"host": [
+														"{{start_url}}"
+													],
+													"path": [
+														"tablebuilder",
+														"characteristics",
+														"{{request_level}}"
+													]
+												}
+											},
+											"response": []
 										}
-									},
-									"response": []
+									],
+									"_postman_isSubFolder": true
 								}
 							],
 							"event": [
