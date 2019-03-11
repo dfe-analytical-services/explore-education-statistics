@@ -96,19 +96,22 @@ const config = {
     if (isServer) {
       config.plugins.push(
         new ForkTsCheckerPlugin({
-          tsconfig: path.resolve(__dirname, '../tsconfig.json'),
+          tsconfig: path.resolve(__dirname, 'tsconfig.json'),
         }),
       );
     }
 
     config.plugins.push(
       new DotEnvPlugin({
-        path: path.resolve(__dirname, '../.env'),
+        path: path.resolve(
+          __dirname,
+          process.env.BUILD_ENV ? `.env.${process.env.BUILD_ENV}` : '.env',
+        ),
         safe: true,
       }),
     );
 
-    config.resolve.alias.src = path.resolve(__dirname);
+    config.resolve.alias.src = path.resolve(__dirname, 'src');
 
     return config;
   },

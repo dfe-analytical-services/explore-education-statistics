@@ -12,8 +12,12 @@ import {
 } from '../../services/tableBuilderService';
 import PrototypePage from '../components/PrototypePage';
 import CharacteristicsDataTable from './components/CharacteristicsDataTable';
-import CharacteristicsFilterForm, { CharacteristicsFilterFormSubmitHandler } from './components/CharacteristicsFilterForm';
-import PublicationMenu, { MenuChangeEventHandler } from './components/PublicationMenu';
+import CharacteristicsFilterForm, {
+  CharacteristicsFilterFormSubmitHandler,
+} from './components/CharacteristicsFilterForm';
+import PublicationMenu, {
+  MenuChangeEventHandler,
+} from './components/PublicationMenu';
 
 interface State {
   filters: {
