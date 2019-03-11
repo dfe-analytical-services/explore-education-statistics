@@ -103,7 +103,11 @@ const config = {
 
     config.plugins.push(
       new DotEnvPlugin({
-        path: path.resolve(__dirname, '../.env'),
+        path: path.resolve(
+          __dirname,
+          '../',
+          process.env.BUILD_ENV ? `.env.${process.env.BUILD_ENV}` : '.env',
+        ),
         safe: true,
       }),
     );
