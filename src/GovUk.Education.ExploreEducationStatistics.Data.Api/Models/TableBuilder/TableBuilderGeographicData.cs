@@ -8,6 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilde
     public class TableBuilderGeographicData : ITableBuilderGeographicData
     {
         public int Year { get; set; }
+        public string Term { get; set; }
         public Country Country { get; set; }
         public Region Region { get; set; }
         public LocalAuthority LocalAuthority { get; set; }

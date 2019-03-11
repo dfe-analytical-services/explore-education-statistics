@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilde
     public class TableBuilderCharacteristicData : ITableBuilderData
     {
         public int Year { get; set; }
-
+        public string Term { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public SchoolType SchoolType { get; set; }
 

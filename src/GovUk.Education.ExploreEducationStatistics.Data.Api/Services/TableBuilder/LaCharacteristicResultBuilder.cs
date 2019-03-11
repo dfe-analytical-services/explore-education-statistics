@@ -22,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             return new TableBuilderLaCharacteristicData
             {
                 Year = data.Year,
+                Term = data.Term,
                 Country = data.Country,
                 Region = data.Region,
                 LocalAuthority = data.LocalAuthority,

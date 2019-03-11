@@ -20,6 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             return new TableBuilderCharacteristicData
             {
                 Year = data.Year,
+                Term = data.Term,
                 SchoolType = data.SchoolType,
                 // TODO Label is not currently set in CharacteristicViewModel. Not sure if it needs to be?
                 // TODO If Label is not used then is CharacteristicViewModel needed?

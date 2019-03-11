@@ -11,6 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             return new TableBuilderGeographicData
             {
                 Year = data.Year,
+                Term = data.Term,
                 SchoolType = data.SchoolType,
                 Country = data.Country,
                 Region = data.Region,
