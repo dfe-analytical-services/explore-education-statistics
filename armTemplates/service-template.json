@@ -324,6 +324,7 @@
       "type": "Microsoft.Web/sites",
       "name": "[variables('publicAppName')]",
       "apiVersion": "2018-02-01",
+      "kind": "app",
       "location": "[resourceGroup().location]",
       "tags": {
         "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]": "empty"
@@ -370,7 +371,7 @@
         "Name": "[first(split(parameters('sku'), ' '))]"
       },
       "name": "[variables('publicPlanName')]",
-      "apiVersion": "2015-08-01",
+      "apiVersion": "2018-02-01",
       "location": "[resourceGroup().location]",
       "properties": {
         "name": "[variables('publicPlanName')]",
