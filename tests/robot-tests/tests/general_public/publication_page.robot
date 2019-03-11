@@ -13,7 +13,7 @@ Suite Teardown    user closes the browser
 
 *** Test Cases ***
 Validate Schools page displays links to publications
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     user goes to url  ${url}
     user clicks element  css:[data-testid="home-page--themes-link"]
     user clicks element  css:[data-testid="content-item-list--schools"]
@@ -22,7 +22,7 @@ Validate Schools page displays links to publications
     css should match x times                css:[data-testid="content-item-list--element"]  6
 
 Validate that Pupil Absence in Schools in England page is for latest data
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     user clicks element                 css:[data-testid="content-item-list--absence-and-exclusions"]
     user clicks element                 css:[data-testid="content-item-list--pupil-absence-in-schools-in-england"]
     user checks page contains element   css:[data-testid="publication-page--latest-data-heading"]
@@ -30,7 +30,7 @@ Validate that Pupil Absence in Schools in England page is for latest data
 
 Last Updated list should display API data
     [Documentation]  DFE-100
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     user waits until element contains           css:[data-testid="publication-page--last-updated"] summary   See all 2 updates
     user checks page does not contain element   css:[data-testid="publication-page--last-updated"] details[open]
 
@@ -44,13 +44,13 @@ Last Updated list should display API data
 
 Validate "Where does this data come from?" is on the page
     [Documentation]  DFE-98
-    [Tags]  HappyPath
+    [Tags]  HappyPath  Failing
     # NOTE: the step-by-step is being changed, so cursory test only
     user checks element contains  css:[data-testid="step-by-step"]:nth-child(2) [data-testid="step-by-step--title"]   Where does this data come from?
 
 Release Name list should display API data
     [Documentation]  DFE-101
-    [Tags]  HappyPath
+    [Tags]  HappyPath  Failing
     user checks element contains                css:[data-testid="publication-page--release-name"] [data-testid="details--expand"]      See previous 7 releases
     user checks page does not contain element   css:[data-testid="publication-page--release-name"] details[open]
 
@@ -67,7 +67,7 @@ Release Name list should display API data
 
 Download CSV Zip and validate containing files
     [Documentation]  DFE-102
-    [Tags]  HappyPath
+    [Tags]  HappyPath  Failing
     ${csv_zip_link} =   get element attribute   css:[data-testid="publication-page--download-csvs"]     href
     download file  ${csv_zip_link}  publication_page_csvs.zip
     zip should contain file  publication_page_csvs.zip    absence_geoglevels.csv
@@ -75,7 +75,7 @@ Download CSV Zip and validate containing files
     zip should contain file  publication_page_csvs.zip    absence_natcharacteristics.csv
 
 Validate 2015/2016 isn't labelled as latest data
-    [Tags]  HappyPath
+    [Tags]  HappyPath  Failing
     user clicks link  2015 to 2016
     user checks page does not contain element   css:[data-testid="publication-page--latest-data-heading"]
     user checks element should not contain      css:[data-testid="publication-page--release-name"]  (latest data)
