@@ -53,6 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 
             services.AddScoped<GeographicResultBuilder>();
             services.AddScoped<CharacteristicResultBuilder>();
+            services.AddScoped<LaCharacteristicResultBuilder>();
 
             services.AddTransient<ISeedService, SeedService>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();

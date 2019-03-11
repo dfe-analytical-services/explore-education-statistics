@@ -14,18 +14,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
         private readonly INationalCharacteristicDataService _nationalCharacteristicDataService;
         private readonly GeographicResultBuilder _geographicResultBuilder;
         private readonly CharacteristicResultBuilder _characteristicResultBuilder;
+        private readonly LaCharacteristicResultBuilder _laCharacteristicResultBuilder;
 
         public TableBuilderService(IGeographicDataService geographicDataService,
             ILaCharacteristicDataService laCharacteristicDataService,
             INationalCharacteristicDataService nationalCharacteristicDataService,
             GeographicResultBuilder geographicResultBuilder,
-            CharacteristicResultBuilder characteristicResultBuilder)
+            CharacteristicResultBuilder characteristicResultBuilder,
+            LaCharacteristicResultBuilder laCharacteristicResultBuilder)
         {
             _geographicDataService = geographicDataService;
             _laCharacteristicDataService = laCharacteristicDataService;
             _nationalCharacteristicDataService = nationalCharacteristicDataService;
             _geographicResultBuilder = geographicResultBuilder;
             _characteristicResultBuilder = characteristicResultBuilder;
+            _laCharacteristicResultBuilder = laCharacteristicResultBuilder;
         }
 
         public TableBuilderResult GetGeographic(GeographicQueryContext query)
@@ -41,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             return BuildResult(
                 _laCharacteristicDataService.FindMany(query.FindExpression()),
                 query.Attributes,
-                _characteristicResultBuilder);
+                _laCharacteristicResultBuilder);
         }
 
         public TableBuilderResult GetNational(NationalQueryContext query)
@@ -54,6 +57,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 
         private static TableBuilderResult BuildResult(IEnumerable<IGeographicData> data, ICollection<string> attributes,
             IResultBuilder<IGeographicData, ITableBuilderData> resultBuilder)
+        {
+            if (!data.Any())
+            {
+                return new TableBuilderResult();
+            }
+
+            var first = data.FirstOrDefault();
+            return new TableBuilderResult
+            {
+                PublicationId = first.PublicationId,
+                ReleaseId = first.ReleaseId,
+                ReleaseDate = first.ReleaseDate,
+                Level = first.Level,
+                Result = data.Select(tidyData => resultBuilder.BuildResult(tidyData, attributes))
+            };
+        }
+
+        private static TableBuilderResult BuildResult(IEnumerable<ICharacteristicGeographicData> data,
+            ICollection<string> attributes,
+            IResultBuilder<ICharacteristicGeographicData, ITableBuilderData> resultBuilder)
         {
             if (!data.Any())
             {

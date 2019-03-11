@@ -1,21 +1,23 @@
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder
 {
-    public class TableBuilderGeographicData : ITableBuilderGeographicData
+    public class TableBuilderLaCharacteristicData : ITableBuilderGeographicData
     {
         public int Year { get; set; }
+
         public Country Country { get; set; }
         public Region Region { get; set; }
         public LocalAuthority LocalAuthority { get; set; }
-        public School School { get; set; }
-
+        
         [JsonConverter(typeof(StringEnumConverter))]
         public SchoolType SchoolType { get; set; }
 
+        public CharacteristicViewModel Characteristic { get; set; }
         public Dictionary<string, string> Attributes { get; set; }
     }
 }
