@@ -161,9 +161,6 @@
       "!src/**/*.d.ts"
     ],
     "resolver": "jest-pnp-resolver",
-    "setupFiles": [
-      "react-app-polyfill/jsdom"
-    ],
     "setupTestFrameworkScriptFile": "<rootDir>/test/setupTests.js",
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
