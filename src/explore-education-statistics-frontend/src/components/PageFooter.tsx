@@ -18,17 +18,17 @@ const PageFooter = ({ wide }: Props) => (
           <h2 className="govuk-visually-hidden">Support links</h2>
           <ul className="govuk-footer__inline-list">
             <li className="govuk-footer__inline-list-item">
-              <Link className="govuk-footer__link" to="/cookies/">
+              <Link className="govuk-footer__link" to="/cookies">
                 Cookies
               </Link>
             </li>
             <li className="govuk-footer__inline-list-item">
-              <Link className="govuk-footer__link" to="/privacy-policy/">
+              <Link className="govuk-footer__link" to="/privacy-policy">
                 Privacy policy
               </Link>
             </li>
             <li className="govuk-footer__inline-list-item">
-              <Link className="govuk-footer__link" to="/prototypes/">
+              <Link className="govuk-footer__link" to="/prototypes">
                 Prototypes
               </Link>
             </li>

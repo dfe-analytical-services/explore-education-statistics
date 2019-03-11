@@ -1,15 +1,10 @@
 import React from 'react';
-import { MemoryRouter } from 'react-router';
 import { render } from 'react-testing-library';
 import Link from '../Link';
 
 describe('Link', () => {
   test('renders correctly without `unvisited` state', () => {
-    const { getByText } = render(
-      <MemoryRouter>
-        <Link to="/the-link">Test Link</Link>
-      </MemoryRouter>,
-    );
+    const { getByText } = render(<Link to="/the-link">Test Link</Link>);
 
     const link = getByText('Test Link') as HTMLLinkElement;
 
@@ -18,11 +13,9 @@ describe('Link', () => {
 
   test('renders correctly with `unvisited` state', () => {
     const { getByText } = render(
-      <MemoryRouter>
-        <Link to="/the-link" unvisited>
-          Test Link
-        </Link>
-      </MemoryRouter>,
+      <Link to="/the-link" unvisited>
+        Test Link
+      </Link>,
     );
 
     const link = getByText('Test Link');
@@ -31,11 +24,7 @@ describe('Link', () => {
   });
 
   test('anchor href is correct', () => {
-    const { getByText } = render(
-      <MemoryRouter>
-        <Link to="/the-link">Test Link</Link>
-      </MemoryRouter>,
-    );
+    const { getByText } = render(<Link to="/the-link">Test Link</Link>);
 
     const link = getByText('Test Link') as HTMLLinkElement;
 

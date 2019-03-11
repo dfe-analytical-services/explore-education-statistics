@@ -1,24 +1,28 @@
 import React from 'react';
-import { fireEvent, render } from 'react-testing-library';
+import { fireEvent, render, wait } from 'react-testing-library';
 import Details from '../Details';
 
 describe('Details', () => {
-  test('renders correctly', () => {
+  test('renders correctly', async () => {
     const { container } = render(
       <Details summary="Test summary" id="test-details">
         Test content
       </Details>,
     );
 
+    await wait();
+
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('renders correctly with `open` prop set to true', () => {
+  test('renders correctly with `open` prop set to true', async () => {
     const { getByText, container } = render(
       <Details summary="Test summary" id="test-details" open>
         Test content
       </Details>,
     );
+
+    await wait();
 
     expect(container.querySelector('[open]')).not.toBeNull();
 
@@ -31,12 +35,14 @@ describe('Details', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('clicking the summary reveals the content', () => {
+  test('clicking the summary reveals the content', async () => {
     const { container, getByText } = render(
       <Details summary="Test summary" id="test-details">
         Test content
       </Details>,
     );
+
+    await wait();
 
     const content = getByText('Test content');
     const summary = container.querySelector('summary') as HTMLElement;

@@ -1,14 +1,10 @@
-import React, { ComponentClass } from 'react';
-import { MemoryRouter } from 'react-router';
-import { fireEvent, render } from 'react-testing-library';
-import AccordionWithRouter, { AccordionProps } from '../Accordion';
+import React from 'react';
+import { fireEvent, render, wait } from 'react-testing-library';
+import Accordion from '../Accordion';
 import AccordionSection from '../AccordionSection';
 
-const Accordion: ComponentClass<AccordionProps> = (AccordionWithRouter as any)
-  .WrappedComponent;
-
 describe('Accordion', () => {
-  test('renders with hidden content by default', () => {
+  test('renders with hidden content by default', async () => {
     const { container } = render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading">
@@ -16,6 +12,8 @@ describe('Accordion', () => {
         </AccordionSection>
       </Accordion>,
     );
+
+    await wait();
 
     expect(
       container.querySelector('govuk-accordion__section--expanded'),
@@ -28,7 +26,7 @@ describe('Accordion', () => {
     expect(container).toMatchSnapshot();
   });
 
-  test('renders with visible content when `open` is true', () => {
+  test('renders with visible content when `open` is true', async () => {
     const { container } = render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading" open>
@@ -36,6 +34,8 @@ describe('Accordion', () => {
         </AccordionSection>
       </Accordion>,
     );
+
+    await wait();
 
     expect(
       container.querySelector('govuk-accordion__section--expanded'),
@@ -48,7 +48,7 @@ describe('Accordion', () => {
     expect(container).toMatchSnapshot();
   });
 
-  test('clicking heading makes the hidden content visible', () => {
+  test('clicking heading makes the hidden content visible', async () => {
     const { getByText } = render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading">
@@ -56,6 +56,8 @@ describe('Accordion', () => {
         </AccordionSection>
       </Accordion>,
     );
+
+    await wait();
 
     const heading = getByText('Test heading');
 
@@ -66,13 +68,15 @@ describe('Accordion', () => {
     expect(heading).toHaveAttribute('aria-expanded', 'true');
   });
 
-  test('generates section IDs in correct order', () => {
+  test('generates section IDs in correct order', async () => {
     const { getAllByText } = render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading">Test content</AccordionSection>
         <AccordionSection heading="Test heading">Test content</AccordionSection>
       </Accordion>,
     );
+
+    await wait();
 
     const headings = getAllByText('Test heading');
     const contents = getAllByText('Test content');
@@ -84,21 +88,21 @@ describe('Accordion', () => {
     expect(contents[1]).toHaveAttribute('id', 'test-sections-content-2');
   });
 
-  test('scrolls to and opens section if location hash matches section heading ID', () => {
+  test('scrolls to and opens section if location hash matches section heading ID', async () => {
+    location.hash = '#test-sections-heading-1';
+
     const { getByText } = render(
-      <MemoryRouter
-        initialEntries={[{ pathname: '/', hash: '#test-sections-heading-1' }]}
-      >
-        <AccordionWithRouter id="test-sections">
-          <AccordionSection heading="Test heading 1">
-            Test content 1
-          </AccordionSection>
-          <AccordionSection heading="Test heading 2">
-            Test content 2
-          </AccordionSection>
-        </AccordionWithRouter>
-      </MemoryRouter>,
+      <Accordion id="test-sections">
+        <AccordionSection heading="Test heading 1">
+          Test content 1
+        </AccordionSection>
+        <AccordionSection heading="Test heading 2">
+          Test content 2
+        </AccordionSection>
+      </Accordion>,
     );
+
+    await wait();
 
     const heading = getByText('Test heading 1');
 
@@ -106,21 +110,21 @@ describe('Accordion', () => {
     expect(heading.scrollIntoView).toHaveBeenCalled();
   });
 
-  test('scrolls to and opens section if location hash matches section content ID', () => {
+  test('scrolls to and opens section if location hash matches section content ID', async () => {
+    location.hash = '#test-sections-heading-1';
+
     const { container, getByText } = render(
-      <MemoryRouter
-        initialEntries={[{ pathname: '/', hash: '#test-sections-content-1' }]}
-      >
-        <AccordionWithRouter id="test-sections">
-          <AccordionSection heading="Test heading 1">
-            Test content 1
-          </AccordionSection>
-          <AccordionSection heading="Test heading 2">
-            Test content 2
-          </AccordionSection>
-        </AccordionWithRouter>
-      </MemoryRouter>,
+      <Accordion id="test-sections">
+        <AccordionSection heading="Test heading 1">
+          Test content 1
+        </AccordionSection>
+        <AccordionSection heading="Test heading 2">
+          Test content 2
+        </AccordionSection>
+      </Accordion>,
     );
+
+    await wait();
 
     expect(getByText('Test heading 1')).toHaveAttribute(
       'aria-expanded',

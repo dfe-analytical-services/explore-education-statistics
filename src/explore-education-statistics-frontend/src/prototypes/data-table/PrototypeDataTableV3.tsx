@@ -1,4 +1,4 @@
-import { range } from 'lodash-es';
+import range from 'lodash/range';
 import React, { Component, createRef } from 'react';
 import PageHeading from '../../components/PageHeading';
 import Tabs from '../../components/Tabs';
@@ -12,12 +12,8 @@ import {
 } from '../../services/tableBuilderService';
 import PrototypePage from '../components/PrototypePage';
 import CharacteristicsDataTable from './components/CharacteristicsDataTable';
-import CharacteristicsFilterForm, {
-  CharacteristicsFilterFormSubmitHandler,
-} from './components/CharacteristicsFilterForm';
-import PublicationMenu, {
-  MenuChangeEventHandler,
-} from './components/PublicationMenu';
+import CharacteristicsFilterForm, { CharacteristicsFilterFormSubmitHandler } from './components/CharacteristicsFilterForm';
+import PublicationMenu, { MenuChangeEventHandler } from './components/PublicationMenu';
 
 interface State {
   filters: {

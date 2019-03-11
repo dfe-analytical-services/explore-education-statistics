@@ -1,4 +1,3 @@
-import GovUkDetails from 'govuk-frontend/components/details/details';
 import React, { Component, createRef, ReactNode } from 'react';
 import styles from './MenuDetails.module.scss';
 
@@ -13,7 +12,13 @@ class MenuDetails extends Component<Props> {
   private ref = createRef<HTMLDetailsElement>();
 
   public componentDidMount(): void {
-    new GovUkDetails(this.ref.current).init();
+    if (this.ref.current) {
+      import('govuk-frontend/components/details/details').then(
+        ({ default: GovUkDetails }) => {
+          new GovUkDetails(this.ref.current).init();
+        },
+      );
+    }
   }
 
   public render() {

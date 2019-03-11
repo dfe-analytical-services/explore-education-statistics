@@ -1,4 +1,3 @@
-import GovUkErrorSummary from 'govuk-frontend/components/error-summary/error-summary';
 import React, { Component, createRef } from 'react';
 
 export interface ErrorSummaryMessage {
@@ -20,7 +19,13 @@ class ErrorSummary extends Component<Props> {
   private ref = createRef<HTMLDivElement>();
 
   public componentDidMount(): void {
-    new GovUkErrorSummary(this.ref.current).init();
+    if (this.ref.current) {
+      import('govuk-frontend/components/error-summary/error-summary').then(
+        ({ default: GovUkErrorSummary }) => {
+          new GovUkErrorSummary(this.ref.current).init();
+        },
+      );
+    }
   }
 
   public render() {
