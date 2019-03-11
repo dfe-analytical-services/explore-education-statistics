@@ -55,8 +55,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
                 _characteristicResultBuilder);
         }
 
-        private static TableBuilderResult BuildResult(IEnumerable<IGeographicData> data, ICollection<string> attributes,
-            IResultBuilder<IGeographicData, ITableBuilderData> resultBuilder)
+        private static TableBuilderResult BuildResult(IEnumerable<IGeographicSchoolData> data,
+            ICollection<string> attributes,
+            IResultBuilder<IGeographicSchoolData, ITableBuilderData> resultBuilder)
         {
             if (!data.Any())
             {

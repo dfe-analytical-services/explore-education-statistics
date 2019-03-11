@@ -672,7 +672,7 @@
 							"name": "School",
 							"item": [
 								{
-									"name": "Geographic - School - 2122000 - Schools, pupils and their characteristics",
+									"name": "Geographic - School - 2022000 - Schools, pupils and their characteristics",
 									"request": {
 										"method": "POST",
 										"header": [
@@ -685,7 +685,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"schools\": [\"2122000\"],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"enrolments\",\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"schools\": [\"2022000\"],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{start_url}}/tablebuilder/geographic",
@@ -701,7 +701,7 @@
 									"response": []
 								},
 								{
-									"name": "Geographic - School - 2122000 - Permanent and fixed period exclusions",
+									"name": "Geographic - School - 2022000 - Permanent and fixed period exclusions",
 									"request": {
 										"method": "POST",
 										"header": [
@@ -714,7 +714,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schools\": [\"2122000\"],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schools\": [\"2022000\"],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{start_url}}/tablebuilder/geographic",
@@ -730,7 +730,7 @@
 									"response": []
 								},
 								{
-									"name": "Geographic - School - 2122000 - Pupil absence in schools in England",
+									"name": "Geographic - School - 2022000 - Pupil absence in schools in England",
 									"request": {
 										"method": "POST",
 										"header": [
@@ -743,7 +743,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schools\": [\"2122000\"],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schools\": [\"2022000\"],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"enrolments\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{start_url}}/tablebuilder/geographic",
