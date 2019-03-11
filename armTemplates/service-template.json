@@ -351,7 +351,8 @@
               "value": "10.15.1"
             }
           ],
-          "linuxFxVersion": "node|10.15.1",
+          "linuxFxVersion": "node|10.10",
+          "nodeVersion": "10.15.1",
           "phpVersion": "off"
         },
         "name": "[variables('publicAppName')]",
