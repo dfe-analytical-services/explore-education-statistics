@@ -323,7 +323,7 @@
     {
       "type": "Microsoft.Web/sites",
       "name": "[variables('publicAppName')]",
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2018-02-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]": "empty"
@@ -352,7 +352,6 @@
             }
           ],
           "linuxFxVersion": "node|10.10",
-          "nodeVersion": "10.15.1",
           "phpVersion": "off"
         },
         "name": "[variables('publicAppName')]",
