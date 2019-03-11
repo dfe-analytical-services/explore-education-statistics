@@ -351,6 +351,7 @@
               "value": "10.15.1"
             }
           ],
+          "linuxFxVersion": "node|10.15.1",
           "phpVersion": "off"
         },
         "name": "[variables('publicAppName')]",
@@ -377,7 +378,8 @@
         "reserved": false,
         "numberOfWorkers": "1",
         "hostingEnvironment": ""
-      }
+      },
+      "kind": "linux"
     },
     {
       "type": "Microsoft.Insights/components",
