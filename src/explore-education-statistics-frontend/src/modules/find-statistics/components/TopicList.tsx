@@ -27,7 +27,7 @@ class TopicList extends Component<Props, State> {
 
     contentApi
       .get(`theme/${theme}/topics`)
-      .then(json => this.setState({ topics: json.data }))
+      .then(json => this.setState({ topics: json.data }));
   }
 
   public render() {

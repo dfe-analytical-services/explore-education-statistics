@@ -31,5 +31,4 @@ class ContentBlock extends Component<Props> {
   }
 }
 
-
 export default ContentBlock;

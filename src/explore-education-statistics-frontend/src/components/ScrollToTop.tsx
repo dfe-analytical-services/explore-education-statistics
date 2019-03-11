@@ -2,7 +2,7 @@ import { SingletonRouter, withRouter } from 'next/router';
 import React, { Component } from 'react';
 
 interface Props {
-  router: SingletonRouter
+  router: SingletonRouter;
 }
 
 class ScrollToTop extends Component<Props> {

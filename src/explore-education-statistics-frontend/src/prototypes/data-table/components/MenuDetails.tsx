@@ -13,10 +13,11 @@ class MenuDetails extends Component<Props> {
 
   public componentDidMount(): void {
     if (this.ref.current) {
-      import('govuk-frontend/components/details/details')
-        .then(({ default: GovUkDetails }) => {
-          new GovUkDetails(this.ref.current).init()
-        });
+      import('govuk-frontend/components/details/details').then(
+        ({ default: GovUkDetails }) => {
+          new GovUkDetails(this.ref.current).init();
+        },
+      );
     }
   }
 

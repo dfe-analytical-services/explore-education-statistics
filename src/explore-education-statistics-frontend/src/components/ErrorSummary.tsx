@@ -20,10 +20,11 @@ class ErrorSummary extends Component<Props> {
 
   public componentDidMount(): void {
     if (this.ref.current) {
-      import('govuk-frontend/components/error-summary/error-summary')
-        .then(({ default: GovUkErrorSummary }) => {
-          new GovUkErrorSummary(this.ref.current).init()
-        });
+      import('govuk-frontend/components/error-summary/error-summary').then(
+        ({ default: GovUkErrorSummary }) => {
+          new GovUkErrorSummary(this.ref.current).init();
+        },
+      );
     }
   }
 
