@@ -12,11 +12,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         {
             return x => x.PublicationId == publicationId;
         }
-        
+
         public static Expression<Func<T, bool>> LevelExpression<T>(Level level)
             where T : ITidyData
         {
             return x => x.Level == level;
+        }
+
+        public static Expression<Func<T, bool>> RegionsExpression<T>(IEnumerable<string> regions)
+            where T : IGeographicData
+        {
+            return x => regions == null || !regions.Any() || regions.Contains(x.RegionCode);
+        }
+
+        public static Expression<Func<T, bool>> LocalAuthoritiesExpression<T>(IEnumerable<string> localAuthorities)
+            where T : IGeographicData
+        {
+            return x => localAuthorities == null || !localAuthorities.Any() ||
+                        localAuthorities.Contains(x.LocalAuthorityCode);
         }
 
         public static Expression<Func<T, bool>> SchoolTypeExpression<T>(IEnumerable<SchoolType> schoolTypes)

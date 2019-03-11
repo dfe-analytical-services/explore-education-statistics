@@ -9,7 +9,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
         LocalAuthority LocalAuthority { get; set; }
         
         string LocalAuthorityCode { get; set; }
-        
-        School School { get; set; }
     }
 }

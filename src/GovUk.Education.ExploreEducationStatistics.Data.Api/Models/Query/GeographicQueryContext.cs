@@ -27,19 +27,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
                 .And(QueryContextUtil.SchoolTypeExpression<GeographicData>(SchoolTypes))
                 .And(QueryContextUtil.YearExpression<GeographicData>(
                     QueryUtil.YearsQuery(Years, StartYear, EndYear)))
-                .And(RegionsExpression())
-                .And(LocalAuthoritiesExpression())
+                .And(QueryContextUtil.RegionsExpression<GeographicData>(Regions))
+                .And(QueryContextUtil.LocalAuthoritiesExpression<GeographicData>(LocalAuthorities))
                 .And(SchoolsExpression());
-        }
-
-        private Expression<Func<GeographicData, bool>> RegionsExpression()
-        {
-            return x => Regions == null || !Regions.Any() || Regions.Contains(x.RegionCode);
-        }
-
-        private Expression<Func<GeographicData, bool>> LocalAuthoritiesExpression()
-        {
-            return x => LocalAuthorities == null || !LocalAuthorities.Any() || LocalAuthorities.Contains(x.LocalAuthorityCode);
         }
 
         private Expression<Func<GeographicData, bool>> SchoolsExpression()

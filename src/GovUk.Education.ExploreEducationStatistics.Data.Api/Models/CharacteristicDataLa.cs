@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
-    public class CharacteristicDataLa : CharacteristicData
+    public class CharacteristicDataLa : CharacteristicData, IGeographicData
     {
         public CharacteristicDataLa()
         {
@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
         public string RegionCode { get; set; }
 
         public LocalAuthority LocalAuthority { get; set; }
-        
+
         public string LocalAuthorityCode { get; set; }
     }
 }

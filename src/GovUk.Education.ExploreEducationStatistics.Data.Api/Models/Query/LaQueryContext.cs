@@ -10,6 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public Guid PublicationId { get; set; }
         public ICollection<SchoolType> SchoolTypes { get; set; }
         public ICollection<int> Years { get; set; }
+        public ICollection<string> Regions { get; set; }
+        public ICollection<string> LocalAuthorities { get; set; }
         public int StartYear { get; set; }
         public int EndYear { get; set; }
         public ICollection<string> Attributes { get; set; }
@@ -23,6 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
                 .And(QueryContextUtil.SchoolTypeExpression<CharacteristicDataLa>(SchoolTypes))
                 .And(QueryContextUtil.YearExpression<CharacteristicDataLa>(
                     QueryUtil.YearsQuery(Years, StartYear, EndYear)))
+                .And(QueryContextUtil.RegionsExpression<CharacteristicDataLa>(Regions))
+                .And(QueryContextUtil.LocalAuthoritiesExpression<CharacteristicDataLa>(LocalAuthorities))
                 .And(QueryContextUtil.CharacteristicsQuery<CharacteristicDataLa>(Characteristics));
         }
     }
