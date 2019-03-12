@@ -323,7 +323,8 @@
     {
       "type": "Microsoft.Web/sites",
       "name": "[variables('publicAppName')]",
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2018-02-01",
+      "kind": "app",
       "location": "[resourceGroup().location]",
       "tags": {
         "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]": "empty"
@@ -351,6 +352,7 @@
               "value": "10.15.1"
             }
           ],
+          "linuxFxVersion": "node|10.10",
           "phpVersion": "off"
         },
         "name": "[variables('publicAppName')]",
@@ -365,11 +367,10 @@
     {
       "type": "Microsoft.Web/serverfarms",
       "sku": {
-        "Tier": "[first(skip(split(parameters('sku'), ' '), 1))]",
-        "Name": "[first(split(parameters('sku'), ' '))]"
+        "name": "B1"
       },
       "name": "[variables('publicPlanName')]",
-      "apiVersion": "2015-08-01",
+      "apiVersion": "2018-02-01",
       "location": "[resourceGroup().location]",
       "properties": {
         "name": "[variables('publicPlanName')]",
@@ -377,7 +378,8 @@
         "reserved": false,
         "numberOfWorkers": "1",
         "hostingEnvironment": ""
-      }
+      },
+      "kind": "linux"
     },
     {
       "type": "Microsoft.Insights/components",
