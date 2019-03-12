@@ -9,11 +9,11 @@ exports[`Tabs renders multiple tabs correctly 1`] = `
     <li class="govuk-tabs__list-item"
         role="presentation"
     >
-      <a aria-controls="section-1"
-         aria-selected="true"
-         class="govuk-tabs__tab govuk-tabs__tab--selected"
+      <a class="govuk-tabs__tab govuk-tabs__tab--selected"
          href="#section-1"
          id="section-1-tab"
+         aria-controls="section-1"
+         aria-selected="true"
          role="tab"
       >
         Tab 1
@@ -22,21 +22,21 @@ exports[`Tabs renders multiple tabs correctly 1`] = `
     <li class="govuk-tabs__list-item"
         role="presentation"
     >
-      <a aria-controls="section-2"
-         aria-selected="false"
-         class="govuk-tabs__tab"
+      <a class="govuk-tabs__tab"
          href="#section-2"
          id="section-2-tab"
-         role="tab"
          tabindex="-1"
+         aria-controls="section-2"
+         aria-selected="false"
+         role="tab"
       >
         Tab 2
       </a>
     </li>
   </ul>
-  <section aria-labelledby="section-1-tab"
-           class="govuk-tabs__panel panel"
+  <section class="govuk-tabs__panel panel"
            id="section-1"
+           aria-labelledby="section-1-tab"
            role="tabpanel"
            tabindex="-1"
   >
@@ -44,10 +44,10 @@ exports[`Tabs renders multiple tabs correctly 1`] = `
       Test section 1 content
     </p>
   </section>
-  <section aria-labelledby="section-2-tab"
-           class="govuk-tabs__panel panel govuk-tabs__panel--hidden"
+  <section class="govuk-tabs__panel panel govuk-tabs__panel--hidden"
            id="section-2"
            hidden
+           aria-labelledby="section-2-tab"
            role="tabpanel"
            tabindex="-1"
   >
@@ -68,20 +68,20 @@ exports[`Tabs renders single tab correctly 1`] = `
     <li class="govuk-tabs__list-item"
         role="presentation"
     >
-      <a aria-controls="section-1"
-         aria-selected="true"
-         class="govuk-tabs__tab govuk-tabs__tab--selected"
+      <a class="govuk-tabs__tab govuk-tabs__tab--selected"
          href="#section-1"
          id="section-1-tab"
+         aria-controls="section-1"
+         aria-selected="true"
          role="tab"
       >
         Tab 1
       </a>
     </li>
   </ul>
-  <section aria-labelledby="section-1-tab"
-           class="govuk-tabs__panel panel"
+  <section class="govuk-tabs__panel panel"
            id="section-1"
+           aria-labelledby="section-1-tab"
            role="tabpanel"
            tabindex="-1"
   >

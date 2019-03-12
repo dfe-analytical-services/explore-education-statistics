@@ -1,147 +1,130 @@
 import classNames from 'classnames';
 import React, {
   cloneElement,
-  Component,
   HTMLAttributes,
   ReactElement,
   ReactNode,
   RefAttributes,
+  useState,
 } from 'react';
+import useRendered from '../hooks/useRendered';
 import isComponentType from '../lib/type-guards/components/isComponentType';
 import TabsSection, { TabsSectionProps } from './TabsSection';
+
+function filterSections(children: ReactNode): ReactElement<TabsSectionProps>[] {
+  if (Array.isArray(children)) {
+    return children.filter(child =>
+      isComponentType(child, TabsSection),
+    ) as ReactElement<TabsSectionProps>[];
+  }
+
+  if (isComponentType(children, TabsSection)) {
+    return [children];
+  }
+
+  return [];
+}
 
 interface Props {
   children: ReactNode;
 }
 
-interface State {
-  loadedSections: Set<number>;
-  selectedTabIndex: number;
-}
+const Tabs = ({ children }: Props) => {
+  const [loadedSections, setLoadedSections] = useState(new Set<number>());
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
-class Tabs extends Component<Props, State> {
-  public state = {
-    loadedSections: new Set<number>(),
-    selectedTabIndex: 0,
+  const { onRendered } = useRendered();
+
+  const tabElements: HTMLAnchorElement[] = [];
+  const sectionElements: HTMLElement[] = [];
+
+  const setSelectedTab = (index: number) => {
+    setLoadedSections(loadedSections.add(index));
+    setSelectedTabIndex(index);
   };
 
-  private tabElements: HTMLAnchorElement[] = [];
-  private sectionElements: HTMLElement[] = [];
+  const sections = filterSections(children);
 
-  private setSelectedTab(index: number) {
-    this.setState({
-      loadedSections: this.state.loadedSections.add(index),
-      selectedTabIndex: index,
-    });
-  }
+  return (
+    <div className="govuk-tabs">
+      <ul className="govuk-tabs__list" role="tablist">
+        {sections.map(({ props }, index) => (
+          <li
+            className="govuk-tabs__list-item"
+            key={props.id}
+            role="presentation"
+          >
+            <a
+              aria-controls={onRendered(props.id)}
+              aria-selected={onRendered(selectedTabIndex === index)}
+              className={classNames('govuk-tabs__tab', {
+                'govuk-tabs__tab--selected': selectedTabIndex === index,
+              })}
+              href={`#${props.id}`}
+              id={`${props.id}-tab`}
+              ref={(element: HTMLAnchorElement) => tabElements.push(element)}
+              role={onRendered('tab')}
+              onClick={event => {
+                event.preventDefault();
+                setSelectedTab(index);
+              }}
+              onKeyDown={event => {
+                switch (event.key) {
+                  case 'ArrowLeft': {
+                    const nextTabIndex =
+                      selectedTabIndex > 0
+                        ? selectedTabIndex - 1
+                        : sections.length - 1;
 
-  public render() {
-    const { children } = this.props;
-    const { selectedTabIndex } = this.state;
+                    setSelectedTab(nextTabIndex);
+                    tabElements[nextTabIndex].focus();
 
-    const sections = this.filterSections(children);
-
-    return (
-      <div className="govuk-tabs">
-        <ul className="govuk-tabs__list" role="tablist">
-          {sections.map(({ props }, index) => (
-            <li
-              className="govuk-tabs__list-item"
-              key={props.id}
-              role="presentation"
-            >
-              <a
-                aria-controls={props.id}
-                aria-selected={selectedTabIndex === index}
-                className={classNames('govuk-tabs__tab', {
-                  'govuk-tabs__tab--selected': selectedTabIndex === index,
-                })}
-                href={`#${props.id}`}
-                id={`${props.id}-tab`}
-                ref={(element: HTMLAnchorElement) =>
-                  this.tabElements.push(element)
-                }
-                role="tab"
-                onClick={event => {
-                  event.preventDefault();
-                  this.setSelectedTab(index);
-                }}
-                onKeyDown={event => {
-                  switch (event.key) {
-                    case 'ArrowLeft': {
-                      const nextTabIndex =
-                        selectedTabIndex > 0
-                          ? selectedTabIndex - 1
-                          : sections.length - 1;
-
-                      this.setSelectedTab(nextTabIndex);
-                      this.tabElements[nextTabIndex].focus();
-
-                      break;
-                    }
-                    case 'ArrowRight': {
-                      const nextTabIndex =
-                        selectedTabIndex < sections.length - 1
-                          ? selectedTabIndex + 1
-                          : 0;
-
-                      this.setSelectedTab(nextTabIndex);
-                      this.tabElements[nextTabIndex].focus();
-
-                      break;
-                    }
-                    case 'ArrowDown':
-                      this.sectionElements[selectedTabIndex].focus();
-                      break;
+                    break;
                   }
-                }}
-                tabIndex={selectedTabIndex !== index ? -1 : undefined}
-              >
-                {props.title}
-              </a>
-            </li>
-          ))}
-        </ul>
+                  case 'ArrowRight': {
+                    const nextTabIndex =
+                      selectedTabIndex < sections.length - 1
+                        ? selectedTabIndex + 1
+                        : 0;
 
-        {sections.map((section, index) => {
-          const { id, lazy } = section.props;
+                    setSelectedTab(nextTabIndex);
+                    tabElements[nextTabIndex].focus();
 
-          return cloneElement<
-            TabsSectionProps &
-              HTMLAttributes<HTMLElement> &
-              RefAttributes<HTMLElement>
-          >(
-            section,
-            {
-              'aria-labelledby': `${id}-tab`,
-              hidden: selectedTabIndex !== index,
-              key: id,
-              ref: (element: HTMLElement) => this.sectionElements.push(element),
-            },
-            lazy && !this.state.loadedSections.has(index)
-              ? null
-              : section.props.children,
-          );
-        })}
-      </div>
-    );
-  }
+                    break;
+                  }
+                  case 'ArrowDown':
+                    sectionElements[selectedTabIndex].focus();
+                    break;
+                }
+              }}
+              tabIndex={selectedTabIndex !== index ? -1 : undefined}
+            >
+              {props.title}
+            </a>
+          </li>
+        ))}
+      </ul>
 
-  private filterSections(
-    children: ReactNode,
-  ): ReactElement<TabsSectionProps>[] {
-    if (Array.isArray(children)) {
-      return children.filter(child =>
-        isComponentType(child, TabsSection),
-      ) as ReactElement<TabsSectionProps>[];
-    }
+      {sections.map((section, index) => {
+        const { id, lazy } = section.props;
 
-    if (isComponentType(children, TabsSection)) {
-      return [children];
-    }
-
-    return [];
-  }
-}
+        return cloneElement<
+          TabsSectionProps &
+            HTMLAttributes<HTMLElement> &
+            RefAttributes<HTMLElement>
+        >(
+          section,
+          {
+            'aria-labelledby': `${id}-tab`,
+            hidden: selectedTabIndex !== index,
+            key: id,
+            ref: (element: HTMLElement) => sectionElements.push(element),
+          },
+          lazy && !loadedSections.has(index) ? null : section.props.children,
+        );
+      })}
+    </div>
+  );
+};
 
 export default Tabs;

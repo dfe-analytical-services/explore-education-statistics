@@ -6,6 +6,7 @@ import React, {
   ReactNode,
   Ref,
 } from 'react';
+import useRendered from 'src/hooks/useRendered';
 import styles from './TabsSection.module.scss';
 
 export interface TabsSectionProps {
@@ -24,6 +25,8 @@ const TabsSection: FunctionComponent<TabsSectionProps> = forwardRef(
     { children, id, lazy = false, ...restProps }: TabsSectionProps,
     ref: Ref<HTMLElement>,
   ) => {
+    const { onRendered } = useRendered();
+
     // Hide additional props from the component's public API to
     // avoid any confusion over this component's usage as
     // it should only be used in combination with Tabs.
@@ -31,7 +34,7 @@ const TabsSection: FunctionComponent<TabsSectionProps> = forwardRef(
 
     return (
       <section
-        aria-labelledby={tabProps['aria-labelledby']}
+        aria-labelledby={onRendered(tabProps['aria-labelledby'])}
         className={classNames('govuk-tabs__panel', styles.panel, {
           'govuk-tabs__panel--hidden': tabProps.hidden,
         })}
@@ -39,8 +42,8 @@ const TabsSection: FunctionComponent<TabsSectionProps> = forwardRef(
         hidden={tabProps.hidden}
         ref={ref}
         onMouseDown={event => event.preventDefault()}
-        role="tabpanel"
-        tabIndex={-1}
+        role={onRendered('tabpanel')}
+        tabIndex={onRendered(-1)}
       >
         {children}
       </section>
