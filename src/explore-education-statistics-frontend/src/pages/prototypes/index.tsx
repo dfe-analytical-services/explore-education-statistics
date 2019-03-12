@@ -32,14 +32,6 @@ class PrototypesIndexPage extends Component {
             </Link>
           </li>
         </ul>
-
-        <h2>Data table</h2>
-
-        <ul>
-          <li>
-            <Link to="/prototypes/data-table-v3">Data table v3</Link>
-          </li>
-        </ul>
       </PrototypePage>
     );
   }

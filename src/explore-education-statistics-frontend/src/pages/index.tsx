@@ -28,7 +28,7 @@ class HomePage extends Component {
               statistics and data.
             </p>
             <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-              <Link to="/prototypes/data-table-v3">
+              <Link to="/table-tool">
                 Create your own charts and tables online
               </Link>
             </h2>

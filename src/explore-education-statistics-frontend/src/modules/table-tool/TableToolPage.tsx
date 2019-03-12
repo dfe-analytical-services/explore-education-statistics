@@ -10,7 +10,6 @@ import {
   PublicationMeta,
   SchoolType,
 } from '../../services/tableBuilderService';
-import PrototypePage from '../components/PrototypePage';
 import CharacteristicsDataTable from './components/CharacteristicsDataTable';
 import CharacteristicsFilterForm, {
   CharacteristicsFilterFormSubmitHandler,
@@ -32,7 +31,7 @@ interface State {
   tableData: DataTableResult[];
 }
 
-class PrototypeDataTableV3 extends Component<{}, State> {
+class TableToolPage extends Component<{}, State> {
   public state: State = {
     filters: {
       attributes: [],
@@ -139,13 +138,7 @@ class PrototypeDataTableV3 extends Component<{}, State> {
     const { filters, publicationMeta, publicationName, tableData } = this.state;
 
     return (
-      <PrototypePage
-        breadcrumbs={[
-          { text: 'Education training and skills' },
-          { text: 'National level' },
-          { text: 'Explore statistics' },
-        ]}
-      >
+      <>
         <PageHeading caption="National level" heading="Explore statistics" />
 
         <ul>
@@ -222,9 +215,9 @@ class PrototypeDataTableV3 extends Component<{}, State> {
             </ul>
           </div>
         )}
-      </PrototypePage>
+      </>
     );
   }
 }
 
-export default PrototypeDataTableV3;
+export default TableToolPage;
