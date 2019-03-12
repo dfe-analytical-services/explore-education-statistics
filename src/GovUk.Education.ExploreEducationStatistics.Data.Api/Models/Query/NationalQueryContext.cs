@@ -15,10 +15,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public ICollection<string> Attributes { get; set; }
         public ICollection<string> Characteristics { get; set; }
 
-        public Expression<Func<CharacteristicDataNational, bool>> FindExpression()
+        public Expression<Func<CharacteristicDataNational, bool>> FindExpression(int releaseId)
         {
             return PredicateBuilder.True<CharacteristicDataNational>()
-                .And(QueryContextUtil.PublicationIdExpression<CharacteristicDataNational>(PublicationId))
+                .And(QueryContextUtil.ReleaseIdExpression<CharacteristicDataNational>(releaseId))
                 .And(QueryContextUtil.LevelExpression<CharacteristicDataNational>(Level.National))
                 .And(QueryContextUtil.SchoolTypeExpression<CharacteristicDataNational>(SchoolTypes))
                 .And(QueryContextUtil.YearExpression<CharacteristicDataNational>(

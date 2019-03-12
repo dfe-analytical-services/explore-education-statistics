@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
     {
         Guid PublicationId { get; set; }
         ICollection<string> Attributes { get; set; }
-        Expression<Func<TEntity, bool>> FindExpression();
+        Expression<Func<TEntity, bool>> FindExpression(int releaseId);
     }
 }

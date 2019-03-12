@@ -23,6 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ConfigurePublicationId(modelBuilder);
+            ConfigureReleaseId(modelBuilder);
             ConfigureYear(modelBuilder);
             ConfigureLevel(modelBuilder);
             ConfigureSchoolType(modelBuilder);
@@ -46,6 +47,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
                 .HasIndex(data => data.PublicationId);
         }
 
+        private static void ConfigureReleaseId(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<GeographicData>()
+                .HasIndex(data => data.ReleaseId);
+            
+            modelBuilder.Entity<CharacteristicDataNational>()
+                .HasIndex(data => data.ReleaseId);
+            
+            modelBuilder.Entity<CharacteristicDataLa>()
+                .HasIndex(data => data.ReleaseId);
+        }
+        
         private static void ConfigureYear(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GeographicData>()

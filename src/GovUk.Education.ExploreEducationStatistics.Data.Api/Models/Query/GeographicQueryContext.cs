@@ -19,10 +19,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public int EndYear { get; set; }
         public ICollection<string> Attributes { get; set; }
 
-        public Expression<Func<GeographicData, bool>> FindExpression()
+        public Expression<Func<GeographicData, bool>> FindExpression(int releaseId)
         {
             return PredicateBuilder.True<GeographicData>()
-                .And(QueryContextUtil.PublicationIdExpression<GeographicData>(PublicationId))
+                .And(QueryContextUtil.ReleaseIdExpression<GeographicData>(releaseId))
                 .And(QueryContextUtil.LevelExpression<GeographicData>(Level))
                 .And(QueryContextUtil.SchoolTypeExpression<GeographicData>(SchoolTypes))
                 .And(QueryContextUtil.YearExpression<GeographicData>(
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
                 .And(QueryContextUtil.LocalAuthoritiesExpression<GeographicData>(LocalAuthorities))
                 .And(SchoolsExpression());
         }
-
+        
         private Expression<Func<GeographicData, bool>> SchoolsExpression()
         {
             return x => Schools == null || !Schools.Any() || Schools.Contains(x.SchoolLaEstab);

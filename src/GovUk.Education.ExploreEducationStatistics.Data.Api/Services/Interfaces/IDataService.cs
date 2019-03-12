@@ -12,5 +12,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
         int Count(Expression<Func<TEntity, bool>> expression);
 
         IEnumerable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression);
+
+        int Max(Expression<Func<TEntity, int>> expression);
+        
+        int TopWithPredicate(Expression<Func<TEntity, int>> expression, Expression<Func<TEntity, bool>> predicate);
     }
 }

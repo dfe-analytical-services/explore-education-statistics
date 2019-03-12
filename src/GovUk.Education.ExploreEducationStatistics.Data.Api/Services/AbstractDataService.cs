@@ -41,5 +41,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             return DbSet().Where(expression);
         }
+
+        public int Max(Expression<Func<TEntity, int>> expression)
+        {
+            return DbSet().Max(expression);
+        }
+
+        public int TopWithPredicate(Expression<Func<TEntity, int>> expression, Expression<Func<TEntity, bool>> predicate)
+        {
+            return DbSet().Where(predicate)
+                .OrderByDescending(expression)
+                .Select(expression)
+                .FirstOrDefault();
+        }
     }
 }
