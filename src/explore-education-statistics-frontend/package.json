@@ -109,12 +109,12 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "node hooks/exitWsl.js || lint-staged"
+      "pre-commit": "node git-hooks/exitWsl.js || lint-staged"
     }
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "node hooks/exec.js  'tsc --noEmit'",
+      "node git-hooks/exec.js  'tsc --noEmit'",
       "tslint --project tsconfig.json",
       "jest --findRelatedTests"
     ],
