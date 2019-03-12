@@ -5,6 +5,7 @@ import React, {
   HTMLAttributes,
   ReactNode,
   Ref,
+  useState,
 } from 'react';
 import useRendered from 'src/hooks/useRendered';
 import styles from './TabsSection.module.scss';
@@ -25,6 +26,7 @@ const TabsSection: FunctionComponent<TabsSectionProps> = forwardRef(
     { children, id, lazy = false, ...restProps }: TabsSectionProps,
     ref: Ref<HTMLElement>,
   ) => {
+    const [mouseDown, setMouseDown] = useState(false);
     const { onRendered } = useRendered();
 
     // Hide additional props from the component's public API to
@@ -41,7 +43,13 @@ const TabsSection: FunctionComponent<TabsSectionProps> = forwardRef(
         id={id}
         hidden={tabProps.hidden}
         ref={ref}
-        onMouseDown={event => event.preventDefault()}
+        onFocus={event => {
+          if (mouseDown) {
+            event.target.blur();
+          }
+        }}
+        onMouseDown={() => setMouseDown(true)}
+        onMouseUp={() => setMouseDown(false)}
         role={onRendered('tabpanel')}
         tabIndex={onRendered(-1)}
       >
