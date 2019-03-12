@@ -4,8 +4,8 @@ import { Helmet } from 'react-helmet';
 import ReactMarkdown from 'react-markdown';
 import Accordion from '../../components/Accordion';
 import AccordionSection from '../../components/AccordionSection';
-import Date from '../../components/Date';
 import Details from '../../components/Details';
+import FormattedDate from '../../components/FormattedDate';
 import GoToTopLink from '../../components/GoToTopLink';
 import Link from '../../components/Link';
 import Tabs from '../../components/Tabs';
@@ -177,12 +177,12 @@ class PublicationPage extends Component<Props> {
 
               <h4>
                 <span className="govuk-caption-m">Published: </span>
-                <Date value={data.published} />
+                <FormattedDate>{data.published}</FormattedDate>
               </h4>
 
               <h4 data-testid="publication-page--last-updated">
                 <span className="govuk-caption-m">Last updated: </span>
-                <Date value={data.updates[0].on} />
+                <FormattedDate>{data.updates[0].on}</FormattedDate>
 
                 <Details summary={`See all ${data.updates.length} updates`}>
                   {data.updates.map(elem => (
@@ -190,10 +190,9 @@ class PublicationPage extends Component<Props> {
                       data-testid="publication-page--update-element"
                       key={elem.on}
                     >
-                      <Date
-                        className="govuk-body govuk-!-font-weight-bold"
-                        value={elem.on}
-                      />
+                      <FormattedDate className="govuk-body govuk-!-font-weight-bold">
+                        {elem.on}
+                      </FormattedDate>
                       <p>{elem.reason}</p>
                     </div>
                   ))}
@@ -202,7 +201,7 @@ class PublicationPage extends Component<Props> {
 
               <h4>
                 <span className="govuk-caption-m">Next update: </span>
-                <Date value={data.publication.nextUpdate} />
+                <FormattedDate>{data.publication.nextUpdate}</FormattedDate>
 
                 <span className="govuk-caption-m">
                   <Link to="#" unvisited>

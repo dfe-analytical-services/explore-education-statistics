@@ -8,6 +8,7 @@
     "axios": "^0.18.0",
     "classnames": "^2.2.6",
     "cross-env": "^5.2.0",
+    "date-fns": "^2.0.0-alpha.27",
     "dotenv": "6.0.0",
     "dotenv-expand": "4.2.0",
     "dotenv-webpack": "^1.7.0",
@@ -18,7 +19,6 @@
     "govuk-frontend": "^2.7.0",
     "leaflet": "^1.4.0",
     "lodash": "^4.17.11",
-    "moment": "^2.24.0",
     "next": "^8.0.3",
     "next-images": "^1.1.0",
     "normalize.css": "^8.0.1",
@@ -27,7 +27,6 @@
     "react-helmet": "^5.2.0",
     "react-leaflet": "^2.2.1",
     "react-markdown": "^4.0.6",
-    "react-moment": "^0.8.4",
     "recharts": "^1.5.0",
     "typescript": "^3.3.3333",
     "webpack": "4.28.3",
@@ -141,7 +140,6 @@
       "src/**/*.{js,jsx,ts,tsx}",
       "!src/**/*.d.ts"
     ],
-    "resolver": "jest-pnp-resolver",
     "setupTestFrameworkScriptFile": "<rootDir>/test/setupTests.js",
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
