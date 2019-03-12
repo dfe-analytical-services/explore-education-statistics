@@ -1,10 +1,12 @@
 const withCss = require('@zeit/next-css');
 const cssLoaderConfig = require('@zeit/next-css/css-loader-config');
 const withTypescript = require('@zeit/next-typescript');
+const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const DotEnvPlugin = require('dotenv-webpack');
 const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin');
 const compose = require('lodash/fp/compose');
 const withImages = require('next-images');
+const StylelintPlugin = require('stylelint-webpack-plugin');
 const path = require('path');
 
 const createPlugin = plugin => {
@@ -91,14 +93,19 @@ const withSassModules = createPlugin((config, options) => {
 
 const config = {
   webpack(config, options) {
-    const { isServer } = options;
+    const { dev, isServer } = options;
 
     if (isServer) {
       config.plugins.push(
         new ForkTsCheckerPlugin({
           tsconfig: path.resolve(__dirname, 'tsconfig.json'),
+          tslint: path.resolve(__dirname, 'tslint.json'),
         }),
       );
+    }
+
+    if (dev) {
+      config.plugins.push(new CaseSensitivePathsPlugin());
     }
 
     config.plugins.push(
@@ -109,7 +116,23 @@ const config = {
         ),
         safe: true,
       }),
+      new StylelintPlugin({
+        // Next doesn't play nicely with emitted errors
+        // so we'll just display warnings instead
+        emitErrors: !dev,
+      }),
     );
+
+    config.module.rules.push({
+      test: /\.jsx?$/,
+      enforce: 'pre',
+      exclude: /node_modules/,
+      loader: 'eslint-loader',
+      options: {
+        emitError: !dev,
+        emitWarning: dev,
+      },
+    });
 
     config.resolve.alias.src = path.resolve(__dirname, 'src');
 
