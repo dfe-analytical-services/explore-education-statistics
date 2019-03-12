@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
@@ -20,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         private readonly IAttributeMetaService _attributeMetaService;
         private readonly ICharacteristicMetaService _characteristicMetaService;
         private readonly IMapper _mapper;
-        
+
         public TableBuilderController(ITableBuilderService tableBuilderService,
             IAttributeMetaService attributeMetaService,
             ICharacteristicMetaService characteristicMetaService,
@@ -32,61 +30,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("geographic/{publicationId}/{level}")]
-        public ActionResult<TableBuilderResult> GetGeographic(Guid publicationId,
-            [CommaSeparatedQueryString] ICollection<int> years,
-            [FromQuery(Name = "startYear")] int startYear,
-            [FromQuery(Name = "endYear")] int endYear,
-            [CommaSeparatedQueryString] ICollection<SchoolType> schoolTypes,
-            [CommaSeparatedQueryString] ICollection<string> attributes,
-            Level level = Level.National)
-        {
-            var query = new GeographicQueryContext
-            {
-                Attributes = attributes,
-                Level = level,
-                PublicationId = publicationId,
-                SchoolTypes = schoolTypes,
-                Years = years,
-                StartYear = startYear,
-                EndYear = endYear
-            };
-
-            return _tableBuilderService.GetGeographic(query);
-        }
-
         [HttpPost("geographic")]
         public ActionResult<TableBuilderResult> GetGeographic([FromBody] GeographicQueryContext query)
         {
-            var result =_tableBuilderService.GetGeographic(query);
+            var result = _tableBuilderService.GetGeographic(query);
             if (result.Result.Any())
             {
-                return result;    
+                return result;
             }
-            return NotFound();     
-        }
 
-        [HttpGet("characteristics/local-authority/{publicationId}")]
-        public ActionResult<TableBuilderResult> GetLocalAuthority(Guid publicationId,
-            [CommaSeparatedQueryString] ICollection<int> years,
-            [FromQuery(Name = "startYear")] int startYear,
-            [FromQuery(Name = "endYear")] int endYear,
-            [CommaSeparatedQueryString] ICollection<SchoolType> schoolTypes,
-            [CommaSeparatedQueryString] ICollection<string> attributes,
-            [CommaSeparatedQueryString] ICollection<string> characteristics)
-        {
-            var query = new LaQueryContext
-            {
-                Attributes = attributes,
-                Characteristics = characteristics,
-                PublicationId = publicationId,
-                SchoolTypes = schoolTypes,
-                Years = years,
-                StartYear = startYear,
-                EndYear = endYear
-            };
-
-            return _tableBuilderService.GetLocalAuthority(query);
+            return NotFound();
         }
 
         [HttpPost("characteristics/local-authority")]
@@ -95,36 +48,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             var result = _tableBuilderService.GetLocalAuthority(query);
             if (result.Result.Any())
             {
-                return result;    
+                return result;
             }
-            return NotFound();
-        }
 
-        [HttpGet("characteristics/national/{publicationId}")]
-        public ActionResult<TableBuilderResult> GetNational(Guid publicationId,
-            [CommaSeparatedQueryString] ICollection<int> years,
-            [FromQuery(Name = "startYear")] int startYear,
-            [FromQuery(Name = "endYear")] int endYear,
-            [CommaSeparatedQueryString] ICollection<SchoolType> schoolTypes,
-            [CommaSeparatedQueryString] ICollection<string> attributes,
-            [CommaSeparatedQueryString] ICollection<string> characteristics)
-        {
-            var query = new NationalQueryContext
-            {
-                Attributes = attributes,
-                Characteristics = characteristics,
-                PublicationId = publicationId,
-                SchoolTypes = schoolTypes,
-                Years = years,
-                StartYear = startYear,
-                EndYear = endYear
-            };
-
-            var result = _tableBuilderService.GetNational(query);
-            if (result.Result.Any())
-            {
-                return result;    
-            }
             return NotFound();
         }
 
@@ -136,6 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             {
                 return result;
             }
+
             return NotFound();
         }
 

@@ -116,11 +116,6 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
             );
         }
 
-        [Fact(Skip = "TODO")]
-        public void GetGeographic()
-        {
-        }
-
         [Fact]
         public void GetGeographic_Post()
         {
@@ -135,11 +130,6 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
             Assert.IsAssignableFrom<NotFoundResult>(result.Result);
         }
 
-        [Fact(Skip = "TODO")]
-        public void GetLocalAuthority()
-        {
-        }
-
         [Fact]
         public void GetLocalAuthority_Post()
         {
@@ -152,11 +142,6 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
         {
             var result = _controller.GetLocalAuthority(new LaQueryContext());
             Assert.IsAssignableFrom<NotFoundResult>(result.Result);
-        }
-
-        [Fact(Skip = "TODO")]
-        public void GetNational()
-        {
         }
 
         [Fact]
