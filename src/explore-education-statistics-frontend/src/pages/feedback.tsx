@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { Helmet } from 'react-helmet';
+import Page from '../components/Page';
 
 class FeedbackPage extends Component {
   public render() {
     return (
-      <div className="govuk-grid-row">
+      <Page breadcrumbs={[{ name: 'Feedback' }]}>
         <Helmet>
           <title>Feedback - GOV.UK</title>
         </Helmet>
@@ -75,7 +76,7 @@ class FeedbackPage extends Component {
             </button>
           </form>
         </div>
-      </div>
+      </Page>
     );
   }
 }

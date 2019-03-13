@@ -1,5 +1,6 @@
 import range from 'lodash/range';
 import React, { Component, createRef } from 'react';
+import Page from '../../components/Page';
 import PageHeading from '../../components/PageHeading';
 import Tabs from '../../components/Tabs';
 import TabsSection from '../../components/TabsSection';
@@ -138,7 +139,7 @@ class TableToolPage extends Component<{}, State> {
     const { filters, publicationMeta, publicationName, tableData } = this.state;
 
     return (
-      <>
+      <Page breadcrumbs={[{ name: 'Explore statistics' }]}>
         <PageHeading caption="National level" heading="Explore statistics" />
 
         <ul>
@@ -215,7 +216,7 @@ class TableToolPage extends Component<{}, State> {
             </ul>
           </div>
         )}
-      </>
+      </Page>
     );
   }
 }

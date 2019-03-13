@@ -8,6 +8,7 @@ import Details from '../../components/Details';
 import FormattedDate from '../../components/FormattedDate';
 import GoToTopLink from '../../components/GoToTopLink';
 import Link from '../../components/Link';
+import Page from '../../components/Page';
 import Tabs from '../../components/Tabs';
 import TabsSection from '../../components/TabsSection';
 import { baseUrl, contentApi } from '../../services/api';
@@ -93,7 +94,12 @@ class PublicationPage extends Component<Props> {
       data.publication.legacyReleases.length;
 
     return (
-      <>
+      <Page
+        breadcrumbs={[
+          { name: 'Find statistics and data', link: '/statistics' },
+          { name: data.title },
+        ]}
+      >
         <Helmet>
           <title>{data.title} - GOV.UK</title>
         </Helmet>
@@ -354,7 +360,7 @@ class PublicationPage extends Component<Props> {
         </Link>
 
         <GoToTopLink />
-      </>
+      </Page>
     );
   }
 }

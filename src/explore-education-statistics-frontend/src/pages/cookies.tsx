@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { Helmet } from 'react-helmet';
+import Page from '../components/Page';
 
 class CookiesPage extends Component {
   public render() {
     return (
-      <>
+      <Page breadcrumbs={[{ name: 'Cookies' }]}>
         <Helmet>
           <title>Cookies - GOV.UK</title>
         </Helmet>
@@ -73,7 +74,7 @@ class CookiesPage extends Component {
             </tr>
           </tbody>
         </table>
-      </>
+      </Page>
     );
   }
 }

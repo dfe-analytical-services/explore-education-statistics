@@ -1,32 +1,37 @@
 import React from 'react';
-// import Link from './Link';
+import Link from './Link';
 
-const Breadcrumbs = () => {
-  // const currentBreadcrumbIndex = breadcrumbs.length - 1;
+export interface BreadcrumbsProps {
+  breadcrumbs?: {
+    link?: string;
+    name: string;
+  }[];
+}
+
+const Breadcrumbs = ({ breadcrumbs = [] }: BreadcrumbsProps) => {
+  const currentBreadcrumbIndex = breadcrumbs.length - 1;
 
   return (
     <div className="govuk-breadcrumbs">
       <ol className="govuk-breadcrumbs__list" data-testid="breadcrumbs--list">
-        {/*{breadcrumbs.map((breadcrumb, index) =>*/}
-        {/*index < currentBreadcrumbIndex ? (*/}
-        {/*<li key={index} className="govuk-breadcrumbs__list-item">*/}
-        {/*<Link*/}
-        {/*className="govuk-breadcrumbs__link"*/}
-        {/*to={breadcrumb.props.match.url}*/}
-        {/*>*/}
-        {/*{breadcrumb}*/}
-        {/*</Link>*/}
-        {/*</li>*/}
-        {/*) : (*/}
-        {/*<li*/}
-        {/*key={index}*/}
-        {/*className="govuk-breadcrumbs__list-item"*/}
-        {/*aria-current="page"*/}
-        {/*>*/}
-        {/*{breadcrumb}*/}
-        {/*</li>*/}
-        {/*),*/}
-        {/*)}*/}
+        <li className="govuk-breadcrumbs__list-item">
+          <Link className="govuk-breadcrumbs__link" to="/">
+            Home
+          </Link>
+        </li>
+        {breadcrumbs.map((breadcrumb, index) => {
+          return (
+            <li key={index} className="govuk-breadcrumbs__list-item">
+              {index < currentBreadcrumbIndex && breadcrumb.link ? (
+                <Link className="govuk-breadcrumbs__link" to={breadcrumb.link}>
+                  {breadcrumb.name}
+                </Link>
+              ) : (
+                breadcrumb.name
+              )}
+            </li>
+          );
+        })}
       </ol>
     </div>
   );

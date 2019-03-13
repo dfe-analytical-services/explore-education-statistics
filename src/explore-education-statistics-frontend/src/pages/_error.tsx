@@ -1,6 +1,7 @@
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import { Helmet } from 'react-helmet';
+import Page from '../components/Page';
 
 interface Props {
   errorMessage: string;
@@ -55,7 +56,7 @@ class ErrorPage extends Component<Props> {
       : ErrorPage.statusCodeTitles[statusCode];
 
     return (
-      <div className="govuk-grid-row">
+      <Page>
         <Helmet>
           <title>{pageTitle} - GOV.UK</title>
         </Helmet>
@@ -71,7 +72,7 @@ class ErrorPage extends Component<Props> {
             this.getStatusCodePage()
           )}
         </div>
-      </div>
+      </Page>
     );
   }
 }

@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { Helmet } from 'react-helmet';
 import Link from '../components/Link';
+import Page from '../components/Page';
 
 class HomePage extends Component {
   public render() {
     return (
-      <>
+      <Page>
         <Helmet>
           <title>Explore Education Statistics - GOV.UK</title>
         </Helmet>
@@ -85,7 +86,7 @@ class HomePage extends Component {
             </p>
           </div>
         </div>
-      </>
+      </Page>
     );
   }
 }

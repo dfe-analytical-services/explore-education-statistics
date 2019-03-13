@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Helmet } from 'react-helmet';
 import { contentApi } from 'src/services/api';
+import Page from '../../components/Page';
 import TopicList from './components/TopicList';
 
 interface Props {
@@ -28,7 +29,7 @@ class FindStatisticsPage extends Component<Props> {
     const { themes } = this.props;
 
     return (
-      <>
+      <Page breadcrumbs={[{ name: 'Find statistics and data' }]}>
         <Helmet>
           <title>Find statistics and data - GOV.UK</title>
         </Helmet>
@@ -64,7 +65,7 @@ class FindStatisticsPage extends Component<Props> {
         ) : (
           <div className="govuk-inset-text">No data currently published.</div>
         )}
-      </>
+      </Page>
     );
   }
 }
