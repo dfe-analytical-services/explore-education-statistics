@@ -369,8 +369,8 @@
             "hostingEnvironment": ""
         },
         "sku": {
-            "Tier": "Standard",
-            "Name": "S1"
+            "Tier": "Basic",
+            "Name": "B1"
         },
         "kind": "linux"
     },
