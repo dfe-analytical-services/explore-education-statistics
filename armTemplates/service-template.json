@@ -344,7 +344,7 @@
                         "name": "DATA_API_BASE_URL",
                         "value": "//"
                     }
-                ],
+                ]
             },
             "name": "[variables('publicAppName')]",
             "serverFarmId": "[variables('publicPlanName')]",
