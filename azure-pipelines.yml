@@ -90,6 +90,15 @@ jobs:
         inputs:
           artifactName: 'frontend'
           targetPath: '$(Build.ArtifactStagingDirectory)'
+  - job: 'Selenium tests'
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+      - task: PublishPipelineArtifact@0
+      displayName: 'Publish Pipeline Artifact'
+      inputs:
+        artifactName: 'robot-tests'
+        targetPath: 'tests/robot-tests'
 
 #  - job: 'Frontend_Build'
 #    dependsOn: 'Frontend_Test'
