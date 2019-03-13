@@ -54,4 +54,20 @@ describe('FormattedDate', () => {
       expect(container.textContent).toContain('19 03 Tue');
     });
   });
+
+  describe('invalid date', () => {
+    test('does not render with string date', () => {
+      const { container } = render(<FormattedDate>not a date</FormattedDate>);
+
+      expect(container.textContent).toBe('');
+    });
+
+    test('does not render with Date', () => {
+      const { container } = render(
+        <FormattedDate>{new Date('not a date')}</FormattedDate>,
+      );
+
+      expect(container.textContent).toBe('');
+    });
+  });
 });

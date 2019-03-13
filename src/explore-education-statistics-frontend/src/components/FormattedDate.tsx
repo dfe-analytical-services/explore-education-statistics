@@ -1,4 +1,4 @@
-import { format as formatter, parse, toDate } from 'date-fns';
+import { format as formatter, isValid, parse, toDate } from 'date-fns';
 import React from 'react';
 
 interface Props {
@@ -22,6 +22,10 @@ const FormattedDate = ({
       : new Date(children);
   } else {
     parsedDate = toDate(children);
+  }
+
+  if (!isValid(parsedDate)) {
+    return null;
   }
 
   return <time className={className}>{formatter(parsedDate, format)}</time>;
