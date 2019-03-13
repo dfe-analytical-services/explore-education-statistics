@@ -90,7 +90,7 @@ const PrototypeTableSample = ({ caption }: Props) => {
               </td>
             </tr>
             <tr className="govuk-table__row">
-              <th className="govuk-table__header">
+              <th className="govuk-table__header" colSpan={6}>
                 Percentage of sessions missed due to:
               </th>
             </tr>

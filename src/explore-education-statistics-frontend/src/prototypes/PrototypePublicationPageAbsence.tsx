@@ -51,7 +51,7 @@ const PublicationPage = () => {
             </p>
 
             <div className="govuk-inset-text">
-              <Link to="#">
+              <Link to="/prototypes/methodology-absence">
                 Find out more about our pupil absence data and statistics
                 methodology and terminology
               </Link>

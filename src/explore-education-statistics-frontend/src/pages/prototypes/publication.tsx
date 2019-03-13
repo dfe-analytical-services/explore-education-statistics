@@ -1,3 +1,3 @@
-import Page from 'src/prototypes/PrototypePublicationPage';
+import Page from 'src/prototypes/PrototypePublicationPageAbsence';
 
 export default Page;
