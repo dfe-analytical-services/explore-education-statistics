@@ -95,10 +95,10 @@ jobs:
       vmImage: 'ubuntu-16.04'
     steps:
       - task: PublishPipelineArtifact@0
-      displayName: 'Publish Pipeline Artifact'
-      inputs:
-        artifactName: 'robot-tests'
-        targetPath: 'tests/robot-tests'
+        displayName: 'Publish Pipeline Artifact'
+        inputs:
+          artifactName: 'robot-tests'
+          targetPath: 'tests/robot-tests'
 
 #  - job: 'Frontend_Build'
 #    dependsOn: 'Frontend_Test'
