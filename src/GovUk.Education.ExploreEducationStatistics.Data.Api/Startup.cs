@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ModelBinding;
@@ -116,6 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             {
                 using (var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>())
                 {
+                    context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
                 }
             }

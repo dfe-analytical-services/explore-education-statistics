@@ -28,6 +28,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Converters
                 case "InsetTextBlock":
                     contentBlock = new InsetTextBlock();
                     break;
+                case "DataBlock":
+                    contentBlock = new DataBlock();
+                    break;
             }
             serializer.Populate(jsonObject.CreateReader(), contentBlock);
             return contentBlock;

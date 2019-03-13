@@ -12,6 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
+            Database.SetCommandTimeout(int.MaxValue);
         }
 
         public DbSet<AttributeMeta> AttributeMeta { get; set; }

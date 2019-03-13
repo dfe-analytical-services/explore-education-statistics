@@ -10,3 +10,4 @@ tags
 *.pyc
 **/test-results/
 tests/robot-tests/lib
+data

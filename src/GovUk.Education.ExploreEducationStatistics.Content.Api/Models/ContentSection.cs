@@ -41,4 +41,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
         
         public string Body { get; set; }
     }
+
+    public class DataBlock : IContentBlock 
+    {
+        public string Type => "DataBlock";
+
+        public string Heading { get; set; }
+
+        public string DataUrl { get; set; }
+
+        public string ChartType { get; set; }
+
+    }
 }
