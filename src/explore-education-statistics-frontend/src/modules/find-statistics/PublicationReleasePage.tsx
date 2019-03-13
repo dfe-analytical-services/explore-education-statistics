@@ -48,7 +48,7 @@ class PublicationReleasePage extends Component<Props> {
   }
 
   public render() {
-    const { data, release: currentRelease } = this.props;
+    const { data, release } = this.props;
 
     const releaseCount =
       data.publication.releases.slice(1).length +
@@ -63,7 +63,7 @@ class PublicationReleasePage extends Component<Props> {
       >
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            {!currentRelease && (
+            {!release && (
               <strong className="govuk-tag govuk-!-margin-bottom-2">
                 {' '}
                 This is the latest data{' '}
@@ -114,29 +114,30 @@ class PublicationReleasePage extends Component<Props> {
 
               <h4 data-testid="publication-page--release-name">
                 <span className="govuk-caption-m">For school year: </span>
-                {data.releaseName}{' '}
-                {!currentRelease && <span>(latest data)</span>}
+                {data.releaseName} {!release && <span>(latest data)</span>}
                 <Details summary={`See previous ${releaseCount} releases`}>
                   <ul
                     className="govuk-list"
                     data-testid="publication-page--release-name-list"
                   >
-                    {data.publication.releases.slice(1).map(elem => (
-                      <li key={elem.id} data-testid="item-internal">
-                        <Link
-                          to={`/statistics/${data.publication.slug}/${
-                            elem.slug
-                          }`}
-                        >
-                          {elem.releaseName}
-                        </Link>
-                      </li>
-                    ))}
-                    {data.publication.legacyReleases.map(elem => (
-                      <li key={elem.id} data-testid="item-external">
-                        <a href={elem.url}>{elem.description}</a>
-                      </li>
-                    ))}
+                    {data.publication.releases
+                      .slice(1)
+                      .map(({ id, slug, releaseName }) => (
+                        <li key={id} data-testid="item-internal">
+                          <Link
+                            to={`/statistics/${data.publication.slug}/${slug}`}
+                          >
+                            {releaseName}
+                          </Link>
+                        </li>
+                      ))}
+                    {data.publication.legacyReleases.map(
+                      ({ id, description, url }) => (
+                        <li key={id} data-testid="item-external">
+                          <a href={url}>{description}</a>
+                        </li>
+                      ),
+                    )}
                   </ul>
                 </Details>
               </h4>
@@ -185,7 +186,7 @@ class PublicationReleasePage extends Component<Props> {
           <>
             <h2 className="govuk-heading-l">
               {`${
-                !currentRelease ? 'Latest headline' : 'Headline'
+                !release ? 'Latest headline' : 'Headline'
               } facts and figures - ${data.releaseName}
               `}
             </h2>
@@ -242,43 +243,31 @@ class PublicationReleasePage extends Component<Props> {
           >
             <ul className="govuk-list">
               <li>
-                <a href="#" className="govuk-link">
-                  How do we collect it?
-                </a>
+                <a href="#">How do we collect it?</a>
               </li>
               <li>
-                <a href="#" className="govuk-link">
-                  What do we do with it?
-                </a>
+                <a href="#">What do we do with it?</a>
               </li>
               <li>
-                <a href="#" className="govuk-link">
-                  Related policies
-                </a>
+                <a href="#">Related policies</a>
               </li>
             </ul>
           </AccordionSection>
           <AccordionSection heading="Feedback and questions" headingTag="h3">
             <ul className="govuk-list">
               <li>
-                <a href="#" className="govuk-link">
-                  Feedback on this page
-                </a>
+                <a href="#">Feedback on this page</a>
               </li>
               <li>
-                <a href="#" className="govuk-link">
-                  Make a suggestion
-                </a>
+                <a href="#">Make a suggestion</a>
               </li>
               <li>
-                <a href="#" className="govuk-link">
-                  Ask a question
-                </a>
+                <a href="#">Ask a question</a>
               </li>
             </ul>
           </AccordionSection>
           <AccordionSection heading="Contact us" headingTag="h3">
-            <h4 className="govuk-heading-">Media enquiries</h4>
+            <h4>Media enquiries</h4>
             <address className="govuk-body dfe-font-style-normal">
               Press Office News Desk
               <br />
@@ -291,7 +280,7 @@ class PublicationReleasePage extends Component<Props> {
               Telephone: 020 7783 8300
             </address>
 
-            <h4 className="govuk-heading-">Other enquiries</h4>
+            <h4>Other enquiries</h4>
             <address className="govuk-body dfe-font-style-normal">
               Data Insight and Statistics Division
               <br />
@@ -306,7 +295,10 @@ class PublicationReleasePage extends Component<Props> {
               SW1P 3BT <br />
               Telephone: 020 7783 8300
               <br />
-              Email: <a href="#">Schools.statistics@education.gov.uk</a>
+              Email:{' '}
+              <a href="mailto:Schools.statistics@education.co.uk">
+                Schools.statistics@education.gov.uk
+              </a>
             </address>
           </AccordionSection>
         </Accordion>
