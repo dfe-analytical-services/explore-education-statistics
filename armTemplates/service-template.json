@@ -349,7 +349,7 @@
             },
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "10.15.1"
+              "value": "10.14"
             }
           ],
           "linuxFxVersion": "node|10.10",
