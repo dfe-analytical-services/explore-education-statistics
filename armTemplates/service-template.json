@@ -321,65 +321,50 @@
       }
     },
     {
-      "type": "Microsoft.Web/sites",
-      "name": "[variables('publicAppName')]",
-      "apiVersion": "2018-02-01",
-      "kind": "app",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]": "empty"
-      },
-      "resources": [
-        {
-          "type": "siteextensions",
-          "name": "Microsoft.ApplicationInsights.AzureWebSites",
-          "apiVersion": "2015-08-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.Web/Sites', variables('publicAppName'))]"
-          ],
-          "properties": {}
-        }
-      ],
-      "properties": {
-        "siteConfig": {
-          "appSettings": [
-            {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', variables('publicAppName')), '2015-05-01').InstrumentationKey]"
+        "type": "Microsoft.Web/sites",
+        "name": "[parameters('siteName')]",
+        "properties": {
+            "siteConfig": {
+                "linuxFxVersion": "NODE|10.14",
+                "windowsFxVersion": null,
+                "appSettings": [
+                    {
+                        "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                        "value": "[reference(resourceId('microsoft.insights/components/', variables('publicAppName')), '2015-05-01').InstrumentationKey]"
+                    },
+                    {
+                        "name": "WEBSITE_NODE_DEFAULT_VERSION",
+                        "value": "10.14"
+                    }
+                ],
             },
-            {
-              "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "10.14"
-            }
-          ],
-          "linuxFxVersion": "node|10.10",
-          "phpVersion": "off"
+            "name": "[variables('publicAppName')]",
+            "serverFarmId": "[variables('publicPlanName')]",
+            "hostingEnvironment": ""
         },
-        "name": "[variables('publicAppName')]",
-        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
-        "hostingEnvironment": ""
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('publicAppName'))]"
-      ]
+        "apiVersion": "2016-08-01",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+            "[variables('publicPlanName')]"
+        ]
     },
     {
-      "type": "Microsoft.Web/serverfarms",
-      "sku": {
-        "name": "B1"
-      },
-      "name": "[variables('publicPlanName')]",
-      "apiVersion": "2018-02-01",
-      "location": "[resourceGroup().location]",
-      "properties": {
+        "apiVersion": "2016-09-01",
         "name": "[variables('publicPlanName')]",
-        "workerSizeId": "0",
-        "reserved": false,
-        "numberOfWorkers": "1",
-        "hostingEnvironment": ""
-      },
-      "kind": "linux"
+        "type": "Microsoft.Web/serverfarms",
+        "location": "[resourceGroup().location]",
+        "properties": {
+            "name": "[variables('publicPlanName')]",
+            "workerSizeId": "1",
+            "reserved": true,
+            "numberOfWorkers": "1",
+            "hostingEnvironment": ""
+        },
+        "sku": {
+            "Tier": "Standard",
+            "Name": "S1"
+        },
+        "kind": "linux"
     },
     {
       "type": "Microsoft.Insights/components",
