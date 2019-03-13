@@ -1,9 +1,9 @@
 import range from 'lodash/range';
 import React, { Component, createRef } from 'react';
-import Page from '../../components/Page';
-import PageHeading from '../../components/PageHeading';
-import Tabs from '../../components/Tabs';
-import TabsSection from '../../components/TabsSection';
+import Page from 'src/components/Page';
+import PageTitle from 'src/components/PageTitle';
+import Tabs from 'src/components/Tabs';
+import TabsSection from 'src/components/TabsSection';
 import {
   DataTableResult,
   getCharacteristicsMeta,
@@ -140,7 +140,7 @@ class TableToolPage extends Component<{}, State> {
 
     return (
       <Page breadcrumbs={[{ name: 'Explore statistics' }]}>
-        <PageHeading caption="National level" heading="Explore statistics" />
+        <PageTitle caption="National level" title="Explore statistics" />
 
         <ul>
           <li>

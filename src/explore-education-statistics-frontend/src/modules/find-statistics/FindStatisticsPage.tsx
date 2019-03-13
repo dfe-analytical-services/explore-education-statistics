@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Helmet } from 'react-helmet';
+import Page from 'src/components/Page';
+import PageTitle from 'src/components/PageTitle';
 import { contentApi } from 'src/services/api';
-import Page from '../../components/Page';
 import TopicList from './components/TopicList';
 
 interface Props {
@@ -30,11 +30,7 @@ class FindStatisticsPage extends Component<Props> {
 
     return (
       <Page breadcrumbs={[{ name: 'Find statistics and data' }]}>
-        <Helmet>
-          <title>Find statistics and data - GOV.UK</title>
-        </Helmet>
-
-        <h1 className="govuk-heading-xl">Find statistics and data</h1>
+        <PageTitle title="Find statistics and data" />
 
         <p className="govuk-body-l">
           Browse to find the statistics and data you’re looking for and open the

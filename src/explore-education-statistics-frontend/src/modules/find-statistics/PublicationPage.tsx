@@ -1,7 +1,7 @@
 import { NextContext } from 'next';
 import React, { Component } from 'react';
-import { Helmet } from 'react-helmet';
 import ReactMarkdown from 'react-markdown';
+import PageTitle from 'src/components/PageTitle';
 import Accordion from '../../components/Accordion';
 import AccordionSection from '../../components/AccordionSection';
 import Details from '../../components/Details';
@@ -100,9 +100,6 @@ class PublicationPage extends Component<Props> {
           { name: data.title },
         ]}
       >
-        <Helmet>
-          <title>{data.title} - GOV.UK</title>
-        </Helmet>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             {!release && (
@@ -112,7 +109,7 @@ class PublicationPage extends Component<Props> {
               </strong>
             )}
 
-            <h1 className="govuk-heading-xl">{data.title}</h1>
+            <PageTitle title={data.title} />
 
             <ReactMarkdown className="govuk-body-l" source={data.summary} />
 

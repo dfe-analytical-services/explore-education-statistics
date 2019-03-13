@@ -1,15 +1,13 @@
 import React, { Component } from 'react';
-import { Helmet } from 'react-helmet';
-import Page from '../components/Page';
+import Page from 'src/components/Page';
+import PageTitle from 'src/components/PageTitle';
 
 class CookiesPage extends Component {
   public render() {
     return (
       <Page breadcrumbs={[{ name: 'Cookies' }]}>
-        <Helmet>
-          <title>Cookies - GOV.UK</title>
-        </Helmet>
-        <h1 className="govuk-heading-xl">Cookies</h1>
+        <PageTitle title="Cookies" />
+
         <p>
           The Explore education statistics service puts small files (known as
           ‘cookies’) onto your computer to collect information about how you

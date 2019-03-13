@@ -1,6 +1,6 @@
 import { Container, default as BaseApp } from 'next/app';
 import React from 'react';
-
+import Helmet from 'react-helmet';
 import './_app.scss';
 
 class App extends BaseApp {
@@ -23,6 +23,7 @@ class App extends BaseApp {
 
     return (
       <Container>
+        <Helmet titleTemplate="%s - GOV.UK" />
         <Component {...pageProps} />
       </Container>
     );
