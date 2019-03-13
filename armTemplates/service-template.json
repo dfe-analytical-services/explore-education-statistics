@@ -322,7 +322,7 @@
     },
     {
         "type": "Microsoft.Web/sites",
-        "name": "[parameters('siteName')]",
+        "name": "[variables('publicAppName')]",
         "properties": {
             "siteConfig": {
                 "linuxFxVersion": "NODE|10.14",
@@ -335,6 +335,14 @@
                     {
                         "name": "WEBSITE_NODE_DEFAULT_VERSION",
                         "value": "10.14"
+                    },
+                    {
+                        "name": "CONTENT_API_BASE_URL",
+                        "value": "//"
+                    },
+                    {
+                        "name": "DATA_API_BASE_URL",
+                        "value": "//"
                     }
                 ],
             },
