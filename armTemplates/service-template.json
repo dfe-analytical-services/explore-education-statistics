@@ -333,6 +333,10 @@
                         "value": "10.14"
                     },
                     {
+                        "name": "NODE_ENV",
+                        "value": "production"
+                    }.
+                    {
                         "name": "CONTENT_API_BASE_URL",
                         "value": "//"
                     },
@@ -365,8 +369,8 @@
             "hostingEnvironment": ""
         },
         "sku": {
-            "Tier": "Standard",
-            "Name": "S1"
+            "Tier": "Basic",
+            "Name": "B1"
         },
         "kind": "linux"
     },
