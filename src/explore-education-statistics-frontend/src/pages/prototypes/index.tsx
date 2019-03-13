@@ -10,7 +10,7 @@ class PrototypesIndexPage extends Component {
 
         <ul>
           <li>
-            <Link to="/prototypes/start">Start page - test</Link>
+            <Link to="/prototypes/start">Start page</Link>
           </li>
           <li>
             <Link to="/prototypes/home-v1">Home page (3 nav options)</Link>
