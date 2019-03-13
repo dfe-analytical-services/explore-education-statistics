@@ -335,7 +335,7 @@
                     {
                         "name": "NODE_ENV",
                         "value": "production"
-                    }.
+                    },
                     {
                         "name": "CONTENT_API_BASE_URL",
                         "value": "//"
