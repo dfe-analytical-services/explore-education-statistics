@@ -1,70 +1,31 @@
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
+import Accordion from 'src/components/Accordion';
+import AccordionSection from 'src/components/AccordionSection';
+import Details from 'src/components/Details';
+import FormattedDate from 'src/components/FormattedDate';
+import GoToTopLink from 'src/components/GoToTopLink';
+import Link from 'src/components/Link';
+import Page from 'src/components/Page';
 import PageTitle from 'src/components/PageTitle';
-import Accordion from '../../components/Accordion';
-import AccordionSection from '../../components/AccordionSection';
-import Details from '../../components/Details';
-import FormattedDate from '../../components/FormattedDate';
-import GoToTopLink from '../../components/GoToTopLink';
-import Link from '../../components/Link';
-import Page from '../../components/Page';
-import Tabs from '../../components/Tabs';
-import TabsSection from '../../components/TabsSection';
-import { baseUrl, contentApi } from '../../services/api';
+import Tabs from 'src/components/Tabs';
+import TabsSection from 'src/components/TabsSection';
+import { baseUrl } from 'src/services/api';
+import {
+  getLatestPublicationRelease,
+  getPublicationRelease,
+  Release,
+} from 'src/services/publicationService';
 import ContentBlock from './components/ContentBlock';
-
-interface LegacyRelease {
-  id: string;
-  description: string;
-  url: string;
-}
-
-interface Release {
-  id: string;
-  releaseName: string;
-  slug: string;
-}
-
-interface ContentSection {
-  caption: string;
-  content: any[];
-  heading: string;
-  order: number;
-}
-
-interface KeyStatistic {
-  title: string;
-  description: string;
-}
-
-interface Publication {
-  dataSource: string;
-  nextUpdate: string;
-  releases: Release[];
-  legacyReleases: LegacyRelease[];
-  slug: string;
-}
 
 interface Props {
   publication: string;
   release: string;
-  data: {
-    title: string;
-    published: string;
-    summary: string;
-    releaseName: string;
-    publication: Publication;
-    content: ContentSection[];
-    keyStatistics: KeyStatistic[];
-    updates: {
-      on: string;
-      reason: string;
-    }[];
-  };
+  data: Release;
 }
 
-class PublicationPage extends Component<Props> {
+class PublicationReleasePage extends Component<Props> {
   public static async getInitialProps({
     query,
   }: NextContext<{
@@ -73,11 +34,11 @@ class PublicationPage extends Component<Props> {
   }>) {
     const { publication, release } = query;
 
-    const url = release
-      ? `release/${release}`
-      : `publication/${publication}/latest`;
+    const request = release
+      ? getPublicationRelease(release)
+      : getLatestPublicationRelease(publication);
 
-    const { data } = await contentApi.get(url);
+    const { data } = await request;
 
     return {
       data,
@@ -87,7 +48,7 @@ class PublicationPage extends Component<Props> {
   }
 
   public render() {
-    const { data, release } = this.props;
+    const { data, release: currentRelease } = this.props;
 
     const releaseCount =
       data.publication.releases.slice(1).length +
@@ -102,7 +63,7 @@ class PublicationPage extends Component<Props> {
       >
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            {!release && (
+            {!currentRelease && (
               <strong className="govuk-tag govuk-!-margin-bottom-2">
                 {' '}
                 This is the latest data{' '}
@@ -146,13 +107,15 @@ class PublicationPage extends Component<Props> {
               </ul>
             </Details>
           </div>
+
           <div className="govuk-grid-column-one-third">
             <aside className="app-related-items">
               <h3 id="subsection-title">About these statistics</h3>
 
               <h4 data-testid="publication-page--release-name">
                 <span className="govuk-caption-m">For school year: </span>
-                {data.releaseName} {!release && <span>(latest data)</span>}
+                {data.releaseName}{' '}
+                {!currentRelease && <span>(latest data)</span>}
                 <Details summary={`See previous ${releaseCount} releases`}>
                   <ul
                     className="govuk-list"
@@ -203,7 +166,7 @@ class PublicationPage extends Component<Props> {
               </h4>
 
               <h4>
-                <span className="govuk-caption-m">Next update: </span>
+                <span className="govuk-caption-m">Next update:</span>
                 <FormattedDate>{data.publication.nextUpdate}</FormattedDate>
 
                 <span className="govuk-caption-m">
@@ -221,9 +184,12 @@ class PublicationPage extends Component<Props> {
         {data.keyStatistics.length > 0 && (
           <>
             <h2 className="govuk-heading-l">
-              {!release ? <>Latest headline </> : <>Headline </>}
-              facts and figures - {data.releaseName}
+              {`${
+                !currentRelease ? 'Latest headline' : 'Headline'
+              } facts and figures - ${data.releaseName}
+              `}
             </h2>
+
             <Tabs>
               <TabsSection id="summary" title="Summary">
                 <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">
@@ -267,6 +233,7 @@ class PublicationPage extends Component<Props> {
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Extra information
         </h2>
+
         <Accordion id="extra-information-sections">
           <AccordionSection
             heading="Where does this data come from"
@@ -347,11 +314,13 @@ class PublicationPage extends Component<Props> {
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Exploring the data
         </h2>
+
         <p>
           The statistics can be viewed as reports, or you can customise and
           download as excel or .csv files . The data can also be accessed via an
           API. <a href="#">What is an API?</a>
         </p>
+
         <Link to="/prototypes/data-table-v3" className="govuk-button">
           Explore pupil absence statistics
         </Link>
@@ -362,4 +331,4 @@ class PublicationPage extends Component<Props> {
   }
 }
 
-export default PublicationPage;
+export default PublicationReleasePage;
