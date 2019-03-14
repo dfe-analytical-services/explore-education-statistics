@@ -99,6 +99,15 @@ jobs:
         inputs:
           artifactName: 'robot-tests'
           targetPath: 'tests/robot-tests'
+  - job: 'Newman_tests'
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish Pipeline Artifact'
+        inputs:
+          artifactName: 'newman-tests'
+          targetPath: 'tests/newman'
 
 #  - job: 'Frontend_Build'
 #    dependsOn: 'Frontend_Test'
