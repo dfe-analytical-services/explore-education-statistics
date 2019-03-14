@@ -55,35 +55,35 @@ jobs:
         displayName: 'npm ci'
         inputs:
           command: 'custom'
-          workingDir: 'src/explore-education-statistics-frontend'
+          workingDir: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
           verbose: false
           customCommand: 'ci'
       - task: 'Npm@1'
         displayName: 'npm test'
         inputs:
           command: 'custom'
-          workingDir: 'src/explore-education-statistics-frontend'
+          workingDir: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
           verbose: false
           customCommand: 'test'
       - task: 'Npm@1'
         displayName: 'npm run lint'
         inputs:
           command: 'custom'
-          workingDir: 'src/explore-education-statistics-frontend'
+          workingDir: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
           verbose: false
           customCommand: 'run lint'
       - task: 'Npm@1'
         displayName: 'npm run format:check'
         inputs:
           command: 'custom'
-          workingDir: 'src/explore-education-statistics-frontend'
+          workingDir: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
           verbose: false
           customCommand: 'run format:check'
       - task: 'Npm@1'
         displayName: 'npm run build'
         inputs:
           command: 'custom'
-          workingDir: 'src/explore-education-statistics-frontend'
+          workingDir: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
           verbose: false
           customCommand: 'run build'
       - task: 'ArchiveFiles@2'
