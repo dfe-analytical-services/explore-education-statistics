@@ -1,47 +1,39 @@
-import React, {
-  ChangeEvent,
-  Component,
-  FormEvent,
-  ReactEventHandler,
-} from 'react';
-
-import 'leaflet/dist/leaflet.css';
-
-import styles from './PrototypeMap.module.scss';
-
-import { Feature, FeatureCollection } from 'geojson';
-
 import { LatLngBounds, Path } from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import React, { ChangeEvent, Component } from 'react';
 import { GeoJSON, Map } from 'react-leaflet';
 
+import styles from './PrototypeMap.module.scss';
+import {
+  PrototypeMapBoundariesFeature,
+  PrototypeMapBoundariesFeatureCollection,
+} from './PrototypeMapBoundaries';
+
 export interface PrototypeMapProps {
-  Boundaries: FeatureCollection;
-  OnFeatureSelect?: any;
+  boundaries: PrototypeMapBoundariesFeatureCollection;
+  onFeatureSelect?: any;
   map: (map: PrototypeMap) => void;
   selectedAuthority?: string;
 }
 
 interface PrototypeMapState {
   selectedAuthority: string;
-  selectedFeature?: Feature;
+  selectedFeature?: PrototypeMapBoundariesFeature;
 }
 
 class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
-  private mapNode: any;
+  public static defaultProps: Partial<PrototypeMapProps> = {
+    onFeatureSelect: undefined,
+    selectedAuthority: '',
+  };
 
   private static DEFAULT_BOUNDS = new LatLngBounds(
     { lat: 48, lng: -6.5 },
     { lat: 60, lng: 2 },
   );
 
-  public static defaultProps: Partial<PrototypeMapProps> = {
-    OnFeatureSelect: undefined,
-    selectedAuthority: '',
-  };
-
-  private data: FeatureCollection;
-  private OnFeatureSelect: any | undefined;
-
+  private mapNode: any;
+  private onFeatureSelect: any | undefined;
   private geoRef: any;
 
   constructor(props: PrototypeMapProps) {
@@ -54,37 +46,24 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
       selectedFeature: undefined,
     };
 
-    /**
-     * lad17cd - code
-     * lad17nm - name
-     */
-
-    this.data = {
-      ...props.Boundaries,
-      features: props.Boundaries.features.map(g => {
-        if (g.properties) {
-          g.properties.selectable = g.properties.lad17cd[0] === 'E';
-        }
-
-        return g;
-      }),
-    } as FeatureCollection;
-
-    this.OnFeatureSelect = this.props.OnFeatureSelect;
+    this.onFeatureSelect = this.props.onFeatureSelect;
   }
 
   public refresh() {
     requestAnimationFrame(_ => this.mapNode.leafletElement.invalidateSize());
   }
 
-  private onEachFeature = (feature: Feature, layer: Path) => {
+  private onEachFeature = (
+    feature: PrototypeMapBoundariesFeature,
+    layer: Path,
+  ) => {
+    const { boundaries } = this.props;
+
     if (feature.properties && feature.properties.selectable) {
-      const featureIndex = this.data.features.findIndex(f => f === feature);
+      const featureIndex = boundaries.features.findIndex(f => f === feature);
 
-      // @ts-ignore
-      this.data.features[featureIndex].properties.layer = layer;
+      boundaries.features[featureIndex].properties.layer = layer;
 
-      // @ts-ignore
       layer.bindTooltip(
         `${feature.properties.lad17nm}<br /> overall absence ${
           feature.properties.absence.overall
@@ -101,39 +80,40 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
     }
   };
 
-  private selectFeature = (feature?: Feature) => {
-    if (this.state.selectedAuthority !== '') {
-      // @ts-ignore
+  private selectFeature = (feature?: PrototypeMapBoundariesFeature) => {
+    if (this.state.selectedAuthority !== '' && this.state.selectedFeature) {
       const currentSelectedLayer = this.state.selectedFeature.properties.layer;
 
-      currentSelectedLayer.getElement().classList.remove(styles.selected);
+      if (currentSelectedLayer) {
+        currentSelectedLayer.getElement()!.classList.remove(styles.selected);
+      }
     }
 
-    // @ts-ignore
     if (feature && feature.properties.selectable) {
-      if (this.OnFeatureSelect && feature && feature.properties) {
-        this.OnFeatureSelect(feature.properties);
+      if (this.onFeatureSelect && feature && feature.properties) {
+        this.onFeatureSelect(feature.properties);
       }
 
       if (feature !== undefined) {
-        // @ts-ignore
         const selectedLayer = feature.properties.layer;
 
-        selectedLayer.getElement().classList.add(styles.selected);
+        if (selectedLayer) {
+          selectedLayer.getElement()!.classList.add(styles.selected);
 
-        this.mapNode.leafletElement.fitBounds(selectedLayer.getBounds(), {
-          padding: [200, 200],
-        });
-        selectedLayer.bringToFront();
+          // @ts-ignore
+          this.mapNode.leafletElement.fitBounds(selectedLayer.getBounds(), {
+            padding: [200, 200],
+          });
+          selectedLayer.bringToFront();
+        }
 
         this.setState({
-          // @ts-ignore
           selectedAuthority: feature.properties.lad17nm,
           selectedFeature: feature,
         });
       }
     } else {
-      this.OnFeatureSelect(undefined);
+      this.onFeatureSelect(undefined);
 
       this.setState({
         selectedAuthority: '',
@@ -146,8 +126,7 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
     }
   };
 
-  // @ts-ignore
-  private click = (e: any) => {
+  private handleClick = (e: any) => {
     if (e.sourceTarget.feature) {
       this.selectFeature(e.sourceTarget.feature);
     }
@@ -156,8 +135,7 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
   private selectAuthority = (e: ChangeEvent<HTMLSelectElement>) => {
     const selectedFeatureName = e.currentTarget.value;
 
-    const feature = this.data.features.find(
-      // @ts-ignore
+    const feature = this.props.boundaries.features.find(
       f => f.properties.lad17nm === selectedFeatureName,
     );
 
@@ -179,8 +157,7 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
     snapshot?: any,
   ): void {
     if (prevProps.selectedAuthority !== this.props.selectedAuthority) {
-      const feature = this.data.features.find(
-        // @ts-ignore
+      const feature = this.props.boundaries.features.find(
         f => f.properties.lad17nm === this.props.selectedAuthority,
       );
 
@@ -189,6 +166,8 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
   }
 
   public render() {
+    const { boundaries } = this.props;
+
     const position = {
       lat: 53.009865,
       lng: -3.2524038,
@@ -211,10 +190,10 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
         >
           <GeoJSON
             ref={(geo: any) => (this.geoRef = geo)}
-            data={this.data}
+            data={boundaries}
             onEachFeature={this.onEachFeature}
             style={this.styleFeature}
-            onClick={this.click}
+            onClick={this.handleClick}
           />
         </Map>
       </div>

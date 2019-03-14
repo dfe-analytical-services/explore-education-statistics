@@ -1,55 +1,51 @@
 import classNames from 'classnames';
-import { FeatureCollection } from 'geojson';
 import React, { Component } from 'react';
 import Details from '../../components/Details';
-import PrototypeMap from './PrototypeMap';
-import { Boundaries } from './PrototypeMapBoundaries';
-
 import styles from './PrototypeAbsenceData.module.scss';
+import PrototypeMap from './PrototypeMap';
+import { PrototypeMapBoundariesFeatureCollection } from './PrototypeMapBoundaries';
 
-interface PrototypeAbsenceDataState {
-  absenceData?: any;
-  selectedAuthority: string;
-}
-
-interface PrototypeAbsenceDataProps {
+interface Props {
   map: (map: PrototypeMap) => void;
 }
 
-class PrototypeAbsenceData extends Component<
-  PrototypeAbsenceDataProps,
-  PrototypeAbsenceDataState
-> {
+interface State {
+  absenceData?: any;
+  boundaries?: PrototypeMapBoundariesFeatureCollection;
+  data?: PrototypeMapBoundariesFeatureCollection;
+  legend?: {
+    idx: number;
+    max: number;
+    min: number;
+  }[];
+  selectedAuthority: string;
+}
+
+class PrototypeAbsenceData extends Component<Props, State> {
+  public state: State = {
+    absenceData: undefined,
+    selectedAuthority: '',
+  };
+
   private map: (map: PrototypeMap) => void;
-  private data: FeatureCollection;
-  private legend: any;
 
-  constructor(props: PrototypeAbsenceDataProps) {
+  constructor(props: Props) {
     super(props);
-
     this.map = props.map;
-
-    this.state = {
-      absenceData: undefined,
-      selectedAuthority: '',
-    };
-
-    this.data = this.generateLegendData(
-      this.preprocessBoundaryData(Boundaries),
-    );
   }
 
-  private preprocessBoundaryData(data: FeatureCollection) {
+  public componentDidMount(): void {
+    import('./PrototypeMapBoundaries').then(({ boundaries }) => {
+      this.generateLegendData(this.preprocessBoundaryData(boundaries));
+    });
+  }
+
+  private preprocessBoundaryData(
+    data: PrototypeMapBoundariesFeatureCollection,
+  ) {
     const dataParsed = {
       ...data,
-      features: data.features.map(g => {
-        if (g.properties) {
-          g.properties.selectable = g.properties.lad17cd[0] === 'E';
-        }
-
-        return g;
-      }),
-    } as FeatureCollection;
+    };
 
     dataParsed.features.sort((a, b) => {
       const c = [
@@ -63,7 +59,7 @@ class PrototypeAbsenceData extends Component<
     return dataParsed;
   }
 
-  private generateLegendData(data: FeatureCollection) {
+  private generateLegendData(data: PrototypeMapBoundariesFeatureCollection) {
     const minOverall = +data.features.reduce(
       (min, next) =>
         next.properties && next.properties.absence.overall < min
@@ -81,34 +77,45 @@ class PrototypeAbsenceData extends Component<
 
     const range = (maxOverall - minOverall) / 4;
 
-    this.legend = [4, 3, 2, 1, 0].map(value => {
+    const legend = [4, 3, 2, 1, 0].map(value => {
       return {
         idx: value,
-        max: (minOverall + (value + 1) / range - 0.1).toFixed(1),
-        min: (minOverall + value / range).toFixed(1),
+        max: +(minOverall + (value + 1) / range - 0.1).toFixed(1),
+        min: +(minOverall + value / range).toFixed(1),
       };
     });
 
-    return {
+    const parsedData = {
       ...data,
       features: data.features.map(feature => {
-        if (feature.properties) {
-          if (feature.properties.selectable) {
-            const rate = Math.floor(
-              (feature.properties.absence.overall - minOverall) / range,
-            );
-            feature.properties.className = styles[`rate${rate}`];
-          } else {
-            feature.properties.className = styles.unselectable;
-          }
+        let className: string = '';
+
+        if (feature.properties.selectable) {
+          const rate = Math.floor(
+            (feature.properties.absence.overall - minOverall) / range,
+          );
+          className = styles[`rate${rate}`];
+        } else {
+          className = styles.unselectable;
         }
 
-        return feature;
+        return {
+          ...feature,
+          properties: {
+            ...feature.properties,
+            className,
+          },
+        };
       }),
     };
+
+    this.setState({
+      legend,
+      data: parsedData,
+    });
   }
 
-  public OnFeatureSelect = (properties: any) => {
+  public onFeatureSelect = (properties: any) => {
     if (properties) {
       this.setState({
         absenceData: {
@@ -133,6 +140,8 @@ class PrototypeAbsenceData extends Component<
   };
 
   public render() {
+    const { data, legend } = this.state;
+
     return (
       <div className="govuk-grid-row">
         <div
@@ -157,21 +166,24 @@ class PrototypeAbsenceData extends Component<
                 className="govuk-select"
               >
                 <option>Select a local authority</option>
-                {this.data.features
-                  .filter(
-                    feature =>
-                      feature.properties && feature.properties.selectable,
-                  )
-                  .map((feature, idx) => (
-                    <option
-                      value={
-                        feature.properties ? feature.properties.lad17nm : ''
-                      }
-                      key={feature.properties ? feature.properties.lad17cd : ''}
-                    >
-                      {feature.properties ? feature.properties.lad17nm : ''}
-                    </option>
-                  ))}
+                {data &&
+                  data.features
+                    .filter(
+                      feature =>
+                        feature.properties && feature.properties.selectable,
+                    )
+                    .map(feature => (
+                      <option
+                        value={
+                          feature.properties ? feature.properties.lad17nm : ''
+                        }
+                        key={
+                          feature.properties ? feature.properties.lad17cd : ''
+                        }
+                      >
+                        {feature.properties ? feature.properties.lad17nm : ''}
+                      </option>
+                    ))}
               </select>
             </div>
           </form>
@@ -230,12 +242,13 @@ class PrototypeAbsenceData extends Component<
           <div className={classNames(styles.legend, styles.hideMobile)}>
             <h3 className="govuk-heading-s">Key to overall absence rate</h3>
             <dl className="govuk-list">
-              {this.legend.map(({ min, max, idx }: any) => (
-                <dd key={idx}>
-                  <span className={styles[`rate${idx}`]}>&nbsp;</span> {min}% to{' '}
-                  {max}%{' '}
-                </dd>
-              ))}
+              {legend &&
+                legend.map(({ min, max, idx }: any) => (
+                  <dd key={idx}>
+                    <span className={styles[`rate${idx}`]}>&nbsp;</span> {min}%
+                    to {max}%{' '}
+                  </dd>
+                ))}
             </dl>
           </div>
         </div>
@@ -245,12 +258,14 @@ class PrototypeAbsenceData extends Component<
             styles.hideMobile,
           )}
         >
-          <PrototypeMap
-            Boundaries={Boundaries}
-            OnFeatureSelect={this.OnFeatureSelect}
-            map={m => this.map(m)}
-            selectedAuthority={this.state.selectedAuthority}
-          />
+          {data && (
+            <PrototypeMap
+              boundaries={data}
+              onFeatureSelect={this.onFeatureSelect}
+              map={m => this.map(m)}
+              selectedAuthority={this.state.selectedAuthority}
+            />
+          )}
         </div>
       </div>
     );
