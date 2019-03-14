@@ -48,7 +48,7 @@ jobs:
 
   - job: 'Frontend'
     pool:
-      vmImage: 'ubuntu-16.04'
+      vmImage: 'vs2017-win2016'
       demands: 'npm'
     steps:
       - task: 'Npm@1'
@@ -79,7 +79,7 @@ jobs:
           workingDir: 'src/explore-education-statistics-frontend'
           verbose: false
           customCommand: 'run format:check'
-       - task: 'Npm@1'
+      - task: 'Npm@1'
         displayName: 'npm run build'
         inputs:
           command: 'custom'
