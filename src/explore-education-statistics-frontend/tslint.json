@@ -10,7 +10,9 @@
   "jsRules": {},
   "linterOptions": {
     "exclude": [
-      "src/prototypes/components/PrototypeMapBoundaries.ts"
+      "src/prototypes/components/PrototypeMapBoundaries.ts",
+      "*.json",
+      "**/*.json"
       ]
   },
   "rules": {
