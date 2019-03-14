@@ -355,8 +355,7 @@
         "hostingEnvironment": ""
       },
       "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('publicAppName'))]"
+        "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]"
       ]
     },
     {
