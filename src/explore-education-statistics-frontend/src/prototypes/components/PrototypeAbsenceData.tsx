@@ -1,9 +1,14 @@
 import classNames from 'classnames';
+import dynamic from 'next-server/dynamic';
 import React, { Component } from 'react';
 import Details from '../../components/Details';
 import styles from './PrototypeAbsenceData.module.scss';
 import PrototypeMap from './PrototypeMap';
 import { PrototypeMapBoundariesFeatureCollection } from './PrototypeMapBoundaries';
+
+const DynamicPrototypeMap = dynamic(() => import('./PrototypeMap'), {
+  ssr: false,
+});
 
 interface Props {
   map: (map: PrototypeMap) => void;
@@ -259,7 +264,7 @@ class PrototypeAbsenceData extends Component<Props, State> {
           )}
         >
           {data && (
-            <PrototypeMap
+            <DynamicPrototypeMap
               boundaries={data}
               onFeatureSelect={this.onFeatureSelect}
               map={m => this.map(m)}
