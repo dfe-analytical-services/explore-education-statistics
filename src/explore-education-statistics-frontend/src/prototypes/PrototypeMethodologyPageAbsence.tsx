@@ -8,6 +8,7 @@ import PrototypeAnnexA from './components/methodology/absence/PrototypeAnnexA';
 import PrototypeAnnexB from './components/methodology/absence/PrototypeAnnexB';
 import PrototypeAnnexC from './components/methodology/absence/PrototypeAnnexC';
 import PrototypeAnnexD from './components/methodology/absence/PrototypeAnnexD';
+import PrototypeAnnexE from './components/methodology/absence/PrototypeAnnexE';
 import PrototypeSection1 from './components/methodology/absence/PrototypeSection1';
 import PrototypeSection2 from './components/methodology/absence/PrototypeSection2';
 import PrototypeSection3 from './components/methodology/absence/PrototypeSection3';
@@ -183,7 +184,7 @@ const PublicationPage = () => {
           <PrototypeAnnexD />
         </AccordionSection>
         <AccordionSection heading="Annex E, standard breakdowns that are currently published">
-          <p>breakdowns</p>
+          <PrototypeAnnexE />
         </AccordionSection>
         <AccordionSection heading="Annex F, timeline">
           <p>timeline</p>
