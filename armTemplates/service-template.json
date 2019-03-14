@@ -271,7 +271,7 @@
           "connectionStrings": [
             {
               "name": "AzureStorage",
-              "connectionString":"[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value),';EndpointSuffix=core.windows.net')]"
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value),';EndpointSuffix=core.windows.net')]"
             },
             {
               "name": "ContentDb",
@@ -321,58 +321,60 @@
       }
     },
     {
-        "type": "Microsoft.Web/sites",
-        "name": "[variables('publicAppName')]",
-        "properties": {
-            "siteConfig": {
-                "linuxFxVersion": "NODE|10.14",
-                "windowsFxVersion": null,
-                "appSettings": [
-                    {
-                        "name": "WEBSITE_NODE_DEFAULT_VERSION",
-                        "value": "10.14"
-                    },
-                    {
-                        "name": "NODE_ENV",
-                        "value": "production"
-                    },
-                    {
-                        "name": "CONTENT_API_BASE_URL",
-                        "value": "//"
-                    },
-                    {
-                        "name": "DATA_API_BASE_URL",
-                        "value": "//"
-                    }
-                ]
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('publicAppName')]",
+      "apiVersion": "2016-08-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]": "empty"
+      },
+      "properties": {
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "WEBSITE_NODE_DEFAULT_VERSION",
+              "value": "8.11.1"
             },
-            "name": "[variables('publicAppName')]",
-            "serverFarmId": "[variables('publicPlanName')]",
-            "hostingEnvironment": ""
+            {
+              "name": "NODE_ENV",
+              "value": "production"
+            },
+            {
+              "name": "CONTENT_API_BASE_URL",
+              "value": "//content-explore-education-statistics-test.azurewebsites.net/"
+            },
+            {
+              "name": "DATA_API_BASE_URL",
+              "value": "//data-explore-education-statistics-test.azurewebsites.net/"
+            }
+          ],
+          "phpVersion": "off"
         },
-        "apiVersion": "2016-08-01",
-        "location": "UK South",
-        "dependsOn": [
-            "[variables('publicPlanName')]"
-        ]
+        "name": "[variables('publicAppName')]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
+        "hostingEnvironment": ""
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
+        "[resourceId('microsoft.insights/components/', variables('publicAppName'))]"
+      ]
     },
     {
-        "apiVersion": "2016-09-01",
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "Tier": "[first(skip(split(parameters('sku'), ' '), 1))]",
+        "Name": "[first(split(parameters('sku'), ' '))]"
+      },
+      "name": "[variables('publicPlanName')]",
+      "apiVersion": "2015-08-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
         "name": "[variables('publicPlanName')]",
-        "type": "Microsoft.Web/serverfarms",
-        "location": "UK South",
-        "properties": {
-            "name": "[variables('publicPlanName')]",
-            "workerSizeId": "1",
-            "reserved": true,
-            "numberOfWorkers": "1",
-            "hostingEnvironment": ""
-        },
-        "sku": {
-            "Tier": "Basic",
-            "Name": "B1"
-        },
-        "kind": "linux"
+        "workerSizeId": "0",
+        "reserved": false,
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
+      }
     },
     {
       "name": "[parameters('storageAccountName')]",
@@ -449,6 +451,5 @@
         }
       ]
     }
-
   ]
 }
