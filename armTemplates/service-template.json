@@ -330,6 +330,7 @@
       },
       "properties": {
         "siteConfig": {
+          "AlwaysOn": true,
           "appSettings": [
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
@@ -361,8 +362,8 @@
     {
       "type": "Microsoft.Web/serverfarms",
       "sku": {
-        "Tier": "[first(skip(split(parameters('sku'), ' '), 1))]",
-        "Name": "[first(split(parameters('sku'), ' '))]"
+        "Tier": "Basic",
+        "Name": "B1"
       },
       "name": "[variables('publicPlanName')]",
       "apiVersion": "2015-08-01",
