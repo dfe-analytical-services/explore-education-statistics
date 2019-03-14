@@ -85,7 +85,7 @@ jobs:
           command: 'custom'
           workingDir: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
           verbose: false
-          customCommand: 'run build'
+          customCommand: 'run build:test'
       - task: 'ArchiveFiles@2'
         displayName: 'Archive frontend'
         inputs:
