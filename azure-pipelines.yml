@@ -1,455 +1,149 @@
-{
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "webAppName": {
-      "type": "string"
-    },
-    "hostingPlanName": {
-      "type": "string"
-    },
-    "appInsightsLocation": {
-      "type": "string"
-    },
-    "sku": {
-      "type": "string",
-      "defaultValue": "Standard S1"
-    },
-    "storageAccountName": {
-      "type": "string"
-    },
-    "cosmosAccountName": {
-      "type": "string"
-    },
-    "sqlAdministratorLogin": {
-      "type": "string",
-      "metadata": {
-        "description": "The admin user of the SQL Server"
-      }
-    },
-    "sqlAdministratorLoginPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "The password of the admin user of the SQL Server"
-      }
-    }
-  },
-  "variables": {
-    "dataAppName": "[concat('data-', parameters('webAppName'))]",
-    "contentAppName": "[concat('content-', parameters('webAppName'))]",
-    "adminAppName": "[concat('admin-', parameters('webAppName'))]",
-    "publicAppName": "[concat('public-', parameters('webAppName'))]",
-    "dataPlanName": "[concat('data-', parameters('hostingPlanName'))]",
-    "contentPlanName": "[concat('content-', parameters('hostingPlanName'))]",
-    "adminPlanName": "[concat('admin-', parameters('hostingPlanName'))]",
-    "publicPlanName": "[concat('public-', parameters('hostingPlanName'))]",
-    "importFunctionName": "[concat('data-', parameters('webAppName'))]",
-    "sqlserverName": "[parameters('webAppName')]"
-  },
-  "resources": [
-    {
-      "apiVersion": "2015-04-08",
-      "kind": "MongoDB",
-      "type": "Microsoft.DocumentDb/databaseAccounts",
-      "name": "[parameters('cosmosAccountName')]",
-      "location": "westeurope",
-      "properties": {
-        "databaseAccountOfferType": "Standard",
-        "locations": [
-          {
-            "failoverPriority": 0,
-            "locationName": "westeurope"
-          }
-        ],
-        "enableMultipleWriteLocations": false,
-        "isVirtualNetworkFilterEnabled": false,
-        "virtualNetworkRules": [],
-        "dependsOn": []
-      }
-    },
-    {
-      "type": "Microsoft.Web/sites",
-      "name": "[variables('dataAppName')]",
-      "apiVersion": "2016-08-01",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('dataPlanName'))]": "empty"
-      },
-      "resources": [
-        {
-          "type": "siteextensions",
-          "name": "Microsoft.ApplicationInsights.AzureWebSites",
-          "apiVersion": "2015-08-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
-          ],
-          "properties": {}
-        }
-      ],
-      "properties": {
-        "siteConfig": {
-          "appSettings": [
-            {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', variables('dataAppName')), '2015-05-01').InstrumentationKey]"
-            },
-            {
-              "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "6.9.1"
-            },
-            {
-              "name": "AzureStorageConfig:CosmosEndpointUrl",
-              "value": "[Concat('https://',  parameters('cosmosAccountName'), '.documents.azure.com:443')]"
-            },
-            {
-              "name": "AzureStorageConfig:CosmosAuthorizationKey",
-              "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('cosmosAccountName')), '2015-04-08').primaryMasterKey]"
-            },
-            {
-              "name": "SeedConfig:BatchSize",
-              "value": "50"
-            }
-          ],
-          "connectionStrings": [
-            {
-              "name": "StatisticsDb",
-              "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
-            }
-          ],
-          "phpVersion": "off"
-        },
-        "name": "[variables('dataAppName')]",
-        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
-        "hostingEnvironment": ""
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('dataAppName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Web/serverfarms",
-      "sku": {
-        "Tier": "[first(skip(split(parameters('sku'), ' '), 1))]",
-        "Name": "[first(split(parameters('sku'), ' '))]"
-      },
-      "name": "[variables('dataPlanName')]",
-      "apiVersion": "2015-08-01",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "name": "[variables('dataPlanName')]",
-        "workerSizeId": "0",
-        "reserved": false,
-        "numberOfWorkers": "1",
-        "hostingEnvironment": ""
-      }
-    },
-    {
-      "type": "Microsoft.Insights/components",
-      "name": "[variables('dataAppName')]",
-      "apiVersion": "2014-04-01",
-      "location": "[parameters('appInsightsLocation')]",
-      "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('dataAppName'))]": "Resource"
-      },
-      "properties": {
-        "applicationId": "[variables('dataAppName')]",
-        "Request_Source": "AzureTfsExtensionAzureProject"
-      }
-    },
-    {
-      "type": "Microsoft.Web/sites",
-      "name": "[variables('contentAppName')]",
-      "apiVersion": "2016-08-01",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('contentPlanName'))]": "empty"
-      },
-      "resources": [
-        {
-          "type": "siteextensions",
-          "name": "Microsoft.ApplicationInsights.AzureWebSites",
-          "apiVersion": "2015-08-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
-          ],
-          "properties": {}
-        }
-      ],
-      "properties": {
-        "siteConfig": {
-          "appSettings": [
-            {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', variables('contentAppName')), '2015-05-01').InstrumentationKey]"
-            },
-            {
-              "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "6.9.1"
-            }
-          ],
-          "connectionStrings": [
-            {
-              "name": "ContentDb",
-              "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
-            }
-          ],
-          "phpVersion": "off"
-        },
-        "name": "[variables('contentAppName')]",
-        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
-        "hostingEnvironment": ""
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('contentAppName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Web/serverfarms",
-      "sku": {
-        "Tier": "[first(skip(split(parameters('sku'), ' '), 1))]",
-        "Name": "[first(split(parameters('sku'), ' '))]"
-      },
-      "name": "[variables('contentPlanName')]",
-      "apiVersion": "2015-08-01",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "name": "[variables('contentPlanName')]",
-        "workerSizeId": "0",
-        "reserved": false,
-        "numberOfWorkers": "1",
-        "hostingEnvironment": ""
-      }
-    },
-    {
-      "type": "Microsoft.Insights/components",
-      "name": "[variables('contentAppName')]",
-      "apiVersion": "2014-04-01",
-      "location": "[parameters('appInsightsLocation')]",
-      "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('contentAppName'))]": "Resource"
-      },
-      "properties": {
-        "applicationId": "[variables('contentAppName')]",
-        "Request_Source": "AzureTfsExtensionAzureProject"
-      }
-    },
-    {
-      "type": "Microsoft.Web/sites",
-      "name": "[variables('adminAppName')]",
-      "apiVersion": "2016-08-01",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('adminPlanName'))]": "empty"
-      },
-      "resources": [
-        {
-          "type": "siteextensions",
-          "name": "Microsoft.ApplicationInsights.AzureWebSites",
-          "apiVersion": "2015-08-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
-          ],
-          "properties": {}
-        }
-      ],
-      "properties": {
-        "siteConfig": {
-          "appSettings": [
-            {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', variables('adminAppName')), '2015-05-01').InstrumentationKey]"
-            },
-            {
-              "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "6.9.1"
-            }
-          ],
-          "connectionStrings": [
-            {
-              "name": "AzureStorage",
-              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value),';EndpointSuffix=core.windows.net')]"
-            },
-            {
-              "name": "ContentDb",
-              "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
-            }
-          ],
-          "phpVersion": "off"
-        },
-        "name": "[variables('adminAppName')]",
-        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
-        "hostingEnvironment": ""
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', variables('adminPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('adminAppName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Web/serverfarms",
-      "sku": {
-        "Tier": "[first(skip(split(parameters('sku'), ' '), 1))]",
-        "Name": "[first(split(parameters('sku'), ' '))]"
-      },
-      "name": "[variables('adminPlanName')]",
-      "apiVersion": "2015-08-01",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "name": "[variables('adminPlanName')]",
-        "workerSizeId": "0",
-        "reserved": false,
-        "numberOfWorkers": "1",
-        "hostingEnvironment": ""
-      }
-    },
-    {
-      "type": "Microsoft.Insights/components",
-      "name": "[variables('adminAppName')]",
-      "apiVersion": "2014-04-01",
-      "location": "[parameters('appInsightsLocation')]",
-      "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('contentAppName'))]": "Resource"
-      },
-      "properties": {
-        "applicationId": "[variables('adminAppName')]",
-        "Request_Source": "AzureTfsExtensionAzureProject"
-      }
-    },
-    {
-      "type": "Microsoft.Web/sites",
-      "name": "[variables('publicAppName')]",
-      "apiVersion": "2016-08-01",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]": "empty"
-      },
-      "properties": {
-        "siteConfig": {
-          "appSettings": [
-            {
-              "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "8.11.1"
-            },
-            {
-              "name": "NODE_ENV",
-              "value": "production"
-            },
-            {
-              "name": "CONTENT_API_BASE_URL",
-              "value": "//content-explore-education-statistics-test.azurewebsites.net/"
-            },
-            {
-              "name": "DATA_API_BASE_URL",
-              "value": "//data-explore-education-statistics-test.azurewebsites.net/"
-            }
-          ],
-          "phpVersion": "off"
-        },
-        "name": "[variables('publicAppName')]",
-        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
-        "hostingEnvironment": ""
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('publicAppName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Web/serverfarms",
-      "sku": {
-        "Tier": "[first(skip(split(parameters('sku'), ' '), 1))]",
-        "Name": "[first(split(parameters('sku'), ' '))]"
-      },
-      "name": "[variables('publicPlanName')]",
-      "apiVersion": "2015-08-01",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "name": "[variables('publicPlanName')]",
-        "workerSizeId": "0",
-        "reserved": false,
-        "numberOfWorkers": "1",
-        "hostingEnvironment": ""
-      }
-    },
-    {
-      "name": "[parameters('storageAccountName')]",
-      "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-07-01",
-      "location": "westeurope",
-      "properties": {
-        "accessTier": "Hot",
-        "supportsHttpsTrafficOnly": true
-      },
-      "dependsOn": [],
-      "sku": {
-        "name": "Standard_RAGRS"
-      },
-      "kind": "StorageV2"
-    },
+variables:
+  BuildConfiguration: 'Release'
+  CI: true
 
-    {
-      "name": "[variables('sqlserverName')]",
-      "type": "Microsoft.Sql/servers",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "SqlServer"
-      },
-      "apiVersion": "2014-04-01",
-      "properties": {
-        "administratorLogin": "[parameters('sqlAdministratorLogin')]",
-        "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
-        "version": "12.0"
-      },
-      "resources": [
-        {
-          "name": "statistics",
-          "type": "databases",
-          "location": "[resourceGroup().location]",
-          "tags": {
-            "displayName": "Database"
-          },
-          "apiVersion": "2015-01-01",
-          "dependsOn": ["[variables('sqlserverName')]"],
-          "properties": {
-            "edition": "Standard",
-            "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "maxSizeBytes": "268435456000",
-            "requestedServiceObjectiveName": "S3"
-          }
-        },
-        {
-          "name": "content",
-          "type": "databases",
-          "location": "[resourceGroup().location]",
-          "tags": {
-            "displayName": "Database"
-          },
-          "apiVersion": "2015-01-01",
-          "dependsOn": ["[variables('sqlserverName')]"],
-          "properties": {
-            "edition": "Basic",
-            "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "maxSizeBytes": "1073741824",
-            "requestedServiceObjectiveName": "Basic"
-          }
-        },
-        {
-          "type": "firewallrules",
-          "apiVersion": "2014-04-01",
-          "dependsOn": ["[variables('sqlserverName')]"],
-          "location": "[resourceGroup().location]",
-          "name": "AllowAllWindowsAzureIps",
-          "properties": {
-            "endIpAddress": "0.0.0.0",
-            "startIpAddress": "0.0.0.0"
-          }
-        }
-      ]
-    }
-  ]
-}
+trigger: [ 'master' ]
+pr: [ 'master' ]
+
+jobs:
+  - job: 'Backend'
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Restore'
+        inputs:
+          command: 'restore'
+          projects: '**/GovUk.*/*csproj'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Build'
+        inputs:
+          projects: '**/GovUk.*/*csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Test'
+        inputs:
+          command: 'test'
+          projects: '**/GovUk.*[Tt]ests/*.csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.*/*.csproj'
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+          zipAfterPublish: True
+      - task: 'CopyFiles@2'
+        displayName: 'Copy ARM templates'
+        inputs:
+          SourceFolder: 'armTemplates'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Pipeline Artifact'
+        inputs:
+          artifactName: 'backend'
+          targetPath: '$(Build.ArtifactStagingDirectory)'
+
+  - job: 'Frontend'
+    pool:
+      vmImage: 'ubuntu-16.04'
+      demands: 'npm'
+    steps:
+      - task: 'Npm@1'
+        displayName: 'npm ci'
+        inputs:
+          command: 'custom'
+          workingDir: 'src/explore-education-statistics-frontend'
+          verbose: false
+          customCommand: 'ci'
+      - task: 'Npm@1'
+        displayName: 'npm test'
+        inputs:
+          command: 'custom'
+          workingDir: 'src/explore-education-statistics-frontend'
+          verbose: false
+          customCommand: 'test'
+      - task: 'Npm@1'
+        displayName: 'npm run lint'
+        inputs:
+          command: 'custom'
+          workingDir: 'src/explore-education-statistics-frontend'
+          verbose: false
+          customCommand: 'run lint'
+      - task: 'Npm@1'
+        displayName: 'npm run format:check'
+        inputs:
+          command: 'custom'
+          workingDir: 'src/explore-education-statistics-frontend'
+          verbose: false
+          customCommand: 'run format:check'
+       - task: 'Npm@1'
+        displayName: 'npm run build'
+        inputs:
+          command: 'custom'
+          workingDir: 'src/explore-education-statistics-frontend'
+          verbose: false
+          customCommand: 'run build'
+      - task: 'ArchiveFiles@2'
+        displayName: 'Archive frontend'
+        inputs:
+          rootFolderOrFile: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
+          includeRootFolder: false
+          archiveFile: '$(Build.ArtifactStagingDirectory)/explore-education-statistics-frontend.zip'
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Pipeline Artifact'
+        inputs:
+          artifactName: 'frontend'
+          targetPath: '$(Build.ArtifactStagingDirectory)'
+  - job: 'Selenium_tests'
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish Pipeline Artifact'
+        inputs:
+          artifactName: 'robot-tests'
+          targetPath: 'tests/robot-tests'
+  - job: 'Newman_tests'
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish Pipeline Artifact'
+        inputs:
+          artifactName: 'newman-tests'
+          targetPath: 'tests/newman'
+
+#  - job: 'Frontend_Build'
+#    dependsOn: 'Frontend_Test'
+#    pool:
+#      vmImage: 'ubuntu-16.04'
+#      demands: 'npm'
+#    steps:
+#    - task: 'Npm@1'
+#      displayName: 'npm ci'
+#      inputs:
+#        command: 'custom'
+#        workingDir: 'src/explore-education-statistics-frontend'
+#        verbose: false
+#        customCommand: 'ci'
+#    - task: 'Npm@1'
+#      displayName: 'npm run build:test'
+#      inputs:
+#        command: 'custom'
+#        workingDir: 'src/explore-education-statistics-frontend'
+#        verbose: false
+#        customCommand: 'run build:test'
+#    - task: 'ArchiveFiles@2'
+#      displayName: 'Archive frontend'
+#      inputs:
+#        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
+#        includeRootFolder: false
+#        archiveFile: '$(Build.ArtifactStagingDirectory)/explore-education-statistics-frontend.zip'
+#    - task: 'PublishPipelineArtifact@0'
+#      displayName: 'Publish Pipeline Artifact'
+#      inputs:
+#        artifactName: 'frontend'
+#        targetPath: '$(Build.ArtifactStagingDirectory)'
