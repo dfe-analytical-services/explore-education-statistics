@@ -1,7 +1,7 @@
 import { NextContext } from 'next';
 import React, { Component } from 'react';
-import { Helmet } from 'react-helmet';
 import Page from '../components/Page';
+import PageTitle from '../components/PageTitle';
 
 interface Props {
   errorMessage: string;
@@ -29,7 +29,7 @@ class ErrorPage extends Component<Props> {
       case 404:
         return (
           <>
-            <h1>{ErrorPage.statusCodeTitles[404]}</h1>
+            <PageTitle title={ErrorPage.statusCodeTitles[404]} />
 
             <p>If you typed the web address, check it is correct.</p>
             <p>
@@ -41,7 +41,7 @@ class ErrorPage extends Component<Props> {
       default:
         return (
           <>
-            <h1>{ErrorPage.statusCodeTitles[500]}</h1>
+            <PageTitle title={ErrorPage.statusCodeTitles[500]} />
 
             <p>Please try again later.</p>
           </>
@@ -57,21 +57,15 @@ class ErrorPage extends Component<Props> {
 
     return (
       <Page>
-        <Helmet>
-          <title>{pageTitle} - GOV.UK</title>
-        </Helmet>
+        {errorMessage ? (
+          <>
+            <PageTitle title={pageTitle} />
 
-        <div className="govuk-grid-column-two-thirds">
-          {errorMessage ? (
-            <>
-              <h1>There was a problem</h1>
-
-              <p>{errorMessage}</p>
-            </>
-          ) : (
-            this.getStatusCodePage()
-          )}
-        </div>
+            <p>{errorMessage}</p>
+          </>
+        ) : (
+          this.getStatusCodePage()
+        )}
       </Page>
     );
   }
