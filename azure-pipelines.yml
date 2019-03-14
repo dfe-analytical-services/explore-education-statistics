@@ -79,6 +79,13 @@ jobs:
           workingDir: 'src/explore-education-statistics-frontend'
           verbose: false
           customCommand: 'run format:check'
+       - task: 'Npm@1'
+        displayName: 'npm run build'
+        inputs:
+          command: 'custom'
+          workingDir: 'src/explore-education-statistics-frontend'
+          verbose: false
+          customCommand: 'run build'
       - task: 'ArchiveFiles@2'
         displayName: 'Archive frontend'
         inputs:
