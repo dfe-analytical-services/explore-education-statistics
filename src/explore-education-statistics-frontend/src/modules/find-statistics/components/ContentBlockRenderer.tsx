@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Block } from './ContentBlock';
+import { DataBlock } from './DataBlock';
 
 interface ContentBlockRendererProps {
   block: Block;
@@ -20,6 +21,8 @@ class ContentBlockRenderer extends Component<ContentBlockRendererProps> {
             <ReactMarkdown className="govuk-body" source={block.body} />
           </div>
         );
+      case 'DataBlock':
+        return <DataBlock {...block} />;
       default:
         return null;
     }

@@ -2,10 +2,14 @@ import classNames from 'classnames';
 import { FeatureCollection } from 'geojson';
 import React, { Component } from 'react';
 import Details from '../../components/Details';
-import PrototypeMap from './PrototypeMap';
+
 import { Boundaries } from './PrototypeMapBoundaries';
 
+import dynamic from 'next/dynamic';
+
 import styles from './PrototypeAbsenceData.module.scss';
+
+const PrototypeMap = dynamic(() => import('./PrototypeMap'), { ssr: false });
 
 interface PrototypeAbsenceDataState {
   absenceData?: any;
@@ -13,14 +17,14 @@ interface PrototypeAbsenceDataState {
 }
 
 interface PrototypeAbsenceDataProps {
-  map: (map: PrototypeMap) => void;
+  map: (map: any) => void;
 }
 
 class PrototypeAbsenceData extends Component<
   PrototypeAbsenceDataProps,
   PrototypeAbsenceDataState
 > {
-  private map: (map: PrototypeMap) => void;
+  private map: (map: any) => void;
   private data: FeatureCollection;
   private legend: any;
 

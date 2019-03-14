@@ -5,11 +5,19 @@ interface Props {
   content: Block[];
 }
 
+export interface DataQuery {
+  path: string;
+  method: string;
+  body: string;
+}
+
 export interface Block {
   body: string;
   heading: string;
   order: number;
   type: string;
+  dataQuery: DataQuery;
+  chartType: string;
 }
 
 class ContentBlock extends Component<Props> {
