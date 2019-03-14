@@ -1,6 +1,6 @@
 import { LatLngBounds, Path } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import React, { ChangeEvent, Component } from 'react';
+import React, { ChangeEvent, Component, RefAttributes } from 'react';
 import { GeoJSON, Map } from 'react-leaflet';
 
 import styles from './PrototypeMap.module.scss';
@@ -9,19 +9,20 @@ import {
   PrototypeMapBoundariesFeatureCollection,
 } from './PrototypeMapBoundaries';
 
-export interface PrototypeMapProps {
+export type PrototypeMapProps = {
   boundaries: PrototypeMapBoundariesFeatureCollection;
-  onFeatureSelect?: any;
-  map: (map: PrototypeMap) => void;
+  onFeatureSelect?: (
+    properties: PrototypeMapBoundariesFeature['properties'],
+  ) => void;
   selectedAuthority?: string;
-}
+} & RefAttributes<PrototypeMap>;
 
-interface PrototypeMapState {
+interface State {
   selectedAuthority: string;
   selectedFeature?: PrototypeMapBoundariesFeature;
 }
 
-class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
+class PrototypeMap extends Component<PrototypeMapProps, State> {
   public static defaultProps: Partial<PrototypeMapProps> = {
     onFeatureSelect: undefined,
     selectedAuthority: '',
@@ -32,25 +33,19 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
     { lat: 60, lng: 2 },
   );
 
-  private mapNode: any;
-  private onFeatureSelect: any | undefined;
-  private geoRef: any;
+  public state: State = {
+    selectedAuthority: this.props.selectedAuthority || '',
+    selectedFeature: undefined,
+  };
 
-  constructor(props: PrototypeMapProps) {
-    super(props);
-
-    if (props.map) props.map(this);
-
-    this.state = {
-      selectedAuthority: props.selectedAuthority || '',
-      selectedFeature: undefined,
-    };
-
-    this.onFeatureSelect = this.props.onFeatureSelect;
-  }
+  private mapRef: Map | null = null;
 
   public refresh() {
-    requestAnimationFrame(_ => this.mapNode.leafletElement.invalidateSize());
+    requestAnimationFrame(_ => {
+      if (this.mapRef) {
+        this.mapRef.leafletElement.invalidateSize();
+      }
+    });
   }
 
   private onEachFeature = (
@@ -90,8 +85,10 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
     }
 
     if (feature && feature.properties.selectable) {
-      if (this.onFeatureSelect && feature && feature.properties) {
-        this.onFeatureSelect(feature.properties);
+      if (this.props.onFeatureSelect && feature && feature.properties) {
+        if (this.props.onFeatureSelect) {
+          this.props.onFeatureSelect(feature.properties);
+        }
       }
 
       if (feature !== undefined) {
@@ -101,7 +98,7 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
           selectedLayer.getElement()!.classList.add(styles.selected);
 
           // @ts-ignore
-          this.mapNode.leafletElement.fitBounds(selectedLayer.getBounds(), {
+          this.mapRef.leafletElement.fitBounds(selectedLayer.getBounds(), {
             padding: [200, 200],
           });
           selectedLayer.bringToFront();
@@ -113,16 +110,16 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
         });
       }
     } else {
-      this.onFeatureSelect(undefined);
-
       this.setState({
         selectedAuthority: '',
         selectedFeature: undefined,
       });
 
-      this.mapNode.leafletElement.fitBounds(PrototypeMap.DEFAULT_BOUNDS, {
-        padding: [200, 200],
-      });
+      if (this.mapRef) {
+        this.mapRef.leafletElement.fitBounds(PrototypeMap.DEFAULT_BOUNDS, {
+          padding: [200, 200],
+        });
+      }
     }
   };
 
@@ -153,7 +150,7 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
 
   public componentDidUpdate(
     prevProps: Readonly<PrototypeMapProps>,
-    prevState: Readonly<PrototypeMapState>,
+    prevState: Readonly<State>,
     snapshot?: any,
   ): void {
     if (prevProps.selectedAuthority !== this.props.selectedAuthority) {
@@ -180,7 +177,7 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
           local authority
         </h3>
         <Map
-          ref={(n: any) => (this.mapNode = n)}
+          ref={el => (this.mapRef = el)}
           center={position}
           className={styles.map}
           zoom={6.5}
@@ -189,7 +186,6 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
           maxBounds={PrototypeMap.DEFAULT_BOUNDS}
         >
           <GeoJSON
-            ref={(geo: any) => (this.geoRef = geo)}
             data={boundaries}
             onEachFeature={this.onEachFeature}
             style={this.styleFeature}

@@ -1,18 +1,18 @@
 import classNames from 'classnames';
 import dynamic from 'next-server/dynamic';
-import React, { Component } from 'react';
+import React, { Component, RefAttributes } from 'react';
 import Details from '../../components/Details';
+import { FormSelect } from '../../components/form';
 import styles from './PrototypeAbsenceData.module.scss';
 import PrototypeMap from './PrototypeMap';
-import { PrototypeMapBoundariesFeatureCollection } from './PrototypeMapBoundaries';
+import {
+  PrototypeMapBoundariesFeature,
+  PrototypeMapBoundariesFeatureCollection,
+} from './PrototypeMapBoundaries';
 
 const DynamicPrototypeMap = dynamic(() => import('./PrototypeMap'), {
   ssr: false,
 });
-
-interface Props {
-  map: (map: PrototypeMap) => void;
-}
 
 interface State {
   absenceData?: any;
@@ -26,18 +26,16 @@ interface State {
   selectedAuthority: string;
 }
 
-class PrototypeAbsenceData extends Component<Props, State> {
+class PrototypeAbsenceData extends Component<
+  RefAttributes<PrototypeAbsenceData>,
+  State
+> {
   public state: State = {
     absenceData: undefined,
     selectedAuthority: '',
   };
 
-  private map: (map: PrototypeMap) => void;
-
-  constructor(props: Props) {
-    super(props);
-    this.map = props.map;
-  }
+  public mapRef: PrototypeMap | null = null;
 
   public componentDidMount(): void {
     import('./PrototypeMapBoundaries').then(({ boundaries }) => {
@@ -120,32 +118,10 @@ class PrototypeAbsenceData extends Component<Props, State> {
     });
   }
 
-  public onFeatureSelect = (properties: any) => {
-    if (properties) {
-      this.setState({
-        absenceData: {
-          values: properties.absence,
-        },
-        selectedAuthority: properties.lad17nm,
-      });
-    } else {
-      this.setState({
-        absenceData: undefined,
-        selectedAuthority: '',
-      });
-    }
-  };
-
-  public selectAuthority = (e: any) => {
-    const selectedAuthority = e.currentTarget.value;
-
-    this.setState({
-      selectedAuthority,
-    });
-  };
-
   public render() {
     const { data, legend } = this.state;
+
+    const localAuthorityOptions = data ? data.features : [];
 
     return (
       <div className="govuk-grid-row">
@@ -158,38 +134,34 @@ class PrototypeAbsenceData extends Component<Props, State> {
         >
           <form>
             <div className="govuk-form-group govuk-!-margin-bottom-6">
-              <label
-                className="govuk-label govuk-label--s"
-                htmlFor="selectedAuthority"
-              >
-                Select a local authority
-              </label>
-              <select
+              <FormSelect
+                name="selectedAuthority"
                 id="selectedAuthority"
+                label="Select a local authority"
                 value={this.state.selectedAuthority}
-                onChange={this.selectAuthority}
-                className="govuk-select"
-              >
-                <option>Select a local authority</option>
-                {data &&
-                  data.features
+                onChange={e => {
+                  this.setState({
+                    selectedAuthority: e.currentTarget.value,
+                  });
+                }}
+                options={[
+                  { text: 'Select a local authority', value: '' },
+                ].concat(
+                  localAuthorityOptions
                     .filter(
                       feature =>
                         feature.properties && feature.properties.selectable,
                     )
-                    .map(feature => (
-                      <option
-                        value={
-                          feature.properties ? feature.properties.lad17nm : ''
-                        }
-                        key={
-                          feature.properties ? feature.properties.lad17cd : ''
-                        }
-                      >
-                        {feature.properties ? feature.properties.lad17nm : ''}
-                      </option>
-                    ))}
-              </select>
+                    .map(feature => ({
+                      text: feature.properties
+                        ? feature.properties.lad17nm
+                        : '',
+                      value: feature.properties
+                        ? feature.properties.lad17nm
+                        : '',
+                    })),
+                )}
+              />
             </div>
           </form>
 
@@ -266,8 +238,24 @@ class PrototypeAbsenceData extends Component<Props, State> {
           {data && (
             <DynamicPrototypeMap
               boundaries={data}
-              onFeatureSelect={this.onFeatureSelect}
-              map={m => this.map(m)}
+              onFeatureSelect={(
+                properties: PrototypeMapBoundariesFeature['properties'],
+              ) => {
+                if (properties) {
+                  this.setState({
+                    absenceData: {
+                      values: properties.absence,
+                    },
+                    selectedAuthority: properties.lad17nm,
+                  });
+                } else {
+                  this.setState({
+                    absenceData: undefined,
+                    selectedAuthority: '',
+                  });
+                }
+              }}
+              ref={el => el && (this.mapRef = el)}
               selectedAuthority={this.state.selectedAuthority}
             />
           )}

@@ -9,7 +9,7 @@ import PrototypeMap from './components/PrototypeMap';
 import PrototypePage from './components/PrototypePage';
 
 const PublicationPage = () => {
-  let mapRef: PrototypeMap;
+  let mapRef: PrototypeMap | null = null;
 
   return (
     <PrototypePage
@@ -614,11 +614,7 @@ const PublicationPage = () => {
           heading="Pupil absence by local authority"
           onToggle={isOpen => mapRef && mapRef.refresh()}
         >
-          <PrototypeAbsenceData
-            map={m => {
-              mapRef = m;
-            }}
-          />
+          <PrototypeAbsenceData ref={el => el && (mapRef = el.mapRef)} />
 
           <p>
             There is variation in overall and persistent absence rates across
