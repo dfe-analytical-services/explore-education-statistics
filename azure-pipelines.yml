@@ -72,13 +72,13 @@ jobs:
           workingDir: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
           verbose: false
           customCommand: 'run lint'
-      - task: 'Npm@1'
-        displayName: 'npm run format:check'
-        inputs:
-          command: 'custom'
-          workingDir: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
-          verbose: false
-          customCommand: 'run format:check'
+      # - task: 'Npm@1'
+      #   displayName: 'npm run format:check'
+      #   inputs:
+      #     command: 'custom'
+      #     workingDir: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
+      #     verbose: false
+      #     customCommand: 'run format:check'
       - task: 'Npm@1'
         displayName: 'npm run build'
         inputs:
