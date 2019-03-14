@@ -15,6 +15,7 @@ ${timeout}    2
 ${implicit_wait}   2
 
 ${url}        about:blank
+${urlAdmin}   about:blank
 
 *** Keywords ***
 perform setup

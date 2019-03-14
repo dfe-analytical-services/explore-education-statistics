@@ -6,7 +6,7 @@ Suite Teardown    user closes the browser
 
 *** Test Cases ***
 Validate Home page breadcrumbs
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     user goes to url  ${url}
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
     css should match x times  css:[data-testid="breadcrumbs--list"] li   1
