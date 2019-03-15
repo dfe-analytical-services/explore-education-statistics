@@ -50,11 +50,11 @@ env = "test"  # by default, run tests against test environment
 url = "about:blank"
 localUrl = "http://localhost:3000"
 localAdminUrl = ""
-testUrl = "https://educationstatisticstest.z6.web.core.windows.net"
-testAdminUrl= "https://admin-explore-education-statistics-test.azurewebsites.net"
-stageUrl = "https://educationstatisticsstage.z6.web.core.windows.net"
+testUrl = "https://public-explore-education-statistics-test.azurewebsites.net"
+testAdminUrl = "https://admin-explore-education-statistics-test.azurewebsites.net"
+stageUrl = "https://public-explore-education-statistics-stage.azurewebsites.net"
 stageAdminUrl = "https://admin-explore-education-statistics-stage.azurewebsites.net"
-prodUrl = "https://educationstatistics.z6.web.core.windows.net"
+prodUrl = ""
 prodAdminUrl = ""
 
 timeout = 10
