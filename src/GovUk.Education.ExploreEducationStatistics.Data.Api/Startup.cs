@@ -1,7 +1,6 @@
 ﻿using System;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Data;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
@@ -39,7 +38,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("StatisticsDb")));
+                options
+                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"))
+                    .EnableSensitiveDataLogging()
+            );
 
             // Adds Brotli and Gzip compressing
             services.AddResponseCompression();
@@ -50,17 +52,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Data API", Version = "v1"});
             });
 
-            services.AddScoped<TidyDataReleaseCounter>();
-
             services.AddScoped<GeographicResultBuilder>();
             services.AddScoped<CharacteristicResultBuilder>();
             services.AddScoped<LaCharacteristicResultBuilder>();
 
             services.AddTransient<ISeedService, SeedService>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
-
-            services.AddTransient<IAttributeMetaService, AttributeMetaService>();
-            services.AddTransient<ICharacteristicMetaService, CharacteristicMetaService>();
+            services.AddTransient<ReleaseService>();
 
             services.AddScoped<IGeographicDataService, GeographicDataService>();
             services.AddScoped<ILaCharacteristicDataService, LaCharacteristicDataService>();

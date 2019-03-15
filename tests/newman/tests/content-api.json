@@ -1,0 +1,408 @@
+{
+	"info": {
+		"_postman_id": "41c2ef43-b849-4893-9842-2c77f787a57b",
+		"name": "Dfe Content API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Publication",
+			"item": [
+				{
+					"name": "Get Publications",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{content_api_url}}/Publication",
+							"host": [
+								"{{content_api_url}}"
+							],
+							"path": [
+								"Publication"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Specific Publication",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ff0279ab-8825-4c10-b5eb-e5628eb8905b",
+								"exec": [
+									"pm.variables.set('publication_id', 'cbbd299f-8297-44bc-92ac-558bcf51f8ad')"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "9e15d6ea-ffcb-4c8e-9b64-06688bc8eb62",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().id).to.equal(pm.variables.get(\"publication_id\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{content_api_url}}/Publication/{{publication_id}}",
+							"host": [
+								"{{content_api_url}}"
+							],
+							"path": [
+								"Publication",
+								"{{publication_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Latest Specific Publication",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ff0279ab-8825-4c10-b5eb-e5628eb8905b",
+								"exec": [
+									"pm.variables.set('publication_id', 'cbbd299f-8297-44bc-92ac-558bcf51f8ad')"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "8c0b7ff3-a619-44f3-b2fb-60d5342f69aa",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().publicationId).to.equal(pm.variables.get(\"publication_id\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{content_api_url}}/Publication/{{publication_id}}/latest",
+							"host": [
+								"{{content_api_url}}"
+							],
+							"path": [
+								"Publication",
+								"{{publication_id}}",
+								"latest"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Release",
+			"item": [
+				{
+					"name": "Get Releases",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{content_api_url}}/Release",
+							"host": [
+								"{{content_api_url}}"
+							],
+							"path": [
+								"Release"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Specific Release",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Release id matches the release requested\", function () { pm.expect(pm.response.json().id).to.equal(pm.variables.get(\"release_id\")); });"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e95e89f8-249c-43ca-bb24-d7cb82df7e26",
+								"exec": [
+									"pm.variables.set('release_id', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{content_api_url}}/Release/{{release_id}}",
+							"host": [
+								"{{content_api_url}}"
+							],
+							"path": [
+								"Release",
+								"{{release_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Theme",
+			"item": [
+				{
+					"name": "Get Themes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{content_api_url}}/Theme",
+							"host": [
+								"{{content_api_url}}"
+							],
+							"path": [
+								"Theme"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Specific Theme",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Theme id matches the theme requested\", function () { pm.expect(pm.response.json().id).to.equal(pm.variables.get(\"theme_id\")); });"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e95e89f8-249c-43ca-bb24-d7cb82df7e26",
+								"exec": [
+									"pm.variables.set('theme_id', 'bc08839f-2970-4f34-af2d-29608a48082f')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{content_api_url}}/Theme/{{theme_id}}",
+							"host": [
+								"{{content_api_url}}"
+							],
+							"path": [
+								"Theme",
+								"{{theme_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Topic",
+			"item": [
+				{
+					"name": "Get Topics",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{content_api_url}}/Topic",
+							"host": [
+								"{{content_api_url}}"
+							],
+							"path": [
+								"Topic"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Specific Theme Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Topic id matches the topic requested\", function () { pm.expect(pm.response.json().id).to.equal(pm.variables.get(\"topic_id\")); });"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e95e89f8-249c-43ca-bb24-d7cb82df7e26",
+								"exec": [
+									"pm.variables.set('topic_id', '66ff5e67-36cf-4210-9ad2-632baeb4eca7')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{content_api_url}}/Topic/{{topic_id}}",
+							"host": [
+								"{{content_api_url}}"
+							],
+							"path": [
+								"Topic",
+								"{{topic_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

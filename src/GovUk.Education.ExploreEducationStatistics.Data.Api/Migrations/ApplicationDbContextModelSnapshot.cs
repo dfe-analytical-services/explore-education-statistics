@@ -52,9 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasComputedColumnSql("JSON_VALUE(Region, '$.region_code')");
 
-                    b.Property<DateTime>("ReleaseDate");
-
-                    b.Property<int>("ReleaseId");
+                    b.Property<long>("ReleaseId");
 
                     b.Property<string>("SchoolType")
                         .IsRequired();
@@ -101,9 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                     b.Property<Guid>("PublicationId");
 
-                    b.Property<DateTime>("ReleaseDate");
-
-                    b.Property<int>("ReleaseId");
+                    b.Property<long>("ReleaseId");
 
                     b.Property<string>("SchoolType")
                         .IsRequired();
@@ -156,9 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasComputedColumnSql("JSON_VALUE(Region, '$.region_code')");
 
-                    b.Property<DateTime>("ReleaseDate");
-
-                    b.Property<int>("ReleaseId");
+                    b.Property<long>("ReleaseId");
 
                     b.Property<string>("School");
 
@@ -194,17 +188,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Group");
-
                     b.Property<bool>("KeyIndicator");
 
                     b.Property<string>("Label");
 
                     b.Property<string>("Name");
 
-                    b.Property<Guid>("PublicationId");
-
-                    b.Property<int>("Unit");
+                    b.Property<string>("Unit")
+                        .IsRequired();
 
                     b.HasKey("Id");
 
@@ -223,11 +214,108 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<Guid>("PublicationId");
-
                     b.HasKey("Id");
 
                     b.ToTable("CharacteristicMeta");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Release", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<Guid>("PublicationId");
+
+                    b.Property<DateTime>("ReleaseDate");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PublicationId");
+
+                    b.ToTable("Release");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Api.Models.ReleaseAttributeMeta", b =>
+                {
+                    b.Property<long>("ReleaseId");
+
+                    b.Property<long>("AttributeMetaId");
+
+                    b.Property<string>("DataType");
+
+                    b.Property<string>("Group");
+
+                    b.HasKey("ReleaseId", "AttributeMetaId", "DataType");
+
+                    b.HasIndex("AttributeMetaId");
+
+                    b.ToTable("ReleaseAttributeMeta");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Api.Models.ReleaseCharacteristicMeta", b =>
+                {
+                    b.Property<long>("ReleaseId");
+
+                    b.Property<long>("CharacteristicMetaId");
+
+                    b.Property<string>("DataType");
+
+                    b.HasKey("ReleaseId", "CharacteristicMetaId", "DataType");
+
+                    b.HasIndex("CharacteristicMetaId");
+
+                    b.ToTable("ReleaseCharacteristicMeta");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Api.Models.CharacteristicDataLa", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Release", "Release")
+                        .WithMany()
+                        .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Api.Models.CharacteristicDataNational", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Release", "Release")
+                        .WithMany()
+                        .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Api.Models.GeographicData", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Release", "Release")
+                        .WithMany()
+                        .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Api.Models.ReleaseAttributeMeta", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta.AttributeMeta", "AttributeMeta")
+                        .WithMany("ReleaseAttributeMetas")
+                        .HasForeignKey("AttributeMetaId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Release", "Release")
+                        .WithMany("ReleaseAttributeMetas")
+                        .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Api.Models.ReleaseCharacteristicMeta", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta.CharacteristicMeta", "CharacteristicMeta")
+                        .WithMany("ReleaseCharacteristicMetas")
+                        .HasForeignKey("CharacteristicMetaId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Release", "Release")
+                        .WithMany("ReleaseCharacteristicMetas")
+                        .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

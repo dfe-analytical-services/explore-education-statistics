@@ -5,10 +5,12 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Release = GovUk.Education.ExploreEducationStatistics.Data.Api.Importer.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
@@ -17,7 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly ILogger _logger;
         private readonly ApplicationDbContext _context;
         private readonly CsvImporterFactory _csvImporterFactory = new CsvImporterFactory();
-        private readonly TidyDataReleaseCounter _tidyDataReleaseCounter;
         private readonly IOptions<SeedConfigurationOptions> _options;
 
         private const string attributeMetaTableName = "AttributeMeta";
@@ -25,22 +26,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public SeedService(ILogger<SeedService> logger,
             ApplicationDbContext context,
-            TidyDataReleaseCounter tidyDataReleaseCounter,
             IOptions<SeedConfigurationOptions> options)
         {
             _logger = logger;
             _context = context;
-            _tidyDataReleaseCounter = tidyDataReleaseCounter;
             _options = options;
         }
 
         public void DeleteAll()
         {
+            _context.Database.ExecuteSqlCommand("truncate table ReleaseAttributeMeta");
+            _context.Database.ExecuteSqlCommand("truncate table ReleaseCharacteristicMeta");
+
+
+            _context.Database.ExecuteSqlCommand(
+                "alter table ReleaseAttributeMeta drop constraint FK_ReleaseAttributeMeta_AttributeMeta_AttributeMetaId");
             _context.Database.ExecuteSqlCommand("truncate table AttributeMeta");
+            _context.Database.ExecuteSqlCommand(
+                "alter table ReleaseAttributeMeta add constraint FK_ReleaseAttributeMeta_AttributeMeta_AttributeMetaId foreign key (AttributeMetaId) references AttributeMeta (Id)");
+
+
+            _context.Database.ExecuteSqlCommand(
+                "alter table ReleaseCharacteristicMeta drop constraint FK_ReleaseCharacteristicMeta_CharacteristicMeta_CharacteristicMetaId");
             _context.Database.ExecuteSqlCommand("truncate table CharacteristicMeta");
+            _context.Database.ExecuteSqlCommand(
+                "alter table ReleaseCharacteristicMeta add constraint FK_ReleaseCharacteristicMeta_CharacteristicMeta_CharacteristicMetaId foreign key (CharacteristicMetaId) references CharacteristicMeta (Id)");
+
+
+            _context.Database.ExecuteSqlCommand(
+                "alter table ReleaseAttributeMeta drop constraint FK_ReleaseAttributeMeta_Release_ReleaseId");
+            _context.Database.ExecuteSqlCommand(
+                "alter table ReleaseCharacteristicMeta drop constraint FK_ReleaseCharacteristicMeta_Release_ReleaseId");
+            _context.Database.ExecuteSqlCommand(
+                "alter table GeographicData drop constraint FK_GeographicData_Release_ReleaseId");
+            _context.Database.ExecuteSqlCommand(
+                "alter table CharacteristicDataNational drop constraint FK_CharacteristicDataNational_Release_ReleaseId");
+            _context.Database.ExecuteSqlCommand(
+                "alter table CharacteristicDataLa drop constraint FK_CharacteristicDataLa_Release_ReleaseId");
+
+
             _context.Database.ExecuteSqlCommand("truncate table GeographicData");
             _context.Database.ExecuteSqlCommand("truncate table CharacteristicDataLa");
             _context.Database.ExecuteSqlCommand("truncate table CharacteristicDataNational");
+            _context.Database.ExecuteSqlCommand("truncate table Release");
+
+
+            _context.Database.ExecuteSqlCommand(
+                "alter table ReleaseAttributeMeta add constraint FK_ReleaseAttributeMeta_Release_ReleaseId foreign key (ReleaseId) references Release (Id)");
+            _context.Database.ExecuteSqlCommand(
+                "alter table ReleaseCharacteristicMeta add constraint FK_ReleaseCharacteristicMeta_Release_ReleaseId foreign key (ReleaseId) references Release (Id)");
+            _context.Database.ExecuteSqlCommand(
+                "alter table GeographicData add constraint FK_GeographicData_Release_ReleaseId foreign key (ReleaseId) references Release (Id)");
+            _context.Database.ExecuteSqlCommand(
+                "alter table CharacteristicDataNational add constraint FK_CharacteristicDataNational_Release_ReleaseId foreign key (ReleaseId) references Release (Id)");
+            _context.Database.ExecuteSqlCommand(
+                "alter table CharacteristicDataLa add constraint FK_CharacteristicDataLa_Release_ReleaseId foreign key (ReleaseId) references Release (Id)");
         }
 
         public void Seed()
@@ -50,6 +90,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             try
             {
                 _context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                SeedAttributes();
+                SeedCharacteristics();
+                _context.SaveChanges();
 
                 foreach (var publication in SamplePublications.Publications.Values)
                 {
@@ -64,12 +108,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _logger.LogInformation("Seeding complete");
         }
 
+        private void SeedAttributes()
+        {
+            _logger.LogInformation("Seeding {Table}", attributeMetaTableName);
+
+            if (!_context.AttributeMeta.Any())
+            {
+                _context.AttributeMeta.AddRange(SamplePublications.AttributeMetas.Values);
+            }
+            else
+            {
+                _logger.LogWarning("Not seeding {Table}. Table already contains values", attributeMetaTableName);
+            }
+        }
+
+        private void SeedCharacteristics()
+        {
+            _logger.LogInformation("Seeding {Table}", characteristicMetaTableName);
+
+            if (!_context.CharacteristicMeta.Any())
+            {
+                _context.CharacteristicMeta.AddRange(SamplePublications.CharacteristicMetas.Values);
+            }
+            else
+            {
+                _logger.LogWarning("Not seeding {Table}. Table already contains values", characteristicMetaTableName);
+            }
+        }
+
         private void Seed(Publication publication)
         {
             _logger.LogInformation("Seeding Publication {Publication}", publication.PublicationId);
-
-            SeedAttributes(publication);
-            SeedCharacteristics(publication);
 
             foreach (var release in publication.Releases)
             {
@@ -82,34 +151,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _logger.LogInformation("Seeding Release for {Publication}, {Release}", release.PublicationId,
                 release.Name);
 
-            foreach (var dataCsvFilename in release.Filenames)
+            var releaseDb = CreateRelease(release);
+
+            foreach (var dataSet in release.DataSets)
             {
-                var importer = _csvImporterFactory.Importer(dataCsvFilename);
-                if (_tidyDataReleaseCounter.Count(dataCsvFilename, release.PublicationId, release.ReleaseId) == 0)
-                {
-                    var data = importer.Data(dataCsvFilename, release.PublicationId, release.ReleaseId,
-                        release.ReleaseDate);
-                    SeedReleaseData(release, data);
-                }
-                else
-                {
-                    _logger.LogWarning("Not seeding {Release}. Data already exists for Release {ReleaseId}",
-                        release.Name, release.ReleaseId);
-                }
+                SeedDataSet(releaseDb, dataSet);
             }
         }
 
-        private void SeedReleaseData(Release release, IEnumerable<ITidyData> tidyData)
+        private void SeedDataSet(Models.Release release, DataSet dataSet)
+        {
+            SeedDataSetMeta(release, dataSet);
+            _context.SaveChanges();
+
+            var importer = _csvImporterFactory.Importer(dataSet.Filename);
+            var data = importer.Data(dataSet.Filename, release);
+            SeedData(release, data);
+        }
+
+        private void SeedData(Models.Release release, IEnumerable<ITidyData> tidyData)
         {
             var index = 1;
             var batches = tidyData.Batch(_options.Value.BatchSize);
-            Stopwatch stopWatch = new Stopwatch();
+            var stopWatch = new Stopwatch();
             stopWatch.Start();
             foreach (var batch in batches)
             {
                 _logger.LogInformation(
-                    "Seeding batch {Index} of {TotalCount} for Publication {Publication}, {Release}", index,
-                    batches.Count(), release.PublicationId, release.Name);
+                    "Seeding batch {Index} of {TotalCount} for Publication {Publication}, Release {Release}", index,
+                    batches.Count(), release.PublicationId, release.Id);
 
                 _context.Set<ITidyData>().AddRange(batch);
                 _context.SaveChanges();
@@ -123,46 +193,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             stopWatch.Stop();
         }
 
-        private void SeedAttributes(Publication publication)
+        private void SeedDataSetMeta(Models.Release releaseDb, DataSet dataSet)
         {
-            _logger.LogInformation("Seeding {Table}", attributeMetaTableName);
-
-            if (_context.CharacteristicMeta.Count(meta => meta.PublicationId == publication.PublicationId) == 0)
-            {
-                foreach (var attributeMeta in publication.AttributeMetas)
-                {
-                    attributeMeta.PublicationId = publication.PublicationId;
-                }
-
-                _context.AttributeMeta.AddRange(publication.AttributeMetas);
-                _context.SaveChanges();
-            }
-            else
-            {
-                _logger.LogWarning("Not seeding {Table}. Table already contains meta for publication {Publication}",
-                    attributeMetaTableName, publication.PublicationId);
-            }
+            SeedDataSetAttributes(releaseDb, dataSet);
+            SeedDataSetCharacteristics(releaseDb, dataSet);
         }
 
-        private void SeedCharacteristics(Publication publication)
+        private void SeedDataSetAttributes(Models.Release releaseDb, DataSet dataSet)
         {
-            _logger.LogInformation("Seeding {Table}", characteristicMetaTableName);
-
-            if (_context.CharacteristicMeta.Count(meta => meta.PublicationId == publication.PublicationId) == 0)
-            {
-                foreach (var characteristicMeta in publication.CharacteristicMetas)
+            _logger.LogInformation("Seeding Data Set Attributes");
+            
+            _context.AddRange(
+                from metaGroup in dataSet.AttributeMetas
+                from attributeMeta in metaGroup.Meta
+                let attributeMetaDb = LookupAttributeMeta(attributeMeta.Name)
+                select new ReleaseAttributeMeta
                 {
-                    characteristicMeta.PublicationId = publication.PublicationId;
+                    Release = releaseDb,
+                    AttributeMeta = attributeMetaDb,
+                    DataType = dataSet.getDataType().Name,
+                    Group = metaGroup.Name
                 }
+            );
+        }
 
-                _context.CharacteristicMeta.AddRange(publication.CharacteristicMetas);
-                _context.SaveChanges();
-            }
-            else
-            {
-                _logger.LogWarning("Not seeding {Table}. Table already contains meta for publication {Publication}",
-                    characteristicMetaTableName, publication.PublicationId);
-            }
+        private void SeedDataSetCharacteristics(Models.Release releaseDb, DataSet dataSet)
+        {
+            _logger.LogInformation("Seeding Data Set Characteristics");
+            
+            _context.AddRange(dataSet.CharacteristicMetas
+                .Select(characteristicMeta => LookupCharacteristicMeta(characteristicMeta.Name))
+                .Select(characteristicMetaDb =>
+                    new ReleaseCharacteristicMeta
+                    {
+                        Release = releaseDb,
+                        CharacteristicMeta = characteristicMetaDb,
+                        DataType = dataSet.getDataType().Name
+                    })
+                .ToList());
+        }
+
+        private Models.Release CreateRelease(Release release)
+        {
+            return _context.Release.Add(new Models.Release(release.ReleaseDate, release.PublicationId)).Entity;
+        }
+
+        private AttributeMeta LookupAttributeMeta(string name)
+        {
+            return _context.AttributeMeta.FirstOrDefault(meta => meta.Name == name);
+        }
+
+        private CharacteristicMeta LookupCharacteristicMeta(string name)
+        {
+            return _context.CharacteristicMeta.FirstOrDefault(meta => meta.Name == name);
         }
     }
 }
