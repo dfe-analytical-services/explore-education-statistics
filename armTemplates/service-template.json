@@ -302,6 +302,7 @@
           "name": "[variables('publicAppName')]",
           "httpsOnly": true,
           "AlwaysOn": true,
+          "clientAffinityEnabled": false,
           "appSettings": [
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
