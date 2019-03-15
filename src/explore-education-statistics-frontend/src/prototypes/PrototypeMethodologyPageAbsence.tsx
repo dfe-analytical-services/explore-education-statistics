@@ -13,6 +13,9 @@ import PrototypeSection1 from './components/methodology/absence/PrototypeSection
 import PrototypeSection2 from './components/methodology/absence/PrototypeSection2';
 import PrototypeSection3 from './components/methodology/absence/PrototypeSection3';
 import PrototypeSection4 from './components/methodology/absence/PrototypeSection4';
+import PrototypeSection5 from './components/methodology/absence/PrototypeSection5';
+import PrototypeSection6 from './components/methodology/absence/PrototypeSection6';
+import PrototypeSection7 from './components/methodology/absence/PrototypeSection7';
 import PrototypeAbsenceData from './components/PrototypeAbsenceData';
 import PrototypeDataSample from './components/PrototypeDataSample';
 import PrototypeMap from './components/PrototypeMap';
@@ -191,15 +194,60 @@ const PublicationPage = () => {
         </AccordionSection>
 
         <AccordionSection heading="Data processing">
-          <p>DATA PROCESSING</p>
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-one-quarter">
+              <h3 className="govuk-heading-s">In this section</h3>
+              <ul className="govuk-body-s">
+                <li>
+                  <a href="#section5-1">Data linking</a>
+                </li>
+                <li>
+                  <a href="#section5-2">Data removed</a>
+                </li>
+                <li>
+                  <a href="#section5-3">Variables added</a>
+                </li>
+                <li>
+                  <a href="#section5-4">Consistency checks</a>
+                </li>
+                <li>
+                  <a href="#section5-5">Data quality</a>
+                </li>
+              </ul>
+            </div>
+            <div className="govuk-grid-column-three-quarters">
+              <PrototypeSection5 />
+            </div>
+          </div>
         </AccordionSection>
 
         <AccordionSection heading="Research relating to pupil absence">
-          <p>PUPIL ABSENCE</p>
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-one-quarter">
+              <h3 className="govuk-heading-s">In this section</h3>
+              <ul className="govuk-body-s">
+                <li>
+                  <a href="#section6-1">The impact of absenteeism on pupils</a>
+                </li>
+                <li>
+                  <a href="#section6-2">Factors associated with absenteeism</a>
+                </li>
+                <li>
+                  <a href="#section6-3">Approaches to reduce absenteeism</a>
+                </li>
+                <li>
+                  <a href="#section6-4">References</a>
+                </li>
+              </ul>
+            </div>
+            <div className="govuk-grid-column-three-quarters">
+              <PrototypeSection6 />
+            </div>
+          </div>
         </AccordionSection>
 
         <AccordionSection heading="Contacts">
-          <p>Contacts</p>
+          <PrototypeSection7 />
         </AccordionSection>
       </Accordion>
 
