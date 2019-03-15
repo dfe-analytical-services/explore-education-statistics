@@ -30,15 +30,15 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/GeographicData",
+							"raw": "{{data_api_url}}/tablebuilder/meta/GeographicData/{{publication_id}}",
 							"host": [
 								"{{data_api_url}}"
 							],
 							"path": [
 								"tablebuilder",
 								"meta",
-								"{{publication_id}}",
-								"GeographicData"
+								"GeographicData",
+								"{{publication_id}}"
 							]
 						}
 					},
@@ -66,15 +66,15 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/CharacteristicDataLa",
+							"raw": "{{data_api_url}}/tablebuilder/meta/CharacteristicDataLa/{{publication_id}}",
 							"host": [
 								"{{data_api_url}}"
 							],
 							"path": [
 								"tablebuilder",
 								"meta",
-								"{{publication_id}}",
-								"CharacteristicDataLa"
+								"CharacteristicDataLa",
+								"{{publication_id}}"
 							]
 						}
 					},
@@ -102,15 +102,15 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/CharacteristicDataNational",
+							"raw": "{{data_api_url}}/tablebuilder/meta/CharacteristicDataNational/{{publication_id}}",
 							"host": [
 								"{{data_api_url}}"
 							],
 							"path": [
 								"tablebuilder",
 								"meta",
-								"{{publication_id}}",
-								"CharacteristicDataNational"
+								"CharacteristicDataNational",
+								"{{publication_id}}"
 							]
 						}
 					},
@@ -138,15 +138,15 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/GeographicData",
+							"raw": "{{data_api_url}}/tablebuilder/meta/GeographicData/{{publication_id}}",
 							"host": [
 								"{{data_api_url}}"
 							],
 							"path": [
 								"tablebuilder",
 								"meta",
-								"{{publication_id}}",
-								"GeographicData"
+								"GeographicData",
+								"{{publication_id}}"
 							]
 						}
 					},
@@ -174,15 +174,15 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/CharacteristicDataLa",
+							"raw": "{{data_api_url}}/tablebuilder/meta/CharacteristicDataLa/{{publication_id}}",
 							"host": [
 								"{{data_api_url}}"
 							],
 							"path": [
 								"tablebuilder",
 								"meta",
-								"{{publication_id}}",
-								"CharacteristicDataLa"
+								"CharacteristicDataLa",
+								"{{publication_id}}"
 							]
 						}
 					},
@@ -210,15 +210,15 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/CharacteristicDataNational",
+							"raw": "{{data_api_url}}/tablebuilder/meta/CharacteristicDataNational/{{publication_id}}",
 							"host": [
 								"{{data_api_url}}"
 							],
 							"path": [
 								"tablebuilder",
 								"meta",
-								"{{publication_id}}",
-								"CharacteristicDataNational"
+								"CharacteristicDataNational",
+								"{{publication_id}}"
 							]
 						}
 					},
@@ -246,15 +246,15 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/GeographicData",
+							"raw": "{{data_api_url}}/tablebuilder/meta/GeographicData/{{publication_id}}",
 							"host": [
 								"{{data_api_url}}"
 							],
 							"path": [
 								"tablebuilder",
 								"meta",
-								"{{publication_id}}",
-								"GeographicData"
+								"GeographicData",
+								"{{publication_id}}"
 							]
 						}
 					},
@@ -282,15 +282,15 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/CharacteristicDataLa",
+							"raw": "{{data_api_url}}/tablebuilder/meta/CharacteristicDataLa/{{publication_id}}",
 							"host": [
 								"{{data_api_url}}"
 							],
 							"path": [
 								"tablebuilder",
 								"meta",
-								"{{publication_id}}",
-								"CharacteristicDataLa"
+								"CharacteristicDataLa",
+								"{{publication_id}}"
 							]
 						}
 					},
@@ -318,15 +318,15 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/CharacteristicDataNational",
+							"raw": "{{data_api_url}}/tablebuilder/meta/CharacteristicDataNational/{{publication_id}}",
 							"host": [
 								"{{data_api_url}}"
 							],
 							"path": [
 								"tablebuilder",
 								"meta",
-								"{{publication_id}}",
-								"CharacteristicDataNational"
+								"CharacteristicDataNational",
+								"{{publication_id}}"
 							]
 						}
 					},
