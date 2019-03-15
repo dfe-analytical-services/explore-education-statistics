@@ -708,7 +708,7 @@
 											"script": {
 												"id": "b51e0205-6b34-4055-b620-51e641882379",
 												"exec": [
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(9); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(2); });"
 												],
 												"type": "text/javascript"
 											}
