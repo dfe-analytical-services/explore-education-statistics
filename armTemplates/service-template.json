@@ -299,6 +299,8 @@
       },
       "properties": {
         "siteConfig": {
+          "name": "[variables('publicAppName')]",
+          "httpsOnly": true,
           "AlwaysOn": true,
           "appSettings": [
             {
@@ -312,7 +314,6 @@
           ],
           "phpVersion": "off"
         },
-        "name": "[variables('publicAppName')]",
         "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
         "hostingEnvironment": ""
       },
