@@ -18,9 +18,6 @@
     "storageAccountName": {
       "type": "string"
     },
-    "cosmosAccountName": {
-      "type": "string"
-    },
     "sqlAdministratorLogin": {
       "type": "string",
       "metadata": {
@@ -47,26 +44,6 @@
     "sqlserverName": "[parameters('webAppName')]"
   },
   "resources": [
-    {
-      "apiVersion": "2015-04-08",
-      "kind": "MongoDB",
-      "type": "Microsoft.DocumentDb/databaseAccounts",
-      "name": "[parameters('cosmosAccountName')]",
-      "location": "westeurope",
-      "properties": {
-        "databaseAccountOfferType": "Standard",
-        "locations": [
-          {
-            "failoverPriority": 0,
-            "locationName": "westeurope"
-          }
-        ],
-        "enableMultipleWriteLocations": false,
-        "isVirtualNetworkFilterEnabled": false,
-        "virtualNetworkRules": [],
-        "dependsOn": []
-      }
-    },
     {
       "type": "Microsoft.Web/sites",
       "name": "[variables('dataAppName')]",
@@ -96,14 +73,6 @@
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
               "value": "6.9.1"
-            },
-            {
-              "name": "AzureStorageConfig:CosmosEndpointUrl",
-              "value": "[Concat('https://',  parameters('cosmosAccountName'), '.documents.azure.com:443')]"
-            },
-            {
-              "name": "AzureStorageConfig:CosmosAuthorizationKey",
-              "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('cosmosAccountName')), '2015-04-08').primaryMasterKey]"
             },
             {
               "name": "SeedConfig:BatchSize",
