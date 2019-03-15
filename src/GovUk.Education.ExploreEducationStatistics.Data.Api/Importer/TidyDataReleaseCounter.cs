@@ -19,26 +19,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
             _nationalCharacteristicDataService = nationalCharacteristicDataService;
         }
 
-        public int Count(DataCsvFilename filename, Guid publicationId, int releaseId)
+        public int Count(DataCsvFilename filename, Guid publicationId, long releaseId)
         {
-            var entityType = filename.GetEntityTypeFromDataFileAttributeOfEnumType(filename.GetType());
+            var entityType = filename.GetDataTypeFromDataFileAttributeOfEnumType(filename.GetType());
 
             if (entityType == typeof(GeographicData))
             {
                 return _geographicDataService.Count(data =>
-                    data.PublicationId == publicationId && data.ReleaseId == releaseId);
+                    data.PublicationId == publicationId && data.Release.Id == releaseId);
             }
 
             if (entityType == typeof(CharacteristicDataLa))
             {
                 return _laCharacteristicDataService.Count(data =>
-                    data.PublicationId == publicationId && data.ReleaseId == releaseId);
+                    data.PublicationId == publicationId && data.Release.Id == releaseId);
             }
 
             if (entityType == typeof(CharacteristicDataNational))
             {
                 return _nationalCharacteristicDataService.Count(data =>
-                    data.PublicationId == publicationId && data.ReleaseId == releaseId);
+                    data.PublicationId == publicationId && data.Release.Id == releaseId);
             }
 
             throw new ArgumentOutOfRangeException(nameof(filename), filename, null);

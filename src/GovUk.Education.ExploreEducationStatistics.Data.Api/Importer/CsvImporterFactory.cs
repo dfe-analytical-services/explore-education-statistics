@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
 
         public ICsvImporter Importer(DataCsvFilename filename)
         {
-            var entityType = filename.GetEntityTypeFromDataFileAttributeOfEnumType(filename.GetType());
+            var entityType = filename.GetDataTypeFromDataFileAttributeOfEnumType(filename.GetType());
 
             if (entityType == typeof(GeographicData))
             {

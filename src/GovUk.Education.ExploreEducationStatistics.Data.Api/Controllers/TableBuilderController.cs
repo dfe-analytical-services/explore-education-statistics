@@ -1,7 +1,5 @@
 using System;
 using System.Linq;
-using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
@@ -15,19 +13,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     public class TableBuilderController : ControllerBase
     {
         private readonly ITableBuilderService _tableBuilderService;
-        private readonly IAttributeMetaService _attributeMetaService;
-        private readonly ICharacteristicMetaService _characteristicMetaService;
-        private readonly IMapper _mapper;
+        private readonly IReleaseService _releaseService;
 
-        public TableBuilderController(ITableBuilderService tableBuilderService,
-            IAttributeMetaService attributeMetaService,
-            ICharacteristicMetaService characteristicMetaService,
-            IMapper mapper)
+        public TableBuilderController(
+            ITableBuilderService tableBuilderService,
+            IReleaseService releaseService)
         {
             _tableBuilderService = tableBuilderService;
-            _attributeMetaService = attributeMetaService;
-            _characteristicMetaService = characteristicMetaService;
-            _mapper = mapper;
+            _releaseService = releaseService;
         }
 
         [HttpPost("geographic")]
@@ -66,40 +59,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return NotFound();
         }
 
-        [HttpGet("meta/{publicationId}")]
-        public ActionResult<PublicationMetaViewModel> GetMeta(Guid publicationId)
+        [HttpGet("meta/{typeName}/{publicationId}")]
+        public ActionResult<PublicationMetaViewModel> GetMeta(string typeName, Guid publicationId)
         {
+            var type = Type.GetType("GovUk.Education.ExploreEducationStatistics.Data.Api.Models." + typeName);
+
             var result = new PublicationMetaViewModel
             {
                 PublicationId = publicationId,
-                Attributes = _attributeMetaService.Get(publicationId)
-                    .GroupBy(o => o.Group)
-                    .ToDictionary(
-                        metas => metas.Key,
-                        metas => metas.Select(ToAttributeMetaViewModel).ToList()),
-                Characteristics = _characteristicMetaService.Get(publicationId)
-                    .GroupBy(o => o.Group)
-                    .ToDictionary(
-                        metas => metas.Key,
-                        metas => metas.Select(ToNameLabelViewModel).ToList())
+                Attributes = _releaseService.GetAttributeMetas(publicationId, type),
+                Characteristics = _releaseService.GetCharacteristicMetas(publicationId, type)
             };
 
-            if (result.Attributes.Any() && result.Characteristics.Any())
+            if (result.Attributes.Any() || result.Characteristics.Any())
             {
                 return result;
             }
 
             return NotFound();
-        }
-
-        private AttributeMetaViewModel ToAttributeMetaViewModel(AttributeMeta attributeMeta)
-        {
-            return _mapper.Map<AttributeMetaViewModel>(attributeMeta);
-        }
-
-        private NameLabelViewModel ToNameLabelViewModel(CharacteristicMeta characteristicMeta)
-        {
-            return _mapper.Map<NameLabelViewModel>(characteristicMeta);
         }
     }
 }

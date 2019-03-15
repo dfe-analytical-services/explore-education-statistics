@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
@@ -14,9 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
 
         protected override TidyData TidyDataFromCsv(string csvLine,
             List<string> headers,
-            Guid publicationId,
-            int releaseId,
-            DateTime releaseDate)
+            Models.Release release)
         {
             var headerValues = new[]
             {
@@ -26,9 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
             var values = csvLine.Split(',');
             var model = new CharacteristicDataNational
             {
-                PublicationId = publicationId,
-                ReleaseId = releaseId,
-                ReleaseDate = releaseDate,
+                PublicationId = release.PublicationId,
+                Release = release,
                 Year = int.Parse(values[headers.FindIndex(h => h.Equals("year"))]),
                 Level = Levels.EnumFromStringForImport(values[headers.FindIndex(h => h.Equals("level"))]),
                 Country = new Country

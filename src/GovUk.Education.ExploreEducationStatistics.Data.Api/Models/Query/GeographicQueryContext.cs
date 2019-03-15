@@ -19,10 +19,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public int EndYear { get; set; }
         public ICollection<string> Attributes { get; set; }
 
-        public Expression<Func<GeographicData, bool>> FindExpression(int releaseId)
+        public Expression<Func<GeographicData, bool>> FindExpression(long releaseId)
         {
             return PredicateBuilder.True<GeographicData>()
-                .And(QueryContextUtil.ReleaseIdExpression<GeographicData>(releaseId))
+                .And(QueryContextUtil.ReleaseExpression<GeographicData>(releaseId))
                 .And(QueryContextUtil.LevelExpression<GeographicData>(Level))
                 .And(QueryContextUtil.SchoolTypeExpression<GeographicData>(SchoolTypes))
                 .And(QueryContextUtil.YearExpression<GeographicData>(

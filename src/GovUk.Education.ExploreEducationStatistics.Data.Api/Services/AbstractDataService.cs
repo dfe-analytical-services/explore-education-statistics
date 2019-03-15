@@ -15,14 +15,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly ApplicationDbContext _context;
 
         private readonly ILogger _logger;
-        
+
         protected AbstractDataService(ApplicationDbContext context, ILogger logger)
         {
             _context = context;
             _logger = logger;
         }
 
-        private DbSet<TEntity> DbSet()
+        protected DbSet<TEntity> DbSet()
         {
             return _context.Set<TEntity>();
         }
@@ -37,9 +37,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return DbSet().Count(expression);
         }
 
-        public IEnumerable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression)
+        public TEntity Find(object id)
         {
-            return DbSet().Where(expression);
+            return DbSet().Find(id);
+        }
+
+        public IEnumerable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression,
+            List<Expression<Func<TEntity, object>>> include = null)
+        {
+            var queryable = DbSet().Where(expression);
+            include?.ForEach(i => queryable = queryable.Include(i));
+            return queryable;
         }
 
         public int Max(Expression<Func<TEntity, int>> expression)
@@ -47,7 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return DbSet().Max(expression);
         }
 
-        public int TopWithPredicate(Expression<Func<TEntity, int>> expression, Expression<Func<TEntity, bool>> predicate)
+        public long TopWithPredicate(Expression<Func<TEntity, long>> expression,
+            Expression<Func<TEntity, bool>> predicate)
         {
             return DbSet().Where(predicate)
                 .OrderByDescending(expression)

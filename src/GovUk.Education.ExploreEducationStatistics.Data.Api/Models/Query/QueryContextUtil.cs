@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 {
     public static class QueryContextUtil
     {
-        public static Expression<Func<T, bool>> ReleaseIdExpression<T>(int releaseId)
+        public static Expression<Func<T, bool>> ReleaseExpression<T>(long releaseId)
             where T : ITidyData
         {
             return x => x.ReleaseId == releaseId;

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
@@ -9,6 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 {
     public class TableBuilderService : ITableBuilderService
     {
+        private readonly IReleaseService _releaseService;
         private readonly IGeographicDataService _geographicDataService;
         private readonly ILaCharacteristicDataService _laCharacteristicDataService;
         private readonly INationalCharacteristicDataService _nationalCharacteristicDataService;
@@ -16,13 +19,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
         private readonly CharacteristicResultBuilder _characteristicResultBuilder;
         private readonly LaCharacteristicResultBuilder _laCharacteristicResultBuilder;
 
-        public TableBuilderService(IGeographicDataService geographicDataService,
+        public TableBuilderService(IReleaseService releaseService,
+            IGeographicDataService geographicDataService,
             ILaCharacteristicDataService laCharacteristicDataService,
             INationalCharacteristicDataService nationalCharacteristicDataService,
             GeographicResultBuilder geographicResultBuilder,
             CharacteristicResultBuilder characteristicResultBuilder,
             LaCharacteristicResultBuilder laCharacteristicResultBuilder)
         {
+            _releaseService = releaseService;
             _geographicDataService = geographicDataService;
             _laCharacteristicDataService = laCharacteristicDataService;
             _nationalCharacteristicDataService = nationalCharacteristicDataService;
@@ -46,17 +51,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             return BuildResult(_nationalCharacteristicDataService, query, _characteristicResultBuilder);
         }
 
-        private static int GetLatestRelease<T>(IDataService<T> dataService, Guid publicationId) where T : TidyData
+        private IEnumerable<T> GetData<T>(IDataService<T> dataService, IQueryContext<T> queryContext) where T : TidyData
         {
-            return dataService.TopWithPredicate(data => data.ReleaseId, data => data.PublicationId == publicationId);
+            var releaseId = _releaseService.GetLatestRelease(queryContext.PublicationId);
+            return dataService.FindMany(queryContext.FindExpression(releaseId),
+                new List<Expression<Func<T, object>>> {data => data.Release}
+            );
         }
 
-        private static TableBuilderResult BuildResult<T>(IDataService<T> dataService,
+        private TableBuilderResult BuildResult<T>(IDataService<T> dataService,
             IQueryContext<T> queryContext,
             IResultBuilder<T, ITableBuilderData> resultBuilder) where T : TidyData
         {
-            var releaseId = GetLatestRelease(dataService, queryContext.PublicationId);
-            var data = dataService.FindMany(queryContext.FindExpression(releaseId));
+            var data = GetData(dataService, queryContext);
 
             if (!data.Any())
             {
@@ -67,8 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             return new TableBuilderResult
             {
                 PublicationId = first.PublicationId,
-                ReleaseId = first.ReleaseId,
-                ReleaseDate = first.ReleaseDate,
+                ReleaseId = first.Release.Id,
+                ReleaseDate = first.Release.ReleaseDate,
                 Level = first.Level,
                 Result = data.Select(tidyData => resultBuilder.BuildResult(tidyData, queryContext.Attributes))
             };

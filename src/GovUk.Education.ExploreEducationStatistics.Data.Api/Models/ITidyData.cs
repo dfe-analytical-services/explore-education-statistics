@@ -8,8 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
     {
         long Id { get; set; }
         Guid PublicationId { get; set; }
-        int ReleaseId { get; set; }
-        DateTime ReleaseDate { get; set; }
+        Release Release { get; set; }
+        long ReleaseId { get; set; }
         string Term { get; set; }
         int Year { get; set; }
         Level Level { get; set; }
