@@ -339,14 +339,6 @@
             {
               "name": "NODE_ENV",
               "value": "production"
-            },
-            {
-              "name": "CONTENT_API_BASE_URL",
-              "value": "//content-explore-education-statistics-test.azurewebsites.net/"
-            },
-            {
-              "name": "DATA_API_BASE_URL",
-              "value": "//data-explore-education-statistics-test.azurewebsites.net/"
             }
           ],
           "phpVersion": "off"
