@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 {
     public class TableBuilderService : ITableBuilderService
     {
-        private readonly ReleaseService _releaseService;
+        private readonly IReleaseService _releaseService;
         private readonly IGeographicDataService _geographicDataService;
         private readonly ILaCharacteristicDataService _laCharacteristicDataService;
         private readonly INationalCharacteristicDataService _nationalCharacteristicDataService;
@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
         private readonly CharacteristicResultBuilder _characteristicResultBuilder;
         private readonly LaCharacteristicResultBuilder _laCharacteristicResultBuilder;
 
-        public TableBuilderService(ReleaseService releaseService,
+        public TableBuilderService(IReleaseService releaseService,
             IGeographicDataService geographicDataService,
             ILaCharacteristicDataService laCharacteristicDataService,
             INationalCharacteristicDataService nationalCharacteristicDataService,

@@ -25,7 +25,9 @@ export interface PublicationMeta {
 export const getCharacteristicsMeta = (
   publicationUuid: string,
 ): AxiosPromise<PublicationMeta> =>
-  dataApi.get(`/tablebuilder/meta/${publicationUuid}`);
+  dataApi.get(
+    `/tablebuilder/meta/CharacteristicDataNational/${publicationUuid}`,
+  );
 
 export enum SchoolType {
   Dummy = 'Dummy',
