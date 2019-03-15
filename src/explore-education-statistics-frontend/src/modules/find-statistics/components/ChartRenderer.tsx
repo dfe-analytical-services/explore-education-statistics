@@ -39,16 +39,19 @@ export class ChartRenderer extends Component<ChartRendererProps> {
       return a.year < b.year ? -1 : a.year > b.year ? 1 : 0;
     });
 
-    return (
-      <div className="dfe-content-overflow">
-        <LineChartBlock
-          chartDataKeys={this.props.attributes}
-          characteristicsData={characteristicsData}
-          labels={labels}
-          xAxisLabel={xAxisLabel}
-          yAxisLabel={yAxisLabel}
-        />
-      </div>
-    );
+    switch (this.props.type) {
+      case 'line':
+        return (
+          <LineChartBlock
+            chartDataKeys={this.props.attributes}
+            characteristicsData={characteristicsData}
+            labels={labels}
+            xAxisLabel={xAxisLabel}
+            yAxisLabel={yAxisLabel}
+          />
+        );
+      default:
+        return '';
+    }
   }
 }

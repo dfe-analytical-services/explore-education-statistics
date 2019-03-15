@@ -22,7 +22,11 @@ const ContentSubBlockRenderer = ({ block }: Props) => {
         </div>
       );
     case 'DataBlock':
-      return <DataBlock {...block} />;
+      return (
+        <div className="dfe-content-overflow">
+          <DataBlock {...block} />
+        </div>
+      );
     default:
       return null;
   }

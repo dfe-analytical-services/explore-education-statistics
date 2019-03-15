@@ -56,7 +56,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
     const publicationId = json.publicationId;
 
     const metaResponse = await fetch(
-      `http://localhost:5000/api/TableBuilder/meta/${publicationId}`,
+      `http://localhost:5000/api/TableBuilder/meta/CharacteristicDataNational/${publicationId}`,
     );
 
     const jsonMeta: PublicationMeta = await metaResponse.json();
