@@ -12,6 +12,7 @@ import PrototypeAnnexE from './components/methodology/absence/PrototypeAnnexE';
 import PrototypeSection1 from './components/methodology/absence/PrototypeSection1';
 import PrototypeSection2 from './components/methodology/absence/PrototypeSection2';
 import PrototypeSection3 from './components/methodology/absence/PrototypeSection3';
+import PrototypeSection4 from './components/methodology/absence/PrototypeSection4';
 import PrototypeAbsenceData from './components/PrototypeAbsenceData';
 import PrototypeDataSample from './components/PrototypeDataSample';
 import PrototypeMap from './components/PrototypeMap';
@@ -153,7 +154,40 @@ const PublicationPage = () => {
         </AccordionSection>
 
         <AccordionSection heading="Data collection">
-          <p>DATA COLLECTION</p>
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-one-quarter">
+              <h3 className="govuk-heading-s">In this section</h3>
+              <ul className="govuk-body-s">
+                <li>
+                  <a href="#section4-1">
+                    The current process 2005/06 to present
+                  </a>
+                </li>
+                <li>
+                  <a href="#section4-2">
+                    Background of absence data collection
+                  </a>
+                </li>
+                <li>
+                  <a href="#section4-3">Data coverage</a>
+                </li>
+                <li>
+                  <a href="#section4-4">What absence data is collected</a>
+                </li>
+                <li>
+                  <a href="#section4-5">
+                    No longer collected but available historically
+                  </a>
+                </li>
+                <li>
+                  <a href="#section4-6">What absence data is not collected</a>
+                </li>
+              </ul>
+            </div>
+            <div className="govuk-grid-column-three-quarters">
+              <PrototypeSection4 />
+            </div>
+          </div>
         </AccordionSection>
 
         <AccordionSection heading="Data processing">
