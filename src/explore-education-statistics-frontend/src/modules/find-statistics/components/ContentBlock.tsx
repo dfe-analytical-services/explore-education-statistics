@@ -1,42 +1,26 @@
-import React, { Component } from 'react';
-import ContentBlockRenderer from './ContentBlockRenderer';
+import React from 'react';
+import { Release } from '../../../services/publicationService';
+import ContentSubBlockRenderer from './ContentSubBlockRenderer';
 
 interface Props {
-  content: Block[];
+  content: Release['content'][0]['content'];
 }
 
-export interface DataQuery {
-  path: string;
-  method: string;
-  body: string;
-}
-
-export interface Block {
-  body: string;
-  heading: string;
-  order: number;
-  type: string;
-  dataQuery: DataQuery;
-  chartType: string;
-}
-
-class ContentBlock extends Component<Props> {
-  public render() {
-    const { content } = this.props;
-
-    return content.length > 0 ? (
-      content.map(block => (
-        <ContentBlockRenderer
+const ContentBlock = ({ content }: Props) => {
+  return content.length > 0 ? (
+    <>
+      {content.map((block, index) => (
+        <ContentSubBlockRenderer
           block={block}
-          key={`${block.order}-${block.heading}`}
+          key={`${index}-${block.heading}-${block.type}`}
         />
-      ))
-    ) : (
-      <div className="govuk-inset-text">
-        There is no content for this section.
-      </div>
-    );
-  }
-}
+      ))}
+    </>
+  ) : (
+    <div className="govuk-inset-text">
+      There is no content for this section.
+    </div>
+  );
+};
 
 export default ContentBlock;

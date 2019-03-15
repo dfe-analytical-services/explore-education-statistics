@@ -1,70 +1,31 @@
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
+import Accordion from 'src/components/Accordion';
+import AccordionSection from 'src/components/AccordionSection';
+import Details from 'src/components/Details';
+import FormattedDate from 'src/components/FormattedDate';
+import GoToTopLink from 'src/components/GoToTopLink';
+import Link from 'src/components/Link';
+import Page from 'src/components/Page';
 import PageTitle from 'src/components/PageTitle';
-import Accordion from '../../components/Accordion';
-import AccordionSection from '../../components/AccordionSection';
-import Details from '../../components/Details';
-import FormattedDate from '../../components/FormattedDate';
-import GoToTopLink from '../../components/GoToTopLink';
-import Link from '../../components/Link';
-import Page from '../../components/Page';
-import Tabs from '../../components/Tabs';
-import TabsSection from '../../components/TabsSection';
-import { baseUrl, contentApi } from '../../services/api';
+import Tabs from 'src/components/Tabs';
+import TabsSection from 'src/components/TabsSection';
+import { baseUrl } from 'src/services/api';
+import {
+  getLatestPublicationRelease,
+  getPublicationRelease,
+  Release,
+} from 'src/services/publicationService';
 import ContentBlock from './components/ContentBlock';
-
-interface LegacyRelease {
-  id: string;
-  description: string;
-  url: string;
-}
-
-interface Release {
-  id: string;
-  releaseName: string;
-  slug: string;
-}
-
-interface ContentSection {
-  caption: string;
-  content: any[];
-  heading: string;
-  order: number;
-}
-
-interface KeyStatistic {
-  title: string;
-  description: string;
-}
-
-interface Publication {
-  dataSource: string;
-  nextUpdate: string;
-  releases: Release[];
-  legacyReleases: LegacyRelease[];
-  slug: string;
-}
 
 interface Props {
   publication: string;
   release: string;
-  data: {
-    title: string;
-    published: string;
-    summary: string;
-    releaseName: string;
-    publication: Publication;
-    content: ContentSection[];
-    keyStatistics: KeyStatistic[];
-    updates: {
-      on: string;
-      reason: string;
-    }[];
-  };
+  data: Release;
 }
 
-class PublicationPage extends Component<Props> {
+class PublicationReleasePage extends Component<Props> {
   public static async getInitialProps({
     query,
   }: NextContext<{
@@ -73,11 +34,11 @@ class PublicationPage extends Component<Props> {
   }>) {
     const { publication, release } = query;
 
-    const url = release
-      ? `release/${release}`
-      : `publication/${publication}/latest`;
+    const request = release
+      ? getPublicationRelease(release)
+      : getLatestPublicationRelease(publication);
 
-    const { data } = await contentApi.get(url);
+    const { data } = await request;
 
     return {
       data,
@@ -146,6 +107,7 @@ class PublicationPage extends Component<Props> {
               </ul>
             </Details>
           </div>
+
           <div className="govuk-grid-column-one-third">
             <aside className="app-related-items">
               <h3 id="subsection-title">About these statistics</h3>
@@ -158,22 +120,24 @@ class PublicationPage extends Component<Props> {
                     className="govuk-list"
                     data-testid="publication-page--release-name-list"
                   >
-                    {data.publication.releases.slice(1).map(elem => (
-                      <li key={elem.id} data-testid="item-internal">
-                        <Link
-                          to={`/statistics/${data.publication.slug}/${
-                            elem.slug
-                          }`}
-                        >
-                          {elem.releaseName}
-                        </Link>
-                      </li>
-                    ))}
-                    {data.publication.legacyReleases.map(elem => (
-                      <li key={elem.id} data-testid="item-external">
-                        <a href={elem.url}>{elem.description}</a>
-                      </li>
-                    ))}
+                    {data.publication.releases
+                      .slice(1)
+                      .map(({ id, slug, releaseName }) => (
+                        <li key={id} data-testid="item-internal">
+                          <Link
+                            to={`/statistics/${data.publication.slug}/${slug}`}
+                          >
+                            {releaseName}
+                          </Link>
+                        </li>
+                      ))}
+                    {data.publication.legacyReleases.map(
+                      ({ id, description, url }) => (
+                        <li key={id} data-testid="item-external">
+                          <a href={url}>{description}</a>
+                        </li>
+                      ),
+                    )}
                   </ul>
                 </Details>
               </h4>
@@ -203,7 +167,7 @@ class PublicationPage extends Component<Props> {
               </h4>
 
               <h4>
-                <span className="govuk-caption-m">Next update: </span>
+                <span className="govuk-caption-m">Next update:</span>
                 <FormattedDate>{data.publication.nextUpdate}</FormattedDate>
 
                 <span className="govuk-caption-m">
@@ -221,9 +185,12 @@ class PublicationPage extends Component<Props> {
         {data.keyStatistics.length > 0 && (
           <>
             <h2 className="govuk-heading-l">
-              {!release ? <>Latest headline </> : <>Headline </>}
-              facts and figures - {data.releaseName}
+              {`${
+                !release ? 'Latest headline' : 'Headline'
+              } facts and figures - ${data.releaseName}
+              `}
             </h2>
+
             <Tabs>
               <TabsSection id="summary" title="Summary">
                 <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">
@@ -267,6 +234,7 @@ class PublicationPage extends Component<Props> {
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Extra information
         </h2>
+
         <Accordion id="extra-information-sections">
           <AccordionSection
             heading="Where does this data come from"
@@ -275,43 +243,31 @@ class PublicationPage extends Component<Props> {
           >
             <ul className="govuk-list">
               <li>
-                <a href="#" className="govuk-link">
-                  How do we collect it?
-                </a>
+                <a href="#">How do we collect it?</a>
               </li>
               <li>
-                <a href="#" className="govuk-link">
-                  What do we do with it?
-                </a>
+                <a href="#">What do we do with it?</a>
               </li>
               <li>
-                <a href="#" className="govuk-link">
-                  Related policies
-                </a>
+                <a href="#">Related policies</a>
               </li>
             </ul>
           </AccordionSection>
           <AccordionSection heading="Feedback and questions" headingTag="h3">
             <ul className="govuk-list">
               <li>
-                <a href="#" className="govuk-link">
-                  Feedback on this page
-                </a>
+                <a href="#">Feedback on this page</a>
               </li>
               <li>
-                <a href="#" className="govuk-link">
-                  Make a suggestion
-                </a>
+                <a href="#">Make a suggestion</a>
               </li>
               <li>
-                <a href="#" className="govuk-link">
-                  Ask a question
-                </a>
+                <a href="#">Ask a question</a>
               </li>
             </ul>
           </AccordionSection>
           <AccordionSection heading="Contact us" headingTag="h3">
-            <h4 className="govuk-heading-">Media enquiries</h4>
+            <h4>Media enquiries</h4>
             <address className="govuk-body dfe-font-style-normal">
               Press Office News Desk
               <br />
@@ -324,7 +280,7 @@ class PublicationPage extends Component<Props> {
               Telephone: 020 7783 8300
             </address>
 
-            <h4 className="govuk-heading-">Other enquiries</h4>
+            <h4>Other enquiries</h4>
             <address className="govuk-body dfe-font-style-normal">
               Data Insight and Statistics Division
               <br />
@@ -339,7 +295,10 @@ class PublicationPage extends Component<Props> {
               SW1P 3BT <br />
               Telephone: 020 7783 8300
               <br />
-              Email: <a href="#">Schools.statistics@education.gov.uk</a>
+              Email:{' '}
+              <a href="mailto:Schools.statistics@education.co.uk">
+                Schools.statistics@education.gov.uk
+              </a>
             </address>
           </AccordionSection>
         </Accordion>
@@ -347,11 +306,13 @@ class PublicationPage extends Component<Props> {
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Exploring the data
         </h2>
+
         <p>
           The statistics can be viewed as reports, or you can customise and
           download as excel or .csv files . The data can also be accessed via an
           API. <a href="#">What is an API?</a>
         </p>
+
         <Link to="/prototypes/data-table-v3" className="govuk-button">
           Explore pupil absence statistics
         </Link>
@@ -362,4 +323,4 @@ class PublicationPage extends Component<Props> {
   }
 }
 
-export default PublicationPage;
+export default PublicationReleasePage;

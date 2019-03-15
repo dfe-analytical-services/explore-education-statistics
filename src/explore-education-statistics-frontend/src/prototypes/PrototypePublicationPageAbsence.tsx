@@ -2,7 +2,6 @@ import React from 'react';
 import Accordion from '../components/Accordion';
 import AccordionSection from '../components/AccordionSection';
 import Details from '../components/Details';
-import GoToTopLink from '../components/GoToTopLink';
 import Link from '../components/Link';
 import PrototypeAbsenceData from './components/PrototypeAbsenceData';
 import PrototypeDataSample from './components/PrototypeDataSample';
@@ -10,7 +9,7 @@ import PrototypeMap from './components/PrototypeMap';
 import PrototypePage from './components/PrototypePage';
 
 const PublicationPage = () => {
-  let mapRef: PrototypeMap;
+  let mapRef: PrototypeMap | null = null;
 
   return (
     <PrototypePage
@@ -51,7 +50,7 @@ const PublicationPage = () => {
             </p>
 
             <div className="govuk-inset-text">
-              <Link to="#">
+              <Link to="/prototypes/methodology-absence">
                 Find out more about our pupil absence data and statistics
                 methodology and terminology
               </Link>
@@ -615,11 +614,7 @@ const PublicationPage = () => {
           heading="Pupil absence by local authority"
           onToggle={isOpen => mapRef && mapRef.refresh()}
         >
-          <PrototypeAbsenceData
-            map={m => {
-              mapRef = m;
-            }}
-          />
+          <PrototypeAbsenceData ref={el => el && (mapRef = el.mapRef)} />
 
           <p>
             There is variation in overall and persistent absence rates across

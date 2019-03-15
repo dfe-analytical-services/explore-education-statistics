@@ -271,7 +271,7 @@
           "connectionStrings": [
             {
               "name": "AzureStorage",
-              "connectionString":"[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value),';EndpointSuffix=core.windows.net')]"
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value),';EndpointSuffix=core.windows.net')]"
             },
             {
               "name": "ContentDb",
@@ -323,36 +323,32 @@
     {
       "type": "Microsoft.Web/sites",
       "name": "[variables('publicAppName')]",
-      "apiVersion": "2018-02-01",
-      "kind": "app",
+      "apiVersion": "2016-08-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]": "empty"
       },
-      "resources": [
-        {
-          "type": "siteextensions",
-          "name": "Microsoft.ApplicationInsights.AzureWebSites",
-          "apiVersion": "2015-08-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.Web/Sites', variables('publicAppName'))]"
-          ],
-          "properties": {}
-        }
-      ],
       "properties": {
         "siteConfig": {
+          "AlwaysOn": true,
           "appSettings": [
             {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', variables('publicAppName')), '2015-05-01').InstrumentationKey]"
+              "name": "WEBSITE_NODE_DEFAULT_VERSION",
+              "value": "8.11.1"
             },
             {
-              "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "10.15.1"
+              "name": "NODE_ENV",
+              "value": "production"
+            },
+            {
+              "name": "CONTENT_API_BASE_URL",
+              "value": "//content-explore-education-statistics-test.azurewebsites.net/"
+            },
+            {
+              "name": "DATA_API_BASE_URL",
+              "value": "//data-explore-education-statistics-test.azurewebsites.net/"
             }
           ],
-          "linuxFxVersion": "node|10.10",
           "phpVersion": "off"
         },
         "name": "[variables('publicAppName')]",
@@ -360,17 +356,17 @@
         "hostingEnvironment": ""
       },
       "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('publicAppName'))]"
+        "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]"
       ]
     },
     {
       "type": "Microsoft.Web/serverfarms",
       "sku": {
-        "name": "B1"
+        "Tier": "Basic",
+        "Name": "B1"
       },
       "name": "[variables('publicPlanName')]",
-      "apiVersion": "2018-02-01",
+      "apiVersion": "2015-08-01",
       "location": "[resourceGroup().location]",
       "properties": {
         "name": "[variables('publicPlanName')]",
@@ -378,20 +374,6 @@
         "reserved": false,
         "numberOfWorkers": "1",
         "hostingEnvironment": ""
-      },
-      "kind": "linux"
-    },
-    {
-      "type": "Microsoft.Insights/components",
-      "name": "[variables('publicAppName')]",
-      "apiVersion": "2014-04-01",
-      "location": "[parameters('appInsightsLocation')]",
-      "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('publicAppName'))]": "Resource"
-      },
-      "properties": {
-        "applicationId": "[variables('publicAppName')]",
-        "Request_Source": "AzureTfsExtensionAzureProject"
       }
     },
     {
@@ -469,6 +451,5 @@
         }
       ]
     }
-
   ]
 }

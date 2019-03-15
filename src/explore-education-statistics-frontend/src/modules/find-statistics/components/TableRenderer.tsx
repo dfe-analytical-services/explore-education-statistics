@@ -8,16 +8,12 @@ interface TableRendererProps {
 
 export class TableRenderer extends Component<TableRendererProps> {
   public render() {
-    console.log(this.props.data.result);
-    // console.log(this.props.meta);
-
     const results: any[] = this.props.data.result;
 
     const attributes: string[] = Object.keys(results[0].attributes);
-    // @ts-ignore
-    const characteristics: string[] = [
-      ...new Set(results.map(result => result.characteristic.name)),
-    ];
+    const characteristics: string[] = Array.from(
+      new Set(results.map(result => result.characteristic.name)),
+    );
 
     const years = results.map(result => result.year).sort();
 

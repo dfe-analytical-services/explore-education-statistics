@@ -1,12 +1,14 @@
 import { AxiosPromise } from 'axios';
 import { dataApi } from './api';
 
+export interface AttributesMetaItem {
+  name: string;
+  label: string;
+  unit?: string;
+}
+
 export interface AttributesMeta {
-  [group: string]: {
-    name: string;
-    label: string;
-    unit?: string;
-  }[];
+  [group: string]: AttributesMetaItem[];
 }
 
 export interface CharacteristicsMeta {

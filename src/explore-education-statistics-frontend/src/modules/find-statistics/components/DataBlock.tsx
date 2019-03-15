@@ -1,20 +1,16 @@
 import React, { Component } from 'react';
 import Tabs from '../../../components/Tabs';
 import TabsSection from '../../../components/TabsSection';
-import { DataQuery } from './ContentBlock';
-import { TableRenderer } from './TableRenderer';
+import { Chart, DataQuery } from '../../../services/publicationService';
+import { PublicationMeta } from '../../../services/tableBuilderService';
 import { ChartRenderer } from './ChartRenderer';
-
-interface Chart {
-  type: string;
-  attributes: string[];
-}
+import { TableRenderer } from './TableRenderer';
 
 interface DataBlockProps {
   type: string;
-  heading: string;
-  dataQuery: DataQuery;
-  charts: Chart[];
+  heading?: string;
+  dataQuery?: DataQuery;
+  charts?: Chart[];
 }
 
 interface DataBlockState {
@@ -35,7 +31,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
   public async componentDidMount() {
     const { dataQuery } = this.props;
 
-    await this.getData(dataQuery);
+    if (dataQuery) await this.getData(dataQuery);
   }
 
   public async componentWillUnmount() {
@@ -63,14 +59,24 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
       `http://localhost:5000/api/TableBuilder/meta/${publicationId}`,
     );
 
-    const jsonMeta = await metaResponse.json();
+    const jsonMeta: PublicationMeta = await metaResponse.json();
 
     if (this.currentDataQuery === dataQuery) {
       this.parseDataResponse(json);
 
-      this.setState({
+      const newState: any = {
         tables: [{ data: json, meta: jsonMeta }],
-      });
+      };
+
+      if (this.props.charts) {
+        newState.charts = this.props.charts.map(chart => ({
+          ...chart,
+          data: json,
+          meta: jsonMeta,
+        }));
+      }
+
+      this.setState(newState);
     }
   }
 
@@ -82,8 +88,6 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
     const { charts, dataQuery, heading } = this.props;
 
     const id = new Date().getDate();
-
-    console.log(charts);
 
     return (
       <div className="govuk-datablock">

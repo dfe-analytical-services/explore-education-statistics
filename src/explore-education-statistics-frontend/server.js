@@ -9,7 +9,7 @@ const app = next({
 
 const handleRequest = app.getRequestHandler();
 
-async function startServer(port = 3000) {
+async function startServer(port = process.env.PORT || 3000) {
   try {
     await app.prepare();
   } catch (err) {
