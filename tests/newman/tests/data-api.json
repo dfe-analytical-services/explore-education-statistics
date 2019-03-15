@@ -9,7 +9,7 @@
 			"name": "Meta",
 			"item": [
 				{
-					"name": "Meta - Pupil absence in schools in England",
+					"name": "Meta - Geographic - Pupil absence in schools in England",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -30,21 +30,94 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}",
+							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/GeographicData",
 							"host": [
 								"{{data_api_url}}"
 							],
 							"path": [
 								"tablebuilder",
 								"meta",
-								"{{publication_id}}"
+								"{{publication_id}}",
+								"GeographicData"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Meta - Permanent and fixed period exclusions",
+					"name": "Meta - Characteristics LA - Pupil absence in schools in England",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+								"exec": [
+									"pm.variables.set('publication_id', 'cbbd299f-8297-44bc-92ac-558bcf51f8ad')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/CharacteristicDataLa",
+							"host": [
+								"{{data_api_url}}"
+							],
+							"path": [
+								"tablebuilder",
+								"meta",
+								"{{publication_id}}",
+								"CharacteristicDataLa"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Meta - Characteristics National - Pupil absence in schools in England",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+								"exec": [
+									"pm.variables.set('publication_id', 'cbbd299f-8297-44bc-92ac-558bcf51f8ad')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/CharacteristicDataNational",
+							"host": [
+								"{{data_api_url}}"
+							],
+							"path": [
+								"tablebuilder",
+								"meta",
+								"{{publication_id}}",
+								"CharacteristicDataNational"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Meta - Geographic - Permanent and fixed period exclusions",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -65,21 +138,94 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}",
+							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/GeographicData",
 							"host": [
 								"{{data_api_url}}"
 							],
 							"path": [
 								"tablebuilder",
 								"meta",
-								"{{publication_id}}"
+								"{{publication_id}}",
+								"GeographicData"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Meta - Schools, pupils and their characteristics",
+					"name": "Meta - Characteristics LA - Permanent and fixed period exclusions",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "172e5a61-30d3-454a-9a6c-d29b57b2aabd",
+								"exec": [
+									"pm.variables.set('publication_id', 'bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/CharacteristicDataLa",
+							"host": [
+								"{{data_api_url}}"
+							],
+							"path": [
+								"tablebuilder",
+								"meta",
+								"{{publication_id}}",
+								"CharacteristicDataLa"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Meta - Characteristics National - Permanent and fixed period exclusions",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "172e5a61-30d3-454a-9a6c-d29b57b2aabd",
+								"exec": [
+									"pm.variables.set('publication_id', 'bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/CharacteristicDataNational",
+							"host": [
+								"{{data_api_url}}"
+							],
+							"path": [
+								"tablebuilder",
+								"meta",
+								"{{publication_id}}",
+								"CharacteristicDataNational"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Meta - Geographic - Schools, pupils and their characteristics",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -100,14 +246,87 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{data_api_url}}/tablebuilder/meta/a91d9e05-be82-474c-85ae-4913158406d0",
+							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/GeographicData",
 							"host": [
 								"{{data_api_url}}"
 							],
 							"path": [
 								"tablebuilder",
 								"meta",
-								"a91d9e05-be82-474c-85ae-4913158406d0"
+								"{{publication_id}}",
+								"GeographicData"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Meta - Characteristics LA - Schools, pupils and their characteristics",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1566cb5c-7ac9-4134-8be3-03a5184ae3da",
+								"exec": [
+									"pm.variables.set('publication_id', 'a91d9e05-be82-474c-85ae-4913158406d0')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/CharacteristicDataLa",
+							"host": [
+								"{{data_api_url}}"
+							],
+							"path": [
+								"tablebuilder",
+								"meta",
+								"{{publication_id}}",
+								"CharacteristicDataLa"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Meta - Characteristics National - Schools, pupils and their characteristics",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1566cb5c-7ac9-4134-8be3-03a5184ae3da",
+								"exec": [
+									"pm.variables.set('publication_id', 'a91d9e05-be82-474c-85ae-4913158406d0')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}/CharacteristicDataNational",
+							"host": [
+								"{{data_api_url}}"
+							],
+							"path": [
+								"tablebuilder",
+								"meta",
+								"{{publication_id}}",
+								"CharacteristicDataNational"
 							]
 						}
 					},

@@ -302,6 +302,7 @@
           "name": "[variables('publicAppName')]",
           "httpsOnly": true,
           "AlwaysOn": true,
+          "clientAffinityEnabled": false,
           "appSettings": [
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
@@ -381,7 +382,7 @@
             "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "268435456000",
-            "requestedServiceObjectiveName": "S3"
+            "requestedServiceObjectiveName": "S1"
           }
         },
         {
