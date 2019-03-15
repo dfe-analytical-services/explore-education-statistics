@@ -18,9 +18,6 @@
     "storageAccountName": {
       "type": "string"
     },
-    "cosmosAccountName": {
-      "type": "string"
-    },
     "sqlAdministratorLogin": {
       "type": "string",
       "metadata": {
@@ -47,26 +44,6 @@
     "sqlserverName": "[parameters('webAppName')]"
   },
   "resources": [
-    {
-      "apiVersion": "2015-04-08",
-      "kind": "MongoDB",
-      "type": "Microsoft.DocumentDb/databaseAccounts",
-      "name": "[parameters('cosmosAccountName')]",
-      "location": "westeurope",
-      "properties": {
-        "databaseAccountOfferType": "Standard",
-        "locations": [
-          {
-            "failoverPriority": 0,
-            "locationName": "westeurope"
-          }
-        ],
-        "enableMultipleWriteLocations": false,
-        "isVirtualNetworkFilterEnabled": false,
-        "virtualNetworkRules": [],
-        "dependsOn": []
-      }
-    },
     {
       "type": "Microsoft.Web/sites",
       "name": "[variables('dataAppName')]",
@@ -96,14 +73,6 @@
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
               "value": "6.9.1"
-            },
-            {
-              "name": "AzureStorageConfig:CosmosEndpointUrl",
-              "value": "[Concat('https://',  parameters('cosmosAccountName'), '.documents.azure.com:443')]"
-            },
-            {
-              "name": "AzureStorageConfig:CosmosAuthorizationKey",
-              "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('cosmosAccountName')), '2015-04-08').primaryMasterKey]"
             },
             {
               "name": "SeedConfig:BatchSize",
@@ -271,7 +240,7 @@
           "connectionStrings": [
             {
               "name": "AzureStorage",
-              "connectionString":"[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value),';EndpointSuffix=core.windows.net')]"
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value),';EndpointSuffix=core.windows.net')]"
             },
             {
               "name": "ContentDb",
@@ -321,58 +290,53 @@
       }
     },
     {
-        "type": "Microsoft.Web/sites",
-        "name": "[variables('publicAppName')]",
-        "properties": {
-            "siteConfig": {
-                "linuxFxVersion": "NODE|10.14",
-                "windowsFxVersion": null,
-                "appSettings": [
-                    {
-                        "name": "WEBSITE_NODE_DEFAULT_VERSION",
-                        "value": "10.14"
-                    },
-                    {
-                        "name": "NODE_ENV",
-                        "value": "production"
-                    },
-                    {
-                        "name": "CONTENT_API_BASE_URL",
-                        "value": "//"
-                    },
-                    {
-                        "name": "DATA_API_BASE_URL",
-                        "value": "//"
-                    }
-                ]
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('publicAppName')]",
+      "apiVersion": "2016-08-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]": "empty"
+      },
+      "properties": {
+        "siteConfig": {
+          "name": "[variables('publicAppName')]",
+          "httpsOnly": true,
+          "AlwaysOn": true,
+          "appSettings": [
+            {
+              "name": "WEBSITE_NODE_DEFAULT_VERSION",
+              "value": "8.11.1"
             },
-            "name": "[variables('publicAppName')]",
-            "serverFarmId": "[variables('publicPlanName')]",
-            "hostingEnvironment": ""
+            {
+              "name": "NODE_ENV",
+              "value": "production"
+            }
+          ],
+          "phpVersion": "off"
         },
-        "apiVersion": "2016-08-01",
-        "location": "UK South",
-        "dependsOn": [
-            "[variables('publicPlanName')]"
-        ]
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
+        "hostingEnvironment": ""
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]"
+      ]
     },
     {
-        "apiVersion": "2016-09-01",
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "Tier": "Basic",
+        "Name": "B1"
+      },
+      "name": "[variables('publicPlanName')]",
+      "apiVersion": "2015-08-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
         "name": "[variables('publicPlanName')]",
-        "type": "Microsoft.Web/serverfarms",
-        "location": "UK South",
-        "properties": {
-            "name": "[variables('publicPlanName')]",
-            "workerSizeId": "1",
-            "reserved": true,
-            "numberOfWorkers": "1",
-            "hostingEnvironment": ""
-        },
-        "sku": {
-            "Tier": "Basic",
-            "Name": "B1"
-        },
-        "kind": "linux"
+        "workerSizeId": "0",
+        "reserved": false,
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
+      }
     },
     {
       "name": "[parameters('storageAccountName')]",
@@ -449,6 +413,5 @@
         }
       ]
     }
-
   ]
 }
