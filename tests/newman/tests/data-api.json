@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "b3910a6a-c174-4989-9e26-9ffb62dec554",
-		"name": "DfE",
+		"_postman_id": "9dab3655-e6fc-4a01-8de4-ab55959d3561",
+		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -30,9 +30,9 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{start_url}}/tablebuilder/meta/{{publication_id}}",
+							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}",
 							"host": [
-								"{{start_url}}"
+								"{{data_api_url}}"
 							],
 							"path": [
 								"tablebuilder",
@@ -65,9 +65,9 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{start_url}}/tablebuilder/meta/{{publication_id}}",
+							"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}",
 							"host": [
-								"{{start_url}}"
+								"{{data_api_url}}"
 							],
 							"path": [
 								"tablebuilder",
@@ -100,9 +100,9 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{start_url}}/tablebuilder/meta/a91d9e05-be82-474c-85ae-4913158406d0",
+							"raw": "{{data_api_url}}/tablebuilder/meta/a91d9e05-be82-474c-85ae-4913158406d0",
 							"host": [
-								"{{start_url}}"
+								"{{data_api_url}}"
 							],
 							"path": [
 								"tablebuilder",
@@ -154,6 +154,18 @@
 							"item": [
 								{
 									"name": "Geographic - National - Schools, pupils and their characteristics",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "033fb3fd-a17c-4618-b593-41cb79ce482b",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(2); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -169,9 +181,9 @@
 											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -183,6 +195,18 @@
 								},
 								{
 									"name": "Geographic - National - Permanent and fixed period exclusions",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "90b98aa5-7752-4999-a070-a76d0f8c9e3b",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(9); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -195,12 +219,12 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"perm_excl\",\n        \"fixed_excl\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"State_Funded_Secondary\",\n        \"Total\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"perm_excl\",\n        \"fixed_excl\",\n        \"fixed_excl_rate\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -212,6 +236,18 @@
 								},
 								{
 									"name": "Geographic - National - Pupil absence in schools in England",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "0b154cb3-3b83-4085-a37a-95ca8d90d496",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(3); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -224,12 +260,12 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"Total\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -269,6 +305,18 @@
 							"item": [
 								{
 									"name": "Geographic - Region - Schools, pupils and their characteristics",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "73ec0d3f-0b77-4fd4-8793-d20a65c211f5",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(20); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -284,9 +332,9 @@
 											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -298,6 +346,18 @@
 								},
 								{
 									"name": "Geographic - Region - Permanent and fixed period exclusions",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "3f618f35-9563-4733-acc6-6144351dfeb3",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(20); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -310,12 +370,12 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"Total\",\n        \"Special\"\n    ],\n    \"startYear\": 201516,\n    \"endYear\": 201516,\n    \"attributes\": [\n        \"num_schools\",\n        \"perm_excl\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -327,6 +387,18 @@
 								},
 								{
 									"name": "Geographic - Region - Pupil absence in schools in England",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "288b5522-62d8-40e4-9e3b-5569356a852a",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(100); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -339,12 +411,12 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"enrolments\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Total\"\n    ],\n    \"startYear\": 200607,\n    \"endYear\": 201011,\n    \"attributes\": [\n        \"num_schools\",\n        \"enrolments\",\n        \"sess_overall_totalreasons\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -355,7 +427,19 @@
 									"response": []
 								},
 								{
-									"name": "Geographic - Region - North East - Schools, pupils and their characteristics",
+									"name": "Geographic - Region - North East, Inner London - Schools, pupils and their characteristics",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "53a4f22b-955b-4581-9d68-811e46debad1",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(4); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -368,12 +452,12 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"regions\": [\"E12000001\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"regions\": [\n    \t\"E12000001\",\n    \t\"E13000001\"\n    ],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201617,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"num_schools\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -384,7 +468,19 @@
 									"response": []
 								},
 								{
-									"name": "Geographic - Region - North East - Permanent and fixed period exclusions",
+									"name": "Geographic - Region - South East - Permanent and fixed period exclusions",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "bf878157-00dc-4461-bce3-322b9260ecf5",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(8); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -397,12 +493,12 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"regions\": [\"E12000001\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"regions\": [\n    \t\"E12000008\",\n    \t\"E12000009\"\n    ],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201112,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -413,7 +509,19 @@
 									"response": []
 								},
 								{
-									"name": "Geographic - Region - North East - Pupil absence in schools in England",
+									"name": "Geographic - Region - North West, East of England, Outer London - Pupil absence in schools in England",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "602e930f-5e15-4962-928e-08fea629ec28",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(9); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -426,12 +534,12 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"regions\": [\"E12000001\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"enrolments\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"regions\": [\n    \t\"E12000002\",\n    \t\"E12000006\",\n    \t\"E13000002\"\n    ],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"State_Funded_Secondary\",\n        \"Special\"\n    ],\n    \"startYear\": 200910,\n    \"endYear\": 200910,\n    \"attributes\": [\n        \"num_schools\",\n        \"enrolments\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -471,6 +579,18 @@
 							"item": [
 								{
 									"name": "Geographic - Local Authority - Schools, pupils and their characteristics",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "8afcb6e7-a425-46f2-908d-c81270243a2b",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(450); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -483,12 +603,12 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"Special\"\n    ],\n    \"startYear\": 201213,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -500,6 +620,18 @@
 								},
 								{
 									"name": "Geographic - Local Authority - Permanent and fixed period exclusions",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "28e32682-dd95-4d8c-83e5-e1fbc4828614",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(303); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -512,12 +644,12 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Total\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -529,6 +661,18 @@
 								},
 								{
 									"name": "Geographic - Local Authority - Pupil absence in schools in England",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "8bb19802-1ae2-460d-a984-fab65fed33a9",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(150); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -541,12 +685,12 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"enrolments\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"Total\"\n    ],\n    \"startYear\": 200708,\n    \"endYear\": 200708,\n    \"attributes\": [\n        \"sess_overall\",\n        \"sess_possible\",\n        \"sess_authorised\",\n        \"sess_unauthorised\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -558,6 +702,18 @@
 								},
 								{
 									"name": "Geographic - Local Authority - Wandsworth - Schools, pupils and their characteristics",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "b51e0205-6b34-4055-b620-51e641882379",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(9); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -573,9 +729,9 @@
 											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -586,7 +742,19 @@
 									"response": []
 								},
 								{
-									"name": "Geographic - Local Authority - Wandsworth - Permanent and fixed period exclusions",
+									"name": "Geographic - Local Authority - Halton, Wandsworth - Permanent and fixed period exclusions",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "eead5a49-b18b-472b-85fa-fb5f6964f1e4",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(12); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -599,12 +767,12 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"localAuthorities\": [\n    \t\"E06000006\",\n    \t\"E09000032\"\n    ],\n    \"schoolTypes\": [\n        \"Total\",\n        \"Special\"\n    ],\n    \"startYear\": 201213,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"perm_excl_rate\",\n        \"fixed_excl_rate\",\n        \"one_plus_fixed_rate\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -616,6 +784,18 @@
 								},
 								{
 									"name": "Geographic - Local Authority - Wandsworth - Pupil absence in schools in England",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "256feed5-c15e-42bb-9658-275f5bc17c3f",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(2); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -628,12 +808,12 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"enrolments\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"State_Funded_Secondary\"\n    ],\n    \"startYear\": 201112,\n    \"endYear\": 201112,\n    \"attributes\": [\n        \"num_schools\",\n        \"enrolments\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -673,6 +853,18 @@
 							"item": [
 								{
 									"name": "Geographic - School - 2022000 - Schools, pupils and their characteristics",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "5ce764c7-38bf-41a9-b5ea-f02e61656f37",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(1); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -688,9 +880,9 @@
 											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"schools\": [\"2022000\"],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -701,7 +893,19 @@
 									"response": []
 								},
 								{
-									"name": "Geographic - School - 2022000 - Permanent and fixed period exclusions",
+									"name": "Geographic - School - 2022000, 2022001 - Permanent and fixed period exclusions",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "24db380e-46b5-40a3-9987-fb00cf43f137",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(2); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -714,12 +918,12 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schools\": [\"2022000\"],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schools\": [\n    \t\"2022000\",\n    \t\"2022001\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -731,6 +935,18 @@
 								},
 								{
 									"name": "Geographic - School - 2022000 - Pupil absence in schools in England",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "9144f264-b434-4307-8e53-01e3c14a0aef",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(6); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -743,12 +959,12 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schools\": [\"2022000\"],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"enrolments\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schools\": [\n    \t\"2013614\",\n    \t\"2022000\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"num_schools\",\n        \"enrolments\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/geographic",
+											"raw": "{{data_api_url}}/tablebuilder/geographic",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -822,7 +1038,7 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
-													""
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(6); });"
 												],
 												"type": "text/javascript"
 											}
@@ -843,9 +1059,9 @@
 											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+											"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -858,6 +1074,18 @@
 								},
 								{
 									"name": "Characteristics - National - Permanent and fixed period exclusions",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "4d1d91d9-babf-412d-a58f-9d3da3f0b10c",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(36); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -870,12 +1098,12 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"perm_excl\",\n        \"fixed_excl\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"schoolTypes\": [\n        \"Total\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"perm_excl\",\n        \"fixed_excl\"\n    ],\n    \"characteristics\": [\n        \"Age_5\",\n        \"Age_6\",\n        \"Age_7\",\n        \"Age_8\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+											"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -888,6 +1116,18 @@
 								},
 								{
 									"name": "Characteristics - National - Schools, pupils and their characteristics",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "72240184-6933-4cc8-a792-b27e3ccb5ccd",
+												"exec": [
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(12); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -900,12 +1140,12 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"headcount\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"schoolTypes\": [\n        \"State_Funded_Secondary\"\n    ],\n    \"startYear\": 201314,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"headcount\"\n    ],\n    \"characteristics\": [\n        \"FSM_Eligible\",\n        \"FSM_NotEligible\",\n        \"FSM_Unclassified\"\n    ]\n}"
 										},
 										"url": {
-											"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+											"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
 											"host": [
-												"{{start_url}}"
+												"{{data_api_url}}"
 											],
 											"path": [
 												"tablebuilder",
@@ -950,6 +1190,18 @@
 									"item": [
 										{
 											"name": "Characteristics - LA - All - Pupil absence in schools in England",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "52a47f6a-86b0-4e99-92d2-c327455de60d",
+														"exec": [
+															"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(453); });"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
 											"request": {
 												"method": "POST",
 												"header": [
@@ -962,12 +1214,12 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"schoolTypes\": [\n        \"State_Funded_Secondary\"\n    ],\n    \"startYear\": 201617,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\",\n        \"Total\"\n    ]\n}"
 												},
 												"url": {
-													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
 													"host": [
-														"{{start_url}}"
+														"{{data_api_url}}"
 													],
 													"path": [
 														"tablebuilder",
@@ -980,6 +1232,18 @@
 										},
 										{
 											"name": "Characteristics - LA - All - Schools, pupils and their characteristics",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "13ee2327-ff9e-44b3-9d82-26c096bee718",
+														"exec": [
+															"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(1202); });"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
 											"request": {
 												"method": "POST",
 												"header": [
@@ -992,12 +1256,12 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"headcount\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+													"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"schoolTypes\": [\n        \"Total\",\n        \"Special\"\n    ],\n    \"startYear\": 201617,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"headcount\"\n    ],\n    \"characteristics\": [\n        \"Age_4_and_under\",\n        \"Age_5\",\n        \"Age_6\",\n        \"Age_7\"\n    ]\n}"
 												},
 												"url": {
-													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
 													"host": [
-														"{{start_url}}"
+														"{{data_api_url}}"
 													],
 													"path": [
 														"tablebuilder",
@@ -1010,6 +1274,18 @@
 										},
 										{
 											"name": "Characteristics - LA - All - Permanent and fixed period exclusions",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "4377cf44-d78c-431d-b51d-4967092a70dd",
+														"exec": [
+															"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(604); });"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
 											"request": {
 												"method": "POST",
 												"header": [
@@ -1022,12 +1298,12 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"perm_excl\",\n        \"fixed_excl\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+													"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201516,\n    \"attributes\": [\n        \"perm_excl\",\n        \"fixed_excl\"\n    ],\n    \"characteristics\": [\n        \"NC_Year_2\",\n        \"NC_Year_3\"\n    ]\n}"
 												},
 												"url": {
-													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
 													"host": [
-														"{{start_url}}"
+														"{{data_api_url}}"
 													],
 													"path": [
 														"tablebuilder",
@@ -1046,6 +1322,18 @@
 									"item": [
 										{
 											"name": "Characteristics - LA - North East - Pupil absence in schools in England Copy",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "c273f4ab-e972-4dd5-8771-7999ddb5ed3b",
+														"exec": [
+															"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(72); });"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
 											"request": {
 												"method": "POST",
 												"header": [
@@ -1058,12 +1346,12 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"regions\": [\"E12000001\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"regions\": [\"E12000001\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201516,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"NC_Year_2\",\n        \"NC_Year_3\",\n        \"NC_Year_4\"\n    ]\n}"
 												},
 												"url": {
-													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
 													"host": [
-														"{{start_url}}"
+														"{{data_api_url}}"
 													],
 													"path": [
 														"tablebuilder",
@@ -1076,6 +1364,18 @@
 										},
 										{
 											"name": "Characteristics - LA - North East - Schools, pupils and their characteristics",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "dd1b4c48-105f-4f00-9528-b8d4034f1427",
+														"exec": [
+															"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(72); });"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
 											"request": {
 												"method": "POST",
 												"header": [
@@ -1091,9 +1391,9 @@
 													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"regions\": [\"E12000001\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
 												},
 												"url": {
-													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
 													"host": [
-														"{{start_url}}"
+														"{{data_api_url}}"
 													],
 													"path": [
 														"tablebuilder",
@@ -1106,6 +1406,18 @@
 										},
 										{
 											"name": "Characteristics - LA - North East - Permanent and fixed period exclusions",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "d90eef1d-cd0b-4f08-ac49-6fc0d5977783",
+														"exec": [
+															"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(72); });"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
 											"request": {
 												"method": "POST",
 												"header": [
@@ -1121,9 +1433,9 @@
 													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"regions\": [\"E12000001\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
 												},
 												"url": {
-													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
 													"host": [
-														"{{start_url}}"
+														"{{data_api_url}}"
 													],
 													"path": [
 														"tablebuilder",
@@ -1142,6 +1454,18 @@
 									"item": [
 										{
 											"name": "Characteristics - LA - Wandsworth - Pupil absence in schools in England",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+														"exec": [
+															"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(6); });"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
 											"request": {
 												"method": "POST",
 												"header": [
@@ -1157,9 +1481,9 @@
 													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
 												},
 												"url": {
-													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
 													"host": [
-														"{{start_url}}"
+														"{{data_api_url}}"
 													],
 													"path": [
 														"tablebuilder",
@@ -1172,6 +1496,18 @@
 										},
 										{
 											"name": "Characteristics - LA - Wandsworth - Schools, pupils and their characteristics",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "476d029c-ecb3-47cb-97a4-dba3bc3617d9",
+														"exec": [
+															"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(6); });"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
 											"request": {
 												"method": "POST",
 												"header": [
@@ -1187,9 +1523,9 @@
 													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
 												},
 												"url": {
-													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
 													"host": [
-														"{{start_url}}"
+														"{{data_api_url}}"
 													],
 													"path": [
 														"tablebuilder",
@@ -1202,6 +1538,18 @@
 										},
 										{
 											"name": "Characteristics - LA - Wandsworth - Permanent and fixed period exclusions",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "6f0b4b8e-ceef-4e22-8915-9e75526372ed",
+														"exec": [
+															"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(6); });"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
 											"request": {
 												"method": "POST",
 												"header": [
@@ -1217,9 +1565,9 @@
 													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
 												},
 												"url": {
-													"raw": "{{start_url}}/tablebuilder/characteristics/{{request_level}}",
+													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
 													"host": [
-														"{{start_url}}"
+														"{{data_api_url}}"
 													],
 													"path": [
 														"tablebuilder",
@@ -1336,9 +1684,9 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{start_url}}/debug/report",
+							"raw": "{{data_api_url}}/debug/report",
 							"host": [
-								"{{start_url}}"
+								"{{data_api_url}}"
 							],
 							"path": [
 								"debug",
