@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -27,7 +24,6 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
         {
             var tableBuilderService = new Mock<ITableBuilderService>();
             var releaseService = new Mock<IReleaseService>();
-            var mapper = new Mock<IMapper>();
 
             tableBuilderService.Setup(s => s.GetNational(It.IsNotIn(_testNationalQuery))).Returns(
                 new TableBuilderResult
@@ -74,38 +70,30 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
                     }
                 });
 
-            var attributeMeta = new AttributeMeta
-            {
-                Name = "num_schools",
-                Label = "Number of schools",
-                Group = "Exclusion fields",
-                KeyIndicator = false,
-                Unit = Unit.Number
-            };
-
-            mapper.Setup(m => m.Map<AttributeMetaViewModel>(attributeMeta))
-                .Returns(new AttributeMetaViewModel());
-
-            attributeMetaService.Setup(s => s.Get(new Guid("8fe9c479-1ab5-4894-81cd-9f87882e20ed")))
-                .Returns(new List<AttributeMeta>
+            releaseService
+                .Setup(s => s.GetAttributeMetas(new Guid("8fe9c479-1ab5-4894-81cd-9f87882e20ed"),
+                    typeof(GeographicData))).Returns(new Dictionary<string, List<AttributeMetaViewModel>>
                 {
-                    attributeMeta
+                    {
+                        "Exclusion fields",
+                        new List<AttributeMetaViewModel>
+                        {
+                            new AttributeMetaViewModel {Name = "num_schools", Label = "Number of schools"}
+                        }
+                    }
                 });
 
-            var characteristicMeta = new CharacteristicMeta
-            {
-                Name = "Total",
-                Label = "All pupils",
-                Group = "Total"
-            };
-
-            mapper.Setup(m => m.Map<CharacteristicViewModel>(characteristicMeta))
-                .Returns(new CharacteristicViewModel());
-
-            characteristicMetaService.Setup(s => s.Get(new Guid("8fe9c479-1ab5-4894-81cd-9f87882e20ed")))
-                .Returns(new List<CharacteristicMeta>
+            releaseService
+                .Setup(s => s.GetCharacteristicMetas(new Guid("8fe9c479-1ab5-4894-81cd-9f87882e20ed"),
+                    typeof(GeographicData))).Returns(new Dictionary<string, List<NameLabelViewModel>>
                 {
-                    characteristicMeta
+                    {
+                        "Total",
+                        new List<NameLabelViewModel>
+                        {
+                            new NameLabelViewModel {Name = "Total", Label = "All pupils"}
+                        }
+                    }
                 });
 
             _controller = new TableBuilderController(

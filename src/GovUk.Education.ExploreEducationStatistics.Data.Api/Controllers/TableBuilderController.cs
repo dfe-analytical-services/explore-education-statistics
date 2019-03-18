@@ -71,7 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 Characteristics = _releaseService.GetCharacteristicMetas(publicationId, type)
             };
 
-            if (result.Attributes.Any() || result.Characteristics.Any())
+            if (result.Attributes != null && result.Attributes.Any() || 
+                result.Characteristics != null && result.Characteristics.Any())
             {
                 return result;
             }
