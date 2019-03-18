@@ -6,6 +6,8 @@ import {
   PublicationMeta,
 } from '../../../services/tableBuilderService';
 import { LineChartBlock } from './Charts/LineChartBlock';
+import { StackedBarVerticalBlock } from './Charts/StackedBarVerticalBlock';
+import { StackedBarHorizontalBlock } from './Charts/StackedBarHorizontalBlock';
 
 interface ChartRendererProps {
   type: string;
@@ -20,7 +22,9 @@ interface ChartRendererProps {
 
 export class ChartRenderer extends Component<ChartRendererProps> {
   public render() {
-    const allAttributeLabels = Object.values(this.props.meta.attributes).flat();
+    const allAttributeLabels = Array.prototype.concat(
+      ...Object.values(this.props.meta.attributes),
+    );
 
     const usedAttributeLabels = this.props.attributes
       .map(attributeName =>
@@ -51,8 +55,14 @@ export class ChartRenderer extends Component<ChartRendererProps> {
             yAxis={this.props.yAxis}
           />
         );
+      case 'stackedbarvertical':
+        return <StackedBarVerticalBlock />;
+      case 'stackedbarhorizontal':
+        return <StackedBarHorizontalBlock />;
       default:
-        return <div>Unimplemented chart type requested ${this.props.type}</div>;
+        return (
+          <div>[ Unimplemented chart type requested ${this.props.type} ]</div>
+        );
     }
   }
 }

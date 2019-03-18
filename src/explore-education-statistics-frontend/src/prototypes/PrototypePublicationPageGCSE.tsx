@@ -4,7 +4,13 @@ import AccordionSection from '../components/AccordionSection';
 import Details from '../components/Details';
 import GoToTopLink from '../components/GoToTopLink';
 import Link from '../components/Link';
+import { ChartRenderer } from '../modules/find-statistics/components/ChartRenderer';
 import PrototypeAbsenceData from './components/PrototypeAbsenceData';
+import {
+  ks4SchoolAverageHeadlineScoresByPupilCharacteristics,
+  kS4SchoolPerformanceChart,
+  ks4SchoolRevisedAttainmentChart,
+} from './components/PrototypeDataFactory';
 import PrototypeDataSampleGCSE from './components/PrototypeDataSampleGCSE';
 import PrototypeMap from './components/PrototypeMap';
 import PrototypePage from './components/PrototypePage';
@@ -244,7 +250,8 @@ const PublicationPage = () => {
           heading="School performance for 2018"
           caption="School performance for 2018 shows small increases across all headline measures compared to 2017"
         >
-          [CHART]
+          <ChartRenderer {...kS4SchoolPerformanceChart} />
+          />
           <p>
             Results for 2018 show an increases across all headline measures
             compared to 2017.{' '}
@@ -316,6 +323,7 @@ const PublicationPage = () => {
               coasting and floor standard by region
             </strong>
           </p>
+          <ChartRenderer {...ks4SchoolRevisedAttainmentChart} />
           [CHART - England, state-funded schools assessed against the floor and
           coasting standards, 2018]
           <p>
@@ -350,6 +358,9 @@ const PublicationPage = () => {
           heading="Pupil characteristics"
           caption="Disadvantaged pupils and those with Special Education Needs continue to do less well than their peers"
         >
+          <ChartRenderer
+            {...ks4SchoolAverageHeadlineScoresByPupilCharacteristics}
+          />
           [CHART - Average headline scores by pupil characteristics ]
           <p>
             Breakdowns by pupil characteristics show that across all headline
