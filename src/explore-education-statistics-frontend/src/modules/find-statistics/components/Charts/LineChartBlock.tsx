@@ -10,6 +10,7 @@ import {
   YAxis,
 } from 'recharts';
 import { CharacteristicsData } from '../../../../services/tableBuilderService';
+import { colours, parseCondensedYearRange, symbols } from './Charts';
 
 interface LineChartBlockProps {
   chartDataKeys: string[];
@@ -18,16 +19,6 @@ interface LineChartBlockProps {
   xAxisLabel: string;
   labels: { [name: string]: string };
 }
-
-const colours: string[] = [
-  '#b10e1e',
-  '#006435',
-  '#005ea5',
-  '#800080',
-  '#C0C0C0',
-];
-
-const symbols: any[] = ['circle', 'square', 'triangle', 'cross', 'star'];
 
 const CustomToolTip = (props: any) => {
   if (props.active) {
@@ -68,7 +59,7 @@ export class LineChartBlock extends Component<LineChartBlockProps> {
           }
           return v;
         },
-        { name: result.year },
+        { name: parseCondensedYearRange(`${result.year}`) },
       );
     });
 

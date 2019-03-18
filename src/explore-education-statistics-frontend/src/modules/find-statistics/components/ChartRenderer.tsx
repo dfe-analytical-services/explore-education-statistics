@@ -39,7 +39,7 @@ export class ChartRenderer extends Component<ChartRendererProps> {
       return a.year < b.year ? -1 : a.year > b.year ? 1 : 0;
     });
 
-    switch (this.props.type) {
+    switch (this.props.type.toLowerCase()) {
       case 'line':
         return (
           <LineChartBlock
