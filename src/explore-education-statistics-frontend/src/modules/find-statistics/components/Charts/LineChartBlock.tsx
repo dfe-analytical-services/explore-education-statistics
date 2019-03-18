@@ -9,14 +9,15 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { Axis } from '../../../../services/publicationService';
 import { CharacteristicsData } from '../../../../services/tableBuilderService';
 import { colours, parseCondensedYearRange, symbols } from './Charts';
 
 interface LineChartBlockProps {
   chartDataKeys: string[];
   characteristicsData: CharacteristicsData;
-  yAxisLabel: string;
-  xAxisLabel: string;
+  yAxis: Axis;
+  xAxis: Axis;
   labels: { [name: string]: string };
 }
 
@@ -46,8 +47,8 @@ export class LineChartBlock extends Component<LineChartBlockProps> {
     const {
       characteristicsData,
       chartDataKeys,
-      xAxisLabel,
-      yAxisLabel,
+      xAxis,
+      yAxis,
       labels,
     } = this.props;
 
@@ -78,7 +79,7 @@ export class LineChartBlock extends Component<LineChartBlockProps> {
           label={{
             offset: 5,
             position: 'bottom',
-            value: xAxisLabel,
+            value: xAxis.title,
           }}
           padding={{ left: 20, right: 20 }}
           tickMargin={10}
@@ -88,7 +89,7 @@ export class LineChartBlock extends Component<LineChartBlockProps> {
             angle: -90,
             offset: 0,
             position: 'left',
-            value: yAxisLabel,
+            value: yAxis.title,
           }}
           scale="auto"
           unit="%"

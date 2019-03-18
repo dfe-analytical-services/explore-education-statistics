@@ -27,9 +27,15 @@ export interface DataQuery {
   body: string;
 }
 
+export interface Axis {
+  title: string;
+}
+
 export interface Chart {
   type: string;
   attributes: string[];
+  XAxis?: Axis;
+  YAxis?: Axis;
 }
 
 export interface ContentBlock {

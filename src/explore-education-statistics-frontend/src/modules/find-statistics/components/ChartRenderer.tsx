@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Axis } from '../../../services/publicationService';
 import {
   AttributesMetaItem,
   CharacteristicsData,
@@ -12,6 +13,9 @@ interface ChartRendererProps {
 
   data: any;
   meta: PublicationMeta;
+
+  xAxis: Axis;
+  yAxis: Axis;
 }
 
 export class ChartRenderer extends Component<ChartRendererProps> {
@@ -23,9 +27,6 @@ export class ChartRenderer extends Component<ChartRendererProps> {
         allAttributeLabels.find(({ name }) => name === attributeName),
       )
       .filter(_ => _ !== undefined) as AttributesMetaItem[]; // just in case
-
-    const yAxisLabel = 'Absence Rate';
-    const xAxisLabel = 'School Year';
 
     const labels = usedAttributeLabels.reduce((obj: any, next) => {
       obj[next.name] = next.label;
@@ -46,12 +47,12 @@ export class ChartRenderer extends Component<ChartRendererProps> {
             chartDataKeys={this.props.attributes}
             characteristicsData={characteristicsData}
             labels={labels}
-            xAxisLabel={xAxisLabel}
-            yAxisLabel={yAxisLabel}
+            xAxis={this.props.xAxis}
+            yAxis={this.props.yAxis}
           />
         );
       default:
-        return '';
+        return <div>Unimplemented chart type requested ${this.props.type}</div>;
     }
   }
 }
