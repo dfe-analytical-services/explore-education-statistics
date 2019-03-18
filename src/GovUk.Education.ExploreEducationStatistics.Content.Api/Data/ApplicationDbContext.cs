@@ -305,7 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                     {
                                         new Chart 
                                         {
-                                            Type = "Line",
+                                            Type = "line",
                                             XAxis = new Axis 
                                             {
                                                 title = "School Year"
