@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Tabs from '../../../components/Tabs';
 import TabsSection from '../../../components/TabsSection';
+import { baseUrl } from '../../../services/api';
 import { Chart, DataQuery } from '../../../services/publicationService';
 import { PublicationMeta } from '../../../services/tableBuilderService';
 import { ChartRenderer } from './ChartRenderer';
@@ -43,16 +44,13 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
     this.currentDataQuery = dataQuery;
 
-    const response = await fetch(
-      `${process.env.DATA_API_BASE_URL}${dataQuery.path}`,
-      {
-        body: dataQuery.body,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        method: dataQuery.method,
+    const response = await fetch(`${baseUrl.data}${dataQuery.path}`, {
+      body: dataQuery.body,
+      headers: {
+        'Content-Type': 'application/json',
       },
-    );
+      method: dataQuery.method,
+    });
 
     const json = await response.json();
 
@@ -60,7 +58,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
     const metaResponse = await fetch(
       `${
-        process.env.DATA_API_BASE_URL
+        baseUrl.data
       }/api/TableBuilder/meta/CharacteristicDataNational/${publicationId}`,
     );
 
