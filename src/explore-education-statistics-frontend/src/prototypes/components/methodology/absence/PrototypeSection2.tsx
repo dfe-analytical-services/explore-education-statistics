@@ -7,46 +7,62 @@ const PrototypeMethodologySection = () => {
     <>
       <h3 id="section2-1">Current termly publications</h3>
       <p>
-        The Department publishes termly pupil absence data via three National
-        Statistics releases each year. These are:
+        DfE publishes termly pupil absence data and statistics via the following
+        3 National Statistics releases each year:
       </p>
       <ul className="govuk-list govuk-list--bullet">
-        <li>autumn term, published in May</li>
-        <li>autumn and spring terms, published in October</li>
-        <li>full year, published in March</li>
+        <li>autumn term data and statistics - published in May</li>
+        <li>
+          autumn and spring terms data and statistics - published in October
+        </li>
+        <li>full year data and statistics - published in March</li>
       </ul>
       <p>
         Only the full year absence release gives a definitive view of pupil
-        absence. Termly publications can be affected significantly by term
-        length and therefore findings from these releases are for indicative
-        purposes only and the results should be treated with caution.
+        absence.
       </p>
       <p>
-        The Department’s annual absence statistical releases have been badged as
-        National Statistics since the 1999/00 academic year publication. The
-        termly and two term combined releases were badged as National Statistics
-        slightly later. The combined autumn and spring term release was badged
-        as national statistics from the autumn 2006 and spring 2007 publication
-        and the single term releases were badged as National Statistics as of
-        the autumn term 2009 publication.
+        Termly publications can be affected significantly by term length with
+        findings from these releases for indicative purposes only and the
+        results should be treated with caution.
+      </p>
+      <p>
+        DfE’s annual absence releases have been badged as National Statistics
+        since the 1999/00 academic year publication.
+      </p>
+      <p>
+        The termly and 2 term combined releases were badged as National
+        Statistics slightly later.
+      </p>
+      <p>
+        The combined autumn and spring term release was badged as national
+        statistics from the autumn 2006 and spring 2007 publication and the
+        single term releases were badged as National Statistics as of the autumn
+        term 2009 publication.
       </p>
       <h4>Historical publications</h4>
       <p>
-        Prior to the 2012/13 academic year the Department also published spring
-        term only absence data. However, this was discontinued as it was deemed
-        no longer necessary and of the least importance to users. The last
-        published spring term release was{' '}
-        <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-spring-term-2012">
-          Pupil absence in schools in England: spring term 2012
-        </a>{' '}
-        published on 30th August 201section2-
+        Prior to the 2012/13 academic year DfE also published spring term only
+        absence data. However, this was discontinued as it was deemed no longer
+        necessary and of the least importance to users.
       </p>
+      <p>The last spring term release wass published on 30 August 2012: </p>
+      <ul className="govuk-list govuk-list--bullet">
+        <li>
+          <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-spring-term-2012">
+            Pupil absence in schools in England: spring term 2012
+          </a>{' '}
+        </li>
+      </ul>
       <p>
         For the 2005/06 academic year, due to the transition of absence
         collection between the Absence in Schools Survey and the school census,
         absence information was published for secondary schools only as a
-        National Statistics release. Absence data for 2005/06 were not released
-        on a termly basis as this was the first year of collection.
+        National Statistics release.
+      </p>
+      <p>
+        Absence data for 2005/06 were not released on a termly basis as this was
+        the first year of collection.
       </p>
       <p>
         For academic years 1999/00 to 2004/05, annual pupil absence information
@@ -61,13 +77,16 @@ const PrototypeMethodologySection = () => {
       </p>
       <h3 id="section2-2">Key absence measures</h3>
       <p>
-        The Department monitors pupil absence levels using two key measures -
-        overall absence rate and persistent absence (PA) rate. The key measures
-        are calculated for pupils who are of compulsory school age i.e. aged
-        between 5 and 15 as at the start of the academic year (31st August).
+        DfE monitors pupil absence levels using 2 key measures - overall absence
+        rate and persistent absence (PA) rate.
       </p>
       <p>
-        Absence information is reported as a totals or rates across a period,
+        These key measures are calculated for pupils who are of compulsory s
+        chool age - ie aged between 5 and 15 as at the start of the academic
+        year (31 August).
+      </p>
+      <p>
+        Absence information is reported as totals or rates across a period,
         usually by school term or academic year.
       </p>
       <p>
@@ -76,8 +95,8 @@ const PrototypeMethodologySection = () => {
       </p>
       <p>
         Authorised absence is absence with permission from a teacher or other
-        authorised representative of the schools. This includes instances of
-        absence for which a satisfactory explanation has been provided e.g.
+        authorised school representative - including absences where a
+        satisfactory explanation has been provided. For example, through
         illness.
       </p>
       <p>
@@ -88,48 +107,69 @@ const PrototypeMethodologySection = () => {
       </p>
       <p>
         Persistent absence is when a pupil enrolment’s overall absence equates
-        to 10 per cent or more of their possible sessions.
+        to 10% or more of their possible sessions.
       </p>
       <p>See persistent absence methodology section for further information.</p>
       <h3 id="section2-3">Cohort used in absence measures</h3>
       <p>
         Absence information is collected and disseminated at enrolment level
-        rather than pupil level. This means that where a pupil has moved school
-        throughout the year, they will be counted more than once as they have
-        recorded attendance and absence at more than one school. This allows for
-        schools to be held accountable for pupil absences, as the absence is
-        attached to enrolments at a particular school, not the individual pupil.
+        rather than pupil level.
+      </p>
+      <p>
+        This means where a pupil has moved school throughout the year, theyll be
+        counted more than once as they have recorded attendance and absence at
+        more than 1 school.
+      </p>
+      <p>
+        This allows for schools to be held accountable for pupil absences, as
+        the absence is attached to enrolments at a particular school, not the
+        individual pupil.
+      </p>
+      <p>
         All the enrolments at a school over the period in question are included
         in the absence measures, not just the pupils on roll at a particular
-        date. Schools only record absence for the period a pupil is on roll at
-        their school. The number of pupil enrolments is approximately 4 per cent
-        higher than the number of pupils.
+        date.
       </p>
-      <h3 id="section2-4">
-        The school year (five half terms vs six half terms)
-      </h3>
       <p>
-        Generally, the academic year is made up of three terms, autumn, spring
-        and summer. Each term has two parts (half terms) which are usually
-        separated by a half term break.
+        Schools only record absence for the period a pupil is on roll at their
+        school.
+      </p>
+      <p>
+        The number of pupil enrolments is approximately 4% higher than the
+        number of pupils.
+      </p>
+      <h3 id="section2-4">The school year (5 half terms vs 6 half terms)</h3>
+      <p>
+        Generally, the academic year is made up of 3 terms - autumn, spring and
+        summer.
+      </p>
+      <p>
+        Each term has 2 parts (half terms) which are usually separated by a half
+        term break.
       </p>
       <p>
         Since the 2012/13 academic year, pupil absence information has been
-        collected for the full academic year i.e. all six half terms. However,
-        prior to this absence information was collected for the first five half
-        terms only, meaning absences in the second half of the summer term were
-        not collected.
+        collected for the full academic year (ie all 6 half terms).
       </p>
       <p>
-        Since the 2012/13 academic year, the Department’s key absence indicators
-        have been based on the full academic year’s (six half term) data.
-        However, as we are unable to rework time series tables or provide any
-        historical six half term absence levels the Department continued to
-        publish a full set of absence information for the first five half terms
-        up to and including the 2013/14 academic year. Following this, a single
-        csv file based on data for five half terms has been published alongside
-        the annual absence publications to enable users to still make longer
-        term time comparisons on this basis if they wish to.
+        However, prior to this absence information was collected for the first 5
+        half terms only, meaning absences in the second half of the summer term
+        were not collected.
+      </p>
+      <p>
+        Since the 2012/13 academic year, DfE's key absence indicators have been
+        based on the full academic year’s (ie 6 half terms) data.
+      </p>
+      <p>
+        However, as we're unable to rework time series tables or provide any
+        historical 6 half term absence levels DfE continued to publish a full
+        set of absence information for the first 5 half terms up to and
+        including the 2013/14 academic year.
+      </p>
+      <p>
+        Following this, a single csv file based on data for 5 half terms has
+        been published alongside the annual absence publications so longer
+        term-time comparisons can still be made.
       </p>
       <p>
         To account for high levels of study leave and other authorised absences
@@ -242,77 +282,119 @@ const PrototypeMethodologySection = () => {
       <p>
         In published absence statistics, pupil enrolments who first enrolled at
         a school within the second half of the summer term are not included.
+      </p>
+      <p>
         This is to ensure the same cohorts of enrolments are included in both
-        the five and six half term absence measures. Screen reader support
-        enabled.
+        the 5 and 6 half term absence measures.
       </p>
       <h3 id="section2-5">
         Published geographical and characteristics breakdowns
       </h3>
       <p>
-        The Department routinely publishes pupil absence information at
-        national, local authority and school level including breakdowns by pupil
+        DfE routinely publishes pupil absence information at national, local
+        authority and school level - including breakdowns by pupil
         characteristics.
       </p>
       <p>
         The autumn term absence publication provides high level information
         designed to give an early indication on absence levels and the effect of
-        winter illness. Information provided includes authorised, unauthorised
-        and overall absence rates, absence broken down by reason, the number of
-        pupils with one or more sessions of absence for different reasons and
-        information on persistent absence.
+        winter illness. This includes:
       </p>
+      <ul className="govuk-list govuk-list--bullet">
+        <li>authorised, unauthorised and overall absence rates</li>
+        <li>absence broken down by reason</li>
+        <li>
+          the number of pupils with 1 or more sessions of absence for different
+          reasons
+        </li>
+        <li>information on persistent absence</li>
+      </ul>
       <p>
         The combined autumn and spring term publication includes similar
         information to that of the autumn term. However, it also includes
-        absence levels broken down by pupils’ gender, free school meal
-        eligibility, national curriculum year group, first language, special
-        educational need and ethnic group.
+        absence levels broken down by pupil:
+      </p>
+      <ul className="govuk-list govuk-list--bullet">
+        <li>ethnic group</li>
+        <li>first language</li>
+        <li>free school meal eligibility</li>
+        <li>gender</li>
+        <li>national curriculum year group</li>
+        <li>special educational need</li>
+      </ul>
+      <p>
+        The full academic year's absence publication includes combined absence #
+        information for the autumn, spring and summer terms.
       </p>
       <p>
-        The full academic year's absence publication includes combined absence
-        information for the autumn, spring and summer terms. It is the largest
-        publication and includes similar breakdowns to that of the combined
-        autumn and spring term publication (as outlined above) as well as
-        persistent absence broken down by reason for absence and pupil
-        characteristic. Additional breakdowns included in this full year release
-        relate to the distribution of enrolments by length of overall absence,
-        percentage of enrolments by their overall absence and number of schools
-        by the percentage of persistent absentees. In this publication,
-        information is also provided at district level, based on Income
-        Deprivation Affecting Children Index (IDACI) and by degree of rurality.
+        It’s the largest publication and includes similar breakdowns to that of
+        the combined autumn and spring term publication (as outlined above) as
+        well as persistent absence broken down by reason for absence and pupil
+        characteristic.
+      </p>
+      <p>
+        Additional breakdowns included in this full year release relate to the:
+      </p>
+      <ul className="govuk-list govuk-list--bullet">
+        <li>distribution of enrolments by length of overall absence</li>
+        <li>percentage of enrolments by their overall absence </li>
+        <li>number of schools by the percentage of persistent absentees</li>
+      </ul>
+      <p>
+        In this publication, information is also provided at district level,
+        based on Income Deprivation Affecting Children Index (IDACI) and by
+        degree of rurality.
+      </p>
+      <p>
         In addition, from 2015/16 onwards, characteristics include free school
         meal eligibility in the last 6 years.
       </p>
       <p>
         The Income Deprivation Affecting Children Index (IDACI) is provided by
-        the Department for Communities and Local Government (CLG). The index
-        measures the proportion of all children aged 0 to 15 living in income
-        deprived families and is based on Lower-layer Super Output Areas (LSOAs)
-        in England. Each LSOA is given a rank between 1 and 32,844 where the
-        LSOA with the rank of 1 is the most deprived LSOA and the LSOA with the
-        rank of 32,844 is the most deprived. IDACI is a subset of the Income
-        Deprivation Domain of the Index of Multiple Deprivation 2015, which
-        which measures the proportion of the population in an area experiencing
-        deprivation relating to low income. The definition of low income used
-        includes both those people that are out-of-work, and those that are in
-        work but who have low earnings (and who satisfy the respective means
-        tests). Further information about IDACI can be found on the CLG site.
+        the Department for Communities and Local Government (CLG).
       </p>
       <p>
-        IDACI bands from 2014/15 are based on 2015 IDACI scores. IDACI bands for
-        2010/11 to 2013/14 are based on 2010 IDACI scores and those for 2007/08
-        to 2009/10 are based on 2007 IDACI scores. Care should be taken when
-        comparing IDACI tables based on different IDACI scores.
+        The index measures the proportion of all children aged 0 to 15 living in
+        income deprived families and is based on Lower-layer Super Output Areas
+        (LSOAs) in England.
+      </p>
+      <p>
+        Each LSOA is given a rank between 1 and 32,844 where the LSOA with the
+        rank of 1 is the most deprived LSOA and the LSOA with the rank of 32,844
+        is the most deprived.
+      </p>
+      <p>
+        IDACI is a subset of the Income Deprivation Domain of the Index of
+        Multiple Deprivation 2015 which measures the proportion of the
+        population in an area experiencing deprivation relating to low income.
+      </p>
+      <p>
+        The definition of low income used includes both those people that are
+        out-of-work and those that are in work but who have low earnings (and
+        who satisfy the respective means tests).
+      </p>
+      <p>Further information about IDACI can be found on the CLG site.</p>
+      <p>IDACI bands from 2014/15 are based on 2015 IDACI scores.</p>
+      <p>
+        IDACI bands for 2010/11 to 2013/14 are based on 2010 IDACI scores and
+        those for 2007/08 to 2009/10 are based on 2007 IDACI scores.
+      </p>
+      <p>
+        Care should be taken when comparing IDACI tables based on different
+        IDACI scores.
       </p>
       <p>
         The Rural and Urban Area Classification is a product of a joint project
         to produce a single and consistent classification of urban and rural
         areas. The project was sponsored by a number of government departments.
+      </p>
+      <p>
         The rural and urban definitions classify output areas, wards and super
         output areas by aggregating the underlying hectare grid squares
-        classifications for the measures of settlement size and sparsity. Up to
-        eight classes of output areas could be distinguished; four settlement
+        classifications for the measures of settlement size and sparsity.
+      </p>
+      <p>
+        Up to 8 classes of output areas could be distinguished - 4 settlement
         types (urban, town and fringe, village, hamlet and isolated dwelling) in
         either a sparse or less sparse regional setting.
       </p>
@@ -320,9 +402,11 @@ const PrototypeMethodologySection = () => {
         Absence data by degree of rurality from 2014/15 has been analysed based
         on the 2011 Rural and Urban Area Classification, whereas equivalent data
         for previous years was analysed based on the 2004 Rural and Urban Area
-        Classification. Further information about the Rural and Urban Area
-        Classification 2011 can be found on the Office for National Statistics
-        website
+        Classification.
+      </p>
+      <p>
+        Further information about the Rural and Urban Area Classification 2011
+        can be found on the Office for National Statistics website.
       </p>
       <p>
         A full list of published absence breakdowns (as of the latest academic
@@ -331,23 +415,35 @@ const PrototypeMethodologySection = () => {
       <p>
         From 2015/16 onwards, published tables on characteristics breakdowns
         include figures for pupils with unclassified or missing characteristics
-        information. This represents a small proportion of all pupils and the
-        figures should be interpreted with caution. For some characteristics,
-        like free school meals eligibility, pupils with unclassified or missing
-        characteristics information have been found to have a low average number
-        of sessions possible, which might explain more variability in absence
-        rates which use the number of possible sessions as a denominator.
+        information.
+      </p>
+      <p>
+        This represents a small proportion of all pupils and the figures should
+        be interpreted with caution.
+      </p>
+      <p>
+        For some characteristics, like free school meals eligibility, pupils
+        with unclassified or missing characteristics information have been found
+        to have a low average number of sessions possible, which might explain
+        more variability in absence rates which use the number of possible
+        sessions as a denominator.
       </p>
       <h3 id="section2-6">Underlying data provided alongside publications</h3>
       <p>
         From the 2009/10 academic year, each National Statistics release has
         been accompanied by underlying data, including national, local authority
-        and school level information. Alongside the underlying data there is an
-        accompanying document (metadata) which provides further information on
-        the contents of these files. This data is released under the terms of
-        the Open Government License and is intended to meet at least 3 stars for
-        Open Data.
+        and school level information.
       </p>
+      <p>
+        Alongside the underlying data there is an accompanying document
+        (metadata) which provides further information on the contents of these
+        files.
+      </p>
+      <p>
+        This data is released under the terms of the Open Government License and
+        is intended to meet at least 3 stars for Open Data.
+      </p>
+
       <p>
         Following the ‘
         <a href="https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/467936/Absence_statistics_changes_-_consultation_response.pdf">
@@ -355,16 +451,17 @@ const PrototypeMethodologySection = () => {
         </a>
         ’, results published in October 2015, releases are now accompanied by
         time series underlying data, containing additional breakdowns and data
-        from 2006/07 to the latest year. This additional data is intended to
-        provide users with all information in one place and give them the option
-        of producing their own analysis.
+        from 2006/07 to the latest year.
+      </p>
+      <p>
+        This additional data is intended to provide users with all information
+        in one place and give them the option of producing their own analysis.
       </p>
       <h3 id="section2-7">Suppression of absence data</h3>
       <p>
-        The Code of Practice for Official Statistics requires that reasonable
-        steps should be taken to ensure that all published or disseminated
-        statistics produced by the Department for Education protects
-        confidentiality.{' '}
+        The Code of Practice for Official Statistics requires reasonable steps
+        are taken to ensure all published or disseminated statistics produced by
+        DfE protects confidentiality.{' '}
       </p>
       <p>
         To do this totals are rounded and small numbers are suppressed according
@@ -383,12 +480,12 @@ const PrototypeMethodologySection = () => {
         <li>
           where the numerator or denominator of any percentage calculated on
           enrolment numbers of 1 or 2, the percentage is suppressed. This
-          suppression is consistent with the
+          suppression is consistent with
           <a href="http://media.education.gov.uk/assets/files/policy%20statement%20on%20confidentiality.pdf">
-            Departmental statistical policy
+            DfE's statistical policy
           </a>
         </li>
-        <li>where any number is shown as 0, the original figure was also 0</li>
+        <li>where any number is shown as 0 - the original figure was also 0</li>
       </ul>
 
       <table className="govuk-table">
