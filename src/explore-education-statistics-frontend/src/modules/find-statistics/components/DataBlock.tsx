@@ -43,20 +43,25 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
     this.currentDataQuery = dataQuery;
 
-    const response = await fetch(`http://localhost:5001${dataQuery.path}`, {
-      body: dataQuery.body,
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      `${process.env.DATA_API_BASE_URL}${dataQuery.path}`,
+      {
+        body: dataQuery.body,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: dataQuery.method,
       },
-      method: dataQuery.method,
-    });
+    );
 
     const json = await response.json();
 
     const publicationId = json.publicationId;
 
     const metaResponse = await fetch(
-      `http://localhost:5000/api/TableBuilder/meta/CharacteristicDataNational/${publicationId}`,
+      `${
+        process.env.DATA_API_BASE_URL
+      }/api/TableBuilder/meta/CharacteristicDataNational/${publicationId}`,
     );
 
     const jsonMeta: PublicationMeta = await metaResponse.json();
