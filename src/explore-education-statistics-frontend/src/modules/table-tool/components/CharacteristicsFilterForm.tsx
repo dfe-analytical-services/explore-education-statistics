@@ -9,22 +9,18 @@ import {
 } from 'formik';
 import debounce from 'lodash/debounce';
 import React, { ChangeEvent, Component, createRef } from 'react';
-import Button from '../../../components/Button';
-import ErrorSummary, {
-  ErrorSummaryMessage,
-} from '../../../components/ErrorSummary';
+import Button from 'src/components/Button';
+import ErrorSummary, { ErrorSummaryMessage } from 'src/components/ErrorSummary';
 import {
   FormFieldSet,
   FormGroup,
   FormSelect,
   FormTextInput,
-} from '../../../components/form';
-import FormFieldCheckboxGroup from '../../../components/form/FormFieldCheckboxGroup';
-import Yup from '../../../lib/validation/yup';
-import {
-  PublicationMeta,
-  SchoolType,
-} from '../../../services/tableBuilderService';
+} from 'src/components/form';
+import FormFieldCheckboxGroup from 'src/components/form/FormFieldCheckboxGroup';
+import Yup from 'src/lib/validation/yup';
+import { PublicationMeta } from 'src/services/tableBuilderService';
+import SchoolType from 'src/services/types/SchoolType';
 import SearchableFilterMenus from './SearchableFilterMenus';
 
 interface FormValues {

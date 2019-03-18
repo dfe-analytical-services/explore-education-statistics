@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Client from 'src/services/api/Client';
 import { commaSeparated } from '../util/paramSerializers';
 
 export const baseUrl = {
@@ -6,12 +7,16 @@ export const baseUrl = {
   data: process.env.DATA_API_BASE_URL,
 };
 
-export const contentApi = axios.create({
-  baseURL: `${baseUrl.content}/api/`,
-  paramsSerializer: commaSeparated,
-});
+export const contentApi = new Client(
+  axios.create({
+    baseURL: `${baseUrl.content}/api/`,
+    paramsSerializer: commaSeparated,
+  }),
+);
 
-export const dataApi = axios.create({
-  baseURL: `${baseUrl.data}/api/`,
-  paramsSerializer: commaSeparated,
-});
+export const dataApi = new Client(
+  axios.create({
+    baseURL: `${baseUrl.data}/api/`,
+    paramsSerializer: commaSeparated,
+  }),
+);
