@@ -5,13 +5,14 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
-    public class ReleaseService : AbstractDataService<Release>
+    public class ReleaseService : AbstractDataService<Release>, IReleaseService
     {
         private IMapper _mapper;
 

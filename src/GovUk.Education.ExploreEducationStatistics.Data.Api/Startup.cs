@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 
             services.AddTransient<ISeedService, SeedService>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
-            services.AddTransient<ReleaseService>();
+            services.AddTransient<IReleaseService, ReleaseService>();
 
             services.AddScoped<IGeographicDataService, GeographicDataService>();
             services.AddScoped<ILaCharacteristicDataService, LaCharacteristicDataService>();
