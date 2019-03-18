@@ -195,6 +195,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
             modelBuilder.Entity<GeographicData>()
                 .Property(data => data.SchoolLaEstab)
                 .HasComputedColumnSql("JSON_VALUE(School, '$.laestab')");
+                
+            modelBuilder.Entity<GeographicData>()
+                .HasIndex(data => data.SchoolLaEstab);
         }
 
         private static void ConfigureAttributes(ModelBuilder modelBuilder)
@@ -250,6 +253,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
             modelBuilder.Entity<GeographicData>()
                 .Property(data => data.LocalAuthorityCode)
                 .HasComputedColumnSql("JSON_VALUE(LocalAuthority, '$.new_la_code')");
+            
+            modelBuilder.Entity<GeographicData>()
+                .HasIndex(data => data.LocalAuthorityCode);
 
             modelBuilder.Entity<CharacteristicDataLa>()
                 .Property(data => data.LocalAuthority)
@@ -260,6 +266,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
             modelBuilder.Entity<CharacteristicDataLa>()
                 .Property(data => data.LocalAuthorityCode)
                 .HasComputedColumnSql("JSON_VALUE(LocalAuthority, '$.new_la_code')");
+            
+            modelBuilder.Entity<CharacteristicDataLa>()
+                .HasIndex(data => data.LocalAuthorityCode);
         }
 
         private static void ConfigureRegion(ModelBuilder modelBuilder)
