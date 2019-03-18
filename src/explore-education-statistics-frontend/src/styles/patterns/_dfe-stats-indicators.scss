@@ -35,6 +35,19 @@
   }
 }
 
+.dfe-dash-tiles--4-in-row {
+  margin-top: 0;
+  padding-top: 0;
+
+  .dfe-dash-tiles__tile {
+    flex-basis: 24.5%;
+    margin: 1% 0.5% 2% 0;
+    @include govuk-media-query($until: tablet) {
+      flex-basis: 100%;
+    }
+  }
+}
+
 .dfe-dash-tiles__tile {
   background: govuk-colour('grey-4');
   // border-top: 1px solid $govuk-border-colour;
@@ -44,7 +57,7 @@
   flex-direction: column;
   // justify-content: space-between;
   // margin: 2% 2% 1% 0;
-  padding: 20px 20px 0;
+  padding: 16px 16px 0;
   // position: relative;
 
   .dfe-dash-tiles__heading {
