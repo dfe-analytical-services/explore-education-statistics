@@ -5,7 +5,7 @@ import Link from '../../../../components/Link';
 const PrototypeMethodologySection = () => {
   return (
     <>
-      <h3 id="section1-1">School pupil attendance requirements</h3>
+      <h3 id="section1-1">Pupil attendance requirements for schools</h3>
       <p>
         All maintained schools are required to provide 2 possible sessions per
         day, morning and afternoon, to all pupils.

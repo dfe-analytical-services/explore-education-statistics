@@ -31,12 +31,16 @@ interface State {
 }
 
 class TableToolPage extends Component<{}, State> {
+  private readonly defaultFilters: State['filters'] = {
+    attributes: [],
+    characteristics: [],
+    schoolTypes: [],
+    years: [],
+  };
+
   public state: State = {
     filters: {
-      attributes: [],
-      characteristics: [],
-      schoolTypes: [],
-      years: [],
+      ...this.defaultFilters,
     },
     publicationId: '',
     publicationMeta: {
@@ -79,8 +83,12 @@ class TableToolPage extends Component<{}, State> {
     this.setState(
       {
         publicationMeta,
+        filters: {
+          ...this.defaultFilters,
+        },
         publicationId: publication.id,
         publicationName: publication.label,
+        tableData: [],
       },
       () => {
         if (this.filtersRef.current) {

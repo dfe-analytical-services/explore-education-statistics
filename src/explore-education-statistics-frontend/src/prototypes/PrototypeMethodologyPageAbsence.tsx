@@ -75,11 +75,13 @@ const PublicationPage = () => {
               <ul className="govuk-body-s">
                 <li>
                   <a href="#section1-1">
-                    Requirements of schools in ensuring pupil attendance
+                    Pupil attendance requirements for schools
                   </a>
                 </li>
                 <li>
-                  <a href="#section1-2">Uses and Users</a>
+                  <a href="#section1-2">
+                    Uses and users of absence data and statistics
+                  </a>
                 </li>
               </ul>
             </div>
