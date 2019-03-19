@@ -65,6 +65,7 @@
     "identity-obj-proxy": "3.0.0",
     "jest": "23.6.0",
     "jest-dom": "^3.1.2",
+    "jest-junit": "^6.3.0",
     "jest-resolve": "23.6.0",
     "jest-serializer-html": "^6.0.0",
     "jest-watch-typeahead": "^0.2.1",
@@ -103,6 +104,7 @@
     "lint:js": "tslint --project tsconfig.json 'src/**/*.{ts,tsx}'",
     "lint:style": "stylelint 'src/**/*.{scss,css}'",
     "test": "jest",
+    "test:ci": "jest --ci --reporters=default --reporters=jest-junit",
     "test:watch": "jest --watch",
     "test:snapshot": "jest --updateSnapshot",
     "tsc": "tsc --noEmit"
@@ -182,5 +184,8 @@
     "snapshotSerializers": [
       "jest-serializer-html"
     ]
+  },
+  "jest-junit": {
+    "ancestorSeparator": " › "
   }
 }
