@@ -1,7 +1,7 @@
 import { AxiosPromise } from 'axios';
 import { dataApi } from './api';
 
-export interface AttributesMeta {
+export interface IndicatorsMeta {
   [group: string]: {
     name: string;
     label: string;
@@ -18,8 +18,8 @@ export interface CharacteristicsMeta {
 
 export interface PublicationMeta {
   publicationId: string;
-  attributes: AttributesMeta;
   characteristics: CharacteristicsMeta;
+  indicators: IndicatorsMeta;
 }
 
 export const getCharacteristicsMeta = (
@@ -40,8 +40,8 @@ export enum SchoolType {
 export interface DataTableResult {
   year: number;
   schoolType: SchoolType;
-  attributes: {
-    [attribute: string]: string;
+  indicators: {
+    [indicator: string]: string;
   };
 }
 
@@ -54,16 +54,16 @@ export interface CharacteristicsData {
 
 export const getNationalCharacteristicsData = (
   publicationId: string,
-  attributes: string[],
+  indicators: string[],
   characteristics: string[],
   schoolTypes: SchoolType[],
   startYear: number,
   endYear: number,
 ): AxiosPromise<CharacteristicsData> =>
   dataApi.post('/tablebuilder/characteristics/national', {
-    attributes,
     characteristics,
     endYear,
+    indicators,
     publicationId,
     schoolTypes,
     startYear,

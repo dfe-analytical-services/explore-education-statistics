@@ -21,13 +21,13 @@ import PublicationMenu, {
 
 interface State {
   filters: {
-    attributes: string[];
     characteristics: string[];
+    indicators: string[];
     schoolTypes: SchoolType[];
     years: number[];
   };
   publicationId: string;
-  publicationMeta: Pick<PublicationMeta, 'attributes' | 'characteristics'>;
+  publicationMeta: Pick<PublicationMeta, 'characteristics' | 'indicators'>;
   publicationName: string;
   tableData: DataTableResult[];
 }
@@ -35,15 +35,15 @@ interface State {
 class TableToolPage extends Component<{}, State> {
   public state: State = {
     filters: {
-      attributes: [],
       characteristics: [],
+      indicators: [],
       schoolTypes: [],
       years: [],
     },
     publicationId: '',
     publicationMeta: {
-      attributes: {},
       characteristics: {},
+      indicators: {},
     },
     publicationName: '',
     tableData: [],
@@ -94,8 +94,8 @@ class TableToolPage extends Component<{}, State> {
   };
 
   private handleFilterFormSubmit: CharacteristicsFilterFormSubmitHandler = async ({
-    attributes,
     characteristics,
+    indicators,
     schoolTypes,
     startYear,
     endYear,
@@ -105,8 +105,8 @@ class TableToolPage extends Component<{}, State> {
 
     const { data } = await getNationalCharacteristicsData(
       this.state.publicationId,
-      attributes,
       characteristics,
+      indicators,
       schoolTypes,
       formatToAcademicYear(startYear),
       formatToAcademicYear(endYear),
@@ -117,8 +117,8 @@ class TableToolPage extends Component<{}, State> {
     this.setState(
       {
         filters: {
-          attributes,
           characteristics,
+          indicators,
           schoolTypes,
           years,
         },
@@ -191,10 +191,10 @@ class TableToolPage extends Component<{}, State> {
             <h2>3. Explore statistics from '{publicationName}'</h2>
 
             <CharacteristicsDataTable
-              attributes={filters.attributes}
-              attributesMeta={publicationMeta.attributes}
               characteristics={filters.characteristics}
               characteristicsMeta={publicationMeta.characteristics}
+              indicators={filters.indicators}
+              indicatorsMeta={publicationMeta.indicators}
               results={tableData}
               schoolTypes={filters.schoolTypes}
               years={filters.years}

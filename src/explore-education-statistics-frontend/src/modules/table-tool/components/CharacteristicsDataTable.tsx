@@ -3,9 +3,9 @@ import max from 'lodash/max';
 import min from 'lodash/min';
 import React, { Component } from 'react';
 import {
-  AttributesMeta,
   CharacteristicsMeta,
   DataTableResult,
+  IndicatorsMeta,
   SchoolType,
 } from '../../../services/tableBuilderService';
 import GroupedDataTable, { GroupedDataSet } from './GroupedDataTable';
@@ -21,10 +21,10 @@ const schoolKeys: {
 };
 
 interface Props {
-  attributes: string[];
-  attributesMeta: AttributesMeta;
   characteristics: string[];
   characteristicsMeta: CharacteristicsMeta;
+  indicators: string[];
+  indicatorsMeta: IndicatorsMeta;
   results: DataTableResult[];
   schoolTypes: string[];
   years: number[];
@@ -52,11 +52,11 @@ class CharacteristicsDataTable extends Component<Props> {
   }): any {
     return Object.values(groupedValues)
       .flatMap(groups => groups)
-      .reduce((acc, attribute) => {
+      .reduce((acc, indicator) => {
         return {
           ...acc,
-          [attribute.name]: {
-            ...attribute,
+          [indicator.name]: {
+            ...indicator,
           },
         };
       }, {});
@@ -64,10 +64,10 @@ class CharacteristicsDataTable extends Component<Props> {
 
   public render() {
     const {
-      attributes,
-      attributesMeta,
       characteristics,
       characteristicsMeta,
+      indicators,
+      indicatorsMeta,
       results,
       schoolTypes,
       years,
@@ -75,8 +75,8 @@ class CharacteristicsDataTable extends Component<Props> {
     const firstYear = this.parseYear(min(years));
     const lastYear = this.parseYear(max(years));
 
-    const attributesByName = this.groupByName(attributesMeta);
     const characteristicsByName = this.groupByName(characteristicsMeta);
+    const indicatorsByName = this.groupByName(indicatorsMeta);
 
     const dataBySchool = groupBy(results, 'schoolType');
 
@@ -93,9 +93,9 @@ class CharacteristicsDataTable extends Component<Props> {
             if (!dataByCharacteristic[characteristic]) {
               return {
                 name: characteristicsByName[characteristic].label,
-                rows: attributes.map(attribute => ({
+                rows: indicators.map(indicator => ({
                   columns: years.map(() => '--'),
-                  name: attributesByName[attribute].label,
+                  name: indicatorsByName[indicator].label,
                 })),
               };
             }
@@ -107,25 +107,25 @@ class CharacteristicsDataTable extends Component<Props> {
 
             return {
               name: characteristicsByName[characteristic].label,
-              rows: attributes.map(attribute => ({
+              rows: indicators.map(indicator => ({
                 columns: years.map(year => {
                   if (!dataByYear[year]) {
                     return '--';
                   }
 
                   if (dataByYear[year].length > 0) {
-                    if (dataByYear[year][0].attributes[attribute]) {
-                      const unit = attributesByName[attribute].unit;
+                    if (dataByYear[year][0].indicators[indicator]) {
+                      const unit = indicatorsByName[indicator].unit;
 
                       return `${
-                        dataByYear[year][0].attributes[attribute]
+                        dataByYear[year][0].indicators[indicator]
                       }${unit}`;
                     }
                   }
 
                   return '--';
                 }),
-                name: attributesByName[attribute].label,
+                name: indicatorsByName[indicator].label,
               })),
             };
           },
