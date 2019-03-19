@@ -85,6 +85,7 @@ jobs:
           testResultsFormat: 'JUnit'
           testResultsFiles: '**/junit.xml'
           searchFolder: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
+          testRunTitle: 'Frontend Jest tests'
       - task: 'ArchiveFiles@2'
         displayName: 'Archive frontend'
         inputs:
