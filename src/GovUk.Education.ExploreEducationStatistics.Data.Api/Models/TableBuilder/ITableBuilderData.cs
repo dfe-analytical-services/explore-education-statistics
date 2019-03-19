@@ -5,9 +5,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilde
 {
     public interface ITableBuilderData
     {
-        int Year { get; set; }
-        string Term { get; set; }
+        int TimePeriod { get; set; }
+        string TimeIdentifier { get; set; }
         SchoolType SchoolType { get; set; }
-        Dictionary<string, string> Attributes { get; set; }
+        Dictionary<string, string> Indicators { get; set; }
     }
 }

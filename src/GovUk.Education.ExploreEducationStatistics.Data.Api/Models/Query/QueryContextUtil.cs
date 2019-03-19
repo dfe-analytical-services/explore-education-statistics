@@ -38,10 +38,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
             return x => schoolTypes == null || !schoolTypes.Any() || schoolTypes.Contains(x.SchoolType);
         }
 
-        public static Expression<Func<T, bool>> YearExpression<T>(IEnumerable<int> yearsQuery)
+        public static Expression<Func<T, bool>> TimePeriodExpression<T>(IEnumerable<int> timePeriods)
             where T : ITidyData
         {
-            return x => !yearsQuery.Any() || yearsQuery.Contains(x.Year);
+            return x => !timePeriods.Any() || timePeriods.Contains(x.TimePeriod);
         }
 
         public static Expression<Func<T, bool>> CharacteristicsQuery<T>(IEnumerable<string> characteristics)

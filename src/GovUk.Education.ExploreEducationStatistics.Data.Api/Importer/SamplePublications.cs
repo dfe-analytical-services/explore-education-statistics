@@ -8,10 +8,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
     {
         private static readonly SequenceGenerator ReleaseSequenceGenerator = new SequenceGenerator();
 
-        public static readonly Dictionary<string, AttributeMeta> AttributeMetas = new Dictionary<string, AttributeMeta>
+        public static readonly Dictionary<string, IndicatorMeta> IndicatorMetas = new Dictionary<string, IndicatorMeta>
         {
             {
-                "all_through", new AttributeMeta
+                "all_through", new IndicatorMeta
                 {
                     Name = "all_through",
                     Label = "All through school flag",
@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "num_schools", new AttributeMeta
+                "num_schools", new IndicatorMeta
                 {
                     Name = "num_schools",
                     Label = "Number of schools",
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "enrolments", new AttributeMeta
+                "enrolments", new IndicatorMeta
                 {
                     Name = "enrolments",
                     Label = "Number of pupil enrolments",
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_possible", new AttributeMeta
+                "sess_possible", new IndicatorMeta
                 {
                     Name = "sess_possible",
                     Label = "Number of sessions possible",
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_overall", new AttributeMeta
+                "sess_overall", new IndicatorMeta
                 {
                     Name = "sess_overall",
                     Label = "Number of overall absence sessions",
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_authorised", new AttributeMeta
+                "sess_authorised", new IndicatorMeta
                 {
                     Name = "sess_authorised",
                     Label = "Number of authorised absence sessions",
@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_unauthorised", new AttributeMeta
+                "sess_unauthorised", new IndicatorMeta
                 {
                     Name = "sess_unauthorised",
                     Label = "Number of unauthorised absence sessions",
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_overall_percent", new AttributeMeta
+                "sess_overall_percent", new IndicatorMeta
                 {
                     Name = "sess_overall_percent",
                     Label = "Overall absence rate",
@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_authorised_percent", new AttributeMeta
+                "sess_authorised_percent", new IndicatorMeta
                 {
                     Name = "sess_authorised_percent",
                     Label = "Authorised absence rate",
@@ -92,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_unauthorised_percent", new AttributeMeta
+                "sess_unauthorised_percent", new IndicatorMeta
                 {
                     Name = "sess_unauthorised_percent",
                     Label = "Unauthorised absence rate",
@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "enrolments_PA_10_exact", new AttributeMeta
+                "enrolments_PA_10_exact", new IndicatorMeta
                 {
                     Name = "enrolments_PA_10_exact",
                     Label = "Number of persistent absentees",
@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "enrolments_pa_10_exact_percent", new AttributeMeta
+                "enrolments_pa_10_exact_percent", new IndicatorMeta
                 {
                     Name = "enrolments_pa_10_exact_percent",
                     Label = "Percentage of persistent absentees",
@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_possible_pa_10_exact", new AttributeMeta
+                "sess_possible_pa_10_exact", new IndicatorMeta
                 {
                     Name = "sess_possible_pa_10_exact",
                     Label = "Number of sessions possible for persistent absentees",
@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_overall_pa_10_exact", new AttributeMeta
+                "sess_overall_pa_10_exact", new IndicatorMeta
                 {
                     Name = "sess_overall_pa_10_exact",
                     Label = "Number of overall absence sessions for persistent absentees",
@@ -137,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_authorised_pa_10_exact", new AttributeMeta
+                "sess_authorised_pa_10_exact", new IndicatorMeta
                 {
                     Name = "sess_authorised_pa_10_exact",
                     Label = "Number of authorised absence sessions for persistent absentees",
@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_unauthorised_pa_10_exact", new AttributeMeta
+                "sess_unauthorised_pa_10_exact", new IndicatorMeta
                 {
                     Name = "sess_unauthorised_pa_10_exact",
                     Label = "Number of unauthorised absence sessions for persistent absentees",
@@ -155,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_overall_percent_pa_10_exact", new AttributeMeta
+                "sess_overall_percent_pa_10_exact", new IndicatorMeta
                 {
                     Name = "sess_overall_percent_pa_10_exact",
                     Label = "Overall absence rate for persistent absentees",
@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_authorised_percent_pa_10_exact", new AttributeMeta
+                "sess_authorised_percent_pa_10_exact", new IndicatorMeta
                 {
                     Name = "sess_authorised_percent_pa_10_exact",
                     Label = "Authorised absence rate for persistent absentees",
@@ -173,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_unauthorised_percent_pa_10_exact", new AttributeMeta
+                "sess_unauthorised_percent_pa_10_exact", new IndicatorMeta
                 {
                     Name = "sess_unauthorised_percent_pa_10_exact",
                     Label = "Unauthorised absence rate for persistent absentees",
@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_auth_illness", new AttributeMeta
+                "sess_auth_illness", new IndicatorMeta
                 {
                     Name = "sess_auth_illness",
                     Label = "Number of illness sessions",
@@ -191,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_auth_appointments", new AttributeMeta
+                "sess_auth_appointments", new IndicatorMeta
                 {
                     Name = "sess_auth_appointments",
                     Label = "Number of medical appointments sessions",
@@ -200,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_auth_religious", new AttributeMeta
+                "sess_auth_religious", new IndicatorMeta
                 {
                     Name = "sess_auth_religious",
                     Label = "Number of religious observance sessions",
@@ -209,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_auth_study", new AttributeMeta
+                "sess_auth_study", new IndicatorMeta
                 {
                     Name = "sess_auth_study",
                     Label = "Number of study leave sessions",
@@ -218,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_auth_traveller", new AttributeMeta
+                "sess_auth_traveller", new IndicatorMeta
                 {
                     Name = "sess_auth_traveller",
                     Label = "Number of traveller sessions",
@@ -227,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_auth_holiday", new AttributeMeta
+                "sess_auth_holiday", new IndicatorMeta
                 {
                     Name = "sess_auth_holiday",
                     Label = "Number of authorised holiday sessions",
@@ -236,7 +236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_auth_ext_holiday", new AttributeMeta
+                "sess_auth_ext_holiday", new IndicatorMeta
                 {
                     Name = "sess_auth_ext_holiday",
                     Label = "Number of extended authorised holiday sessions",
@@ -245,7 +245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_auth_excluded", new AttributeMeta
+                "sess_auth_excluded", new IndicatorMeta
                 {
                     Name = "sess_auth_excluded",
                     Label = "Number of excluded sessions",
@@ -254,7 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_auth_other", new AttributeMeta
+                "sess_auth_other", new IndicatorMeta
                 {
                     Name = "sess_auth_other",
                     Label = "Number of authorised other sessions",
@@ -263,7 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_auth_totalreasons", new AttributeMeta
+                "sess_auth_totalreasons", new IndicatorMeta
                 {
                     Name = "sess_auth_totalreasons",
                     Label = "Number of authorised reasons sessions",
@@ -272,7 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_unauth_holiday", new AttributeMeta
+                "sess_unauth_holiday", new IndicatorMeta
                 {
                     Name = "sess_unauth_holiday",
                     Label = "Number of unauthorised holiday sessions",
@@ -281,7 +281,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_unauth_late", new AttributeMeta
+                "sess_unauth_late", new IndicatorMeta
                 {
                     Name = "sess_unauth_late",
                     Label = "Number of late sessions",
@@ -290,7 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_unauth_other", new AttributeMeta
+                "sess_unauth_other", new IndicatorMeta
                 {
                     Name = "sess_unauth_other",
                     Label = "Number of unauthorised other sessions",
@@ -299,7 +299,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_unauth_noyet", new AttributeMeta
+                "sess_unauth_noyet", new IndicatorMeta
                 {
                     Name = "sess_unauth_noyet",
                     Label = "Number of no reason yet sessions",
@@ -308,7 +308,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_unauth_totalreasons", new AttributeMeta
+                "sess_unauth_totalreasons", new IndicatorMeta
                 {
                     Name = "sess_unauth_totalreasons",
                     Label = "Number of unauthorised reasons sessions",
@@ -317,7 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "sess_overall_totalreasons", new AttributeMeta
+                "sess_overall_totalreasons", new IndicatorMeta
                 {
                     Name = "sess_overall_totalreasons",
                     Label = "Number of overall reasons sessions",
@@ -326,7 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "headcount", new AttributeMeta
+                "headcount", new IndicatorMeta
                 {
                     Name = "headcount",
                     Label = "Number of pupils",
@@ -335,7 +335,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "perm_excl", new AttributeMeta
+                "perm_excl", new IndicatorMeta
                 {
                     Name = "perm_excl",
                     Label = "Number of permanent exclusions",
@@ -344,7 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "perm_excl_rate", new AttributeMeta
+                "perm_excl_rate", new IndicatorMeta
                 {
                     Name = "perm_excl_rate",
                     Label = "Permanent exclusion rate",
@@ -353,7 +353,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "fixed_excl", new AttributeMeta
+                "fixed_excl", new IndicatorMeta
                 {
                     Name = "fixed_excl",
                     Label = "Number of fixed period exclusions",
@@ -362,7 +362,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "fixed_excl_rate", new AttributeMeta
+                "fixed_excl_rate", new IndicatorMeta
                 {
                     Name = "fixed_excl_rate",
                     Label = "Fixed period exclusion rate",
@@ -371,7 +371,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "one_plus_fixed", new AttributeMeta
+                "one_plus_fixed", new IndicatorMeta
                 {
                     Name = "one_plus_fixed",
                     Label = "Number of enrolments with one or more fixed period exclusions",
@@ -380,7 +380,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             },
             {
-                "one_plus_fixed_rate", new AttributeMeta
+                "one_plus_fixed_rate", new IndicatorMeta
                 {
                     Name = "one_plus_fixed_rate",
                     Label = "Percentage of enrolments with one or more fixed period exclusions",
@@ -1187,9 +1187,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 }
             };
 
-        private static AttributeMeta GetAttributeMeta(string key)
+        private static IndicatorMeta GetIndicatorMeta(string key)
         {
-            return AttributeMetas[key];
+            return IndicatorMetas[key];
         }
 
         private static CharacteristicMeta GetCharacteristicMeta(string key)
@@ -1216,69 +1216,69 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                                 new DataSet
                                 {
                                     Filename = DataCsvFilename.absence_geoglevels,
-                                    AttributeMetas = new[]
+                                    IndicatorMetas = new[]
                                     {
-                                        new MetaGroup<AttributeMeta>
+                                        new MetaGroup<IndicatorMeta>
                                         {
                                             Name = "Choice",
                                             Meta = new[]
                                             {
-                                                GetAttributeMeta("all_through")
+                                                GetIndicatorMeta("all_through")
                                             }
                                         },
-                                        new MetaGroup<AttributeMeta>
+                                        new MetaGroup<IndicatorMeta>
                                         {
                                             Name = "Absence fields",
                                             Meta = new[]
                                             {
-                                                GetAttributeMeta("num_schools"),
-                                                GetAttributeMeta("enrolments"),
-                                                GetAttributeMeta("sess_possible"),
-                                                GetAttributeMeta("sess_overall"),
-                                                GetAttributeMeta("sess_authorised"),
-                                                GetAttributeMeta("sess_unauthorised"),
-                                                GetAttributeMeta("sess_overall_percent"),
-                                                GetAttributeMeta("sess_authorised_percent"),
-                                                GetAttributeMeta("sess_unauthorised_percent"),
-                                                GetAttributeMeta("enrolments_PA_10_exact"),
-                                                GetAttributeMeta("enrolments_pa_10_exact_percent")
+                                                GetIndicatorMeta("num_schools"),
+                                                GetIndicatorMeta("enrolments"),
+                                                GetIndicatorMeta("sess_possible"),
+                                                GetIndicatorMeta("sess_overall"),
+                                                GetIndicatorMeta("sess_authorised"),
+                                                GetIndicatorMeta("sess_unauthorised"),
+                                                GetIndicatorMeta("sess_overall_percent"),
+                                                GetIndicatorMeta("sess_authorised_percent"),
+                                                GetIndicatorMeta("sess_unauthorised_percent"),
+                                                GetIndicatorMeta("enrolments_PA_10_exact"),
+                                                GetIndicatorMeta("enrolments_pa_10_exact_percent")
                                             }
                                         },
-                                        new MetaGroup<AttributeMeta>
+                                        new MetaGroup<IndicatorMeta>
                                         {
                                             Name = "Absence for persistent absentees",
                                             Meta = new[]
                                             {
-                                                GetAttributeMeta("sess_possible_pa_10_exact"),
-                                                GetAttributeMeta("sess_overall_pa_10_exact"),
-                                                GetAttributeMeta("sess_authorised_pa_10_exact"),
-                                                GetAttributeMeta("sess_unauthorised_pa_10_exact"),
-                                                GetAttributeMeta("sess_overall_percent_pa_10_exact"),
-                                                GetAttributeMeta("sess_authorised_percent_pa_10_exact"),
-                                                GetAttributeMeta("sess_unauthorised_percent_pa_10_exact")
+                                                GetIndicatorMeta("sess_possible_pa_10_exact"),
+                                                GetIndicatorMeta("sess_overall_pa_10_exact"),
+                                                GetIndicatorMeta("sess_authorised_pa_10_exact"),
+                                                GetIndicatorMeta("sess_unauthorised_pa_10_exact"),
+                                                GetIndicatorMeta("sess_overall_percent_pa_10_exact"),
+                                                GetIndicatorMeta("sess_authorised_percent_pa_10_exact"),
+                                                GetIndicatorMeta("sess_unauthorised_percent_pa_10_exact")
                                             }
                                         },
-                                        new MetaGroup<AttributeMeta>
+                                        new MetaGroup<IndicatorMeta>
                                         {
                                             Name = "Absence by reason",
                                             Meta = new[]
                                             {
-                                                GetAttributeMeta("sess_auth_illness"),
-                                                GetAttributeMeta("sess_auth_appointments"),
-                                                GetAttributeMeta("sess_auth_religious"),
-                                                GetAttributeMeta("sess_auth_study"),
-                                                GetAttributeMeta("sess_auth_traveller"),
-                                                GetAttributeMeta("sess_auth_holiday"),
-                                                GetAttributeMeta("sess_auth_ext_holiday"),
-                                                GetAttributeMeta("sess_auth_excluded"),
-                                                GetAttributeMeta("sess_auth_other"),
-                                                GetAttributeMeta("sess_auth_totalreasons"),
-                                                GetAttributeMeta("sess_unauth_holiday"),
-                                                GetAttributeMeta("sess_unauth_late"),
-                                                GetAttributeMeta("sess_unauth_other"),
-                                                GetAttributeMeta("sess_unauth_noyet"),
-                                                GetAttributeMeta("sess_unauth_totalreasons"),
-                                                GetAttributeMeta("sess_overall_totalreasons")
+                                                GetIndicatorMeta("sess_auth_illness"),
+                                                GetIndicatorMeta("sess_auth_appointments"),
+                                                GetIndicatorMeta("sess_auth_religious"),
+                                                GetIndicatorMeta("sess_auth_study"),
+                                                GetIndicatorMeta("sess_auth_traveller"),
+                                                GetIndicatorMeta("sess_auth_holiday"),
+                                                GetIndicatorMeta("sess_auth_ext_holiday"),
+                                                GetIndicatorMeta("sess_auth_excluded"),
+                                                GetIndicatorMeta("sess_auth_other"),
+                                                GetIndicatorMeta("sess_auth_totalreasons"),
+                                                GetIndicatorMeta("sess_unauth_holiday"),
+                                                GetIndicatorMeta("sess_unauth_late"),
+                                                GetIndicatorMeta("sess_unauth_other"),
+                                                GetIndicatorMeta("sess_unauth_noyet"),
+                                                GetIndicatorMeta("sess_unauth_totalreasons"),
+                                                GetIndicatorMeta("sess_overall_totalreasons")
                                             }
                                         }
                                     },
@@ -1287,60 +1287,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                                 new DataSet
                                 {
                                     Filename = DataCsvFilename.absence_lacharacteristics,
-                                    AttributeMetas = new[]
+                                    IndicatorMetas = new[]
                                     {
-                                        new MetaGroup<AttributeMeta>
+                                        new MetaGroup<IndicatorMeta>
                                         {
                                             Name = "Absence fields",
                                             Meta = new[]
                                             {
-                                                GetAttributeMeta("enrolments"),
-                                                GetAttributeMeta("sess_possible"),
-                                                GetAttributeMeta("sess_overall"),
-                                                GetAttributeMeta("sess_authorised"),
-                                                GetAttributeMeta("sess_unauthorised"),
-                                                GetAttributeMeta("sess_overall_percent"),
-                                                GetAttributeMeta("sess_authorised_percent"),
-                                                GetAttributeMeta("sess_unauthorised_percent"),
-                                                GetAttributeMeta("enrolments_PA_10_exact"),
-                                                GetAttributeMeta("enrolments_pa_10_exact_percent")
+                                                GetIndicatorMeta("enrolments"),
+                                                GetIndicatorMeta("sess_possible"),
+                                                GetIndicatorMeta("sess_overall"),
+                                                GetIndicatorMeta("sess_authorised"),
+                                                GetIndicatorMeta("sess_unauthorised"),
+                                                GetIndicatorMeta("sess_overall_percent"),
+                                                GetIndicatorMeta("sess_authorised_percent"),
+                                                GetIndicatorMeta("sess_unauthorised_percent"),
+                                                GetIndicatorMeta("enrolments_PA_10_exact"),
+                                                GetIndicatorMeta("enrolments_pa_10_exact_percent")
                                             }
                                         },
-                                        new MetaGroup<AttributeMeta>
+                                        new MetaGroup<IndicatorMeta>
                                         {
                                             Name = "Absence for persistent absentees",
                                             Meta = new[]
                                             {
-                                                GetAttributeMeta("sess_possible_pa_10_exact"),
-                                                GetAttributeMeta("sess_overall_pa_10_exact"),
-                                                GetAttributeMeta("sess_authorised_pa_10_exact"),
-                                                GetAttributeMeta("sess_unauthorised_pa_10_exact"),
-                                                GetAttributeMeta("sess_overall_percent_pa_10_exact"),
-                                                GetAttributeMeta("sess_authorised_percent_pa_10_exact"),
-                                                GetAttributeMeta("sess_unauthorised_percent_pa_10_exact")
+                                                GetIndicatorMeta("sess_possible_pa_10_exact"),
+                                                GetIndicatorMeta("sess_overall_pa_10_exact"),
+                                                GetIndicatorMeta("sess_authorised_pa_10_exact"),
+                                                GetIndicatorMeta("sess_unauthorised_pa_10_exact"),
+                                                GetIndicatorMeta("sess_overall_percent_pa_10_exact"),
+                                                GetIndicatorMeta("sess_authorised_percent_pa_10_exact"),
+                                                GetIndicatorMeta("sess_unauthorised_percent_pa_10_exact")
                                             }
                                         },
-                                        new MetaGroup<AttributeMeta>
+                                        new MetaGroup<IndicatorMeta>
                                         {
                                             Name = "Absence by reason",
                                             Meta = new[]
                                             {
-                                                GetAttributeMeta("sess_auth_illness"),
-                                                GetAttributeMeta("sess_auth_appointments"),
-                                                GetAttributeMeta("sess_auth_religious"),
-                                                GetAttributeMeta("sess_auth_study"),
-                                                GetAttributeMeta("sess_auth_traveller"),
-                                                GetAttributeMeta("sess_auth_holiday"),
-                                                GetAttributeMeta("sess_auth_ext_holiday"),
-                                                GetAttributeMeta("sess_auth_excluded"),
-                                                GetAttributeMeta("sess_auth_other"),
-                                                GetAttributeMeta("sess_auth_totalreasons"),
-                                                GetAttributeMeta("sess_unauth_holiday"),
-                                                GetAttributeMeta("sess_unauth_late"),
-                                                GetAttributeMeta("sess_unauth_other"),
-                                                GetAttributeMeta("sess_unauth_noyet"),
-                                                GetAttributeMeta("sess_unauth_totalreasons"),
-                                                GetAttributeMeta("sess_overall_totalreasons")
+                                                GetIndicatorMeta("sess_auth_illness"),
+                                                GetIndicatorMeta("sess_auth_appointments"),
+                                                GetIndicatorMeta("sess_auth_religious"),
+                                                GetIndicatorMeta("sess_auth_study"),
+                                                GetIndicatorMeta("sess_auth_traveller"),
+                                                GetIndicatorMeta("sess_auth_holiday"),
+                                                GetIndicatorMeta("sess_auth_ext_holiday"),
+                                                GetIndicatorMeta("sess_auth_excluded"),
+                                                GetIndicatorMeta("sess_auth_other"),
+                                                GetIndicatorMeta("sess_auth_totalreasons"),
+                                                GetIndicatorMeta("sess_unauth_holiday"),
+                                                GetIndicatorMeta("sess_unauth_late"),
+                                                GetIndicatorMeta("sess_unauth_other"),
+                                                GetIndicatorMeta("sess_unauth_noyet"),
+                                                GetIndicatorMeta("sess_unauth_totalreasons"),
+                                                GetIndicatorMeta("sess_overall_totalreasons")
                                             }
                                         }
                                     },
@@ -1421,60 +1421,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                                 new DataSet
                                 {
                                     Filename = DataCsvFilename.absence_natcharacteristics,
-                                    AttributeMetas = new[]
+                                    IndicatorMetas = new[]
                                     {
-                                        new MetaGroup<AttributeMeta>
+                                        new MetaGroup<IndicatorMeta>
                                         {
                                             Name = "Absence fields",
                                             Meta = new[]
                                             {
-                                                GetAttributeMeta("enrolments"),
-                                                GetAttributeMeta("sess_possible"),
-                                                GetAttributeMeta("sess_overall"),
-                                                GetAttributeMeta("sess_authorised"),
-                                                GetAttributeMeta("sess_unauthorised"),
-                                                GetAttributeMeta("sess_overall_percent"),
-                                                GetAttributeMeta("sess_authorised_percent"),
-                                                GetAttributeMeta("sess_unauthorised_percent"),
-                                                GetAttributeMeta("enrolments_PA_10_exact"),
-                                                GetAttributeMeta("enrolments_pa_10_exact_percent")
+                                                GetIndicatorMeta("enrolments"),
+                                                GetIndicatorMeta("sess_possible"),
+                                                GetIndicatorMeta("sess_overall"),
+                                                GetIndicatorMeta("sess_authorised"),
+                                                GetIndicatorMeta("sess_unauthorised"),
+                                                GetIndicatorMeta("sess_overall_percent"),
+                                                GetIndicatorMeta("sess_authorised_percent"),
+                                                GetIndicatorMeta("sess_unauthorised_percent"),
+                                                GetIndicatorMeta("enrolments_PA_10_exact"),
+                                                GetIndicatorMeta("enrolments_pa_10_exact_percent")
                                             }
                                         },
-                                        new MetaGroup<AttributeMeta>
+                                        new MetaGroup<IndicatorMeta>
                                         {
                                             Name = "Absence for persistent absentees",
                                             Meta = new[]
                                             {
-                                                GetAttributeMeta("sess_possible_pa_10_exact"),
-                                                GetAttributeMeta("sess_overall_pa_10_exact"),
-                                                GetAttributeMeta("sess_authorised_pa_10_exact"),
-                                                GetAttributeMeta("sess_unauthorised_pa_10_exact"),
-                                                GetAttributeMeta("sess_overall_percent_pa_10_exact"),
-                                                GetAttributeMeta("sess_authorised_percent_pa_10_exact"),
-                                                GetAttributeMeta("sess_unauthorised_percent_pa_10_exact")
+                                                GetIndicatorMeta("sess_possible_pa_10_exact"),
+                                                GetIndicatorMeta("sess_overall_pa_10_exact"),
+                                                GetIndicatorMeta("sess_authorised_pa_10_exact"),
+                                                GetIndicatorMeta("sess_unauthorised_pa_10_exact"),
+                                                GetIndicatorMeta("sess_overall_percent_pa_10_exact"),
+                                                GetIndicatorMeta("sess_authorised_percent_pa_10_exact"),
+                                                GetIndicatorMeta("sess_unauthorised_percent_pa_10_exact")
                                             }
                                         },
-                                        new MetaGroup<AttributeMeta>
+                                        new MetaGroup<IndicatorMeta>
                                         {
                                             Name = "Absence by reason",
                                             Meta = new[]
                                             {
-                                                GetAttributeMeta("sess_auth_illness"),
-                                                GetAttributeMeta("sess_auth_appointments"),
-                                                GetAttributeMeta("sess_auth_religious"),
-                                                GetAttributeMeta("sess_auth_study"),
-                                                GetAttributeMeta("sess_auth_traveller"),
-                                                GetAttributeMeta("sess_auth_holiday"),
-                                                GetAttributeMeta("sess_auth_ext_holiday"),
-                                                GetAttributeMeta("sess_auth_excluded"),
-                                                GetAttributeMeta("sess_auth_other"),
-                                                GetAttributeMeta("sess_auth_totalreasons"),
-                                                GetAttributeMeta("sess_unauth_holiday"),
-                                                GetAttributeMeta("sess_unauth_late"),
-                                                GetAttributeMeta("sess_unauth_other"),
-                                                GetAttributeMeta("sess_unauth_noyet"),
-                                                GetAttributeMeta("sess_unauth_totalreasons"),
-                                                GetAttributeMeta("sess_overall_totalreasons")
+                                                GetIndicatorMeta("sess_auth_illness"),
+                                                GetIndicatorMeta("sess_auth_appointments"),
+                                                GetIndicatorMeta("sess_auth_religious"),
+                                                GetIndicatorMeta("sess_auth_study"),
+                                                GetIndicatorMeta("sess_auth_traveller"),
+                                                GetIndicatorMeta("sess_auth_holiday"),
+                                                GetIndicatorMeta("sess_auth_ext_holiday"),
+                                                GetIndicatorMeta("sess_auth_excluded"),
+                                                GetIndicatorMeta("sess_auth_other"),
+                                                GetIndicatorMeta("sess_auth_totalreasons"),
+                                                GetIndicatorMeta("sess_unauth_holiday"),
+                                                GetIndicatorMeta("sess_unauth_late"),
+                                                GetIndicatorMeta("sess_unauth_other"),
+                                                GetIndicatorMeta("sess_unauth_noyet"),
+                                                GetIndicatorMeta("sess_unauth_totalreasons"),
+                                                GetIndicatorMeta("sess_overall_totalreasons")
                                             }
                                         }
                                     },
@@ -1574,21 +1574,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                                 new DataSet
                                 {
                                     Filename = DataCsvFilename.exclusion_geoglevels,
-                                    AttributeMetas = new[]
+                                    IndicatorMetas = new[]
                                     {
-                                        new MetaGroup<AttributeMeta>
+                                        new MetaGroup<IndicatorMeta>
                                         {
                                             Name = "Exclusion fields",
                                             Meta = new[]
                                             {
-                                                GetAttributeMeta("num_schools"),
-                                                GetAttributeMeta("headcount"),
-                                                GetAttributeMeta("perm_excl"),
-                                                GetAttributeMeta("perm_excl_rate"),
-                                                GetAttributeMeta("fixed_excl"),
-                                                GetAttributeMeta("fixed_excl_rate"),
-                                                GetAttributeMeta("one_plus_fixed"),
-                                                GetAttributeMeta("one_plus_fixed_rate")
+                                                GetIndicatorMeta("num_schools"),
+                                                GetIndicatorMeta("headcount"),
+                                                GetIndicatorMeta("perm_excl"),
+                                                GetIndicatorMeta("perm_excl_rate"),
+                                                GetIndicatorMeta("fixed_excl"),
+                                                GetIndicatorMeta("fixed_excl_rate"),
+                                                GetIndicatorMeta("one_plus_fixed"),
+                                                GetIndicatorMeta("one_plus_fixed_rate")
                                             }
                                         }
                                     },
@@ -1597,20 +1597,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                                 new DataSet
                                 {
                                     Filename = DataCsvFilename.exclusion_lacharacteristics,
-                                    AttributeMetas = new[]
+                                    IndicatorMetas = new[]
                                     {
-                                        new MetaGroup<AttributeMeta>
+                                        new MetaGroup<IndicatorMeta>
                                         {
                                             Name = "Exclusion fields",
                                             Meta = new[]
                                             {
-                                                GetAttributeMeta("headcount"),
-                                                GetAttributeMeta("perm_excl"),
-                                                GetAttributeMeta("perm_excl_rate"),
-                                                GetAttributeMeta("fixed_excl"),
-                                                GetAttributeMeta("fixed_excl_rate"),
-                                                GetAttributeMeta("one_plus_fixed"),
-                                                GetAttributeMeta("one_plus_fixed_rate")
+                                                GetIndicatorMeta("headcount"),
+                                                GetIndicatorMeta("perm_excl"),
+                                                GetIndicatorMeta("perm_excl_rate"),
+                                                GetIndicatorMeta("fixed_excl"),
+                                                GetIndicatorMeta("fixed_excl_rate"),
+                                                GetIndicatorMeta("one_plus_fixed"),
+                                                GetIndicatorMeta("one_plus_fixed_rate")
                                             }
                                         }
                                     },
@@ -1716,20 +1716,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                                 new DataSet
                                 {
                                     Filename = DataCsvFilename.exclusion_natcharacteristics,
-                                    AttributeMetas = new[]
+                                    IndicatorMetas = new[]
                                     {
-                                        new MetaGroup<AttributeMeta>
+                                        new MetaGroup<IndicatorMeta>
                                         {
                                             Name = "Exclusion fields",
                                             Meta = new[]
                                             {
-                                                GetAttributeMeta("headcount"),
-                                                GetAttributeMeta("perm_excl"),
-                                                GetAttributeMeta("perm_excl_rate"),
-                                                GetAttributeMeta("fixed_excl"),
-                                                GetAttributeMeta("fixed_excl_rate"),
-                                                GetAttributeMeta("one_plus_fixed"),
-                                                GetAttributeMeta("one_plus_fixed_rate")
+                                                GetIndicatorMeta("headcount"),
+                                                GetIndicatorMeta("perm_excl"),
+                                                GetIndicatorMeta("perm_excl_rate"),
+                                                GetIndicatorMeta("fixed_excl"),
+                                                GetIndicatorMeta("fixed_excl_rate"),
+                                                GetIndicatorMeta("one_plus_fixed"),
+                                                GetIndicatorMeta("one_plus_fixed_rate")
                                             }
                                         }
                                     },
@@ -1854,15 +1854,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                                 new DataSet
                                 {
                                     Filename = DataCsvFilename.schpupnum_geoglevels,
-                                    AttributeMetas = new[]
+                                    IndicatorMetas = new[]
                                     {
-                                        new MetaGroup<AttributeMeta>
+                                        new MetaGroup<IndicatorMeta>
                                         {
                                             Name = "School pupil fields",
                                             Meta = new[]
                                             {
-                                                GetAttributeMeta("num_schools"),
-                                                GetAttributeMeta("headcount")
+                                                GetIndicatorMeta("num_schools"),
+                                                GetIndicatorMeta("headcount")
                                             }
                                         }
                                     },
@@ -1871,14 +1871,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                                 new DataSet
                                 {
                                     Filename = DataCsvFilename.schpupnum_lacharacteristics,
-                                    AttributeMetas = new[]
+                                    IndicatorMetas = new[]
                                     {
-                                        new MetaGroup<AttributeMeta>
+                                        new MetaGroup<IndicatorMeta>
                                         {
                                             Name = "School pupil fields",
                                             Meta = new[]
                                             {
-                                                GetAttributeMeta("headcount")
+                                                GetIndicatorMeta("headcount")
                                             }
                                         }
                                     },
@@ -1983,14 +1983,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                                 new DataSet
                                 {
                                     Filename = DataCsvFilename.schpupnum_natcharacteristics,
-                                    AttributeMetas = new[]
+                                    IndicatorMetas = new[]
                                     {
-                                        new MetaGroup<AttributeMeta>
+                                        new MetaGroup<IndicatorMeta>
                                         {
                                             Name = "School pupil fields",
                                             Meta = new[]
                                             {
-                                                GetAttributeMeta("headcount")
+                                                GetIndicatorMeta("headcount")
                                             }
                                         }
                                     },

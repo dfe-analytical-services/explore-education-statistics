@@ -67,11 +67,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             var result = new PublicationMetaViewModel
             {
                 PublicationId = publicationId,
-                Attributes = _releaseService.GetAttributeMetas(publicationId, type),
+                Indicators = _releaseService.GetIndicatorMetas(publicationId, type),
                 Characteristics = _releaseService.GetCharacteristicMetas(publicationId, type)
             };
 
-            if (result.Attributes != null && result.Attributes.Any() || 
+            if (result.Indicators != null && result.Indicators.Any() || 
                 result.Characteristics != null && result.Characteristics.Any())
             {
                 return result;

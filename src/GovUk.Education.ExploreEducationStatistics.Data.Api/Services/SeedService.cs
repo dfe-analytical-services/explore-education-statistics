@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly CsvImporterFactory _csvImporterFactory = new CsvImporterFactory();
         private readonly IOptions<SeedConfigurationOptions> _options;
 
-        private const string attributeMetaTableName = "AttributeMeta";
+        private const string indicatorMetaTableName = "IndicatorMeta";
         private const string characteristicMetaTableName = "CharacteristicMeta";
 
         public SeedService(ILogger<SeedService> logger,
@@ -35,15 +35,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public void DeleteAll()
         {
-            _context.Database.ExecuteSqlCommand("truncate table ReleaseAttributeMeta");
+            _context.Database.ExecuteSqlCommand("truncate table ReleaseIndicatorMeta");
             _context.Database.ExecuteSqlCommand("truncate table ReleaseCharacteristicMeta");
 
 
             _context.Database.ExecuteSqlCommand(
-                "alter table ReleaseAttributeMeta drop constraint FK_ReleaseAttributeMeta_AttributeMeta_AttributeMetaId");
-            _context.Database.ExecuteSqlCommand("truncate table AttributeMeta");
+                "alter table ReleaseIndicatorMeta drop constraint FK_ReleaseIndicatorMeta_IndicatorMeta_IndicatorMetaId");
+            _context.Database.ExecuteSqlCommand("truncate table IndicatorMeta");
             _context.Database.ExecuteSqlCommand(
-                "alter table ReleaseAttributeMeta add constraint FK_ReleaseAttributeMeta_AttributeMeta_AttributeMetaId foreign key (AttributeMetaId) references AttributeMeta (Id)");
+                "alter table ReleaseIndicatorMeta add constraint FK_ReleaseIndicatorMeta_IndicatorMeta_IndicatorMetaId foreign key (IndicatorMetaId) references IndicatorMeta (Id)");
 
 
             _context.Database.ExecuteSqlCommand(
@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
 
             _context.Database.ExecuteSqlCommand(
-                "alter table ReleaseAttributeMeta drop constraint FK_ReleaseAttributeMeta_Release_ReleaseId");
+                "alter table ReleaseIndicatorMeta drop constraint FK_ReleaseIndicatorMeta_Release_ReleaseId");
             _context.Database.ExecuteSqlCommand(
                 "alter table ReleaseCharacteristicMeta drop constraint FK_ReleaseCharacteristicMeta_Release_ReleaseId");
             _context.Database.ExecuteSqlCommand(
@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
 
             _context.Database.ExecuteSqlCommand(
-                "alter table ReleaseAttributeMeta add constraint FK_ReleaseAttributeMeta_Release_ReleaseId foreign key (ReleaseId) references Release (Id)");
+                "alter table ReleaseIndicatorMeta add constraint FK_ReleaseIndicatorMeta_Release_ReleaseId foreign key (ReleaseId) references Release (Id)");
             _context.Database.ExecuteSqlCommand(
                 "alter table ReleaseCharacteristicMeta add constraint FK_ReleaseCharacteristicMeta_Release_ReleaseId foreign key (ReleaseId) references Release (Id)");
             _context.Database.ExecuteSqlCommand(
@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             {
                 _context.ChangeTracker.AutoDetectChangesEnabled = false;
 
-                SeedAttributes();
+                SeedIndicators();
                 SeedCharacteristics();
                 _context.SaveChanges();
 
@@ -108,17 +108,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _logger.LogInformation("Seeding complete");
         }
 
-        private void SeedAttributes()
+        private void SeedIndicators()
         {
-            _logger.LogInformation("Seeding {Table}", attributeMetaTableName);
+            _logger.LogInformation("Seeding {Table}", indicatorMetaTableName);
 
-            if (!_context.AttributeMeta.Any())
+            if (!_context.IndicatorMeta.Any())
             {
-                _context.AttributeMeta.AddRange(SamplePublications.AttributeMetas.Values);
+                _context.IndicatorMeta.AddRange(SamplePublications.IndicatorMetas.Values);
             }
             else
             {
-                _logger.LogWarning("Not seeding {Table}. Table already contains values", attributeMetaTableName);
+                _logger.LogWarning("Not seeding {Table}. Table already contains values", indicatorMetaTableName);
             }
         }
 
@@ -195,22 +195,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private void SeedDataSetMeta(Models.Release releaseDb, DataSet dataSet)
         {
-            SeedDataSetAttributes(releaseDb, dataSet);
+            SeedDataSetIndicators(releaseDb, dataSet);
             SeedDataSetCharacteristics(releaseDb, dataSet);
         }
 
-        private void SeedDataSetAttributes(Models.Release releaseDb, DataSet dataSet)
+        private void SeedDataSetIndicators(Models.Release releaseDb, DataSet dataSet)
         {
-            _logger.LogInformation("Seeding Data Set Attributes");
-            
+            _logger.LogInformation("Seeding Data Set Indicators");
+
             _context.AddRange(
-                from metaGroup in dataSet.AttributeMetas
-                from attributeMeta in metaGroup.Meta
-                let attributeMetaDb = LookupAttributeMeta(attributeMeta.Name)
-                select new ReleaseAttributeMeta
+                from metaGroup in dataSet.IndicatorMetas
+                from indicatorMeta in metaGroup.Meta
+                let indicatorMetaDb = LookupIndicatorMeta(indicatorMeta.Name)
+                select new ReleaseIndicatorMeta
                 {
                     Release = releaseDb,
-                    AttributeMeta = attributeMetaDb,
+                    IndicatorMeta = indicatorMetaDb,
                     DataType = dataSet.getDataType().Name,
                     Group = metaGroup.Name
                 }
@@ -220,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private void SeedDataSetCharacteristics(Models.Release releaseDb, DataSet dataSet)
         {
             _logger.LogInformation("Seeding Data Set Characteristics");
-            
+
             _context.AddRange(dataSet.CharacteristicMetas
                 .Select(characteristicMeta => LookupCharacteristicMeta(characteristicMeta.Name))
                 .Select(characteristicMetaDb =>
@@ -238,9 +238,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return _context.Release.Add(new Models.Release(release.ReleaseDate, release.PublicationId)).Entity;
         }
 
-        private AttributeMeta LookupAttributeMeta(string name)
+        private IndicatorMeta LookupIndicatorMeta(string name)
         {
-            return _context.AttributeMeta.FirstOrDefault(meta => meta.Name == name);
+            return _context.IndicatorMeta.FirstOrDefault(meta => meta.Name == name);
         }
 
         private CharacteristicMeta LookupCharacteristicMeta(string name)

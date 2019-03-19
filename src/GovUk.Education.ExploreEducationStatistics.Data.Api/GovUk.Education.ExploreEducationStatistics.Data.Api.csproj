@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <Folder Include="Migrations" />
+    <Folder Include="Services\Meta" />
     <Folder Include="wwwroot\" />
     <Folder Include="wwwroot\data\zip" />
   </ItemGroup>

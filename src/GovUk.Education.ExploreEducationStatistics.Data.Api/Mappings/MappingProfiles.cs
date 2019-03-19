@@ -14,14 +14,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
         {
             CreateMap<Characteristic, CharacteristicViewModel>();
             CreateMap<CharacteristicMeta, NameLabelViewModel>();
-            CreateMap<AttributeMeta, AttributeMetaViewModel>()
+            CreateMap<IndicatorMeta, IndicatorMetaViewModel>()
                 .ForMember(dest => dest.Unit,
-                    opts => opts.MapFrom(MapAttributeMetaUnitExpression()));
+                    opts => opts.MapFrom(MapIndicatorMetaUnitExpression()));
         }
 
-        private static Expression<Func<AttributeMeta, string>> MapAttributeMetaUnitExpression()
+        private static Expression<Func<IndicatorMeta, string>> MapIndicatorMetaUnitExpression()
         {
-            return attributeMeta => attributeMeta.Unit == Unit.Percent ? "%" : "";
+            return indicatorMeta => indicatorMeta.Unit == Unit.Percent ? "%" : "";
         }
     }
 }

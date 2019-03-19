@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public ICollection<int> Years { get; set; }
         public int StartYear { get; set; }
         public int EndYear { get; set; }
-        public ICollection<string> Attributes { get; set; }
+        public ICollection<string> Indicators { get; set; }
         public ICollection<string> Characteristics { get; set; }
 
         public Expression<Func<CharacteristicDataNational, bool>> FindExpression(long releaseId)
@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
                 .And(QueryContextUtil.ReleaseExpression<CharacteristicDataNational>(releaseId))
                 .And(QueryContextUtil.LevelExpression<CharacteristicDataNational>(Level.National))
                 .And(QueryContextUtil.SchoolTypeExpression<CharacteristicDataNational>(SchoolTypes))
-                .And(QueryContextUtil.YearExpression<CharacteristicDataNational>(
+                .And(QueryContextUtil.TimePeriodExpression<CharacteristicDataNational>(
                     QueryUtil.YearsQuery(Years, StartYear, EndYear)))
                 .And(QueryContextUtil.CharacteristicsQuery<CharacteristicDataNational>(Characteristics));
         }

@@ -6,20 +6,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 {
     public class GeographicResultBuilder : IResultBuilder<IGeographicSchoolData, TableBuilderGeographicData>
     {
-        public TableBuilderGeographicData BuildResult(IGeographicSchoolData data, ICollection<string> attributeFilter)
+        public TableBuilderGeographicData BuildResult(IGeographicSchoolData data, ICollection<string> indicatorFilter)
         {
             return new TableBuilderGeographicData
             {
-                Year = data.Year,
-                Term = data.Term,
+                TimePeriod = data.TimePeriod,
+                TimeIdentifier = data.TimeIdentifier,
                 SchoolType = data.SchoolType,
                 Country = data.Country,
                 Region = data.Region,
                 LocalAuthority = data.LocalAuthority,
                 School = data.School,
-                Attributes = attributeFilter.Count > 0
-                    ? QueryUtil.FilterAttributes(data.Attributes, attributeFilter)
-                    : data.Attributes
+                Indicators = indicatorFilter.Count > 0
+                    ? QueryUtil.FilterIndicators(data.Indicators, indicatorFilter)
+                    : data.Indicators
             };
         }
     }

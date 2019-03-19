@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public ICollection<string> Schools { get; set; }
         public int StartYear { get; set; }
         public int EndYear { get; set; }
-        public ICollection<string> Attributes { get; set; }
+        public ICollection<string> Indicators { get; set; }
 
         public Expression<Func<GeographicData, bool>> FindExpression(long releaseId)
         {
@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
                 .And(QueryContextUtil.ReleaseExpression<GeographicData>(releaseId))
                 .And(QueryContextUtil.LevelExpression<GeographicData>(Level))
                 .And(QueryContextUtil.SchoolTypeExpression<GeographicData>(SchoolTypes))
-                .And(QueryContextUtil.YearExpression<GeographicData>(
+                .And(QueryContextUtil.TimePeriodExpression<GeographicData>(
                     QueryUtil.YearsQuery(Years, StartYear, EndYear)))
                 .And(QueryContextUtil.RegionsExpression<GeographicData>(Regions))
                 .And(QueryContextUtil.LocalAuthoritiesExpression<GeographicData>(LocalAuthorities))

@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
         where TData : ITidyData
         where TResult : ITableBuilderData
     {
-        TResult BuildResult(TData data, ICollection<string> attributeFilter);
+        TResult BuildResult(TData data, ICollection<string> indicatorFilter);
     }
 }

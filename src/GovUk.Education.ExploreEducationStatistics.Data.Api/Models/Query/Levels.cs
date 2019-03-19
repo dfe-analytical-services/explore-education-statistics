@@ -9,8 +9,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         private static readonly Dictionary<Level, string[]> values = new Dictionary<Level, string[]>
         {
             {Level.National, new[] {"National"}},
-            {Level.Region, new[] {"Region", "Regional"}},
+            {Level.Regional, new[] {"Region", "Regional"}},
+            {Level.RSC_Region, new[] {"RSC region"}},
             {Level.Local_Authority, new[] {"Local Authority"}},
+            {Level.Local_Authority_District, new[] {"Local authority district"}},
+            {Level.Parliamentary_Constituency, new[] {"Parliamentary constituency"}},
+            {Level.Establishment, new[] {"Establishment"}},
             {Level.School, new[] {"School"}}
         };
 

@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
 {
     public class DataSet
     {
-        public MetaGroup<AttributeMeta>[] AttributeMetas { get; set; }
+        public MetaGroup<IndicatorMeta>[] IndicatorMetas { get; set; }
         public CharacteristicMeta[] CharacteristicMetas { get; set; }
         public DataCsvFilename Filename { get; set; }
 
