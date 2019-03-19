@@ -59,13 +59,6 @@ jobs:
           verbose: false
           customCommand: 'ci'
       - task: 'Npm@1'
-        displayName: 'npm test'
-        inputs:
-          command: 'custom'
-          workingDir: 'src/explore-education-statistics-frontend'
-          verbose: false
-          customCommand: 'test'
-      - task: 'Npm@1'
         displayName: 'npm run lint'
         inputs:
           command: 'custom'
@@ -79,6 +72,19 @@ jobs:
           workingDir: 'src/explore-education-statistics-frontend'
           verbose: false
           customCommand: 'run format:check'
+      - task: 'Npm@1'
+        displayName: 'npm run test:ci'
+        inputs:
+          command: 'custom'
+          workingDir: 'src/explore-education-statistics-frontend'
+          verbose: false
+          customCommand: 'run test:ci'
+      - task: 'PublishTestResults@2'
+        displayName: 'Publish frontend test results'
+        inputs:
+          testResultsFormat: 'JUnit'
+          testResultsFiles: '**/junit.xml'
+          searchFolder: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
       - task: 'ArchiveFiles@2'
         displayName: 'Archive frontend'
         inputs:
