@@ -3,7 +3,6 @@ Library     SeleniumLibrary  timeout=${timeout}  implicit_wait=${implicit_wait}
 Library     OperatingSystem
 #Library     XvfbRobot           # sudo apt install xvfb + pip install robotframework-xvfb
 
-Library    setup_utilities.py
 Library    utilities.py
 Library    file_operations.py
 
@@ -18,12 +17,7 @@ ${url}        about:blank
 ${urlAdmin}   about:blank
 
 *** Keywords ***
-perform setup
-  install chromedriver
-  add lib dir to path  # Need chromedriver in PATH to run selenium!
-
 user opens the browser
-  perform setup
   run keyword if    "${browser}" == "chrome"    user opens chrome
   run keyword if    "${browser}" == "firefox"   user opens firefox
   go to    about:blank

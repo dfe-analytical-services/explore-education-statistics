@@ -35,6 +35,7 @@ from pabot.pabot import main as pabot_run_cli
 import cProfile
 import pstats
 import scripts.keyword_profile as kp
+import chromedriver_install as cdi
 # import scripts.warm_up_servers as warm_up_servers
 
 arguments = []
@@ -113,6 +114,10 @@ arguments += ["-v", "urlAdmin:" + urlAdmin]
 arguments += ["-v", "browser:" + browser]
 
 arguments += [tests]
+
+# Install Chromedriver and add it to PATH
+path = cdi.install(file_directory='./webdriver/', verbose=False, chmod=True, overwrite=False, version=None)
+os.environ["PATH"] += os.pathsep + os.getcwd() + os.sep + 'webdriver'
 
 # Wait until environment is warmed up
 # warm_up_servers.wait_for_server(url)
