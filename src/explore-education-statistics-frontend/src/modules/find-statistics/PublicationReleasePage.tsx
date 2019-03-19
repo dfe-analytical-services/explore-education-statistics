@@ -34,7 +34,7 @@ class PublicationReleasePage extends Component<Props> {
       ? publicationService.getPublicationRelease(release)
       : publicationService.getLatestPublicationRelease(publication);
 
-    const { data } = await request;
+    const data = await request;
 
     return {
       data,

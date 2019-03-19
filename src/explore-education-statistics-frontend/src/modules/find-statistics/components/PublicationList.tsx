@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import Link from '../../../components/Link';
-import { contentApi } from '../../../services/api';
+import Link from 'src/components/Link';
+import { contentApi } from 'src/services/api';
 
 interface Props {
   topic: string;
@@ -18,16 +18,14 @@ interface State {
 class PublicationList extends Component<Props, State> {
   public state = {
     publications: [],
-    topic: '',
   };
 
   public componentDidMount() {
     const { topic } = this.props;
+
     contentApi
       .get(`topic/${topic}/publications`)
-      .then(json => this.setState({ publications: json.data }))
-      // tslint:disable-next-line:no-console
-      .catch(error => console.log(error));
+      .then(publications => this.setState({ publications }));
   }
 
   public render() {
