@@ -12,11 +12,7 @@ import PageTitle from 'src/components/PageTitle';
 import Tabs from 'src/components/Tabs';
 import TabsSection from 'src/components/TabsSection';
 import { baseUrl } from 'src/services/api';
-import {
-  getLatestPublicationRelease,
-  getPublicationRelease,
-  Release,
-} from 'src/services/publicationService';
+import publicationService, { Release } from 'src/services/publicationService';
 import ContentBlock from './components/ContentBlock';
 
 interface Props {
@@ -35,10 +31,10 @@ class PublicationReleasePage extends Component<Props> {
     const { publication, release } = query;
 
     const request = release
-      ? getPublicationRelease(release)
-      : getLatestPublicationRelease(publication);
+      ? publicationService.getPublicationRelease(release)
+      : publicationService.getLatestPublicationRelease(publication);
 
-    const { data } = await request;
+    const data = await request;
 
     return {
       data,

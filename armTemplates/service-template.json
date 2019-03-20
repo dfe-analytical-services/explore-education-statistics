@@ -311,6 +311,18 @@
             {
               "name": "NODE_ENV",
               "value": "production"
+            },
+            {
+              "name": "CONTENT_API_BASE_URL",
+              "value": "[concat('htttps://', variables('contentAppName'),'.azurewebsites.net/')]"
+            },
+            {
+              "name": "DATA_API_BASE_URL",
+              "value": "[concat('htttps://', variables('dataAppName'),'.azurewebsites.net/')]"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "1"
             }
           ],
           "phpVersion": "off"

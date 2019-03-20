@@ -1,4 +1,3 @@
-import { AxiosPromise } from 'axios';
 import { contentApi } from './api';
 
 export interface Publication {
@@ -21,6 +20,25 @@ export interface Publication {
   }[];
 }
 
+export interface DataQuery {
+  method: string;
+  path: string;
+  body: string;
+}
+
+export interface Chart {
+  type: string;
+  attributes: string[];
+}
+
+export interface ContentBlock {
+  type: string;
+  body: string;
+  heading?: string;
+  dataQuery?: DataQuery;
+  charts?: Chart[];
+}
+
 export interface Release {
   id: string;
   title: string;
@@ -40,11 +58,7 @@ export interface Release {
     order: number;
     heading: string;
     caption: string;
-    content: {
-      type: string;
-      body: string;
-      heading?: string;
-    }[];
+    content: ContentBlock[];
   }[];
   keyStatistics: {
     title: string;
@@ -52,11 +66,11 @@ export interface Release {
   }[];
 }
 
-export const getLatestPublicationRelease = (
-  publicationSlug: string,
-): AxiosPromise<Release> =>
-  contentApi.get(`publication/${publicationSlug}/latest`);
-
-export const getPublicationRelease = (
-  releaseId: string,
-): AxiosPromise<Release> => contentApi.get(`release/${releaseId}`);
+export default {
+  getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
+    return contentApi.get(`publication/${publicationSlug}/latest`);
+  },
+  getPublicationRelease(releaseId: string): Promise<Release> {
+    return contentApi.get(`release/${releaseId}`);
+  },
+};

@@ -1,70 +1,56 @@
-import { AxiosPromise } from 'axios';
+import SchoolType from 'src/services/types/SchoolType';
 import { dataApi } from './api';
-
-export interface IndicatorsMeta {
-  [group: string]: {
-    name: string;
-    label: string;
-    unit?: string;
-  }[];
-}
-
-export interface CharacteristicsMeta {
-  [group: string]: {
-    name: string;
-    label: string;
-  }[];
-}
 
 export interface PublicationMeta {
   publicationId: string;
-  characteristics: CharacteristicsMeta;
-  indicators: IndicatorsMeta;
-}
-
-export const getCharacteristicsMeta = (
-  publicationUuid: string,
-): AxiosPromise<PublicationMeta> =>
-  dataApi.get(
-    `/tablebuilder/meta/CharacteristicDataNational/${publicationUuid}`,
-  );
-
-export enum SchoolType {
-  Dummy = 'Dummy',
-  Total = 'Total',
-  State_Funded_Primary = 'State_Funded_Primary',
-  State_Funded_Secondary = 'State_Funded_Secondary',
-  Special = 'Special',
-}
-
-export interface DataTableResult {
-  year: number;
-  schoolType: SchoolType;
+  characteristics: {
+    [group: string]: {
+      name: string;
+      label: string;
+    }[];
+  };
   indicators: {
-    [indicator: string]: string;
+    [group: string]: {
+      name: string;
+      label: string;
+      unit?: string;
+    }[];
   };
 }
+
+export type CharacteristicsMeta = PublicationMeta['characteristics'];
+export type IndicatorsMeta = PublicationMeta['indicators'];
+export type IndicatorsMetaItem = IndicatorsMeta[0][0];
 
 export interface CharacteristicsData {
   publicationId: string;
   releaseId: string;
   releaseDate: string;
-  result: DataTableResult[];
+  result: {
+    year: number;
+    schoolType: SchoolType;
+    indicators: {
+      [indicator: string]: string;
+    };
+  }[];
 }
 
-export const getNationalCharacteristicsData = (
-  publicationId: string,
-  characteristics: string[],
-  indicators: string[],
-  schoolTypes: SchoolType[],
-  startYear: number,
-  endYear: number,
-): AxiosPromise<CharacteristicsData> =>
-  dataApi.post('/tablebuilder/characteristics/national', {
-    characteristics,
-    endYear,
-    indicators,
-    publicationId,
-    schoolTypes,
-    startYear,
-  });
+export type DataTableResult = CharacteristicsData['result'][0];
+
+export default {
+  getCharacteristicsMeta(publicationUuid: string): Promise<PublicationMeta> {
+    return dataApi.get(
+      `/tablebuilder/meta/CharacteristicDataNational/${publicationUuid}`,
+    );
+  },
+  getNationalCharacteristicsData(query: {
+    publicationId: string;
+    characteristics: string[];
+    indicators: string[];
+    schoolTypes: SchoolType[];
+    startYear: number;
+    endYear: number;
+  }): Promise<CharacteristicsData> {
+    return dataApi.post('/tablebuilder/characteristics/national', query);
+  },
+};

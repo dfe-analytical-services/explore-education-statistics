@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import Accordion from '../../../components/Accordion';
-import AccordionSection from '../../../components/AccordionSection';
-import { contentApi } from '../../../services/api';
+import Accordion from 'src/components/Accordion';
+import AccordionSection from 'src/components/AccordionSection';
+import { contentApi } from 'src/services/api';
 import PublicationList from '../components/PublicationList';
 
 interface Props {
@@ -27,7 +27,7 @@ class TopicList extends Component<Props, State> {
 
     contentApi
       .get(`theme/${theme}/topics`)
-      .then(json => this.setState({ topics: json.data }));
+      .then(topics => this.setState({ topics }));
   }
 
   public render() {

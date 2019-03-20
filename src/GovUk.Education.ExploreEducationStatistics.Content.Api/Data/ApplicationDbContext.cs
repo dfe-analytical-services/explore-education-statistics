@@ -291,6 +291,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                 new MarkDownBlock
                                 {
                                     Body = "The overall absence rate across state-funded primary, secondary and special schools increased from 4.6 per cent in 2015/16 to 4.7 per cent in 2016/17. In primary schools the overall absence rate stayed the same at 4 per cent and the rate in secondary schools increased from 5.2 per cent to 5.4 per cent. Absence in special schools is much higher at 9.7 per cent in 2016/17\n\nThe increase in overall absence rate has been driven by an increase in the unauthorised absence rate across state-funded primary, secondary and special schools - which increased from 1.1 per cent to 1.3 per cent between 2015/16 and 2016/17.\n\nLooking at longer-term trends, overall and authorised absence rates have been fairly stable over recent years after decreasing gradually between 2006/07 and 2013/14. Unauthorised absence rates have not varied much since 2006/07, however the unauthorised absence rate is now at its highest since records began, at 1.3 per cent.\n\nThis increase in unauthorised absence is due to an increase in absence due to family holidays that were not agreed by the school. The authorised absence rate has not changed since last year, at 3.4 per cent. Though in primary schools authorised absence rates have been decreasing across recent years.\n\nThe total number of days missed due to overall absence across state-funded primary, secondary and special schools has increased since last year, from 54.8 million in 2015/16 to 56.7 million in 2016/17. This partly reflects the rise in the total number of pupil enrolments, the average number of days missed per enrolment has increased very slightly from 8.1 days in 2015/16 to 8.2 days in 2016/17.\n\nIn 2016/17, 91.8 per cent of pupils in state-funded primary, state-funded secondary and special schools missed at least one session during the school year, this is similar to the previous year (91.7 per cent in 2015/16)."
+                                },
+                                new DataBlock
+                                {
+                                    Heading = null,
+                                    DataQuery = new DataQuery 
+                                    {
+                                        method = "POST",
+                                        path = "/api/tablebuilder/characteristics/national",
+                                        body = "{ \"attributes\": [ \"num_schools\", \"enrolments\", \"sess_overall_percent\", \"sess_unauthorised_percent\", \"sess_authorised_percent\" ], \"characteristics\": [ \"Total\" ], \"endYear\": 201617, \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\", \"schoolTypes\": [ \"Total\" ], \"startYear\": 201213}"
+                                    },
+                                    Charts = new List<Chart>
+                                    {
+                                        new Chart 
+                                        {
+                                            Type = "line",
+                                            XAxis = new Axis 
+                                            {
+                                                title = "School Year"
+                                            },
+                                            YAxis = new Axis
+                                            {
+                                                title = "Absence Rate"
+                                            },
+                                            Attributes = new List<string> {
+                                                "sess_overall_percent",
+                                                "sess_unauthorised_percent",
+                                                "sess_authorised_percent"
+                                            },
+                                            
+                                        }    
+                                    }
                                 }
                             }
                         },

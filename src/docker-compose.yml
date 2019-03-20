@@ -8,7 +8,7 @@ services:
     - "5001:5001"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_ConnectionStrings__StatisticsDb: Server=db;Database=master;User=SA;Password=Your_Password123;
+      ASPNETCORE_ConnectionStrings__StatisticsDb: Server=db;Database=master;User=SA;Password=Your_Password123;Connection Timeout=1000;
     depends_on:
     - db
   content-api:
@@ -49,6 +49,8 @@ services:
     image: "mcr.microsoft.com/mssql/server"
     ports:
       - "1433:1433"
+    volumes:
+      - ../data/ees-mssql:/var/opt/mssql/data      
     environment:
       SA_PASSWORD: "Your_Password123"
       ACCEPT_EULA: "Y"

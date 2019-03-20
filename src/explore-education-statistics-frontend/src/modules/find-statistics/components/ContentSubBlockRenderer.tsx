@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Release } from 'src/services/publicationService';
+import { ContentBlock } from 'src/services/publicationService';
+import { DataBlock } from './DataBlock';
 
 interface Props {
-  block: Release['content'][0]['content'][0];
+  block: ContentBlock;
 }
 
 const ContentSubBlockRenderer = ({ block }: Props) => {
@@ -18,6 +19,12 @@ const ContentSubBlockRenderer = ({ block }: Props) => {
           )}
 
           <ReactMarkdown className="govuk-body" source={block.body} />
+        </div>
+      );
+    case 'DataBlock':
+      return (
+        <div className="dfe-content-overflow">
+          <DataBlock {...block} />
         </div>
       );
     default:
