@@ -10,7 +10,7 @@ import {
   YAxis,
 } from 'recharts';
 import { CharacteristicsData } from '../../../../services/tableBuilderService';
-import { colours, parseCondensedYearRange, symbols } from './Charts';
+import { colours, parseCondensedTimePeriodRange, symbols } from './Charts';
 
 interface LineChartBlockProps {
   chartDataKeys: string[];
@@ -59,7 +59,7 @@ export class LineChartBlock extends Component<LineChartBlockProps> {
           }
           return v;
         },
-        { name: parseCondensedYearRange(`${result.year}`) },
+        { name: parseCondensedTimePeriodRange(`${result.timePeriod}`) },
       );
     });
 
