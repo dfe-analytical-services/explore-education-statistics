@@ -1,4 +1,3 @@
-import { AxiosPromise } from 'axios';
 import { contentApi } from './api';
 
 export interface Publication {
@@ -73,11 +72,11 @@ export interface Release {
   }[];
 }
 
-export const getLatestPublicationRelease = (
-  publicationSlug: string,
-): AxiosPromise<Release> =>
-  contentApi.get(`publication/${publicationSlug}/latest`);
-
-export const getPublicationRelease = (
-  releaseId: string,
-): AxiosPromise<Release> => contentApi.get(`release/${releaseId}`);
+export default {
+  getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
+    return contentApi.get(`publication/${publicationSlug}/latest`);
+  },
+  getPublicationRelease(releaseId: string): Promise<Release> {
+    return contentApi.get(`release/${releaseId}`);
+  },
+};

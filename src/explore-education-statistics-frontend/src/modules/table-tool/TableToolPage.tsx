@@ -4,13 +4,11 @@ import Page from 'src/components/Page';
 import PageTitle from 'src/components/PageTitle';
 import Tabs from 'src/components/Tabs';
 import TabsSection from 'src/components/TabsSection';
-import {
+import tableBuilderService, {
   DataTableResult,
-  getCharacteristicsMeta,
-  getNationalCharacteristicsData,
   PublicationMeta,
-  SchoolType,
-} from '../../services/tableBuilderService';
+} from 'src/services/tableBuilderService';
+import SchoolType from 'src/services/types/SchoolType';
 import CharacteristicsDataTable from './components/CharacteristicsDataTable';
 import CharacteristicsFilterForm, {
   CharacteristicsFilterFormSubmitHandler,
@@ -33,12 +31,16 @@ interface State {
 }
 
 class TableToolPage extends Component<{}, State> {
+  private readonly defaultFilters: State['filters'] = {
+    attributes: [],
+    characteristics: [],
+    schoolTypes: [],
+    years: [],
+  };
+
   public state: State = {
     filters: {
-      attributes: [],
-      characteristics: [],
-      schoolTypes: [],
-      years: [],
+      ...this.defaultFilters,
     },
     publicationId: '',
     publicationMeta: {
@@ -50,7 +52,7 @@ class TableToolPage extends Component<{}, State> {
   };
 
   private filtersRef = createRef<HTMLDivElement>();
-  private dataTableRef = createRef<HTMLDivElement>();
+  private dataTableRef = createRef<HTMLElement>();
 
   private handleMenuChange: MenuChangeEventHandler = async menuOption => {
     if (!menuOption) {
@@ -74,13 +76,19 @@ class TableToolPage extends Component<{}, State> {
 
     const publication = menuOptions[menuOption];
 
-    const { data } = await getCharacteristicsMeta(publication.id);
+    const publicationMeta = await tableBuilderService.getCharacteristicsMeta(
+      publication.id,
+    );
 
     this.setState(
       {
+        publicationMeta,
+        filters: {
+          ...this.defaultFilters,
+        },
         publicationId: publication.id,
-        publicationMeta: data,
         publicationName: publication.label,
+        tableData: [],
       },
       () => {
         if (this.filtersRef.current) {
@@ -103,13 +111,15 @@ class TableToolPage extends Component<{}, State> {
     const formatToAcademicYear = (year: number) =>
       parseInt(`${year}${`${year + 1}`.substring(2, 4)}`, 0);
 
-    const { data } = await getNationalCharacteristicsData(
-      this.state.publicationId,
-      attributes,
-      characteristics,
-      schoolTypes,
-      formatToAcademicYear(startYear),
-      formatToAcademicYear(endYear),
+    const { result } = await tableBuilderService.getNationalCharacteristicsData(
+      {
+        attributes,
+        characteristics,
+        schoolTypes,
+        endYear: formatToAcademicYear(endYear),
+        publicationId: this.state.publicationId,
+        startYear: formatToAcademicYear(startYear),
+      },
     );
 
     const years = range(startYear, endYear + 1).map(formatToAcademicYear);
@@ -122,7 +132,7 @@ class TableToolPage extends Component<{}, State> {
           schoolTypes,
           years,
         },
-        tableData: data.result,
+        tableData: result,
       },
       () => {
         if (this.dataTableRef.current) {
@@ -157,37 +167,41 @@ class TableToolPage extends Component<{}, State> {
           </li>
         </ul>
 
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-full">
-            <PublicationMenu onChange={this.handleMenuChange} />
-          </div>
-        </div>
-
-        {publicationName && (
-          <div className="govuk-grid-row" ref={this.filtersRef}>
+        <section>
+          <div className="govuk-grid-row">
             <div className="govuk-grid-column-full">
-              <h2>
-                2. Filter statistics from '{publicationName}'
-                <span className="govuk-hint">
-                  Select any options you are interested in from the groups
-                  below.
-                </span>
-              </h2>
-
-              <Tabs>
-                <TabsSection id="characteristics" title="Characteristics">
-                  <CharacteristicsFilterForm
-                    publicationMeta={publicationMeta}
-                    onSubmit={this.handleFilterFormSubmit}
-                  />
-                </TabsSection>
-              </Tabs>
+              <PublicationMenu onChange={this.handleMenuChange} />
             </div>
           </div>
+        </section>
+
+        {publicationName && (
+          <section>
+            <div className="govuk-grid-row" ref={this.filtersRef}>
+              <div className="govuk-grid-column-full">
+                <h2>
+                  2. Filter statistics from '{publicationName}'
+                  <span className="govuk-hint">
+                    Select any options you are interested in from the groups
+                    below.
+                  </span>
+                </h2>
+
+                <Tabs>
+                  <TabsSection id="characteristics" title="Characteristics">
+                    <CharacteristicsFilterForm
+                      publicationMeta={publicationMeta}
+                      onSubmit={this.handleFilterFormSubmit}
+                    />
+                  </TabsSection>
+                </Tabs>
+              </div>
+            </div>
+          </section>
         )}
 
         {tableData.length > 0 && (
-          <div ref={this.dataTableRef}>
+          <section ref={this.dataTableRef}>
             <h2>3. Explore statistics from '{publicationName}'</h2>
 
             <CharacteristicsDataTable
@@ -214,7 +228,7 @@ class TableToolPage extends Component<{}, State> {
                 <a href="#contact">Contact</a>
               </li>
             </ul>
-          </div>
+          </section>
         )}
       </Page>
     );

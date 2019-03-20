@@ -18,10 +18,10 @@ class FindStatisticsPage extends Component<Props> {
   };
 
   public static async getInitialProps(): Promise<Props> {
-    const { data } = await contentApi.get('theme');
+    const themes = await contentApi.get('theme');
 
     return {
-      themes: data,
+      themes,
     };
   }
 

@@ -6,8 +6,8 @@ import {
   AttributesMeta,
   CharacteristicsMeta,
   DataTableResult,
-  SchoolType,
-} from '../../../services/tableBuilderService';
+} from 'src/services/tableBuilderService';
+import SchoolType from 'src/services/types/SchoolType';
 import GroupedDataTable, { GroupedDataSet } from './GroupedDataTable';
 
 const schoolKeys: {
