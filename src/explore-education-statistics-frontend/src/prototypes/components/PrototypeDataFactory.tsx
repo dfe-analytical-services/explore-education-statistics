@@ -11,7 +11,7 @@ function create(
   type: string,
   xAxis: Axis,
   yAxis: Axis,
-  attributes: string[],
+  indicators: string[],
   labels: string[],
   schooltype: SchoolType,
   year: number,
@@ -34,7 +34,7 @@ function create(
             next: string | number | undefined,
             index,
           ) => {
-            if (next) result.indicators[attributes[index]] = `${next}`;
+            if (next) result.indicators[indicators[index]] = `${next}`;
             return result;
           },
           {
@@ -46,13 +46,13 @@ function create(
       }),
     } as CharacteristicsData,
 
-    indicators: attributes.filter(
+    indicators: indicators.filter(
       name => name !== xAxis.key && name !== yAxis.key,
     ),
 
     meta: {
       indicators: {
-        Test: attributes.map((key: string, index: number) => ({
+        Test: indicators.map((key: string, index: number) => ({
           label: labels[index],
           name: key,
         })),

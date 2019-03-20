@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models {
     public class LineChart : IContentBlockChart
     {
         public string Type => "line";
-        public List<string> Attributes;
+        public List<string> Indicators;
         public Axis XAxis;
         public Axis YAxis;
     }

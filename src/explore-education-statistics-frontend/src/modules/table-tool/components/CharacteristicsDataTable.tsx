@@ -92,7 +92,11 @@ class CharacteristicsDataTable extends Component<Props> {
           characteristic => {
             if (!dataByCharacteristic[characteristic]) {
               return {
-                name: characteristicsByName[characteristic].label,
+                name: (
+                  characteristicsByName[characteristic] || {
+                    label: characteristic,
+                  }
+                ).label,
                 rows: indicators.map(indicator => ({
                   columns: years.map(() => '--'),
                   name: indicatorsByName[indicator].label,
@@ -106,7 +110,11 @@ class CharacteristicsDataTable extends Component<Props> {
             );
 
             return {
-              name: characteristicsByName[characteristic].label,
+              name: (
+                characteristicsByName[characteristic] || {
+                  label: characteristic,
+                }
+              ).label,
               rows: indicators.map(indicator => ({
                 columns: years.map(year => {
                   if (!dataByYear[year]) {
