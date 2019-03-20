@@ -36,7 +36,7 @@ export class StackedBarHorizontalBlock extends React.Component<
     ];
 
     const chartDataKeys = ['ebacc_entry', 'eng', 'attainment'];
-    const chartLabels = {
+    const chartLabels: any = {
       ebacc_entry: 'Ebacc Entry',
       eng: 'Eng & Maths (9-5)',
       attainment: 'Attainment 8',

@@ -4,8 +4,8 @@ import {
   CharacteristicsData,
   DataTableResult,
   PublicationMeta,
-  SchoolType,
 } from '../../services/tableBuilderService';
+import SchoolType from '../../services/types/SchoolType';
 
 function create(
   type: string,
