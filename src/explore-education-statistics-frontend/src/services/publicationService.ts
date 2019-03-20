@@ -26,9 +26,19 @@ export interface DataQuery {
   body: string;
 }
 
+export interface Axis {
+  title: string;
+  key?: string;
+  min?: number;
+  max?: number;
+}
+
 export interface Chart {
   type: string;
   attributes: string[];
+  XAxis?: Axis;
+  YAxis?: Axis;
+  stacked?: boolean;
 }
 
 export interface ContentBlock {

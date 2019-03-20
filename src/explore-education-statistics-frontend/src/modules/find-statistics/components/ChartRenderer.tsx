@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
+import { Axis } from '../../../services/publicationService';
 import {
   CharacteristicsData,
   IndicatorsMetaItem,
   PublicationMeta,
 } from '../../../services/tableBuilderService';
+import { HorizontalBarBlock } from './Charts/HorizontalBarBlock';
 import { LineChartBlock } from './Charts/LineChartBlock';
+import { VerticalBarBlock } from './Charts/VerticalBarBlock';
 
 interface ChartRendererProps {
   type: string;
@@ -12,20 +15,25 @@ interface ChartRendererProps {
 
   data: any;
   meta: PublicationMeta;
+
+  xAxis: Axis;
+  yAxis: Axis;
+
+  height?: number;
+  stacked?: boolean;
 }
 
 export class ChartRenderer extends Component<ChartRendererProps> {
   public render() {
-    const allIndicatorLabels = Object.values(this.props.meta.indicators).flat();
+    const allIndicatorLabels = Array.prototype.concat(
+      ...Object.values(this.props.meta.indicators),
+    );
 
     const usedIndicatorLabels = this.props.indicators
       .map(indicatorName =>
         allIndicatorLabels.find(({ name }) => name === indicatorName),
       )
       .filter(_ => _ !== undefined) as IndicatorsMetaItem[]; // just in case
-
-    const yAxisLabel = 'Absence Rate';
-    const xAxisLabel = 'School Year';
 
     const labels = usedIndicatorLabels.reduce((obj: any, next) => {
       obj[next.name] = next.label;
@@ -50,12 +58,38 @@ export class ChartRenderer extends Component<ChartRendererProps> {
             chartDataKeys={this.props.indicators}
             characteristicsData={characteristicsData}
             labels={labels}
-            xAxisLabel={xAxisLabel}
-            yAxisLabel={yAxisLabel}
+            xAxis={this.props.xAxis}
+            yAxis={this.props.yAxis}
+            height={this.props.height}
+          />
+        );
+      case 'verticalbar':
+        return (
+          <VerticalBarBlock
+            chartDataKeys={this.props.indicators}
+            characteristicsData={characteristicsData}
+            labels={labels}
+            yAxis={this.props.yAxis}
+            xAxis={this.props.xAxis}
+            height={this.props.height}
+          />
+        );
+      case 'horizontalbar':
+        return (
+          <HorizontalBarBlock
+            chartDataKeys={this.props.indicators}
+            characteristicsData={characteristicsData}
+            labels={labels}
+            yAxis={this.props.yAxis}
+            xAxis={this.props.xAxis}
+            height={this.props.height}
+            stacked={this.props.stacked}
           />
         );
       default:
-        return '';
+        return (
+          <div>[ Unimplemented chart type requested ${this.props.type} ]</div>
+        );
     }
   }
 }

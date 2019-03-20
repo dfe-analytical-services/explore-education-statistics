@@ -299,13 +299,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                     {
                                         method = "POST",
                                         path = "/api/tablebuilder/characteristics/national",
-                                        body = "{ \"attributes\": [ \"num_schools\", \"enrolments\", \"sess_overall_percent\", \"sess_unauthorised_percent\", \"sess_authorised_percent\" ], \"characteristics\": [ \"Total\" ], \"endYear\": 201617, \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\", \"schoolTypes\": [ \"Total\" ], \"startYear\": 201213}"
+                                        body = "{ \"indicators\": [ \"num_schools\", \"enrolments\", \"sess_overall_percent\", \"sess_unauthorised_percent\", \"sess_authorised_percent\" ], \"characteristics\": [ \"Total\" ], \"endYear\": 201617, \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\", \"schoolTypes\": [ \"Total\" ], \"startYear\": 201213}"
                                     },
-                                    Charts = new List<Chart>
+                                    Charts = new List<IContentBlockChart>
                                     {
-                                        new Chart 
+                                        new LineChart 
                                         {
-                                            Type = "line",
                                             XAxis = new Axis 
                                             {
                                                 title = "School Year"
@@ -314,7 +313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                             {
                                                 title = "Absence Rate"
                                             },
-                                            Attributes = new List<string> {
+                                            Indicators = new List<string> {
                                                 "sess_overall_percent",
                                                 "sess_unauthorised_percent",
                                                 "sess_authorised_percent"

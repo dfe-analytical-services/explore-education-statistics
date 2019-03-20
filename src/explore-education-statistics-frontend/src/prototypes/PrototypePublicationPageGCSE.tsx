@@ -3,6 +3,16 @@ import Accordion from '../components/Accordion';
 import AccordionSection from '../components/AccordionSection';
 import Details from '../components/Details';
 import Link from '../components/Link';
+import { ChartRenderer } from '../modules/find-statistics/components/ChartRenderer';
+import PrototypeAbsenceData from './components/PrototypeAbsenceData';
+import {
+  ks4AverageHeadlineScoresByPupilEthnicity,
+  ks4PerformanceInMatsComparedToNationalAverage,
+  ks4SchoolAverageHeadlineScoresByPupilCharacteristics,
+  kS4SchoolPerformanceChart,
+  ks4SchoolRevisedAttainmentChart,
+  ks4TrendInDisavdantagePuilsAttainmentGapIndex,
+} from './components/PrototypeDataFactory';
 import PrototypeDataSampleGCSE from './components/PrototypeDataSampleGCSE';
 import PrototypePage from './components/PrototypePage';
 
@@ -240,7 +250,8 @@ const PublicationPage = () => {
           heading="School performance for 2018"
           caption="School performance for 2018 shows small increases across all headline measures compared to 2017"
         >
-          [CHART]
+          <ChartRenderer {...kS4SchoolPerformanceChart} />
+          />
           <p>
             Results for 2018 show an increases across all headline measures
             compared to 2017.{' '}
@@ -312,6 +323,7 @@ const PublicationPage = () => {
               coasting and floor standard by region
             </strong>
           </p>
+          <ChartRenderer {...ks4SchoolRevisedAttainmentChart} />
           [CHART - England, state-funded schools assessed against the floor and
           coasting standards, 2018]
           <p>
@@ -346,6 +358,9 @@ const PublicationPage = () => {
           heading="Pupil characteristics"
           caption="Disadvantaged pupils and those with Special Education Needs continue to do less well than their peers"
         >
+          <ChartRenderer
+            {...ks4SchoolAverageHeadlineScoresByPupilCharacteristics}
+          />
           [CHART - Average headline scores by pupil characteristics ]
           <p>
             Breakdowns by pupil characteristics show that across all headline
@@ -378,12 +393,20 @@ const PublicationPage = () => {
             remained broadly stable, widening by 0.6% in 2018, and narrowing by
             9.5% since 2011.
           </p>
+          <ChartRenderer
+            height={600}
+            {...ks4TrendInDisavdantagePuilsAttainmentGapIndex}
+          />
           [CHART - Trend in the disadvantaged pupils’ attainment gap index ]
         </AccordionSection>
         <AccordionSection
           heading="Headline performance"
           caption="Results across headline performance measures vary by ethnicity"
         >
+          <ChartRenderer
+            height={400}
+            {...ks4AverageHeadlineScoresByPupilEthnicity}
+          />
           [CHART - Average headline scores by pupil ethnicity]
           <p>
             Results across headline measures differ by ethnicity with Chinese
@@ -536,6 +559,10 @@ const PublicationPage = () => {
             increased from 62 in 2017 to 85 in 2018. This is an increase from
             384 to 494 schools, and from 54,356 to 69,169 pupils.{' '}
           </p>
+          <ChartRenderer
+            height={300}
+            {...ks4PerformanceInMatsComparedToNationalAverage}
+          />
           [CHART - Performance in MATs compared to national averages]
           <p>
             On Progress8 measures, in 2018, 32.9% of MATs were below the

@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
         
         public DataQuery DataQuery { get; set; }
 
-        public List<Chart> Charts { get; set; }
+        public List<IContentBlockChart> Charts { get; set; }
 
     }
 }

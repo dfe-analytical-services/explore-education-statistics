@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {
+  AxisDomain,
   CartesianGrid,
   Legend,
   Line,
@@ -9,14 +10,16 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { Axis } from '../../../../services/publicationService';
 import { CharacteristicsData } from '../../../../services/tableBuilderService';
 import { colours, parseCondensedTimePeriodRange, symbols } from './Charts';
 
 interface LineChartBlockProps {
   chartDataKeys: string[];
   characteristicsData: CharacteristicsData;
-  yAxisLabel: string;
-  xAxisLabel: string;
+  height?: number;
+  yAxis: Axis;
+  xAxis: Axis;
   labels: { [name: string]: string };
 }
 
@@ -46,8 +49,8 @@ export class LineChartBlock extends Component<LineChartBlockProps> {
     const {
       characteristicsData,
       chartDataKeys,
-      xAxisLabel,
-      yAxisLabel,
+      xAxis,
+      yAxis,
       labels,
     } = this.props;
 
@@ -63,22 +66,32 @@ export class LineChartBlock extends Component<LineChartBlockProps> {
       );
     });
 
+    let yAxisDomain: any;
+
+    if (yAxis.min !== undefined && yAxis.max !== undefined) {
+      yAxisDomain = [yAxis.min, yAxis.max];
+    }
+
     return (
       <LineChart
         width={900}
-        height={300}
+        height={this.props.height || 300}
         data={chartData}
         margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
       >
         <Tooltip content={CustomToolTip} />
-        <Legend verticalAlign="top" height={36} />
+        {chartDataKeys.length > 1 ? (
+          <Legend verticalAlign="top" height={36} />
+        ) : (
+          ''
+        )}
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
           dataKey="name"
           label={{
             offset: 5,
             position: 'bottom',
-            value: xAxisLabel,
+            value: xAxis.title,
           }}
           padding={{ left: 20, right: 20 }}
           tickMargin={10}
@@ -88,10 +101,11 @@ export class LineChartBlock extends Component<LineChartBlockProps> {
             angle: -90,
             offset: 0,
             position: 'left',
-            value: yAxisLabel,
+            value: yAxis.title,
           }}
           scale="auto"
           unit="%"
+          domain={yAxisDomain}
         />
         {chartDataKeys.map((dataKey: any, index: any) => (
           <Line
