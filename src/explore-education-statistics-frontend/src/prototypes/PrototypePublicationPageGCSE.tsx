@@ -7,6 +7,7 @@ import { ChartRenderer } from '../modules/find-statistics/components/ChartRender
 import PrototypeAbsenceData from './components/PrototypeAbsenceData';
 import {
   ks4AverageHeadlineScoresByPupilEthnicity,
+  ks4PerformanceInMatsComparedToNationalAverage,
   ks4SchoolAverageHeadlineScoresByPupilCharacteristics,
   kS4SchoolPerformanceChart,
   ks4SchoolRevisedAttainmentChart,
@@ -558,6 +559,10 @@ const PublicationPage = () => {
             increased from 62 in 2017 to 85 in 2018. This is an increase from
             384 to 494 schools, and from 54,356 to 69,169 pupils.{' '}
           </p>
+          <ChartRenderer
+            height={300}
+            {...ks4PerformanceInMatsComparedToNationalAverage}
+          />
           [CHART - Performance in MATs compared to national averages]
           <p>
             On Progress8 measures, in 2018, 32.9% of MATs were below the

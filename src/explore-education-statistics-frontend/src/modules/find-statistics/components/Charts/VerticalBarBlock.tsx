@@ -13,7 +13,7 @@ import { Axis } from '../../../../services/publicationService';
 import { CharacteristicsData } from '../../../../services/tableBuilderService';
 import { colours, parseCondensedYearRange, symbols } from './Charts';
 
-interface StackedBarHorizontalProps {
+interface StackedBarVerticalProps {
   characteristicsData: CharacteristicsData;
   chartDataKeys: string[];
   labels: { [key: string]: string };
@@ -22,10 +22,10 @@ interface StackedBarHorizontalProps {
   height?: number;
 }
 
-export class StackedBarHorizontalBlock extends React.Component<
-  StackedBarHorizontalProps
-> {
+export class VerticalBarBlock extends React.Component<StackedBarVerticalProps> {
   public render() {
+    // tslint:disable
+
     const chartData = this.props.characteristicsData.result.map(data => {
       return data.indicators;
     });
@@ -33,23 +33,26 @@ export class StackedBarHorizontalBlock extends React.Component<
     return (
       <BarChart
         width={900}
-        height={this.props.height || 600}
+        height={this.props.height || 300}
         data={chartData}
-        layout="vertical"
-        margin={{ top: 5, right: 30, left: 60, bottom: 25 }}
+        margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
       >
-        <YAxis type="category" dataKey={this.props.yAxis.key || 'name'} />
+        <XAxis
+          dataKey={this.props.xAxis.key || 'name'}
+          interval={0}
+          tick={{ fontSize: 12 }}
+        />
         <CartesianGrid />
-        <XAxis type="number" />
-        <Tooltip cursor={false} />
+        <YAxis />
+        <Tooltip />
         <Legend />
 
         {this.props.chartDataKeys.map((key, index) => (
           <Bar
             key={index}
             dataKey={key}
-            name={this.props.labels[key]}
             fill={colours[index]}
+            name={this.props.labels[key]}
           />
         ))}
       </BarChart>

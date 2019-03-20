@@ -16,8 +16,10 @@ function create(
   schooltype: SchoolType,
   year: number,
   data: (string | number | undefined)[][],
+  stacked: boolean = false,
 ) {
   return {
+    stacked,
     type,
 
     xAxis,
@@ -87,7 +89,7 @@ export const kS4SchoolPerformanceChart = create(
 );
 
 export const ks4SchoolRevisedAttainmentChart = create(
-  'stackedbarvertical',
+  'verticalbar',
   { title: '', key: 'la_name' },
   { title: '' },
   ['la_name', 'floor_standards', 'coasting'],
@@ -108,7 +110,7 @@ export const ks4SchoolRevisedAttainmentChart = create(
 );
 
 export const ks4SchoolAverageHeadlineScoresByPupilCharacteristics = create(
-  'stackedbarhorizontal',
+  'horizontalbar',
   { title: '' },
   { title: '', key: 'name' },
   ['name', 'ebacc_entry', 'eng', 'attainment'],
@@ -148,7 +150,7 @@ export const ks4TrendInDisavdantagePuilsAttainmentGapIndex = create(
 );
 
 export const ks4AverageHeadlineScoresByPupilEthnicity = create(
-  'stackedbarvertical',
+  'verticalbar',
   { title: '', key: 'name' },
   { title: '' },
   ['name', 'attainment', 'eng', 'ebacc_entry'],
@@ -162,4 +164,20 @@ export const ks4AverageHeadlineScoresByPupilEthnicity = create(
     ['Black', 45, 39, 45],
     ['Chinese', 63, 75, 63],
   ],
+);
+
+export const ks4PerformanceInMatsComparedToNationalAverage = create(
+  'horizontalbar',
+  { title: '', key: 'name' },
+  { title: '' },
+  ['name', 'below_Average', 'average', 'above_average'],
+  ['Name', 'Below Average', 'Average', 'Above Average'],
+  SchoolType.Total,
+  201819,
+  [
+    ['Progress8', 40, 25, 35],
+    ['Ebacc APS', 63, 0, 37],
+    ['Ebacc Entries', 57, 0, 43],
+  ],
+  true,
 );

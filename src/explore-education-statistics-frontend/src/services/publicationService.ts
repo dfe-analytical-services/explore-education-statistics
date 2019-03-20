@@ -38,6 +38,7 @@ export interface Chart {
   attributes: string[];
   XAxis?: Axis;
   YAxis?: Axis;
+  stacked?: boolean;
 }
 
 export interface ContentBlock {

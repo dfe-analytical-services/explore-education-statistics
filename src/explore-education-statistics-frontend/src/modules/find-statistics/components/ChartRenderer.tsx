@@ -5,9 +5,9 @@ import {
   IndicatorsMetaItem,
   PublicationMeta,
 } from '../../../services/tableBuilderService';
+import { HorizontalBarBlock } from './Charts/HorizontalBarBlock';
 import { LineChartBlock } from './Charts/LineChartBlock';
-import { StackedBarHorizontalBlock } from './Charts/StackedBarHorizontalBlock';
-import { StackedBarVerticalBlock } from './Charts/StackedBarVerticalBlock';
+import { VerticalBarBlock } from './Charts/VerticalBarBlock';
 
 interface ChartRendererProps {
   type: string;
@@ -20,6 +20,7 @@ interface ChartRendererProps {
   yAxis: Axis;
 
   height?: number;
+  stacked?: boolean;
 }
 
 export class ChartRenderer extends Component<ChartRendererProps> {
@@ -58,9 +59,9 @@ export class ChartRenderer extends Component<ChartRendererProps> {
             height={this.props.height}
           />
         );
-      case 'stackedbarvertical':
+      case 'verticalbar':
         return (
-          <StackedBarVerticalBlock
+          <VerticalBarBlock
             chartDataKeys={this.props.indicators}
             characteristicsData={characteristicsData}
             labels={labels}
@@ -69,15 +70,16 @@ export class ChartRenderer extends Component<ChartRendererProps> {
             height={this.props.height}
           />
         );
-      case 'stackedbarhorizontal':
+      case 'horizontalbar':
         return (
-          <StackedBarHorizontalBlock
+          <HorizontalBarBlock
             chartDataKeys={this.props.indicators}
             characteristicsData={characteristicsData}
             labels={labels}
             yAxis={this.props.yAxis}
             xAxis={this.props.xAxis}
             height={this.props.height}
+            stacked={this.props.stacked}
           />
         );
       default:
