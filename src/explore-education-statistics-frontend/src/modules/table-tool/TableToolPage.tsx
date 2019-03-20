@@ -17,6 +17,39 @@ import PublicationMenu, {
   MenuChangeEventHandler,
 } from './components/PublicationMenu';
 
+const defaultPublicationOptions = [
+  {
+    id: 'early-years-and-schools',
+    name: 'Early years and schools',
+    topics: [
+      {
+        id: 'absence-and-exclusions',
+        name: 'Absence and exclusions',
+        publications: [
+          {
+            id: 'cbbd299f-8297-44bc-92ac-558bcf51f8ad',
+            name: 'Pupil absence',
+          },
+          {
+            id: 'bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9',
+            name: 'Exclusions',
+          },
+        ],
+      },
+      {
+        id: 'school-and-pupil-numbers',
+        name: 'School and pupil numbers',
+        publications: [
+          {
+            id: 'a91d9e05-be82-474c-85ae-4913158406d0',
+            name: 'Schools, pupils and their characteristics',
+          },
+        ],
+      },
+    ],
+  },
+];
+
 interface State {
   filters: {
     characteristics: string[];
@@ -54,40 +87,26 @@ class TableToolPage extends Component<{}, State> {
   private filtersRef = createRef<HTMLDivElement>();
   private dataTableRef = createRef<HTMLElement>();
 
-  private handleMenuChange: MenuChangeEventHandler = async menuOption => {
-    if (!menuOption) {
+  private handleMenuChange: MenuChangeEventHandler = async ({
+    publicationId,
+    publicationName,
+  }) => {
+    if (!publicationId) {
       return;
     }
 
-    const menuOptions = {
-      EXCLUSIONS: {
-        id: 'bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9',
-        label: 'Exclusions',
-      },
-      PUPIL_ABSENCE: {
-        id: 'cbbd299f-8297-44bc-92ac-558bcf51f8ad',
-        label: 'Pupil absence',
-      },
-      SCHOOLS_PUPILS_CHARACTERISTICS: {
-        id: 'a91d9e05-be82-474c-85ae-4913158406d0',
-        label: 'Schools, pupils and their characteristics',
-      },
-    };
-
-    const publication = menuOptions[menuOption];
-
     const publicationMeta = await tableBuilderService.getCharacteristicsMeta(
-      publication.id,
+      publicationId,
     );
 
     this.setState(
       {
+        publicationId,
         publicationMeta,
+        publicationName,
         filters: {
           ...this.defaultFilters,
         },
-        publicationId: publication.id,
-        publicationName: publication.label,
         tableData: [],
       },
       () => {
@@ -146,7 +165,13 @@ class TableToolPage extends Component<{}, State> {
   };
 
   public render() {
-    const { filters, publicationMeta, publicationName, tableData } = this.state;
+    const {
+      filters,
+      publicationMeta,
+      publicationId,
+      publicationName,
+      tableData,
+    } = this.state;
 
     return (
       <Page breadcrumbs={[{ name: 'Explore statistics' }]}>
@@ -170,7 +195,18 @@ class TableToolPage extends Component<{}, State> {
         <section>
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-full">
-              <PublicationMenu onChange={this.handleMenuChange} />
+              <h2>
+                1. Choose a publication
+                <span className="govuk-hint">
+                  Pick a publication below to explore its statistics
+                </span>
+              </h2>
+
+              <PublicationMenu
+                onChange={this.handleMenuChange}
+                options={defaultPublicationOptions}
+                value={publicationId}
+              />
             </div>
           </div>
         </section>
