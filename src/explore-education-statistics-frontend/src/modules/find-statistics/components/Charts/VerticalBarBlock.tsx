@@ -11,7 +11,7 @@ import {
 
 import { Axis } from '../../../../services/publicationService';
 import { CharacteristicsData } from '../../../../services/tableBuilderService';
-import { colours, parseCondensedYearRange, symbols } from './Charts';
+import { colours, parseCondensedTimePeriodRange, symbols } from './Charts';
 
 interface StackedBarVerticalProps {
   characteristicsData: CharacteristicsData;

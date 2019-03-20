@@ -42,7 +42,7 @@ function create(
           {
             indicators: {},
             schoolType: schooltype,
-            year: year + rowIndex * 101,
+            timePeriod: year + rowIndex * 101,
           },
         );
       }),
