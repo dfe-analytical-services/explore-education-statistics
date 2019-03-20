@@ -10,4 +10,5 @@ tags
 *.pyc
 **/test-results/
 tests/robot-tests/webdriver
+tests/robot-tests/.env
 data/
