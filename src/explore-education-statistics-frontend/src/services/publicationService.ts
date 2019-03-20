@@ -28,6 +28,9 @@ export interface DataQuery {
 
 export interface Axis {
   title: string;
+  key?: string;
+  min?: number;
+  max?: number;
 }
 
 export interface Chart {

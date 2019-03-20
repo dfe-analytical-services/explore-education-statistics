@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {
+  AxisDomain,
   CartesianGrid,
   Legend,
   Line,
@@ -16,6 +17,7 @@ import { colours, parseCondensedYearRange, symbols } from './Charts';
 interface LineChartBlockProps {
   chartDataKeys: string[];
   characteristicsData: CharacteristicsData;
+  height?: number;
   yAxis: Axis;
   xAxis: Axis;
   labels: { [name: string]: string };
@@ -64,15 +66,25 @@ export class LineChartBlock extends Component<LineChartBlockProps> {
       );
     });
 
+    let yAxisDomain: any;
+
+    if (yAxis.min !== undefined && yAxis.max !== undefined) {
+      yAxisDomain = [yAxis.min, yAxis.max];
+    }
+
     return (
       <LineChart
         width={900}
-        height={300}
+        height={this.props.height || 300}
         data={chartData}
         margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
       >
         <Tooltip content={CustomToolTip} />
-        <Legend verticalAlign="top" height={36} />
+        {chartDataKeys.length > 1 ? (
+          <Legend verticalAlign="top" height={36} />
+        ) : (
+          ''
+        )}
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
           dataKey="name"
@@ -93,6 +105,7 @@ export class LineChartBlock extends Component<LineChartBlockProps> {
           }}
           scale="auto"
           unit="%"
+          domain={yAxisDomain}
         />
         {chartDataKeys.map((dataKey: any, index: any) => (
           <Line

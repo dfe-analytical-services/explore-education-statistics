@@ -6,8 +6,8 @@ import {
   PublicationMeta,
 } from '../../../services/tableBuilderService';
 import { LineChartBlock } from './Charts/LineChartBlock';
-import { StackedBarVerticalBlock } from './Charts/StackedBarVerticalBlock';
 import { StackedBarHorizontalBlock } from './Charts/StackedBarHorizontalBlock';
+import { StackedBarVerticalBlock } from './Charts/StackedBarVerticalBlock';
 
 interface ChartRendererProps {
   type: string;
@@ -18,6 +18,8 @@ interface ChartRendererProps {
 
   xAxis: Axis;
   yAxis: Axis;
+
+  height?: number;
 }
 
 export class ChartRenderer extends Component<ChartRendererProps> {
@@ -53,12 +55,31 @@ export class ChartRenderer extends Component<ChartRendererProps> {
             labels={labels}
             xAxis={this.props.xAxis}
             yAxis={this.props.yAxis}
+            height={this.props.height}
           />
         );
       case 'stackedbarvertical':
-        return <StackedBarVerticalBlock />;
+        return (
+          <StackedBarVerticalBlock
+            chartDataKeys={this.props.attributes}
+            characteristicsData={characteristicsData}
+            labels={labels}
+            yAxis={this.props.yAxis}
+            xAxis={this.props.xAxis}
+            height={this.props.height}
+          />
+        );
       case 'stackedbarhorizontal':
-        return <StackedBarHorizontalBlock />;
+        return (
+          <StackedBarHorizontalBlock
+            chartDataKeys={this.props.attributes}
+            characteristicsData={characteristicsData}
+            labels={labels}
+            yAxis={this.props.yAxis}
+            xAxis={this.props.xAxis}
+            height={this.props.height}
+          />
+        );
       default:
         return (
           <div>[ Unimplemented chart type requested ${this.props.type} ]</div>

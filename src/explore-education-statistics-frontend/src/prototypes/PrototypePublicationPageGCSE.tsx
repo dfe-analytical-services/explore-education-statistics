@@ -7,9 +7,11 @@ import Link from '../components/Link';
 import { ChartRenderer } from '../modules/find-statistics/components/ChartRenderer';
 import PrototypeAbsenceData from './components/PrototypeAbsenceData';
 import {
+  ks4AverageHeadlineScoresByPupilEthnicity,
   ks4SchoolAverageHeadlineScoresByPupilCharacteristics,
   kS4SchoolPerformanceChart,
   ks4SchoolRevisedAttainmentChart,
+  ks4TrendInDisavdantagePuilsAttainmentGapIndex,
 } from './components/PrototypeDataFactory';
 import PrototypeDataSampleGCSE from './components/PrototypeDataSampleGCSE';
 import PrototypeMap from './components/PrototypeMap';
@@ -393,12 +395,20 @@ const PublicationPage = () => {
             remained broadly stable, widening by 0.6% in 2018, and narrowing by
             9.5% since 2011.
           </p>
+          <ChartRenderer
+            height={600}
+            {...ks4TrendInDisavdantagePuilsAttainmentGapIndex}
+          />
           [CHART - Trend in the disadvantaged pupils’ attainment gap index ]
         </AccordionSection>
         <AccordionSection
           heading="Headline performance"
           caption="Results across headline performance measures vary by ethnicity"
         >
+          <ChartRenderer
+            height={400}
+            {...ks4AverageHeadlineScoresByPupilEthnicity}
+          />
           [CHART - Average headline scores by pupil ethnicity]
           <p>
             Results across headline measures differ by ethnicity with Chinese

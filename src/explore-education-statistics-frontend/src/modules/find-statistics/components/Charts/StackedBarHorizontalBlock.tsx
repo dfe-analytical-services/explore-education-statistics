@@ -9,58 +9,46 @@ import {
   YAxis,
 } from 'recharts';
 
+import { Axis } from '../../../../services/publicationService';
+import { CharacteristicsData } from '../../../../services/tableBuilderService';
 import { colours, parseCondensedYearRange, symbols } from './Charts';
 
 interface StackedBarHorizontalProps {
-  nothing?: string;
+  characteristicsData: CharacteristicsData;
+  chartDataKeys: string[];
+  labels: { [key: string]: string };
+  xAxis: Axis;
+  yAxis: Axis;
+  height?: number;
 }
 
 export class StackedBarHorizontalBlock extends React.Component<
   StackedBarHorizontalProps
 > {
   public render() {
-    // tslint:disable
-    const chartData = [
-      { name: 'SEN', ebacc_entry: 12, eng: 13, attainment: 27 },
-      { name: 'No SEN', ebacc_entry: 12, eng: 13, attainment: 27 },
-
-      { name: '' },
-
-      { name: 'Disadvantage', ebacc_entry: 12, eng: 13, attainment: 27 },
-      { name: 'All other pupils', ebacc_entry: 12, eng: 13, attainment: 27 },
-
-      { name: '' },
-
-      { name: 'Boys', ebacc_entry: 12, eng: 13, attainment: 27 },
-      { name: 'Girls', ebacc_entry: 12, eng: 13, attainment: 27 },
-    ];
-
-    const chartDataKeys = ['ebacc_entry', 'eng', 'attainment'];
-    const chartLabels: any = {
-      ebacc_entry: 'Ebacc Entry',
-      eng: 'Eng & Maths (9-5)',
-      attainment: 'Attainment 8',
-    };
+    const chartData = this.props.characteristicsData.result.map(data => {
+      return data.attributes;
+    });
 
     return (
       <BarChart
         width={900}
-        height={600}
+        height={this.props.height || 600}
         data={chartData}
         layout="vertical"
         margin={{ top: 5, right: 30, left: 60, bottom: 25 }}
       >
-        <YAxis type="category" dataKey="name" />
+        <YAxis type="category" dataKey={this.props.yAxis.key || 'name'} />
         <CartesianGrid />
         <XAxis type="number" />
         <Tooltip cursor={false} />
         <Legend />
 
-        {chartDataKeys.map((key, index) => (
+        {this.props.chartDataKeys.map((key, index) => (
           <Bar
             key={index}
             dataKey={key}
-            name={chartLabels[key]}
+            name={this.props.labels[key]}
             fill={colours[index]}
           />
         ))}
