@@ -577,6 +577,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     Summary = "Statistics on pupils in schools in England as collected in the January 2018 school census.",
                     KeyStatistics = new List<KeyStatistic>
                     {
+                        new KeyStatistic { Title = "Pupils in the school system", Description = " Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."},
+                        new KeyStatistic { Title = "Pupils eligible for and claiming free school meals ", Description = " Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."},
+                        new KeyStatistic { Title = "Proportion of infant pupils in large classes", Description = " Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."}
                     },
                     Content = new List<ContentSection>
                     {
