@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9dab3655-e6fc-4a01-8de4-ab55959d3561",
+		"_postman_id": "2acf5cd7-9462-4a09-97a8-463948b26f9b",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -352,7 +352,7 @@
 						"exec": [
 							"pm.test(\"Fields are present\", function () {",
 							"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"attributes\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
 							"    pm.expect(pm.response.to.have.jsonBody(\"characteristics\"));",
 							"});",
 							"",
@@ -397,7 +397,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"indicators\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -438,7 +438,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"State_Funded_Secondary\",\n        \"Total\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"perm_excl\",\n        \"fixed_excl\",\n        \"fixed_excl_rate\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"State_Funded_Secondary\",\n        \"Total\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"indicators\": [\n        \"perm_excl\",\n        \"fixed_excl\",\n        \"fixed_excl_rate\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -479,7 +479,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"Total\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"Total\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"indicators\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -520,10 +520,10 @@
 							"_postman_isSubFolder": true
 						},
 						{
-							"name": "Region",
+							"name": "Regional",
 							"item": [
 								{
-									"name": "Geographic - Region - Schools, pupils and their characteristics",
+									"name": "Geographic - Regional - Schools, pupils and their characteristics",
 									"event": [
 										{
 											"listen": "test",
@@ -542,13 +542,13 @@
 											{
 												"key": "Content-Type",
 												"name": "Content-Type",
-												"value": "application/json",
-												"type": "text"
+												"type": "text",
+												"value": "application/json"
 											}
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"indicators\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -564,7 +564,7 @@
 									"response": []
 								},
 								{
-									"name": "Geographic - Region - Permanent and fixed period exclusions",
+									"name": "Geographic - Regional - Permanent and fixed period exclusions",
 									"event": [
 										{
 											"listen": "test",
@@ -589,7 +589,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"Total\",\n        \"Special\"\n    ],\n    \"startYear\": 201516,\n    \"endYear\": 201516,\n    \"attributes\": [\n        \"num_schools\",\n        \"perm_excl\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"Total\",\n        \"Special\"\n    ],\n    \"startYear\": 201516,\n    \"endYear\": 201516,\n    \"indicators\": [\n        \"num_schools\",\n        \"perm_excl\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -605,7 +605,7 @@
 									"response": []
 								},
 								{
-									"name": "Geographic - Region - Pupil absence in schools in England",
+									"name": "Geographic - Regional - Pupil absence in schools in England",
 									"event": [
 										{
 											"listen": "test",
@@ -630,7 +630,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Total\"\n    ],\n    \"startYear\": 200607,\n    \"endYear\": 201011,\n    \"attributes\": [\n        \"num_schools\",\n        \"enrolments\",\n        \"sess_overall_totalreasons\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Total\"\n    ],\n    \"startYear\": 200607,\n    \"endYear\": 201011,\n    \"indicators\": [\n        \"num_schools\",\n        \"enrolments\",\n        \"sess_overall_totalreasons\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -646,7 +646,7 @@
 									"response": []
 								},
 								{
-									"name": "Geographic - Region - North East, Inner London - Schools, pupils and their characteristics",
+									"name": "Geographic - Regional - North East, Inner London - Schools, pupils and their characteristics",
 									"event": [
 										{
 											"listen": "test",
@@ -671,7 +671,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"regions\": [\n    \t\"E12000001\",\n    \t\"E13000001\"\n    ],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201617,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"num_schools\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"regions\": [\n    \t\"E12000001\",\n    \t\"E13000001\"\n    ],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201617,\n    \"endYear\": 201617,\n    \"indicators\": [\n        \"num_schools\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -687,7 +687,7 @@
 									"response": []
 								},
 								{
-									"name": "Geographic - Region - South East - Permanent and fixed period exclusions",
+									"name": "Geographic - Regional - South East - Permanent and fixed period exclusions",
 									"event": [
 										{
 											"listen": "test",
@@ -712,7 +712,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"regions\": [\n    \t\"E12000008\",\n    \t\"E12000009\"\n    ],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201112,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"regions\": [\n    \t\"E12000008\",\n    \t\"E12000009\"\n    ],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201112,\n    \"endYear\": 201415,\n    \"indicators\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -728,7 +728,7 @@
 									"response": []
 								},
 								{
-									"name": "Geographic - Region - North West, East of England, Outer London - Pupil absence in schools in England",
+									"name": "Geographic - Regional - North West, East of England, Outer London - Pupil absence in schools in England",
 									"event": [
 										{
 											"listen": "test",
@@ -753,7 +753,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"regions\": [\n    \t\"E12000002\",\n    \t\"E12000006\",\n    \t\"E13000002\"\n    ],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"State_Funded_Secondary\",\n        \"Special\"\n    ],\n    \"startYear\": 200910,\n    \"endYear\": 200910,\n    \"attributes\": [\n        \"num_schools\",\n        \"enrolments\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"regions\": [\n    \t\"E12000002\",\n    \t\"E12000006\",\n    \t\"E13000002\"\n    ],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"State_Funded_Secondary\",\n        \"Special\"\n    ],\n    \"startYear\": 200910,\n    \"endYear\": 200910,\n    \"indicators\": [\n        \"num_schools\",\n        \"enrolments\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -776,7 +776,7 @@
 										"id": "e5de5613-b458-4263-a7c2-7c810440c68a",
 										"type": "text/javascript",
 										"exec": [
-											"pm.environment.set(\"request_level\", \"Region\");"
+											"pm.environment.set(\"request_level\", \"Regional\");"
 										]
 									}
 								},
@@ -822,7 +822,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"Special\"\n    ],\n    \"startYear\": 201213,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"Special\"\n    ],\n    \"startYear\": 201213,\n    \"endYear\": 201415,\n    \"indicators\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -863,7 +863,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Total\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Total\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"indicators\": [\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -904,7 +904,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"Total\"\n    ],\n    \"startYear\": 200708,\n    \"endYear\": 200708,\n    \"attributes\": [\n        \"sess_overall\",\n        \"sess_possible\",\n        \"sess_authorised\",\n        \"sess_unauthorised\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schoolTypes\": [\n        \"Total\"\n    ],\n    \"startYear\": 200708,\n    \"endYear\": 200708,\n    \"indicators\": [\n        \"sess_overall\",\n        \"sess_possible\",\n        \"sess_authorised\",\n        \"sess_unauthorised\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -945,7 +945,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"Special\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"indicators\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -986,7 +986,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"localAuthorities\": [\n    \t\"E06000006\",\n    \t\"E09000032\"\n    ],\n    \"schoolTypes\": [\n        \"Total\",\n        \"Special\"\n    ],\n    \"startYear\": 201213,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"perm_excl_rate\",\n        \"fixed_excl_rate\",\n        \"one_plus_fixed_rate\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"localAuthorities\": [\n    \t\"E06000006\",\n    \t\"E09000032\"\n    ],\n    \"schoolTypes\": [\n        \"Total\",\n        \"Special\"\n    ],\n    \"startYear\": 201213,\n    \"endYear\": 201415,\n    \"indicators\": [\n        \"perm_excl_rate\",\n        \"fixed_excl_rate\",\n        \"one_plus_fixed_rate\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -1027,7 +1027,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"State_Funded_Secondary\"\n    ],\n    \"startYear\": 201112,\n    \"endYear\": 201112,\n    \"attributes\": [\n        \"num_schools\",\n        \"enrolments\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\",\n        \"State_Funded_Secondary\"\n    ],\n    \"startYear\": 201112,\n    \"endYear\": 201112,\n    \"indicators\": [\n        \"num_schools\",\n        \"enrolments\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -1096,7 +1096,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"schools\": [\"2022000\"],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"level\": \"{{request_level}}\",\n    \"schools\": [\"2022000\"],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"indicators\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -1137,7 +1137,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schools\": [\n    \t\"2022000\",\n    \t\"2022001\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"attributes\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"level\": \"{{request_level}}\",\n    \"schools\": [\n    \t\"2022000\",\n    \t\"2022001\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201415,\n    \"indicators\": [\n        \"num_schools\",\n        \"headcount\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -1178,7 +1178,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schools\": [\n    \t\"2013614\",\n    \t\"2022000\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"num_schools\",\n        \"enrolments\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"level\": \"{{request_level}}\",\n    \"schools\": [\n    \t\"2013614\",\n    \t\"2022000\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"indicators\": [\n        \"num_schools\",\n        \"enrolments\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/geographic",
@@ -1275,7 +1275,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"indicators\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
@@ -1317,7 +1317,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"schoolTypes\": [\n        \"Total\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"perm_excl\",\n        \"fixed_excl\"\n    ],\n    \"characteristics\": [\n        \"Age_5\",\n        \"Age_6\",\n        \"Age_7\",\n        \"Age_8\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"schoolTypes\": [\n        \"Total\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"indicators\": [\n        \"perm_excl\",\n        \"fixed_excl\"\n    ],\n    \"characteristics\": [\n        \"Age_5\",\n        \"Age_6\",\n        \"Age_7\",\n        \"Age_8\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
@@ -1359,7 +1359,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"schoolTypes\": [\n        \"State_Funded_Secondary\"\n    ],\n    \"startYear\": 201314,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"headcount\"\n    ],\n    \"characteristics\": [\n        \"FSM_Eligible\",\n        \"FSM_NotEligible\",\n        \"FSM_Unclassified\"\n    ]\n}"
+											"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"schoolTypes\": [\n        \"State_Funded_Secondary\"\n    ],\n    \"startYear\": 201314,\n    \"endYear\": 201617,\n    \"indicators\": [\n        \"headcount\"\n    ],\n    \"characteristics\": [\n        \"FSM_Eligible\",\n        \"FSM_NotEligible\",\n        \"FSM_Unclassified\"\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
@@ -1433,7 +1433,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"schoolTypes\": [\n        \"State_Funded_Secondary\"\n    ],\n    \"startYear\": 201617,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\",\n        \"Total\"\n    ]\n}"
+													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"schoolTypes\": [\n        \"State_Funded_Secondary\"\n    ],\n    \"startYear\": 201617,\n    \"endYear\": 201617,\n    \"indicators\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\",\n        \"Total\"\n    ]\n}"
 												},
 												"url": {
 													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
@@ -1475,7 +1475,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"schoolTypes\": [\n        \"Total\",\n        \"Special\"\n    ],\n    \"startYear\": 201617,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"headcount\"\n    ],\n    \"characteristics\": [\n        \"Age_4_and_under\",\n        \"Age_5\",\n        \"Age_6\",\n        \"Age_7\"\n    ]\n}"
+													"raw": "{\n    \"publicationId\": \"a91d9e05-be82-474c-85ae-4913158406d0\",\n    \"schoolTypes\": [\n        \"Total\",\n        \"Special\"\n    ],\n    \"startYear\": 201617,\n    \"endYear\": 201617,\n    \"indicators\": [\n        \"headcount\"\n    ],\n    \"characteristics\": [\n        \"Age_4_and_under\",\n        \"Age_5\",\n        \"Age_6\",\n        \"Age_7\"\n    ]\n}"
 												},
 												"url": {
 													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
@@ -1517,7 +1517,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201516,\n    \"attributes\": [\n        \"perm_excl\",\n        \"fixed_excl\"\n    ],\n    \"characteristics\": [\n        \"NC_Year_2\",\n        \"NC_Year_3\"\n    ]\n}"
+													"raw": "{\n    \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\",\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201516,\n    \"indicators\": [\n        \"perm_excl\",\n        \"fixed_excl\"\n    ],\n    \"characteristics\": [\n        \"NC_Year_2\",\n        \"NC_Year_3\"\n    ]\n}"
 												},
 												"url": {
 													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
@@ -1537,10 +1537,10 @@
 									"_postman_isSubFolder": true
 								},
 								{
-									"name": "Region",
+									"name": "Regional",
 									"item": [
 										{
-											"name": "Characteristics - LA - North East - Pupil absence in schools in England Copy",
+											"name": "Characteristics - Regional - North East - Pupil absence in schools in England",
 											"event": [
 												{
 													"listen": "test",
@@ -1565,7 +1565,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"regions\": [\"E12000001\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201516,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"NC_Year_2\",\n        \"NC_Year_3\",\n        \"NC_Year_4\"\n    ]\n}"
+													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"regions\": [\"E12000001\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201516,\n    \"indicators\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"NC_Year_2\",\n        \"NC_Year_3\",\n        \"NC_Year_4\"\n    ]\n}"
 												},
 												"url": {
 													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
@@ -1582,7 +1582,7 @@
 											"response": []
 										},
 										{
-											"name": "Characteristics - LA - North East - Schools, pupils and their characteristics",
+											"name": "Characteristics - Regional - North East - Schools, pupils and their characteristics",
 											"event": [
 												{
 													"listen": "test",
@@ -1607,7 +1607,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"regions\": [\"E12000001\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"regions\": [\"E12000001\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"indicators\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
 												},
 												"url": {
 													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
@@ -1624,7 +1624,7 @@
 											"response": []
 										},
 										{
-											"name": "Characteristics - LA - North East - Permanent and fixed period exclusions",
+											"name": "Characteristics - Regional - North East - Permanent and fixed period exclusions",
 											"event": [
 												{
 													"listen": "test",
@@ -1649,7 +1649,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"regions\": [\"E12000001\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"regions\": [\"E12000001\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"indicators\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
 												},
 												"url": {
 													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
@@ -1697,7 +1697,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"indicators\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
 												},
 												"url": {
 													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
@@ -1739,7 +1739,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"indicators\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
 												},
 												"url": {
 													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",
@@ -1781,7 +1781,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"attributes\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
+													"raw": "{\n    \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\",\n    \"localAuthorities\": [\"E09000032\"],\n    \"schoolTypes\": [\n        \"State_Funded_Primary\"\n    ],\n    \"startYear\": 201415,\n    \"endYear\": 201617,\n    \"indicators\": [\n        \"sess_overall_percent\",\n        \"sess_authorised_percent\",\n        \"sess_unauthorised_percent\"\n    ],\n    \"characteristics\": [\n        \"Gender_male\",\n        \"Gender_female\"\n    ]\n}"
 												},
 												"url": {
 													"raw": "{{data_api_url}}/tablebuilder/characteristics/{{request_level}}",

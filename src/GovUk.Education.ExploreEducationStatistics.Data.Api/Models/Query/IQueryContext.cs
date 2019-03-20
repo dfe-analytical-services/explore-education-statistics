@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
     public interface IQueryContext<TEntity> where TEntity : class
     {
         Guid PublicationId { get; set; }
-        ICollection<string> Attributes { get; set; }
+        ICollection<string> Indicators { get; set; }
         Expression<Func<TEntity, bool>> FindExpression(long releaseId);
     }
 }

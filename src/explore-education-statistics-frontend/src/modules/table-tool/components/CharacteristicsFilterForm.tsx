@@ -24,8 +24,8 @@ import SchoolType from 'src/services/types/SchoolType';
 import SearchableFilterMenus from './SearchableFilterMenus';
 
 interface FormValues {
-  attributes: string[];
   characteristics: string[];
+  indicators: string[];
   endYear: number;
   schoolTypes: SchoolType[];
   startYear: number;
@@ -36,7 +36,7 @@ export type CharacteristicsFilterFormSubmitHandler = (
 ) => void;
 
 interface Props {
-  publicationMeta: Pick<PublicationMeta, 'attributes' | 'characteristics'>;
+  publicationMeta: Pick<PublicationMeta, 'characteristics' | 'indicators'>;
   onSubmit: CharacteristicsFilterFormSubmitHandler;
 }
 
@@ -127,14 +127,13 @@ class CharacteristicsFilterForm extends Component<Props, State> {
     return (
       <Formik
         initialValues={{
-          attributes: [],
           characteristics: [],
           endYear: 2016,
+          indicators: [],
           schoolTypes: [],
           startYear: 2012,
         }}
         validationSchema={Yup.object({
-          attributes: Yup.array().required('Select at least one option'),
           characteristics: Yup.array().required('Select at least one option'),
           endYear: Yup.number()
             .required('End year is required')
@@ -143,6 +142,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
               Yup.ref('startYear'),
               'Must be after or same as start year',
             ),
+          indicators: Yup.array().required('Select at least one option'),
           schoolTypes: Yup.array().required('Select at least one option'),
           startYear: Yup.number()
             .required('Start year is required')
@@ -236,16 +236,16 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                   </div>
                   <div className="govuk-grid-column-one-half govuk-form-group">
                     <FormFieldSet
-                      id="filter-attributes"
-                      legend="Attributes"
-                      hint="Filter by at least one statistical attribute from the publication"
-                      error={getError('attributes')}
+                      id="filter-indicators"
+                      legend="Indicators"
+                      hint="Filter by at least one statistical indicator from the publication"
+                      error={getError('indicators')}
                     >
                       <SearchableFilterMenus<FormValues>
-                        menuOptions={this.props.publicationMeta.attributes}
-                        name="attributes"
+                        menuOptions={this.props.publicationMeta.indicators}
+                        name="indicators"
                         searchTerm={this.state.searchTerm}
-                        values={values.attributes}
+                        values={values.indicators}
                       />
                     </FormFieldSet>
                   </div>
@@ -271,7 +271,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
 
                   <FormTextInput
                     id="characteristic-search"
-                    label="Search for an attribute or characteristic"
+                    label="Search for an inidicator or characteristic"
                     name="characteristicSearch"
                     onChange={event => {
                       event.persist();

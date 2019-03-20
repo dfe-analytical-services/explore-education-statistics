@@ -71,14 +71,14 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
                 });
 
             releaseService
-                .Setup(s => s.GetAttributeMetas(new Guid("8fe9c479-1ab5-4894-81cd-9f87882e20ed"),
-                    typeof(GeographicData))).Returns(new Dictionary<string, List<AttributeMetaViewModel>>
+                .Setup(s => s.GetIndicatorMetas(new Guid("8fe9c479-1ab5-4894-81cd-9f87882e20ed"),
+                    typeof(GeographicData))).Returns(new Dictionary<string, List<IndicatorMetaViewModel>>
                 {
                     {
                         "Exclusion fields",
-                        new List<AttributeMetaViewModel>
+                        new List<IndicatorMetaViewModel>
                         {
-                            new AttributeMetaViewModel {Name = "num_schools", Label = "Number of schools"}
+                            new IndicatorMetaViewModel {Name = "num_schools", Label = "Number of schools"}
                         }
                     }
                 });

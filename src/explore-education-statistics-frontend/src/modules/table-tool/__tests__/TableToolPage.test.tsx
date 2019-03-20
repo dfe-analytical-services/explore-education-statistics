@@ -25,8 +25,8 @@ describe('TableToolPage', () => {
   test('clicking a publication option reveals the filter form with the correct section title', async () => {
     tableBuilderService.getCharacteristicsMeta.mockImplementation(() =>
       Promise.resolve<PublicationMeta>({
-        attributes: {},
         characteristics: {},
+        indicators: {},
         publicationId: 'cbbd299f-8297-44bc-92ac-558bcf51f8ad',
       }),
     );
@@ -46,28 +46,6 @@ describe('TableToolPage', () => {
     beforeEach(() => {
       tableBuilderService.getCharacteristicsMeta.mockImplementation(() =>
         Promise.resolve<PublicationMeta>({
-          attributes: {
-            'Absence by reason': [
-              {
-                label: 'Number of authorised holidays sessions',
-                name: 'sess_auth_holiday',
-              },
-              {
-                label: 'Number of excluded sessions',
-                name: 'sess_auth_excluded',
-              },
-            ],
-            'Absence fields': [
-              {
-                label: 'Authorised absence rate',
-                name: 'sess_authorised_percent',
-              },
-              {
-                label: 'Unauthorised absence rate',
-                name: 'sess_unauthorised_percent',
-              },
-            ],
-          },
           characteristics: {
             'Ethnic group major': [
               {
@@ -90,25 +68,47 @@ describe('TableToolPage', () => {
               },
             ],
           },
+          indicators: {
+            'Absence by reason': [
+              {
+                label: 'Number of authorised holidays sessions',
+                name: 'sess_auth_holiday',
+              },
+              {
+                label: 'Number of excluded sessions',
+                name: 'sess_auth_excluded',
+              },
+            ],
+            'Absence fields': [
+              {
+                label: 'Authorised absence rate',
+                name: 'sess_authorised_percent',
+              },
+              {
+                label: 'Unauthorised absence rate',
+                name: 'sess_unauthorised_percent',
+              },
+            ],
+          },
           publicationId: 'cbbd299f-8297-44bc-92ac-558bcf51f8ad',
         }),
       );
     });
 
-    test('renders groups of checkboxes in Attributes field set', async () => {
+    test('renders groups of checkboxes in Indicators field set', async () => {
       const page = render(<TableToolPage />);
 
       fireEvent.click(page.getByLabelText('Pupil absence'));
 
       await wait();
 
-      const attributesFieldSet = within(page.container.querySelector(
-        'fieldset#filter-attributes',
+      const indicatorsFieldSet = within(page.container.querySelector(
+        'fieldset#filter-indicators',
       ) as HTMLFieldSetElement);
 
-      expect(attributesFieldSet.getByText('Attributes')).toBeDefined();
+      expect(indicatorsFieldSet.getByText('Indicators')).toBeDefined();
 
-      const checkboxGroups = attributesFieldSet.getAllByRole('group');
+      const checkboxGroups = indicatorsFieldSet.getAllByRole('group');
 
       const group1 = within(checkboxGroups[0]);
 
@@ -144,13 +144,13 @@ describe('TableToolPage', () => {
 
       await wait();
 
-      const attributesFieldSet = within(page.container.querySelector(
+      const charactersticsFieldSet = within(page.container.querySelector(
         'fieldset#filter-characteristics',
       ) as HTMLFieldSetElement);
 
-      expect(attributesFieldSet.getByText('Characteristics')).toBeDefined();
+      expect(charactersticsFieldSet.getByText('Characteristics')).toBeDefined();
 
-      const checkboxGroups = attributesFieldSet.getAllByRole('group');
+      const checkboxGroups = charactersticsFieldSet.getAllByRole('group');
 
       const group1 = within(checkboxGroups[0]);
 

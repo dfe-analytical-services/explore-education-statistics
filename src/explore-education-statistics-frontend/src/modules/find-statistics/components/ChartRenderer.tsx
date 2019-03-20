@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Axis } from '../../../services/publicationService';
 import {
-  AttributesMetaItem,
   CharacteristicsData,
+  IndicatorsMetaItem,
   PublicationMeta,
 } from '../../../services/tableBuilderService';
 import { LineChartBlock } from './Charts/LineChartBlock';
@@ -11,7 +11,7 @@ import { StackedBarVerticalBlock } from './Charts/StackedBarVerticalBlock';
 
 interface ChartRendererProps {
   type: string;
-  attributes: string[];
+  indicators: string[];
 
   data: any;
   meta: PublicationMeta;
@@ -24,17 +24,17 @@ interface ChartRendererProps {
 
 export class ChartRenderer extends Component<ChartRendererProps> {
   public render() {
-    const allAttributeLabels = Array.prototype.concat(
-      ...Object.values(this.props.meta.attributes),
+    const allIndicatorLabels = Array.prototype.concat(
+      ...Object.values(this.props.meta.indicators),
     );
 
-    const usedAttributeLabels = this.props.attributes
-      .map(attributeName =>
-        allAttributeLabels.find(({ name }) => name === attributeName),
+    const usedIndicatorLabels = this.props.indicators
+      .map(indicatorName =>
+        allIndicatorLabels.find(({ name }) => name === indicatorName),
       )
-      .filter(_ => _ !== undefined) as AttributesMetaItem[]; // just in case
+      .filter(_ => _ !== undefined) as IndicatorsMetaItem[]; // just in case
 
-    const labels = usedAttributeLabels.reduce((obj: any, next) => {
+    const labels = usedIndicatorLabels.reduce((obj: any, next) => {
       obj[next.name] = next.label;
       return obj;
     }, {});
@@ -50,7 +50,7 @@ export class ChartRenderer extends Component<ChartRendererProps> {
       case 'line':
         return (
           <LineChartBlock
-            chartDataKeys={this.props.attributes}
+            chartDataKeys={this.props.indicators}
             characteristicsData={characteristicsData}
             labels={labels}
             xAxis={this.props.xAxis}
@@ -61,7 +61,7 @@ export class ChartRenderer extends Component<ChartRendererProps> {
       case 'stackedbarvertical':
         return (
           <StackedBarVerticalBlock
-            chartDataKeys={this.props.attributes}
+            chartDataKeys={this.props.indicators}
             characteristicsData={characteristicsData}
             labels={labels}
             yAxis={this.props.yAxis}
@@ -72,7 +72,7 @@ export class ChartRenderer extends Component<ChartRendererProps> {
       case 'stackedbarhorizontal':
         return (
           <StackedBarHorizontalBlock
-            chartDataKeys={this.props.attributes}
+            chartDataKeys={this.props.indicators}
             characteristicsData={characteristicsData}
             labels={labels}
             yAxis={this.props.yAxis}

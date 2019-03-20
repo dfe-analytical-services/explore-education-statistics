@@ -29,7 +29,7 @@ export class StackedBarVerticalBlock extends React.Component<
     // tslint:disable
 
     const chartData = this.props.characteristicsData.result.map(data => {
-      return data.attributes;
+      return data.indicators;
     });
 
     return (

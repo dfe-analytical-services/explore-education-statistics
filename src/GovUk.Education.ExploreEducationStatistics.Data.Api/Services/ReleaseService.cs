@@ -27,20 +27,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return TopWithPredicate(data => data.Id, data => data.PublicationId == publicationId);
         }
 
-        public Dictionary<string, List<AttributeMetaViewModel>> GetAttributeMetas(Guid publicationId, Type type)
+        public Dictionary<string, List<IndicatorMetaViewModel>> GetIndicatorMetas(Guid publicationId, Type type)
         {
             var releaseId = GetLatestRelease(publicationId);
 
             var release = DbSet().Where(r => r.Id == releaseId)
-                .Include(r => r.ReleaseAttributeMetas)
-                .ThenInclude(meta => meta.AttributeMeta).First();
+                .Include(r => r.ReleaseIndicatorMetas)
+                .ThenInclude(meta => meta.IndicatorMeta).First();
 
-            return release.ReleaseAttributeMetas
+            return release.ReleaseIndicatorMetas
                 .Where(meta => meta.DataType == type.Name)
                 .GroupBy(meta => meta.Group)
                 .ToDictionary(
                     metas => metas.Key,
-                    metas => metas.Select(meta => meta.AttributeMeta).Select(ToAttributeMetaViewModel).ToList());
+                    metas => metas.Select(meta => meta.IndicatorMeta).Select(ToIndicatorMetaViewModel).ToList());
         }
 
         public Dictionary<string, List<NameLabelViewModel>> GetCharacteristicMetas(Guid publicationId, Type type)
@@ -60,9 +60,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     metas => metas.Select(ToNameLabelViewModel).ToList());
         }
 
-        private AttributeMetaViewModel ToAttributeMetaViewModel(AttributeMeta attributeMeta)
+        private IndicatorMetaViewModel ToIndicatorMetaViewModel(IndicatorMeta indicatorMeta)
         {
-            return _mapper.Map<AttributeMetaViewModel>(attributeMeta);
+            return _mapper.Map<IndicatorMetaViewModel>(indicatorMeta);
         }
 
         private NameLabelViewModel ToNameLabelViewModel(CharacteristicMeta characteristicMeta)

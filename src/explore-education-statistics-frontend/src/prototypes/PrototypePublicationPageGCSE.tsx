@@ -2,7 +2,6 @@ import React from 'react';
 import Accordion from '../components/Accordion';
 import AccordionSection from '../components/AccordionSection';
 import Details from '../components/Details';
-import GoToTopLink from '../components/GoToTopLink';
 import Link from '../components/Link';
 import { ChartRenderer } from '../modules/find-statistics/components/ChartRenderer';
 import PrototypeAbsenceData from './components/PrototypeAbsenceData';
@@ -14,9 +13,7 @@ import {
   ks4TrendInDisavdantagePuilsAttainmentGapIndex,
 } from './components/PrototypeDataFactory';
 import PrototypeDataSampleGCSE from './components/PrototypeDataSampleGCSE';
-import PrototypeMap from './components/PrototypeMap';
 import PrototypePage from './components/PrototypePage';
-import PrototypeTableSampleGCSE from './components/PrototypeTableSampleGCSE';
 
 const PublicationPage = () => {
   return (
@@ -671,7 +668,7 @@ const PublicationPage = () => {
         download as excel or .csv files . The data can also be accessed via an
         API. <a href="#">What is an API?</a>
       </p>
-      <Link to="/prototypes/data-table-v3" className="govuk-button">
+      <Link to="/table-tool" className="govuk-button">
         Create charts and tables
       </Link>
       <div className="govuk-!-margin-top-9">

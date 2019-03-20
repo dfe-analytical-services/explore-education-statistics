@@ -23,9 +23,6 @@ function create(
     xAxis,
     yAxis,
 
-    attributes: attributes.filter(
-      name => name !== xAxis.key && name !== yAxis.key,
-    ),
     data: {
       publicationId: '',
       releaseDate: '',
@@ -37,11 +34,11 @@ function create(
             next: string | number | undefined,
             index,
           ) => {
-            if (next) result.attributes[attributes[index]] = `${next}`;
+            if (next) result.indicators[attributes[index]] = `${next}`;
             return result;
           },
           {
-            attributes: {},
+            indicators: {},
             schoolType: schooltype,
             year: year + rowIndex * 101,
           },
@@ -49,8 +46,12 @@ function create(
       }),
     } as CharacteristicsData,
 
+    indicators: attributes.filter(
+      name => name !== xAxis.key && name !== yAxis.key,
+    ),
+
     meta: {
-      attributes: {
+      indicators: {
         Test: attributes.map((key: string, index: number) => ({
           label: labels[index],
           name: key,

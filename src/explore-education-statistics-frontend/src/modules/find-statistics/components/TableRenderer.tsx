@@ -10,10 +10,10 @@ export class TableRenderer extends Component<TableRendererProps> {
   public render() {
     const results: any[] = this.props.data.result;
 
-    const attributes: string[] = Object.keys(results[0].attributes);
     const characteristics: string[] = Array.from(
       new Set(results.map(result => result.characteristic.name)),
     );
+    const indicators: string[] = Object.keys(results[0].indicators);
 
     const years = results.map(result => result.year).sort();
 
@@ -24,10 +24,10 @@ export class TableRenderer extends Component<TableRendererProps> {
 
     return (
       <CharacteristicsDataTable
-        attributes={attributes}
-        attributesMeta={publicationMeta.attributes}
         characteristics={characteristics}
         characteristicsMeta={publicationMeta.characteristics}
+        indicators={indicators}
+        indicatorsMeta={publicationMeta.indicators}
         results={results}
         schoolTypes={schoolTypes}
         years={years}

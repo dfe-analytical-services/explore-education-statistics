@@ -10,11 +10,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
         Guid PublicationId { get; set; }
         Release Release { get; set; }
         long ReleaseId { get; set; }
-        string Term { get; set; }
-        int Year { get; set; }
+        int TimePeriod { get; set; }
+        string TimeIdentifier { get; set; }
         Level Level { get; set; }
         Country Country { get; set; }
         SchoolType SchoolType { get; set; }
-        Dictionary<string, string> Attributes { get; set; }
+        Dictionary<string, string> Indicators { get; set; }
     }
 }

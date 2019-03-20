@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
             Database.SetCommandTimeout(int.MaxValue);
         }
 
-        public DbSet<AttributeMeta> AttributeMeta { get; set; }
+        public DbSet<IndicatorMeta> IndicatorMeta { get; set; }
         public DbSet<CharacteristicMeta> CharacteristicMeta { get; set; }
         public DbSet<Release> Release { get; set; }
         public DbSet<GeographicData> GeographicData { get; set; }
@@ -25,15 +25,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ConfigureUnit(modelBuilder);
-            ConfigureReleaseAttributeMeta(modelBuilder);
+            ConfigureReleaseIndicatorMeta(modelBuilder);
             ConfigureReleaseCharacteristicMeta(modelBuilder);
             ConfigurePublication(modelBuilder);
             ConfigureRelease(modelBuilder);
-            ConfigureYear(modelBuilder);
+            ConfigureTimePeriod(modelBuilder);
             ConfigureLevel(modelBuilder);
             ConfigureSchoolType(modelBuilder);
             ConfigureSchool(modelBuilder);
-            ConfigureAttributes(modelBuilder);
+            ConfigureIndicators(modelBuilder);
             ConfigureCountry(modelBuilder);
             ConfigureLocalAuthority(modelBuilder);
             ConfigureRegion(modelBuilder);
@@ -44,31 +44,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
         {
             var unitConverter = new EnumToStringConverter<Unit>();
 
-            modelBuilder.Entity<AttributeMeta>()
+            modelBuilder.Entity<IndicatorMeta>()
                 .Property(data => data.Unit)
                 .HasConversion(unitConverter);
         }
 
-        private static void ConfigureReleaseAttributeMeta(ModelBuilder modelBuilder)
+        private static void ConfigureReleaseIndicatorMeta(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ReleaseAttributeMeta>()
-                .HasKey(releaseAttributeMeta =>
+            modelBuilder.Entity<ReleaseIndicatorMeta>()
+                .HasKey(releaseIndicatorMeta =>
                     new
                     {
-                        releaseAttributeMeta.ReleaseId,
-                        releaseAttributeMeta.AttributeMetaId,
-                        releaseAttributeMeta.DataType
+                        releaseIndicatorMeta.ReleaseId,
+                        releaseIndicatorMeta.IndicatorMetaId,
+                        releaseIndicatorMeta.DataType
                     });
 
-            modelBuilder.Entity<ReleaseAttributeMeta>()
-                .HasOne(releaseAttributeMeta => releaseAttributeMeta.AttributeMeta)
-                .WithMany(attributeMeta => attributeMeta.ReleaseAttributeMetas)
-                .HasForeignKey(releaseAttributeMeta => releaseAttributeMeta.AttributeMetaId);
+            modelBuilder.Entity<ReleaseIndicatorMeta>()
+                .HasOne(releaseIndicatorMeta => releaseIndicatorMeta.IndicatorMeta)
+                .WithMany(indicatorMeta => indicatorMeta.ReleaseIndicatorMetas)
+                .HasForeignKey(releaseIndicatorMeta => releaseIndicatorMeta.IndicatorMetaId);
 
-            modelBuilder.Entity<ReleaseAttributeMeta>()
-                .HasOne(releaseAttributeMeta => releaseAttributeMeta.Release)
-                .WithMany(release => release.ReleaseAttributeMetas)
-                .HasForeignKey(releaseAttributeMeta => releaseAttributeMeta.ReleaseId);
+            modelBuilder.Entity<ReleaseIndicatorMeta>()
+                .HasOne(releaseIndicatorMeta => releaseIndicatorMeta.Release)
+                .WithMany(release => release.ReleaseIndicatorMetas)
+                .HasForeignKey(releaseIndicatorMeta => releaseIndicatorMeta.ReleaseId);
         }
 
         private static void ConfigureReleaseCharacteristicMeta(ModelBuilder modelBuilder)
@@ -120,16 +120,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
                 .HasIndex(data => data.ReleaseId);
         }
 
-        private static void ConfigureYear(ModelBuilder modelBuilder)
+        private static void ConfigureTimePeriod(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GeographicData>()
-                .HasIndex(data => data.Year);
+                .HasIndex(data => data.TimePeriod);
 
             modelBuilder.Entity<CharacteristicDataNational>()
-                .HasIndex(data => data.Year);
+                .HasIndex(data => data.TimePeriod);
 
             modelBuilder.Entity<CharacteristicDataLa>()
-                .HasIndex(data => data.Year);
+                .HasIndex(data => data.TimePeriod);
         }
 
         private static void ConfigureLevel(ModelBuilder modelBuilder)
@@ -195,27 +195,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
             modelBuilder.Entity<GeographicData>()
                 .Property(data => data.SchoolLaEstab)
                 .HasComputedColumnSql("JSON_VALUE(School, '$.laestab')");
-                
+
             modelBuilder.Entity<GeographicData>()
                 .HasIndex(data => data.SchoolLaEstab);
         }
 
-        private static void ConfigureAttributes(ModelBuilder modelBuilder)
+        private static void ConfigureIndicators(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GeographicData>()
-                .Property(data => data.Attributes)
+                .Property(data => data.Indicators)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<Dictionary<string, string>>(v));
 
             modelBuilder.Entity<CharacteristicDataNational>()
-                .Property(data => data.Attributes)
+                .Property(data => data.Indicators)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<Dictionary<string, string>>(v));
 
             modelBuilder.Entity<CharacteristicDataLa>()
-                .Property(data => data.Attributes)
+                .Property(data => data.Indicators)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<Dictionary<string, string>>(v));
@@ -253,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
             modelBuilder.Entity<GeographicData>()
                 .Property(data => data.LocalAuthorityCode)
                 .HasComputedColumnSql("JSON_VALUE(LocalAuthority, '$.new_la_code')");
-            
+
             modelBuilder.Entity<GeographicData>()
                 .HasIndex(data => data.LocalAuthorityCode);
 
@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
             modelBuilder.Entity<CharacteristicDataLa>()
                 .Property(data => data.LocalAuthorityCode)
                 .HasComputedColumnSql("JSON_VALUE(LocalAuthority, '$.new_la_code')");
-            
+
             modelBuilder.Entity<CharacteristicDataLa>()
                 .HasIndex(data => data.LocalAuthorityCode);
         }
@@ -285,7 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
 
             modelBuilder.Entity<GeographicData>()
                 .HasIndex(data => data.RegionCode);
-            
+
             modelBuilder.Entity<CharacteristicDataLa>()
                 .Property(data => data.Region)
                 .HasConversion(
@@ -295,7 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
             modelBuilder.Entity<CharacteristicDataLa>()
                 .Property(data => data.RegionCode)
                 .HasComputedColumnSql("JSON_VALUE(Region, '$.region_code')");
-            
+
             modelBuilder.Entity<CharacteristicDataLa>()
                 .HasIndex(data => data.RegionCode);
         }
@@ -310,7 +310,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
 
             modelBuilder.Entity<CharacteristicDataNational>()
                 .Property(data => data.CharacteristicName)
-                .HasComputedColumnSql("JSON_VALUE(Characteristic, '$.characteristic_1')");
+                .HasComputedColumnSql("JSON_VALUE(Characteristic, '$.characteristic_breakdown')");
 
             modelBuilder.Entity<CharacteristicDataNational>()
                 .HasIndex(data => data.CharacteristicName);
@@ -323,7 +323,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Data
 
             modelBuilder.Entity<CharacteristicDataLa>()
                 .Property(data => data.CharacteristicName)
-                .HasComputedColumnSql("JSON_VALUE(Characteristic, '$.characteristic_1')");
+                .HasComputedColumnSql("JSON_VALUE(Characteristic, '$.characteristic_breakdown')");
 
             modelBuilder.Entity<CharacteristicDataLa>()
                 .HasIndex(data => data.CharacteristicName);

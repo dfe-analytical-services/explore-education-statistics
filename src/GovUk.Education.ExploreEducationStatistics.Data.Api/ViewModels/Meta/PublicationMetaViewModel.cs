@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
     public class PublicationMetaViewModel
     {
         public Guid PublicationId { get; set; }
-        public Dictionary<string, List<AttributeMetaViewModel>> Attributes { get; set; }
+        public Dictionary<string, List<IndicatorMetaViewModel>> Indicators { get; set; }
         public Dictionary<string, List<NameLabelViewModel>> Characteristics { get; set; }
     }
 }

@@ -56,9 +56,9 @@ export class LineChartBlock extends Component<LineChartBlockProps> {
 
     const chartData = characteristicsData.result.map(result => {
       return chartDataKeys.reduce(
-        (v: any, attributeName) => {
-          if (result.attributes[attributeName]) {
-            v[attributeName] = result.attributes[attributeName];
+        (v: any, indicatorName) => {
+          if (result.indicators[indicatorName]) {
+            v[indicatorName] = result.indicators[indicatorName];
           }
           return v;
         },

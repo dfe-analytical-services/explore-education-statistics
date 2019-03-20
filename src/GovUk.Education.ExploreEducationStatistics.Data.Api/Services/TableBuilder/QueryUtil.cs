@@ -6,12 +6,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 {
     public static class QueryUtil
     {
-        public static Dictionary<string, string> FilterAttributes(
-            Dictionary<string, string> attributes,
+        public static Dictionary<string, string> FilterIndicators(
+            Dictionary<string, string> indicators,
             ICollection<string> filter)
         {
             return (
-                from kvp in attributes
+                from kvp in indicators
                 where filter.Contains(kvp.Key)
                 select kvp
             ).ToDictionary(pair => pair.Key, pair => pair.Value);

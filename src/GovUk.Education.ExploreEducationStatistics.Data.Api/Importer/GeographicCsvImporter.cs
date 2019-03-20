@@ -17,8 +17,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
         {
             var headerValues = new[]
             {
-                "term", "year", "level", "country_code", "country_name", "region_code", "region_name", "old_la_code",
-                "new_la_code", "la_name", "estab", "laestab", "urn", "academy_type", "academy_open_date", "school_type"
+                "time_period", "time_identifier", "level", "country_code", "country_name", "region_code", "region_name",
+                "old_la_code", "new_la_code", "la_name", "estab", "laestab", "urn", "academy_type", "academy_open_date",
+                "school_type"
             };
             var values = csvLine.Split(',');
 
@@ -26,7 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
             {
                 PublicationId = release.PublicationId,
                 Release = release,
-                Year = int.Parse(values[headers.FindIndex(h => h.Equals("year"))]),
+                TimePeriod = int.Parse(values[headers.FindIndex(h => h.Equals("time_period"))]),
+                TimeIdentifier = values[headers.FindIndex(h => h.Equals("time_identifier"))],
                 Level = Levels.EnumFromStringForImport(values[headers.FindIndex(h => h.Equals("level"))]),
                 Country = new Country
                 {
@@ -53,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 },
                 SchoolType =
                     SchoolTypes.EnumFromStringForImport(values[headers.FindIndex(h => h.Equals("school_type"))]),
-                Attributes = new Dictionary<string, string>()
+                Indicators = new Dictionary<string, string>()
             };
 
             if (headers.Contains("urn"))
@@ -61,16 +63,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Importer
                 model.School.Urn = values[headers.FindIndex(h => h.Equals("urn"))];
             }
 
-            if (headers.Contains("term"))
-            {
-                model.Term = values[headers.FindIndex(h => h.Equals("term"))];
-            }
-
             for (var i = 0; i < values.Length; i++)
             {
                 if (!headerValues.Contains(headers[i]))
                 {
-                    model.Attributes.Add(headers[i], values[i]);
+                    model.Indicators.Add(headers[i], values[i]);
                 }
             }
 

@@ -17,12 +17,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
         }
 
         public TableBuilderLaCharacteristicData BuildResult(ICharacteristicGeographicData data,
-            ICollection<string> attributeFilter)
+            ICollection<string> indicatorFilter)
         {
             return new TableBuilderLaCharacteristicData
             {
-                Year = data.Year,
-                Term = data.Term,
+                TimePeriod = data.TimePeriod,
+                TimeIdentifier = data.TimeIdentifier,
                 Country = data.Country,
                 Region = data.Region,
                 LocalAuthority = data.LocalAuthority,
@@ -30,9 +30,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
                 // TODO Label is not currently set in CharacteristicViewModel. Not sure if it needs to be?
                 // TODO If Label is not used then is CharacteristicViewModel needed?
                 Characteristic = _mapper.Map<CharacteristicViewModel>(data.Characteristic),
-                Attributes = attributeFilter.Count > 0
-                    ? QueryUtil.FilterAttributes(data.Attributes, attributeFilter)
-                    : data.Attributes
+                Indicators = indicatorFilter.Count > 0
+                    ? QueryUtil.FilterIndicators(data.Indicators, indicatorFilter)
+                    : data.Indicators
             };
         }
     }

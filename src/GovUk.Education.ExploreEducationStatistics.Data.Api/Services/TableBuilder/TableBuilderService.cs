@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
                 ReleaseId = first.Release.Id,
                 ReleaseDate = first.Release.ReleaseDate,
                 Level = first.Level,
-                Result = data.Select(tidyData => resultBuilder.BuildResult(tidyData, queryContext.Attributes))
+                Result = data.Select(tidyData => resultBuilder.BuildResult(tidyData, queryContext.Indicators))
             };
         }
     }

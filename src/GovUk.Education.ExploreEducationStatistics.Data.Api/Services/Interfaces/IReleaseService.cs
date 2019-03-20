@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
     {
         long GetLatestRelease(Guid publicationId);
 
-        Dictionary<string, List<AttributeMetaViewModel>> GetAttributeMetas(Guid publicationId, Type type);
+        Dictionary<string, List<IndicatorMetaViewModel>> GetIndicatorMetas(Guid publicationId, Type type);
 
         Dictionary<string, List<NameLabelViewModel>> GetCharacteristicMetas(Guid publicationId, Type type);
     }

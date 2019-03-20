@@ -27,7 +27,7 @@ export class StackedBarHorizontalBlock extends React.Component<
 > {
   public render() {
     const chartData = this.props.characteristicsData.result.map(data => {
-      return data.attributes;
+      return data.indicators;
     });
 
     return (

@@ -8,12 +8,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilde
 {
     public class TableBuilderCharacteristicData : ITableBuilderData
     {
-        public int Year { get; set; }
-        public string Term { get; set; }
+        public int TimePeriod { get; set; }
+        public string TimeIdentifier { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public SchoolType SchoolType { get; set; }
 
         public CharacteristicViewModel Characteristic { get; set; }
-        public Dictionary<string, string> Attributes { get; set; }
+        public Dictionary<string, string> Indicators { get; set; }
     }
 }

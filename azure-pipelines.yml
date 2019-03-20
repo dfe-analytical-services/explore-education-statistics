@@ -86,6 +86,11 @@ jobs:
           testResultsFiles: '**/junit.xml'
           searchFolder: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
           testRunTitle: 'Frontend Jest tests'
+      - task: 'Bash@3'
+        displayName: 'Remove node_modules'
+        inputs:
+          targetType: 'inline'
+          script: 'rm -rf $(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend/node_modules/'
       - task: 'ArchiveFiles@2'
         displayName: 'Archive frontend'
         inputs:

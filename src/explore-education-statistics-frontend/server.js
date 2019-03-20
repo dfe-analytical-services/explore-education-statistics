@@ -1,3 +1,4 @@
+const basicAuth = require('express-basic-auth');
 const express = require('express');
 const next = require('next');
 const url = require('url');
@@ -31,6 +32,17 @@ async function startServer(port = process.env.PORT || 3000) {
       next();
     }
   });
+
+  if (process.env.BASIC_AUTH === 'true') {
+    server.use(
+      basicAuth({
+        users: {
+          [process.env.BASIC_AUTH_USERNAME]: process.env.BASIC_AUTH_PASSWORD,
+        },
+        challenge: true,
+      }),
+    );
+  }
 
   server.get('/statistics/:publication/:release?', (req, res) => {
     return app.render(req, res, '/statistics/publication', {
