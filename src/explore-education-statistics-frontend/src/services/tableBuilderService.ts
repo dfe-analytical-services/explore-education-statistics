@@ -54,8 +54,8 @@ export interface CharacteristicsData {
 
 export const getNationalCharacteristicsData = (
   publicationId: string,
-  indicators: string[],
   characteristics: string[],
+  indicators: string[],
   schoolTypes: SchoolType[],
   startYear: number,
   endYear: number,
