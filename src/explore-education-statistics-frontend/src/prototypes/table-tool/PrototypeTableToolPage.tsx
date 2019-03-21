@@ -1,21 +1,22 @@
 import range from 'lodash/range';
 import React, { Component, createRef } from 'react';
-import Page from 'src/components/Page';
 import PageTitle from 'src/components/PageTitle';
 import Tabs from 'src/components/Tabs';
 import TabsSection from 'src/components/TabsSection';
+import CharacteristicsDataTable from 'src/modules/table-tool/components/CharacteristicsDataTable';
+import CharacteristicsFilterForm, {
+  CharacteristicsFilterFormSubmitHandler,
+} from 'src/modules/table-tool/components/CharacteristicsFilterForm';
+import PublicationMenu, {
+  MenuChangeEventHandler,
+} from 'src/modules/table-tool/components/PublicationMenu';
+import PublicationSubjectMenu from 'src/modules/table-tool/components/PublicationSubjectMenu';
+import PrototypePage from 'src/prototypes/components/PrototypePage';
 import tableBuilderService, {
   DataTableResult,
   PublicationMeta,
 } from 'src/services/tableBuilderService';
 import SchoolType from 'src/services/types/SchoolType';
-import CharacteristicsDataTable from './components/CharacteristicsDataTable';
-import CharacteristicsFilterForm, {
-  CharacteristicsFilterFormSubmitHandler,
-} from './components/CharacteristicsFilterForm';
-import PublicationMenu, {
-  MenuChangeEventHandler,
-} from './components/PublicationMenu';
 
 const defaultPublicationOptions = [
   {
@@ -60,10 +61,11 @@ interface State {
   publicationId: string;
   publicationMeta: Pick<PublicationMeta, 'characteristics' | 'indicators'>;
   publicationName: string;
+  publicationSubjectId: string;
   tableData: DataTableResult[];
 }
 
-class TableToolPage extends Component<{}, State> {
+class PrototypeTableToolPage extends Component<{}, State> {
   private readonly defaultFilters: State['filters'] = {
     characteristics: [],
     indicators: [],
@@ -81,10 +83,11 @@ class TableToolPage extends Component<{}, State> {
       indicators: {},
     },
     publicationName: '',
+    publicationSubjectId: '',
     tableData: [],
   };
 
-  private filtersRef = createRef<HTMLDivElement>();
+  private filtersRef = createRef<HTMLElement>();
   private dataTableRef = createRef<HTMLElement>();
 
   private handleMenuChange: MenuChangeEventHandler = async ({
@@ -99,25 +102,16 @@ class TableToolPage extends Component<{}, State> {
       publicationId,
     );
 
-    this.setState(
-      {
-        publicationId,
-        publicationMeta,
-        publicationName,
-        filters: {
-          ...this.defaultFilters,
-        },
-        tableData: [],
+    this.setState({
+      publicationId,
+      publicationMeta,
+      publicationName,
+      filters: {
+        ...this.defaultFilters,
       },
-      () => {
-        if (this.filtersRef.current) {
-          this.filtersRef.current.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
-        }
-      },
-    );
+      publicationSubjectId: '',
+      tableData: [],
+    });
   };
 
   private handleFilterFormSubmit: CharacteristicsFilterFormSubmitHandler = async ({
@@ -170,11 +164,12 @@ class TableToolPage extends Component<{}, State> {
       publicationMeta,
       publicationId,
       publicationName,
+      publicationSubjectId,
       tableData,
     } = this.state;
 
     return (
-      <Page breadcrumbs={[{ name: 'Create your own table' }]}>
+      <PrototypePage breadcrumbs={[{ text: 'Create your own table' }]}>
         <PageTitle caption="Table tool" title="Create your own table" />
 
         <ul>
@@ -189,46 +184,87 @@ class TableToolPage extends Component<{}, State> {
           </li>
         </ul>
 
-        <section>
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-full">
-              <h2>
-                1. Choose a publication
-                <span className="govuk-hint">
-                  Pick a publication below to explore its statistics
-                </span>
-              </h2>
+        <section className="govuk-grid-row">
+          <div className="govuk-grid-column-one-half">
+            <h2>
+              1. Choose a publication
+              <span className="govuk-hint">
+                Pick a publication below to create a table for it
+              </span>
+            </h2>
 
-              <PublicationMenu
-                onChange={this.handleMenuChange}
-                options={defaultPublicationOptions}
-                value={publicationId}
-              />
-            </div>
+            <PublicationMenu
+              onChange={this.handleMenuChange}
+              options={defaultPublicationOptions}
+              value={publicationId}
+            />
           </div>
-        </section>
-
-        {publicationName && (
-          <section>
-            <div className="govuk-grid-row" ref={this.filtersRef}>
-              <div className="govuk-grid-column-full">
+          <div className="govuk-grid-column-one-half">
+            {publicationId && (
+              <>
                 <h2>
-                  2. Filter statistics from '{publicationName}'
+                  2. Choose a subject
                   <span className="govuk-hint">
-                    Select any options you are interested in from the groups
-                    below.
+                    Pick a subject from '{publicationName}'
                   </span>
                 </h2>
 
-                <Tabs>
-                  <TabsSection id="characteristics" title="Characteristics">
-                    <CharacteristicsFilterForm
-                      publicationMeta={publicationMeta}
-                      onSubmit={this.handleFilterFormSubmit}
-                    />
-                  </TabsSection>
-                </Tabs>
-              </div>
+                <PublicationSubjectMenu
+                  onChange={event =>
+                    this.setState(
+                      {
+                        publicationSubjectId: event.target.value,
+                      },
+                      () => {
+                        if (this.filtersRef.current) {
+                          this.filtersRef.current.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                          });
+                        }
+                      },
+                    )
+                  }
+                  options={[
+                    {
+                      id: 'natcharacteristics',
+                      name: 'National characteristics',
+                    },
+                    {
+                      id: 'lacharacteristics',
+                      name: 'Local authority characteristics',
+                    },
+                    {
+                      id: 'geoglevels',
+                      name: 'Geographic levels',
+                    },
+                  ]}
+                  value={publicationSubjectId}
+                />
+              </>
+            )}
+          </div>
+        </section>
+
+        {publicationSubjectId && (
+          <section className="govuk-grid-row" ref={this.filtersRef}>
+            <div className="govuk-grid-column-full">
+              <h2>
+                3. Filter statistics from '{publicationName}'
+                <span className="govuk-hint">
+                  Select any options you are interested in from the groups
+                  below.
+                </span>
+              </h2>
+
+              <Tabs>
+                <TabsSection id="characteristics" title="Characteristics">
+                  <CharacteristicsFilterForm
+                    publicationMeta={publicationMeta}
+                    onSubmit={this.handleFilterFormSubmit}
+                  />
+                </TabsSection>
+              </Tabs>
             </div>
           </section>
         )}
@@ -263,9 +299,9 @@ class TableToolPage extends Component<{}, State> {
             </ul>
           </section>
         )}
-      </Page>
+      </PrototypePage>
     );
   }
 }
 
-export default TableToolPage;
+export default PrototypeTableToolPage;
