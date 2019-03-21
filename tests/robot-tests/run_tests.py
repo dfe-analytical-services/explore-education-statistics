@@ -47,16 +47,13 @@ tests = "tests/"
 browser = "chrome"
 interp = "pabot"
 
-# Get basicAuth credentials
+# Get .env basicAuth credentials
 basicAuthUser = "user"
 basicAuthPass = "pass"
 load_dotenv()
 if os.getenv('publicAppBasicAuthUsername') and os.getenv('publicAppBasicAuthPassword'):
     basicAuthUser = os.getenv('publicAppBasicAuthUsername')
     basicAuthPass = os.getenv('publicAppBasicAuthPassword')
-else:
-    print("No basic auth credentials found! If running locally, have you created a .env file?")
-    sys.exit()
 
 env = "test"  # by default, run tests against test environment
 url = "about:blank"
