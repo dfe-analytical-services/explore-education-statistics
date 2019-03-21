@@ -26,7 +26,7 @@ const PublicationPage = () => {
     <PrototypePage
       breadcrumbs={[
         {
-          link: '/prototypes/browse-releases-find',
+          link: '/prototypes/methodology-home',
           text: 'Methodology',
         },
         { text: 'Specific methodology', link: '#' },

@@ -11,13 +11,17 @@ import PrototypeTileWithChart from './components/PrototypeTileWithChart';
 const BrowseReleasesPage = () => {
   return (
     <PrototypePage
-      breadcrumbs={[{ text: 'Find statistics and download data' }]}
+      breadcrumbs={[
+        {
+          link: '/prototypes/methodology-home',
+          text: 'Methodology',
+        },
+        { text: 'Specific methodology', link: '#' },
+      ]}
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">
-            Find statistics and download data
-          </h1>
+          <h1 className="govuk-heading-xl">Specific methodology</h1>
           <p className="govuk-body-l">
             Browse to find the statistics and data you’re looking for and open
             the section to get links to:
