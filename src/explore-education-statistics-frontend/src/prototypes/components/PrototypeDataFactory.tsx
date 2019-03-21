@@ -181,3 +181,19 @@ export const ks4PerformanceInMatsComparedToNationalAverage = create(
   ],
   true,
 );
+
+import { data as OriginalData } from './PrototypeMapBoundaries';
+
+export const ks4AverageAttainment8ScorePerPupilByLocalAuthority = {
+  ...create(
+    'map',
+    { title: '' },
+    { title: '' },
+    [],
+    [],
+    SchoolType.Total,
+    201819,
+    [[]],
+  ),
+  geometry: OriginalData,
+};

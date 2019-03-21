@@ -9,17 +9,14 @@ import {
   YAxis,
 } from 'recharts';
 
-import { Axis } from '../../../../services/publicationService';
-import { CharacteristicsData } from '../../../../services/tableBuilderService';
-import { colours, parseCondensedYearRange, symbols } from './Charts';
+import {
+  ChartProps,
+  colours,
+  parseCondensedYearRange,
+  symbols,
+} from './Charts';
 
-interface StackedBarHorizontalProps {
-  characteristicsData: CharacteristicsData;
-  chartDataKeys: string[];
-  labels: { [key: string]: string };
-  xAxis: Axis;
-  yAxis: Axis;
-  height?: number;
+interface StackedBarHorizontalProps extends ChartProps {
   stacked?: boolean;
 }
 
