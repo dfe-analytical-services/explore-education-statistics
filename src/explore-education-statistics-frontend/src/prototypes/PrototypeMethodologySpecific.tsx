@@ -16,30 +16,15 @@ const BrowseReleasesPage = () => {
           link: '/prototypes/methodology-home',
           text: 'Methodology',
         },
-        { text: 'Specific methodology', link: '#' },
       ]}
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <h1 className="govuk-heading-xl">Specific methodology</h1>
           <p className="govuk-body-l">
-            Browse to find the statistics and data you’re looking for and open
-            the section to get links to:
+            Find methodology and other useful information relating to each
+            statistical theme.
           </p>
-          <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
-            <li>
-              up-to-date national statistical headlines, breakdowns and
-              explanations
-            </li>
-            <li>
-              charts and tables to help you compare, contrast and view national
-              and regional statistical data and trends
-            </li>
-            <li>
-              links to underlying data so you can download files and carry out
-              your own statistical analysis
-            </li>
-          </ul>
         </div>
         <div className="govuk-grid-column-one-third">
           <aside className="app-related-items" role="complementary">
@@ -49,8 +34,8 @@ const BrowseReleasesPage = () => {
             <nav role="navigation" aria-labelledby="subsection-title">
               <ul className="govuk-list">
                 <li>
-                  <Link to="/prototypes/methodology-home">
-                    Methodology and guidance
+                  <Link to="/prototypes/browse-releases">
+                    Find statistics and data
                   </Link>
                 </li>
               </ul>
@@ -58,108 +43,101 @@ const BrowseReleasesPage = () => {
           </aside>
         </div>
       </div>
-      <h2 className="govuk-heading-l">Early years and schools</h2>
-      <Accordion id="schools">
-        <AccordionSection
-          heading="Absence and exclusions"
-          caption="Pupil absence and permanent and fixed-period exclusions statistics and data"
-        >
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-list-bullet">
-              <li>
-                {' '}
-                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Pupil absence statistics
-                </h4>
-                <p className="govuk-body">
-                  View statistics, create charts and tables and download data
-                  files for authorised, overall, persistent and unauthorised
-                  absence
-                </p>
-                <div className="govuk-!-margin-top-0">
-                  <PrototypeDownloadDropdown />
-                </div>
-              </li>
-              <li className="govuk-!-margin-top-6">
-                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Permanent and fixed-period exclusions statistics
-                </h4>
-                <p className="govuk-body">
-                  View statistics, create charts and tables and download data
-                  files for fixed-period and permanent exclusion statistics
-                </p>
-                <div className="govuk-!-margin-top-0">
-                  <PrototypeDownloadDropdown link="/prototypes/publication-exclusions" />
-                </div>
-              </li>
-            </ul>
-          </div>
+
+      <Accordion id="methodology-specific">
+        <AccordionSection heading="Early years and schools">
+          <h3>Absence and exclusions</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <Link to="#">exclusions statistics guide</Link>
+            </li>
+            <li>
+              <Link to="/prototypes/methodology-absence">
+                pupil absence statistics guide
+              </Link>
+            </li>
+          </ul>
+          <hr />
+          <h3>Capacity and admissions</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <Link to="#">admissions appeals statistics guide</Link>
+            </li>
+            <li>
+              <Link to="#">school capacity statistics guide</Link>
+            </li>
+          </ul>
+          <hr />
+          <h3>Results</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <Link to="#">KS2 statistics guide</Link>
+            </li>
+            <li>
+              <Link to="#">KS4 statistics guide</Link>
+            </li>
+            <li>
+              <Link to="#">
+                phonics screening check and KS1 assessments statistics guide
+              </Link>
+            </li>
+            <li>
+              <Link to="#">early years foundation stage profile results</Link>
+            </li>
+          </ul>
+          <hr />
+          <h3>School and pupil numbers</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              {' '}
+              <Link to="#">
+                School pupils and their characteristics statistics guide
+              </Link>
+            </li>
+            <li>
+              <Link to="#">School worksforce statistics guide</Link>
+            </li>
+          </ul>
+          <hr />
+          <h3>Teacher numbers</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              {' '}
+              <Link to="#">
+                initial teacher training performance statistics guide
+              </Link>
+            </li>
+          </ul>
         </AccordionSection>
-        <AccordionSection
-          heading="Capacity and exclusions"
-          caption="School capacity, admission appeals"
-        >
-          <h3 className="govuk-heading-s">
-            Latest capacity and exclusions releases
-          </h3>
+        <AccordionSection heading="Higher education">
+          <h3>Further education</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <Link to="#">destination of leavers statistics guide</Link>
+            </li>
+            <li>
+              <Link to="#">
+                apprenticeships and traineeships statistics guide
+              </Link>
+            </li>
+            <li>
+              <Link to="#">further education and skills statistics guide</Link>
+            </li>
+            <li>
+              <Link to="#">16 to 18 school performance statistics guide</Link>
+            </li>
+          </ul>
         </AccordionSection>
-        <AccordionSection
-          heading="Results"
-          caption="Local authority and school finance"
-        >
-          <h3 className="govuk-heading-s">Latest results releases</h3>
-        </AccordionSection>
-        <AccordionSection
-          heading="School and pupil numbers"
-          caption="Schools, pupils and their characteristics, SEN and EHC plans, SEN in England"
-        >
-          <h3 className="govuk-heading-s">
-            Latest school and pupil numbers releases
-          </h3>
-        </AccordionSection>
-        <AccordionSection
-          heading="School finance"
-          caption="Local authority and school finance"
-        >
-          <h3 className="govuk-heading-s">Latest school finance releases</h3>
-        </AccordionSection>
-        <AccordionSection
-          heading="Teacher numbers"
-          caption="The number and characteristics of teachers"
-        >
-          <h3 className="govuk-heading-s">Latest teacher number releases</h3>
-        </AccordionSection>
-      </Accordion>
-      <h2 className="govuk-heading-l govuk-!-margin-top-9">Higher education</h2>
-      <Accordion id="higher-education">
-        <AccordionSection
-          heading="Further education"
-          caption="Pupil absence, permanent and fixed period exclusions"
-        >
-          <h3 className="govuk-heading-s">Latest further education releases</h3>
-        </AccordionSection>
-        <AccordionSection
-          heading="Higher education"
-          caption="School capacity, admission appeals"
-        >
-          <h3 className="govuk-heading-s">Latest higher education releases</h3>
-        </AccordionSection>
-      </Accordion>
-      <h2 className="govuk-heading-l govuk-!-margin-top-9">Social care</h2>
-      <Accordion id="social">
-        <AccordionSection
-          heading="Number of children"
-          caption="Pupil absence, permanent and fixed period exclusions"
-        >
-          <h3 className="govuk-heading-s">
-            Latest number of children releases
-          </h3>
-        </AccordionSection>
-        <AccordionSection
-          heading="Vulnerable children"
-          caption="School capacity, admission appeals"
-        >
-          <h3 className="govuk-heading-s">Latest school finance releases</h3>
+        <AccordionSection heading="Social care">
+          <h3>Number of children</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <Link to="#">children in need statistics guide</Link>
+            </li>
+            <li>
+              <Link to="#">looked after children statistics guide</Link>
+            </li>
+          </ul>
         </AccordionSection>
       </Accordion>
     </PrototypePage>

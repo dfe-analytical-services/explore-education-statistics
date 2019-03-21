@@ -29,7 +29,10 @@ const PublicationPage = () => {
           link: '/prototypes/methodology-home',
           text: 'Methodology',
         },
-        { text: 'Specific methodology', link: '#' },
+        {
+          link: '/prototypes/methodology-specific',
+          text: 'Specific methodology',
+        },
       ]}
     >
       <div className="govuk-grid-row">

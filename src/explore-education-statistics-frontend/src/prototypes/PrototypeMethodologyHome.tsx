@@ -5,12 +5,32 @@ import PrototypePage from './components/PrototypePage';
 const HomePage = () => {
   return (
     <PrototypePage>
-      <h1 className="govuk-heading-xl">Methodology and guidance</h1>
-      <p className="govuk-body-l">
-        Information on the methods we use to produce our statistics. This
-        includes classifications, harmonisation, best practice, geography and
-        user guidance for a wide range of data.
-      </p>
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-two-thirds">
+          <h1 className="govuk-heading-xl">Methodology and guidance</h1>
+          <p className="govuk-body-l">
+            Information on the methods we use to produce our statistics. This
+            includes classifications, harmonisation, best practice, geography
+            and user guidance for a wide range of data.
+          </p>
+        </div>
+        <div className="govuk-grid-column-one-third">
+          <aside className="app-related-items" role="complementary">
+            <h2 className="govuk-heading-m" id="releated-content">
+              Related content
+            </h2>
+            <nav role="navigation" aria-labelledby="subsection-title">
+              <ul className="govuk-list">
+                <li>
+                  <Link to="/prototypes/browse-releases">
+                    Find statistics and data
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+          </aside>
+        </div>
+      </div>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-1">
@@ -22,7 +42,9 @@ const HomePage = () => {
           </p>
 
           <h2 className="govuk-heading-m govuk-!-margin-bottom-1">
-            <Link to="#">Specific methodology and guidance</Link>
+            <Link to="/prototypes/methodology-specific">
+              Specific methodology and guidance
+            </Link>
           </h2>
           <p className="govuk-body">
             Find methodology and guidance for specific DfE publications.

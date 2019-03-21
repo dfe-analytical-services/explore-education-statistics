@@ -96,7 +96,7 @@ const BrowseReleasesPage = () => {
           caption="School capacity, admission appeals"
         >
           <h3 className="govuk-heading-s">
-            Latest capacity and exclusions releases
+            Latest capacity and admissions releases
           </h3>
         </AccordionSection>
         <AccordionSection
