@@ -1,11 +1,11 @@
-import React, { FunctionComponent, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 
 interface Props {
-  children: ReactNode;
+  children?: ReactNode;
   id?: string;
 }
 
-const ErrorMessage: FunctionComponent<Props> = ({ children, id }) => {
+const ErrorMessage = ({ children, id }: Props) => {
   return (
     <span className="govuk-error-message" id={id}>
       {children}
