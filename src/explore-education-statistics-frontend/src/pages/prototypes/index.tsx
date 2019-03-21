@@ -28,6 +28,25 @@ class PrototypesIndexPage extends Component {
               Publication page (exclusions)
             </Link>
           </li>
+          <li>
+            <Link to="/prototypes/methodology-home">Methodology home</Link>
+          </li>
+          <li>
+            <Link to="/prototypes/methodology-specific">
+              Specific methodology
+            </Link>
+          </li>
+          <li>
+            <Link to="/prototypes/methodology-absence">
+              Methodology page for absence
+            </Link>
+          </li>
+        </ul>
+
+        <ul>
+          <li>
+            <Link to="/prototypes/table-tool">Table tool page</Link>
+          </li>
         </ul>
       </PrototypePage>
     );

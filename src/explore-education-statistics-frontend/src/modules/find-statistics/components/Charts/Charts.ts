@@ -11,7 +11,7 @@ export const colours: string[] = [
 
 export const symbols: any[] = ['circle', 'square', 'triangle', 'cross', 'star'];
 
-export function parseCondensedYearRange(
+export function parseCondensedTimePeriodRange(
   range: string,
   separator: string = '/',
 ) {

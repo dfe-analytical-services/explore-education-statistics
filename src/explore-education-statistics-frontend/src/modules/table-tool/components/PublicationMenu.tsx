@@ -1,112 +1,64 @@
-import React, { Component, ReactNode } from 'react';
-import { RadioChangeEventHandler } from '../../../components/form/FormRadio';
-import FormRadioGroup from '../../../components/form/FormRadioGroup';
+import React from 'react';
+import FormRadioGroup from 'src/components/form/FormRadioGroup';
 import MenuDetails from './MenuDetails';
-import styles from './PublicationMenu.module.scss';
 
-export type MenuOption = 'EXCLUSIONS' | 'PUPIL_ABSENCE' | '';
-
-export type MenuChangeEventHandler = (option: MenuOption) => void;
+export type MenuChangeEventHandler = (values: {
+  publicationId: string;
+  publicationName: string;
+}) => void;
 
 interface Props {
-  beforeMenu?: ReactNode;
   onChange: MenuChangeEventHandler;
+  options: {
+    id: string;
+    name: string;
+    topics: {
+      id: string;
+      name: string;
+      publications: {
+        id: string;
+        name: string;
+      }[];
+    }[];
+  }[];
+  value: string;
 }
 
-interface State {
-  menuOption: MenuOption;
-}
+const PublicationMenu = ({ options, onChange, value }: Props) => {
+  return (
+    <>
+      {options.map(option => (
+        <MenuDetails summary={option.name} key={option.id}>
+          {option.topics.map(topic => (
+            <MenuDetails summary={topic.name} key={topic.id}>
+              <FormRadioGroup
+                value={value}
+                name="publicationId"
+                id={topic.id}
+                onChange={event => {
+                  const publication = topic.publications.find(
+                    item => item.id === event.target.value,
+                  );
 
-class PublicationMenu extends Component<Props, State> {
-  public state: State = {
-    menuOption: '',
-  };
-
-  private handleRadioChange: RadioChangeEventHandler<{
-    value: MenuOption;
-  }> = event => {
-    this.setState(
-      {
-        menuOption: event.target.value,
-      },
-      () => {
-        this.props.onChange(this.state.menuOption);
-      },
-    );
-  };
-
-  public render() {
-    return (
-      <div className={styles.filterMenu}>
-        {this.props.beforeMenu}
-
-        <h2>
-          1. Choose a publication
-          <div className="govuk-hint">
-            Pick a publication below to explore its statistics
-          </div>
-        </h2>
-
-        <MenuDetails summary="Schools (under 16)" open>
-          <MenuDetails summary="Absence and exclusions" open>
-            <FormRadioGroup
-              value={this.state.menuOption}
-              name="absenceAndExclusions"
-              id="absenceAndExclusions"
-              onChange={this.handleRadioChange}
-              options={[
-                {
-                  id: 'pupilAbsence',
-                  label: 'Pupil absence',
-                  value: 'PUPIL_ABSENCE',
-                },
-                {
-                  id: 'exclusions',
-                  label: 'Exclusions',
-                  value: 'EXCLUSIONS',
-                },
-              ]}
-            />
-          </MenuDetails>
-          <MenuDetails summary="Capacity and admissions" />
-          <MenuDetails summary="Results" />
-          <MenuDetails summary="School and pupil numbers" open>
-            <FormRadioGroup
-              value={this.state.menuOption}
-              name="schoolAndPupilNumbers"
-              id="schoolAndPupilNumbers"
-              onChange={this.handleRadioChange}
-              options={[
-                {
-                  id: 'schoolsPupilsAndTheirCharacteristics',
-                  label: 'Schools, pupils and their characteristics',
-                  value: 'SCHOOLS_PUPILS_CHARACTERISTICS',
-                },
-              ]}
-            />
-          </MenuDetails>
-          <MenuDetails summary="School finance" />
-          <MenuDetails summary="Teacher numbers" />
+                  if (publication) {
+                    onChange({
+                      publicationId: publication.id,
+                      publicationName: publication.name,
+                    });
+                  }
+                }}
+                options={topic.publications.map(publication => ({
+                  id: publication.id,
+                  label: publication.name,
+                  value: publication.id,
+                }))}
+              />
+            </MenuDetails>
+          ))}
         </MenuDetails>
-        <MenuDetails summary="16+ education">
-          <MenuDetails summary="Absence and exclusions" />
-          <MenuDetails summary="Capacity and admissions" />
-          <MenuDetails summary="Results" />
-          <MenuDetails summary="School and pupil numbers" />
-          <MenuDetails summary="School finance" />
-          <MenuDetails summary="Teacher numbers" />
-        </MenuDetails>
-        <MenuDetails summary="Social care">
-          <MenuDetails summary="Absence and exclusions" />
-          <MenuDetails summary="Capacity and admissions" />
-          <MenuDetails summary="Results" />
-          <MenuDetails summary="School and pupil numbers" />
-          <MenuDetails summary="School finance" />
-          <MenuDetails summary="Teacher numbers" />
-        </MenuDetails>
-      </div>
-    );
-  }
-}
+      ))}
+    </>
+  );
+};
 
 export default PublicationMenu;

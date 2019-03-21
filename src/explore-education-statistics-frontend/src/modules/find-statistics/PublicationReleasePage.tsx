@@ -309,7 +309,7 @@ class PublicationReleasePage extends Component<Props> {
           API. <a href="#">What is an API?</a>
         </p>
 
-        <Link to="/prototypes/data-table-v3" className="govuk-button">
+        <Link to="/table-tool" className="govuk-button">
           Explore pupil absence statistics
         </Link>
 

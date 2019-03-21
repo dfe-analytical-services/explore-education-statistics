@@ -27,7 +27,7 @@ export interface CharacteristicsData {
   releaseId: string;
   releaseDate: string;
   result: {
-    year: number;
+    timePeriod: number;
     schoolType: SchoolType;
     indicators: {
       [indicator: string]: string;

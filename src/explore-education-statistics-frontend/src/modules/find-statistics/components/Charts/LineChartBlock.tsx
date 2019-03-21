@@ -13,7 +13,7 @@ import {
 import {
   ChartProps,
   colours,
-  parseCondensedYearRange,
+  parseCondensedTimePeriodRange,
   symbols,
 } from './Charts';
 
@@ -56,7 +56,7 @@ export class LineChartBlock extends Component<ChartProps> {
           }
           return v;
         },
-        { name: parseCondensedYearRange(`${result.year}`) },
+        { name: parseCondensedTimePeriodRange(`${result.timePeriod}`) },
       );
     });
 

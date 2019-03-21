@@ -104,9 +104,9 @@ class CharacteristicsDataTable extends Component<Props> {
               };
             }
 
-            const dataByYear = groupBy(
+            const dataByTimePeriod = groupBy(
               dataByCharacteristic[characteristic],
-              'year',
+              'timePeriod',
             );
 
             return {
@@ -117,16 +117,16 @@ class CharacteristicsDataTable extends Component<Props> {
               ).label,
               rows: indicators.map(indicator => ({
                 columns: years.map(year => {
-                  if (!dataByYear[year]) {
+                  if (!dataByTimePeriod[year]) {
                     return '--';
                   }
 
-                  if (dataByYear[year].length > 0) {
-                    if (dataByYear[year][0].indicators[indicator]) {
+                  if (dataByTimePeriod[year].length > 0) {
+                    if (dataByTimePeriod[year][0].indicators[indicator]) {
                       const unit = indicatorsByName[indicator].unit;
 
                       return `${
-                        dataByYear[year][0].indicators[indicator]
+                        dataByTimePeriod[year][0].indicators[indicator]
                       }${unit}`;
                     }
                   }

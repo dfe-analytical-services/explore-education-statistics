@@ -26,10 +26,13 @@ const PublicationPage = () => {
     <PrototypePage
       breadcrumbs={[
         {
-          link: '/prototypes/browse-releases-find',
+          link: '/prototypes/methodology-home',
           text: 'Methodology',
         },
-        { text: 'Specific methodology', link: '#' },
+        {
+          link: '/prototypes/methodology-specific',
+          text: 'Specific methodology',
+        },
       ]}
     >
       <div className="govuk-grid-row">

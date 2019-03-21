@@ -9,12 +9,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import {
-  ChartProps,
-  colours,
-  parseCondensedYearRange,
-  symbols,
-} from './Charts';
+import { ChartProps, colours } from './Charts';
 
 export class VerticalBarBlock extends React.Component<ChartProps> {
   public render() {

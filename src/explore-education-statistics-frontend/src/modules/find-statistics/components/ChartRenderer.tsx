@@ -49,7 +49,11 @@ export class ChartRenderer extends Component<ChartRendererProps> {
 
     // TODO : Temporary sort on the results to get them in date order
     characteristicsData.result.sort((a, b) => {
-      return a.year < b.year ? -1 : a.year > b.year ? 1 : 0;
+      return a.timePeriod < b.timePeriod
+        ? -1
+        : a.timePeriod > b.timePeriod
+        ? 1
+        : 0;
     });
 
     switch (this.props.type.toLowerCase()) {

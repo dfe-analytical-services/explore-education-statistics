@@ -30,7 +30,12 @@ const PublicationPage = () => {
           <h1 className="govuk-heading-xl">
             Pupil absence statistics and data for schools in England
           </h1>
-          <p className="govuk-body-l">
+
+          <h2 className="govuk-heading-s">
+            <span className="govuk-caption-m">Published: </span>22 March 2018
+          </h2>
+
+          <p className="govuk-body">
             Read national statistical summaries and definitions, view charts and
             tables and download data files across a range of pupil absence
             subject areas.
@@ -43,19 +48,13 @@ const PublicationPage = () => {
             </a>
           </p>
 
-          <Details summary="Read more about our methodology">
-            <p>
-              To help you analyse and understand the statistics the following
-              sections include:
-            </p>
+          <p>
+            <Link to="/prototypes/methodology-absence">
+              Find out more about our pupil absence data and statistics
+              methodology and terminology
+            </Link>
+          </p>
 
-            <div className="govuk-inset-text">
-              <Link to="/prototypes/methodology-absence">
-                Find out more about our pupil absence data and statistics
-                methodology and terminology
-              </Link>
-            </div>
-          </Details>
           <Details summary="Download underlying data files">
             <ul className="govuk-list">
               <li>
@@ -138,10 +137,6 @@ const PublicationPage = () => {
               </ul>
             </Details>
 
-            <h3 className="govuk-heading-s">
-              <span className="govuk-caption-m">Published: </span>22 March 2018
-            </h3>
-
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <span className="govuk-caption-m">Last updated: </span>20 June
               2018
@@ -168,6 +163,22 @@ const PublicationPage = () => {
             <p className="govuk-caption-m govuk-!-margin-top-0">
               <a href="#">Notify me</a>
             </p>
+
+            <h2
+              className="govuk-heading-m govuk-!-margin-top-6"
+              id="related-content"
+            >
+              Related content
+            </h2>
+            <nav role="navigation" aria-labelledby="related-content">
+              <ul className="govuk-list">
+                <li>
+                  <Link to="/prototypes/methodology-absence">
+                    A guide to absence statistics
+                  </Link>
+                </li>
+              </ul>
+            </nav>
           </aside>
         </div>
       </div>
