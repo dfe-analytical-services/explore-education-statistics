@@ -37,6 +37,12 @@ class PrototypesIndexPage extends Component {
             </Link>
           </li>
         </ul>
+
+        <ul>
+          <li>
+            <Link to="/prototypes/table-tool">Table tool page</Link>
+          </li>
+        </ul>
       </PrototypePage>
     );
   }
