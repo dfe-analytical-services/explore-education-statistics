@@ -37,7 +37,6 @@ import pstats
 import scripts.keyword_profile as kp
 import chromedriver_install as cdi
 from dotenv import load_dotenv
-# import scripts.warm_up_servers as warm_up_servers
 
 arguments = []
 headless = True
@@ -48,16 +47,13 @@ tests = "tests/"
 browser = "chrome"
 interp = "pabot"
 
-# Get basicAuth credentials
-basicAuthUser = ""
-basicAuthPass = ""
+# Get .env basicAuth credentials
+basicAuthUser = "user"
+basicAuthPass = "pass"
 load_dotenv()
 if os.getenv('publicAppBasicAuthUsername') and os.getenv('publicAppBasicAuthPassword'):
     basicAuthUser = os.getenv('publicAppBasicAuthUsername')
     basicAuthPass = os.getenv('publicAppBasicAuthPassword')
-else:
-    print("No publicAppBasicAuth credentials found! If running locally, have you created a .env file?")
-    sys.exit()
 
 env = "test"  # by default, run tests against test environment
 url = "about:blank"
@@ -67,6 +63,8 @@ testUrl = "https://%s:%s@public-explore-education-statistics-test.azurewebsites.
 testAdminUrl = "https://admin-explore-education-statistics-test.azurewebsites.net"
 stageUrl = "https://public-explore-education-statistics-stage.azurewebsites.net"
 stageAdminUrl = "https://admin-explore-education-statistics-stage.azurewebsites.net"
+prodUrl = ""
+prodAdminUrl = ""
 
 timeout = 10
 implicit_wait = 10
