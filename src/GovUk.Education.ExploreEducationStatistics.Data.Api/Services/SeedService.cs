@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using EFCore.BulkExtensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Importer;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
@@ -87,6 +88,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             _logger.LogInformation("Seeding");
 
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+
             try
             {
                 _context.ChangeTracker.AutoDetectChangesEnabled = false;
@@ -105,7 +109,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 _context.ChangeTracker.AutoDetectChangesEnabled = true;
             }
 
-            _logger.LogInformation("Seeding complete");
+            stopWatch.Stop();
+            _logger.LogInformation("Seeding completed with duration {duration} ", stopWatch.Elapsed.ToString());
         }
 
         private void SeedIndicators()
@@ -166,31 +171,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             var importer = _csvImporterFactory.Importer(dataSet.Filename);
             var data = importer.Data(dataSet.Filename, release);
-            SeedData(release, data);
-        }
 
-        private void SeedData(Models.Release release, IEnumerable<ITidyData> tidyData)
-        {
-            var index = 1;
-            var batches = tidyData.Batch(_options.Value.BatchSize);
+            _logger.LogInformation("Seeding {Filename}.csv", dataSet.Filename);
+
             var stopWatch = new Stopwatch();
             stopWatch.Start();
-            foreach (var batch in batches)
+
+            if (dataSet.getDataType() == typeof(GeographicData))
             {
-                _logger.LogInformation(
-                    "Seeding batch {Index} of {TotalCount} for Publication {Publication}, Release {Release}", index,
-                    batches.Count(), release.PublicationId, release.Id);
-
-                _context.Set<ITidyData>().AddRange(batch);
-                _context.SaveChanges();
-                index++;
-
-                _logger.LogInformation("Seeded {Count} in {Time}ms. {TimerPerRecord}ms per record", batch.Count(),
-                    stopWatch.Elapsed.TotalMilliseconds, stopWatch.Elapsed.TotalMilliseconds / batch.Count());
-                stopWatch.Restart();
+                SeedGeographicData(data.OfType<GeographicData>().ToList());
             }
 
+            if (dataSet.getDataType() == typeof(CharacteristicDataNational))
+            {
+                SeedCharacteristicDataNational(data.OfType<CharacteristicDataNational>().ToList());
+            }
+
+            if (dataSet.getDataType() == typeof(CharacteristicDataLa))
+            {
+                SeedCharacteristicDataLa(data.OfType<CharacteristicDataLa>().ToList());
+            }
+
+            _logger.LogInformation("Seeded {Count} records in duration {Duration}. {TimerPerRecord}ms per record",
+                data.Count(), stopWatch.Elapsed.ToString(), stopWatch.Elapsed.TotalMilliseconds / data.Count());
+
             stopWatch.Stop();
+        }
+
+        private void SeedGeographicData(IList<GeographicData> geographicData)
+        {
+            _context.BulkInsert(geographicData, CreateBulkConfigForSeed());
+        }
+
+        private void SeedCharacteristicDataNational(IList<CharacteristicDataNational> characteristicDataNational)
+        {
+            _context.BulkInsert(characteristicDataNational, CreateBulkConfigForSeed());
+        }
+
+        private void SeedCharacteristicDataLa(IList<CharacteristicDataLa> characteristicDataLa)
+        {
+            _context.BulkInsert(characteristicDataLa, CreateBulkConfigForSeed());
         }
 
         private void SeedDataSetMeta(Models.Release releaseDb, DataSet dataSet)
@@ -201,8 +221,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private void SeedDataSetIndicators(Models.Release releaseDb, DataSet dataSet)
         {
-            _logger.LogInformation("Seeding Data Set Indicators");
-
             _context.AddRange(
                 from metaGroup in dataSet.IndicatorMetas
                 from indicatorMeta in metaGroup.Meta
@@ -219,8 +237,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private void SeedDataSetCharacteristics(Models.Release releaseDb, DataSet dataSet)
         {
-            _logger.LogInformation("Seeding Data Set Characteristics");
-
             _context.AddRange(dataSet.CharacteristicMetas
                 .Select(characteristicMeta => LookupCharacteristicMeta(characteristicMeta.Name))
                 .Select(characteristicMetaDb =>
@@ -231,6 +247,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         DataType = dataSet.getDataType().Name
                     })
                 .ToList());
+        }
+
+        private static BulkConfig CreateBulkConfigForSeed()
+        {
+            return new BulkConfig {PreserveInsertOrder = true};
         }
 
         private Models.Release CreateRelease(Release release)
