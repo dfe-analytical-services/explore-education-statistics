@@ -433,8 +433,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
-                            Content = "[{\"Order\":1,\"Heading\":\"About this release\",\"Caption\":\"\",\"Content\":null}]",
-                            KeyStatistics = "[]",
+                            Content = "[{\"Order\":1,\"Heading\":\"About this release\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"This statistical publication provides the number of schools and pupils in schools in England, using data from the January 2018School Census.\\n\\n Breakdowns are given for school types as well as for pupil characteristics including free school meal eligibility, English as an additional languageand ethnicity.This release also contains information about average class sizes.\\n\\n SEN tables previously provided in thispublication will be published in the statistical publication ‘Special educational needs in England: January 2018’ scheduled for release on 26July 2018.\\n\\n Cross border movement tables will be added to this publication later this year.\"}]}]",
+                            KeyStatistics = "[{\"Title\":\"Pupils in the school system\",\"Description\":\" Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.\"},{\"Title\":\"Pupils eligible for and claiming free school meals \",\"Description\":\" Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.\"},{\"Title\":\"Proportion of infant pupils in large classes\",\"Description\":\" Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.\"}]",
                             PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                             Published = new DateTime(2018, 5, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "January 2018 ",
