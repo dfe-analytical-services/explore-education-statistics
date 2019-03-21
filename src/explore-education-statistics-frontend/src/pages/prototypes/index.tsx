@@ -32,6 +32,11 @@ class PrototypesIndexPage extends Component {
             <Link to="/prototypes/methodology-home">Methodology home</Link>
           </li>
           <li>
+            <Link to="/prototypes/methodology-specific">
+              Specific methodology
+            </Link>
+          </li>
+          <li>
             <Link to="/prototypes/methodology-absence">
               Methodology page for absence
             </Link>
