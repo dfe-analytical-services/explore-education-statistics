@@ -9,7 +9,7 @@ const HomePage = () => {
         Choose how to explore our statistics and data
       </h1>
       <p className="govuk-body-l">
-        Select an option to find the national and regional level statistical and
+        Select an option to find the national and regional level statistics and
         data you’re looking for.
       </p>
       <div className="govuk-grid-row">
