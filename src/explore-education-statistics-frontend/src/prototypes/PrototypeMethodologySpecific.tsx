@@ -20,10 +20,13 @@ const BrowseReleasesPage = () => {
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">Specific methodology</h1>
+          <h1 className="govuk-heading-xl">
+            Education statistics: specific guidance methodology
+          </h1>
           <p className="govuk-body-l">
-            Find methodology and other useful information relating to each
-            statistical theme.
+            Browse to find the specific statistical topic and data set you're
+            looking for and find out how and why they're collected and
+            published.
           </p>
         </div>
         <div className="govuk-grid-column-one-third">
@@ -49,11 +52,13 @@ const BrowseReleasesPage = () => {
           <h3>Absence and exclusions</h3>
           <ul className="govuk-list-bullet">
             <li>
-              <Link to="#">exclusions statistics guide</Link>
+              <Link to="#">
+                Pupil exclusion statistics: guidance and methodology
+              </Link>
             </li>
             <li>
               <Link to="/prototypes/methodology-absence">
-                pupil absence statistics guide
+                Pupil absence statistics: guidance and methodology
               </Link>
             </li>
           </ul>
@@ -61,28 +66,40 @@ const BrowseReleasesPage = () => {
           <h3>Capacity and admissions</h3>
           <ul className="govuk-list-bullet">
             <li>
-              <Link to="#">admissions appeals statistics guide</Link>
+              <Link to="#">
+                Admissions and appeals statistics: guidance and methodology
+              </Link>
             </li>
             <li>
-              <Link to="#">school capacity statistics guide</Link>
+              <Link to="#">
+                School capacity statistics: guidance and methodology
+              </Link>
             </li>
           </ul>
           <hr />
           <h3>Results</h3>
           <ul className="govuk-list-bullet">
             <li>
-              <Link to="#">KS2 statistics guide</Link>
-            </li>
-            <li>
-              <Link to="#">KS4 statistics guide</Link>
-            </li>
-            <li>
               <Link to="#">
-                phonics screening check and KS1 assessments statistics guide
+                Key stage 1 (KS1) statistics: guidance and methodology
               </Link>
             </li>
             <li>
-              <Link to="#">early years foundation stage profile results</Link>
+              <Link to="#">
+                Key stage 4 (KS4) statistics: guidance and methodology
+              </Link>
+            </li>
+            <li>
+              <Link to="#">
+                Phonics screening check and KS1 assessments statistics: guidance
+                and methodology
+              </Link>
+            </li>
+            <li>
+              <Link to="#">
+                Early years foundation stage (EYFS) profile statistics: guidance
+                and methodology
+              </Link>
             </li>
           </ul>
           <hr />
@@ -91,11 +108,14 @@ const BrowseReleasesPage = () => {
             <li>
               {' '}
               <Link to="#">
-                School pupils and their characteristics statistics guide
+                School pupil characteristics statistics: guidance and
+                methodology
               </Link>
             </li>
             <li>
-              <Link to="#">School worksforce statistics guide</Link>
+              <Link to="#">
+                School worksforce statistics: guidance and methodology
+              </Link>
             </li>
           </ul>
           <hr />
@@ -104,7 +124,8 @@ const BrowseReleasesPage = () => {
             <li>
               {' '}
               <Link to="#">
-                initial teacher training performance statistics guide
+                Initial teacher training (ITT) performance statistics: guidance
+                and methodology
               </Link>
             </li>
           </ul>
@@ -113,18 +134,26 @@ const BrowseReleasesPage = () => {
           <h3>Further education</h3>
           <ul className="govuk-list-bullet">
             <li>
-              <Link to="#">destination of leavers statistics guide</Link>
-            </li>
-            <li>
               <Link to="#">
-                apprenticeships and traineeships statistics guide
+                Destination of leavers statistics: guidance and methodology
               </Link>
             </li>
             <li>
-              <Link to="#">further education and skills statistics guide</Link>
+              <Link to="#">
+                Apprenticeships and traineeships statistics: guidance and
+                methodology
+              </Link>
             </li>
             <li>
-              <Link to="#">16 to 18 school performance statistics guide</Link>
+              <Link to="#">
+                Further education and skills statistics: guidance and
+                methodology
+              </Link>
+            </li>
+            <li>
+              <Link to="#">
+                16 to 18 school performance statistics: guidance and methodology
+              </Link>
             </li>
           </ul>
         </AccordionSection>
@@ -132,10 +161,14 @@ const BrowseReleasesPage = () => {
           <h3>Number of children</h3>
           <ul className="govuk-list-bullet">
             <li>
-              <Link to="#">children in need statistics guide</Link>
+              <Link to="#">
+                Children in need statistics: guidance and methodology
+              </Link>
             </li>
             <li>
-              <Link to="#">looked after children statistics guide</Link>
+              <Link to="#">
+                Looked after children statistics: guidance and methodology
+              </Link>
             </li>
           </ul>
         </AccordionSection>
