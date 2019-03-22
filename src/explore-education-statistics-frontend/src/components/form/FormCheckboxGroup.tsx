@@ -27,7 +27,7 @@ interface State {
  * When using Formik, use {@see FormFieldRadioGroup} instead.
  */
 class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
-  public static defaultProps: Partial<FormCheckboxGroupProps> = {
+  public static defaultProps = {
     legendSize: 'm',
     selectAll: false,
     value: [],
@@ -48,7 +48,7 @@ class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
   public render() {
     const { value, onAllChange, name, id, options, selectAll } = this.props;
     const isAllChecked = options.every(
-      option => value.indexOf(option.value) > -1,
+      option => (value as string[]).indexOf(option.value) > -1,
     );
 
     return (

@@ -1,5 +1,8 @@
 export { default as FormCheckbox } from './FormCheckbox';
 export { default as FormCheckboxGroup } from './FormCheckboxGroup';
+export { default as FormFieldCheckboxGroup } from './FormFieldCheckboxGroup';
+export { default as FormFieldRadioGroup } from './FormFieldRadioGroup';
+export { default as FormFieldSelect } from './FormFieldSelect';
 export { default as FormFieldset } from './FormFieldset';
 export { default as FormGroup } from './FormGroup';
 export { default as FormRadio } from './FormRadio';

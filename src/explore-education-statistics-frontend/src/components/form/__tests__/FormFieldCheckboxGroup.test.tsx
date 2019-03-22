@@ -1,4 +1,4 @@
-import { Formik, FormikProps } from 'formik';
+import { Formik } from 'formik';
 import React from 'react';
 import { fireEvent, render, wait } from 'react-testing-library';
 import Yup from 'src/lib/validation/yup';
@@ -16,7 +16,7 @@ describe('FormFieldCheckboxGroup', () => {
           test: [],
         }}
         onSubmit={() => null}
-        render={(props: FormikProps<FormValues>) => (
+        render={() => (
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
@@ -25,7 +25,6 @@ describe('FormFieldCheckboxGroup', () => {
               { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
               { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
             ]}
-            value={props.values.test}
           />
         )}
       />,
@@ -49,7 +48,7 @@ describe('FormFieldCheckboxGroup', () => {
           test: ['1'],
         }}
         onSubmit={() => null}
-        render={(props: FormikProps<FormValues>) => (
+        render={() => (
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
@@ -58,7 +57,6 @@ describe('FormFieldCheckboxGroup', () => {
               { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
               { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
             ]}
-            value={props.values.test}
           />
         )}
       />,
@@ -82,7 +80,7 @@ describe('FormFieldCheckboxGroup', () => {
           test: [],
         }}
         onSubmit={() => null}
-        render={(props: FormikProps<FormValues>) => (
+        render={() => (
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
@@ -91,7 +89,6 @@ describe('FormFieldCheckboxGroup', () => {
               { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
               { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
             ]}
-            value={props.values.test}
             selectAll
           />
         )}
@@ -118,11 +115,10 @@ describe('FormFieldCheckboxGroup', () => {
           test: ['1', '2', '3'],
         }}
         onSubmit={() => null}
-        render={(props: FormikProps<FormValues>) => (
+        render={() => (
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
-            value={props.values.test}
             selectAll
             options={[
               { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
@@ -156,11 +152,10 @@ describe('FormFieldCheckboxGroup', () => {
           test: [],
         }}
         onSubmit={() => null}
-        render={(props: FormikProps<FormValues>) => (
+        render={() => (
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
-            value={props.values.test}
             selectAll
             options={[
               { id: 'checkbox-1', label: 'Checkbox 1', value: '1' },
@@ -199,11 +194,10 @@ describe('FormFieldCheckboxGroup', () => {
           test: ['1', '2', '3'],
         }}
         onSubmit={() => null}
-        render={(props: FormikProps<FormValues>) => (
+        render={() => (
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
-            value={props.values.test}
             selectAll
             options={[
               { id: 'checkbox-1', label: 'Checkbox 1', value: '1' },
@@ -240,7 +234,7 @@ describe('FormFieldCheckboxGroup', () => {
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
-          render={(props: FormikProps<FormValues>) => (
+          render={() => (
             <FormFieldCheckboxGroup<FormValues>
               name="test"
               id="checkboxes"
@@ -249,7 +243,6 @@ describe('FormFieldCheckboxGroup', () => {
                 { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
                 { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
               ]}
-              value={props.values.test}
             />
           )}
         />,
@@ -268,7 +261,7 @@ describe('FormFieldCheckboxGroup', () => {
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
-          render={(props: FormikProps<FormValues>) => (
+          render={() => (
             <FormFieldCheckboxGroup<FormValues>
               name="test"
               id="checkboxes"
@@ -277,7 +270,6 @@ describe('FormFieldCheckboxGroup', () => {
                 { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
                 { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
               ]}
-              value={props.values.test}
             />
           )}
         />,
@@ -303,7 +295,7 @@ describe('FormFieldCheckboxGroup', () => {
             test: ['1'],
           }}
           onSubmit={() => null}
-          render={(props: FormikProps<FormValues>) => (
+          render={() => (
             <FormFieldCheckboxGroup<FormValues>
               name="test"
               id="checkboxes"
@@ -313,7 +305,6 @@ describe('FormFieldCheckboxGroup', () => {
                 { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
                 { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
               ]}
-              value={props.values.test}
             />
           )}
         />,
@@ -332,7 +323,7 @@ describe('FormFieldCheckboxGroup', () => {
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
-          render={(props: FormikProps<FormValues>) => (
+          render={() => (
             <FormFieldCheckboxGroup<FormValues>
               name="test"
               id="checkboxes"
@@ -342,7 +333,6 @@ describe('FormFieldCheckboxGroup', () => {
                 { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
                 { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
               ]}
-              value={props.values.test}
             />
           )}
         />,

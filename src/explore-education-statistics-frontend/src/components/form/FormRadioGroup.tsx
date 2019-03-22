@@ -11,17 +11,18 @@ interface RadioOption {
 }
 
 export type FormRadioGroupProps = {
-  value: string | null;
   inline?: boolean;
   name: string;
   onChange?: RadioChangeEventHandler<any>;
   options: RadioOption[];
+  value: string | null;
 } & FieldSetProps;
 
 class FormRadioGroup extends Component<FormRadioGroupProps> {
   public static defaultProps = {
     inline: false,
     legendSize: 'm',
+    value: '',
   };
 
   private ref = createRef<HTMLInputElement>();

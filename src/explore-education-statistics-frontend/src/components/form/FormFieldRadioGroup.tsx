@@ -1,12 +1,13 @@
 import { Field, FieldProps } from 'formik';
 import React from 'react';
 import createErrorHelper from 'src/lib/validation/createErrorHelper';
+import { Omit } from 'src/types/util';
 import FormRadioGroup, { FormRadioGroupProps } from './FormRadioGroup';
 
 type Props<FormValues> = {
   name: keyof FormValues | string;
   showError?: boolean;
-} & FormRadioGroupProps;
+} & Omit<FormRadioGroupProps, 'value'>;
 
 const FormFieldRadioGroup = <T extends {}>(props: Props<T>) => {
   const { error, name, showError = true } = props;

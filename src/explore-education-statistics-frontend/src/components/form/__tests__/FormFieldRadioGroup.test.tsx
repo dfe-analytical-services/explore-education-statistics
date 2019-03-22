@@ -16,7 +16,7 @@ describe('FormFieldRadioGroup', () => {
           test: '',
         }}
         onSubmit={() => null}
-        render={(props: FormikProps<FormValues>) => (
+        render={() => (
           <FormFieldRadioGroup<FormValues>
             name="test"
             id="radios"
@@ -25,7 +25,6 @@ describe('FormFieldRadioGroup', () => {
               { id: 'radio-2', value: '2', label: 'Radio 2' },
               { id: 'radio-3', value: '3', label: 'Radio 3' },
             ]}
-            value={props.values.test}
           />
         )}
       />,
@@ -49,7 +48,7 @@ describe('FormFieldRadioGroup', () => {
           test: '1',
         }}
         onSubmit={() => null}
-        render={(props: FormikProps<FormValues>) => (
+        render={() => (
           <FormFieldRadioGroup<FormValues>
             name="test"
             id="radios"
@@ -58,7 +57,6 @@ describe('FormFieldRadioGroup', () => {
               { id: 'radio-2', value: '2', label: 'Radio 2' },
               { id: 'radio-3', value: '3', label: 'Radio 3' },
             ]}
-            value={props.values.test}
           />
         )}
       />,
@@ -89,7 +87,7 @@ describe('FormFieldRadioGroup', () => {
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
-          render={(props: FormikProps<FormValues>) => (
+          render={() => (
             <FormFieldRadioGroup<FormValues>
               name="test"
               id="radios"
@@ -98,7 +96,6 @@ describe('FormFieldRadioGroup', () => {
                 { id: 'radio-2', value: '2', label: 'Radio 2' },
                 { id: 'radio-3', value: '3', label: 'Radio 3' },
               ]}
-              value={props.values.test}
             />
           )}
         />,
@@ -127,7 +124,6 @@ describe('FormFieldRadioGroup', () => {
                   { id: 'radio-2', value: '2', label: 'Radio 2' },
                   { id: 'radio-3', value: '3', label: 'Radio 3' },
                 ]}
-                value={props.values.test}
               />
 
               <button type="submit">Submit</button>
@@ -152,7 +148,7 @@ describe('FormFieldRadioGroup', () => {
             test: '1',
           }}
           onSubmit={() => null}
-          render={(props: FormikProps<FormValues>) => (
+          render={() => (
             <FormFieldRadioGroup<FormValues>
               name="test"
               id="radios"
@@ -162,7 +158,6 @@ describe('FormFieldRadioGroup', () => {
                 { id: 'radio-2', value: '2', label: 'Radio 2' },
                 { id: 'radio-3', value: '3', label: 'Radio 3' },
               ]}
-              value={props.values.test}
             />
           )}
         />,
@@ -192,7 +187,6 @@ describe('FormFieldRadioGroup', () => {
                   { id: 'radio-2', value: '2', label: 'Radio 2' },
                   { id: 'radio-3', value: '3', label: 'Radio 3' },
                 ]}
-                value={props.values.test}
               />
 
               <button type="submit">Submit</button>

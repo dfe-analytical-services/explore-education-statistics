@@ -89,7 +89,6 @@ class SearchableFilterMenus<
             <FormFieldCheckboxGroup
               name={name as string}
               options={options}
-              value={values}
               id={compositeKey}
               selectAll
               showError={false}

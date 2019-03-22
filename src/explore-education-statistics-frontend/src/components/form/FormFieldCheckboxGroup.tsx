@@ -2,16 +2,17 @@ import { FieldArray } from 'formik';
 import difference from 'lodash/difference';
 import React from 'react';
 import createErrorHelper from 'src/lib/validation/createErrorHelper';
+import { Omit } from 'src/types/util';
 import { FormCheckboxGroupProps } from './FormCheckboxGroup';
 import { FormCheckboxGroup } from './index';
 
 type Props<FormValues> = {
   name: keyof FormValues | string;
   showError?: boolean;
-} & FormCheckboxGroupProps;
+} & Omit<FormCheckboxGroupProps, 'value'>;
 
 const FormFieldCheckboxGroup = <T extends {}>(props: Props<T>) => {
-  const { error, name, options, showError = true, value } = props;
+  const { error, name, options, showError = true } = props;
 
   return (
     <FieldArray name={name}>
@@ -29,6 +30,7 @@ const FormFieldCheckboxGroup = <T extends {}>(props: Props<T>) => {
             {...props}
             error={errorMessage}
             options={options}
+            value={form.values[name]}
             onAllChange={event => {
               const allOptionValues = options.map(option => option.value);
               const restValues = difference(form.values[name], allOptionValues);
@@ -43,7 +45,7 @@ const FormFieldCheckboxGroup = <T extends {}>(props: Props<T>) => {
               if (event.target.checked) {
                 helpers.push(event.target.value);
               } else {
-                const index = value.indexOf(event.target.value);
+                const index = form.values[name].indexOf(event.target.value);
 
                 if (index > -1) {
                   helpers.remove(index);

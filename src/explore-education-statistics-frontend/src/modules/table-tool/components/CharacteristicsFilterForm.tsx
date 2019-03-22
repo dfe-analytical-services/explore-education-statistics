@@ -196,7 +196,6 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                       legend="School types"
                       hint="Filter statistics by number of pupils in school type(s)"
                       options={this.schoolTypeOptions}
-                      value={values.schoolTypes}
                       selectAll
                     />
                   </div>
