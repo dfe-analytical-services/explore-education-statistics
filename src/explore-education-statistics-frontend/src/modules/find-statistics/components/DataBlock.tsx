@@ -2,9 +2,14 @@ import React, { Component } from 'react';
 import Tabs from '../../../components/Tabs';
 import TabsSection from '../../../components/TabsSection';
 import { baseUrl } from '../../../services/api';
-import { Chart, DataQuery } from '../../../services/publicationService';
+import {
+  Chart,
+  DataQuery,
+  Summary,
+} from '../../../services/publicationService';
 import { PublicationMeta } from '../../../services/tableBuilderService';
 import { ChartRenderer } from './ChartRenderer';
+import { SummaryRenderer } from './SummaryRenderer';
 import { TableRenderer } from './TableRenderer';
 
 interface DataBlockProps {
@@ -12,18 +17,21 @@ interface DataBlockProps {
   heading?: string;
   dataQuery?: DataQuery;
   charts?: Chart[];
+  summary?: Summary;
 }
 
 interface DataBlockState {
   charts?: any[];
   downloads?: any[];
   tables?: any[];
+  summary?: any;
 }
 
 export class DataBlock extends Component<DataBlockProps, DataBlockState> {
   public state: DataBlockState = {
     charts: undefined,
     downloads: undefined,
+    summary: undefined,
     tables: undefined,
   };
 
@@ -79,6 +87,14 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
         }));
       }
 
+      if (this.props.summary) {
+        newState.summary = {
+          ...this.props.summary,
+          data: json,
+          meta: jsonMeta,
+        };
+      }
+
       this.setState(newState);
     }
   }
@@ -88,27 +104,33 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
   }
 
   public render() {
-    const { charts, dataQuery, heading } = this.props;
-
     const id = new Date().getDate();
 
     return (
       <div className="govuk-datablock">
         <Tabs>
-          <TabsSection id={`${id}0`} title="Data tables">
-            {this.state.tables !== undefined
-              ? this.state.tables.map((table: any, idx) => (
-                  <TableRenderer key={`${id}0_table_${idx}`} {...table} />
-                ))
-              : ''}
-          </TabsSection>
-          <TabsSection id={`${id}1`} title="Charts">
-            {this.state.charts !== undefined
-              ? this.state.charts.map((chart: any, idx) => (
-                  <ChartRenderer key={`${id}_chart_${idx}`} {...chart} />
-                ))
-              : ''}
-          </TabsSection>
+          {this.state.summary && (
+            <TabsSection id={`${id}_summary`} title="Summary">
+              <SummaryRenderer {...this.state.summary} />
+            </TabsSection>
+          )}
+
+          {this.state.tables && (
+            <TabsSection id={`${id}0`} title="Data tables">
+              {this.state.tables.map((table: any, idx) => (
+                <TableRenderer key={`${id}0_table_${idx}`} {...table} />
+              ))}
+            </TabsSection>
+          )}
+
+          {this.state.charts && (
+            <TabsSection id={`${id}1`} title="Charts">
+              {this.state.charts.map((chart: any, idx) => (
+                <ChartRenderer key={`${id}_chart_${idx}`} {...chart} />
+              ))}
+            </TabsSection>
+          )}
+
           <TabsSection id={`${id}2`} title="Data downloads">
             downloads
           </TabsSection>

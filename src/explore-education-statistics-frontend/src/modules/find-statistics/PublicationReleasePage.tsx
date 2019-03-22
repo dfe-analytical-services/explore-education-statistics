@@ -14,6 +14,7 @@ import TabsSection from 'src/components/TabsSection';
 import { baseUrl } from 'src/services/api';
 import publicationService, { Release } from 'src/services/publicationService';
 import ContentBlock from './components/ContentBlock';
+import { DataBlock } from './components/DataBlock';
 
 interface Props {
   publication: string;
@@ -178,36 +179,7 @@ class PublicationReleasePage extends Component<Props> {
 
         <hr />
 
-        {data.keyStatistics.length > 0 && (
-          <>
-            <h2 className="govuk-heading-l">
-              {`${
-                !release ? 'Latest headline' : 'Headline'
-              } facts and figures - ${data.releaseName}
-              `}
-            </h2>
-
-            <Tabs>
-              <TabsSection id="summary" title="Summary">
-                <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">
-                  {data.keyStatistics.map(({ title, description }) => (
-                    <div className="dfe-dash-tiles__tile" key={title}>
-                      <h3 className="govuk-heading-m dfe-dash-tiles__heading">
-                        {title}
-                      </h3>
-                      <p className="govuk-heading-xl govuk-!-margin-bottom-2">
-                        --
-                      </p>
-                      <Details summary={`What is ${title}?`}>
-                        {description}
-                      </Details>
-                    </div>
-                  ))}
-                </div>
-              </TabsSection>
-            </Tabs>
-          </>
-        )}
+        {data.keyStatistics && <DataBlock {...data.keyStatistics} />}
 
         {data.content.length > 0 && (
           <>

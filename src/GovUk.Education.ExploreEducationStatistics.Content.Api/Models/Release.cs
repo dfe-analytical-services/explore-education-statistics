@@ -28,8 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
 
         public List<ContentSection> Content { get; set; }
         
-        public List<KeyStatistic> KeyStatistics { get; set; }
-
-        public DataBlock KeyStatisticsBlock { get; set; }
+        public DataBlock KeyStatistics { get; set; }
     }
 }

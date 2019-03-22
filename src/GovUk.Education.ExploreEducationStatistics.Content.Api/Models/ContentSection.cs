@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
 
     }
 
-    public class Summary 
+    public class Summary
     {
         public List<string> dataKeys { get; set; }
 

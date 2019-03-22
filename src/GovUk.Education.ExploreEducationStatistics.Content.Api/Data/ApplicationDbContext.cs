@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                 .Property(b => b.KeyStatistics)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<List<KeyStatistic>>(v));
+                    v => JsonConvert.DeserializeObject<DataBlock>(v));
             
             modelBuilder.Entity<Theme>().HasData(
                 new Theme
@@ -264,23 +264,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     Published = new DateTime(2017, 3, 22),
                     Slug = "2016-17",
                     Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
-                    KeyStatistics = new List<KeyStatistic>
-                    {
-                        new KeyStatistic {
-                            Title = "Overall absence", 
-                            Description = "Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."
-                        },
-                        new KeyStatistic {
-                            Title = "Authorised absence", 
-                            Description = "Authorised absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."
-                        },
-                        new KeyStatistic {
-                            Title = "Unauthorised absence", 
-                            Description = "Unauthorised absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."
-                        }
-                    },
                     
-                    KeyStatisticsBlock = new DataBlock {
+                    KeyStatistics = new DataBlock {
                         Heading = "Latest headline facts and figures - 2016 to 2017",
                         
                         DataQuery = new DataQuery 
@@ -467,12 +452,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     Published = new DateTime(2016, 3, 25),
                     Slug = "2015-16",
                     Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
-                    KeyStatistics = new List<KeyStatistic>
-                    {
-                        new KeyStatistic {Title = "Overall absence", Description = "Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."},
-                        new KeyStatistic {Title = "Authorised absence", Description = "Authorised absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."},
-                        new KeyStatistic {Title = "Unauthorised absence", Description = "Unauthorised absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."}
+                    
+                    KeyStatistics = new DataBlock {
+                        Heading = "Latest headline facts and figures - 2016 to 2017",
+                        
+                        Summary = new Summary 
+                        {
+                            dataKeys = new List<string> {
+                                "--",
+                                "--",
+                                "--"
+                                },
+                            
+                            description = new MarkDownBlock {
+                                Body = ""
+                                }
+                        }
+                        
                     },
+                    
                     Content = new List<ContentSection>
                     {
                         new ContentSection {Order = 1, Heading = "About this release", Caption = ""},
@@ -495,11 +493,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     Published = new DateTime(2018, 7, 19),
                     Slug = "2016-17",
                     Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of permanent and fixed-period exclusion subject areas.",
-                    KeyStatistics = new List<KeyStatistic>
-                    {
-                        new KeyStatistic {Title = "Overall permanent exclusions", Description = "Overall permanent exclusions is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."},
-                        new KeyStatistic {Title = "Number of exclusions", Description = "Number of exclusions is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."},
-                        new KeyStatistic {Title = "Overall rate of fixed-period exclusions", Description = "Overall rate of fixed-period exclusionsis the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."}
+                    KeyStatistics = new DataBlock {
+                        Heading = "Latest headline facts and figures - 2016 to 2017",
+                        
+                        Summary = new Summary 
+                        {
+                            dataKeys = new List<string> {
+                                "--",
+                                "--",
+                                "--"
+                            },
+                            
+                            description = new MarkDownBlock {
+                                Body = ""
+                            }
+                        }
+                        
                     },
                     Content = new List<ContentSection>
                     {
@@ -630,11 +639,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     Published = new DateTime(2018, 5, 28),
                     Slug = "january-2018",
                     Summary = "Statistics on pupils in schools in England as collected in the January 2018 school census.",
-                    KeyStatistics = new List<KeyStatistic>
-                    {
-                        new KeyStatistic { Title = "Pupils in the school system", Description = " Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."},
-                        new KeyStatistic { Title = "Pupils eligible for and claiming free school meals ", Description = " Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."},
-                        new KeyStatistic { Title = "Proportion of infant pupils in large classes", Description = " Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."}
+                    KeyStatistics = new DataBlock {
+                        Heading = "Latest headline facts and figures - 2016 to 2017",
+                        
+                        Summary = new Summary 
+                        {
+                            dataKeys = new List<string> {
+                                "--",
+                                "--",
+                                "--"
+                            },
+                            
+                            description = new MarkDownBlock {
+                                Body = ""
+                            }
+                        }
+                        
                     },
                     Content = new List<ContentSection>
                     {
