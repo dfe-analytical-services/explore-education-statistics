@@ -90,7 +90,7 @@ jobs:
         displayName: 'Publish Pipeline Artifact'
         inputs:
           artifactName: 'frontend'
-          targetPath: '$(Build.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
+          targetPath: 'src/explore-education-statistics-frontend'
   - job: 'MiscellaneousArtifacts'
     pool:
       vmImage: 'ubuntu-16.04'
