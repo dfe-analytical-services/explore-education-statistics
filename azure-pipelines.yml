@@ -97,7 +97,7 @@ jobs:
         inputs:
           artifactName: 'frontend'
           targetPath: '$(Build.ArtifactStagingDirectory)'
-  - job: 'Miscellaneous Artifacts'
+  - job: 'MiscellaneousArtifacts'
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
