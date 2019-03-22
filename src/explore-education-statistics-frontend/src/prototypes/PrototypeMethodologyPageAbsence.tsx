@@ -37,21 +37,17 @@ const PublicationPage = () => {
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">A guide to absence statistics</h1>
+          <h1 className="govuk-heading-xl">
+            Pupil absence statistics: guidance and methodology
+          </h1>
           <h2 className="govuk-heading-s">
             <span className="govuk-caption-m">Published: </span>March 2018
           </h2>
           <p className="govuk-body-l">
-            This document provides a comprehensive guide to the pupil absence in
-            schools in England statistics published by the Department for
-            Education.
+            Find out about the background of and methodology for pupil absence
+            data and statistics and how and why they are collected and
+            published.
           </p>
-          <p>The key areas covered in this guide are:</p>
-          <ul className="govuk-list govuk-list--bullet">
-            <li>background to published statistics and methodology</li>
-            <li>data collection and coverage</li>
-            <li>data processing</li>
-          </ul>
         </div>
 
         <div className="govuk-grid-column-one-third">
