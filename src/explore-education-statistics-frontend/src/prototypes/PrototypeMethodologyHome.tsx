@@ -7,11 +7,12 @@ const HomePage = () => {
     <PrototypePage>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">Methodology and guidance</h1>
+          <h1 className="govuk-heading-xl">
+            Education statistics: guidance and methodology
+          </h1>
           <p className="govuk-body-l">
-            Information on the methods we use to produce our statistics. This
-            includes classifications, harmonisation, best practice, geography
-            and user guidance for a wide range of data.
+            Select an option to find the kind of guidance and methodology you're
+            looking for.
           </p>
         </div>
         <div className="govuk-grid-column-one-third">
@@ -34,28 +35,31 @@ const HomePage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-1">
-            <Link to="#">General methodology</Link>
+            <Link to="#">General guidance and methodology</Link>
           </h2>
           <p className="govuk-body">
-            How we collect and process data, what we do with it and related
-            policies.
+            Browse to find out more about the general background of and
+            methodology behind education statistics and data and how and why
+            they're collected and published.
           </p>
 
           <h2 className="govuk-heading-m govuk-!-margin-bottom-1">
             <Link to="/prototypes/methodology-specific">
-              Specific methodology and guidance
+              Specific guidance and methodology
             </Link>
           </h2>
           <p className="govuk-body">
-            Find methodology and guidance for specific DfE publications.
+            Browse to find out more about the background of and methodology
+            behind specific education statistics and data and how and why
+            they're collected and published.
           </p>
 
           <h2 className="govuk-heading-m govuk-!-margin-bottom-1">
             <Link to="#">Glossary</Link>
           </h2>
           <p className="govuk-body">
-            A comprehensive list of decriptions for terms used in our
-            publications.
+            Browse our A to Z list of definitions for terms used across
+            education statistics and data.
           </p>
         </div>
       </div>

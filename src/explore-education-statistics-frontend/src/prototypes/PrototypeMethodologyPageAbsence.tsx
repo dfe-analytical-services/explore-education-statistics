@@ -44,8 +44,8 @@ const PublicationPage = () => {
             <span className="govuk-caption-m">Published: </span>March 2018
           </h2>
           <p className="govuk-body-l">
-            Find out about the background of and methodology for pupil absence
-            data and statistics and how and why they are collected and
+            Find out about the background of and methodology behind pupil
+            absence statistics and data and how and why they're collected and
             published.
           </p>
         </div>
@@ -79,7 +79,7 @@ const PublicationPage = () => {
                 </li>
                 <li>
                   <a href="#section1-2">
-                    Uses and users of absence data and statistics
+                    Uses and users of absence statistics and data
                   </a>
                 </li>
               </ul>
@@ -254,22 +254,22 @@ const PublicationPage = () => {
 
       <h2 className="govuk-heading-l govuk-!-margin-top-9">Annex</h2>
       <Accordion id="annex-sections">
-        <AccordionSection heading="Annex A, glossary">
+        <AccordionSection heading="Annex A - Glossary">
           <PrototypeAnnexA />
         </AccordionSection>
-        <AccordionSection heading="Annex B, calculations">
+        <AccordionSection heading="Annex B - Calculations">
           <PrototypeAnnexB />
         </AccordionSection>
-        <AccordionSection heading="Annex C, school attendance codes">
+        <AccordionSection heading="Annex C - School attendance codes">
           <PrototypeAnnexC />
         </AccordionSection>
-        <AccordionSection heading="Annex D, links to pupil absence national statistics publications">
+        <AccordionSection heading="Annex D - Links to pupil absence national statistics publications">
           <PrototypeAnnexD />
         </AccordionSection>
-        <AccordionSection heading="Annex E, standard breakdowns that are currently published">
+        <AccordionSection heading="Annex E - Standard breakdowns that are currently published">
           <PrototypeAnnexE />
         </AccordionSection>
-        <AccordionSection heading="Annex F, timeline">
+        <AccordionSection heading="Annex F - Timeline">
           <p>timeline</p>
         </AccordionSection>
       </Accordion>
