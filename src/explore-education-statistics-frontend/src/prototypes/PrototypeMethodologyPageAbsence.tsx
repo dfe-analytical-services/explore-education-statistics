@@ -45,7 +45,8 @@ const PublicationPage = () => {
           </h2>
           <p className="govuk-body-l">
             Find out about the background of and methodology for pupil absence
-            data and statistics and why they are collected and published.
+            data and statistics and how and why they are collected and
+            published.
           </p>
         </div>
 
