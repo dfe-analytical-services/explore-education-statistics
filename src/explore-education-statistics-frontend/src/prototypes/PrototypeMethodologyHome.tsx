@@ -50,8 +50,8 @@ const HomePage = () => {
           </h2>
           <p className="govuk-body">
             Browse to find out more about the background of and methodology
-            behind specific education statistics and data and how and why
-            they're collected and published.
+            behind specific education statistical topics and data sets and how
+            and why they're collected and published.
           </p>
 
           <h2 className="govuk-heading-m govuk-!-margin-bottom-1">
