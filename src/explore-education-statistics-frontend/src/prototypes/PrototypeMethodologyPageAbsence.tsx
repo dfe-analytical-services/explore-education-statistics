@@ -38,7 +38,7 @@ const PublicationPage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <h1 className="govuk-heading-xl">
-            Pupil absence statistics: guidance
+            Pupil absence statistics: guidance and methodology
           </h1>
           <h2 className="govuk-heading-s">
             <span className="govuk-caption-m">Published: </span>March 2018
