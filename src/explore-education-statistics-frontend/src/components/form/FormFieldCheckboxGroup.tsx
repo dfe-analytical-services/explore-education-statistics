@@ -7,20 +7,27 @@ import { FormCheckboxGroup } from './index';
 
 type Props<FormValues> = {
   name: keyof FormValues | string;
+  showError?: boolean;
 } & FormCheckboxGroupProps;
 
 const FormFieldCheckboxGroup = <T extends {}>(props: Props<T>) => {
-  const { error, name, options, value } = props;
+  const { error, name, options, showError = true, value } = props;
 
   return (
     <FieldArray name={name}>
       {({ form, ...helpers }) => {
         const { getError } = createErrorHelper(form);
 
+        let errorMessage = error ? error : getError(name);
+
+        if (!showError) {
+          errorMessage = '';
+        }
+
         return (
           <FormCheckboxGroup
             {...props}
-            error={error ? error : getError(name)}
+            error={errorMessage}
             options={options}
             onAllChange={event => {
               const allOptionValues = options.map(option => option.value);

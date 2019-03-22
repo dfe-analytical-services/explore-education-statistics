@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { ChangeEventHandler, Component, createRef } from 'react';
+import React, { Component, createRef } from 'react';
 import FormFieldset, { FieldSetProps } from './FormFieldset';
 import FormRadio, { RadioChangeEventHandler } from './FormRadio';
 
@@ -36,14 +36,8 @@ class FormRadioGroup extends Component<FormRadioGroupProps> {
     }
   }
 
-  private handleChange: ChangeEventHandler<HTMLInputElement> = event => {
-    if (this.props.onChange) {
-      this.props.onChange(event);
-    }
-  };
-
   public render() {
-    const { inline, name, options } = this.props;
+    const { inline, name, onChange, options, value } = this.props;
 
     return (
       <FormFieldset {...this.props}>
@@ -56,10 +50,14 @@ class FormRadioGroup extends Component<FormRadioGroupProps> {
           {options.map(option => (
             <FormRadio
               {...option}
-              checked={this.props.value === option.value}
+              checked={value === option.value}
               key={option.id}
               name={name}
-              onChange={this.handleChange}
+              onChange={event => {
+                if (onChange) {
+                  onChange(event);
+                }
+              }}
             />
           ))}
         </div>

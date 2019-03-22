@@ -1,6 +1,7 @@
 import { Formik, FormikProps } from 'formik';
 import React from 'react';
 import { fireEvent, render, wait } from 'react-testing-library';
+import Yup from 'src/lib/validation/yup';
 import FormFieldCheckboxGroup from '../FormFieldCheckboxGroup';
 
 describe('FormFieldCheckboxGroup', () => {
@@ -226,5 +227,138 @@ describe('FormFieldCheckboxGroup', () => {
 
     expect(checkbox.checked).toBe(false);
     expect(selectAll.checked).toBe(false);
+  });
+
+  describe('error messages', () => {
+    test('does not display validation message when checkboxes are untouched', async () => {
+      const { queryByText } = render(
+        <Formik
+          initialValues={{
+            test: [],
+          }}
+          onSubmit={() => null}
+          validationSchema={Yup.object({
+            test: Yup.array().required('Select at least one option'),
+          })}
+          render={(props: FormikProps<FormValues>) => (
+            <FormFieldCheckboxGroup<FormValues>
+              name="test"
+              id="checkboxes"
+              options={[
+                { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
+                { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
+                { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
+              ]}
+              value={props.values.test}
+            />
+          )}
+        />,
+      );
+
+      expect(queryByText('Select at least one option')).toBeNull();
+    });
+
+    test('displays validation message when no checkboxes are checked', async () => {
+      const { getByLabelText, queryByText } = render(
+        <Formik
+          initialValues={{
+            test: ['1'],
+          }}
+          onSubmit={() => null}
+          validationSchema={Yup.object({
+            test: Yup.array().required('Select at least one option'),
+          })}
+          render={(props: FormikProps<FormValues>) => (
+            <FormFieldCheckboxGroup<FormValues>
+              name="test"
+              id="checkboxes"
+              options={[
+                { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
+                { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
+                { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
+              ]}
+              value={props.values.test}
+            />
+          )}
+        />,
+      );
+
+      const checkbox = getByLabelText('Checkbox 1') as HTMLInputElement;
+
+      expect(checkbox.checked).toBe(true);
+      expect(queryByText('Select at least one option')).toBeNull();
+
+      fireEvent.click(checkbox);
+
+      await wait();
+
+      expect(checkbox.checked).toBe(false);
+      expect(queryByText('Select at least one option')).not.toBeNull();
+    });
+
+    test('displays custom error message from `error` prop', () => {
+      const { getByText } = render(
+        <Formik
+          initialValues={{
+            test: ['1'],
+          }}
+          onSubmit={() => null}
+          render={(props: FormikProps<FormValues>) => (
+            <FormFieldCheckboxGroup<FormValues>
+              name="test"
+              id="checkboxes"
+              error="Invalid checkbox selection"
+              options={[
+                { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
+                { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
+                { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
+              ]}
+              value={props.values.test}
+            />
+          )}
+        />,
+      );
+
+      expect(getByText('Invalid checkbox selection')).toBeDefined();
+    });
+
+    test('does not display validation message when `showError` is false', async () => {
+      const { getByLabelText, queryByText } = render(
+        <Formik
+          initialValues={{
+            test: ['1'],
+          }}
+          onSubmit={() => null}
+          validationSchema={Yup.object({
+            test: Yup.array().required('Select at least one option'),
+          })}
+          render={(props: FormikProps<FormValues>) => (
+            <FormFieldCheckboxGroup<FormValues>
+              name="test"
+              id="checkboxes"
+              showError={false}
+              options={[
+                { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
+                { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
+                { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
+              ]}
+              value={props.values.test}
+            />
+          )}
+        />,
+      );
+
+      const checkbox = getByLabelText('Checkbox 1') as HTMLInputElement;
+
+      expect(checkbox.checked).toBe(true);
+      expect(queryByText('Select at least one option')).toBeNull();
+
+      fireEvent.click(checkbox);
+
+      await wait();
+
+      expect(checkbox.checked).toBe(false);
+      expect(queryByText('Select at least one option')).toBeNull();
+    });
   });
 });
