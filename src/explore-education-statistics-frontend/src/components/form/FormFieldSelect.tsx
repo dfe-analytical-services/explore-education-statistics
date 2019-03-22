@@ -6,23 +6,26 @@ import FormSelect, { FormSelectProps } from './FormSelect';
 
 type Props<FormValues> = {
   name: keyof FormValues | string;
+  showError?: boolean;
 } & FormSelectProps;
 
 const FormFieldSelect = <T extends {}>(props: Props<T>) => {
-  const { error, name } = props;
+  const { error, name, showError = true } = props;
 
   return (
     <Field name={name}>
       {({ field, form }: FieldProps) => {
-        const { getError, hasError } = createErrorHelper(form);
+        const { getError } = createErrorHelper(form);
+
+        let errorMessage = error ? error : getError(name);
+
+        if (!showError) {
+          errorMessage = '';
+        }
 
         return (
-          <FormGroup hasError={error ? !!error : hasError(name)}>
-            <FormSelect
-              {...props}
-              {...field}
-              error={error ? error : getError(name)}
-            />
+          <FormGroup hasError={!!errorMessage}>
+            <FormSelect {...props} {...field} error={errorMessage} />
           </FormGroup>
         );
       }}

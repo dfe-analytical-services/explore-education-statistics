@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from 'react-testing-library';
 import FormFieldset from '../FormFieldset';
 
-describe('FormFieldSet', () => {
+describe('FormFieldset', () => {
   test('renders correctly with required props', () => {
     const { container } = render(
       <FormFieldset id="test-fieldset" legend="Fill the form">
