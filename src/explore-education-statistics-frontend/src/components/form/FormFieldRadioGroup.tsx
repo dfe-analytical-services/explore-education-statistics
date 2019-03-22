@@ -1,27 +1,30 @@
 import { Field, FieldProps } from 'formik';
-import React, { Component } from 'react';
+import React from 'react';
 import createErrorHelper from 'src/lib/validation/createErrorHelper';
-import { Omit } from 'src/types/util';
 import FormRadioGroup, { FormRadioGroupProps } from './FormRadioGroup';
 
 type Props<FormValues> = {
   name: keyof FormValues | string;
-} & Omit<FormRadioGroupProps, 'error'>;
+} & FormRadioGroupProps;
 
-class FormFieldRadioGroup<FormValues> extends Component<Props<FormValues>> {
-  public render() {
-    return (
-      <Field name={name}>
-        {({ field, form }: FieldProps) => {
-          const { getError } = createErrorHelper(form);
+const FormFieldRadioGroup = <T extends {}>(props: Props<T>) => {
+  const { error } = props;
 
-          return (
-            <FormRadioGroup {...this.props} {...field} error={getError(name)} />
-          );
-        }}
-      </Field>
-    );
-  }
-}
+  return (
+    <Field name={name}>
+      {({ field, form }: FieldProps) => {
+        const { getError } = createErrorHelper(form);
+
+        return (
+          <FormRadioGroup
+            {...props}
+            {...field}
+            error={error ? error : getError(name)}
+          />
+        );
+      }}
+    </Field>
+  );
+};
 
 export default FormFieldRadioGroup;

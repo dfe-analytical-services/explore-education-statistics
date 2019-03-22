@@ -1,14 +1,15 @@
 import { Field, FieldProps } from 'formik';
 import React from 'react';
 import createErrorHelper from 'src/lib/validation/createErrorHelper';
-import { Omit } from 'src/types/util';
 import FormGroup from './FormGroup';
 import FormSelect, { FormSelectProps } from './FormSelect';
 
-type Props = Omit<FormSelectProps, 'error'>;
+type Props<FormValues> = {
+  name: keyof FormValues | string;
+} & FormSelectProps;
 
-const FormFieldSelect = (props: Props) => {
-  const { name } = props;
+const FormFieldSelect = <T extends {}>(props: Props<T>) => {
+  const { error, name } = props;
 
   return (
     <Field name={name}>
@@ -16,8 +17,12 @@ const FormFieldSelect = (props: Props) => {
         const { getError, hasError } = createErrorHelper(form);
 
         return (
-          <FormGroup hasError={hasError(name)}>
-            <FormSelect {...props} {...field} error={getError(name)} />
+          <FormGroup hasError={error ? !!error : hasError(name)}>
+            <FormSelect
+              {...props}
+              {...field}
+              error={error ? error : getError(name)}
+            />
           </FormGroup>
         );
       }}

@@ -175,13 +175,13 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                       legend="Academic years"
                       hint="Filter statistics by a given start and end date"
                     >
-                      <FormFieldSelect
+                      <FormFieldSelect<FormValues>
                         id="filter-startYear"
                         label="Start year"
                         name="startYear"
                         options={this.yearOptions}
                       />
-                      <FormFieldSelect
+                      <FormFieldSelect<FormValues>
                         id="filter-endYear"
                         label="End year"
                         name="endYear"
@@ -190,7 +190,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                     </FormFieldset>
                   </div>
                   <div className="govuk-grid-column-one-half govuk-form-group">
-                    <FormFieldCheckboxGroup
+                    <FormFieldCheckboxGroup<FormValues>
                       id="filter-schoolTypes"
                       name="schoolTypes"
                       legend="School types"
