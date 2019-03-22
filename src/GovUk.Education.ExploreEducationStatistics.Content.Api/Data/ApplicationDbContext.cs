@@ -266,10 +266,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
                     KeyStatistics = new List<KeyStatistic>
                     {
-                        new KeyStatistic {Title = "Overall absence", Description = "Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."},
-                        new KeyStatistic {Title = "Authorised absence", Description = "Authorised absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."},
-                        new KeyStatistic {Title = "Unauthorised absence", Description = "Unauthorised absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."}
+                        new KeyStatistic {
+                            Title = "Overall absence", 
+                            Description = "Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."
+                        },
+                        new KeyStatistic {
+                            Title = "Authorised absence", 
+                            Description = "Authorised absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."
+                        },
+                        new KeyStatistic {
+                            Title = "Unauthorised absence", 
+                            Description = "Unauthorised absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla."
+                        }
                     },
+                    
+                    KeyStatisticsBlock = new DataBlock {
+                        Heading = "Latest headline facts and figures - 2016 to 2017",
+                        
+                        DataQuery = new DataQuery 
+                        {
+                            method = "POST",
+                            path = "/api/tablebuilder/characteristics/national",
+                            body = "{ \"indicators\": [\"enrolments\",\"sess_authorised\",\"sess_overall\",\"enrolments_PA_10_exact\",\"sess_unauthorised_percent\",\"enrolments_pa_10_exact_percent\",\"sess_authorised_percent\",\"sess_overall_percent\" ], \"characteristics\": [ \"Total\" ], \"endYear\": 201617, \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\", \"schoolTypes\": [ \"Total\" ], \"startYear\": 201213}"
+                        },
+                        
+                        Summary = new Summary 
+                        {
+                            dataKeys = new List<string> {
+                                "sess_overall_percent",
+                                "sess_authorised_percent",
+                                "sess_unauthorised_percent"
+                                },
+                            
+                            description = new MarkDownBlock {
+                                Body = ""
+                                }
+                        },
+                        
+                        Charts = new List<IContentBlockChart>
+                        {
+                            new LineChart 
+                            {
+                                XAxis = new Axis 
+                                {
+                                    title = "School Year"
+                                },
+                                YAxis = new Axis
+                                {
+                                    title = "Absence Rate"
+                                },
+                                Indicators = new List<string> {
+                                    "sess_overall_percent",
+                                    "sess_unauthorised_percent",
+                                    "sess_authorised_percent"
+                                },
+                                            
+                            }    
+                        }
+                    },
+                    
                     Content = new List<ContentSection>
                     {
                         new ContentSection
