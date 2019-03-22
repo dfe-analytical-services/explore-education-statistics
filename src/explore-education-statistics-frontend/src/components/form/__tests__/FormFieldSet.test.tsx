@@ -1,14 +1,14 @@
 import React from 'react';
 import { render } from 'react-testing-library';
-import FormFieldSet from '../FormFieldSet';
+import FormFieldset from '../FormFieldset';
 
 describe('FormFieldSet', () => {
   test('renders correctly with required props', () => {
     const { container } = render(
-      <FormFieldSet id="test-fieldset" legend="Fill the form">
+      <FormFieldset id="test-fieldset" legend="Fill the form">
         <input type="text" name="test-input-1" />
         <input type="text" name="test-input-2" />
-      </FormFieldSet>,
+      </FormFieldset>,
     );
 
     expect(container.querySelector('#test-fieldset')).not.toBeNull();
@@ -17,14 +17,14 @@ describe('FormFieldSet', () => {
 
   test('renders correctly with hint', () => {
     const { container, getByText } = render(
-      <FormFieldSet
+      <FormFieldset
         id="test-fieldset"
         legend="Fill the form"
         hint="All fields are required"
       >
         <input type="text" name="test-input-1" />
         <input type="text" name="test-input-2" />
-      </FormFieldSet>,
+      </FormFieldset>,
     );
 
     expect(getByText('All fields are required')).toBeDefined();
@@ -33,14 +33,14 @@ describe('FormFieldSet', () => {
 
   test('renders correctly with error', () => {
     const { container, getByText } = render(
-      <FormFieldSet
+      <FormFieldset
         id="test-fieldset"
         legend="Fill the form"
         error="There was an error"
       >
         <input type="text" name="test-input-1" />
         <input type="text" name="test-input-2" />
-      </FormFieldSet>,
+      </FormFieldset>,
     );
 
     expect(getByText('There was an error')).toBeDefined();
@@ -49,7 +49,7 @@ describe('FormFieldSet', () => {
 
   test('aria-describedby is equal to the hint id', () => {
     const { container } = render(
-      <FormFieldSet
+      <FormFieldset
         id="test-fieldset"
         legend="Fill the form"
         hint="All fields are required"
@@ -64,7 +64,7 @@ describe('FormFieldSet', () => {
 
   test('aria-describedby is equal to the error id', () => {
     const { container } = render(
-      <FormFieldSet
+      <FormFieldset
         id="test-fieldset"
         legend="Fill the form"
         error="There was an error"
@@ -79,7 +79,7 @@ describe('FormFieldSet', () => {
 
   test('aria-describedby contains both hint and error ids', () => {
     const { container } = render(
-      <FormFieldSet
+      <FormFieldset
         id="test-fieldset"
         legend="Fill the form"
         hint="All fields are required"
@@ -98,7 +98,7 @@ describe('FormFieldSet', () => {
 
   test('setting `legendSize` to xl applies class correctly', () => {
     const { container } = render(
-      <FormFieldSet
+      <FormFieldset
         id="test-fieldset"
         legend="Fill the form"
         hint="All fields are required"
@@ -106,7 +106,7 @@ describe('FormFieldSet', () => {
       >
         <input type="text" name="test-input-1" />
         <input type="text" name="test-input-2" />
-      </FormFieldSet>,
+      </FormFieldset>,
     );
 
     expect(container.querySelector('legend')).toHaveClass(

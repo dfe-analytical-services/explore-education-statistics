@@ -1,6 +1,6 @@
 import React, { Component, createRef } from 'react';
 import FormCheckbox, { CheckboxChangeEventHandler } from './FormCheckbox';
-import FormFieldSet, { FieldSetProps } from './FormFieldSet';
+import FormFieldset, { FieldSetProps } from './FormFieldset';
 
 export interface CheckboxOption {
   hint?: string;
@@ -24,7 +24,7 @@ interface State {
 
 /**
  * Basic checkbox group that should be used as a controlled component.
- * When using Formik, use {@see FormFieldCheckboxGroup} instead.
+ * When using Formik, use {@see FormFieldRadioGroup} instead.
  */
 class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
   public static defaultProps: Partial<FormCheckboxGroupProps> = {
@@ -52,7 +52,7 @@ class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
     );
 
     return (
-      <FormFieldSet {...this.props}>
+      <FormFieldset {...this.props}>
         <div className="govuk-checkboxes" ref={this.ref}>
           {selectAll && (
             <FormCheckbox
@@ -83,7 +83,7 @@ class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
             />
           ))}
         </div>
-      </FormFieldSet>
+      </FormFieldset>
     );
   }
 }

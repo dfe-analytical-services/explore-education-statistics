@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import React, { ChangeEventHandler, Component, createRef } from 'react';
-import FormFieldSet, { FieldSetProps } from './FormFieldSet';
+import FormFieldset, { FieldSetProps } from './FormFieldset';
 import FormRadio, { RadioChangeEventHandler } from './FormRadio';
 
 interface RadioOption {
@@ -10,7 +10,7 @@ interface RadioOption {
   value: string;
 }
 
-type Props = {
+export type FormRadioGroupProps = {
   value: string | null;
   inline?: boolean;
   name: string;
@@ -18,7 +18,7 @@ type Props = {
   options: RadioOption[];
 } & FieldSetProps;
 
-class FormRadioGroup extends Component<Props> {
+class FormRadioGroup extends Component<FormRadioGroupProps> {
   public static defaultProps = {
     inline: false,
     legendSize: 'm',
@@ -42,31 +42,29 @@ class FormRadioGroup extends Component<Props> {
     }
   };
 
-  private renderRadios() {
+  public render() {
     const { inline, name, options } = this.props;
 
     return (
-      <div
-        className={classNames('govuk-radios', {
-          'govuk-radios--inline': inline,
-        })}
-        ref={this.ref}
-      >
-        {options.map(option => (
-          <FormRadio
-            {...option}
-            checked={this.props.value === option.value}
-            key={option.id}
-            name={name}
-            onChange={this.handleChange}
-          />
-        ))}
-      </div>
+      <FormFieldset {...this.props}>
+        <div
+          className={classNames('govuk-radios', {
+            'govuk-radios--inline': inline,
+          })}
+          ref={this.ref}
+        >
+          {options.map(option => (
+            <FormRadio
+              {...option}
+              checked={this.props.value === option.value}
+              key={option.id}
+              name={name}
+              onChange={this.handleChange}
+            />
+          ))}
+        </div>
+      </FormFieldset>
     );
-  }
-
-  public render() {
-    return <FormFieldSet {...this.props}>{this.renderRadios()}</FormFieldSet>;
   }
 }
 
