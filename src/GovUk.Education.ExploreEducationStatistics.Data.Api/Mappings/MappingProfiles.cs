@@ -1,10 +1,10 @@
 using System;
 using System.Linq.Expressions;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Meta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
 {
@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
         {
             CreateMap<Characteristic, CharacteristicViewModel>()
                 .ForMember(destinationMember => destinationMember.Name,
-                opts => opts.MapFrom(characteristic => characteristic.Breakdown));
+                    opts => opts.MapFrom(characteristic => characteristic.Breakdown));
             CreateMap<CharacteristicMeta, NameLabelViewModel>();
             CreateMap<IndicatorMeta, IndicatorMetaViewModel>()
                 .ForMember(dest => dest.Unit,

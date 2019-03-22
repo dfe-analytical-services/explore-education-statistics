@@ -1,0 +1,72 @@
+using System.Collections.Generic;
+using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using Microsoft.Extensions.Logging;
+
+namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
+{
+    public class LaCharacteristicImporter : Importer
+    {
+        public LaCharacteristicImporter(ApplicationDbContext context, ILogger<LaCharacteristicImporter> logger) : 
+            base(context, logger)
+        {
+        }
+
+        protected override TidyData TidyDataFromCsv(string csvLine,
+            List<string> headers,
+            Release release)
+        {
+            var headerValues = new[]
+            {
+                "time_period", "time_identifier", "level", "country_code", "country_name", "region_code", "region_name",
+                "old_la_code", "new_la_code", "la_name", "school_type", "characteristic_breakdown",
+                "characteristic_label"
+            };
+            var values = csvLine.Split(',');
+            var model = new CharacteristicDataLa
+            {
+                PublicationId = release.PublicationId,
+                Release = release,
+                TimePeriod = int.Parse(values[headers.FindIndex(h => h.Equals("time_period"))]),
+                TimeIdentifier = values[headers.FindIndex(h => h.Equals("time_identifier"))],
+                Level = Levels.EnumFromStringForImport(values[headers.FindIndex(h => h.Equals("level"))]),
+                Country = new Country
+                {
+                    Code = values[headers.FindIndex(h => h.Equals("country_code"))],
+                    Name = values[headers.FindIndex(h => h.Equals("country_name"))]
+                },
+                Region = new Region
+                {
+                    Code = values[headers.FindIndex(h => h.Equals("region_code"))],
+                    Name = values[headers.FindIndex(h => h.Equals("region_name"))]
+                },
+                LocalAuthority = new LocalAuthority
+                {
+                    Old_Code = values[headers.FindIndex(h => h.Equals("old_la_code"))],
+                    Code = values[headers.FindIndex(h => h.Equals("new_la_code"))],
+                    Name = values[headers.FindIndex(h => h.Equals("la_name"))]
+                },
+                SchoolType =
+                    SchoolTypes.EnumFromStringForImport(values[headers.FindIndex(h => h.Equals("school_type"))]),
+                Indicators = new Dictionary<string, string>(),
+                Characteristic = new Characteristic
+                {
+                    Breakdown = values[headers.FindIndex(h => h.Equals("characteristic_breakdown"))],
+                    Label = values[headers.FindIndex(h => h.Equals("characteristic_label"))]
+                }
+            };
+
+            for (var i = 0; i < values.Length; i++)
+            {
+                if (!headerValues.Contains(headers[i]))
+                {
+                    model.Indicators.Add(headers[i], values[i]);
+                }
+            }
+
+            return model;
+        }
+    }
+}
