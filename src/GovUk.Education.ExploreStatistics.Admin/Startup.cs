@@ -71,9 +71,12 @@ namespace GovUk.Education.ExploreStatistics.Admin
             }
             
             app.UseHttpsRedirection();
+            
+            // Security Headers
             app.UseXContentTypeOptions();
             app.UseXXssProtection(options => options.EnabledWithBlockMode());
             app.UseXfo(options => options.SameOrigin());
+            app.UseReferrerPolicy(options => options.NoReferrerWhenDowngrade());
             
             app.UseStaticFiles();
             app.UseCookiePolicy();
