@@ -1,6 +1,6 @@
 import classNames from 'classnames';
-import React, { ChangeEventHandler, Component, createRef } from 'react';
-import FormFieldSet, { FieldSetProps } from './FormFieldSet';
+import React, { Component, createRef } from 'react';
+import FormFieldset, { FieldSetProps } from './FormFieldset';
 import FormRadio, { RadioChangeEventHandler } from './FormRadio';
 
 interface RadioOption {
@@ -10,18 +10,19 @@ interface RadioOption {
   value: string;
 }
 
-type Props = {
-  value: string | null;
+export type FormRadioGroupProps = {
   inline?: boolean;
   name: string;
   onChange?: RadioChangeEventHandler<any>;
   options: RadioOption[];
+  value: string | null;
 } & FieldSetProps;
 
-class FormRadioGroup extends Component<Props> {
+class FormRadioGroup extends Component<FormRadioGroupProps> {
   public static defaultProps = {
     inline: false,
     legendSize: 'm',
+    value: '',
   };
 
   private ref = createRef<HTMLInputElement>();
@@ -36,37 +37,33 @@ class FormRadioGroup extends Component<Props> {
     }
   }
 
-  private handleChange: ChangeEventHandler<HTMLInputElement> = event => {
-    if (this.props.onChange) {
-      this.props.onChange(event);
-    }
-  };
-
-  private renderRadios() {
-    const { inline, name, options } = this.props;
+  public render() {
+    const { inline, name, onChange, options, value } = this.props;
 
     return (
-      <div
-        className={classNames('govuk-radios', {
-          'govuk-radios--inline': inline,
-        })}
-        ref={this.ref}
-      >
-        {options.map(option => (
-          <FormRadio
-            {...option}
-            checked={this.props.value === option.value}
-            key={option.id}
-            name={name}
-            onChange={this.handleChange}
-          />
-        ))}
-      </div>
+      <FormFieldset {...this.props}>
+        <div
+          className={classNames('govuk-radios', {
+            'govuk-radios--inline': inline,
+          })}
+          ref={this.ref}
+        >
+          {options.map(option => (
+            <FormRadio
+              {...option}
+              checked={value === option.value}
+              key={option.id}
+              name={name}
+              onChange={event => {
+                if (onChange) {
+                  onChange(event);
+                }
+              }}
+            />
+          ))}
+        </div>
+      </FormFieldset>
     );
-  }
-
-  public render() {
-    return <FormFieldSet {...this.props}>{this.renderRadios()}</FormFieldSet>;
   }
 }
 

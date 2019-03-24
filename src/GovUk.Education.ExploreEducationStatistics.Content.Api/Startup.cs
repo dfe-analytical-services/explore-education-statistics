@@ -1,5 +1,7 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Converters;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Data;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -56,6 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             services.AddCors();
+
+            services.AddTransient<IContentService, ContentService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

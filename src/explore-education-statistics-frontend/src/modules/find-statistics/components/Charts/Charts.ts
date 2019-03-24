@@ -1,3 +1,6 @@
+import { Axis } from '../../../../services/publicationService';
+import { CharacteristicsData } from '../../../../services/tableBuilderService';
+
 export const colours: string[] = [
   '#b10e1e',
   '#006435',
@@ -13,4 +16,13 @@ export function parseCondensedTimePeriodRange(
   separator: string = '/',
 ) {
   return [range.substring(0, 4), range.substring(4, 6)].join(separator);
+}
+
+export interface ChartProps {
+  characteristicsData: CharacteristicsData;
+  chartDataKeys: string[];
+  labels: { [key: string]: string };
+  xAxis: Axis;
+  yAxis: Axis;
+  height?: number;
 }
