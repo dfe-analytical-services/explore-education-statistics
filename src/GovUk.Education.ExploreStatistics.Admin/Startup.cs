@@ -76,6 +76,17 @@ namespace GovUk.Education.ExploreStatistics.Admin
             app.UseXXssProtection(options => options.EnabledWithBlockMode());
             app.UseXfo(options => options.SameOrigin());
             app.UseReferrerPolicy(options => options.NoReferrerWhenDowngrade());
+            app.UseCsp(opts => opts
+                .BlockAllMixedContent()
+                .StyleSources(s => s.Self())
+                .StyleSources(s => s.UnsafeInline())
+                .FontSources(s => s.Self())
+                .FormActions(s => s.Self())
+                .FrameAncestors(s => s.Self())
+                .ImageSources(s => s.Self())
+                .ScriptSources(s => s.Self())
+                .ScriptSources(s => s.UnsafeInline())
+            );
             
             app.UseStaticFiles();
             app.UseCookiePolicy();
