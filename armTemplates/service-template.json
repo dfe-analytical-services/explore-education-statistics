@@ -154,6 +154,7 @@
       ],
       "properties": {
         "siteConfig": {
+          "clientAffinityEnabled": false,
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
