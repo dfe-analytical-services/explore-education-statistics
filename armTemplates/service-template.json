@@ -233,6 +233,7 @@
       ],
       "properties": {
         "siteConfig": {
+          "httpsOnly": true,
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
