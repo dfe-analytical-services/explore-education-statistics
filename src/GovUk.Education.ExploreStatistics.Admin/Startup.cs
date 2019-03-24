@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreStatistics.Admin
             
             app.UseHttpsRedirection();
             app.UseXContentTypeOptions();
-            
+            app.UseXXssProtection(options => options.EnabledWithBlockMode());
             
             app.UseStaticFiles();
             app.UseCookiePolicy();
