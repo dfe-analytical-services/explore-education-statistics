@@ -35,11 +35,6 @@ jobs:
           projects: '**/GovUk.*/*.csproj'
           arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
           zipAfterPublish: True
-      - task: 'CopyFiles@2'
-        displayName: 'Copy ARM templates'
-        inputs:
-          SourceFolder: 'armTemplates'
-          TargetFolder: '$(Build.ArtifactStagingDirectory)'
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
         inputs:
@@ -91,18 +86,12 @@ jobs:
         inputs:
           targetType: 'inline'
           script: 'rm -rf $(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend/node_modules/'
-      - task: 'ArchiveFiles@2'
-        displayName: 'Archive frontend'
-        inputs:
-          rootFolderOrFile: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
-          includeRootFolder: false
-          archiveFile: '$(Build.ArtifactStagingDirectory)/explore-education-statistics-frontend.zip'
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
         inputs:
           artifactName: 'frontend'
-          targetPath: '$(Build.ArtifactStagingDirectory)'
-  - job: 'Selenium_tests'
+          targetPath: 'src/explore-education-statistics-frontend'
+  - job: 'MiscellaneousArtifacts'
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
@@ -111,15 +100,16 @@ jobs:
         inputs:
           artifactName: 'robot-tests'
           targetPath: 'tests/robot-tests'
-  - job: 'Newman_tests'
-    pool:
-      vmImage: 'ubuntu-16.04'
-    steps:
       - task: PublishPipelineArtifact@0
         displayName: 'Publish Pipeline Artifact'
         inputs:
           artifactName: 'newman-tests'
           targetPath: 'tests/newman'
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish ARM templates'
+        inputs:
+          artifactName: 'arm-templates'
+          targetPath: 'armTemplates'
 
 #  - job: 'Frontend_Build'
 #    dependsOn: 'Frontend_Test'

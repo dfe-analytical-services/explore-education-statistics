@@ -35,7 +35,10 @@ export type PrototypeMapBoundariesFeatureCollection = FeatureCollection<
   PrototypeMapBoundariesProperties
 >;
 
-const data = originalData as FeatureCollection<Geometry, BaseMapProperties>;
+export const data = originalData as FeatureCollection<
+  Geometry,
+  BaseMapProperties
+>;
 
 export const boundaries: PrototypeMapBoundariesFeatureCollection = {
   ...data,

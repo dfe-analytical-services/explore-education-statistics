@@ -1,4 +1,4 @@
-import React, { ChangeEventHandler, FunctionComponent } from 'react';
+import React, { ChangeEventHandler } from 'react';
 
 export type CheckboxChangeEventHandler<
   T = HTMLInputElement
@@ -14,7 +14,7 @@ interface Props {
   value: string | string[] | number;
 }
 
-const FormCheckbox: FunctionComponent<Props> = ({
+const FormCheckbox = ({
   checked,
   id,
   hint,
@@ -22,7 +22,7 @@ const FormCheckbox: FunctionComponent<Props> = ({
   name,
   onChange,
   value,
-}) => {
+}: Props) => {
   return (
     <div className="govuk-checkboxes__item">
       <input
