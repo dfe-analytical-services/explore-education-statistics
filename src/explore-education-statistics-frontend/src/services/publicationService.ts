@@ -41,6 +41,11 @@ export interface Chart {
   [property: string]: any;
 }
 
+export interface Summary {
+  dataKeys: string[];
+  description: { type: string; body: string };
+}
+
 export interface ContentBlock {
   type: string;
   body: string;
@@ -70,10 +75,7 @@ export interface Release {
     caption: string;
     content: ContentBlock[];
   }[];
-  keyStatistics: {
-    title: string;
-    description: string;
-  }[];
+  keyStatistics: ContentBlock;
 }
 
 export default {
