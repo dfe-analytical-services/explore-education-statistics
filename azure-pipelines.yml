@@ -99,7 +99,7 @@ jobs:
         inputs:
           rootFolderOrFile: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
           includeRootFolder: false
-          archiveFile: '$(Build.ArtifactStagingDirectory}/public-frontend-test.zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory}/public-frontend-test-$(Build.BuildId).zip'
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
         inputs:
@@ -132,7 +132,7 @@ jobs:
         inputs:
           rootFolderOrFile: 'src/explore-education-statistics-frontend'
           includeRootFolder: false
-          archiveFile: '$(Build.ArtifactStagingDirectory)/public-frontend-stage.zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/public-frontend-stage-$(Build.BuildId).zip'
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
         inputs:
@@ -165,7 +165,7 @@ jobs:
         inputs:
           rootFolderOrFile: 'src/explore-education-statistics-frontend'
           includeRootFolder: false
-          archiveFile: '$(Build.ArtifactStagingDirectory)/explore-education-statistics-frontend-live.zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/public-frontend-live-$(Build.BuildId).zip'
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
         inputs:
