@@ -1,23 +1,12 @@
-import {
-  Field,
-  FieldProps,
-  Form,
-  Formik,
-  FormikErrors,
-  FormikProps,
-  FormikTouched,
-} from 'formik';
+import { Form, Formik, FormikErrors, FormikProps, FormikTouched } from 'formik';
 import debounce from 'lodash/debounce';
 import React, { ChangeEvent, Component, createRef } from 'react';
 import Button from 'src/components/Button';
 import ErrorSummary, { ErrorSummaryMessage } from 'src/components/ErrorSummary';
-import {
-  FormFieldSet,
-  FormGroup,
-  FormSelect,
-  FormTextInput,
-} from 'src/components/form';
+import { FormFieldset, FormGroup, FormTextInput } from 'src/components/form';
 import FormFieldCheckboxGroup from 'src/components/form/FormFieldCheckboxGroup';
+import FormFieldSelect from 'src/components/form/FormFieldSelect';
+import createErrorHelper from 'src/lib/validation/createErrorHelper';
 import Yup from 'src/lib/validation/yup';
 import { PublicationMeta } from 'src/services/tableBuilderService';
 import SchoolType from 'src/services/types/SchoolType';
@@ -169,15 +158,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
           values,
           ...form
         }: FormikProps<FormValues>) => {
-          const getError = (value: keyof FormValues): string => {
-            if (!touched[value]) {
-              return '';
-            }
-
-            return typeof errors[value] === 'string'
-              ? (errors[value] as any)
-              : '';
-          };
+          const { getError } = createErrorHelper({ errors, touched });
 
           return (
             <div ref={this.ref}>
@@ -189,53 +170,37 @@ class CharacteristicsFilterForm extends Component<Props, State> {
               <Form>
                 <div className="govuk-grid-row">
                   <div className="govuk-grid-column-one-half govuk-form-group">
-                    <FormFieldSet
+                    <FormFieldset
                       id="years"
                       legend="Academic years"
                       hint="Filter statistics by a given start and end date"
                     >
-                      <Field name="startYear">
-                        {({ field }: FieldProps) => (
-                          <FormGroup hasError={!!getError('startYear')}>
-                            <FormSelect
-                              {...field}
-                              error={getError('startYear')}
-                              id="filter-startYear"
-                              label="Start year"
-                              options={this.yearOptions}
-                            />
-                          </FormGroup>
-                        )}
-                      </Field>
-                      <Field name="endYear">
-                        {({ field }: FieldProps) => (
-                          <FormGroup hasError={!!getError('endYear')}>
-                            <FormSelect
-                              {...field}
-                              error={getError('endYear')}
-                              id="filter-endYear"
-                              label="End year"
-                              options={this.yearOptions}
-                            />
-                          </FormGroup>
-                        )}
-                      </Field>
-                    </FormFieldSet>
+                      <FormFieldSelect<FormValues>
+                        id="filter-startYear"
+                        label="Start year"
+                        name="startYear"
+                        options={this.yearOptions}
+                      />
+                      <FormFieldSelect<FormValues>
+                        id="filter-endYear"
+                        label="End year"
+                        name="endYear"
+                        options={this.yearOptions}
+                      />
+                    </FormFieldset>
                   </div>
                   <div className="govuk-grid-column-one-half govuk-form-group">
-                    <FormFieldCheckboxGroup
+                    <FormFieldCheckboxGroup<FormValues>
                       id="filter-schoolTypes"
                       name="schoolTypes"
                       legend="School types"
-                      error={getError('schoolTypes')}
                       hint="Filter statistics by number of pupils in school type(s)"
                       options={this.schoolTypeOptions}
-                      value={values.schoolTypes}
                       selectAll
                     />
                   </div>
                   <div className="govuk-grid-column-one-half govuk-form-group">
-                    <FormFieldSet
+                    <FormFieldset
                       id="filter-indicators"
                       legend="Indicators"
                       hint="Filter by at least one statistical indicator from the publication"
@@ -247,10 +212,10 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                         searchTerm={this.state.searchTerm}
                         values={values.indicators}
                       />
-                    </FormFieldSet>
+                    </FormFieldset>
                   </div>
                   <div className="govuk-grid-column-one-half govuk-form-group">
-                    <FormFieldSet
+                    <FormFieldset
                       id="filter-characteristics"
                       legend="Characteristics"
                       hint="Filter by at least one pupil characteristic from the publication"
@@ -262,7 +227,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                         searchTerm={this.state.searchTerm}
                         values={values.characteristics}
                       />
-                    </FormFieldSet>
+                    </FormFieldset>
                   </div>
                 </div>
 
