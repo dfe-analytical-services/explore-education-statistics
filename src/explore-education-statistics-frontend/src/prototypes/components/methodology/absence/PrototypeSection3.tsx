@@ -215,7 +215,7 @@ const PrototypeMethodologySection = () => {
         sessions across the full academic year for pupils aged 15 (whose absence
         information is based on the first five half terms only, as any sixth
         half term absence is removed prior to analysis as set out in the section
-        on the
+        on the{' '}
         <a href="#section2-4">
           school year (five half terms vs six half terms)
         </a>

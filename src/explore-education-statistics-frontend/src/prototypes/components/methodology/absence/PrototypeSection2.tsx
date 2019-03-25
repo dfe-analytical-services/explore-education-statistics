@@ -480,7 +480,7 @@ const PrototypeMethodologySection = () => {
         <li>
           where the numerator or denominator of any percentage calculated on
           enrolment numbers of 1 or 2, the percentage is suppressed. This
-          suppression is consistent with
+          suppression is consistent with{' '}
           <a href="http://media.education.gov.uk/assets/files/policy%20statement%20on%20confidentiality.pdf">
             DfE's statistical policy
           </a>
@@ -558,11 +558,17 @@ const PrototypeMethodologySection = () => {
         following links:
       </p>
       <p>Wales: school.stats@wales.gsi.gov.uk or</p>
-      <p>Welsh Government – Statistics and Research</p>
+      <a href="https://gov.wales/statistics-and-research">
+        Welsh Government – Statistics and Research
+      </a>
       <p>Scotland: school.stats@wales.gsi.gov.uk or</p>
-      <p>Scottish Government – School Education Statistics</p>
+      <a href="https://www2.gov.scot/Topics/Statistics/Browse/School-Education">
+        Scottish Government – School Education Statistics
+      </a>
       <p>Northern Ireland: statistics@deni.gov.uk or</p>
-      <p>Department of Education – Education Statistics</p>
+      <a href="https://www.education-ni.gov.uk/topics/statistics-and-research/statistics">
+        Department of Education – Education Statistics
+      </a>
     </>
   );
 };
