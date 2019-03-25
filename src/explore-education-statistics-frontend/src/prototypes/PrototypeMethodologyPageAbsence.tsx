@@ -26,28 +26,29 @@ const PublicationPage = () => {
     <PrototypePage
       breadcrumbs={[
         {
-          link: '/prototypes/methodology-home',
+          link: '/prototypes/browse-releases-find',
           text: 'Methodology',
         },
-        {
-          link: '/prototypes/methodology-specific',
-          text: 'Specific methodology',
-        },
+        { text: 'Specific methodology', link: '#' },
       ]}
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">
-            Pupil absence statistics: guidance and methodology
-          </h1>
+          <h1 className="govuk-heading-xl">A guide to absence statistics</h1>
           <h2 className="govuk-heading-s">
             <span className="govuk-caption-m">Published: </span>March 2018
           </h2>
           <p className="govuk-body-l">
-            Find out about the background of and methodology behind pupil
-            absence statistics and data and how and why they're collected and
-            published.
+            This document provides a comprehensive guide to the pupil absence in
+            schools in England statistics published by the Department for
+            Education.
           </p>
+          <p>The key areas covered in this guide are:</p>
+          <ul className="govuk-list govuk-list--bullet">
+            <li>background to published statistics and methodology</li>
+            <li>data collection and coverage</li>
+            <li>data processing</li>
+          </ul>
         </div>
 
         <div className="govuk-grid-column-one-third">
@@ -79,7 +80,7 @@ const PublicationPage = () => {
                 </li>
                 <li>
                   <a href="#section1-2">
-                    Uses and users of absence statistics and data
+                    Uses and users of absence data and statistics
                   </a>
                 </li>
               </ul>
@@ -254,22 +255,22 @@ const PublicationPage = () => {
 
       <h2 className="govuk-heading-l govuk-!-margin-top-9">Annex</h2>
       <Accordion id="annex-sections">
-        <AccordionSection heading="Annex A - Glossary">
+        <AccordionSection heading="Annex A, glossary">
           <PrototypeAnnexA />
         </AccordionSection>
-        <AccordionSection heading="Annex B - Calculations">
+        <AccordionSection heading="Annex B, calculations">
           <PrototypeAnnexB />
         </AccordionSection>
-        <AccordionSection heading="Annex C - School attendance codes">
+        <AccordionSection heading="Annex C, school attendance codes">
           <PrototypeAnnexC />
         </AccordionSection>
-        <AccordionSection heading="Annex D - Links to pupil absence national statistics publications">
+        <AccordionSection heading="Annex D, links to pupil absence national statistics publications">
           <PrototypeAnnexD />
         </AccordionSection>
-        <AccordionSection heading="Annex E - Standard breakdowns that are currently published">
+        <AccordionSection heading="Annex E, standard breakdowns that are currently published">
           <PrototypeAnnexE />
         </AccordionSection>
-        <AccordionSection heading="Annex F - Timeline">
+        <AccordionSection heading="Annex F, timeline">
           <p>timeline</p>
         </AccordionSection>
       </Accordion>

@@ -8,7 +8,7 @@ export interface SelectOption {
   value: string | number;
 }
 
-export interface FormSelectProps {
+interface Props {
   error?: string;
   id: string;
   label: ReactNode | string;
@@ -26,7 +26,7 @@ const FormSelect = ({
   onChange,
   options,
   value,
-}: FormSelectProps) => {
+}: Props) => {
   return (
     <>
       <label className="govuk-label" htmlFor={id}>

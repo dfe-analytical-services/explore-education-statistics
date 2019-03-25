@@ -1,6 +1,6 @@
 import classNames from 'classnames';
-import React, { ReactNode } from 'react';
-import ErrorMessage from 'src/components/ErrorMessage';
+import React, { FunctionComponent, ReactNode } from 'react';
+import ErrorMessage from '../ErrorMessage';
 import FormGroup from './FormGroup';
 import createDescribedBy from './util/createDescribedBy';
 
@@ -13,7 +13,7 @@ export interface FieldSetProps {
   legendSize?: 'xl' | 'l' | 'm' | 's';
 }
 
-const FormFieldset = ({
+const FormFieldSet: FunctionComponent<FieldSetProps> = ({
   children,
   error,
   hint,
@@ -42,19 +42,16 @@ const FormFieldset = ({
             {legend}
           </legend>
         )}
-
         {hint && (
           <span className="govuk-hint" id={`${id}-hint`}>
             {hint}
           </span>
         )}
-
         {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
-
         {children}
       </fieldset>
     </FormGroup>
   );
 };
 
-export default FormFieldset;
+export default FormFieldSet;

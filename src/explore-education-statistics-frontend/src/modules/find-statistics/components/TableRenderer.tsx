@@ -15,7 +15,7 @@ export class TableRenderer extends Component<TableRendererProps> {
     );
     const indicators: string[] = Object.keys(results[0].indicators);
 
-    const years = results.map(result => result.timePeriod).sort();
+    const years = results.map(result => result.year).sort();
 
     // @ts-ignore
     const schoolTypes = [...new Set(results.map(result => result.schoolType))];

@@ -25,11 +25,11 @@ class GroupedDataTable extends Component<Props> {
         <thead>
           <tr>
             <th />
-            {header.map((column, index) => (
+            {header.map(column => (
               <th
                 className="govuk-table__header--numeric"
                 scope="col"
-                key={`${column}_${index}`}
+                key={column}
               >
                 {column}
               </th>

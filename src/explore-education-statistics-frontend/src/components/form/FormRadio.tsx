@@ -1,4 +1,4 @@
-import React, { ChangeEventHandler } from 'react';
+import React, { ChangeEventHandler, FunctionComponent } from 'react';
 
 export type RadioChangeEventHandler<T = HTMLInputElement> = ChangeEventHandler<
   T
@@ -14,7 +14,7 @@ interface Props {
   value: string;
 }
 
-const FormRadio = ({
+const FormRadio: FunctionComponent<Props> = ({
   checked,
   hint,
   id,
@@ -22,7 +22,7 @@ const FormRadio = ({
   name,
   onChange,
   value,
-}: Props) => {
+}) => {
   return (
     <div className="govuk-radios__item">
       <input

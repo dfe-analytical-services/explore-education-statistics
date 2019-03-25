@@ -81,7 +81,7 @@ const PrototypeMethodologySection = () => {
       <p>
         Further information is available in DfE's advice on school attendance.{' '}
       </p>
-      <h3 id="section1-2">Uses and users of absence statistics and data</h3>
+      <h3 id="section1-2">Uses and users of absence data and statistics</h3>
       <p>
         The data used to publish absence statistics is collected via the school
         census which is used by a variety of companies and organisations

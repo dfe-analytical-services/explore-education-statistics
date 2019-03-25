@@ -13,47 +13,24 @@ const BrowseReleasesPage = () => {
     <PrototypePage
       breadcrumbs={[{ text: 'Find statistics and download data' }]}
     >
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">
-            Find statistics and download data
-          </h1>
-          <p className="govuk-body-l">
-            Browse to find the statistics and data you’re looking for and open
-            the section to get links to:
-          </p>
-          <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
-            <li>
-              up-to-date national statistical headlines, breakdowns and
-              explanations
-            </li>
-            <li>
-              charts and tables to help you compare, contrast and view national
-              and regional statistical data and trends
-            </li>
-            <li>
-              links to underlying data so you can download files and carry out
-              your own statistical analysis
-            </li>
-          </ul>
-        </div>
-        <div className="govuk-grid-column-one-third">
-          <aside className="app-related-items" role="complementary">
-            <h2 className="govuk-heading-m" id="releated-content">
-              Related content
-            </h2>
-            <nav role="navigation" aria-labelledby="subsection-title">
-              <ul className="govuk-list">
-                <li>
-                  <Link to="/prototypes/methodology-home">
-                    Methodology and guidance
-                  </Link>
-                </li>
-              </ul>
-            </nav>
-          </aside>
-        </div>
-      </div>
+      <h1 className="govuk-heading-xl">Find statistics and download data</h1>
+      <p className="govuk-body-l">
+        Browse to find the statistics and data you’re looking for and open the
+        section to get links to:
+      </p>
+      <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+        <li>
+          up-to-date national statistical headlines, breakdowns and explanations
+        </li>
+        <li>
+          charts and tables to help you compare, contrast and view national and
+          regional statistical data and trends
+        </li>
+        <li>
+          links to underlying data so you can download files and carry out your
+          own statistical analysis
+        </li>
+      </ul>
       <h2 className="govuk-heading-l">Early years and schools</h2>
       <Accordion id="schools">
         <AccordionSection
@@ -65,9 +42,11 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Pupil absence statistics
+                  <Link to="/prototypes/publication">
+                    Pupil absence statistics
+                  </Link>
                 </h4>
-                <p className="govuk-body">
+                <p className="govuk-caption-m govuk-!-margin-top-1 govuk-!-margin-bottom-1">
                   View statistics, create charts and tables and download data
                   files for authorised, overall, persistent and unauthorised
                   absence
@@ -78,9 +57,11 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Permanent and fixed-period exclusions statistics
+                  <Link to="/prototypes/publication-exclusions">
+                    Permanent and fixed-period exclusions statistics
+                  </Link>
                 </h4>
-                <p className="govuk-body">
+                <p className="govuk-caption-m govuk-!-margin-top-1 govuk-!-margin-bottom-1">
                   View statistics, create charts and tables and download data
                   files for fixed-period and permanent exclusion statistics
                 </p>
@@ -96,7 +77,7 @@ const BrowseReleasesPage = () => {
           caption="School capacity, admission appeals"
         >
           <h3 className="govuk-heading-s">
-            Latest capacity and admissions releases
+            Latest capacity and exclusions releases
           </h3>
         </AccordionSection>
         <AccordionSection

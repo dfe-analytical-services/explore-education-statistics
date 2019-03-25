@@ -1,36 +1,31 @@
 import { FieldArray } from 'formik';
 import difference from 'lodash/difference';
-import React from 'react';
-import createErrorHelper from 'src/lib/validation/createErrorHelper';
-import { Omit } from 'src/types/util';
+import React, { Component } from 'react';
 import { FormCheckboxGroupProps } from './FormCheckboxGroup';
 import { FormCheckboxGroup } from './index';
 
 type Props<FormValues> = {
   name: keyof FormValues | string;
-  showError?: boolean;
-} & Omit<FormCheckboxGroupProps, 'value'>;
+} & FormCheckboxGroupProps;
 
-const FormFieldCheckboxGroup = <T extends {}>(props: Props<T>) => {
-  const { error, name, options, showError = true } = props;
+/**
+ * Convenience wrapper that integrates {@see FormCheckboxGroup}
+ * with Formik using the {@see FieldArray} component.
+ */
+class FormFieldCheckboxGroup<
+  FormValues extends { [key: string]: unknown }
+> extends Component<Props<FormValues>> {
+  public render() {
+    const { id, name, options, value, ...restProps } = this.props;
 
-  return (
-    <FieldArray name={name}>
-      {({ form, ...helpers }) => {
-        const { getError } = createErrorHelper(form);
-
-        let errorMessage = error ? error : getError(name);
-
-        if (!showError) {
-          errorMessage = '';
-        }
-
-        return (
+    return (
+      <FieldArray name={name}>
+        {({ form, ...helpers }) => (
           <FormCheckboxGroup
-            {...props}
-            error={errorMessage}
-            options={options}
-            value={form.values[name]}
+            {...restProps}
+            value={value}
+            name={name}
+            id={id}
             onAllChange={event => {
               const allOptionValues = options.map(option => option.value);
               const restValues = difference(form.values[name], allOptionValues);
@@ -45,18 +40,19 @@ const FormFieldCheckboxGroup = <T extends {}>(props: Props<T>) => {
               if (event.target.checked) {
                 helpers.push(event.target.value);
               } else {
-                const index = form.values[name].indexOf(event.target.value);
+                const index = value.indexOf(event.target.value);
 
                 if (index > -1) {
                   helpers.remove(index);
                 }
               }
             }}
+            options={options}
           />
-        );
-      }}
-    </FieldArray>
-  );
-};
+        )}
+      </FieldArray>
+    );
+  }
+}
 
 export default FormFieldCheckboxGroup;
