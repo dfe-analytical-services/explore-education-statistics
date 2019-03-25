@@ -65,11 +65,29 @@ namespace GovUk.Education.ExploreStatistics.Admin
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                
+                app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
             }
-
+            
             app.UseHttpsRedirection();
+            
+            // Security Headers
+            app.UseXContentTypeOptions();
+            app.UseXXssProtection(options => options.EnabledWithBlockMode());
+            app.UseXfo(options => options.SameOrigin());
+            app.UseReferrerPolicy(options => options.NoReferrerWhenDowngrade());
+            app.UseCsp(opts => opts
+                .BlockAllMixedContent()
+                .StyleSources(s => s.Self())
+                .StyleSources(s => s.UnsafeInline())
+                .FontSources(s => s.Self())
+                .FormActions(s => s.Self())
+                .FrameAncestors(s => s.Self())
+                .ImageSources(s => s.Self())
+                .ScriptSources(s => s.Self())
+                .ScriptSources(s => s.UnsafeInline())
+            );
+            
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
