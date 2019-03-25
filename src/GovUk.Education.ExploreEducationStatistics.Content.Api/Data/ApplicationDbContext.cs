@@ -284,7 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                 },
                             
                             description = new MarkDownBlock {
-                                Body = ""
+                                Body = " * pupils missed on average 8.2 school days \n * overall and unauthorised absence rates up on previous year \n * unauthorised rise due to higher rates of unauthorised holidays \n * 10% of pupils persistently absent during 2016/17"
                                 }
                         },
                         

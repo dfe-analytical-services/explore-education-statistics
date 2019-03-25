@@ -1,4 +1,6 @@
 import * as React from 'react';
+import ReactMarkdown from 'react-markdown';
+import Details from '../../../components/Details';
 import { PublicationMeta } from '../../../services/tableBuilderService';
 
 interface Props {
@@ -21,18 +23,29 @@ export class SummaryRenderer extends React.Component<Props> {
       .reduce((allMeta, next) => ({ ...allMeta, [next.name]: next }), {});
 
     return (
-      <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">
-        {dataKeys.map(key => (
-          <div className="dfe-dash-tiles__tile" key={key}>
-            <h3 className="govuk-heading-m dfe-dash-tiles__heading">
-              {indicatorMeta[key].label}
-            </h3>
-            <p className="govuk-heading-xl govuk-!-margin-bottom-2">
-              {indicators[key]}
-              {indicatorMeta[key].unit}
-            </p>
-          </div>
-        ))}
+      <div>
+        <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">
+          {dataKeys.map(key => (
+            <div className="dfe-dash-tiles__tile" key={key}>
+              <h3 className="govuk-heading-m dfe-dash-tiles__heading">
+                {indicatorMeta[key].label}
+              </h3>
+              <p className="govuk-heading-xl govuk-!-margin-bottom-2">
+                {indicators[key]}
+                {indicatorMeta[key].unit}
+              </p>
+              <Details summary={`What is ${indicatorMeta[key].label}?`}>
+                Overall absence is the adipisicing elit. Dolorum hic nobis
+                voluptas quidem fugiat enim ipsa reprehenderit nulla.
+              </Details>
+            </div>
+          ))}
+        </div>
+        {this.props.description.body !== '' ? (
+          <ReactMarkdown source={this.props.description.body} />
+        ) : (
+          ''
+        )}
       </div>
     );
   }
