@@ -8,6 +8,7 @@ dfe-meta.db
 *.~lock*
 tags
 *.pyc
+*.sln.DotSettings.user
 **/test-results/
 tests/robot-tests/webdriver
 tests/robot-tests/.env

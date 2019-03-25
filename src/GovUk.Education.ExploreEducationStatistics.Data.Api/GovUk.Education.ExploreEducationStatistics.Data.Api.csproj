@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <AssemblyName>GovUk.Education.ExploreEducationStatistics.Data.Api</AssemblyName>
     <RootNamespace>GovUk.Education.ExploreEducationStatistics.Data.Api</RootNamespace>
   </PropertyGroup>
