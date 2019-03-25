@@ -70,6 +70,8 @@
         }
       ],
       "properties": {
+        "httpsOnly": true,
+        "clientAffinityEnabled": false,
         "siteConfig": {
           "appSettings": [
             {
