@@ -174,14 +174,17 @@ class TableToolPage extends Component<{}, State> {
     } = this.state;
 
     return (
-      <Page breadcrumbs={[{ name: 'Create your own table' }]}>
-        <PageTitle caption="Table tool" title="Create your own table" />
+      <Page breadcrumbs={[{ name: 'Explore statistics' }]}>
+        <PageTitle caption="National level" title="Explore statistics" />
 
         <ul>
-          <li>You can create your own tables from our publication data.</li>
           <li>
-            You can filter it by things like year, school type, area or pupil
-            characteristics.
+            You can explore all the DfE statistics available at national level
+            here.
+          </li>
+          <li>
+            Once you've chosen your data you can view it by year, school type,
+            area or pupil characteristics.
           </li>
           <li>
             You can also download it, visualise it or copy and paste it as you

@@ -1,7 +1,6 @@
-import { Formik } from 'formik';
+import { Formik, FormikProps } from 'formik';
 import React from 'react';
 import { fireEvent, render, wait } from 'react-testing-library';
-import Yup from 'src/lib/validation/yup';
 import FormFieldCheckboxGroup from '../FormFieldCheckboxGroup';
 
 describe('FormFieldCheckboxGroup', () => {
@@ -16,7 +15,7 @@ describe('FormFieldCheckboxGroup', () => {
           test: [],
         }}
         onSubmit={() => null}
-        render={() => (
+        render={(props: FormikProps<FormValues>) => (
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
@@ -25,6 +24,7 @@ describe('FormFieldCheckboxGroup', () => {
               { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
               { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
             ]}
+            value={props.values.test}
           />
         )}
       />,
@@ -48,7 +48,7 @@ describe('FormFieldCheckboxGroup', () => {
           test: ['1'],
         }}
         onSubmit={() => null}
-        render={() => (
+        render={(props: FormikProps<FormValues>) => (
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
@@ -57,6 +57,7 @@ describe('FormFieldCheckboxGroup', () => {
               { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
               { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
             ]}
+            value={props.values.test}
           />
         )}
       />,
@@ -80,7 +81,7 @@ describe('FormFieldCheckboxGroup', () => {
           test: [],
         }}
         onSubmit={() => null}
-        render={() => (
+        render={(props: FormikProps<FormValues>) => (
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
@@ -89,6 +90,7 @@ describe('FormFieldCheckboxGroup', () => {
               { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
               { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
             ]}
+            value={props.values.test}
             selectAll
           />
         )}
@@ -115,10 +117,11 @@ describe('FormFieldCheckboxGroup', () => {
           test: ['1', '2', '3'],
         }}
         onSubmit={() => null}
-        render={() => (
+        render={(props: FormikProps<FormValues>) => (
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
+            value={props.values.test}
             selectAll
             options={[
               { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
@@ -152,10 +155,11 @@ describe('FormFieldCheckboxGroup', () => {
           test: [],
         }}
         onSubmit={() => null}
-        render={() => (
+        render={(props: FormikProps<FormValues>) => (
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
+            value={props.values.test}
             selectAll
             options={[
               { id: 'checkbox-1', label: 'Checkbox 1', value: '1' },
@@ -194,10 +198,11 @@ describe('FormFieldCheckboxGroup', () => {
           test: ['1', '2', '3'],
         }}
         onSubmit={() => null}
-        render={() => (
+        render={(props: FormikProps<FormValues>) => (
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
+            value={props.values.test}
             selectAll
             options={[
               { id: 'checkbox-1', label: 'Checkbox 1', value: '1' },
@@ -221,134 +226,5 @@ describe('FormFieldCheckboxGroup', () => {
 
     expect(checkbox.checked).toBe(false);
     expect(selectAll.checked).toBe(false);
-  });
-
-  describe('error messages', () => {
-    test('does not display validation message when checkboxes are untouched', async () => {
-      const { queryByText } = render(
-        <Formik
-          initialValues={{
-            test: [],
-          }}
-          onSubmit={() => null}
-          validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
-          })}
-          render={() => (
-            <FormFieldCheckboxGroup<FormValues>
-              name="test"
-              id="checkboxes"
-              options={[
-                { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-                { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-                { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
-              ]}
-            />
-          )}
-        />,
-      );
-
-      expect(queryByText('Select at least one option')).toBeNull();
-    });
-
-    test('displays validation message when no checkboxes are checked', async () => {
-      const { getByLabelText, queryByText } = render(
-        <Formik
-          initialValues={{
-            test: ['1'],
-          }}
-          onSubmit={() => null}
-          validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
-          })}
-          render={() => (
-            <FormFieldCheckboxGroup<FormValues>
-              name="test"
-              id="checkboxes"
-              options={[
-                { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-                { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-                { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
-              ]}
-            />
-          )}
-        />,
-      );
-
-      const checkbox = getByLabelText('Checkbox 1') as HTMLInputElement;
-
-      expect(checkbox.checked).toBe(true);
-      expect(queryByText('Select at least one option')).toBeNull();
-
-      fireEvent.click(checkbox);
-
-      await wait();
-
-      expect(checkbox.checked).toBe(false);
-      expect(queryByText('Select at least one option')).not.toBeNull();
-    });
-
-    test('displays custom error message from `error` prop', () => {
-      const { getByText } = render(
-        <Formik
-          initialValues={{
-            test: ['1'],
-          }}
-          onSubmit={() => null}
-          render={() => (
-            <FormFieldCheckboxGroup<FormValues>
-              name="test"
-              id="checkboxes"
-              error="Invalid checkbox selection"
-              options={[
-                { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-                { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-                { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
-              ]}
-            />
-          )}
-        />,
-      );
-
-      expect(getByText('Invalid checkbox selection')).toBeDefined();
-    });
-
-    test('does not display validation message when `showError` is false', async () => {
-      const { getByLabelText, queryByText } = render(
-        <Formik
-          initialValues={{
-            test: ['1'],
-          }}
-          onSubmit={() => null}
-          validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
-          })}
-          render={() => (
-            <FormFieldCheckboxGroup<FormValues>
-              name="test"
-              id="checkboxes"
-              showError={false}
-              options={[
-                { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-                { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-                { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
-              ]}
-            />
-          )}
-        />,
-      );
-
-      const checkbox = getByLabelText('Checkbox 1') as HTMLInputElement;
-
-      expect(checkbox.checked).toBe(true);
-      expect(queryByText('Select at least one option')).toBeNull();
-
-      fireEvent.click(checkbox);
-
-      await wait();
-
-      expect(checkbox.checked).toBe(false);
-      expect(queryByText('Select at least one option')).toBeNull();
-    });
   });
 });

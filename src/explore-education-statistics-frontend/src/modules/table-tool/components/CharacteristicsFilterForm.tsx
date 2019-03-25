@@ -1,12 +1,23 @@
-import { Form, Formik, FormikErrors, FormikProps, FormikTouched } from 'formik';
+import {
+  Field,
+  FieldProps,
+  Form,
+  Formik,
+  FormikErrors,
+  FormikProps,
+  FormikTouched,
+} from 'formik';
 import debounce from 'lodash/debounce';
 import React, { ChangeEvent, Component, createRef } from 'react';
 import Button from 'src/components/Button';
 import ErrorSummary, { ErrorSummaryMessage } from 'src/components/ErrorSummary';
-import { FormFieldset, FormGroup, FormTextInput } from 'src/components/form';
+import {
+  FormFieldSet,
+  FormGroup,
+  FormSelect,
+  FormTextInput,
+} from 'src/components/form';
 import FormFieldCheckboxGroup from 'src/components/form/FormFieldCheckboxGroup';
-import FormFieldSelect from 'src/components/form/FormFieldSelect';
-import createErrorHelper from 'src/lib/validation/createErrorHelper';
 import Yup from 'src/lib/validation/yup';
 import { PublicationMeta } from 'src/services/tableBuilderService';
 import SchoolType from 'src/services/types/SchoolType';
@@ -158,7 +169,15 @@ class CharacteristicsFilterForm extends Component<Props, State> {
           values,
           ...form
         }: FormikProps<FormValues>) => {
-          const { getError } = createErrorHelper({ errors, touched });
+          const getError = (value: keyof FormValues): string => {
+            if (!touched[value]) {
+              return '';
+            }
+
+            return typeof errors[value] === 'string'
+              ? (errors[value] as any)
+              : '';
+          };
 
           return (
             <div ref={this.ref}>
@@ -170,37 +189,53 @@ class CharacteristicsFilterForm extends Component<Props, State> {
               <Form>
                 <div className="govuk-grid-row">
                   <div className="govuk-grid-column-one-half govuk-form-group">
-                    <FormFieldset
+                    <FormFieldSet
                       id="years"
                       legend="Academic years"
                       hint="Filter statistics by a given start and end date"
                     >
-                      <FormFieldSelect<FormValues>
-                        id="filter-startYear"
-                        label="Start year"
-                        name="startYear"
-                        options={this.yearOptions}
-                      />
-                      <FormFieldSelect<FormValues>
-                        id="filter-endYear"
-                        label="End year"
-                        name="endYear"
-                        options={this.yearOptions}
-                      />
-                    </FormFieldset>
+                      <Field name="startYear">
+                        {({ field }: FieldProps) => (
+                          <FormGroup hasError={!!getError('startYear')}>
+                            <FormSelect
+                              {...field}
+                              error={getError('startYear')}
+                              id="filter-startYear"
+                              label="Start year"
+                              options={this.yearOptions}
+                            />
+                          </FormGroup>
+                        )}
+                      </Field>
+                      <Field name="endYear">
+                        {({ field }: FieldProps) => (
+                          <FormGroup hasError={!!getError('endYear')}>
+                            <FormSelect
+                              {...field}
+                              error={getError('endYear')}
+                              id="filter-endYear"
+                              label="End year"
+                              options={this.yearOptions}
+                            />
+                          </FormGroup>
+                        )}
+                      </Field>
+                    </FormFieldSet>
                   </div>
                   <div className="govuk-grid-column-one-half govuk-form-group">
-                    <FormFieldCheckboxGroup<FormValues>
+                    <FormFieldCheckboxGroup
                       id="filter-schoolTypes"
                       name="schoolTypes"
                       legend="School types"
+                      error={getError('schoolTypes')}
                       hint="Filter statistics by number of pupils in school type(s)"
                       options={this.schoolTypeOptions}
+                      value={values.schoolTypes}
                       selectAll
                     />
                   </div>
                   <div className="govuk-grid-column-one-half govuk-form-group">
-                    <FormFieldset
+                    <FormFieldSet
                       id="filter-indicators"
                       legend="Indicators"
                       hint="Filter by at least one statistical indicator from the publication"
@@ -212,10 +247,10 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                         searchTerm={this.state.searchTerm}
                         values={values.indicators}
                       />
-                    </FormFieldset>
+                    </FormFieldSet>
                   </div>
                   <div className="govuk-grid-column-one-half govuk-form-group">
-                    <FormFieldset
+                    <FormFieldSet
                       id="filter-characteristics"
                       legend="Characteristics"
                       hint="Filter by at least one pupil characteristic from the publication"
@@ -227,7 +262,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                         searchTerm={this.state.searchTerm}
                         values={values.characteristics}
                       />
-                    </FormFieldset>
+                    </FormFieldSet>
                   </div>
                 </div>
 
@@ -236,7 +271,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
 
                   <FormTextInput
                     id="characteristic-search"
-                    label="Search for an indicator or a characteristic"
+                    label="Search for an inidicator or characteristic"
                     name="characteristicSearch"
                     onChange={event => {
                       event.persist();

@@ -9,10 +9,23 @@ import {
   YAxis,
 } from 'recharts';
 
-import { ChartProps, colours } from './Charts';
+import { Axis } from '../../../../services/publicationService';
+import { CharacteristicsData } from '../../../../services/tableBuilderService';
+import { colours, parseCondensedTimePeriodRange, symbols } from './Charts';
 
-export class VerticalBarBlock extends React.Component<ChartProps> {
+interface StackedBarVerticalProps {
+  characteristicsData: CharacteristicsData;
+  chartDataKeys: string[];
+  labels: { [key: string]: string };
+  xAxis: Axis;
+  yAxis: Axis;
+  height?: number;
+}
+
+export class VerticalBarBlock extends React.Component<StackedBarVerticalProps> {
   public render() {
+    // tslint:disable
+
     const chartData = this.props.characteristicsData.result.map(data => {
       return data.indicators;
     });

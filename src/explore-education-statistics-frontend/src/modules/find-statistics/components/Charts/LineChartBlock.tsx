@@ -10,12 +10,18 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import {
-  ChartProps,
-  colours,
-  parseCondensedTimePeriodRange,
-  symbols,
-} from './Charts';
+import { Axis } from '../../../../services/publicationService';
+import { CharacteristicsData } from '../../../../services/tableBuilderService';
+import { colours, parseCondensedTimePeriodRange, symbols } from './Charts';
+
+interface LineChartBlockProps {
+  chartDataKeys: string[];
+  characteristicsData: CharacteristicsData;
+  height?: number;
+  yAxis: Axis;
+  xAxis: Axis;
+  labels: { [name: string]: string };
+}
 
 const CustomToolTip = (props: any) => {
   if (props.active) {
@@ -38,7 +44,7 @@ const CustomToolTip = (props: any) => {
   }
 };
 
-export class LineChartBlock extends Component<ChartProps> {
+export class LineChartBlock extends Component<LineChartBlockProps> {
   public render() {
     const {
       characteristicsData,

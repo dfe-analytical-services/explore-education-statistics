@@ -1,12 +1,15 @@
 import classNames from 'classnames';
-import React, { ReactNode } from 'react';
+import React, { FunctionComponent, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
   hasError?: boolean;
 }
 
-const FormGroup = ({ children, hasError = false }: Props) => {
+const FormGroup: FunctionComponent<Props> = ({
+  children,
+  hasError = false,
+}) => {
   return (
     <div
       className={classNames('govuk-form-group', {

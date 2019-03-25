@@ -1,6 +1,6 @@
 import sortBy from 'lodash/sortBy';
 import React, { PureComponent } from 'react';
-import FormFieldCheckboxGroup from 'src/components/form/FormFieldCheckboxGroup';
+import FormFieldCheckboxGroup from '../../../components/form/FormFieldCheckboxGroup';
 import MenuDetails from './MenuDetails';
 
 interface Props<FormValues> {
@@ -86,12 +86,12 @@ class SearchableFilterMenus<
               });
             }}
           >
-            <FormFieldCheckboxGroup
+            <FormFieldCheckboxGroup<FormValues>
+              id={compositeKey}
               name={name as string}
               options={options}
-              id={compositeKey}
+              value={values}
               selectAll
-              showError={false}
             />
           </MenuDetails>
         );

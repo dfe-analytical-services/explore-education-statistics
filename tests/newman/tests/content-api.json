@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "28478d7c-8bbb-4f82-ae2a-015c856d2cc6",
+		"_postman_id": "41c2ef43-b849-4893-9842-2c77f787a57b",
 		"name": "Dfe Content API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -397,51 +397,6 @@
 							"path": [
 								"Topic",
 								"{{topic_id}}"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Content",
-			"item": [
-				{
-					"name": "Get Content tree",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-									"",
-									"pm.test(\"Should return some results\", function () {",
-									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
-									"});",
-									"",
-									"pm.test(\"Returned array should be correct length\", function () { pm.expect(pm.response.json().length).to.equal(3); });"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{content_api_url}}/Content/tree",
-							"host": [
-								"{{content_api_url}}"
-							],
-							"path": [
-								"Content",
-								"tree"
 							]
 						}
 					},
