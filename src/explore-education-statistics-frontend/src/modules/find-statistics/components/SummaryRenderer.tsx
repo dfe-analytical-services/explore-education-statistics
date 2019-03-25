@@ -12,21 +12,29 @@ interface Props {
 
 export class SummaryRenderer extends React.Component<Props> {
   public render() {
-    const result = this.props.data.result;
-
-    const latest = result[result.length - 1];
-    const indicators = latest.indicators;
-
+    let indicators: any = {};
+    let indicatorMeta: any = {};
     const dataKeys = this.props.dataKeys;
-    const indicatorMeta = Array.prototype
-      .concat(...Object.values(this.props.meta.indicators))
-      .reduce((allMeta, next) => ({ ...allMeta, [next.name]: next }), {});
+
+    if (this.props.data) {
+      const result = this.props.data.result;
+      const latest = result[result.length - 1];
+      indicators = latest.indicators;
+      indicatorMeta = Array.prototype
+        .concat(...Object.values(this.props.meta.indicators))
+        .reduce((allMeta, next) => ({ ...allMeta, [next.name]: next }), {});
+    } else {
+      dataKeys.forEach(key => {
+        indicators[key] = '';
+        indicatorMeta[key] = { label: key, unit: '' };
+      });
+    }
 
     return (
       <div>
         <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">
-          {dataKeys.map(key => (
-            <div className="dfe-dash-tiles__tile" key={key}>
+          {dataKeys.map((key, index) => (
+            <div className="dfe-dash-tiles__tile" key={`${key}_${index}`}>
               <h3 className="govuk-heading-m dfe-dash-tiles__heading">
                 {indicatorMeta[key].label}
               </h3>

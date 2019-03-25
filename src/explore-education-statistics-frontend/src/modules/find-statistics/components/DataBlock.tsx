@@ -40,7 +40,11 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
   public async componentDidMount() {
     const { dataQuery } = this.props;
 
-    if (dataQuery) await this.getData(dataQuery);
+    if (dataQuery) {
+      await this.getData(dataQuery);
+    } else {
+      this.parseDataResponse(undefined, undefined);
+    }
   }
 
   public async componentWillUnmount() {
@@ -73,11 +77,15 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
     const jsonMeta: PublicationMeta = await metaResponse.json();
 
     if (this.currentDataQuery === dataQuery) {
-      this.parseDataResponse(json);
+      this.parseDataResponse(json, jsonMeta);
+    }
+  }
 
-      const newState: any = {
-        tables: [{ data: json, meta: jsonMeta }],
-      };
+  private parseDataResponse(json?: any, jsonMeta?: PublicationMeta): void {
+    const newState: any = {};
+
+    if (json && jsonMeta) {
+      newState.tables = [{ data: json, meta: jsonMeta }];
 
       if (this.props.charts) {
         newState.charts = this.props.charts.map(chart => ({
@@ -86,21 +94,17 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
           meta: jsonMeta,
         }));
       }
-
-      if (this.props.summary) {
-        newState.summary = {
-          ...this.props.summary,
-          data: json,
-          meta: jsonMeta,
-        };
-      }
-
-      this.setState(newState);
     }
-  }
 
-  private parseDataResponse(json: any): void {
-    return;
+    if (this.props.summary) {
+      newState.summary = {
+        ...this.props.summary,
+        data: json,
+        meta: jsonMeta,
+      };
+    }
+
+    this.setState(newState);
   }
 
   public render() {
