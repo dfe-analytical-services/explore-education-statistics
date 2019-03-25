@@ -6,6 +6,7 @@ import Link from '../components/Link';
 import { ChartRenderer } from '../modules/find-statistics/components/ChartRenderer';
 import PrototypeAbsenceData from './components/PrototypeAbsenceData';
 import {
+  ks4AverageAttainment8ScorePerPupilByLocalAuthority,
   ks4AverageHeadlineScoresByPupilEthnicity,
   ks4PerformanceInMatsComparedToNationalAverage,
   ks4SchoolAverageHeadlineScoresByPupilCharacteristics,
@@ -444,6 +445,10 @@ const PublicationPage = () => {
             pupil show that. This is similar to patterns seen in recent years
             and against other performance measures.{' '}
           </p>
+          <ChartRenderer
+            {...ks4AverageAttainment8ScorePerPupilByLocalAuthority}
+            height={400}
+          />
           [INTERACTIVE MAP]
         </AccordionSection>
         <AccordionSection

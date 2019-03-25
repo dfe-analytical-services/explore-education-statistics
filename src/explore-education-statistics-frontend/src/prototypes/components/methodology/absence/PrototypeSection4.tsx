@@ -878,7 +878,9 @@ const PrototypeMethodologySection = () => {
           travel which has prevented the pupil from attending school
         </li>
       </ul>
-      <p> code can also be used where a pupil is unable to attend because: </p>
+      <p>
+        This code can also be used where a pupil is unable to attend because:{' '}
+      </p>
       <ul className="govuk-list govuk-list--bullet">
         <li>
           The pupil is in custody; detained for a period of less than four

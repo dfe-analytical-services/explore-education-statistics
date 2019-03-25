@@ -1,3 +1,4 @@
+import dynamic from 'next-server/dynamic';
 import React, { Component } from 'react';
 import { Axis } from '../../../services/publicationService';
 import {
@@ -8,6 +9,10 @@ import {
 import { HorizontalBarBlock } from './Charts/HorizontalBarBlock';
 import { LineChartBlock } from './Charts/LineChartBlock';
 import { VerticalBarBlock } from './Charts/VerticalBarBlock';
+
+const DynamicMapBlock = dynamic(() => import('./Charts/MapBlock'), {
+  ssr: false,
+});
 
 interface ChartRendererProps {
   type: string;
@@ -20,7 +25,7 @@ interface ChartRendererProps {
   yAxis: Axis;
 
   height?: number;
-  stacked?: boolean;
+  [property: string]: any;
 }
 
 export class ChartRenderer extends Component<ChartRendererProps> {
@@ -84,6 +89,18 @@ export class ChartRenderer extends Component<ChartRendererProps> {
             xAxis={this.props.xAxis}
             height={this.props.height}
             stacked={this.props.stacked}
+          />
+        );
+      case 'map':
+        return (
+          <DynamicMapBlock
+            chartDataKeys={this.props.indicators}
+            characteristicsData={characteristicsData}
+            labels={labels}
+            yAxis={this.props.yAxis}
+            xAxis={this.props.xAxis}
+            height={this.props.height}
+            geometry={this.props.geometry}
           />
         );
       default:

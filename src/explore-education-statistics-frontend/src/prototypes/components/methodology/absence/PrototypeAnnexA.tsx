@@ -55,7 +55,7 @@ const PrototypeMethodologySection = () => {
           academies including free schools, studio schools and university
           technical colleges and city technology colleges in England.
         </dd>
-        <dt>unauthorised absence</dt>
+        <dt>Unauthorised absence</dt>
         <dd>
           Absence without permission from a teacher or other authorised
           representative of the school. This includes all unexplained or

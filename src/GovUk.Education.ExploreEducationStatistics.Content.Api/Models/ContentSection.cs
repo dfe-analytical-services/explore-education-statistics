@@ -52,5 +52,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
 
         public List<IContentBlockChart> Charts { get; set; }
 
+        public Summary Summary { get; set; }
+
+    }
+
+    public class Summary
+    {
+        public List<string> dataKeys { get; set; }
+
+        public MarkDownBlock description { get; set; }
+        
     }
 }

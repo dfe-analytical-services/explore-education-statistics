@@ -38,7 +38,12 @@ export interface Chart {
   attributes: string[];
   XAxis?: Axis;
   YAxis?: Axis;
-  stacked?: boolean;
+  [property: string]: any;
+}
+
+export interface Summary {
+  dataKeys: string[];
+  description: { type: string; body: string };
 }
 
 export interface ContentBlock {
@@ -70,10 +75,7 @@ export interface Release {
     caption: string;
     content: ContentBlock[];
   }[];
-  keyStatistics: {
-    title: string;
-    description: string;
-  }[];
+  keyStatistics: ContentBlock;
 }
 
 export default {
