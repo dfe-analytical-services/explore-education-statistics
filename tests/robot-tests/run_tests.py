@@ -54,6 +54,8 @@ load_dotenv()
 if os.getenv('publicAppBasicAuthUsername') and os.getenv('publicAppBasicAuthPassword'):
     basicAuthUser = os.getenv('publicAppBasicAuthUsername')
     basicAuthPass = os.getenv('publicAppBasicAuthPassword')
+else:
+    print("No basic auth credentials detected!")
 
 env = "test"  # by default, run tests against test environment
 url = "about:blank"

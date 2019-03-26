@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder
 {

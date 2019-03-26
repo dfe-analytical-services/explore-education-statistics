@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 {

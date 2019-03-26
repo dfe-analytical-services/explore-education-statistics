@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <AssemblyName>GovUk.Education.ExploreEducationStatistics.Data.Api</AssemblyName>
     <RootNamespace>GovUk.Education.ExploreEducationStatistics.Data.Api</RootNamespace>
   </PropertyGroup>
@@ -13,19 +12,20 @@
 
   <ItemGroup>
     <Folder Include="Migrations" />
-    <Folder Include="Services\Meta" />
     <Folder Include="wwwroot\" />
     <Folder Include="wwwroot\data\zip" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="EFCore.BulkExtensions" Version="2.4.4" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model\GovUk.Education.ExploreEducationStatistics.Data.Model.csproj" />
   </ItemGroup>
 
 </Project>

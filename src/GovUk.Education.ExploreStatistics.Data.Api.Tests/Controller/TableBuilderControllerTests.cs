@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -71,8 +71,8 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
                 });
 
             releaseService
-                .Setup(s => s.GetIndicatorMetas(new Guid("8fe9c479-1ab5-4894-81cd-9f87882e20ed"),
-                    typeof(GeographicData))).Returns(new Dictionary<string, List<IndicatorMetaViewModel>>
+                .Setup(s => s.GetIndicatorMetas(new Guid("8fe9c479-1ab5-4894-81cd-9f87882e20ed"), "GeographicData"))
+                .Returns(new Dictionary<string, List<IndicatorMetaViewModel>>
                 {
                     {
                         "Exclusion fields",
@@ -84,8 +84,9 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
                 });
 
             releaseService
-                .Setup(s => s.GetCharacteristicMetas(new Guid("8fe9c479-1ab5-4894-81cd-9f87882e20ed"),
-                    typeof(GeographicData))).Returns(new Dictionary<string, List<NameLabelViewModel>>
+                .Setup(
+                    s => s.GetCharacteristicMetas(new Guid("8fe9c479-1ab5-4894-81cd-9f87882e20ed"), "GeographicData"))
+                .Returns(new Dictionary<string, List<NameLabelViewModel>>
                 {
                     {
                         "Total",

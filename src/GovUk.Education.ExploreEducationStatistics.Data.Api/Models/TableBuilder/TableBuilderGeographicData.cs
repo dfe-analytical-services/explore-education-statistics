@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 

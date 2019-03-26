@@ -2,7 +2,9 @@ version: "3"
 services:
   data-api:
     container_name: ees-data
-    build: GovUk.Education.ExploreEducationStatistics.Data.Api
+    build:
+      context: .
+      dockerfile: Dockerfile-Data-Api
     ports:
     - "5000:5000"
     - "5001:5001"

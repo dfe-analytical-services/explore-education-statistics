@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Debug;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
@@ -25,9 +25,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("report")]
         public async Task<ActionResult<DebugReport>> GetReport()
         {
-            Task<int> geographicCount = _geographicDataService.Count();
-            Task<int> nationalCharacteristicCount = _nationalCharacteristicDataService.Count();
-            Task<int> laCharacteristicCount = _laCharacteristicDataService.Count();
+            var geographicCount = _geographicDataService.Count();
+            var nationalCharacteristicCount = _nationalCharacteristicDataService.Count();
+            var laCharacteristicCount = _laCharacteristicDataService.Count();
             
             var counts = await Task.WhenAll(
                 geographicCount, nationalCharacteristicCount, laCharacteristicCount

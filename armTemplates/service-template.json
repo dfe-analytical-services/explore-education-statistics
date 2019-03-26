@@ -70,6 +70,8 @@
         }
       ],
       "properties": {
+        "httpsOnly": true,
+        "clientAffinityEnabled": false,
         "siteConfig": {
           "appSettings": [
             {
@@ -154,6 +156,7 @@
       ],
       "properties": {
         "siteConfig": {
+          "clientAffinityEnabled": false,
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -233,6 +236,7 @@
       ],
       "properties": {
         "siteConfig": {
+          "httpsOnly": true,
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",

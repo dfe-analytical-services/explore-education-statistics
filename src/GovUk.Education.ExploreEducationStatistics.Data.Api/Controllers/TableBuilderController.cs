@@ -62,13 +62,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("meta/{typeName}/{publicationId}")]
         public ActionResult<PublicationMetaViewModel> GetMeta(string typeName, Guid publicationId)
         {
-            var type = Type.GetType("GovUk.Education.ExploreEducationStatistics.Data.Api.Models." + typeName);
-
             var result = new PublicationMetaViewModel
             {
                 PublicationId = publicationId,
-                Indicators = _releaseService.GetIndicatorMetas(publicationId, type),
-                Characteristics = _releaseService.GetCharacteristicMetas(publicationId, type)
+                Indicators = _releaseService.GetIndicatorMetas(publicationId, typeName),
+                Characteristics = _releaseService.GetCharacteristicMetas(publicationId, typeName)
             };
 
             if (result.Indicators != null && result.Indicators.Any() || 
