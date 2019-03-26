@@ -1,10 +1,11 @@
 import { FormikState } from 'formik';
-import React, { Fragment } from 'react';
+import React from 'react';
 import { FormFieldCheckboxGroup, FormFieldset } from 'src/components/form';
 import createErrorHelper from 'src/lib/validation/createErrorHelper';
 import { FormValues } from 'src/prototypes/table-tool/components/FiltersForm';
 import { MetaSpecification } from 'src/prototypes/table-tool/components/meta/initialSpec';
 import SearchableGroupedFilterMenus from 'src/prototypes/table-tool/components/SearchableGroupedFilterMenus';
+import styles from './CategoricalFilters.module.scss';
 
 interface Props {
   form: FormikState<FormValues>;
@@ -15,10 +16,10 @@ const CategoricalFilters = ({ form, specification }: Props) => {
   const { getError } = createErrorHelper<any>(form);
 
   return (
-    <>
+    <div className={styles.columns}>
       {Object.entries(specification).map(([filterKey, filterSpec]) => {
         return (
-          <Fragment key={filterKey}>
+          <div className={styles.group} key={filterKey}>
             {Array.isArray(filterSpec.options) ? (
               <FormFieldCheckboxGroup<FormValues>
                 id={`filter-${filterKey}`}
@@ -46,10 +47,10 @@ const CategoricalFilters = ({ form, specification }: Props) => {
                 />
               </FormFieldset>
             )}
-          </Fragment>
+          </div>
         );
       })}
-    </>
+    </div>
   );
 };
 

@@ -186,7 +186,10 @@ class PrototypeTableToolPage extends Component<{}, State> {
     } = this.state;
 
     return (
-      <PrototypePage breadcrumbs={[{ text: 'Create your own tables online' }]}>
+      <PrototypePage
+        breadcrumbs={[{ text: 'Create your own tables online' }]}
+        wide
+      >
         <PageTitle caption="Table tool" title="Create your own tables online" />
 
         <p>
@@ -199,8 +202,8 @@ class PrototypeTableToolPage extends Component<{}, State> {
           for your own offline analysis.
         </p>
 
-        <section className="govuk-grid-row">
-          <div className="govuk-grid-column-one-half">
+        <section className="govuk-grid-row govuk-form-group">
+          <div className="govuk-grid-column-one-third-from-desktop">
             <h2>
               1. Choose your data
               <span className="govuk-hint">Select a data set.</span>
@@ -212,7 +215,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
               value={publicationId}
             />
           </div>
-          <div className="govuk-grid-column-one-half">
+          <div className="govuk-grid-column-one-third-from-desktop">
             {publicationId && (
               <>
                 <h2>
@@ -247,20 +250,18 @@ class PrototypeTableToolPage extends Component<{}, State> {
         </section>
 
         {publicationSubjectId && (
-          <section className="govuk-grid-row" ref={this.filtersRef}>
-            <div className="govuk-grid-column-full">
-              <h2>
-                3. Choose your filters for '{publicationName}'
-                <span className="govuk-hint">
-                  Select any combination of filters.
-                </span>
-              </h2>
+          <section className="govuk-form-group" ref={this.filtersRef}>
+            <h2>
+              3. Choose your filters for '{publicationName}'
+              <span className="govuk-hint">
+                Select any combination of filters.
+              </span>
+            </h2>
 
-              <FiltersForm
-                specification={metaSpecification}
-                onSubmit={this.handleFilterFormSubmit}
-              />
-            </div>
+            <FiltersForm
+              specification={metaSpecification}
+              onSubmit={this.handleFilterFormSubmit}
+            />
           </section>
         )}
 

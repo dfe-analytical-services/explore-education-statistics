@@ -2,7 +2,7 @@ import { Form, Formik, FormikErrors, FormikProps, FormikTouched } from 'formik';
 import React, { Component, createRef } from 'react';
 import Button from 'src/components/Button';
 import ErrorSummary, { ErrorSummaryMessage } from 'src/components/ErrorSummary';
-import { FormFieldset } from 'src/components/form';
+import { FormFieldset, FormGroup } from 'src/components/form';
 import createErrorHelper from 'src/lib/validation/createErrorHelper';
 import Yup from 'src/lib/validation/yup';
 import SchoolType from 'src/services/types/SchoolType';
@@ -129,19 +129,19 @@ class FiltersForm extends Component<Props, State> {
 
               <Form>
                 <div className="govuk-grid-row">
-                  <div className="govuk-grid-column-one-third govuk-form-group">
+                  <FormGroup className="govuk-grid-column-one-quarter-from-desktop">
                     <ObservationalUnitFilters
                       form={form}
                       specification={specification.observationalUnits}
                     />
-                  </div>
-                  <div className="govuk-grid-column-one-third govuk-form-group">
+                  </FormGroup>
+                  <FormGroup className="govuk-grid-column-one-half-from-desktop">
                     <CategoricalFilters
                       form={form}
                       specification={specification.categoricalFilters}
                     />
-                  </div>
-                  <div className="govuk-grid-column-one-third govuk-form-group">
+                  </FormGroup>
+                  <FormGroup className="govuk-grid-column-one-quarter-from-desktop">
                     <FormFieldset
                       id="filter-indicators"
                       legend="Indicators"
@@ -154,7 +154,7 @@ class FiltersForm extends Component<Props, State> {
                         values={values.indicators}
                       />
                     </FormFieldset>
-                  </div>
+                  </FormGroup>
                 </div>
 
                 <Button
@@ -182,8 +182,8 @@ class FiltersForm extends Component<Props, State> {
                   type="submit"
                 >
                   {form.isSubmitting && form.isValid
-                    ? 'Submitting'
-                    : 'Confirm filters'}
+                    ? 'Creating table...'
+                    : 'Create table'}
                 </Button>
               </Form>
             </div>

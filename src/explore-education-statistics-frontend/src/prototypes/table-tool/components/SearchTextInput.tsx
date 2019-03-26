@@ -22,7 +22,7 @@ const SearchTextInput = ({ onChange, ...restProps }: Props) => {
         event.persist();
         setDebouncedFilterSearch(event);
       }}
-      width={20}
+      width={10}
     />
   );
 };
