@@ -103,7 +103,23 @@ const BrowseReleasesPage = () => {
           heading="Results"
           caption="Local authority and school finance"
         >
-          <h3 className="govuk-heading-s">Latest results releases</h3>
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                GCSE and equivalent results in England
+                </h4>
+                <p className="govuk-body">
+                  View statistics, create charts and tables and download data
+                  files for GCSE and equivalent results in England
+                </p>
+                <div className="govuk-!-margin-top-0">
+                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse"/>
+                </div>
+              </li>
+            </ul>
+          </div>
         </AccordionSection>
         <AccordionSection
           heading="School and pupil numbers"
