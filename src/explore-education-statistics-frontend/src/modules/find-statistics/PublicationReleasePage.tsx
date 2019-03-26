@@ -282,7 +282,7 @@ class PublicationReleasePage extends Component<Props> {
         </p>
 
         <Link to="/table-tool" className="govuk-button">
-          Explore pupil absence statistics
+          Create charts and tables
         </Link>
 
         <GoToTopLink />
