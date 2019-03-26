@@ -5,7 +5,7 @@ Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
 
 *** Test Cases ***
-Verify Public Page Loads
+Go to Table Tool page
     [Tags]  HappyPath
     user goes to url  ${url}
     user checks element contains  css:body   Explore education statistics
