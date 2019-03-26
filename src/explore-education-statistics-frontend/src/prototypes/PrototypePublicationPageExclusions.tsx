@@ -26,7 +26,10 @@ const PublicationPageExclusions = () => {
           <h1 className="govuk-heading-xl">
             Permanent and fixed-period exclusions statistics in England
           </h1>
-          <p className="govuk-body-l">
+          <h2 className="govuk-heading-s">
+            <span className="govuk-caption-m">Published: </span>19 July 2018
+          </h2>
+          <p className="govuk-body">
             Read national statistical summaries and definitions, view charts and
             tables and download data files across a range of permanent and
             fixed-period exclusion subject areas.
@@ -39,19 +42,12 @@ const PublicationPageExclusions = () => {
             </a>
           </p>
 
-          <Details summary="Read more about our methodology">
-            <p>
-              To help you analyse and understand the statistics the following
-              sections include:
-            </p>
-
-            <div className="govuk-inset-text">
-              <Link to="#">
-                Find out more about our permanent and fixed-period exclusions
-                data and statistics methodology and terminology
-              </Link>
-            </div>
-          </Details>
+          <p>
+            <Link to="#">
+              Find out more about our permanent and fixed-period exclusions data
+              and statistics methodology and terminology
+            </Link>
+          </p>
           <Details summary="Download underlying data files">
             <ul className="govuk-list">
               <li>
@@ -136,10 +132,6 @@ const PublicationPageExclusions = () => {
               </ul>
             </Details>
 
-            <h3 className="govuk-heading-s">
-              <span className="govuk-caption-m">Published: </span>19 July 2018
-            </h3>
-
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <span className="govuk-caption-m">Last updated: </span>6 August
               2018
@@ -166,6 +158,23 @@ const PublicationPageExclusions = () => {
             <p className="govuk-caption-m govuk-!-margin-top-0">
               <a href="#">Notify me</a>
             </p>
+
+            <h2
+              className="govuk-heading-m govuk-!-margin-top-6"
+              id="related-content"
+            >
+              Related content
+            </h2>
+            <nav role="navigation" aria-labelledby="related-content">
+              <ul className="govuk-list">
+                <li>
+                  <Link to="/prototypes/methodology-absence">
+                    Permanent and fixed-period exclusions: guidance and
+                    methodology
+                  </Link>
+                </li>
+              </ul>
+            </nav>
           </aside>
         </div>
       </div>
