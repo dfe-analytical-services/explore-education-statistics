@@ -73,8 +73,9 @@ const PrototypeMethodologySection = () => {
         their own possible sessions, rather than if they reach a standard
         threshold of absence sessions. Meaning, that if an enrolment’s overall
         absence rate 10 per cent or higher2 they will be classified as
-        persistently absent. See <a href="#3.1">overall absence methodology</a>{' '}
-        section for further information.
+        persistently absent. See{' '}
+        <a href="#section3-1">overall absence methodology</a> section for
+        further information.
       </p>
       <p>
         To calculate school, local authority and national level persistent

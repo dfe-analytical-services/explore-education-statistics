@@ -32,7 +32,8 @@ const PublicationPage = () => {
           </h1>
 
           <h2 className="govuk-heading-s">
-            <span className="govuk-caption-m">Published: </span>22 March 2018
+            <span className="govuk-caption-m govuk-!-inline">Published: </span>
+            22 March 2018
           </h2>
 
           <p className="govuk-body">
@@ -174,7 +175,7 @@ const PublicationPage = () => {
               <ul className="govuk-list">
                 <li>
                   <Link to="/prototypes/methodology-absence">
-                    A guide to absence statistics
+                    Pupil absence statistics: guidance and methodology
                   </Link>
                 </li>
               </ul>
@@ -658,17 +659,17 @@ const PublicationPage = () => {
         >
           <ul className="govuk-list">
             <li>
-              <a href="#" className="govuk-link">
+              <a href="/prototypes/methodology-absence" className="govuk-link">
                 How do we collect it?
               </a>
             </li>
             <li>
-              <a href="#" className="govuk-link">
+              <a href="/prototypes/methodology-absence" className="govuk-link">
                 What do we do with it?
               </a>
             </li>
             <li>
-              <a href="#" className="govuk-link">
+              <a href="/prototypes/methodology-absence" className="govuk-link">
                 Related policies
               </a>
             </li>
