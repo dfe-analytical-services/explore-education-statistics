@@ -108,14 +108,14 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                GCSE and equivalent results in England
+                  GCSE and equivalent results in England
                 </h4>
                 <p className="govuk-body">
                   View statistics, create charts and tables and download data
                   files for GCSE and equivalent results in England
                 </p>
                 <div className="govuk-!-margin-top-0">
-                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse"/>
+                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
                 </div>
               </li>
             </ul>
