@@ -46,7 +46,7 @@ const PublicationPage = () => {
           <p className="govuk-body">
             You can also view a regional breakdown of statistics and data within
             the{' '}
-            <a href="#contents-sections-heading-9">
+            <a href="#contents-sections-heading-6">
               <strong>local authorities section</strong>
             </a>
           </p>
