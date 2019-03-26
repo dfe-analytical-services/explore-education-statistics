@@ -26,9 +26,12 @@ const PublicationPageExclusions = () => {
           <h1 className="govuk-heading-xl">
             Permanent and fixed-period exclusions statistics in England
           </h1>
-          <h2 className="govuk-heading-s">
-            <span className="govuk-caption-m">Published: </span>19 July 2018
-          </h2>
+          <dl className="dfe-meta-content">
+            <dt className="govuk-caption-m">Published: </dt>
+            <dd>
+              <strong>22 March 2018</strong>
+            </dd>
+          </dl>
           <p className="govuk-body">
             Read national statistical summaries and definitions, view charts and
             tables and download data files across a range of permanent and
