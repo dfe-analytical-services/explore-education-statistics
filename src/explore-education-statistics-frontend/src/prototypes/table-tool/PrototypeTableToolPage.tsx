@@ -1,17 +1,17 @@
 import range from 'lodash/range';
 import React, { Component, createRef } from 'react';
 import PageTitle from 'src/components/PageTitle';
-import Tabs from 'src/components/Tabs';
-import TabsSection from 'src/components/TabsSection';
 import CharacteristicsDataTable from 'src/modules/table-tool/components/CharacteristicsDataTable';
-import CharacteristicsFilterForm, {
-  CharacteristicsFilterFormSubmitHandler,
-} from 'src/modules/table-tool/components/CharacteristicsFilterForm';
+import { CharacteristicsFilterFormSubmitHandler } from 'src/modules/table-tool/components/CharacteristicsFilterForm';
 import PublicationMenu, {
   MenuChangeEventHandler,
 } from 'src/modules/table-tool/components/PublicationMenu';
 import PublicationSubjectMenu from 'src/modules/table-tool/components/PublicationSubjectMenu';
 import PrototypePage from 'src/prototypes/components/PrototypePage';
+import FiltersForm from 'src/prototypes/table-tool/components/FiltersForm';
+import initialMetaSpecification, {
+  MetaSpecification,
+} from 'src/prototypes/table-tool/components/meta/initialSpec';
 import tableBuilderService, {
   DataTableResult,
   PublicationMeta,
@@ -58,6 +58,7 @@ interface State {
     schoolTypes: SchoolType[];
     years: number[];
   };
+  metaSpecification: MetaSpecification;
   publicationId: string;
   publicationMeta: Pick<PublicationMeta, 'characteristics' | 'indicators'>;
   publicationName: string;
@@ -77,6 +78,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
     filters: {
       ...this.defaultFilters,
     },
+    metaSpecification: initialMetaSpecification,
     publicationId: '',
     publicationMeta: {
       characteristics: {},
@@ -108,6 +110,20 @@ class PrototypeTableToolPage extends Component<{}, State> {
       publicationName,
       filters: {
         ...this.defaultFilters,
+      },
+      metaSpecification: {
+        ...this.state.metaSpecification,
+        categoricalFilters: {
+          ...this.state.metaSpecification.categoricalFilters,
+          characteristics: {
+            ...this.state.metaSpecification.categoricalFilters.characteristics,
+            options: publicationMeta.characteristics,
+          },
+        },
+        indicators: {
+          ...this.state.metaSpecification.indicators,
+          ...publicationMeta.indicators,
+        },
       },
       publicationSubjectId: '',
       tableData: [],
@@ -161,6 +177,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
   public render() {
     const {
       filters,
+      metaSpecification,
       publicationMeta,
       publicationId,
       publicationName,
@@ -221,20 +238,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
                       },
                     )
                   }
-                  options={[
-                    {
-                      id: 'natcharacteristics',
-                      name: 'National characteristics',
-                    },
-                    {
-                      id: 'lacharacteristics',
-                      name: 'Local authority characteristics',
-                    },
-                    {
-                      id: 'geoglevels',
-                      name: 'Geographic levels',
-                    },
-                  ]}
+                  options={metaSpecification.publicationSubject}
                   value={publicationSubjectId}
                 />
               </>
@@ -252,14 +256,10 @@ class PrototypeTableToolPage extends Component<{}, State> {
                 </span>
               </h2>
 
-              <Tabs>
-                <TabsSection id="characteristics" title="Filters">
-                  <CharacteristicsFilterForm
-                    publicationMeta={publicationMeta}
-                    onSubmit={this.handleFilterFormSubmit}
-                  />
-                </TabsSection>
-              </Tabs>
+              <FiltersForm
+                specification={metaSpecification}
+                onSubmit={this.handleFilterFormSubmit}
+              />
             </div>
           </section>
         )}
