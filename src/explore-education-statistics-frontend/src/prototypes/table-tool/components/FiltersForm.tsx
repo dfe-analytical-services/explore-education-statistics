@@ -13,23 +13,21 @@ import SearchableGroupedFilterMenus from './SearchableGroupedFilterMenus';
 
 export interface FormValues {
   characteristics: string[];
-  endYear: number;
+  endDate: number;
   indicators: string[];
   locationLevel: string;
   locationCountry: string;
   locationRegion: string;
   locationLocalAuthority: string;
   schoolTypes: SchoolType[];
-  startYear: number;
+  startDate: number;
 }
 
-export type CharacteristicsFilterFormSubmitHandler = (
-  values: FormValues,
-) => void;
+export type FilterFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
   specification: MetaSpecification;
-  onSubmit: CharacteristicsFilterFormSubmitHandler;
+  onSubmit: FilterFormSubmitHandler;
 }
 
 interface State {
@@ -77,32 +75,32 @@ class FiltersForm extends Component<Props, State> {
       <Formik
         initialValues={{
           characteristics: [],
-          endYear: 2016,
+          endDate: 2016,
           indicators: [],
           locationCountry: '',
           locationLevel: '',
           locationLocalAuthority: '',
           locationRegion: '',
           schoolTypes: [],
-          startYear: 2012,
+          startDate: 2012,
         }}
         validationSchema={Yup.object({
           characteristics: Yup.array().required('Select at least one option'),
-          endYear: Yup.number()
-            .required('End year is required')
-            .oneOf(startEndDateValues, 'Must be one of provided years')
+          endDate: Yup.number()
+            .required('End date is required')
+            .oneOf(startEndDateValues, 'Must be one of provided dates')
             .moreThanOrEqual(
-              Yup.ref('startYear'),
-              'Must be after or same as start year',
+              Yup.ref('startDate'),
+              'Must be after or same as start date',
             ),
           indicators: Yup.array().required('Select at least one option'),
           schoolTypes: Yup.array().required('Select at least one option'),
-          startYear: Yup.number()
-            .required('Start year is required')
-            .oneOf(startEndDateValues, 'Must be one of provided years')
+          startDate: Yup.number()
+            .required('Start date is required')
+            .oneOf(startEndDateValues, 'Must be one of provided dates')
             .lessThanOrEqual(
-              Yup.ref('endYear'),
-              'Must be before or same as end year',
+              Yup.ref('endDate'),
+              'Must be before or same as end date',
             ),
         })}
         onSubmit={async (form, actions) => {

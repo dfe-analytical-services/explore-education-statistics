@@ -2,13 +2,14 @@ import range from 'lodash/range';
 import React, { Component, createRef } from 'react';
 import PageTitle from 'src/components/PageTitle';
 import CharacteristicsDataTable from 'src/modules/table-tool/components/CharacteristicsDataTable';
-import { CharacteristicsFilterFormSubmitHandler } from 'src/modules/table-tool/components/CharacteristicsFilterForm';
 import PublicationMenu, {
   MenuChangeEventHandler,
 } from 'src/modules/table-tool/components/PublicationMenu';
 import PublicationSubjectMenu from 'src/modules/table-tool/components/PublicationSubjectMenu';
 import PrototypePage from 'src/prototypes/components/PrototypePage';
-import FiltersForm from 'src/prototypes/table-tool/components/FiltersForm';
+import FiltersForm, {
+  FilterFormSubmitHandler,
+} from 'src/prototypes/table-tool/components/FiltersForm';
 import initialMetaSpecification, {
   MetaSpecification,
 } from 'src/prototypes/table-tool/components/meta/initialSpec';
@@ -130,12 +131,12 @@ class PrototypeTableToolPage extends Component<{}, State> {
     });
   };
 
-  private handleFilterFormSubmit: CharacteristicsFilterFormSubmitHandler = async ({
+  private handleFilterFormSubmit: FilterFormSubmitHandler = async ({
     characteristics,
     indicators,
     schoolTypes,
-    startYear,
-    endYear,
+    startDate,
+    endDate,
   }) => {
     const formatToAcademicYear = (year: number) =>
       parseInt(`${year}${`${year + 1}`.substring(2, 4)}`, 0);
@@ -145,13 +146,13 @@ class PrototypeTableToolPage extends Component<{}, State> {
         characteristics,
         indicators,
         schoolTypes,
-        endYear: formatToAcademicYear(endYear),
+        endYear: formatToAcademicYear(endDate),
         publicationId: this.state.publicationId,
-        startYear: formatToAcademicYear(startYear),
+        startYear: formatToAcademicYear(startDate),
       },
     );
 
-    const years = range(startYear, endYear + 1).map(formatToAcademicYear);
+    const years = range(startDate, endDate + 1).map(formatToAcademicYear);
 
     this.setState(
       {
