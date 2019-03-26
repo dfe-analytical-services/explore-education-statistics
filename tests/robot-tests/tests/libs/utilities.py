@@ -2,6 +2,11 @@ from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.common.by import By
 s2l = BuiltIn().get_library_instance('SeleniumLibrary')
 
+def cookie_names_should_be_on_page():
+  cookies = s2l.driver.get_cookies()
+  for cookie in cookies:
+    s2l.page_should_contain(cookie['name'])
+
 def get_matching_css_count(css):
   if css.startswith('css:'):
     css = css[4:]
@@ -13,37 +18,3 @@ def css_should_match_x_times(css, times):
   elements = s2l._current_browser().find_elements(By.CSS_SELECTOR, css)
   if len(elements) != int(times):
     raise AssertionError("\"CSS Should Match X Times\" found " + str(len(elements)) + " matching elements, not " + str(times) + " elements!")
-
-def import_jquery(url):
-  if s2l._current_browser().execute_script("return typeof(jQuery) == 'undefined'"):
-    jscode = '''var headNode = document.getElementsByTagName('head')[0]; 
-                var scriptNode = document.createElement('script'); 
-                scriptNode.type='text/javascript'; 
-                scriptNode.src='%s'; 
-                headNode.appendChild(scriptNode);''' % url
-
-    s2l._current_browser().execute_script(jscode)
-
-def get_matching_jquery_count(jquery):
-  jscode = '''
-  var count=0;
-  jQuery("%s").each(function() {
-    count++;
-  });
-  return count;
-  ''' % jquery.replace("'", "\\'").replace("\"", "\\'")
-
-  return s2l._current_browser().execute_script(jscode)
-
-def jquery_should_match_x_times(jquery, times):
-  jscode = '''
-  var count=0;
-  jQuery("%s").each(function() {
-    count++;
-  });
-  return count;
-  ''' % jquery.replace("'", "\\'").replace("\"", "\\'")
-
-  num = int(s2l._current_browser().execute_script(jscode))
-  if num != int(times):
-    raise AssertionError("\"jQuery Should Match X Times\" found " + str(num) + " matching elements, not " + str(times) + " elements!")

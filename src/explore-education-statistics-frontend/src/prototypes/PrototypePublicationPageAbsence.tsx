@@ -31,9 +31,12 @@ const PublicationPage = () => {
             Pupil absence statistics and data for schools in England
           </h1>
 
-          <h2 className="govuk-heading-s">
-            <span className="govuk-caption-m">Published: </span>22 March 2018
-          </h2>
+          <dl className="dfe-meta-content">
+            <dt className="govuk-caption-m">Published: </dt>
+            <dd>
+              <strong>22 March 2018</strong>
+            </dd>
+          </dl>
 
           <p className="govuk-body">
             Read national statistical summaries and definitions, view charts and
@@ -174,7 +177,7 @@ const PublicationPage = () => {
               <ul className="govuk-list">
                 <li>
                   <Link to="/prototypes/methodology-absence">
-                    A guide to absence statistics
+                    Pupil absence statistics: guidance and methodology
                   </Link>
                 </li>
               </ul>
@@ -658,17 +661,17 @@ const PublicationPage = () => {
         >
           <ul className="govuk-list">
             <li>
-              <a href="#" className="govuk-link">
+              <a href="/prototypes/methodology-absence" className="govuk-link">
                 How do we collect it?
               </a>
             </li>
             <li>
-              <a href="#" className="govuk-link">
+              <a href="/prototypes/methodology-absence" className="govuk-link">
                 What do we do with it?
               </a>
             </li>
             <li>
-              <a href="#" className="govuk-link">
+              <a href="/prototypes/methodology-absence" className="govuk-link">
                 Related policies
               </a>
             </li>
@@ -734,7 +737,7 @@ const PublicationPage = () => {
         download as excel or .csv files . The data can also be accessed via an
         API. <a href="#">What is an API?</a>
       </p>
-      <Link to="/table-tool" className="govuk-button">
+      <Link to="/prototypes/table-tool" className="govuk-button">
         Create charts and tables
       </Link>
       <div className="govuk-!-margin-top-9">

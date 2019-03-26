@@ -34,6 +34,7 @@ const FormRadio = ({
         onChange={onChange}
         type="radio"
         value={value}
+        data-testid={label}
       />
       <label className="govuk-label govuk-radios__label" htmlFor={id}>
         {label}

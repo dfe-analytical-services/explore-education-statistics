@@ -1,9 +1,9 @@
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import PageFooter from '../../components/PageFooter';
-import PageHeader from '../../components/PageHeader';
 import PrototypeBreadcrumbs, { Breadcrumb } from './PrototypeBreadcrumbs';
 import PrototypePageBanner from './PrototypePageBanner';
+import PrototypePageHeader from './PrototypePageHeader';
 
 interface Props {
   breadcrumbs?: Breadcrumb[];
@@ -14,7 +14,7 @@ interface Props {
 const PrototypePage = ({ breadcrumbs = [], children, wide }: Props) => {
   return (
     <>
-      <PageHeader wide={wide} />
+      <PrototypePageHeader wide={wide} />
 
       <div
         className={classNames('govuk-width-container', {

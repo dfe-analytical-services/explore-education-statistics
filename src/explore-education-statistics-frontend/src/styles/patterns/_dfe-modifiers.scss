@@ -7,3 +7,14 @@
 .dfe-font-style-normal {
   font-style: normal;
 }
+
+.dfe-meta-content {
+  .govuk-caption-m {
+    display: inline;
+  }
+
+  dd {
+    display: inline;
+    margin-left: 0;
+  }
+}

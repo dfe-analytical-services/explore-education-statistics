@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
@@ -69,9 +70,86 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 Characteristics = _releaseService.GetCharacteristicMetas(publicationId, typeName)
             };
 
-            if (result.Indicators != null && result.Indicators.Any() || 
+            if (result.Indicators != null && result.Indicators.Any() ||
                 result.Characteristics != null && result.Characteristics.Any())
             {
+                result.ObservationalUnits = new ObservationalUnitsViewModel
+                {
+                    Country = new List<NameLabelViewModel>
+                    {
+                        new NameLabelViewModel {Name = "E92000001", Label = "England"}
+                    },
+                    LocalAuthority = new List<NameLabelViewModel>
+                    {
+                        new NameLabelViewModel
+                        {
+                            Name = "E09000007",
+                            Label = "Camden"
+                        },
+                        new NameLabelViewModel
+                        {
+                            Name = "E09000001",
+                            Label = "City of London"
+                        },
+                        new NameLabelViewModel
+                        {
+                            Name = "E09000011",
+                            Label = "Greenwich"
+                        }
+                    },
+                    Region = new List<NameLabelViewModel>
+                    {
+                        new NameLabelViewModel
+                        {
+                            Name = "E13000001",
+                            Label = "Inner London"
+                        },
+                        new NameLabelViewModel
+                        {
+                            Name = "E13000002",
+                            Label = "Outer London"
+                        }
+                    },
+                    TimePeriod = new TimePeriodMetaViewModel
+                    {
+                        Hint = "Filter statistics by a given start and end date",
+                        Legend = "Academic Year",
+                        Options = new List<NameLabelViewModel>
+                        {
+                            new NameLabelViewModel
+                            {
+                                Name = "201112",
+                                Label = "2011/12"
+                            },
+                            new NameLabelViewModel
+                            {
+                                Name = "201213",
+                                Label = "2012/13"
+                            },
+                            new NameLabelViewModel
+                            {
+                                Name = "201314",
+                                Label = "2013/14"
+                            },
+                            new NameLabelViewModel
+                            {
+                                Name = "201415",
+                                Label = "2014/15"
+                            },
+                            new NameLabelViewModel
+                            {
+                                Name = "201516",
+                                Label = "2015/16"
+                            },
+                            new NameLabelViewModel
+                            {
+                                Name = "201617",
+                                Label = "2016/17"
+                            }
+                        }
+                    }
+                };
+
                 return result;
             }
 
