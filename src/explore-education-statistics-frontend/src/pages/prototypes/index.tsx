@@ -29,6 +29,11 @@ class PrototypesIndexPage extends Component {
             </Link>
           </li>
           <li>
+            <Link to="/prototypes/publication-gcse">
+              Publication page (KS4)
+            </Link>
+          </li>
+          <li>
             <Link to="/prototypes/methodology-home">Methodology home</Link>
           </li>
           <li>
