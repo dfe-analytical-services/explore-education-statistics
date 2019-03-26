@@ -72,21 +72,27 @@ export class MapBlock extends Component<MapProps, MapState> {
     requestAnimationFrame(() => this.refresh());
   }
 
+  public componentDidUpdate() {
+    requestAnimationFrame(() => this.refresh());
+  }
+
   public render() {
     return (
       <div>
-        <Map
-          style={{ height: `${this.props.height || 200}px` }}
-          ref={el => (this.mapRef = el)}
-          center={this.state.position}
-          // className={styles.map}
-          zoom={6.5}
-          // minZoom={6.5}
-          // zoomSnap={0.5}
-          // maxBounds={this.state.maxBounds}
-        >
-          {this.renderGeoJson()}
-        </Map>
+        {this.state.geometry && (
+          <Map
+            style={{ height: `${this.props.height || 200}px` }}
+            ref={el => (this.mapRef = el)}
+            center={this.state.position}
+            // className={styles.map}
+            zoom={6.5}
+            // minZoom={6.5}
+            // zoomSnap={0.5}
+            // maxBounds={this.state.maxBounds}
+          >
+            {this.renderGeoJson()}
+          </Map>
+        )}
       </div>
     );
   }

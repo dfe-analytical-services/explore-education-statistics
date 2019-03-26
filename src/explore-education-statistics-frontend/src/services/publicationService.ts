@@ -35,9 +35,9 @@ export interface Axis {
 
 export interface Chart {
   type: string;
-  attributes: string[];
-  XAxis?: Axis;
-  YAxis?: Axis;
+  indicators: string[];
+  xAxis?: Axis;
+  yAxis?: Axis;
   [property: string]: any;
 }
 

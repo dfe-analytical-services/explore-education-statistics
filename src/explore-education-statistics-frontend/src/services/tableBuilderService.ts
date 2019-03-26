@@ -32,6 +32,12 @@ export interface CharacteristicsData {
     indicators: {
       [indicator: string]: string;
     };
+    characteristic?: {
+      label: string;
+      name: string;
+      description?: string | null;
+      name2?: string | null;
+    };
   }[];
 }
 

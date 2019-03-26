@@ -12,12 +12,15 @@ import { ChartRenderer } from './ChartRenderer';
 import { SummaryRenderer } from './SummaryRenderer';
 import { TableRenderer } from './TableRenderer';
 
-interface DataBlockProps {
+export interface DataBlockProps {
   type: string;
   heading?: string;
   dataQuery?: DataQuery;
   charts?: Chart[];
   summary?: Summary;
+  data?: any;
+  meta?: PublicationMeta;
+  height?: number;
 }
 
 interface DataBlockState {
@@ -43,7 +46,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
     if (dataQuery) {
       await this.getData(dataQuery);
     } else {
-      this.parseDataResponse(undefined, undefined);
+      this.parseDataResponse(this.props.data, this.props.meta);
     }
   }
 
@@ -85,7 +88,9 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
     const newState: any = {};
 
     if (json && jsonMeta) {
-      newState.tables = [{ data: json, meta: jsonMeta }];
+      if (json.length > 0) {
+        newState.tables = [{ data: json, meta: jsonMeta }];
+      }
 
       if (this.props.charts) {
         newState.charts = this.props.charts.map(chart => ({
@@ -115,12 +120,14 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
         <Tabs>
           {this.state.summary && (
             <TabsSection id={`${id}_summary`} title="Summary">
+              <h3>{this.props.heading}</h3>
               <SummaryRenderer {...this.state.summary} />
             </TabsSection>
           )}
 
           {this.state.tables && (
             <TabsSection id={`${id}0`} title="Data tables">
+              <h3>{this.props.heading}</h3>
               {this.state.tables.map((table: any, idx) => (
                 <TableRenderer key={`${id}0_table_${idx}`} {...table} />
               ))}
@@ -128,9 +135,14 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
           )}
 
           {this.state.charts && (
-            <TabsSection id={`${id}1`} title="Charts">
+            <TabsSection id={`${id}1`} title="Charts" lazy={false}>
+              <h3>{this.props.heading}</h3>
               {this.state.charts.map((chart: any, idx) => (
-                <ChartRenderer key={`${id}_chart_${idx}`} {...chart} />
+                <ChartRenderer
+                  key={`${id}_chart_${idx}`}
+                  {...chart}
+                  height={this.props.height}
+                />
               ))}
             </TabsSection>
           )}

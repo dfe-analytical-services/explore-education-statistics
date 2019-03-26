@@ -23,7 +23,7 @@ const PrototypeDownloadDropdown = ({ viewType, topic, link }: Props) => {
         <div className="govuk-grid-column-one-third">
           <Link
             className="govuk-link govuk-!-margin-right-9 "
-            to="/prototypes/data-table-v3"
+            to="/prototypes/table-tool"
           >
             Create charts and tables
           </Link>

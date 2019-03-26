@@ -4,13 +4,13 @@ import AccordionSection from '../components/AccordionSection';
 import Details from '../components/Details';
 import Link from '../components/Link';
 import { ChartRenderer } from '../modules/find-statistics/components/ChartRenderer';
-import PrototypeAbsenceData from './components/PrototypeAbsenceData';
+import { DataBlock } from '../modules/find-statistics/components/DataBlock';
 import {
   ks4AverageAttainment8ScorePerPupilByLocalAuthority,
   ks4AverageHeadlineScoresByPupilEthnicity,
   ks4PerformanceInMatsComparedToNationalAverage,
   ks4SchoolAverageHeadlineScoresByPupilCharacteristics,
-  kS4SchoolPerformanceChart,
+  kS4SchoolPerformanceDataBlock,
   ks4SchoolRevisedAttainmentChart,
   ks4TrendInDisavdantagePuilsAttainmentGapIndex,
 } from './components/PrototypeDataFactory';
@@ -37,7 +37,13 @@ const PublicationPage = () => {
           <h1 className="govuk-heading-xl">
             GCSE and equivalent results in England, 2016 to 2017
           </h1>
-          <p className="govuk-body-l">
+          <dl className="dfe-meta-content">
+            <dt className="govuk-caption-m">Published: </dt>
+            <dd>
+              <strong>22 March 2018</strong>
+            </dd>
+          </dl>
+          <p className="govuk-body">
             This statistical first release (SFR) provides information on the
             achievements in GCSE examinations and other qualifications of young
             people in academic year 2016 to 2017. This typically covers those
@@ -46,24 +52,18 @@ const PublicationPage = () => {
           <p className="govuk-body">
             You can also view a regional breakdown of statistics and data within
             the{' '}
-            <a href="#contents-sections-heading-9">
+            <a href="#contents-sections-heading-6">
               <strong>local authorities section</strong>
             </a>
           </p>
 
-          <Details summary="Read more about our methodology">
-            <p>
-              To help you analyse and understand the statistics the following
-              sections include:
-            </p>
+          <p>
+            <Link to="#">
+              Find out more about our GCSE and equivalent results methodology
+              and terminology
+            </Link>
+          </p>
 
-            <div className="govuk-inset-text">
-              <Link to="#">
-                Find out more about our pupil absence data and statistics
-                methodology and terminology
-              </Link>
-            </div>
-          </Details>
           <Details summary="Download underlying data files">
             <ul className="govuk-list">
               <li>
@@ -146,10 +146,6 @@ const PublicationPage = () => {
               </ul>
             </Details>
 
-            <h3 className="govuk-heading-s">
-              <span className="govuk-caption-m">Published: </span>22 March 2018
-            </h3>
-
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <span className="govuk-caption-m">Last updated: </span>20 June
               2018
@@ -176,6 +172,22 @@ const PublicationPage = () => {
             <p className="govuk-caption-m govuk-!-margin-top-0">
               <a href="#">Notify me</a>
             </p>
+
+            <h2
+              className="govuk-heading-m govuk-!-margin-top-6"
+              id="related-content"
+            >
+              Related content
+            </h2>
+            <nav role="navigation" aria-labelledby="related-content">
+              <ul className="govuk-list">
+                <li>
+                  <Link to="#">
+                    GCSE absence statistics: guidance and methodology
+                  </Link>
+                </li>
+              </ul>
+            </nav>
           </aside>
         </div>
       </div>
@@ -251,8 +263,7 @@ const PublicationPage = () => {
           heading="School performance for 2018"
           caption="School performance for 2018 shows small increases across all headline measures compared to 2017"
         >
-          <ChartRenderer {...kS4SchoolPerformanceChart} />
-          />
+          <DataBlock {...kS4SchoolPerformanceDataBlock} />
           <p>
             Results for 2018 show an increases across all headline measures
             compared to 2017.{' '}
@@ -324,9 +335,7 @@ const PublicationPage = () => {
               coasting and floor standard by region
             </strong>
           </p>
-          <ChartRenderer {...ks4SchoolRevisedAttainmentChart} />
-          [CHART - England, state-funded schools assessed against the floor and
-          coasting standards, 2018]
+          <DataBlock {...ks4SchoolRevisedAttainmentChart} />
           <p>
             The floor and coasting standards give measures of whether schools
             are helping pupils to fulfil their potential based on progress
@@ -359,10 +368,9 @@ const PublicationPage = () => {
           heading="Pupil characteristics"
           caption="Disadvantaged pupils and those with Special Education Needs continue to do less well than their peers"
         >
-          <ChartRenderer
+          <DataBlock
             {...ks4SchoolAverageHeadlineScoresByPupilCharacteristics}
           />
-          [CHART - Average headline scores by pupil characteristics ]
           <p>
             Breakdowns by pupil characteristics show that across all headline
             measures:
@@ -394,21 +402,19 @@ const PublicationPage = () => {
             remained broadly stable, widening by 0.6% in 2018, and narrowing by
             9.5% since 2011.
           </p>
-          <ChartRenderer
+          <DataBlock
             height={600}
             {...ks4TrendInDisavdantagePuilsAttainmentGapIndex}
           />
-          [CHART - Trend in the disadvantaged pupils’ attainment gap index ]
         </AccordionSection>
         <AccordionSection
           heading="Headline performance"
           caption="Results across headline performance measures vary by ethnicity"
         >
-          <ChartRenderer
+          <DataBlock
             height={400}
             {...ks4AverageHeadlineScoresByPupilEthnicity}
           />
-          [CHART - Average headline scores by pupil ethnicity]
           <p>
             Results across headline measures differ by ethnicity with Chinese
             pupils in particular achieving scores above the national average.
@@ -445,11 +451,10 @@ const PublicationPage = () => {
             pupil show that. This is similar to patterns seen in recent years
             and against other performance measures.{' '}
           </p>
-          <ChartRenderer
+          <DataBlock
             {...ks4AverageAttainment8ScorePerPupilByLocalAuthority}
             height={400}
           />
-          [INTERACTIVE MAP]
         </AccordionSection>
         <AccordionSection
           heading="Pupil subject areas"
@@ -564,11 +569,10 @@ const PublicationPage = () => {
             increased from 62 in 2017 to 85 in 2018. This is an increase from
             384 to 494 schools, and from 54,356 to 69,169 pupils.{' '}
           </p>
-          <ChartRenderer
+          <DataBlock
             height={300}
             {...ks4PerformanceInMatsComparedToNationalAverage}
           />
-          [CHART - Performance in MATs compared to national averages]
           <p>
             On Progress8 measures, in 2018, 32.9% of MATs were below the
             national average and 7.1% well below average. 29.4% were not above
@@ -678,7 +682,7 @@ const PublicationPage = () => {
         download as excel or .csv files . The data can also be accessed via an
         API. <a href="#">What is an API?</a>
       </p>
-      <Link to="/table-tool" className="govuk-button">
+      <Link to="/prototypes/table-tool" className="govuk-button">
         Create charts and tables
       </Link>
       <div className="govuk-!-margin-top-9">

@@ -24,7 +24,7 @@ const Link = ({
   const href = props.href || to;
 
   return (
-    <RouterLink {...props} href={href}>
+    <RouterLink href={href}>
       <a
         {...props}
         className={classNames(

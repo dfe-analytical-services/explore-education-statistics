@@ -140,11 +140,11 @@ class CharacteristicsDataTable extends Component<Props> {
     return (
       <div>
         {firstYear === lastYear && (
-          <h3>{`Comparing statistics for ${firstYear}`}</h3>
+          <p>{`Comparing statistics for ${firstYear}`}</p>
         )}
 
         {firstYear !== lastYear && (
-          <h3>{`Comparing statistics between ${firstYear} and ${lastYear}`}</h3>
+          <p>{`Comparing statistics between ${firstYear} and ${lastYear}`}</p>
         )}
 
         {schoolGroups.map(schoolGroup => {
