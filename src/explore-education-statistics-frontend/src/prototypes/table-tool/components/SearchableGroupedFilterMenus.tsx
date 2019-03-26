@@ -69,7 +69,7 @@ class SearchableGroupedFilterMenus<
                 values.indexOf(item.name) > -1,
             )
             .map(item => ({
-              id: item.name,
+              id: `${name}-${item.name}`,
               label: item.label,
               value: item.name,
             })),

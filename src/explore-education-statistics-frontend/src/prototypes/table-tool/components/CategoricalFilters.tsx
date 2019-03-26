@@ -27,7 +27,7 @@ const CategoricalFilters = ({ form, specification }: Props) => {
                 legend={filterSpec.legend}
                 hint={filterSpec.hint}
                 options={filterSpec.options.map(option => ({
-                  id: option.name,
+                  id: `${filterKey}-${option.name}`,
                   label: option.label,
                   value: option.name,
                 }))}
