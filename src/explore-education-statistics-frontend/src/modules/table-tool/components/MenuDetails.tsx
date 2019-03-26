@@ -35,7 +35,9 @@ class MenuDetails extends Component<Props> {
             }
           }}
         >
-          <span className="govuk-details__summary-text">{summary}</span>
+          <span className="govuk-details__summary-text" data-testid={summary}>
+            {summary}
+          </span>
         </summary>
         <div className={styles.content}>{children}</div>
       </details>

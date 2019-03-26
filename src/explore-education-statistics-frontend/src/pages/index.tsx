@@ -21,7 +21,9 @@ class HomePage extends Component {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-three-quarters">
             <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-              <Link to="/statistics">Find statistics and data</Link>
+              <Link to="/statistics" data-testid="home--find-statistics-link">
+                Find statistics and data
+              </Link>
             </h2>
             <p className="govuk-caption-m govuk-!-margin-top-2">
               Browse to find statistical summaries and explanations to help you
@@ -29,7 +31,7 @@ class HomePage extends Component {
               statistics and data.
             </p>
             <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-              <Link to="/table-tool">
+              <Link to="/table-tool" data-testid="home--table-tool-link">
                 Create your own charts and tables online
               </Link>
             </h2>
@@ -38,7 +40,9 @@ class HomePage extends Component {
               national and regional statistics and data.
             </p>
             <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-              <Link to="/statistics">Download data files</Link>
+              <Link to="/statistics" data-testid="home--download-data-link">
+                Download data files
+              </Link>
             </h2>
             <p className="govuk-caption-m govuk-!-margin-top-2">
               Browse to find and download the data files behind our range of

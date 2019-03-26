@@ -15,6 +15,7 @@ exports[`FormRadioGroup renders correctly with legend 1`] = `
                id="radio-1"
                name="test-radios"
                type="radio"
+               data-testid="Test radio 1"
                value="1"
         >
         <label class="govuk-label govuk-radios__label"
@@ -28,6 +29,7 @@ exports[`FormRadioGroup renders correctly with legend 1`] = `
                id="radio-2"
                name="test-radios"
                type="radio"
+               data-testid="Test radio 2"
                value="2"
         >
         <label class="govuk-label govuk-radios__label"
@@ -41,6 +43,7 @@ exports[`FormRadioGroup renders correctly with legend 1`] = `
                id="radio-3"
                name="test-radios"
                type="radio"
+               data-testid="Test radio 3"
                value="3"
         >
         <label class="govuk-label govuk-radios__label"
@@ -67,6 +70,7 @@ exports[`FormRadioGroup renders list of radios in correct order 1`] = `
                id="radio-1"
                name="test-radios"
                type="radio"
+               data-testid="Test radio 1"
                value="1"
         >
         <label class="govuk-label govuk-radios__label"
@@ -80,6 +84,7 @@ exports[`FormRadioGroup renders list of radios in correct order 1`] = `
                id="radio-2"
                name="test-radios"
                type="radio"
+               data-testid="Test radio 2"
                value="2"
         >
         <label class="govuk-label govuk-radios__label"
@@ -93,6 +98,7 @@ exports[`FormRadioGroup renders list of radios in correct order 1`] = `
                id="radio-3"
                name="test-radios"
                type="radio"
+               data-testid="Test radio 3"
                value="3"
         >
         <label class="govuk-label govuk-radios__label"
