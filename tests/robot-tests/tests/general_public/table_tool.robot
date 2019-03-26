@@ -9,10 +9,43 @@ Go to Table Tool page
     [Tags]  HappyPath
     user goes to url  ${url}
     user checks element contains  css:body   Explore education statistics
+    user clicks link   Create your own charts and tables online
+    page should contain     Create your own table
 
-Validate names of cookies appear on Cookie Page
-    user clicks link   Cookies
-    cookie names should be on page
+Select Pupil absence publication
+    [Tags]  HappyPath
+    user clicks element    css:[data-testid="Early years and schools"]
+    user clicks element    css:[data-testid="Absence and exclusions"]
+    user clicks element    css:[data-testid="Pupil absence"]
+    page should contain    2. Filter statistics from
 
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Cookies
+Select start and end years
+    [Tags]  HappyPath
+    select from list by label   css:#filter-startYear   2012/13
+    select from list by label   css:#filter-endYear   2015/16
+
+Select School type Total
+    [Tags]  HappyPath
+    user clicks element  css:#filter-schoolTypes-total
+
+Select a few Indicators
+    [Tags]  HappyPath
+    user clicks element   css:[data-testid="Absence fields"]
+
+    user clicks element   css:#sess_authorised_percent
+    user clicks element   css:#sess_overall_percent
+    user clicks element   css:#sess_unauthorised_percent
+
+Select a few Characteristics
+    [Tags]  HappyPath
+    user clicks element   css:[data-testid="Total"]
+    user clicks element   css:input#Total
+
+Generate a table
+    [Tags]  HappyPath Failing
+    user clicks element   css:#submit-button
+    page should contain   Explore statistics from
+    element should contain  css:table   2012/13
+    element should contain  css:table   2013/14
+    element should contain  css:table   2013/14
+    element should not contain  css:table   2016/17

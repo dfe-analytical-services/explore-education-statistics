@@ -11,6 +11,7 @@ Verify Public Page Loads
     user checks element contains  css:body   Explore education statistics
 
 Validate names of cookies appear on Cookie Page
+    [Tags]  HappyPath Failing
     user clicks link   Cookies
     cookie names should be on page
 
