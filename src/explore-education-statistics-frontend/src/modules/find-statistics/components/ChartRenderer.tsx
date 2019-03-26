@@ -21,8 +21,8 @@ interface ChartRendererProps {
   data: any;
   meta: PublicationMeta;
 
-  xAxis: Axis;
-  yAxis: Axis;
+  xAxis?: Axis;
+  yAxis?: Axis;
 
   height?: number;
   [property: string]: any;
@@ -56,6 +56,11 @@ export class ChartRenderer extends Component<ChartRendererProps> {
         : 0;
     });
 
+    // @ts-ignore
+    const xAxis: Axis = this.props.xAxis;
+    // @ts-ignore
+    const yAxis: Axis = this.props.yAxis;
+
     switch (this.props.type.toLowerCase()) {
       case 'line':
         return (
@@ -63,8 +68,8 @@ export class ChartRenderer extends Component<ChartRendererProps> {
             chartDataKeys={this.props.indicators}
             characteristicsData={characteristicsData}
             labels={labels}
-            xAxis={this.props.xAxis}
-            yAxis={this.props.yAxis}
+            xAxis={xAxis}
+            yAxis={yAxis}
             height={this.props.height}
           />
         );
@@ -74,8 +79,8 @@ export class ChartRenderer extends Component<ChartRendererProps> {
             chartDataKeys={this.props.indicators}
             characteristicsData={characteristicsData}
             labels={labels}
-            yAxis={this.props.yAxis}
-            xAxis={this.props.xAxis}
+            xAxis={xAxis}
+            yAxis={yAxis}
             height={this.props.height}
           />
         );
@@ -85,8 +90,8 @@ export class ChartRenderer extends Component<ChartRendererProps> {
             chartDataKeys={this.props.indicators}
             characteristicsData={characteristicsData}
             labels={labels}
-            yAxis={this.props.yAxis}
-            xAxis={this.props.xAxis}
+            xAxis={xAxis}
+            yAxis={yAxis}
             height={this.props.height}
             stacked={this.props.stacked}
           />
@@ -97,8 +102,8 @@ export class ChartRenderer extends Component<ChartRendererProps> {
             chartDataKeys={this.props.indicators}
             characteristicsData={characteristicsData}
             labels={labels}
-            yAxis={this.props.yAxis}
-            xAxis={this.props.xAxis}
+            xAxis={xAxis}
+            yAxis={yAxis}
             height={this.props.height}
             geometry={this.props.geometry}
           />

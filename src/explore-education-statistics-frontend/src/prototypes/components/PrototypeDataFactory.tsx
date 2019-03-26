@@ -1,31 +1,28 @@
 import React from 'react';
-import { Axis } from '../../services/publicationService';
+import {
+  DataBlock,
+  DataBlockProps,
+} from '../../modules/find-statistics/components/DataBlock';
+import { Axis, Chart } from '../../services/publicationService';
 import {
   CharacteristicsData,
   DataTableResult,
   PublicationMeta,
 } from '../../services/tableBuilderService';
 import SchoolType from '../../services/types/SchoolType';
+import { data as OriginalData } from './PrototypeMapBoundaries';
 
-function create(
-  type: string,
-  xAxis: Axis,
-  yAxis: Axis,
+function createDataValues(
   indicators: string[],
   labels: string[],
   schooltype: SchoolType,
   year: number,
   data: (string | number | undefined)[][],
-  stacked: boolean = false,
 ) {
   return {
-    stacked,
-    type,
-
-    xAxis,
-    yAxis,
-
     data: {
+      indicators,
+
       publicationId: '',
       releaseDate: '',
       releaseId: '',
@@ -40,6 +37,12 @@ function create(
             return result;
           },
           {
+            characteristic: {
+              description: null,
+              label: '',
+              name: 'Total',
+              name2: null,
+            },
             indicators: {},
             schoolType: schooltype,
             timePeriod: year + rowIndex * 101,
@@ -48,35 +51,96 @@ function create(
       }),
     } as CharacteristicsData,
 
-    indicators: indicators.filter(
-      name => name !== xAxis.key && name !== yAxis.key,
-    ),
-
     meta: {
       indicators: {
         Test: indicators.map((key: string, index: number) => ({
           label: labels[index],
           name: key,
+          unit: '',
         })),
       },
 
-      characteristics: {},
+      characteristics: {
+        Test: [
+          {
+            label: 'Total',
+            name: 'Total',
+          },
+        ],
+      },
 
       publicationId: '',
     } as PublicationMeta,
   };
 }
 
-export const kS4SchoolPerformanceChart = create(
-  'line',
-  { title: '' },
-  { title: '' },
+function createBasicChart(
+  type: string,
+  indicators: string[],
+  xAxis: Axis,
+  yAxis: Axis,
+  stacked: boolean = false,
+): Chart {
+  return {
+    indicators,
+    stacked,
+    type,
+    xAxis,
+    yAxis,
+  };
+}
+
+function createFullChartWithData(
+  type: string,
+  xAxis: Axis,
+  yAxis: Axis,
+  indicators: string[],
+  labels: string[],
+  schooltype: SchoolType,
+  year: number,
+  data: (string | number | undefined)[][],
+  stacked: boolean = false,
+) {
+  return {
+    ...createBasicChart(type, indicators, xAxis, yAxis, stacked),
+
+    ...createDataValues(
+      indicators.filter(name => name !== xAxis.key && name !== yAxis.key),
+      labels,
+      schooltype,
+      year,
+      data,
+    ),
+  };
+}
+
+function createDataBlockWithChart(
+  heading: string,
+  indicators: string[],
+  labels: string[],
+  schooltype: SchoolType,
+  year: number,
+  data: (string | number | undefined)[][],
+  charts?: Chart[],
+): DataBlockProps {
+  return {
+    charts,
+
+    heading,
+    type: 'DataBlock',
+
+    ...createDataValues(indicators, labels, schooltype, year, data),
+  };
+}
+
+export const kS4SchoolPerformanceDataBlock = createDataBlockWithChart(
+  'Average headline performance measures over time',
   ['attainment_english_maths', 'ebacc_entries', 'attainment_8'],
   ['Attainment in English and Maths', 'Ebacc Entries', 'Attainment 8'],
   SchoolType.Total,
   200910,
   [
-    ['55', '22', undefined],
+    ['55', '22', '--'],
     ['55', '22', undefined],
     ['55', '22', undefined],
     ['55', '35', undefined],
@@ -86,14 +150,21 @@ export const kS4SchoolPerformanceChart = create(
     ['42', '40', '48'],
     ['42', '40', '48'],
   ],
+  [
+    createBasicChart(
+      'line',
+      ['attainment_english_maths', 'ebacc_entries', 'attainment_8'],
+      { title: '' },
+      { title: '' },
+    ),
+  ],
 );
 
-export const ks4SchoolRevisedAttainmentChart = create(
-  'verticalbar',
-  { title: '', key: 'la_name' },
-  { title: '' },
+export const ks4SchoolRevisedAttainmentChart = createDataBlockWithChart(
+  'There is wide variation in the percentage of schools meeting the coasting and floor standard by region',
   ['la_name', 'floor_standards', 'coasting'],
   ['Region', 'Floor Standards', 'Coasting'],
+
   SchoolType.Total,
   201819,
   [
@@ -107,12 +178,18 @@ export const ks4SchoolRevisedAttainmentChart = create(
     ['North West', 21, 12],
     ['North East', 23, 11],
   ],
+  [
+    createBasicChart(
+      'verticalbar',
+      ['floor_standards', 'coasting'],
+      { title: '', key: 'la_name' },
+      { title: '' },
+    ),
+  ],
 );
 
-export const ks4SchoolAverageHeadlineScoresByPupilCharacteristics = create(
-  'horizontalbar',
-  { title: '' },
-  { title: '', key: 'name' },
+export const ks4SchoolAverageHeadlineScoresByPupilCharacteristics = createDataBlockWithChart(
+  'Average headline scores by pupil characteristics',
   ['name', 'ebacc_entry', 'eng', 'attainment'],
   ['Name', 'Ebacc Entry', 'Eng & Maths (9-5)', 'Attainment 8'],
   SchoolType.Total,
@@ -127,12 +204,18 @@ export const ks4SchoolAverageHeadlineScoresByPupilCharacteristics = create(
     ['Boys', 12, 13, 27],
     ['Girls', 12, 13, 27],
   ],
+  [
+    createBasicChart(
+      'horizontalbar',
+      ['ebacc_entry', 'eng', 'attainment'],
+      { title: '' },
+      { title: '', key: 'name' },
+    ),
+  ],
 );
 
-export const ks4TrendInDisavdantagePuilsAttainmentGapIndex = create(
-  'line',
-  { title: '' },
-  { title: '', min: 0, max: 5 },
+export const ks4TrendInDisavdantagePuilsAttainmentGapIndex = createDataBlockWithChart(
+  'Disadvantage attainment gap index',
   ['value'],
   ['Value'],
   SchoolType.Total,
@@ -147,12 +230,18 @@ export const ks4TrendInDisavdantagePuilsAttainmentGapIndex = create(
     ['3.66'],
     ['3.68'],
   ],
+  [
+    createBasicChart(
+      'line',
+      ['value'],
+      { title: '' },
+      { title: '', min: 0, max: 5 },
+    ),
+  ],
 );
 
-export const ks4AverageHeadlineScoresByPupilEthnicity = create(
-  'verticalbar',
-  { title: '', key: 'name' },
-  { title: '' },
+export const ks4AverageHeadlineScoresByPupilEthnicity = createDataBlockWithChart(
+  'Average headline scores by pupil ethnicity',
   ['name', 'attainment', 'eng', 'ebacc_entry'],
   ['Name', 'Attainment 8', 'Eng & Maths (9-5)', 'Ebacc Entry'],
   SchoolType.Total,
@@ -164,12 +253,18 @@ export const ks4AverageHeadlineScoresByPupilEthnicity = create(
     ['Black', 45, 39, 45],
     ['Chinese', 63, 75, 63],
   ],
+  [
+    createBasicChart(
+      'verticalbar',
+      ['attainment', 'eng', 'ebacc_entry'],
+      { title: '', key: 'name' },
+      { title: '' },
+    ),
+  ],
 );
 
-export const ks4PerformanceInMatsComparedToNationalAverage = create(
-  'horizontalbar',
-  { title: '', key: 'name' },
-  { title: '' },
+export const ks4PerformanceInMatsComparedToNationalAverage = createDataBlockWithChart(
+  'Performance in MATs compared to national average',
   ['name', 'below_Average', 'average', 'above_average'],
   ['Name', 'Below Average', 'Average', 'Above Average'],
   SchoolType.Total,
@@ -179,21 +274,28 @@ export const ks4PerformanceInMatsComparedToNationalAverage = create(
     ['Ebacc APS', 63, 0, 37],
     ['Ebacc Entries', 57, 0, 43],
   ],
-  true,
+  [
+    createBasicChart(
+      'horizontalbar',
+      ['below_Average', 'average', 'above_average'],
+      { title: '', key: 'name' },
+      { title: '' },
+      true,
+    ),
+  ],
 );
 
-import { data as OriginalData } from './PrototypeMapBoundaries';
-
-export const ks4AverageAttainment8ScorePerPupilByLocalAuthority = {
-  ...create(
-    'map',
-    { title: '' },
-    { title: '' },
-    [],
-    [],
-    SchoolType.Total,
-    201819,
-    [[]],
-  ),
-  geometry: OriginalData,
-};
+export const ks4AverageAttainment8ScorePerPupilByLocalAuthority = createDataBlockWithChart(
+  'Average Attainment 8 score per pupil by local authority',
+  [],
+  [],
+  SchoolType.Total,
+  201819,
+  [[]],
+  [
+    {
+      ...createBasicChart('map', [], { title: '' }, { title: '' }),
+      geometry: OriginalData,
+    },
+  ],
+);
