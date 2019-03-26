@@ -16,8 +16,9 @@ function createDataValues(
   indicators: string[],
   labels: string[],
   schooltype: SchoolType,
-  year: number,
+  year: number | undefined,
   data: (string | number | undefined)[][],
+  characteristic: string = 'Total',
 ) {
   return {
     data: {
@@ -27,6 +28,18 @@ function createDataValues(
       releaseDate: '',
       releaseId: '',
       result: data.map((row: (string | number | undefined)[], rowIndex) => {
+        const initialData: any = {
+          characteristic: {
+            description: null,
+            label: '',
+            name: characteristic,
+            name2: null,
+          },
+          indicators: {},
+          schoolType: schooltype,
+          timePeriod: year !== undefined ? year + rowIndex * 101 : undefined,
+        };
+
         return row.reduce(
           (
             result: DataTableResult,
@@ -36,17 +49,7 @@ function createDataValues(
             if (next) result.indicators[indicators[index]] = `${next}`;
             return result;
           },
-          {
-            characteristic: {
-              description: null,
-              label: '',
-              name: 'Total',
-              name2: null,
-            },
-            indicators: {},
-            schoolType: schooltype,
-            timePeriod: year + rowIndex * 101,
-          },
+          initialData,
         );
       }),
     } as CharacteristicsData,
@@ -65,6 +68,10 @@ function createDataValues(
           {
             label: 'Total',
             name: 'Total',
+          },
+          {
+            label: 'Year',
+            name: 'Year',
           },
         ],
       },
@@ -100,6 +107,7 @@ function createFullChartWithData(
   year: number,
   data: (string | number | undefined)[][],
   stacked: boolean = false,
+  characteristic: string = 'Total',
 ) {
   return {
     ...createBasicChart(type, indicators, xAxis, yAxis, stacked),
@@ -119,9 +127,10 @@ function createDataBlockWithChart(
   indicators: string[],
   labels: string[],
   schooltype: SchoolType,
-  year: number,
+  year: number | undefined,
   data: (string | number | undefined)[][],
   charts?: Chart[],
+  characteristic: string = 'Total',
 ): DataBlockProps {
   return {
     charts,
@@ -129,7 +138,14 @@ function createDataBlockWithChart(
     heading,
     type: 'DataBlock',
 
-    ...createDataValues(indicators, labels, schooltype, year, data),
+    ...createDataValues(
+      indicators,
+      labels,
+      schooltype,
+      year,
+      data,
+      characteristic,
+    ),
   };
 }
 
@@ -193,7 +209,7 @@ export const ks4SchoolAverageHeadlineScoresByPupilCharacteristics = createDataBl
   ['name', 'ebacc_entry', 'eng', 'attainment'],
   ['Name', 'Ebacc Entry', 'Eng & Maths (9-5)', 'Attainment 8'],
   SchoolType.Total,
-  2001819,
+  201819,
   [
     ['SEN', 12, 13, 27],
     ['No SEN', 12, 13, 27],
@@ -297,5 +313,116 @@ export const ks4AverageAttainment8ScorePerPupilByLocalAuthority = createDataBloc
       ...createBasicChart('map', [], { title: '' }, { title: '' }),
       geometry: OriginalData,
     },
+  ],
+);
+
+export const ks4RevisedAttainmentData = createDataBlockWithChart(
+  'Pupil subject entries are highest for science and humanities and continue to increase',
+  ['label', 'label_0', 'label_1'],
+  ['', '2017', '2018'],
+  SchoolType.Total,
+  undefined,
+  [
+    ['Science', '91.3', '95.5'],
+    ['Humanities', '76.8', '78.3'],
+    ['Languages', '47.4', '46.1'],
+    ['Art', '46.5', '44.3'],
+  ],
+  undefined,
+  'Year',
+);
+
+export const ks4StateFundedSchoolsPerformance2 = createDataBlockWithChart(
+  'Across state-funded schools performance is typically higher in converter academies, the most common school type',
+  ['group', 'schools', 'end_of_ks4', 'attainment8', 'progress8'],
+  [
+    '',
+    'Schools',
+    'Pupils at end of KS4',
+    'Average Attainment8',
+    'Average Progress8',
+  ],
+  SchoolType.Total,
+  201819,
+  [
+    ['LA Maintained Schools', '930', '151242', '46.5', '-0.03'],
+    ['Academies/Free Schools', '2223', '360345', '47.9', '0.03'],
+    ['Sponsored Academies', '643', '151242', '46.5', '-0.03'],
+    ['Converter Academies', '1431', '151242', '46.5', '-0.03'],
+    ['Free Schools', '930', '77', '46.5', '-0.03'],
+    [
+      'Studio Schools',
+      'University Technical Colleges',
+      '28',
+      '151242',
+      '46.5',
+      '-0.03',
+    ],
+    ['Further Education Colleges', '19', '151242', '46.5', '-0.03'],
+    ['All', '3175', '151242', '46.5', '-0.03'],
+  ],
+);
+
+export const ks4StateFundedSchoolsPerformance = createDataBlockWithChart(
+  'Across state-funded schools performance is typically higher in converter academies, the most common school type',
+  [
+    'group',
+    'LA Maintained Schools',
+    'Academies/Free Schools',
+    'Sponsored Academies',
+    'Converter Academies',
+    'Free Schools',
+    'Studio Schools',
+    'Further Education Colleges',
+    'All',
+  ],
+  [
+    '',
+    'LA Maintained Schools',
+    'Academies/Free Schools',
+    'Sponsored Academies',
+    'Converter Academies',
+    'Free Schools',
+    'Studio Schools',
+    'Further Education Colleges',
+    'All',
+  ],
+  SchoolType.Total,
+  201819,
+  [
+    ['Schools', '930', '2223', '643', '1431', '930', '77', '19', '3175'],
+    [
+      'Pupils at end of KS4',
+      '151242',
+      '360345',
+      '151242',
+      '151242',
+      '77',
+      '28',
+      '151242',
+      '151242',
+    ],
+    [
+      'Average Attainment8',
+      '46.5',
+      '47.9',
+      '46.5',
+      '46.5',
+      '46.5',
+      '151242',
+      '46.5',
+      '46.5',
+    ],
+    [
+      'Average Progress8',
+      '-0.03',
+      '0.03',
+      '-0.03',
+      '-0.03',
+      '-0.03',
+      '46.5',
+      '-0.03',
+      '-0.03',
+    ],
   ],
 );

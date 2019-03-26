@@ -9,9 +9,11 @@ import {
   ks4AverageAttainment8ScorePerPupilByLocalAuthority,
   ks4AverageHeadlineScoresByPupilEthnicity,
   ks4PerformanceInMatsComparedToNationalAverage,
+  ks4RevisedAttainmentData,
   ks4SchoolAverageHeadlineScoresByPupilCharacteristics,
   kS4SchoolPerformanceDataBlock,
   ks4SchoolRevisedAttainmentChart,
+  ks4StateFundedSchoolsPerformance,
   ks4TrendInDisavdantagePuilsAttainmentGapIndex,
 } from './components/PrototypeDataFactory';
 import PrototypeDataSampleGCSE from './components/PrototypeDataSampleGCSE';
@@ -460,7 +462,7 @@ const PublicationPage = () => {
           heading="Pupil subject areas"
           caption="Pupil subject entries are highest for science and humanities and continue to increase"
         >
-          [TABLE - Subject entries]
+          <DataBlock {...ks4RevisedAttainmentData} />
           <p>
             It is compulsory for pupils to study English and Maths at key stage
             4 in state-funded schools.{' '}
@@ -520,6 +522,7 @@ const PublicationPage = () => {
           heading="Schools performance"
           caption="Across state-funded schools performance is typically higher in converter academies, the most common school type"
         >
+          <DataBlock {...ks4StateFundedSchoolsPerformance} />
           [TABLE - Key stage 4 revised attainment data ]
           <p>
             Schools in England can be divided into state-funded and independent
