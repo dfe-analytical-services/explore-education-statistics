@@ -25,11 +25,13 @@ interface Props {
 class PublicationReleasePage extends Component<Props> {
   public static async getInitialProps({
     query,
+    req,
   }: NextContext<{
     publication: string;
     release: string;
   }>) {
-    const { publication, release } = query;
+    // @ts-ignore
+    const { publication, release } = req ? req.query : query;
 
     const request = release
       ? publicationService.getPublicationRelease(release)
