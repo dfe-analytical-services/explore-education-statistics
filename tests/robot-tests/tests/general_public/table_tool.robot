@@ -10,19 +10,19 @@ Go to Table Tool page
     user goes to url  ${url}
     user checks element contains  css:body   Explore education statistics
     user clicks link   Create your own charts and tables online
-    page should contain     Create your own table
+    user waits until page contains   Create your own table
 
 Select Pupil absence publication
     [Tags]  HappyPath
     user clicks element    css:[data-testid="Early years and schools"]
     user clicks element    css:[data-testid="Absence and exclusions"]
     user clicks element    css:[data-testid="Pupil absence"]
-    page should contain    2. Filter statistics from
+    user waits until page contains    2. Filter statistics from
 
 Select start and end years
     [Tags]  HappyPath
-    select from list by label   css:#filter-startYear   2012/13
-    select from list by label   css:#filter-endYear   2015/16
+    user selects from list by label   css:#filter-startYear   2012/13
+    user selects from list by label   css:#filter-endYear   2015/16
 
 Select School type Total
     [Tags]  HappyPath
@@ -42,10 +42,10 @@ Select a few Characteristics
     user clicks element   css:input#Total
 
 Generate a table
-    [Tags]  HappyPath Failing
+    [Tags]  HappyPath  Failing
     user clicks element   css:#submit-button
-    page should contain   Explore statistics from
-    element should contain  css:table   2012/13
-    element should contain  css:table   2013/14
-    element should contain  css:table   2013/14
-    element should not contain  css:table   2016/17
+    user waits until page contains  Explore statistics from
+    user checks element should contain  css:table   2012/13
+    user checks element should contain  css:table   2013/14
+    user checks element should contain  css:table   2013/14
+    user checks element should not contain  css:table   2016/17

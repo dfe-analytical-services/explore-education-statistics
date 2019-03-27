@@ -174,3 +174,6 @@ user checks element attribute value should be
   [Arguments]   ${locator}  ${attribute}    ${expected}
   element attribute value should be  ${locator}     ${attribute}   ${expected}
 
+user selects from list by label
+  [Arguments]   ${locator}   ${label}
+  select from list by label   ${locator}   ${label}
