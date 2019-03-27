@@ -31,7 +31,7 @@ class PublicationReleasePage extends Component<Props> {
     release: string;
   }>) {
     // @ts-ignore
-    const { publication, release } = req ? req.query : query;
+    const { publication, release } = query; // req ? req.query : query;
 
     const request = release
       ? publicationService.getPublicationRelease(release)
