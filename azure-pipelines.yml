@@ -81,6 +81,13 @@ jobs:
           testResultsFiles: '**/junit.xml'
           searchFolder: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
           testRunTitle: 'Frontend Jest tests'
+      - task: 'Npm@1'
+        displayName: 'npm run build:test'
+        inputs:
+          command: 'custom'
+          workingDir: 'src/explore-education-statistics-frontend'
+          verbose: false
+          customCommand: 'run build:test'
       - task: 'Bash@3'
         displayName: 'Remove node_modules'
         inputs:
@@ -89,7 +96,7 @@ jobs:
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
         inputs:
-          artifactName: 'frontend'
+          artifactName: 'frontend-test'
           targetPath: 'src/explore-education-statistics-frontend'
   - job: 'MiscellaneousArtifacts'
     pool:
