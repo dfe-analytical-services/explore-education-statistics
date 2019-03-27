@@ -2,7 +2,7 @@
 
 robot_env=$1
 
-if [ "${robot_env}" != "test" && "${robot_env}" != "stage" && "${robot_env}" != "prod" ]
+if [[ "${robot_env}" != "test" && "${robot_env}" != "stage" && "${robot_env}" != "prod" ]]
 then
     robot_env="test"
 fi
