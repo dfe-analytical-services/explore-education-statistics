@@ -1,3 +1,4 @@
+import camelCase from 'lodash/camelCase';
 import sortBy from 'lodash/sortBy';
 import React, { PureComponent } from 'react';
 import { FormGroup } from 'src/components/form';
@@ -50,7 +51,7 @@ class SearchableGroupedFilterMenus<
           ),
       )
       .map(([groupKey, items]) => {
-        const compositeKey = `${name}-${groupKey}`;
+        const compositeKey = `${name}-${camelCase(groupKey)}`;
 
         const isMenuOpen = Boolean(
           menuOptions[groupKey].some(
@@ -69,7 +70,7 @@ class SearchableGroupedFilterMenus<
                 values.indexOf(item.name) > -1,
             )
             .map(item => ({
-              id: `${name}-${item.name}`,
+              id: `${compositeKey}-${item.name}`,
               label: item.label,
               value: item.name,
             })),
