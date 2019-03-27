@@ -9,17 +9,55 @@ import { MetaSpecification } from 'src/prototypes/table-tool/components/meta/ini
 import { FormValues } from './FiltersForm';
 
 enum LocationLevel {
-  National = 'NATIONAL',
-  Region = 'REGION',
-  Local_Authority = 'LOCAL_AUTHORITY',
+  National = 'national',
+  Region = 'region',
+  Local_Authority = 'localAuthority',
+  School = 'school',
 }
+
+const defaultLocationLevelOptions = [
+  {
+    id: 'locationLevel-national',
+    label: 'National',
+    value: LocationLevel.National,
+  },
+  {
+    id: 'locationLevel-region',
+    label: 'Region',
+    value: LocationLevel.Region,
+  },
+  {
+    id: 'locationLevel-localAuthority',
+    label: 'Local authority',
+    value: LocationLevel.Local_Authority,
+  },
+  {
+    id: 'locationLevel-school',
+    label: 'School',
+    value: LocationLevel.School,
+  },
+];
 
 interface Props {
   form: FormikState<FormValues>;
-  specification: MetaSpecification['observationalUnits'];
+  publicationSubject: MetaSpecification['publicationSubject'][0];
+  specification: MetaSpecification;
 }
 
-const ObservationalUnitFilters = ({ form, specification }: Props) => {
+const ObservationalUnitFilters = ({
+  form,
+  publicationSubject,
+  specification,
+}: Props) => {
+  const locationLevelOptions = defaultLocationLevelOptions.filter(
+    option =>
+      publicationSubject.supports.observationalUnits.location.indexOf(
+        option.value,
+      ) > -1,
+  );
+
+  const locationSpecification = specification.observationalUnits.location;
+
   return (
     <>
       <FormFieldset
@@ -27,73 +65,71 @@ const ObservationalUnitFilters = ({ form, specification }: Props) => {
         legend="Location"
         hint="Filter statistics by location"
       >
-        <FormFieldRadioGroup
-          name="locationLevel"
-          options={[
-            {
-              id: 'locationLevel-national',
-              label: 'National',
-              value: LocationLevel.National,
-            },
-            {
-              id: 'locationLevel-region',
-              label: 'Region',
-              value: LocationLevel.Region,
-            },
-            {
-              id: 'locationLevel-localAuthority',
-              label: 'Local authority',
-              value: LocationLevel.Local_Authority,
-            },
-          ]}
-          id="filter-locationLevel"
-        />
+        {locationLevelOptions.length > 1 && (
+          <FormFieldRadioGroup
+            name="location.level"
+            options={locationLevelOptions}
+            id="filter-locationLevel"
+          />
+        )}
 
         {form.values.location.level === LocationLevel.National &&
-          specification.country.length > 1 && (
+          locationSpecification.national.length > 1 && (
             <FormFieldSelect
-              name="country"
+              name="location.country"
               id="filter-country"
               label="Country"
-              options={specification.country}
+              options={locationSpecification.national}
             />
           )}
 
         {form.values.location.level === LocationLevel.Region && (
           <FormFieldSelect
-            name="region"
+            name="location.region"
             id="filter-region"
             label="Region"
-            options={specification.region}
+            options={[
+              {
+                text: 'Select an option',
+                value: '',
+              },
+              ...locationSpecification.region,
+            ]}
           />
         )}
 
         {form.values.location.level === LocationLevel.Local_Authority && (
           <FormFieldSelect
-            name="localAuthority"
+            name="location.localAuthority"
             id="filter-localAuthority"
             label="Local authority"
-            options={specification.localAuthority}
+            options={[
+              {
+                text: 'Select an option',
+                value: '',
+              },
+              ...locationSpecification.localAuthority,
+            ]}
           />
         )}
       </FormFieldset>
 
       <FormFieldset
         id="filter-startEndDates"
-        legend={specification.startEndDate.legend}
-        hint={specification.startEndDate.hint}
+        legend={specification.observationalUnits.startEndDate.legend}
+        hint={specification.observationalUnits.startEndDate.hint}
       >
         <FormFieldSelect
           name="startDate"
           id="filter-startDate"
           label="Start date"
-          options={specification.startEndDate.options}
+          options={specification.observationalUnits.startEndDate.options}
         />
         <FormFieldSelect
           name="endDate"
           id="filter-endDate"
           label="End date"
-          options={specification.startEndDate.options}
+          options={specification.observationalUnits.startEndDate.options}
         />
       </FormFieldset>
     </>

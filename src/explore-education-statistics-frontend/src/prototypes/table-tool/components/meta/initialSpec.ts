@@ -1,5 +1,4 @@
 import { SelectOption } from 'src/components/form/FormSelect';
-import { PublicationSubjectOption } from 'src/modules/table-tool/components/PublicationSubjectMenu';
 import SchoolType from 'src/services/types/SchoolType';
 
 export interface FilterOption {
@@ -11,11 +10,24 @@ export interface GroupedFilterOptions {
   [name: string]: FilterOption[];
 }
 
+interface PublicationSubjectOption {
+  name: string;
+  label: string;
+  supports: {
+    observationalUnits: {
+      location: (keyof MetaSpecification['observationalUnits']['location'])[];
+    };
+  };
+}
+
 export interface MetaSpecification {
   observationalUnits: {
-    country: SelectOption[];
-    localAuthority: SelectOption[];
-    region: SelectOption[];
+    location: {
+      national: SelectOption[];
+      localAuthority: SelectOption[];
+      region: SelectOption[];
+      school: SelectOption[];
+    };
     startEndDate: {
       hint?: string;
       legend: string;
@@ -65,16 +77,19 @@ const metaSpecification: MetaSpecification = {
   },
   indicators: {},
   observationalUnits: {
-    country: [{ value: 'ENGLAND', text: 'England' }],
-    localAuthority: [
-      { value: 'CAMDEN', text: 'Camden' },
-      { value: 'CITY_OF_LONDON', text: 'City of London' },
-      { value: 'GREENWICH', text: 'Greenwich' },
-    ],
-    region: [
-      { value: 'INNER_LONDON', text: 'Inner London' },
-      { value: 'OUTER_LONDON', text: 'Outer London' },
-    ],
+    location: {
+      localAuthority: [
+        { value: 'CAMDEN', text: 'Camden' },
+        { value: 'CITY_OF_LONDON', text: 'City of London' },
+        { value: 'GREENWICH', text: 'Greenwich' },
+      ],
+      national: [{ value: 'ENGLAND', text: 'England' }],
+      region: [
+        { value: 'INNER_LONDON', text: 'Inner London' },
+        { value: 'OUTER_LONDON', text: 'Outer London' },
+      ],
+      school: [],
+    },
     startEndDate: {
       hint: 'Filter statistics by a given start and end date',
       legend: 'Academic Year',
@@ -90,16 +105,29 @@ const metaSpecification: MetaSpecification = {
   },
   publicationSubject: [
     {
-      label: 'National characteristics',
-      name: 'natcharacteristics',
+      label: 'Geographic levels',
+      name: 'geoglevels',
+      supports: {
+        observationalUnits: {
+          location: ['national', 'localAuthority', 'region', 'school'],
+        },
+      },
     },
     {
       label: 'Local authority characteristics',
       name: 'lacharacteristics',
+      supports: {
+        observationalUnits: { location: ['localAuthority'] },
+      },
     },
     {
-      label: 'Geographic levels',
-      name: 'geoglevels',
+      label: 'National characteristics',
+      name: 'natcharacteristics',
+      supports: {
+        observationalUnits: {
+          location: ['national'],
+        },
+      },
     },
   ],
 };

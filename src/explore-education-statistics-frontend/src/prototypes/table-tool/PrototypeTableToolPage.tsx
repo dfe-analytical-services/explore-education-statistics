@@ -64,7 +64,7 @@ interface State {
   publicationId: string;
   publicationMeta: Pick<PublicationMeta, 'characteristics' | 'indicators'>;
   publicationName: string;
-  publicationSubjectId: string;
+  publicationSubjectName: string;
   tableData: DataTableResult[];
 }
 
@@ -86,7 +86,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
       indicators: {},
     },
     publicationName: '',
-    publicationSubjectId: '',
+    publicationSubjectName: '',
     tableData: [],
   };
 
@@ -126,7 +126,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
           ...publicationMeta.indicators,
         },
       },
-      publicationSubjectId: '',
+      publicationSubjectName: '',
       tableData: [],
     });
   };
@@ -183,7 +183,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
       publicationMeta,
       publicationId,
       publicationName,
-      publicationSubjectId,
+      publicationSubjectName,
       tableData,
     } = this.state;
 
@@ -231,7 +231,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
                   onChange={event =>
                     this.setState(
                       {
-                        publicationSubjectId: event.target.value,
+                        publicationSubjectName: event.target.value,
                       },
                       () => {
                         if (this.filtersRef.current) {
@@ -244,14 +244,14 @@ class PrototypeTableToolPage extends Component<{}, State> {
                     )
                   }
                   options={metaSpecification.publicationSubject}
-                  value={publicationSubjectId}
+                  value={publicationSubjectName}
                 />
               </>
             )}
           </div>
         </section>
 
-        {publicationSubjectId && (
+        {publicationSubjectName && (
           <section className="govuk-form-group" ref={this.filtersRef}>
             <h2>
               3. Choose your filters for '{publicationName}'
@@ -262,6 +262,11 @@ class PrototypeTableToolPage extends Component<{}, State> {
 
             <FiltersForm
               specification={metaSpecification}
+              publicationSubject={
+                metaSpecification.publicationSubject.find(
+                  subject => subject.name === publicationSubjectName,
+                ) as MetaSpecification['publicationSubject'][0]
+              }
               onSubmit={this.handleFilterFormSubmit}
             />
           </section>

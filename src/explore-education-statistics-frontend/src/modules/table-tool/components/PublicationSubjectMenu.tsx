@@ -2,14 +2,14 @@ import React from 'react';
 import { RadioChangeEventHandler } from 'src/components/form/FormRadio';
 import FormRadioGroup from 'src/components/form/FormRadioGroup';
 
-export interface PublicationSubjectOption {
+export interface PublicationSubjectMenuOption {
   name: string;
   label: string;
 }
 
 interface Props {
   onChange: RadioChangeEventHandler;
-  options: PublicationSubjectOption[];
+  options: PublicationSubjectMenuOption[];
   value: string;
 }
 

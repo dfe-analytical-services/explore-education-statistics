@@ -1,4 +1,5 @@
 import { Form, Formik, FormikErrors, FormikProps, FormikTouched } from 'formik';
+import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
 import React, { Component, createRef } from 'react';
 import Button from 'src/components/Button';
@@ -6,7 +7,6 @@ import ErrorSummary, { ErrorSummaryMessage } from 'src/components/ErrorSummary';
 import { FormFieldset, FormGroup } from 'src/components/form';
 import createErrorHelper from 'src/lib/validation/createErrorHelper';
 import Yup from 'src/lib/validation/yup';
-import { ObjectSchema } from 'yup';
 import CategoricalFilters from './CategoricalFilters';
 import { MetaSpecification } from './meta/initialSpec';
 import ObservationalUnitFilters from './ObservationalUnitFilters';
@@ -30,6 +30,7 @@ export interface FormValues {
 export type FilterFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
+  publicationSubject: MetaSpecification['publicationSubject'][0];
   specification: MetaSpecification;
   onSubmit: FilterFormSubmitHandler;
 }
@@ -52,7 +53,7 @@ class FiltersForm extends Component<Props, State> {
     touched: FormikTouched<FormValues>,
   ) {
     const summaryErrors: ErrorSummaryMessage[] = Object.entries(errors)
-      .filter(([errorName]) => touched[errorName as keyof FormValues])
+      .filter(([errorName]) => get(touched, errorName))
       .map(([errorName, message]) => ({
         id: `filter-${errorName}`,
         message: typeof message === 'string' ? message : '',
@@ -69,21 +70,36 @@ class FiltersForm extends Component<Props, State> {
   }
 
   public render() {
-    const { specification } = this.props;
+    const { publicationSubject, specification } = this.props;
 
     const startEndDateValues = specification.observationalUnits.startEndDate.options.map(
       ({ value }) => value,
     );
 
-    const categoricalFilterRules: ObjectSchema<
-      FormValues['categoricalFilters']
-    > = Yup.object(
-      mapValues(specification.categoricalFilters, () =>
-        Yup.array()
-          .of(Yup.string())
-          .required('Select at least one option'),
-      ),
-    );
+    let locationRules = Yup.object<FormValues['location']>({
+      country: Yup.string().notRequired(),
+      level: Yup.string().notRequired(),
+      localAuthority: Yup.string().notRequired(),
+      region: Yup.string().notRequired(),
+    });
+
+    if (publicationSubject.supports.observationalUnits.location.length > 1) {
+      locationRules = locationRules.shape({
+        ...publicationSubject.supports.observationalUnits.location.reduce(
+          (acc, locationLevel) => {
+            return {
+              ...acc,
+              [locationLevel]: Yup.string().when('level', {
+                is: locationLevel,
+                then: Yup.string().required('Select a location'),
+              }),
+            };
+          },
+          {},
+        ),
+        level: Yup.string().required('Select a location level'),
+      });
+    }
 
     return (
       <Formik<FormValues>
@@ -103,7 +119,13 @@ class FiltersForm extends Component<Props, State> {
           startDate: 2012,
         }}
         validationSchema={Yup.object<FormValues>({
-          categoricalFilters: categoricalFilterRules,
+          categoricalFilters: Yup.object(
+            mapValues(specification.categoricalFilters, () =>
+              Yup.array()
+                .of(Yup.string())
+                .required('Select at least one option'),
+            ),
+          ),
           endDate: Yup.number()
             .required('End date is required')
             .oneOf(startEndDateValues, 'Must be one of provided dates')
@@ -114,7 +136,7 @@ class FiltersForm extends Component<Props, State> {
           indicators: Yup.array()
             .of(Yup.string())
             .required('Select at least one option'),
-          location: Yup.object(),
+          location: locationRules,
           startDate: Yup.number()
             .required('Start date is required')
             .oneOf(startEndDateValues, 'Must be one of provided dates')
@@ -136,12 +158,15 @@ class FiltersForm extends Component<Props, State> {
         }}
         render={(form: FormikProps<FormValues>) => {
           const { errors, touched, values } = form;
-          const { getError } = createErrorHelper({ errors, touched });
+          const { getAllErrors, getError } = createErrorHelper({
+            errors,
+            touched,
+          });
 
           return (
             <div ref={this.ref}>
               <ErrorSummary
-                errors={this.getSummaryErrors(errors, touched)}
+                errors={this.getSummaryErrors(getAllErrors(), touched)}
                 id="filter-errors"
               />
 
@@ -150,7 +175,8 @@ class FiltersForm extends Component<Props, State> {
                   <FormGroup className="govuk-grid-column-one-quarter-from-desktop">
                     <ObservationalUnitFilters
                       form={form}
-                      specification={specification.observationalUnits}
+                      specification={specification}
+                      publicationSubject={publicationSubject}
                     />
                   </FormGroup>
                   <FormGroup className="govuk-grid-column-one-half-from-desktop">

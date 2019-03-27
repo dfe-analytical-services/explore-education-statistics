@@ -1,14 +1,41 @@
 import { FormikErrors, FormikTouched, FormikValues } from 'formik';
 import get from 'lodash/get';
 
-function createErrorHelper<T extends FormikValues>({
+const createErrorHelper = <T extends FormikValues>({
   touched,
   errors,
 }: {
   touched: FormikTouched<T>;
   errors: FormikErrors<T>;
-}) {
-  const getError = (name: keyof T): string => {
+}) => {
+  const getAllErrors = (
+    errorGroup: FormikValues,
+    keyPrefix?: string,
+  ): { [key: string]: string } => {
+    return Object.entries(errorGroup).reduce((acc, [key, error]) => {
+      const errorKey = keyPrefix ? `${keyPrefix}.${key}` : key;
+
+      const isTouched = get(touched, errorKey, false);
+
+      if (!isTouched) {
+        return acc;
+      }
+
+      if (typeof error === 'string') {
+        return {
+          ...acc,
+          [errorKey]: error,
+        };
+      }
+
+      return {
+        ...acc,
+        ...getAllErrors(error, errorKey),
+      };
+    }, {});
+  };
+
+  const getError = (name: keyof T | string): string => {
     const isTouched = get(touched, name, false);
 
     if (!isTouched) {
@@ -20,14 +47,15 @@ function createErrorHelper<T extends FormikValues>({
     return typeof error === 'string' ? error : '';
   };
 
-  const hasError = (value: keyof T): boolean => {
+  const hasError = (value: keyof T | string): boolean => {
     return !!getError(value);
   };
 
   return {
     getError,
     hasError,
+    getAllErrors: () => getAllErrors(errors),
   };
-}
+};
 
 export default createErrorHelper;
