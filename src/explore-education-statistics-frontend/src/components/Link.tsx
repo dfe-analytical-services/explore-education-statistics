@@ -5,6 +5,7 @@ import React, { AnchorHTMLAttributes, ReactNode } from 'react';
 import { Omit } from '../types/util';
 
 type Props = {
+  as?: string | UrlLike;
   children: ReactNode;
   className?: string;
   to?: string | UrlLike;
@@ -13,6 +14,7 @@ type Props = {
   Omit<LinkProps, 'children'>;
 
 const Link = ({
+  as,
   children,
   className,
   to,
@@ -24,7 +26,7 @@ const Link = ({
   const href = props.href || to;
 
   return (
-    <RouterLink href={href}>
+    <RouterLink href={href} as={as}>
       <a
         {...props}
         className={classNames(
