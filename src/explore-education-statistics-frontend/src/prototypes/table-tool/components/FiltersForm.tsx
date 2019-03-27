@@ -1,26 +1,30 @@
 import { Form, Formik, FormikErrors, FormikProps, FormikTouched } from 'formik';
+import mapValues from 'lodash/mapValues';
 import React, { Component, createRef } from 'react';
 import Button from 'src/components/Button';
 import ErrorSummary, { ErrorSummaryMessage } from 'src/components/ErrorSummary';
 import { FormFieldset, FormGroup } from 'src/components/form';
 import createErrorHelper from 'src/lib/validation/createErrorHelper';
 import Yup from 'src/lib/validation/yup';
-import SchoolType from 'src/services/types/SchoolType';
+import { ObjectSchema } from 'yup';
 import CategoricalFilters from './CategoricalFilters';
 import { MetaSpecification } from './meta/initialSpec';
 import ObservationalUnitFilters from './ObservationalUnitFilters';
 import SearchableGroupedFilterMenus from './SearchableGroupedFilterMenus';
 
 export interface FormValues {
-  characteristics: string[];
   endDate: number;
   indicators: string[];
-  locationLevel: string;
-  locationCountry: string;
-  locationRegion: string;
-  locationLocalAuthority: string;
-  schoolTypes: SchoolType[];
+  location: {
+    level: string;
+    country: string;
+    region: string;
+    localAuthority: string;
+  };
   startDate: number;
+  categoricalFilters: {
+    [key: string]: string[];
+  };
 }
 
 export type FilterFormSubmitHandler = (values: FormValues) => void;
@@ -71,21 +75,35 @@ class FiltersForm extends Component<Props, State> {
       ({ value }) => value,
     );
 
+    const categoricalFilterRules: ObjectSchema<
+      FormValues['categoricalFilters']
+    > = Yup.object(
+      mapValues(specification.categoricalFilters, () =>
+        Yup.array()
+          .of(Yup.string())
+          .required('Select at least one option'),
+      ),
+    );
+
     return (
-      <Formik
+      <Formik<FormValues>
         initialValues={{
-          characteristics: [],
+          categoricalFilters: mapValues(
+            specification.categoricalFilters,
+            () => [],
+          ),
           endDate: 2016,
           indicators: [],
-          locationCountry: '',
-          locationLevel: '',
-          locationLocalAuthority: '',
-          locationRegion: '',
-          schoolTypes: [],
+          location: {
+            country: '',
+            level: '',
+            localAuthority: '',
+            region: '',
+          },
           startDate: 2012,
         }}
-        validationSchema={Yup.object({
-          characteristics: Yup.array().required('Select at least one option'),
+        validationSchema={Yup.object<FormValues>({
+          categoricalFilters: categoricalFilterRules,
           endDate: Yup.number()
             .required('End date is required')
             .oneOf(startEndDateValues, 'Must be one of provided dates')
@@ -93,8 +111,10 @@ class FiltersForm extends Component<Props, State> {
               Yup.ref('startDate'),
               'Must be after or same as start date',
             ),
-          indicators: Yup.array().required('Select at least one option'),
-          schoolTypes: Yup.array().required('Select at least one option'),
+          indicators: Yup.array()
+            .of(Yup.string())
+            .required('Select at least one option'),
+          location: Yup.object(),
           startDate: Yup.number()
             .required('Start date is required')
             .oneOf(startEndDateValues, 'Must be one of provided dates')

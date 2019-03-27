@@ -54,9 +54,10 @@ const defaultPublicationOptions = [
 
 interface State {
   filters: {
-    characteristics: string[];
     indicators: string[];
-    schoolTypes: SchoolType[];
+    categorical: {
+      [key: string]: string[];
+    };
     years: number[];
   };
   metaSpecification: MetaSpecification;
@@ -69,9 +70,8 @@ interface State {
 
 class PrototypeTableToolPage extends Component<{}, State> {
   private readonly defaultFilters: State['filters'] = {
-    characteristics: [],
+    categorical: {},
     indicators: [],
-    schoolTypes: [],
     years: [],
   };
 
@@ -132,12 +132,14 @@ class PrototypeTableToolPage extends Component<{}, State> {
   };
 
   private handleFilterFormSubmit: FilterFormSubmitHandler = async ({
-    characteristics,
+    categoricalFilters,
     indicators,
-    schoolTypes,
     startDate,
     endDate,
   }) => {
+    const { characteristics } = categoricalFilters;
+    const schoolTypes = categoricalFilters.schoolTypes as SchoolType[];
+
     const formatToAcademicYear = (year: number) =>
       parseInt(`${year}${`${year + 1}`.substring(2, 4)}`, 0);
 
@@ -157,10 +159,9 @@ class PrototypeTableToolPage extends Component<{}, State> {
     this.setState(
       {
         filters: {
-          characteristics,
           indicators,
-          schoolTypes,
           years,
+          categorical: categoricalFilters,
         },
         tableData: result,
       },
@@ -271,12 +272,12 @@ class PrototypeTableToolPage extends Component<{}, State> {
             <h2>4. Explore data for '{publicationName}'</h2>
 
             <CharacteristicsDataTable
-              characteristics={filters.characteristics}
+              characteristics={filters.categorical.characteristics}
               characteristicsMeta={publicationMeta.characteristics}
               indicators={filters.indicators}
               indicatorsMeta={publicationMeta.indicators}
               results={tableData}
-              schoolTypes={filters.schoolTypes}
+              schoolTypes={filters.categorical.schoolTypes}
               years={filters.years}
             />
 

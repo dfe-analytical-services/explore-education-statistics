@@ -29,6 +29,10 @@ class SearchableGroupedFilterMenus<
     [key: string]: unknown;
   }
 > extends PureComponent<Props<FormValues>, State> {
+  public static defaultProps = {
+    values: [],
+  };
+
   public state: State = {
     openFilters: {},
     searchTerm: '',

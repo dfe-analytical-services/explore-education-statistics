@@ -49,7 +49,7 @@ const ObservationalUnitFilters = ({ form, specification }: Props) => {
           id="filter-locationLevel"
         />
 
-        {form.values.locationLevel === LocationLevel.National &&
+        {form.values.location.level === LocationLevel.National &&
           specification.country.length > 1 && (
             <FormFieldSelect
               name="country"
@@ -59,7 +59,7 @@ const ObservationalUnitFilters = ({ form, specification }: Props) => {
             />
           )}
 
-        {form.values.locationLevel === LocationLevel.Region && (
+        {form.values.location.level === LocationLevel.Region && (
           <FormFieldSelect
             name="region"
             id="filter-region"
@@ -68,7 +68,7 @@ const ObservationalUnitFilters = ({ form, specification }: Props) => {
           />
         )}
 
-        {form.values.locationLevel === LocationLevel.Local_Authority && (
+        {form.values.location.level === LocationLevel.Local_Authority && (
           <FormFieldSelect
             name="localAuthority"
             id="filter-localAuthority"

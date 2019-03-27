@@ -1,4 +1,5 @@
 import { FormikErrors, FormikTouched, FormikValues } from 'formik';
+import get from 'lodash/get';
 
 function createErrorHelper<T extends FormikValues>({
   touched,
@@ -8,11 +9,15 @@ function createErrorHelper<T extends FormikValues>({
   errors: FormikErrors<T>;
 }) {
   const getError = (name: keyof T): string => {
-    if (!touched[name]) {
+    const isTouched = get(touched, name, false);
+
+    if (!isTouched) {
       return '';
     }
 
-    return typeof errors[name] === 'string' ? (errors[name] as string) : '';
+    const error = get(errors, name);
+
+    return typeof error === 'string' ? error : '';
   };
 
   const hasError = (value: keyof T): boolean => {

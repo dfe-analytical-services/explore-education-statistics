@@ -18,12 +18,14 @@ const CategoricalFilters = ({ form, specification }: Props) => {
   return (
     <div className={styles.columns}>
       {Object.entries(specification).map(([filterKey, filterSpec]) => {
+        const filterName = `categoricalFilters.${filterKey}`;
+
         return (
           <div className={styles.group} key={filterKey}>
             {Array.isArray(filterSpec.options) ? (
               <FormFieldCheckboxGroup<FormValues>
                 id={`filter-${filterKey}`}
-                name={filterKey}
+                name={filterName}
                 legend={filterSpec.legend}
                 hint={filterSpec.hint}
                 options={filterSpec.options.map(option => ({
@@ -38,12 +40,12 @@ const CategoricalFilters = ({ form, specification }: Props) => {
                 id={`filter-${filterKey}`}
                 legend={filterSpec.legend}
                 hint={filterSpec.hint}
-                error={getError(filterKey)}
+                error={getError(filterName)}
               >
                 <SearchableGroupedFilterMenus<FormValues>
                   menuOptions={filterSpec.options}
-                  name={filterKey}
-                  values={form.values.characteristics}
+                  name={filterName}
+                  values={form.values.categoricalFilters[filterKey]}
                 />
               </FormFieldset>
             )}
