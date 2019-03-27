@@ -88,7 +88,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
     const newState: any = {};
 
     if (json && jsonMeta) {
-      if (json.indicators.length > 0) {
+      if (json.result.length > 0) {
         newState.tables = [{ data: json, meta: jsonMeta }];
       }
 

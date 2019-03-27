@@ -13,15 +13,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public ContentService(ApplicationDbContext context)
         {
-            _context = context;    
-
+            _context = context;
         }
-        
+
         public List<ThemeTree> GetContentTree()
         {
-            var tree = _context.Themes.Select(t => new ThemeTree { Id = t.Id,Title = t.Title, 
-                Topics = t.Topics.Select(x => new TopicTree { Id = x.Id, Title = x.Title, Summary = x.Summary,
-                    Publications = x.Publications.Select(p => new PublicationTree { Id = p.Id, Title = p.Title, Summary = p.Summary, Slug = p.Slug}).ToList()} ).ToList()}).ToList();
+            var tree = _context.Themes.Select(t => new ThemeTree
+            {
+                Id = t.Id, Title = t.Title,
+                Topics = t.Topics.Select(x => new TopicTree
+                {
+                    Id = x.Id, Title = x.Title, Summary = x.Summary,
+                    Publications = x.Publications
+                        .Where(p => p.Releases.Count > 0)
+                        .Select(p => new PublicationTree
+                            {Id = p.Id, Title = p.Title, Summary = p.Summary, Slug = p.Slug}).ToList()
+                }).ToList()
+            }).ToList();
 
             return tree;
         }
@@ -43,9 +51,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public List<PublicationTree> Publications { get; set; }
     }
-    
+
     public class PublicationTree
-    
+
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
