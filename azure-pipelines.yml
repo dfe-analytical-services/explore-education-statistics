@@ -43,7 +43,7 @@ jobs:
 
   - job: 'Frontend'
     pool:
-      vmImage: 'ubuntu-16.04'
+      vmImage: 'vs2017-win2016'
       demands: 'npm'
     steps:
       - task: 'Npm@1'
@@ -88,11 +88,11 @@ jobs:
           workingDir: 'src/explore-education-statistics-frontend'
           verbose: false
           customCommand: 'run build:test'
-      - task: 'Bash@3'
-        displayName: 'Remove node_modules'
-        inputs:
-          targetType: 'inline'
-          script: 'rm -rf $(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend/node_modules/'
+      # - task: 'Bash@3'
+      #   displayName: 'Remove node_modules'
+      #   inputs:
+      #     targetType: 'inline'
+      #     script: 'rm -rf $(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend/node_modules/'
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
         inputs:
