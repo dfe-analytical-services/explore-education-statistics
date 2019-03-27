@@ -9,8 +9,6 @@ import GoToTopLink from 'src/components/GoToTopLink';
 import Link from 'src/components/Link';
 import Page from 'src/components/Page';
 import PageTitle from 'src/components/PageTitle';
-import Tabs from 'src/components/Tabs';
-import TabsSection from 'src/components/TabsSection';
 import { baseUrl } from 'src/services/api';
 import publicationService, { Release } from 'src/services/publicationService';
 import ContentBlock from './components/ContentBlock';
@@ -25,13 +23,11 @@ interface Props {
 class PublicationReleasePage extends Component<Props> {
   public static async getInitialProps({
     query,
-    req,
   }: NextContext<{
     publication: string;
     release: string;
   }>) {
-    // @ts-ignore
-    const { publication, release } = query; // req ? req.query : query;
+    const { publication, release } = query;
 
     const request = release
       ? publicationService.getPublicationRelease(release)

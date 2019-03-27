@@ -1,7 +1,10 @@
 import * as React from 'react';
 import ReactMarkdown from 'react-markdown';
 import Details from '../../../components/Details';
-import { PublicationMeta } from '../../../services/tableBuilderService';
+import {
+  CharacteristicsData,
+  PublicationMeta,
+} from '../../../services/tableBuilderService';
 
 interface Props {
   data: any;
@@ -17,7 +20,14 @@ export class SummaryRenderer extends React.Component<Props> {
     const dataKeys = this.props.dataKeys;
 
     if (this.props.data) {
-      const result = this.props.data.result;
+      const characteristicsData: CharacteristicsData = this.props.data;
+
+      const result = [...characteristicsData.result];
+
+      result.sort((a, b) =>
+        a.timePeriod < b.timePeriod ? -1 : a.timePeriod > b.timePeriod ? 1 : 0,
+      );
+
       const latest = result[result.length - 1];
       indicators = latest.indicators;
       indicatorMeta = Array.prototype
