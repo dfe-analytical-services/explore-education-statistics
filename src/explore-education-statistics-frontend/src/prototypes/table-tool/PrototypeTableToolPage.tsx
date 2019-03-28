@@ -137,7 +137,6 @@ class PrototypeTableToolPage extends Component<{}, State> {
           },
         },
         indicators: {
-          ...this.state.metaSpecification.indicators,
           ...Object.entries(publicationMeta.indicators).reduce(
             (acc, [groupKey, group]) => {
               return {
