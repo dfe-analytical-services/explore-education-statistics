@@ -145,6 +145,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
                   label: groupKey,
                   options: group.map(option => ({
                     label: option.label,
+                    unit: option.unit,
                     value: option.name,
                   })),
                 },
@@ -210,7 +211,6 @@ class PrototypeTableToolPage extends Component<{}, State> {
     const {
       filters,
       metaSpecification,
-      publicationMeta,
       publicationId,
       publicationName,
       publicationSubjectName,
@@ -302,13 +302,9 @@ class PrototypeTableToolPage extends Component<{}, State> {
             <h2>4. Explore data for '{publicationName}'</h2>
 
             <DataTable
-              characteristics={filters.categorical.characteristics}
-              characteristicsMeta={publicationMeta.characteristics}
-              indicators={filters.indicators}
-              indicatorsMeta={publicationMeta.indicators}
+              filters={filters}
+              specification={metaSpecification}
               results={tableData}
-              schoolTypes={filters.categorical.schoolTypes}
-              years={filters.years}
             />
 
             <ul className="govuk-list">

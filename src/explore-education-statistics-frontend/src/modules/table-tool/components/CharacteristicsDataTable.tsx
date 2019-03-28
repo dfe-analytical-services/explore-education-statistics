@@ -47,7 +47,7 @@ class CharacteristicsDataTable extends Component<Props> {
 
   private groupByName(groupedValues: {
     [group: string]: {
-      name: string;
+      label: string;
     }[];
   }): any {
     return Object.values(groupedValues)
@@ -55,7 +55,7 @@ class CharacteristicsDataTable extends Component<Props> {
       .reduce((acc, indicator) => {
         return {
           ...acc,
-          [indicator.name]: {
+          [indicator.label]: {
             ...indicator,
           },
         };
@@ -92,10 +92,10 @@ class CharacteristicsDataTable extends Component<Props> {
           characteristic => {
             if (!dataByCharacteristic[characteristic]) {
               return {
-                name: characteristicsByName[characteristic].label,
+                label: characteristicsByName[characteristic].label,
                 rows: indicators.map(indicator => ({
                   columns: years.map(() => '--'),
-                  name: indicatorsByName[indicator].label,
+                  label: indicatorsByName[indicator].label,
                 })),
               };
             }
@@ -106,7 +106,7 @@ class CharacteristicsDataTable extends Component<Props> {
             );
 
             return {
-              name: characteristicsByName[characteristic].label,
+              label: characteristicsByName[characteristic].label,
               rows: indicators.map(indicator => ({
                 columns: years.map(year => {
                   if (!dataByTimePeriod[year]) {
@@ -125,7 +125,7 @@ class CharacteristicsDataTable extends Component<Props> {
 
                   return '--';
                 }),
-                name: indicatorsByName[indicator].label,
+                label: indicatorsByName[indicator].label,
               })),
             };
           },
@@ -133,7 +133,7 @@ class CharacteristicsDataTable extends Component<Props> {
 
         return {
           data: groupedData,
-          name: schoolKeys[schoolType],
+          label: schoolKeys[schoolType],
         };
       });
 
@@ -150,8 +150,8 @@ class CharacteristicsDataTable extends Component<Props> {
         {schoolGroups.map(schoolGroup => {
           return (
             <GroupedDataTable
-              key={schoolGroup.name}
-              caption={schoolGroup.name}
+              key={schoolGroup.label}
+              caption={schoolGroup.label}
               header={years.map(this.parseYear)}
               groups={schoolGroup.data}
             />

@@ -6,10 +6,10 @@ import GroupedDataTable, {
   GroupedDataSet,
 } from 'src/modules/table-tool/components/GroupedDataTable';
 import {
-  CharacteristicsMeta,
-  DataTableResult,
-  IndicatorsMeta,
-} from 'src/services/tableBuilderService';
+  GroupedFilterOptions,
+  MetaSpecification,
+} from 'src/prototypes/table-tool/components/meta/initialSpec';
+import { DataTableResult } from 'src/services/tableBuilderService';
 import SchoolType from 'src/services/types/SchoolType';
 
 const schoolKeys: {
@@ -23,13 +23,15 @@ const schoolKeys: {
 };
 
 interface Props {
-  characteristics: string[];
-  characteristicsMeta: CharacteristicsMeta;
-  indicators: string[];
-  indicatorsMeta: IndicatorsMeta;
+  filters: {
+    indicators: string[];
+    categorical: {
+      [key: string]: string[];
+    };
+    years: number[];
+  };
+  specification: MetaSpecification;
   results: DataTableResult[];
-  schoolTypes: string[];
-  years: number[];
 }
 
 class DataTable extends Component<Props> {
@@ -47,42 +49,37 @@ class DataTable extends Component<Props> {
     return `${year}/${Number(yearString.substring(2, 4)) + 1}`;
   }
 
-  private groupByName(groupedValues: {
+  private groupByValue(groupedValues: {
     [group: string]: {
-      name: string;
-    }[];
+      options: { value: string }[];
+    };
   }): any {
     return Object.values(groupedValues)
-      .flatMap(groups => groups)
-      .reduce((acc, indicator) => {
+      .flatMap(group => group.options)
+      .reduce((acc, option) => {
         return {
           ...acc,
-          [indicator.name]: {
-            ...indicator,
+          [option.value]: {
+            ...option,
           },
         };
       }, {});
   }
 
   public render() {
-    const {
-      characteristics,
-      characteristicsMeta,
-      indicators,
-      indicatorsMeta,
-      results,
-      schoolTypes,
-      years,
-    } = this.props;
-    const firstYear = this.parseYear(min(years));
-    const lastYear = this.parseYear(max(years));
+    const { filters, results, specification } = this.props;
+    const { categorical, indicators, years } = filters;
 
-    const characteristicsByName = this.groupByName(characteristicsMeta);
-    const indicatorsByName = this.groupByName(indicatorsMeta);
+    const firstYear = this.parseYear(min(filters.years));
+    const lastYear = this.parseYear(max(filters.years));
+
+    const characteristicsByValue = this.groupByValue(specification
+      .categoricalFilters.characteristics.options as GroupedFilterOptions);
+    const indicatorsByValue = this.groupByValue(specification.indicators);
 
     const dataBySchool = groupBy(results, 'schoolType');
 
-    const schoolGroups = schoolTypes
+    const schoolGroups = categorical.schoolTypes
       .filter(schoolType => dataBySchool[schoolType])
       .map(schoolType => {
         const dataByCharacteristic = groupBy(
@@ -90,14 +87,14 @@ class DataTable extends Component<Props> {
           'characteristic.name',
         );
 
-        const groupedData: GroupedDataSet[] = characteristics.map(
+        const groupedData: GroupedDataSet[] = categorical.characteristics.map(
           characteristic => {
             if (!dataByCharacteristic[characteristic]) {
               return {
-                name: characteristicsByName[characteristic].label,
+                label: characteristicsByValue[characteristic],
                 rows: indicators.map(indicator => ({
                   columns: years.map(() => '--'),
-                  name: indicatorsByName[indicator].label,
+                  label: indicatorsByValue[indicator].label,
                 })),
               };
             }
@@ -108,7 +105,7 @@ class DataTable extends Component<Props> {
             );
 
             return {
-              name: characteristicsByName[characteristic].label,
+              label: characteristicsByValue[characteristic].label,
               rows: indicators.map(indicator => ({
                 columns: years.map(year => {
                   if (!dataByTimePeriod[year]) {
@@ -117,7 +114,7 @@ class DataTable extends Component<Props> {
 
                   if (dataByTimePeriod[year].length > 0) {
                     if (dataByTimePeriod[year][0].indicators[indicator]) {
-                      const unit = indicatorsByName[indicator].unit;
+                      const unit = indicatorsByValue[indicator].unit;
 
                       return `${
                         dataByTimePeriod[year][0].indicators[indicator]
@@ -127,7 +124,7 @@ class DataTable extends Component<Props> {
 
                   return '--';
                 }),
-                name: indicatorsByName[indicator].label,
+                label: indicatorsByValue[indicator].label,
               })),
             };
           },
@@ -135,7 +132,7 @@ class DataTable extends Component<Props> {
 
         return {
           data: groupedData,
-          name: schoolKeys[schoolType],
+          label: schoolKeys[schoolType],
         };
       });
 
@@ -152,8 +149,8 @@ class DataTable extends Component<Props> {
         {schoolGroups.map(schoolGroup => {
           return (
             <GroupedDataTable
-              key={schoolGroup.name}
-              caption={schoolGroup.name}
+              key={schoolGroup.label}
+              caption={schoolGroup.label}
               header={years.map(this.parseYear)}
               groups={schoolGroup.data}
             />

@@ -47,7 +47,13 @@ export interface MetaSpecification {
       options: FilterOption[] | GroupedFilterOptions;
     };
   };
-  indicators: GroupedFilterOptions;
+  indicators: {
+    [key: string]: {
+      label: string;
+      options: FilterOption[];
+      unit: string;
+    };
+  };
 }
 
 const metaSpecification: MetaSpecification = {
