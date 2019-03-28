@@ -1,4 +1,5 @@
 import { Container, default as BaseApp } from 'next/app';
+import Router from 'next/router'
 import React from 'react';
 import Helmet from 'react-helmet';
 import { initGA, logPageView } from '../utils/analytics'
@@ -18,7 +19,12 @@ class App extends BaseApp {
   public componentDidMount(): void {
     initGA();
     logPageView();
-    // Router.router.events.on('routeChangeComplete', logPageView);
+
+    if(Router.router !== null)
+    {
+      Router.router.events.on('routeChangeComplete', logPageView);
+    }
+
     document.body.classList.add('js-enabled');
   }
 
