@@ -36,6 +36,7 @@ exports[`Tabs renders multiple tabs correctly 1`] = `
   </ul>
   <section class="govuk-tabs__panel panel"
            id="section-1"
+           data-testid="Tab 1"
            aria-labelledby="section-1-tab"
            role="tabpanel"
            tabindex="-1"
@@ -47,6 +48,7 @@ exports[`Tabs renders multiple tabs correctly 1`] = `
   <section class="govuk-tabs__panel panel govuk-tabs__panel--hidden"
            id="section-2"
            hidden
+           data-testid="Tab 2"
            aria-labelledby="section-2-tab"
            role="tabpanel"
            tabindex="-1"
@@ -81,6 +83,7 @@ exports[`Tabs renders single tab correctly 1`] = `
   </ul>
   <section class="govuk-tabs__panel panel"
            id="section-1"
+           data-testid="Tab 1"
            aria-labelledby="section-1-tab"
            role="tabpanel"
            tabindex="-1"

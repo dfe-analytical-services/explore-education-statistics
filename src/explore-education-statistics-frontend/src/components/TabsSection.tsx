@@ -52,6 +52,7 @@ const TabsSection: FunctionComponent<TabsSectionProps> = forwardRef(
         onMouseUp={() => setMouseDown(false)}
         role={onRendered('tabpanel')}
         tabIndex={onRendered(-1)}
+        data-testid={tabProps.title}
       >
         {children}
       </section>
