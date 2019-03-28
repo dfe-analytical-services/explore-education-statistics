@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormRadio renders correctly when \`hint\` is provided 1`] = `
+
+<div class="govuk-radios__item">
+  <input aria-describedby="test-radio-item-hint"
+         class="govuk-radios__input"
+         id="test-radio"
+         name="test"
+         type="radio"
+         data-testid="Test radio"
+         value="true"
+  >
+  <label class="govuk-label govuk-radios__label"
+         for="test-radio"
+  >
+    Test radio
+  </label>
+  <span id="test-radio-item-hint"
+        class="govuk-hint govuk-radios__hint"
+  >
+    Click me to proceed
+  </span>
+</div>
+
+`;
+
+exports[`FormRadio renders correctly with required props 1`] = `
+
+<div class="govuk-radios__item">
+  <input class="govuk-radios__input"
+         id="test-radio"
+         name="test"
+         type="radio"
+         data-testid="Test radio"
+         value="true"
+  >
+  <label class="govuk-label govuk-radios__label"
+         for="test-radio"
+  >
+    Test radio
+  </label>
+</div>
+
+`;

@@ -1,0 +1,20 @@
+// Override standard gds styling
+
+.dfe-interactive-map {
+  width: 100%;
+}
+
+.dfe-font-style-normal {
+  font-style: normal;
+}
+
+.dfe-meta-content {
+  .govuk-caption-m {
+    display: inline;
+  }
+
+  dd {
+    display: inline;
+    margin-left: 0;
+  }
+}

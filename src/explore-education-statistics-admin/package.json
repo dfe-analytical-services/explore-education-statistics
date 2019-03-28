@@ -1,0 +1,62 @@
+{
+  "name": "explore-education-statistics-admin",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@types/geojson": "^7946.0.7",
+    "@types/jest": "24.0.11",
+    "@types/leaflet": "^1.4.3",
+    "@types/lodash": "^4.14.123",
+    "@types/node": "11.12.0",
+    "@types/react": "16.8.10",
+    "@types/react-dom": "16.8.3",
+    "@types/react-helmet": "^5.0.8",
+    "@types/react-leaflet": "^2.2.1",
+    "@types/recharts": "^1.1.16",
+    "@types/yup": "^0.26.12",
+    "axios": "^0.18.0",
+    "classnames": "^2.2.6",
+    "date-fns": "^2.0.0-alpha.27",
+    "dotenv-webpack": "^1.7.0",
+    "formik": "^1.5.1",
+    "geojson": "^0.5.0",
+    "govuk-frontend": "^2.7.0",
+    "leaflet": "^1.4.0",
+    "node-sass": "^4.11.0",
+    "normalize.css": "^8.0.1",
+    "react": "^16.8.6",
+    "react-app-rewired": "^2.1.1",
+    "react-dom": "^16.8.6",
+    "react-helmet": "^5.2.0",
+    "react-leaflet": "^2.2.1",
+    "react-markdown": "^4.0.6",
+    "react-scripts": "2.1.8",
+    "recharts": "^1.5.0",
+    "stylelint": "^9.10.1",
+    "stylelint-config-prettier": "^5.0.0",
+    "stylelint-config-sass-guidelines": "^5.3.0",
+    "stylelint-prettier": "^1.0.6",
+    "stylelint-webpack-plugin": "^0.10.5",
+    "typescript": "3.3.4000",
+    "yup": "^0.27.0"
+  },
+  "scripts": {
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-app-rewired eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "devDependencies": {
+    "@types/classnames": "^2.2.7",
+    "@babel/core": "7.2.2"
+  }
+}

@@ -1,0 +1,137 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Accordion renders with hidden content by default 1`] = `
+<div>
+  <div
+    class="govuk-accordion"
+    id="test-sections"
+  >
+    <div
+      class="govuk-accordion__controls"
+    >
+      <button
+        aria-expanded="false"
+        class="govuk-accordion__open-all"
+        type="button"
+      >
+        Open all
+        <span
+          class="govuk-visually-hidden"
+        >
+           sections
+        </span>
+      </button>
+    </div>
+    <div
+      class="govuk-accordion__section"
+    >
+      <div
+        class="govuk-accordion__section-header"
+      >
+        <h2
+          class="govuk-accordion__section-heading"
+        >
+          <button
+            aria-controls="test-sections-content-1"
+            aria-expanded="false"
+            class="govuk-accordion__section-button"
+            id="test-sections-heading-1"
+            type="button"
+          >
+            Test heading
+          </button>
+          <span
+            aria-hidden="true"
+            class="govuk-accordion__icon"
+          />
+        </h2>
+      </div>
+      <div
+        aria-labelledby="test-sections-heading-1"
+        class="govuk-accordion__section-content"
+        id="test-sections-content-1"
+      >
+        <p>
+          Test content
+        </p>
+        <div>
+          <a
+            class="govuk-link govuk-link--no-visited-state"
+            href="#"
+          >
+            Go to top
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Accordion renders with visible content when \`open\` is true 1`] = `
+<div>
+  <div
+    class="govuk-accordion"
+    id="test-sections"
+  >
+    <div
+      class="govuk-accordion__controls"
+    >
+      <button
+        aria-expanded="true"
+        class="govuk-accordion__open-all"
+        type="button"
+      >
+        Close all
+        <span
+          class="govuk-visually-hidden"
+        >
+           sections
+        </span>
+      </button>
+    </div>
+    <div
+      class="govuk-accordion__section govuk-accordion__section--expanded"
+    >
+      <div
+        class="govuk-accordion__section-header"
+      >
+        <h2
+          class="govuk-accordion__section-heading"
+        >
+          <button
+            aria-controls="test-sections-content-1"
+            aria-expanded="true"
+            class="govuk-accordion__section-button"
+            id="test-sections-heading-1"
+            type="button"
+          >
+            Test heading
+          </button>
+          <span
+            aria-hidden="true"
+            class="govuk-accordion__icon"
+          />
+        </h2>
+      </div>
+      <div
+        aria-labelledby="test-sections-heading-1"
+        class="govuk-accordion__section-content"
+        id="test-sections-content-1"
+      >
+        <p>
+          Test content
+        </p>
+        <div>
+          <a
+            class="govuk-link govuk-link--no-visited-state"
+            href="#"
+          >
+            Go to top
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

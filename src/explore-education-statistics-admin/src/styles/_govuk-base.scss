@@ -1,0 +1,9 @@
+// Import base GOVUK helpers for use  in other components.
+// This is mostly for convenience to avoid unnecessary
+// amounts of imports.
+
+$govuk-assets-path: '/static/';
+
+@import '~govuk-frontend/settings/all';
+@import '~govuk-frontend/tools/all';
+@import '~govuk-frontend/helpers/all';

@@ -1,0 +1,17 @@
+.map {
+  background-color: #f8f8fc;
+
+  height: 865px;
+  width: 630px;
+
+  path {
+    fill-opacity: 1;
+    stroke: #081b26;
+    stroke-width: 1px;
+  }
+
+  .selected {
+    fill: #ffbf47 !important;
+    stroke-width: 3px;
+  }
+}
