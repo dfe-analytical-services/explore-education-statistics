@@ -1,12 +1,12 @@
 import range from 'lodash/range';
 import React, { Component, createRef } from 'react';
 import PageTitle from 'src/components/PageTitle';
-import CharacteristicsDataTable from 'src/modules/table-tool/components/CharacteristicsDataTable';
 import PublicationMenu, {
   MenuChangeEventHandler,
 } from 'src/modules/table-tool/components/PublicationMenu';
 import PublicationSubjectMenu from 'src/modules/table-tool/components/PublicationSubjectMenu';
 import PrototypePage from 'src/prototypes/components/PrototypePage';
+import DataTable from 'src/prototypes/table-tool/components/DataTable';
 import FiltersForm, {
   FilterFormSubmitHandler,
 } from 'src/prototypes/table-tool/components/FiltersForm';
@@ -169,8 +169,10 @@ class PrototypeTableToolPage extends Component<{}, State> {
     const { characteristics } = categoricalFilters;
     const schoolTypes = categoricalFilters.schoolTypes as SchoolType[];
 
-    const formatToAcademicYear = (year: number) =>
-      parseInt(`${year}${`${year + 1}`.substring(2, 4)}`, 0);
+    const formatToAcademicYear = (year: string | number) => {
+      const nextYear = parseInt(year as string, 0) + 1;
+      return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
+    };
 
     const { result } = await tableBuilderService.getNationalCharacteristicsData(
       {
@@ -300,7 +302,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
           <section ref={this.dataTableRef}>
             <h2>4. Explore data for '{publicationName}'</h2>
 
-            <CharacteristicsDataTable
+            <DataTable
               characteristics={filters.categorical.characteristics}
               characteristicsMeta={publicationMeta.characteristics}
               indicators={filters.indicators}
