@@ -34,7 +34,10 @@ export interface MetaSpecification {
     startEndDate: {
       hint?: string;
       legend: string;
-      options: FilterOption[];
+      options: {
+        label: string;
+        value: string | number;
+      }[];
     };
   };
   categoricalFilters: {
@@ -112,12 +115,12 @@ const metaSpecification: MetaSpecification = {
       hint: 'Filter statistics by a given start and end date',
       legend: 'Academic Year',
       options: [
-        { value: '2011', label: '2011/12' },
-        { value: '2012', label: '2012/13' },
-        { value: '2013', label: '2013/14' },
-        { value: '2014', label: '2014/15' },
-        { value: '2015', label: '2015/16' },
-        { value: '2016', label: '2016/17' },
+        { value: 2011, label: '2011/12' },
+        { value: 2012, label: '2012/13' },
+        { value: 2013, label: '2013/14' },
+        { value: 2014, label: '2014/15' },
+        { value: 2015, label: '2015/16' },
+        { value: 2016, label: '2016/17' },
       ],
     },
   },
