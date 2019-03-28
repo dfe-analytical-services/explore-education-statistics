@@ -4,7 +4,7 @@ import ErrorMessage from '../ErrorMessage';
 import styles from './FormSelect.module.scss';
 
 export interface SelectOption {
-  text: string;
+  label: string;
   value: string | number;
 }
 
@@ -43,8 +43,8 @@ const FormSelect = ({
         value={value}
       >
         {options.map(option => (
-          <option value={option.value} key={`${option.value}-${option.text}`}>
-            {option.text}
+          <option value={option.value} key={`${option.value}-${option.label}`}>
+            {option.label}
           </option>
         ))}
       </select>

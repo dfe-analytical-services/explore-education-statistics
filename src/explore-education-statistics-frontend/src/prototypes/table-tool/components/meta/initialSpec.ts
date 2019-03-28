@@ -1,37 +1,40 @@
-import { SelectOption } from 'src/components/form/FormSelect';
 import SchoolType from 'src/services/types/SchoolType';
 
 export interface FilterOption {
   label: string;
-  name: string;
+  value: string;
 }
 
 export interface GroupedFilterOptions {
-  [name: string]: FilterOption[];
+  [name: string]: {
+    label: string;
+    options: FilterOption[];
+  };
 }
 
-interface PublicationSubjectOption {
-  name: string;
-  label: string;
-  supports: {
-    observationalUnits: {
-      location: (keyof MetaSpecification['observationalUnits']['location'])[];
-    };
-  };
+export enum LocationLevel {
+  National = 'national',
+  Region = 'region',
+  Local_Authority = 'localAuthority',
+  School = 'school',
 }
 
 export interface MetaSpecification {
   observationalUnits: {
     location: {
-      national: SelectOption[];
-      localAuthority: SelectOption[];
-      region: SelectOption[];
-      school: SelectOption[];
+      legend: string;
+      hint?: string;
+      options: {
+        [key in LocationLevel]: {
+          label: string;
+          options: FilterOption[];
+        }
+      };
     };
     startEndDate: {
       hint?: string;
       legend: string;
-      options: SelectOption[];
+      options: FilterOption[];
     };
   };
   categoricalFilters: {
@@ -42,7 +45,6 @@ export interface MetaSpecification {
     };
   };
   indicators: GroupedFilterOptions;
-  publicationSubject: PublicationSubjectOption[];
 }
 
 const metaSpecification: MetaSpecification = {
@@ -50,7 +52,7 @@ const metaSpecification: MetaSpecification = {
     characteristics: {
       hint: 'Filter by pupil characteristics',
       legend: 'Characteristics',
-      options: [],
+      options: {},
     },
     schoolTypes: {
       hint: 'Filter by number of pupils in school type(s)',
@@ -58,19 +60,19 @@ const metaSpecification: MetaSpecification = {
       options: [
         {
           label: 'Total',
-          name: SchoolType.Total,
+          value: SchoolType.Total,
         },
         {
           label: 'Primary',
-          name: SchoolType.State_Funded_Primary,
+          value: SchoolType.State_Funded_Primary,
         },
         {
           label: 'Secondary',
-          name: SchoolType.State_Funded_Secondary,
+          value: SchoolType.State_Funded_Secondary,
         },
         {
           label: 'Special',
-          name: SchoolType.Special,
+          value: SchoolType.Special,
         },
       ],
     },
@@ -78,58 +80,47 @@ const metaSpecification: MetaSpecification = {
   indicators: {},
   observationalUnits: {
     location: {
-      localAuthority: [
-        { value: 'CAMDEN', text: 'Camden' },
-        { value: 'CITY_OF_LONDON', text: 'City of London' },
-        { value: 'GREENWICH', text: 'Greenwich' },
-      ],
-      national: [{ value: 'ENGLAND', text: 'England' }],
-      region: [
-        { value: 'INNER_LONDON', text: 'Inner London' },
-        { value: 'OUTER_LONDON', text: 'Outer London' },
-      ],
-      school: [],
+      hint: 'Filter statistics by location level',
+      legend: 'Location',
+      options: {
+        localAuthority: {
+          label: 'Local authority',
+          options: [
+            { value: 'CAMDEN', label: 'Camden' },
+            { value: 'CITY_OF_LONDON', label: 'City of London' },
+            { value: 'GREENWICH', label: 'Greenwich' },
+          ],
+        },
+        national: {
+          label: 'National',
+          options: [],
+        },
+        region: {
+          label: 'Region',
+          options: [
+            { value: 'INNER_LONDON', label: 'Inner London' },
+            { value: 'OUTER_LONDON', label: 'Outer London' },
+          ],
+        },
+        school: {
+          label: 'School',
+          options: [],
+        },
+      },
     },
     startEndDate: {
       hint: 'Filter statistics by a given start and end date',
       legend: 'Academic Year',
       options: [
-        { value: 2011, text: '2011/12' },
-        { value: 2012, text: '2012/13' },
-        { value: 2013, text: '2013/14' },
-        { value: 2014, text: '2014/15' },
-        { value: 2015, text: '2015/16' },
-        { value: 2016, text: '2016/17' },
+        { value: '2011', label: '2011/12' },
+        { value: '2012', label: '2012/13' },
+        { value: '2013', label: '2013/14' },
+        { value: '2014', label: '2014/15' },
+        { value: '2015', label: '2015/16' },
+        { value: '2016', label: '2016/17' },
       ],
     },
   },
-  publicationSubject: [
-    {
-      label: 'Geographic levels',
-      name: 'geoglevels',
-      supports: {
-        observationalUnits: {
-          location: ['national', 'localAuthority', 'region', 'school'],
-        },
-      },
-    },
-    {
-      label: 'Local authority characteristics',
-      name: 'lacharacteristics',
-      supports: {
-        observationalUnits: { location: ['localAuthority'] },
-      },
-    },
-    {
-      label: 'National characteristics',
-      name: 'natcharacteristics',
-      supports: {
-        observationalUnits: {
-          location: ['national'],
-        },
-      },
-    },
-  ],
 };
 
 export default metaSpecification;

@@ -5,62 +5,25 @@ import {
   FormFieldSelect,
   FormFieldset,
 } from 'src/components/form';
-import { MetaSpecification } from 'src/prototypes/table-tool/components/meta/initialSpec';
+import {
+  LocationLevel,
+  MetaSpecification,
+} from 'src/prototypes/table-tool/components/meta/initialSpec';
 import { FormValues } from './FiltersForm';
-
-enum LocationLevel {
-  National = 'national',
-  Region = 'region',
-  Local_Authority = 'localAuthority',
-  School = 'school',
-}
-
-const defaultLocationLevelOptions = [
-  {
-    id: 'locationLevel-national',
-    label: 'National',
-    value: LocationLevel.National,
-  },
-  {
-    id: 'locationLevel-region',
-    label: 'Region',
-    value: LocationLevel.Region,
-  },
-  {
-    id: 'locationLevel-localAuthority',
-    label: 'Local authority',
-    value: LocationLevel.Local_Authority,
-  },
-  {
-    id: 'locationLevel-school',
-    label: 'School',
-    value: LocationLevel.School,
-  },
-];
 
 interface Props {
   form: FormikState<FormValues>;
-  publicationSubject: MetaSpecification['publicationSubject'][0];
   specification: MetaSpecification;
 }
 
-const ObservationalUnitFilters = ({
-  form,
-  publicationSubject,
-  specification,
-}: Props) => {
-  const locationLevelOptions = defaultLocationLevelOptions.filter(
-    option =>
-      publicationSubject.supports.observationalUnits.location.indexOf(
-        option.value,
-      ) > -1,
-  );
-
-  const locationSpecification = specification.observationalUnits.location;
+const ObservationalUnitFilters = ({ form, specification }: Props) => {
+  const locationSpecification =
+    specification.observationalUnits.location.options;
 
   return (
     <>
-      {locationLevelOptions.length > 1 && (
+      {Object.keys(specification.observationalUnits.location.options).length >
+        1 && (
         <FormFieldset
           id="filter-location"
           legend="Location"
@@ -68,17 +31,23 @@ const ObservationalUnitFilters = ({
         >
           <FormFieldRadioGroup
             name="location.level"
-            options={locationLevelOptions}
+            options={Object.entries(locationSpecification).map(
+              ([locationLevel, option]) => ({
+                id: `filter-locationLevel-${locationLevel}`,
+                label: option.label,
+                value: locationLevel,
+              }),
+            )}
             id="filter-locationLevel"
           />
 
           {form.values.location.level === LocationLevel.National &&
-            locationSpecification.national.length > 1 && (
+            locationSpecification.national.options.length > 1 && (
               <FormFieldSelect
                 name="location.country"
                 id="filter-country"
                 label="Country"
-                options={locationSpecification.national}
+                options={locationSpecification.national.options}
               />
             )}
 
@@ -89,10 +58,10 @@ const ObservationalUnitFilters = ({
               label="Region"
               options={[
                 {
-                  text: 'Select an option',
+                  label: 'Select an option',
                   value: '',
                 },
-                ...locationSpecification.region,
+                ...locationSpecification.region.options,
               ]}
             />
           )}
@@ -104,10 +73,10 @@ const ObservationalUnitFilters = ({
               label="Local authority"
               options={[
                 {
-                  text: 'Select an option',
+                  label: 'Select an option',
                   value: '',
                 },
-                ...locationSpecification.localAuthority,
+                ...locationSpecification.localAuthority.options,
               ]}
             />
           )}

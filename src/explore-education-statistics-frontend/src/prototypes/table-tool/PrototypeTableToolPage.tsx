@@ -13,6 +13,7 @@ import FiltersForm, {
 import initialMetaSpecification, {
   MetaSpecification,
 } from 'src/prototypes/table-tool/components/meta/initialSpec';
+import publicationSubjectSpec from 'src/prototypes/table-tool/components/meta/publicationSubjectSpec';
 import tableBuilderService, {
   DataTableResult,
   PublicationMeta,
@@ -118,12 +119,40 @@ class PrototypeTableToolPage extends Component<{}, State> {
           ...this.state.metaSpecification.categoricalFilters,
           characteristics: {
             ...this.state.metaSpecification.categoricalFilters.characteristics,
-            options: publicationMeta.characteristics,
+            options: Object.entries(publicationMeta.characteristics).reduce(
+              (acc, [groupKey, group]) => {
+                return {
+                  ...acc,
+                  [groupKey]: {
+                    label: groupKey,
+                    options: group.map(option => ({
+                      label: option.label,
+                      value: option.name,
+                    })),
+                  },
+                };
+              },
+              {},
+            ),
           },
         },
         indicators: {
           ...this.state.metaSpecification.indicators,
-          ...publicationMeta.indicators,
+          ...Object.entries(publicationMeta.indicators).reduce(
+            (acc, [groupKey, group]) => {
+              return {
+                ...acc,
+                [groupKey]: {
+                  label: groupKey,
+                  options: group.map(option => ({
+                    label: option.label,
+                    value: option.name,
+                  })),
+                },
+              };
+            },
+            {},
+          ),
         },
       },
       publicationSubjectName: '',
@@ -243,7 +272,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
                       },
                     )
                   }
-                  options={metaSpecification.publicationSubject}
+                  options={publicationSubjectSpec.subjects}
                   value={publicationSubjectName}
                 />
               </>
@@ -262,11 +291,6 @@ class PrototypeTableToolPage extends Component<{}, State> {
 
             <FiltersForm
               specification={metaSpecification}
-              publicationSubject={
-                metaSpecification.publicationSubject.find(
-                  subject => subject.name === publicationSubjectName,
-                ) as MetaSpecification['publicationSubject'][0]
-              }
               onSubmit={this.handleFilterFormSubmit}
             />
           </section>

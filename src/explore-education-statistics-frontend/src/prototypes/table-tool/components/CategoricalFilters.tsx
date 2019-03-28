@@ -29,9 +29,9 @@ const CategoricalFilters = ({ form, specification }: Props) => {
                 legend={filterSpec.legend}
                 hint={filterSpec.hint}
                 options={filterSpec.options.map(option => ({
-                  id: `${filterKey}-${option.name}`,
+                  id: `${filterKey}-${option.value}`,
                   label: option.label,
-                  value: option.name,
+                  value: option.value,
                 }))}
                 selectAll
               />

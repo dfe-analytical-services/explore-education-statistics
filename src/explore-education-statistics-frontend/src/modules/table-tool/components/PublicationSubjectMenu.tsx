@@ -3,7 +3,7 @@ import { RadioChangeEventHandler } from 'src/components/form/FormRadio';
 import FormRadioGroup from 'src/components/form/FormRadioGroup';
 
 export interface PublicationSubjectMenuOption {
-  name: string;
+  value: string;
   label: string;
 }
 
@@ -20,9 +20,9 @@ const PublicationSubjectMenu = ({ options, onChange, value }: Props) => {
       name="publicationSubject"
       onChange={onChange}
       options={options.map(option => ({
-        id: option.name,
+        id: option.value,
         label: option.label,
-        value: option.name,
+        value: option.value,
       }))}
       id="publicationSubject"
     />

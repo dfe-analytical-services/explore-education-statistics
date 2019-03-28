@@ -17,7 +17,7 @@ export interface FormValues {
   indicators: string[];
   location: {
     level: string;
-    country: string;
+    national: string;
     region: string;
     localAuthority: string;
   };
@@ -30,7 +30,6 @@ export interface FormValues {
 export type FilterFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
-  publicationSubject: MetaSpecification['publicationSubject'][0];
   specification: MetaSpecification;
   onSubmit: FilterFormSubmitHandler;
 }
@@ -70,32 +69,30 @@ class FiltersForm extends Component<Props, State> {
   }
 
   public render() {
-    const { publicationSubject, specification } = this.props;
+    const { specification } = this.props;
 
     const startEndDateValues = specification.observationalUnits.startEndDate.options.map(
       ({ value }) => value,
     );
 
     let locationRules = Yup.object<FormValues['location']>({
-      country: Yup.string().notRequired(),
       level: Yup.string().notRequired(),
       localAuthority: Yup.string().notRequired(),
+      national: Yup.string().notRequired(),
       region: Yup.string().notRequired(),
     });
 
-    if (publicationSubject.supports.observationalUnits.location.length > 1) {
+    if (
+      Object.keys(specification.observationalUnits.location.options).length > 1
+    ) {
       locationRules = locationRules.shape({
-        ...publicationSubject.supports.observationalUnits.location.reduce(
-          (acc, locationLevel) => {
-            return {
-              ...acc,
-              [locationLevel]: Yup.string().when('level', {
-                is: locationLevel,
-                then: Yup.string().required('Select a location'),
-              }),
-            };
-          },
-          {},
+        ...mapValues(
+          specification.observationalUnits.location.options,
+          locationLevel =>
+            Yup.string().when('level', {
+              is: locationLevel,
+              then: Yup.string().required('Select a location'),
+            }),
         ),
         level: Yup.string().required('Select a location level'),
       });
@@ -111,9 +108,9 @@ class FiltersForm extends Component<Props, State> {
           endDate: 2016,
           indicators: [],
           location: {
-            country: '',
             level: '',
             localAuthority: '',
+            national: '',
             region: '',
           },
           startDate: 2012,
@@ -176,7 +173,6 @@ class FiltersForm extends Component<Props, State> {
                     <ObservationalUnitFilters
                       form={form}
                       specification={specification}
-                      publicationSubject={publicationSubject}
                     />
                   </FormGroup>
                   <FormGroup className="govuk-grid-column-one-half-from-desktop">
@@ -193,7 +189,7 @@ class FiltersForm extends Component<Props, State> {
                       error={getError('indicators')}
                     >
                       <SearchableGroupedFilterMenus<FormValues>
-                        menuOptions={this.props.specification.indicators}
+                        menuOptions={specification.indicators}
                         name="indicators"
                         values={values.indicators}
                       />

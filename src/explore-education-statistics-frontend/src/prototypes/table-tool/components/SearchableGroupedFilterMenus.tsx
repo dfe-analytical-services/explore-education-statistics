@@ -4,15 +4,11 @@ import React, { PureComponent } from 'react';
 import { FormGroup } from 'src/components/form';
 import FormFieldCheckboxGroup from 'src/components/form/FormFieldCheckboxGroup';
 import MenuDetails from 'src/modules/table-tool/components/MenuDetails';
+import { GroupedFilterOptions } from 'src/prototypes/table-tool/components/meta/initialSpec';
 import SearchTextInput from 'src/prototypes/table-tool/components/SearchTextInput';
 
 interface Props<FormValues> {
-  menuOptions: {
-    [menuGroup: string]: {
-      label: string;
-      name: string;
-    }[];
-  };
+  menuOptions: GroupedFilterOptions;
   name: keyof FormValues | string;
   values: string[];
 }
@@ -47,36 +43,36 @@ class SearchableGroupedFilterMenus<
 
     const groups = sortBy(Object.entries(menuOptions), ([groupKey]) => groupKey)
       .filter(
-        ([groupKey]) =>
+        ([groupKey, group]) =>
           searchTerm === '' ||
-          menuOptions[groupKey].some(
+          group.options.some(
             item =>
-              containsSearchTerm(item.label) || values.indexOf(item.name) > -1,
+              containsSearchTerm(item.label) || values.indexOf(item.value) > -1,
           ),
       )
-      .map(([groupKey, items]) => {
+      .map(([groupKey, group]) => {
         const compositeKey = `${name}-${camelCase(groupKey)}`;
 
         const isMenuOpen = Boolean(
-          menuOptions[groupKey].some(
+          group.options.some(
             item =>
               (searchTerm !== '' && containsSearchTerm(item.label)) ||
-              values.indexOf(item.name) > -1,
+              values.indexOf(item.value) > -1,
           ) || this.state.openFilters[compositeKey],
         );
 
         const options = sortBy(
-          items
+          group.options
             .filter(
               item =>
                 searchTerm === '' ||
                 containsSearchTerm(item.label) ||
-                values.indexOf(item.name) > -1,
+                values.indexOf(item.value) > -1,
             )
             .map(item => ({
-              id: `${compositeKey}-${item.name}`,
+              id: `${compositeKey}-${item.value}`,
               label: item.label,
-              value: item.name,
+              value: item.value,
             })),
           ['label'],
         );
