@@ -11,8 +11,9 @@ Verify Public Page Loads
     user checks element contains  css:body   Explore education statistics
 
 Validate names of cookies appear on Cookie Page
-    [Tags]  HappyPath Failing
+    [Tags]  HappyPath
     user clicks link   Cookies
+    user waits until page contains  How cookies are used on this service
     cookie names should be on page
 
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
