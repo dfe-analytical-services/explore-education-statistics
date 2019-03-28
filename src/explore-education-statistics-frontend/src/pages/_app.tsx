@@ -1,5 +1,6 @@
 import 'core-js/fn/array/virtual/flat-map';
 import 'core-js/fn/array/virtual/includes';
+import 'cross-fetch/polyfill';
 
 import { Container, default as BaseApp } from 'next/app';
 import React from 'react';
