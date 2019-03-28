@@ -60,59 +60,59 @@ const ObservationalUnitFilters = ({
 
   return (
     <>
-      <FormFieldset
-        id="filter-location"
-        legend="Location"
-        hint="Filter statistics by location"
-      >
-        {locationLevelOptions.length > 1 && (
+      {locationLevelOptions.length > 1 && (
+        <FormFieldset
+          id="filter-location"
+          legend="Location"
+          hint="Filter statistics by location"
+        >
           <FormFieldRadioGroup
             name="location.level"
             options={locationLevelOptions}
             id="filter-locationLevel"
           />
-        )}
 
-        {form.values.location.level === LocationLevel.National &&
-          locationSpecification.national.length > 1 && (
+          {form.values.location.level === LocationLevel.National &&
+            locationSpecification.national.length > 1 && (
+              <FormFieldSelect
+                name="location.country"
+                id="filter-country"
+                label="Country"
+                options={locationSpecification.national}
+              />
+            )}
+
+          {form.values.location.level === LocationLevel.Region && (
             <FormFieldSelect
-              name="location.country"
-              id="filter-country"
-              label="Country"
-              options={locationSpecification.national}
+              name="location.region"
+              id="filter-region"
+              label="Region"
+              options={[
+                {
+                  text: 'Select an option',
+                  value: '',
+                },
+                ...locationSpecification.region,
+              ]}
             />
           )}
 
-        {form.values.location.level === LocationLevel.Region && (
-          <FormFieldSelect
-            name="location.region"
-            id="filter-region"
-            label="Region"
-            options={[
-              {
-                text: 'Select an option',
-                value: '',
-              },
-              ...locationSpecification.region,
-            ]}
-          />
-        )}
-
-        {form.values.location.level === LocationLevel.Local_Authority && (
-          <FormFieldSelect
-            name="location.localAuthority"
-            id="filter-localAuthority"
-            label="Local authority"
-            options={[
-              {
-                text: 'Select an option',
-                value: '',
-              },
-              ...locationSpecification.localAuthority,
-            ]}
-          />
-        )}
-      </FormFieldset>
+          {form.values.location.level === LocationLevel.Local_Authority && (
+            <FormFieldSelect
+              name="location.localAuthority"
+              id="filter-localAuthority"
+              label="Local authority"
+              options={[
+                {
+                  text: 'Select an option',
+                  value: '',
+                },
+                ...locationSpecification.localAuthority,
+              ]}
+            />
+          )}
+        </FormFieldset>
+      )}
 
       <FormFieldset
         id="filter-startEndDates"
