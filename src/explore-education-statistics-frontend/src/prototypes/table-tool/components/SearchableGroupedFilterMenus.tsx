@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import camelCase from 'lodash/camelCase';
 import sortBy from 'lodash/sortBy';
 import React, { PureComponent } from 'react';
@@ -6,6 +7,7 @@ import FormFieldCheckboxGroup from 'src/components/form/FormFieldCheckboxGroup';
 import MenuDetails from 'src/modules/table-tool/components/MenuDetails';
 import { GroupedFilterOptions } from 'src/prototypes/table-tool/components/meta/initialSpec';
 import SearchTextInput from 'src/prototypes/table-tool/components/SearchTextInput';
+import styles from './SearchableGroupedFilterMenus.module.scss';
 
 interface Props<FormValues> {
   menuOptions: GroupedFilterOptions;
@@ -55,9 +57,7 @@ class SearchableGroupedFilterMenus<
 
         const isMenuOpen = Boolean(
           group.options.some(
-            item =>
-              (searchTerm !== '' && containsSearchTerm(item.label)) ||
-              values.indexOf(item.value) > -1,
+            item => searchTerm !== '' && containsSearchTerm(item.label),
           ) || this.state.openFilters[compositeKey],
         );
 
@@ -77,9 +77,25 @@ class SearchableGroupedFilterMenus<
           ['label'],
         );
 
+        const optionsSelected = group.options.reduce(
+          (acc, option) => (values.indexOf(option.value) > -1 ? acc + 1 : acc),
+          0,
+        );
+
         return (
           <MenuDetails
-            summary={groupKey}
+            summary={
+              <>
+                {groupKey}
+                {optionsSelected > 0 && (
+                  <span
+                    className={classNames('govuk-tag', styles.selectionCount)}
+                  >
+                    {optionsSelected} selected
+                  </span>
+                )}
+              </>
+            }
             key={compositeKey}
             open={isMenuOpen}
             onToggle={isOpen => {
