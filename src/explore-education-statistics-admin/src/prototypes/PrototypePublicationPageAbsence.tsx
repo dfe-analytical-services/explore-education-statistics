@@ -8,6 +8,7 @@ import PrototypeDataSample from "./components/PrototypeDataSample";
 import PrototypeMap from "./components/PrototypeMap";
 import PrototypePage from "./components/PrototypePage";
 import {PrototypeEditableContent} from "./components/PrototypeEditableContent";
+import TabsSection from "../components/TabsSection";
 
 const PublicationPage = () => {
   let mapRef: PrototypeMap | null = null;
@@ -28,9 +29,12 @@ const PublicationPage = () => {
             {" "}
             This is the latest data{" "}
           </strong>
+          <PrototypeEditableContent
+            content={`
           <h1 className="govuk-heading-xl">
             Pupil absence statistics and data for schools in England
           </h1>
+          `} />
 
           <dl className="dfe-meta-content">
             <dt className="govuk-caption-m">Published:</dt>
@@ -39,6 +43,8 @@ const PublicationPage = () => {
             </dd>
           </dl>
 
+          <PrototypeEditableContent
+            content={`
           <p className="govuk-body">
             Read national statistical summaries and definitions, view charts and
             tables and download data files across a range of pupil absence
@@ -46,11 +52,12 @@ const PublicationPage = () => {
           </p>
           <p className="govuk-body">
             You can also view a regional breakdown of statistics and data within
-            the{" "}
+            the
             <a href="#contents-sections-heading-9">
               <strong>local authorities section</strong>
             </a>
           </p>
+          `} />
 
           <p>
             <Link to="/prototypes/methodology-absence">
@@ -247,17 +254,19 @@ const PublicationPage = () => {
               local authorities also use the statistics to compare their local
               absence rates to regional and national averages for different pupil
               groups.
-            </p>`}>
-          </PrototypeEditableContent>
+            </p>`} />
         </AccordionSection>
 
         <AccordionSection heading="Absence rates">
           <Details summary="Overall absence rate definition">
+            <PrototypeEditableContent
+              content={`
             The overall absence rate is the total number of overall absence
             sessions for all pupils as a percentage of the total number of
             possible sessions for all pupils, where overall absence is the sum
             of authorised and unauthorised absence and one session is equal to
             half a day.
+            `} />
           </Details>
           <PrototypeDataSample
             sectionId="absenceRates"
@@ -298,6 +307,8 @@ const PublicationPage = () => {
             ]}
             chartDataKeys={["primary", "secondary", "primary and secondary"]}
           />
+          <PrototypeEditableContent
+            content={`
           <p>
             The overall absence rate across state-funded primary, secondary and
             special schools increased from 4.6 per cent in 2015/16 to 4.7 per
@@ -341,10 +352,13 @@ const PublicationPage = () => {
             session during the school year, this is similar to the previous year
             (91.7 per cent in 2015/16).
           </p>
+          `} />
         </AccordionSection>
 
         <AccordionSection heading="Persistent absence">
           <Details summary="Persistent absence definition">
+            <PrototypeEditableContent
+              content={`
             <p>
               A pupil enrolment is identified as a persistent absentee if they
               miss 10% or more of their possible sessions
@@ -358,6 +372,7 @@ const PublicationPage = () => {
               the methodologies used in previous years, please see the
               <a href="#">guide to absence statistics</a>.
             </p>
+            `} />
           </Details>
           <PrototypeDataSample
             sectionId="persistentAbsence"
@@ -398,6 +413,8 @@ const PublicationPage = () => {
             ]}
             chartDataKeys={["primary", "secondary", "primary and secondary"]}
           />
+          <PrototypeEditableContent
+            content={`
           <p>
             The percentage of enrolments in state-funded primary and
             state-funded secondary schools that were classified as persistent
@@ -423,10 +440,13 @@ const PublicationPage = () => {
             times higher for persistent absentees compared to other pupils, at
             7.6 per cent and 2.0 per cent respectively.
           </p>
+          `} />
         </AccordionSection>
 
         <AccordionSection heading="Reasons for absence">
           <div className="govuk-inset-text">
+            <PrototypeEditableContent
+              content={`
             <p>
               Within this release absence by reason is broken down in three
               different ways:
@@ -445,6 +465,7 @@ const PublicationPage = () => {
               One or more sessions missed due to each reason: The number of
               pupil enrolments missing at least one session due to each reason.
             </p>
+            `} />
           </div>
           <PrototypeDataSample
             sectionId="reasonAbsence"
@@ -485,6 +506,8 @@ const PublicationPage = () => {
             ]}
             chartDataKeys={["overall", "illness", "family holiday"]}
           />
+          <PrototypeEditableContent
+            content={`
           <p>
             Illness is the main driver for overall absence rates, however whilst
             overall absence rates have increased slightly since 2015/16, illness
@@ -529,8 +552,11 @@ const PublicationPage = () => {
             ‘regularly’ means ‘in accordance with the rules prescribed by the
             school’.
           </p>
+          `} />
         </AccordionSection>
         <AccordionSection heading="Distribution of absence">
+          <PrototypeEditableContent
+            content={`
           <p>
             Nearly half of all pupils (48.9 per cent) were absent for five days
             or fewer across state-funded primary, secondary and special schools
@@ -554,8 +580,11 @@ const PublicationPage = () => {
             highest in the spring term and lowest in the summer term, and the
             unauthorised rate is highest in the summer term.
           </p>
+          `} />
         </AccordionSection>
         <AccordionSection heading="Absence by pupil characteristics">
+          <PrototypeEditableContent
+            content={`
           <p>
             The patterns of absence rates for pupils with different
             characteristics have been consistent across recent years.
@@ -607,8 +636,11 @@ const PublicationPage = () => {
             Traveller of Irish heritage pupils had the highest rate at 64 per
             cent and Chinese pupils had the lowest rate at 3.1 per cent.
           </p>
+          `} />
         </AccordionSection>
         <AccordionSection heading="Absence for four year olds">
+          <PrototypeEditableContent
+            content={`
           <p>
             The overall absence rate for four year olds in 2016/17 was 5.1 per
             cent which is lower than the rate of 5.2 per cent which it has been
@@ -618,14 +650,18 @@ const PublicationPage = () => {
             Absence recorded for four year olds is not treated as 'authorised'
             or 'unauthorised' and is therefore reported as overall absence only.
           </p>
+          `} />
         </AccordionSection>
         <AccordionSection heading="Pupil referral unit absence">
+          <PrototypeEditableContent
+            content={`
           <p>
             The overall absence rate for pupil referral units in 2016/17 was
             33.9 per cent, compared to 32.6 per cent in 2015/16. The percentage
             of enrolments in pupil referral units who were persistent absentees
             was 73.9 per cent in 2016/17, compared to 72.5 per cent in 2015/16.
           </p>
+          `} />
         </AccordionSection>
         <AccordionSection
           heading="Pupil absence by local authority"
@@ -633,6 +669,8 @@ const PublicationPage = () => {
         >
           <PrototypeAbsenceData ref={el => el && (mapRef = el.mapRef)}/>
 
+          <PrototypeEditableContent
+            content={`
           <p>
             There is variation in overall and persistent absence rates across
             state-funded primary, secondary and special schools by region and
@@ -651,6 +689,7 @@ const PublicationPage = () => {
             published within this release, in the accompanying underlying data
             files.
           </p>
+          `} />
         </AccordionSection>
       </Accordion>
       <h2 className="govuk-heading-m govuk-!-margin-top-9">

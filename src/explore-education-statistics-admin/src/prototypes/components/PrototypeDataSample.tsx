@@ -5,6 +5,7 @@ import TabsSection from '../../components/TabsSection';
 import PrototypeChartSample from './PrototypeChartSample';
 import PrototypeDataTilesHighlights from './PrototypeDataTilesHighlights';
 import PrototypeTableSample from './PrototypeTableSample';
+import {PrototypeEditableContent} from "./PrototypeEditableContent";
 
 interface Props {
   sectionId?: string;
@@ -29,6 +30,8 @@ const PrototypeDataSample = ({
         {sectionId === 'headlines' && (
           <TabsSection id={`${sectionId}SummaryData`} title="Summary">
             <PrototypeDataTilesHighlights />
+            <PrototypeEditableContent
+              content={`
             <ul className="govuk-list govuk-list--bullet">
               <li>pupils missed on average 8.2 school days</li>
               <li>
@@ -39,6 +42,7 @@ const PrototypeDataSample = ({
               </li>
               <li>10% of pupils persistently absent during 2016/17</li>
             </ul>
+          `} />
           </TabsSection>
         )}
         <TabsSection id={`${sectionId}TableData`} title="Data tables">
