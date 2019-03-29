@@ -44,7 +44,7 @@ const PrototypeDataSample = ({
         <TabsSection id={`${sectionId}TableData`} title="Data tables">
           <PrototypeTableSample caption={`Table showing ${chartTitle}`} />
         </TabsSection>
-        <TabsSection id={`${sectionId}ChartData`} title="Charts">
+        <TabsSection id={`${sectionId}ChartData`} title="Charts" lazy={true}>
           <h2 className="govuk-heading-s">{`Chart showing ${chartTitle}`}</h2>
           <PrototypeChartSample
             xAxisLabel={xAxisLabel}
