@@ -135,7 +135,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
           )}
 
           {this.state.charts && (
-            <TabsSection id={`${id}1`} title="Charts" lazy={false}>
+            <TabsSection id={`${id}1`} title="Charts" lazy={true}>
               <h3>{this.props.heading}</h3>
               {this.state.charts.map((chart: any, idx) => (
                 <ChartRenderer
