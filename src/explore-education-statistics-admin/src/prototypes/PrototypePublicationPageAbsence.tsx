@@ -1,12 +1,12 @@
-import React from 'react';
-import Accordion from '../components/Accordion';
-import AccordionSection from '../components/AccordionSection';
-import Details from '../components/Details';
-import Link from '../components/Link';
-import PrototypeAbsenceData from './components/PrototypeAbsenceData';
-import PrototypeDataSample from './components/PrototypeDataSample';
-import PrototypeMap from './components/PrototypeMap';
-import PrototypePage from './components/PrototypePage';
+import React from "react";
+import Accordion from "../components/Accordion";
+import AccordionSection from "../components/AccordionSection";
+import Details from "../components/Details";
+import Link from "../components/Link";
+import PrototypeAbsenceData from "./components/PrototypeAbsenceData";
+import PrototypeDataSample from "./components/PrototypeDataSample";
+import PrototypeMap from "./components/PrototypeMap";
+import PrototypePage from "./components/PrototypePage";
 
 const PublicationPage = () => {
   let mapRef: PrototypeMap | null = null;
@@ -15,17 +15,17 @@ const PublicationPage = () => {
     <PrototypePage
       breadcrumbs={[
         {
-          link: '/prototypes/browse-releases-find',
-          text: 'Find statistics and download data',
+          link: "/prototypes/browse-releases-find",
+          text: "Find statistics and download data"
         },
-        { text: 'Absence statistics for schools in England', link: '#' },
+        { text: "Absence statistics for schools in England", link: "#" }
       ]}
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <strong className="govuk-tag govuk-!-margin-bottom-2">
-            {' '}
-            This is the latest data{' '}
+            {" "}
+            This is the latest data{" "}
           </strong>
           <h1 className="govuk-heading-xl">
             Pupil absence statistics and data for schools in England
@@ -45,7 +45,7 @@ const PublicationPage = () => {
           </p>
           <p className="govuk-body">
             You can also view a regional breakdown of statistics and data within
-            the{' '}
+            the{" "}
             <a href="#contents-sections-heading-9">
               <strong>local authorities section</strong>
             </a>
@@ -92,7 +92,7 @@ const PublicationPage = () => {
 
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <span className="govuk-caption-m govuk-caption-inline">
-                For school year:{' '}
+                For school year:{" "}
               </span>
               2016/17 (latest data)
             </h3>
@@ -197,36 +197,36 @@ const PublicationPage = () => {
         chartData={[
           {
             authorised: 4.2,
-            name: '2012/13',
+            name: "2012/13",
             overall: 5.3,
-            unauthorised: 1.1,
+            unauthorised: 1.1
           },
           {
             authorised: 3.5,
-            name: '2013/14',
+            name: "2013/14",
             overall: 4.5,
-            unauthorised: 1.1,
+            unauthorised: 1.1
           },
           {
             authorised: 3.5,
-            name: '2014/15',
+            name: "2014/15",
             overall: 4.6,
-            unauthorised: 1.1,
+            unauthorised: 1.1
           },
           {
             authorised: 3.4,
-            name: '2015/16',
+            name: "2015/16",
             overall: 4.6,
-            unauthorised: 1.1,
+            unauthorised: 1.1
           },
           {
             authorised: 3.4,
-            name: '2016/17',
+            name: "2016/17",
             overall: 4.7,
-            unauthorised: 1.3,
-          },
+            unauthorised: 1.3
+          }
         ]}
-        chartDataKeys={['unauthorised', 'authorised', 'overall']}
+        chartDataKeys={["unauthorised", "authorised", "overall"]}
       />
       <h2 className="govuk-heading-l">Contents</h2>
       <Accordion id="contents-sections">
@@ -263,37 +263,37 @@ const PublicationPage = () => {
             yAxisLabel="Absence Rate"
             chartData={[
               {
-                name: '2012/13',
+                name: "2012/13",
                 primary: 4.7,
-                'primary and secondary': 5.9,
-                secondary: 7.3,
+                "primary and secondary": 5.9,
+                secondary: 7.3
               },
               {
-                name: '2013/14',
+                name: "2013/14",
                 primary: 3.9,
-                'primary and secondary': 4.3,
-                secondary: 5.0,
+                "primary and secondary": 4.3,
+                secondary: 5.0
               },
               {
-                name: '2014/15',
+                name: "2014/15",
                 primary: 4.6,
-                'primary and secondary': 5.8,
-                secondary: 7.1,
+                "primary and secondary": 5.8,
+                secondary: 7.1
               },
               {
-                name: '2015/16',
+                name: "2015/16",
                 primary: 3.8,
-                'primary and secondary': 4.0,
-                secondary: 4.6,
+                "primary and secondary": 4.0,
+                secondary: 4.6
               },
               {
-                name: '2016/17',
+                name: "2016/17",
                 primary: 4.7,
-                'primary and secondary': 5.8,
-                secondary: 7.1,
-              },
+                "primary and secondary": 5.8,
+                secondary: 7.1
+              }
             ]}
-            chartDataKeys={['primary', 'secondary', 'primary and secondary']}
+            chartDataKeys={["primary", "secondary", "primary and secondary"]}
           />
           <p>
             The overall absence rate across state-funded primary, secondary and
@@ -363,37 +363,37 @@ const PublicationPage = () => {
             yAxisLabel="Persistent Absence Rate"
             chartData={[
               {
-                name: '2012/13',
+                name: "2012/13",
                 primary: 14.7,
-                'primary and secondary': 18.9,
-                secondary: 23.3,
+                "primary and secondary": 18.9,
+                secondary: 23.3
               },
               {
-                name: '2013/14',
+                name: "2013/14",
                 primary: 13.9,
-                'primary and secondary': 18.3,
-                secondary: 22.0,
+                "primary and secondary": 18.3,
+                secondary: 22.0
               },
               {
-                name: '2014/15',
+                name: "2014/15",
                 primary: 14.6,
-                'primary and secondary': 18.8,
-                secondary: 24.1,
+                "primary and secondary": 18.8,
+                secondary: 24.1
               },
               {
-                name: '2015/16',
+                name: "2015/16",
                 primary: 13.8,
-                'primary and secondary': 18.0,
-                secondary: 22.6,
+                "primary and secondary": 18.0,
+                secondary: 22.6
               },
               {
-                name: '2016/17',
+                name: "2016/17",
                 primary: 14.7,
-                'primary and secondary': 18.9,
-                secondary: 24.1,
-              },
+                "primary and secondary": 18.9,
+                secondary: 24.1
+              }
             ]}
-            chartDataKeys={['primary', 'secondary', 'primary and secondary']}
+            chartDataKeys={["primary", "secondary", "primary and secondary"]}
           />
           <p>
             The percentage of enrolments in state-funded primary and
@@ -450,37 +450,37 @@ const PublicationPage = () => {
             yAxisLabel="Absence Rate"
             chartData={[
               {
-                'family holiday': 0.7,
+                "family holiday": 0.7,
                 illness: 3.2,
-                name: '2012/13',
-                overall: 3.9,
+                name: "2012/13",
+                overall: 3.9
               },
               {
-                'family holiday': 0.7,
+                "family holiday": 0.7,
                 illness: 3.5,
-                name: '2013/14',
-                overall: 4.2,
+                name: "2013/14",
+                overall: 4.2
               },
               {
-                'family holiday': 0.7,
+                "family holiday": 0.7,
                 illness: 3.4,
-                name: '2014/15',
-                overall: 4.1,
+                name: "2014/15",
+                overall: 4.1
               },
               {
-                'family holiday': 0.7,
+                "family holiday": 0.7,
                 illness: 3.3,
-                name: '2015/16',
-                overall: 4.0,
+                name: "2015/16",
+                overall: 4.0
               },
               {
-                'family holiday': 0.7,
+                "family holiday": 0.7,
                 illness: 3.7,
-                name: '2016/17',
-                overall: 4.4,
-              },
+                name: "2016/17",
+                overall: 4.4
+              }
             ]}
-            chartDataKeys={['overall', 'illness', 'family holiday']}
+            chartDataKeys={["overall", "illness", "family holiday"]}
           />
           <p>
             Illness is the main driver for overall absence rates, however whilst
