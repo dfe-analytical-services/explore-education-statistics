@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import React, { createElement, ReactNode } from 'react';
 import GoToTopLink from './GoToTopLink';
+import {PrototypeEditableContent} from "../prototypes/components/PrototypeEditableContent";
 
 export interface AccordionSectionProps {
   caption?: string;
@@ -45,6 +46,7 @@ const AccordionSection = ({
         'govuk-accordion__section--expanded': open,
       })}
     >
+
       <div className="govuk-accordion__section-header">
         {createElement(
           headingTag,
@@ -52,7 +54,7 @@ const AccordionSection = ({
             className: 'govuk-accordion__section-heading',
           },
           <span className="govuk-accordion__section-button" id={headingId}>
-            {heading}
+             {heading } 
           </span>,
         )}
         {caption && (

@@ -168,8 +168,7 @@ const PublicationPage = () => {
             </Details>
 
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <span className="govuk-caption-m">Next update: </span>22 March
-              2019
+              <span className="govuk-caption-m">Next update: </span><PrototypeEditableContent content={`22 March 2019`} />
             </h3>
             <p className="govuk-caption-m govuk-!-margin-top-0">
               <a href="#">Notify me</a>
