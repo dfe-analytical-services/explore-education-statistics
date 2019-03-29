@@ -7,6 +7,7 @@ import PrototypeAbsenceData from "./components/PrototypeAbsenceData";
 import PrototypeDataSample from "./components/PrototypeDataSample";
 import PrototypeMap from "./components/PrototypeMap";
 import PrototypePage from "./components/PrototypePage";
+import {PrototypeEditableContent} from "./components/PrototypeEditableContent";
 
 const PublicationPage = () => {
   let mapRef: PrototypeMap | null = null;
@@ -18,7 +19,7 @@ const PublicationPage = () => {
           link: "/prototypes/browse-releases-find",
           text: "Find statistics and download data"
         },
-        { text: "Absence statistics for schools in England", link: "#" }
+        {text: "Absence statistics for schools in England", link: "#"}
       ]}
     >
       <div className="govuk-grid-row">
@@ -32,7 +33,7 @@ const PublicationPage = () => {
           </h1>
 
           <dl className="dfe-meta-content">
-            <dt className="govuk-caption-m">Published: </dt>
+            <dt className="govuk-caption-m">Published:</dt>
             <dd>
               <strong>22 March 2018</strong>
             </dd>
@@ -185,7 +186,7 @@ const PublicationPage = () => {
           </aside>
         </div>
       </div>
-      <hr />
+      <hr/>
       <h2 className="govuk-heading-l">
         Latest headline facts and figures - 2016/17
       </h2>
@@ -231,21 +232,23 @@ const PublicationPage = () => {
       <h2 className="govuk-heading-l">Contents</h2>
       <Accordion id="contents-sections">
         <AccordionSection heading="About this release">
-          <p className="govuk-body">
-            This statistical first release (SFR) reports on absence of pupils of
-            compulsory school age in state-funded primary, secondary and special
-            schools during the 2016/17 academic year. Information on absence in
-            pupil referral units, and for pupils aged four, is also included.
-            The Department uses two key measures to monitor pupil absence –
-            overall and persistent absence. Absence by reason and pupils
-            characteristics is also included in this release. Figures are
-            available at national, regional, local authority and school level.
-            Figures held in this release are used for policy development as key
-            indicators in behaviour and school attendance policy. Schools and
-            local authorities also use the statistics to compare their local
-            absence rates to regional and national averages for different pupil
-            groups.
-          </p>
+          <PrototypeEditableContent
+            content={`<p className="govuk-body">
+              This statistical first release (SFR) reports on absence of pupils of
+              compulsory school age in state-funded primary, secondary and special
+              schools during the 2016/17 academic year. Information on absence in
+              pupil referral units, and for pupils aged four, is also included.
+              The Department uses two key measures to monitor pupil absence –
+              overall and persistent absence. Absence by reason and pupils
+              characteristics is also included in this release. Figures are
+              available at national, regional, local authority and school level.
+              Figures held in this release are used for policy development as key
+              indicators in behaviour and school attendance policy. Schools and
+              local authorities also use the statistics to compare their local
+              absence rates to regional and national averages for different pupil
+              groups.
+            </p>`}>
+          </PrototypeEditableContent>
         </AccordionSection>
 
         <AccordionSection heading="Absence rates">
@@ -628,7 +631,7 @@ const PublicationPage = () => {
           heading="Pupil absence by local authority"
           onToggle={isOpen => mapRef && mapRef.refresh()}
         >
-          <PrototypeAbsenceData ref={el => el && (mapRef = el.mapRef)} />
+          <PrototypeAbsenceData ref={el => el && (mapRef = el.mapRef)}/>
 
           <p>
             There is variation in overall and persistent absence rates across
@@ -700,31 +703,31 @@ const PublicationPage = () => {
           <h4 className="govuk-heading-">Media enquiries</h4>
           <address className="govuk-body dfe-font-style-normal">
             Press Office News Desk
-            <br />
-            Department for Education <br />
-            Sanctuary Buildings <br />
-            Great Smith Street <br />
+            <br/>
+            Department for Education <br/>
+            Sanctuary Buildings <br/>
+            Great Smith Street <br/>
             London
-            <br />
-            SW1P 3BT <br />
+            <br/>
+            SW1P 3BT <br/>
             Telephone: 020 7783 8300
           </address>
 
           <h4 className="govuk-heading-">Other enquiries</h4>
           <address className="govuk-body dfe-font-style-normal">
             Data Insight and Statistics Division
-            <br />
-            Level 1<br />
+            <br/>
+            Level 1<br/>
             Department for Education
-            <br />
-            Sanctuary Buildings <br />
+            <br/>
+            Sanctuary Buildings <br/>
             Great Smith Street
-            <br />
+            <br/>
             London
-            <br />
-            SW1P 3BT <br />
+            <br/>
+            SW1P 3BT <br/>
             Telephone: 020 7783 8300
-            <br />
+            <br/>
             Email: <a href="#">Schools.statistics@education.gov.uk</a>
           </address>
         </AccordionSection>
