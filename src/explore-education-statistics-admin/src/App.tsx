@@ -1,12 +1,29 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
+import {createBrowserHistory} from "history";
+
 import logo from './logo.svg';
+
+
 import './App.scss';
-import StartPage from "./prototypes/PrototypeStartPage";
+import {Route, Router} from "react-router";
+
+import {default as PublicationPage} from './pages/prototypes/publication';
+import {default as PrototypesIndexPage} from './pages/prototypes/index';
+import {default as BrowseReleasesPage} from './pages/prototypes/browse-releases';
+import {default as StartPage} from "./pages/prototypes/start";
+
+const history = createBrowserHistory();
 
 class App extends Component {
   render() {
     return (
-        <StartPage />
+      <Router history={history}>
+        <Route exact path="/prototypes/" component={PrototypesIndexPage}/>
+        <Route exact path="/prototypes/start" component={StartPage}/>
+        <Route exact path="/prototypes/browse-releases" component={BrowseReleasesPage}/>
+        <Route exact path="/prototypes/publication" component={PublicationPage}/>
+
+      </Router>
     );
   }
 }
