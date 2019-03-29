@@ -116,7 +116,10 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
     const id = new Date().getDate();
 
     return (
-      <div className="govuk-datablock">
+      <div
+        className="govuk-datablock"
+        data-testid={`DataBlock ${this.props.heading}`}
+      >
         <Tabs>
           {this.state.summary && (
             <TabsSection id={`${id}_summary`} title="Summary">
