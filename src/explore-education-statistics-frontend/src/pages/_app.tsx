@@ -6,7 +6,7 @@ import { Container, default as BaseApp } from 'next/app';
 import Router from 'next/router';
 import React from 'react';
 import Helmet from 'react-helmet';
-import { initGA, logPageView } from '../utils/analytics';
+import { logPageView } from 'src/services/googleAnalyticsService';
 import './_app.scss';
 
 class App extends BaseApp {
@@ -22,7 +22,6 @@ class App extends BaseApp {
 
   public componentDidMount(): void {
     if (process.env.GA_TRACKING_ID !== undefined) {
-      initGA();
       logPageView();
 
       if (Router.router !== null) {
