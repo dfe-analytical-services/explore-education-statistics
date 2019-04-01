@@ -6,7 +6,6 @@ import PublicationMenu, {
 } from 'src/modules/table-tool/components/PublicationMenu';
 import PublicationSubjectMenu from 'src/modules/table-tool/components/PublicationSubjectMenu';
 import PrototypePage from 'src/prototypes/components/PrototypePage';
-import DataTable from 'src/prototypes/table-tool/components/DataTable';
 import FiltersForm, {
   FilterFormSubmitHandler,
 } from 'src/prototypes/table-tool/components/FiltersForm';
@@ -14,6 +13,7 @@ import initialMetaSpecification, {
   MetaSpecification,
 } from 'src/prototypes/table-tool/components/meta/initialSpec';
 import publicationSubjectSpec from 'src/prototypes/table-tool/components/meta/publicationSubjectSpec';
+import PrototypeDataTable from 'src/prototypes/table-tool/components/PrototypeDataTable';
 import tableBuilderService, {
   DataTableResult,
   PublicationMeta,
@@ -301,7 +301,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
           <section ref={this.dataTableRef}>
             <h2>4. Explore data for '{publicationName}'</h2>
 
-            <DataTable
+            <PrototypeDataTable
               filters={filters}
               specification={metaSpecification}
               results={tableData}
