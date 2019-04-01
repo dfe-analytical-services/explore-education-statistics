@@ -1,0 +1,39 @@
+
+div.ck.ck-editor__editable_inline {
+  background-color: #eee;
+}
+
+.editable-content {
+  padding: 0;
+  margin: 0;
+  position: relative;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f8f8f8;
+    .editable-button {
+      display: none;
+    }
+  }
+
+  .editable-button {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0px;
+    border-left: 2px solid black;
+    background-color: #8f8;
+    opacity: 0.85;
+
+  }
+
+  .unsaved {
+    background-color: #f88;
+  }
+}
+
+.editable-content-editing {
+  .editable-button {
+    display: inline !important;
+  }
+}
