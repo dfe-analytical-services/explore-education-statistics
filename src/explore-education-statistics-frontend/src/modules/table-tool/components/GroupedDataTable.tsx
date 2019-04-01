@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import styles from './GroupedDataTable.module.scss';
 
 export interface GroupedDataSet {
-  label: string;
+  name: string;
   rows: {
-    label: string;
+    name: string;
     columns: string[];
   }[];
 }
@@ -39,25 +39,25 @@ class GroupedDataTable extends Component<Props> {
         <tbody>
           {groups.map((group, groupIndex) => {
             return (
-              <React.Fragment key={`${group.label}-${groupIndex}`}>
+              <React.Fragment key={`${group.name}-${groupIndex}`}>
                 <tr>
                   <th
                     colSpan={1 + header.length}
                     className={styles.groupHeadingRow}
                   >
-                    {group.label}
+                    {group.name}
                   </th>
                 </tr>
                 {group.rows.map((row, rowIndex) => {
                   return (
-                    <tr key={`${group.label}-${row}-${rowIndex}`}>
-                      <td role="colgroup">{row.label}</td>
+                    <tr key={`${group.name}-${row}-${rowIndex}`}>
+                      <td role="colgroup">{row.name}</td>
                       {row.columns.map((column, columnIndex) => {
                         return (
                           <td
                             className="govuk-table__cell--numeric"
-                            key={`${group.label}-${
-                              row.label
+                            key={`${group.name}-${
+                              row.name
                             }-${column}-${columnIndex}`}
                           >
                             {column}

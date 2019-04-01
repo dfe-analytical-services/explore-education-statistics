@@ -87,6 +87,7 @@ class DataTable extends Component<Props> {
           'characteristic.name',
         );
 
+        // @ts-ignore
         const groupedData: GroupedDataSet[] = categorical.characteristics.map(
           characteristic => {
             if (!dataByCharacteristic[characteristic]) {
