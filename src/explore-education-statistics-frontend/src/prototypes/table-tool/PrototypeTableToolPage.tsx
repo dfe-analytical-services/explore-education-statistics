@@ -173,25 +173,20 @@ class PrototypeTableToolPage extends Component<{}, State> {
         <PageTitle caption="Table tool" title="Create your own tables online" />
 
         <p>
-          Use our tool to build your own tables and explore our statistics and
-          data.
-        </p>
-
-        <p>
-          Use the following filters to create your table and explore our
-          statistics and data:
+          Choose the statistics and data and geographical subject area you want
+          to explore and then use the following filters to create your table:
         </p>
 
         <ul>
           <li>academic years</li>
+          <li>school types</li>
+          <li>statistical indicators</li>
           <li>pupil charactertistics</li>
-          <li>school PrototypeSearchForm</li>
-          <li>statistical indicatorss</li>
         </ul>
 
         <p>
-          You can also download the statistics and data from your table for your
-          own analysis.
+          Once you've built your table, you can download the statistics and data
+          for your own analysis.
         </p>
 
         <section className="govuk-grid-row">
@@ -213,9 +208,9 @@ class PrototypeTableToolPage extends Component<{}, State> {
             {publicationId && (
               <>
                 <h2>
-                  2. Choose your subject
+                  2. Choose your subject area
                   <span className="govuk-hint">
-                    Select a subject from '{publicationName}'
+                    Select a geographical subject are for '{publicationName}'
                   </span>
                 </h2>
 
