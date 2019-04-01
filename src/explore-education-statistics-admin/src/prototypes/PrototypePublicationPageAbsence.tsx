@@ -1,6 +1,5 @@
 import React from "react";
-import Accordion from "../components/Accordion";
-import AccordionSection from "../components/AccordionSection";
+
 import Details from "../components/Details";
 import Link from "../components/Link";
 import PrototypeAbsenceData from "./components/PrototypeAbsenceData";
@@ -9,6 +8,9 @@ import PrototypeMap from "./components/PrototypeMap";
 import PrototypePage from "./components/PrototypePage";
 import {PrototypeEditableContent} from "./components/PrototypeEditableContent";
 import TabsSection from "../components/TabsSection";
+
+import PrototypeEditableAccordionSection from "./components/PrototypeEditableAccordionSection";
+import PrototypeAccordion from "./components/PrototypeAccordion";
 
 const PublicationPage = () => {
   let mapRef: PrototypeMap | null = null;
@@ -236,8 +238,8 @@ const PublicationPage = () => {
         chartDataKeys={["unauthorised", "authorised", "overall"]}
       />
       <h2 className="govuk-heading-l">Contents</h2>
-      <Accordion id="contents-sections">
-        <AccordionSection heading="About this release">
+      <PrototypeAccordion id="contents-sections">
+        <PrototypeEditableAccordionSection heading="About this release">
           <PrototypeEditableContent
             content={`<p className="govuk-body">
               This statistical first release (SFR) reports on absence of pupils of
@@ -254,9 +256,9 @@ const PublicationPage = () => {
               absence rates to regional and national averages for different pupil
               groups.
             </p>`} />
-        </AccordionSection>
+        </PrototypeEditableAccordionSection>
 
-        <AccordionSection heading="Absence rates">
+        <PrototypeEditableAccordionSection heading="Absence rates">
           <Details summary="Overall absence rate definition">
             <PrototypeEditableContent
               content={`
@@ -352,9 +354,9 @@ const PublicationPage = () => {
             (91.7 per cent in 2015/16).
           </p>
           `} />
-        </AccordionSection>
+        </PrototypeEditableAccordionSection>
 
-        <AccordionSection heading="Persistent absence">
+        <PrototypeEditableAccordionSection heading="Persistent absence">
           <Details summary="Persistent absence definition">
             <PrototypeEditableContent
               content={`
@@ -440,9 +442,9 @@ const PublicationPage = () => {
             7.6 per cent and 2.0 per cent respectively.
           </p>
           `} />
-        </AccordionSection>
+        </PrototypeEditableAccordionSection>
 
-        <AccordionSection heading="Reasons for absence">
+        <PrototypeEditableAccordionSection heading="Reasons for absence">
           <div className="govuk-inset-text">
             <PrototypeEditableContent
               content={`
@@ -552,8 +554,8 @@ const PublicationPage = () => {
             school’.
           </p>
           `} />
-        </AccordionSection>
-        <AccordionSection heading="Distribution of absence">
+        </PrototypeEditableAccordionSection>
+        <PrototypeEditableAccordionSection heading="Distribution of absence">
           <PrototypeEditableContent
             content={`
           <p>
@@ -580,8 +582,8 @@ const PublicationPage = () => {
             unauthorised rate is highest in the summer term.
           </p>
           `} />
-        </AccordionSection>
-        <AccordionSection heading="Absence by pupil characteristics">
+        </PrototypeEditableAccordionSection>
+        <PrototypeEditableAccordionSection heading="Absence by pupil characteristics">
           <PrototypeEditableContent
             content={`
           <p>
@@ -636,8 +638,8 @@ const PublicationPage = () => {
             cent and Chinese pupils had the lowest rate at 3.1 per cent.
           </p>
           `} />
-        </AccordionSection>
-        <AccordionSection heading="Absence for four year olds">
+        </PrototypeEditableAccordionSection>
+        <PrototypeEditableAccordionSection heading="Absence for four year olds">
           <PrototypeEditableContent
             content={`
           <p>
@@ -650,8 +652,8 @@ const PublicationPage = () => {
             or 'unauthorised' and is therefore reported as overall absence only.
           </p>
           `} />
-        </AccordionSection>
-        <AccordionSection heading="Pupil referral unit absence">
+        </PrototypeEditableAccordionSection>
+        <PrototypeEditableAccordionSection heading="Pupil referral unit absence">
           <PrototypeEditableContent
             content={`
           <p>
@@ -661,8 +663,8 @@ const PublicationPage = () => {
             was 73.9 per cent in 2016/17, compared to 72.5 per cent in 2015/16.
           </p>
           `} />
-        </AccordionSection>
-        <AccordionSection
+        </PrototypeEditableAccordionSection>
+        <PrototypeEditableAccordionSection
           heading="Pupil absence by local authority"
           onToggle={isOpen => mapRef && mapRef.refresh()}
         >
@@ -689,13 +691,13 @@ const PublicationPage = () => {
             files.
           </p>
           `} />
-        </AccordionSection>
-      </Accordion>
+        </PrototypeEditableAccordionSection>
+      </PrototypeAccordion>
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
         Extra information
       </h2>
-      <Accordion id="extra-information-sections">
-        <AccordionSection
+      <PrototypeAccordion id="extra-information-sections">
+        <PrototypeEditableAccordionSection
           heading="Where does this data come from?"
           caption="Our methodology, how we collect and process the data"
           headingTag="h3"
@@ -717,8 +719,8 @@ const PublicationPage = () => {
               </a>
             </li>
           </ul>
-        </AccordionSection>
-        <AccordionSection heading="Feedback and questions" headingTag="h3">
+        </PrototypeEditableAccordionSection>
+        <PrototypeEditableAccordionSection heading="Feedback and questions" headingTag="h3">
           <ul className="govuk-list">
             <li>
               <a href="#" className="govuk-link">
@@ -736,8 +738,8 @@ const PublicationPage = () => {
               </a>
             </li>
           </ul>
-        </AccordionSection>
-        <AccordionSection heading="Contact us" headingTag="h3">
+        </PrototypeEditableAccordionSection>
+        <PrototypeEditableAccordionSection heading="Contact us" headingTag="h3">
           <h4 className="govuk-heading-">Media enquiries</h4>
           <address className="govuk-body dfe-font-style-normal">
             Press Office News Desk
@@ -768,8 +770,8 @@ const PublicationPage = () => {
             <br/>
             Email: <a href="#">Schools.statistics@education.gov.uk</a>
           </address>
-        </AccordionSection>
-      </Accordion>
+        </PrototypeEditableAccordionSection>
+      </PrototypeAccordion>
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
         Exploring the data
       </h2>

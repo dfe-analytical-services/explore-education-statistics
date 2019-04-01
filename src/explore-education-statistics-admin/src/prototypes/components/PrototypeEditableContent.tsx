@@ -3,7 +3,8 @@ import * as React from "react";
 import CKEditor from '@ckeditor/ckeditor5-react';
 // @ts-ignore
 import Editor from '@ckeditor/ckeditor5-build-balloon-block';
-import {ReactComponentLike, ReactNodeLike} from "prop-types";
+// @ts-ignore
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import {Fragment} from "react";
 
 // import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
