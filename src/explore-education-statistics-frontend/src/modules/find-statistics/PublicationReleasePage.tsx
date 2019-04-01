@@ -107,13 +107,13 @@ class PublicationReleasePage extends Component<Props> {
             <aside className="app-related-items">
               <h3 id="subsection-title">About these statistics</h3>
 
-              <h4 data-testid="publication-page--release-name">
+              <h4 data-testid="release-period">
                 <span className="govuk-caption-m">For school year: </span>
                 {data.releaseName} {!release && <span>(latest data)</span>}
                 <Details summary={`See previous ${releaseCount} releases`}>
                   <ul
                     className="govuk-list"
-                    data-testid="publication-page--release-name-list"
+                    data-testid="previous-releases-list"
                   >
                     {data.publication.releases
                       .slice(1)
@@ -137,21 +137,18 @@ class PublicationReleasePage extends Component<Props> {
                 </Details>
               </h4>
 
-              <h4>
+              <h4 data-testid="published-date">
                 <span className="govuk-caption-m">Published: </span>
                 <FormattedDate>{data.published}</FormattedDate>
               </h4>
 
-              <h4 data-testid="publication-page--last-updated">
+              <h4 data-testid="last-updated">
                 <span className="govuk-caption-m">Last updated: </span>
                 <FormattedDate>{data.updates[0].on}</FormattedDate>
 
                 <Details summary={`See all ${data.updates.length} updates`}>
                   {data.updates.map(elem => (
-                    <div
-                      data-testid="publication-page--update-element"
-                      key={elem.on}
-                    >
+                    <div data-testid="last-updated-element" key={elem.on}>
                       <FormattedDate className="govuk-body govuk-!-font-weight-bold">
                         {elem.on}
                       </FormattedDate>
@@ -161,7 +158,7 @@ class PublicationReleasePage extends Component<Props> {
                 </Details>
               </h4>
 
-              <h4>
+              <h4 data-testid="next-update">
                 <span className="govuk-caption-m">Next update:</span>
                 <FormattedDate>{data.publication.nextUpdate}</FormattedDate>
 
@@ -181,7 +178,9 @@ class PublicationReleasePage extends Component<Props> {
 
         {data.content.length > 0 && (
           <>
-            <h2 className="govuk-heading-l">Contents</h2>
+            <h2 className="govuk-heading-l" data-testid="contents">
+              Contents
+            </h2>
 
             <Accordion id="contents-sections">
               {data.content.map(({ heading, caption, order, content }) => (
@@ -197,7 +196,10 @@ class PublicationReleasePage extends Component<Props> {
           </>
         )}
 
-        <h2 className="govuk-heading-m govuk-!-margin-top-9">
+        <h2
+          className="govuk-heading-m govuk-!-margin-top-9"
+          data-testid="extra-information"
+        >
           Extra information
         </h2>
 

@@ -3,6 +3,7 @@
 exports[`Details renders correctly 1`] = `
 
 <details class="govuk-details"
+         data-testid="Test summary"
          role="group"
 >
   <summary class="govuk-details__summary"
@@ -30,6 +31,7 @@ exports[`Details renders correctly with \`open\` prop set to true 1`] = `
 
 <details class="govuk-details"
          open
+         data-testid="Test summary"
          role="group"
 >
   <summary class="govuk-details__summary"
