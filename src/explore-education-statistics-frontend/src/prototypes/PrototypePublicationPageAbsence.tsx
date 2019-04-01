@@ -171,7 +171,7 @@ const PublicationPage = () => {
               className="govuk-heading-m govuk-!-margin-top-6"
               id="related-content"
             >
-              Related content
+              Related guidance
             </h2>
             <nav role="navigation" aria-labelledby="related-content">
               <ul className="govuk-list">
@@ -701,7 +701,8 @@ const PublicationPage = () => {
           <address className="govuk-body dfe-font-style-normal">
             Press Office News Desk
             <br />
-            Department for Education <br />
+            Department for Education (DfE)
+            <br />
             Sanctuary Buildings <br />
             Great Smith Street <br />
             London
@@ -715,7 +716,7 @@ const PublicationPage = () => {
             Data Insight and Statistics Division
             <br />
             Level 1<br />
-            Department for Education
+            Department for Education (DfE)
             <br />
             Sanctuary Buildings <br />
             Great Smith Street
@@ -725,20 +726,20 @@ const PublicationPage = () => {
             SW1P 3BT <br />
             Telephone: 020 7783 8300
             <br />
-            Email: <a href="#">Schools.statistics@education.gov.uk</a>
+            Email: <a href="#">schools.statistics@education.gov.uk</a>
           </address>
         </AccordionSection>
       </Accordion>
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
-        Exploring the data
+        Explore our statistics and data
       </h2>
       <p>
-        The statistics can be viewed as reports, or you can customise and
-        download as excel or .csv files . The data can also be accessed via an
-        API. <a href="#">What is an API?</a>
+        Our statistics and data can be viewed as reports, or you can customise
+        and download as excel or .csv files . The data can also be accessed via
+        an API. <a href="#">What is an API?</a>
       </p>
       <Link to="/prototypes/table-tool" className="govuk-button">
-        Create charts and tables
+        Create your own tables
       </Link>
       <div className="govuk-!-margin-top-9">
         <a href="#print" className="govuk-link">

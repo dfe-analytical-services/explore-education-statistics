@@ -236,7 +236,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
 
                   <FormTextInput
                     id="characteristic-search"
-                    label="Enter a characteristic or indicator"
+                    label="Enter a characteristic or indicator."
                     name="characteristicSearch"
                     onChange={event => {
                       event.persist();
