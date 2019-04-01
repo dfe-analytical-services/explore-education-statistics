@@ -169,27 +169,37 @@ class PrototypeTableToolPage extends Component<{}, State> {
     } = this.state;
 
     return (
-      <PrototypePage breadcrumbs={[{ text: 'Create your own table' }]}>
-        <PageTitle caption="Table tool" title="Create your own table" />
+      <PrototypePage breadcrumbs={[{ text: 'Create your own tables online' }]}>
+        <PageTitle caption="Table tool" title="Create your own tables online" />
+
+        <p>
+          Use our tool to build your own tables and explore our statistics and
+          data.
+        </p>
+
+        <p>
+          Use the following filters to create your table and explore our
+          statistics and data:
+        </p>
 
         <ul>
-          <li>You can create your own tables from our publication data.</li>
-          <li>
-            You can filter it by things like year, school type, area or pupil
-            characteristics.
-          </li>
-          <li>
-            You can also download it, visualise it or copy and paste it as you
-            need.
-          </li>
+          <li>academic years</li>
+          <li>pupil charactertistics</li>
+          <li>school PrototypeSearchForm</li>
+          <li>statistical indicatorss</li>
         </ul>
+
+        <p>
+          You can also download the statistics and data from your table for your
+          own analysis.
+        </p>
 
         <section className="govuk-grid-row">
           <div className="govuk-grid-column-one-half">
             <h2>
-              1. Choose a publication
+              1. Choose your statistics and data
               <span className="govuk-hint">
-                Pick a publication below to create a table for it
+                Select a statistical and data set.
               </span>
             </h2>
 
@@ -203,9 +213,9 @@ class PrototypeTableToolPage extends Component<{}, State> {
             {publicationId && (
               <>
                 <h2>
-                  2. Choose a subject
+                  2. Choose your subject
                   <span className="govuk-hint">
-                    Pick a subject from '{publicationName}'
+                    Select a subject from '{publicationName}'
                   </span>
                 </h2>
 
@@ -250,15 +260,14 @@ class PrototypeTableToolPage extends Component<{}, State> {
           <section className="govuk-grid-row" ref={this.filtersRef}>
             <div className="govuk-grid-column-full">
               <h2>
-                3. Filter statistics from '{publicationName}'
+                3. Choose your filters for '{publicationName}'
                 <span className="govuk-hint">
-                  Select any options you are interested in from the groups
-                  below.
+                  Select any combination of filters.
                 </span>
               </h2>
 
               <Tabs>
-                <TabsSection id="characteristics" title="Characteristics">
+                <TabsSection id="characteristics" title="Filters">
                   <CharacteristicsFilterForm
                     publicationMeta={publicationMeta}
                     onSubmit={this.handleFilterFormSubmit}
@@ -271,7 +280,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
 
         {tableData.length > 0 && (
           <section ref={this.dataTableRef}>
-            <h2>3. Explore statistics from '{publicationName}'</h2>
+            <h2>3. Explore statistics and data '{publicationName}'</h2>
 
             <CharacteristicsDataTable
               characteristics={filters.characteristics}

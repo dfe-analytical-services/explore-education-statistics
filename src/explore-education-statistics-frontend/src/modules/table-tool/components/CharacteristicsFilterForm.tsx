@@ -173,17 +173,17 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                     <FormFieldset
                       id="years"
                       legend="Academic years"
-                      hint="Filter statistics by a given start and end date"
+                      hint="Select a start and end date"
                     >
                       <FormFieldSelect<FormValues>
                         id="filter-startYear"
-                        label="Start year"
+                        label="Start"
                         name="startYear"
                         options={this.yearOptions}
                       />
                       <FormFieldSelect<FormValues>
                         id="filter-endYear"
-                        label="End year"
+                        label="End"
                         name="endYear"
                         options={this.yearOptions}
                       />
@@ -194,7 +194,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                       id="filter-schoolTypes"
                       name="schoolTypes"
                       legend="School types"
-                      hint="Filter statistics by number of pupils in school type(s)"
+                      hint="Select school types."
                       options={this.schoolTypeOptions}
                       selectAll
                     />
@@ -203,7 +203,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                     <FormFieldset
                       id="filter-indicators"
                       legend="Indicators"
-                      hint="Filter by at least one statistical indicator from the publication"
+                      hint="Select at least 1 statistical indicator."
                       error={getError('indicators')}
                     >
                       <SearchableFilterMenus<FormValues>
@@ -218,7 +218,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                     <FormFieldset
                       id="filter-characteristics"
                       legend="Characteristics"
-                      hint="Filter by at least one pupil characteristic from the publication"
+                      hint="Select at least 1 pupil characteristic."
                       error={getError('characteristics')}
                     >
                       <SearchableFilterMenus<FormValues>
@@ -232,11 +232,11 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                 </div>
 
                 <FormGroup>
-                  <h3>Can't find what you're looking for?</h3>
+                  <h3>Search for characteristics and indicators</h3>
 
                   <FormTextInput
                     id="characteristic-search"
-                    label="Search for an indicator or a characteristic"
+                    label="Enter a characteristic or indicator"
                     name="characteristicSearch"
                     onChange={event => {
                       event.persist();
