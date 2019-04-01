@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import Page from 'src/components/Page';
 import PageTitle from 'src/components/PageTitle';
 import { contentApi } from 'src/services/api';
-import TopicList from './components/TopicList';
+import TopicList, { Topic } from './components/TopicList';
 
 interface Props {
   themes: {
     id: string;
     slug: string;
     title: string;
+    topics: Topic[];
   }[];
 }
 
@@ -18,7 +19,7 @@ class FindStatisticsPage extends Component<Props> {
   };
 
   public static async getInitialProps(): Promise<Props> {
-    const themes = await contentApi.get('theme');
+    const themes = await contentApi.get('/Content/tree');
 
     return {
       themes,
@@ -50,11 +51,11 @@ class FindStatisticsPage extends Component<Props> {
 
         {themes.length > 0 ? (
           <>
-            {themes.map(({ id, slug, title }) => (
+            {themes.map(({ id, slug, title, topics }) => (
               <div key={id}>
                 <h2 className="govuk-heading-l">{title}</h2>
 
-                <TopicList theme={slug} />
+                <TopicList topics={topics} theme={id} />
               </div>
             ))}
           </>

@@ -2,34 +2,21 @@ import React, { Component } from 'react';
 import Link from 'src/components/Link';
 import { contentApi } from 'src/services/api';
 
+export interface Publication {
+  id: string;
+  slug: string;
+  summary: string;
+  title: string;
+}
+
 interface Props {
   topic: string;
+  publications: Publication[];
 }
 
-interface State {
-  publications: {
-    id: string;
-    slug: string;
-    summary: string;
-    title: string;
-  }[];
-}
-
-class PublicationList extends Component<Props, State> {
-  public state = {
-    publications: [],
-  };
-
-  public componentDidMount() {
-    const { topic } = this.props;
-
-    contentApi
-      .get(`topic/${topic}/publications`)
-      .then(publications => this.setState({ publications }));
-  }
-
+class PublicationList extends Component<Props> {
   public render() {
-    const { publications } = this.state;
+    const { topic, publications } = this.props;
 
     return (
       <>
@@ -49,6 +36,7 @@ class PublicationList extends Component<Props, State> {
                       className="govuk-link govuk-!-margin-right-9"
                       to={`/statistics/publication?publication=${slug}`}
                       as={`/statistics/${slug}`}
+                      data-testid={`view-stats-${slug}`}
                     >
                       View statistics
                     </Link>

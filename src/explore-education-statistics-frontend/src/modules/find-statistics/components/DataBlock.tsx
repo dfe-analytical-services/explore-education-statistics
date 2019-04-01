@@ -88,7 +88,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
     const newState: any = {};
 
     if (json && jsonMeta) {
-      if (json.length > 0) {
+      if (json.result.length > 0) {
         newState.tables = [{ data: json, meta: jsonMeta }];
       }
 
@@ -116,7 +116,10 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
     const id = new Date().getDate();
 
     return (
-      <div className="govuk-datablock">
+      <div
+        className="govuk-datablock"
+        data-testid={`DataBlock ${this.props.heading}`}
+      >
         <Tabs>
           {this.state.summary && (
             <TabsSection id={`${id}_summary`} title="Summary">
@@ -135,7 +138,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
           )}
 
           {this.state.charts && (
-            <TabsSection id={`${id}1`} title="Charts" lazy={false}>
+            <TabsSection id={`${id}1`} title="Charts" lazy={true}>
               <h3>{this.props.heading}</h3>
               {this.state.charts.map((chart: any, idx) => (
                 <ChartRenderer

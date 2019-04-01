@@ -1,20 +1,22 @@
 import classNames from 'classnames';
 import { UrlLike } from 'next-server/router';
-import { default as RouterLink, LinkProps } from 'next/link';
+import { default as RouterLink } from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
-import { Omit } from '../types/util';
 
 type Props = {
+  as?: string | UrlLike;
   children: ReactNode;
   className?: string;
+  prefetch?: boolean;
   to?: string | UrlLike;
   unvisited?: boolean;
-} & AnchorHTMLAttributes<HTMLAnchorElement> &
-  Omit<LinkProps, 'children'>;
+} & AnchorHTMLAttributes<HTMLAnchorElement>;
 
 const Link = ({
+  as,
   children,
   className,
+  prefetch,
   to,
   unvisited = false,
   ...props
@@ -24,7 +26,7 @@ const Link = ({
   const href = props.href || to;
 
   return (
-    <RouterLink href={href}>
+    <RouterLink href={href} as={as} prefetch={prefetch}>
       <a
         {...props}
         className={classNames(
