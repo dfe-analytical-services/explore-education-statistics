@@ -173,7 +173,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                     <FormFieldset
                       id="years"
                       legend="Academic years"
-                      hint="Select a start and end date"
+                      hint="Select a start and end date."
                     >
                       <FormFieldSelect<FormValues>
                         id="filter-startYear"
@@ -272,7 +272,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                 >
                   {form.isSubmitting && form.isValid
                     ? 'Submitting'
-                    : 'Confirm filters'}
+                    : 'Create your table'}
                 </Button>
               </Form>
             </div>

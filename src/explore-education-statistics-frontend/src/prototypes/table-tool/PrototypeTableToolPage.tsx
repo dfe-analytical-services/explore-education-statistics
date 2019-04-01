@@ -275,7 +275,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
 
         {tableData.length > 0 && (
           <section ref={this.dataTableRef}>
-            <h2>3. Explore statistics and data '{publicationName}'</h2>
+            <h2>3. Explore statistics and data for '{publicationName}'</h2>
 
             <CharacteristicsDataTable
               characteristics={filters.characteristics}
