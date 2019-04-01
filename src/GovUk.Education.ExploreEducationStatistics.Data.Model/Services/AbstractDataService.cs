@@ -37,6 +37,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return DbSet().Count(expression);
         }
 
+        public IEnumerable<TEntity> All()
+        {
+            return DbSet();
+        }
+
+        public TEntity Find(object id, List<Expression<Func<TEntity, object>>> include)
+        {
+            var queryable = DbSet().AsQueryable();
+            include.ForEach(i => queryable = queryable.Include(i));
+            return queryable
+                .FilterByPrimaryKey(_context, id)
+                .SingleOrDefault();
+        }
+        
         public TEntity Find(object id)
         {
             return DbSet().Find(id);

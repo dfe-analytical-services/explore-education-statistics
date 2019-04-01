@@ -1,15 +1,16 @@
 using System;
+using GovUk.Education.ExploreEducationStatistics.Data.Seed.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
 {
     [AttributeUsage(AttributeTargets.Field)]
     public class DataFileAttribute : Attribute
     {
-        public Type DataType { get; }
+        public ImportFileType ImportFileType { get; }
 
-        public DataFileAttribute(Type dataType)
+        public DataFileAttribute(ImportFileType importFileType)
         {
-            DataType = dataType;
+            ImportFileType = importFileType;
         }
     }
 }

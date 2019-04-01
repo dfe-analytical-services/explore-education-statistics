@@ -10,34 +10,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     public class DebugController : ControllerBase
     {
         private readonly IGeographicDataService _geographicDataService;
-        private readonly INationalCharacteristicDataService _nationalCharacteristicDataService;
-        private readonly ILaCharacteristicDataService _laCharacteristicDataService;
+        private readonly ICharacteristicDataService _characteristicDataService;
 
         public DebugController(IGeographicDataService geographicDataService,
-            INationalCharacteristicDataService nationalCharacteristicDataService,
-            ILaCharacteristicDataService laCharacteristicDataService)
+            ICharacteristicDataService characteristicDataService)
         {
             _geographicDataService = geographicDataService;
-            _nationalCharacteristicDataService = nationalCharacteristicDataService;
-            _laCharacteristicDataService = laCharacteristicDataService;
+            _characteristicDataService = characteristicDataService;
         }
 
         [HttpGet("report")]
         public async Task<ActionResult<DebugReport>> GetReport()
         {
             var geographicCount = _geographicDataService.Count();
-            var nationalCharacteristicCount = _nationalCharacteristicDataService.Count();
-            var laCharacteristicCount = _laCharacteristicDataService.Count();
-            
+            var characteristicCount = _characteristicDataService.Count();
+
             var counts = await Task.WhenAll(
-                geographicCount, nationalCharacteristicCount, laCharacteristicCount
+                geographicCount, characteristicCount
             );
-            
+
             return new DebugReport
             {
                 geographicCount = counts[0],
-                nationalCharacteristicCount = counts[1],
-                laCharacteristicCount = counts[2]
+                characteristicCount = counts[1]
             };
         }
     }

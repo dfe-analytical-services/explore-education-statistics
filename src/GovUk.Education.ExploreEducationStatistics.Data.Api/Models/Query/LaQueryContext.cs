@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 {
-    public class LaQueryContext : IQueryContext<CharacteristicDataLa>
+    public class LaQueryContext : IQueryContext<CharacteristicData>
     {
         public Guid PublicationId { get; set; }
         public ICollection<SchoolType> SchoolTypes { get; set; }
@@ -18,17 +18,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public ICollection<string> Indicators { get; set; }
         public ICollection<string> Characteristics { get; set; }
 
-        public Expression<Func<CharacteristicDataLa, bool>> FindExpression(long releaseId)
+        public Expression<Func<CharacteristicData, bool>> FindExpression(long releaseId)
         {
-            return PredicateBuilder.True<CharacteristicDataLa>()
-                .And(QueryContextUtil.ReleaseExpression<CharacteristicDataLa>(releaseId))
-                .And(QueryContextUtil.LevelExpression<CharacteristicDataLa>(Level.Local_Authority))
-                .And(QueryContextUtil.SchoolTypeExpression<CharacteristicDataLa>(SchoolTypes))
-                .And(QueryContextUtil.TimePeriodExpression<CharacteristicDataLa>(
+            return PredicateBuilder.True<CharacteristicData>()
+                .And(QueryContextUtil.ReleaseExpression<CharacteristicData>(releaseId))
+                .And(QueryContextUtil.LevelExpression<CharacteristicData>(Level.Local_Authority))
+                .And(QueryContextUtil.SchoolTypeExpression<CharacteristicData>(SchoolTypes))
+                .And(QueryContextUtil.TimePeriodExpression<CharacteristicData>(
                     QueryUtil.YearsQuery(Years, StartYear, EndYear)))
-                .And(QueryContextUtil.RegionsExpression<CharacteristicDataLa>(Regions))
-                .And(QueryContextUtil.LocalAuthoritiesExpression<CharacteristicDataLa>(LocalAuthorities))
-                .And(QueryContextUtil.CharacteristicsQuery<CharacteristicDataLa>(Characteristics));
+                .And(QueryContextUtil.RegionsExpression<CharacteristicData>(Regions))
+                .And(QueryContextUtil.LocalAuthoritiesExpression<CharacteristicData>(LocalAuthorities))
+                .And(QueryContextUtil.CharacteristicsQuery<CharacteristicData>(Characteristics));
         }
     }
 }

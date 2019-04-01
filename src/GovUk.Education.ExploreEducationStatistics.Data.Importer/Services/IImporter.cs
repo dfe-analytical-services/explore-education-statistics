@@ -5,6 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
     public interface IImporter
     {
-        void Import(IEnumerable<string> lines, Release release);
+        void Import(IEnumerable<string> lines, Subject subject);
     }
 }

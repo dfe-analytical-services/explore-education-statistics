@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    public interface ISchoolData
+    public interface ISchoolData : ITidyData
     {
         School School { get; set; }
         

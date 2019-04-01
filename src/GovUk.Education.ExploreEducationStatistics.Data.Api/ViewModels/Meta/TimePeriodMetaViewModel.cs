@@ -6,6 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
     {
         public string Hint { get; set; }
         public string Legend { get; set; }
-        public IEnumerable<NameLabelViewModel> Options { get; set; }
+        public IEnumerable<LabelValueViewModel> Options { get; set; }
     }
 }

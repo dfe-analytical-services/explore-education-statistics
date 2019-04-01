@@ -15,10 +15,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
             CreateMap<Characteristic, CharacteristicViewModel>()
                 .ForMember(destinationMember => destinationMember.Name,
                     opts => opts.MapFrom(characteristic => characteristic.Breakdown));
-            CreateMap<CharacteristicMeta, NameLabelViewModel>();
+            CreateMap<CharacteristicMeta, CharacteristicMetaViewModel>();
             CreateMap<IndicatorMeta, IndicatorMetaViewModel>()
-                .ForMember(dest => dest.Unit,
-                    opts => opts.MapFrom(MapIndicatorMetaUnitExpression()));
+                .ForMember(dest => dest.Unit, opts => opts.MapFrom(MapIndicatorMetaUnitExpression()));
+            CreateMap<Subject, SubjectMetaViewModel>()
+                .ForMember(dest => dest.Label, opts => opts.MapFrom(subject => subject.Name));
         }
 
         private static Expression<Func<IndicatorMeta, string>> MapIndicatorMetaUnitExpression()

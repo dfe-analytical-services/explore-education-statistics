@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
@@ -15,13 +17,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     {
         private readonly ITableBuilderService _tableBuilderService;
         private readonly IReleaseService _releaseService;
+        private readonly ISubjectService _subjectService;
 
         public TableBuilderController(
             ITableBuilderService tableBuilderService,
-            IReleaseService releaseService)
+            IReleaseService releaseService,
+            ISubjectService subjectService)
         {
             _tableBuilderService = tableBuilderService;
             _releaseService = releaseService;
+            _subjectService = subjectService;
         }
 
         [HttpPost("geographic")]
@@ -60,100 +65,129 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return NotFound();
         }
 
-        [HttpGet("meta/{typeName}/{publicationId}")]
-        public ActionResult<PublicationMetaViewModel> GetMeta(string typeName, Guid publicationId)
+        [HttpGet("meta/{publicationId}")]
+        public ActionResult<PublicationSubjectsMetaViewModel> GetMeta(Guid publicationId)
         {
-            var result = new PublicationMetaViewModel
+            return new PublicationSubjectsMetaViewModel
             {
                 PublicationId = publicationId,
-                Indicators = _releaseService.GetIndicatorMetas(publicationId, typeName),
-                Characteristics = _releaseService.GetCharacteristicMetas(publicationId, typeName)
+                Subjects = _subjectService.GetSubjectMetas(publicationId)
             };
+        }
 
-            if (result.Indicators != null && result.Indicators.Any() ||
-                result.Characteristics != null && result.Characteristics.Any())
+        [HttpGet("meta/{typeName}/{publicationId}")]
+        [Obsolete("Use subject instead")]
+        // TODO Remove me - Get meta by subject instead
+        public ActionResult<PublicationMetaViewModel> GetMeta(string typeName, Guid publicationId)
+        {
+            // TODO Remove me once UI updated to get Meta by Subject.
+            // TODO Currently the UI only requests meta data for type "CharacteristicDataNational"
+            if (typeName == "CharacteristicDataNational")
             {
-                result.ObservationalUnits = new ObservationalUnitsViewModel
+                var latestRelease = _releaseService.GetLatestRelease(publicationId);
+
+                var subjectForPublication = _subjectService.FindMany(subject =>
+                    subject.Release.Id == latestRelease &&
+                    subject.Name == "National characteristics"
+                ).FirstOrDefault();
+
+                return GetMeta(subjectForPublication.Id);
+            }
+
+            return NotFound();
+        }
+
+        [HttpGet("meta/subject/{subjectId}")]
+        public ActionResult<PublicationMetaViewModel> GetMeta(long subjectId)
+        {
+            var subject = _subjectService.Find(subjectId, new List<Expression<Func<Subject, object>>> {s => s.Release});
+
+            return new PublicationMetaViewModel
+            {
+                PublicationId = subject.Release.PublicationId,
+                Characteristics = _subjectService.GetCharacteristicMetas(subject),
+                Indicators = _subjectService.GetIndicatorMetas(subject),
+                ObservationalUnits = new ObservationalUnitsMetaViewModel
                 {
-                    Country = new List<NameLabelViewModel>
+                    Location = new LocationMetaViewModel
                     {
-                        new NameLabelViewModel {Name = "E92000001", Label = "England"}
-                    },
-                    LocalAuthority = new List<NameLabelViewModel>
-                    {
-                        new NameLabelViewModel
+                        LocalAuthority = new List<LabelValueViewModel>
                         {
-                            Name = "E09000007",
-                            Label = "Camden"
+                            new LabelValueViewModel
+                            {
+                                Label = "Camden",
+                                Value = "E09000007"
+                            },
+                            new LabelValueViewModel
+                            {
+                                Label = "City of London",
+                                Value = "E09000001"
+                            },
+                            new LabelValueViewModel
+                            {
+                                Label = "Greenwich",
+                                Value = "E09000011"
+                            }
                         },
-                        new NameLabelViewModel
+                        National = new List<LabelValueViewModel>
                         {
-                            Name = "E09000001",
-                            Label = "City of London"
+                            new LabelValueViewModel {Label = "England", Value = "E92000001"}
                         },
-                        new NameLabelViewModel
+                        Region = new List<LabelValueViewModel>
                         {
-                            Name = "E09000011",
-                            Label = "Greenwich"
-                        }
-                    },
-                    Region = new List<NameLabelViewModel>
-                    {
-                        new NameLabelViewModel
-                        {
-                            Name = "E13000001",
-                            Label = "Inner London"
+                            new LabelValueViewModel
+                            {
+                                Label = "Inner London",
+                                Value = "E13000001"
+                            },
+                            new LabelValueViewModel
+                            {
+                                Label = "Outer London",
+                                Value = "E13000002"
+                            }
                         },
-                        new NameLabelViewModel
-                        {
-                            Name = "E13000002",
-                            Label = "Outer London"
-                        }
+                        School = new List<LabelValueViewModel>()
                     },
                     TimePeriod = new TimePeriodMetaViewModel
                     {
                         Hint = "Filter statistics by a given start and end date",
                         Legend = "Academic Year",
-                        Options = new List<NameLabelViewModel>
+                        Options = new List<LabelValueViewModel>
                         {
-                            new NameLabelViewModel
+                            new LabelValueViewModel
                             {
-                                Name = "201112",
-                                Label = "2011/12"
+                                Label = "2011/12",
+                                Value = "201112"
                             },
-                            new NameLabelViewModel
+                            new LabelValueViewModel
                             {
-                                Name = "201213",
-                                Label = "2012/13"
+                                Label = "2012/13",
+                                Value = "201213"
                             },
-                            new NameLabelViewModel
+                            new LabelValueViewModel
                             {
-                                Name = "201314",
-                                Label = "2013/14"
+                                Label = "2013/14",
+                                Value = "201314"
                             },
-                            new NameLabelViewModel
+                            new LabelValueViewModel
                             {
-                                Name = "201415",
-                                Label = "2014/15"
+                                Label = "2014/15",
+                                Value = "201415"
                             },
-                            new NameLabelViewModel
+                            new LabelValueViewModel
                             {
-                                Name = "201516",
-                                Label = "2015/16"
+                                Label = "2015/16",
+                                Value = "201516"
                             },
-                            new NameLabelViewModel
+                            new LabelValueViewModel
                             {
-                                Name = "201617",
-                                Label = "2016/17"
+                                Label = "2016/17",
+                                Value = "201617"
                             }
                         }
                     }
-                };
-
-                return result;
-            }
-
-            return NotFound();
+                }
+            };
         }
     }
 }

@@ -7,6 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Models
         public Guid PublicationId { get; set; }
         public DateTime ReleaseDate { get; set; }
         public string Name { get; set; }
-        public DataSet[] DataSets { get; set; }
+        public Subject[] Subjects { get; set; }
     }
 }

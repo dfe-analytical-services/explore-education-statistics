@@ -1,12 +1,8 @@
-using System.Collections.Generic;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
 {
-    public class ObservationalUnitsViewModel
+    public class ObservationalUnitsMetaViewModel
     {
-        public IEnumerable<NameLabelViewModel> Country { get; set; }
-        public IEnumerable<NameLabelViewModel> LocalAuthority { get; set; }
-        public IEnumerable<NameLabelViewModel> Region { get; set; }
+        public LocationMetaViewModel Location { get; set; }
         public TimePeriodMetaViewModel TimePeriod { get; set; }
     }
 }

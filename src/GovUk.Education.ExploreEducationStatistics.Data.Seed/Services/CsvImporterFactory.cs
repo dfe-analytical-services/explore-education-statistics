@@ -1,6 +1,6 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Seed.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 {
@@ -19,26 +19,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             _laCharacteristicCsvImporter = laCharacteristicCsvImporter;
         }
 
-        public IImporter Importer(DataCsvFilename filename)
+        public IImporter Importer(ImportFileType importFileType)
         {
-            var entityType = filename.GetDataTypeFromDataFileAttributeOfEnumType(filename.GetType());
-
-            if (entityType == typeof(GeographicData))
+            switch (importFileType)
             {
-                return _geographicCsvImporter;
+                case ImportFileType.Geographic:
+                    return _geographicCsvImporter;
+                case ImportFileType.La_Characteristic:
+                    return _laCharacteristicCsvImporter;
+                case ImportFileType.National_Characteristic:
+                    return _nationalCharacteristicCsvImporter;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(importFileType), importFileType, null);
             }
-
-            if (entityType == typeof(CharacteristicDataLa))
-            {
-                return _laCharacteristicCsvImporter;
-            }
-
-            if (entityType == typeof(CharacteristicDataNational))
-            {
-                return _nationalCharacteristicCsvImporter;
-            }
-
-            throw new ArgumentOutOfRangeException(nameof(filename), filename, null);
         }
     }
 }
