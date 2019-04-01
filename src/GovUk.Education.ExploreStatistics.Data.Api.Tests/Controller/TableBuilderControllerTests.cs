@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
@@ -24,6 +25,7 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
         {
             var tableBuilderService = new Mock<ITableBuilderService>();
             var releaseService = new Mock<IReleaseService>();
+            var subjectService = new Mock<ISubjectService>();
 
             tableBuilderService.Setup(s => s.GetNational(It.IsNotIn(_testNationalQuery))).Returns(
                 new TableBuilderResult
@@ -70,36 +72,45 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
                     }
                 });
 
-            releaseService
-                .Setup(s => s.GetIndicatorMetas(new Guid("8fe9c479-1ab5-4894-81cd-9f87882e20ed"), "GeographicData"))
-                .Returns(new Dictionary<string, List<IndicatorMetaViewModel>>
+            var subject = new Subject
+            {
+                Id = 1
+            };
+
+            subjectService
+                .Setup(s => s.Find(1, It.IsAny<List<Expression<Func<Subject, object>>>>()))
+                .Returns(subject);
+
+            subjectService
+                .Setup(s => s.GetIndicatorMetas(subject))
+                .Returns(new Dictionary<string, IEnumerable<IndicatorMetaViewModel>>
                 {
                     {
                         "Exclusion fields",
                         new List<IndicatorMetaViewModel>
                         {
-                            new IndicatorMetaViewModel {Name = "num_schools", Label = "Number of schools"}
+                            new IndicatorMetaViewModel {Name = "num_schools", Label = "Number of schools", Unit = ""}
                         }
                     }
                 });
 
-            releaseService
-                .Setup(
-                    s => s.GetCharacteristicMetas(new Guid("8fe9c479-1ab5-4894-81cd-9f87882e20ed"), "GeographicData"))
-                .Returns(new Dictionary<string, List<NameLabelViewModel>>
+            subjectService
+                .Setup(s => s.GetCharacteristicMetas(subject))
+                .Returns(new Dictionary<string, IEnumerable<CharacteristicMetaViewModel>>
                 {
                     {
                         "Total",
-                        new List<NameLabelViewModel>
+                        new List<CharacteristicMetaViewModel>
                         {
-                            new NameLabelViewModel {Name = "Total", Label = "All pupils"}
+                            new CharacteristicMetaViewModel {Name = "Total", Label = "All pupils"}
                         }
                     }
                 });
 
             _controller = new TableBuilderController(
                 tableBuilderService.Object,
-                releaseService.Object
+                releaseService.Object,
+                subjectService.Object
             );
         }
 
@@ -147,24 +158,46 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
 
         [Theory]
         [InlineData("8fe9c479-1ab5-4894-81cd-9f87882e20ed")]
-        public void GetMeta_KnownId_Returns_ActionResult_WithMetaData(string testId)
+        public void GetMeta_KnownId_Returns_ActionResult_WithSubjectMetaData(string testId)
         {
             var id = new Guid(testId);
 
-            var result = _controller.GetMeta(typeof(GeographicData).Name, id);
+            var result = _controller.GetMeta(id);
 
-            var model = Assert.IsAssignableFrom<ActionResult<PublicationMetaViewModel>>(result);
+            var model = Assert.IsAssignableFrom<ActionResult<PublicationSubjectsMetaViewModel>>(result);
 
             Assert.Equal(id, model.Value.PublicationId);
 
             // TODO: verify the meta data
         }
 
-        [Fact]
+        [Theory]
         [InlineData("335043a6-e7d3-4573-8910-0f8eead36edb")]
-        public void GetMeta_UnknownKnownId_Returns_NotFound()
+        public void GetMeta_UnknownKnownId_Returns_NotFound(string testId)
         {
-            var result = _controller.GetMeta(typeof(GeographicData).Name, new Guid());
+            var id = new Guid(testId);
+
+            var result = _controller.GetMeta(id);
+
+            Assert.IsType<NotFoundResult>(result.Result);
+        }
+
+        [Theory]
+        [InlineData(1)]
+        public void GetSubjectMeta_KnownId_Returns_ActionResult_WithMetaData(long testId)
+        {
+            var result = _controller.GetSubjectMeta(testId);
+
+            var model = Assert.IsAssignableFrom<ActionResult<PublicationMetaViewModel>>(result);
+
+            // TODO: verify the meta data
+        }
+
+        [Theory]
+        [InlineData(2)]
+        public void GetSubjectMeta_UnknownKnownId_Returns_NotFound(long testId)
+        {
+            var result = _controller.GetSubjectMeta(testId);
 
             Assert.IsType<NotFoundResult>(result.Result);
         }

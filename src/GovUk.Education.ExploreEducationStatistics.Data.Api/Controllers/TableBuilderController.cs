@@ -68,17 +68,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("meta/{publicationId}")]
         public ActionResult<PublicationSubjectsMetaViewModel> GetMeta(Guid publicationId)
         {
+            var subjectMetaViewModels = _subjectService.GetSubjectMetas(publicationId);
+
+            if (subjectMetaViewModels == null)
+            {
+                return NotFound();
+            }
+            
             return new PublicationSubjectsMetaViewModel
             {
                 PublicationId = publicationId,
-                Subjects = _subjectService.GetSubjectMetas(publicationId)
+                Subjects = subjectMetaViewModels
             };
         }
 
         [HttpGet("meta/{typeName}/{publicationId}")]
         [Obsolete("Use subject instead")]
         // TODO Remove me - Get meta by subject instead
-        public ActionResult<PublicationMetaViewModel> GetMeta(string typeName, Guid publicationId)
+        public ActionResult<PublicationMetaViewModel> GetSubjectMeta(string typeName, Guid publicationId)
         {
             // TODO Remove me once UI updated to get Meta by Subject.
             // TODO Currently the UI only requests meta data for type "CharacteristicDataNational"
@@ -91,14 +98,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                     subject.Name == "National characteristics"
                 ).FirstOrDefault();
 
-                return GetMeta(subjectForPublication.Id);
+                return GetSubjectMeta(subjectForPublication.Id);
             }
 
             return NotFound();
         }
 
         [HttpGet("meta/subject/{subjectId}")]
-        public ActionResult<PublicationMetaViewModel> GetMeta(long subjectId)
+        public ActionResult<PublicationMetaViewModel> GetSubjectMeta(long subjectId)
         {
             var subject = _subjectService.Find(subjectId, new List<Expression<Func<Subject, object>>> {s => s.Release});
 
