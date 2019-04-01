@@ -210,7 +210,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
                 <h2>
                   2. Choose your subject area
                   <span className="govuk-hint">
-                    Select a geographical subject area for '{publicationName}'
+                    Select a geographical subject area for '{publicationName}'.
                   </span>
                 </h2>
 
