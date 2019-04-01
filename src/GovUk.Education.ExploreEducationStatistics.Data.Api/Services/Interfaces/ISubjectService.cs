@@ -10,8 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
     {
         IEnumerable<SubjectMetaViewModel> GetSubjectMetas(Guid publicationId);
 
-        Dictionary<string, IEnumerable<IndicatorMetaViewModel>> GetIndicatorMetas(Subject subject);
+        Dictionary<string, IEnumerable<IndicatorMetaViewModel>> GetIndicatorMetas(long subjectId);
 
-        Dictionary<string, IEnumerable<CharacteristicMetaViewModel>> GetCharacteristicMetas(Subject subject);
+        Dictionary<string, IEnumerable<CharacteristicMetaViewModel>> GetCharacteristicMetas(long subjectId);
     }
 }

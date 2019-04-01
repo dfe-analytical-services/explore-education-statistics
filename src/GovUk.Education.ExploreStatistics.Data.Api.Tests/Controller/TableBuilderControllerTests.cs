@@ -74,15 +74,37 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
 
             var subject = new Subject
             {
-                Id = 1
+                Id = 1,
+                Release = new Release(DateTime.Now, new Guid("8fe9c479-1ab5-4894-81cd-9f87882e20ed"))
             };
 
             subjectService
-                .Setup(s => s.Find(1, It.IsAny<List<Expression<Func<Subject, object>>>>()))
+                .Setup(s => s.Find(It.Is<long>(l => l == 1), It.IsAny<List<Expression<Func<Subject, object>>>>()))
                 .Returns(subject);
 
             subjectService
-                .Setup(s => s.GetIndicatorMetas(subject))
+                .Setup(s => s.GetSubjectMetas(new Guid("8fe9c479-1ab5-4894-81cd-9f87882e20ed")))
+                .Returns(new List<SubjectMetaViewModel>
+                {
+                    new SubjectMetaViewModel
+                    {
+                        Id = 1,
+                        Label = "Geographic levels"
+                    },
+                    new SubjectMetaViewModel
+                    {
+                        Id = 2,
+                        Label = "Local authority characteristics"
+                    },
+                    new SubjectMetaViewModel
+                    {
+                        Id = 3,
+                        Label = "National characteristics"
+                    }
+                });
+
+            subjectService
+                .Setup(s => s.GetIndicatorMetas(subject.Id))
                 .Returns(new Dictionary<string, IEnumerable<IndicatorMetaViewModel>>
                 {
                     {
@@ -95,7 +117,7 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
                 });
 
             subjectService
-                .Setup(s => s.GetCharacteristicMetas(subject))
+                .Setup(s => s.GetCharacteristicMetas(subject.Id))
                 .Returns(new Dictionary<string, IEnumerable<CharacteristicMetaViewModel>>
                 {
                     {

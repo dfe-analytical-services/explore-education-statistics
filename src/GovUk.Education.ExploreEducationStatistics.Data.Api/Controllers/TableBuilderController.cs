@@ -68,9 +68,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("meta/{publicationId}")]
         public ActionResult<PublicationSubjectsMetaViewModel> GetMeta(Guid publicationId)
         {
-            var subjectMetaViewModels = _subjectService.GetSubjectMetas(publicationId);
+            var subjectMetaViewModels = _subjectService.GetSubjectMetas(publicationId).ToList();
 
-            if (subjectMetaViewModels == null)
+            if (subjectMetaViewModels == null || subjectMetaViewModels.Count == 0)
             {
                 return NotFound();
             }
@@ -109,11 +109,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         {
             var subject = _subjectService.Find(subjectId, new List<Expression<Func<Subject, object>>> {s => s.Release});
 
+            if (subject == null)
+            {
+                return NotFound();
+            }
+            
             return new PublicationMetaViewModel
             {
                 PublicationId = subject.Release.PublicationId,
-                Characteristics = _subjectService.GetCharacteristicMetas(subject),
-                Indicators = _subjectService.GetIndicatorMetas(subject),
+                Characteristics = _subjectService.GetCharacteristicMetas(subject.Id),
+                Indicators = _subjectService.GetIndicatorMetas(subject.Id),
                 ObservationalUnits = new ObservationalUnitsMetaViewModel
                 {
                     Location = new LocationMetaViewModel

@@ -34,9 +34,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 .Select(subject => _mapper.Map<SubjectMetaViewModel>(subject));
         }
 
-        public Dictionary<string, IEnumerable<IndicatorMetaViewModel>> GetIndicatorMetas(Subject subject)
+        public Dictionary<string, IEnumerable<IndicatorMetaViewModel>> GetIndicatorMetas(long subjectId)
         {
-            return DbSet().Where(s => s.Id == subject.Id)
+            return DbSet().Where(s => s.Id == subjectId)
                 .SelectMany(s => s.Indicators)
                 .GroupBy(indicatorMeta => indicatorMeta.Group)
                 .ToDictionary(
@@ -44,9 +44,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     metas => metas.Select(ToIndicatorMetaViewModel));
         }
 
-        public Dictionary<string, IEnumerable<CharacteristicMetaViewModel>> GetCharacteristicMetas(Subject subject)
+        public Dictionary<string, IEnumerable<CharacteristicMetaViewModel>> GetCharacteristicMetas(long subjectId)
         {
-            return DbSet().Where(s => s.Id == subject.Id)
+            return DbSet().Where(s => s.Id == subjectId)
                 .SelectMany(s => s.Characteristics)
                 .GroupBy(characteristicMeta => characteristicMeta.Group)
                 .ToDictionary(
