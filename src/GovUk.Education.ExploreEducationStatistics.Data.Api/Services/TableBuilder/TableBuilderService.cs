@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
         {
             var releaseId = _releaseService.GetLatestRelease(queryContext.PublicationId);
             return dataService.FindMany(queryContext.FindExpression(releaseId),
-                new List<Expression<Func<T, object>>> {data => data.Level, data => data.Subject}
+                new List<Expression<Func<T, object>>> {data => data.Level, data => data.Subject, data => data.Subject.Release}
             );
         }
 
@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             return new TableBuilderResult
             {
                 PublicationId = first.Subject.Release.PublicationId,
-                ReleaseId = first.Subject.Release.Id,
+                ReleaseId = first.SubjectId,
                 ReleaseDate = first.Subject.Release.ReleaseDate,
                 Level = first.Level.Level,
                 Result = data.Select(tidyData => resultBuilder.BuildResult(tidyData, queryContext.Indicators))
