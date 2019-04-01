@@ -24,7 +24,7 @@ const StartPage = () => {
           <ul className="govuk-bulllet-list">
             <li>view annual statistical headlines and trends</li>
             <li>view statistical charts and tables</li>
-            <li>create your own charts and tables</li>
+            <li>create your own tables</li>
             <li>download underlying data files for your own analysis</li>
           </ul>
           <div className="govuk-inset-text">

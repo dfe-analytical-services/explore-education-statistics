@@ -36,6 +36,7 @@ class PublicationList extends Component<Props> {
                       className="govuk-link govuk-!-margin-right-9"
                       to={`/statistics/publication?publication=${slug}`}
                       as={`/statistics/${slug}`}
+                      data-testid={`view-stats-${slug}`}
                     >
                       View statistics
                     </Link>

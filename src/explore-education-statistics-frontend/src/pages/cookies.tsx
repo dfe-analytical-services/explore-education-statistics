@@ -84,6 +84,14 @@ class CookiesPage extends Component {
               <td className="govuk-table__cell">2 years</td>
             </tr>
             <tr className="govuk-table__row">
+              <td className="govuk-table__cell">_gid</td>
+              <td className="govuk-table__cell">
+                This helps us count how many people visit GOV.UK by tracking if
+                you’ve visited before
+              </td>
+              <td className="govuk-table__cell">24 hours</td>
+            </tr>
+            <tr className="govuk-table__row">
               <td className="govuk-table__cell">_gat</td>
               <td className="govuk-table__cell">
                 Used to manage the rate at which page view requests are made

@@ -3,8 +3,10 @@ import 'core-js/fn/array/virtual/includes';
 import 'cross-fetch/polyfill';
 
 import { Container, default as BaseApp } from 'next/app';
+import Router from 'next/router';
 import React from 'react';
 import Helmet from 'react-helmet';
+import { logPageView } from 'src/services/googleAnalyticsService';
 import './_app.scss';
 
 class App extends BaseApp {
@@ -19,6 +21,14 @@ class App extends BaseApp {
   }
 
   public componentDidMount(): void {
+    if (process.env.GA_TRACKING_ID !== undefined) {
+      logPageView();
+
+      if (Router.router !== null) {
+        Router.router.events.on('routeChangeComplete', logPageView);
+      }
+    }
+
     document.body.classList.add('js-enabled');
   }
 

@@ -51,7 +51,11 @@ const AccordionSection = ({
           {
             className: 'govuk-accordion__section-heading',
           },
-          <span className="govuk-accordion__section-button" id={headingId}>
+          <span
+            className="govuk-accordion__section-button"
+            id={headingId}
+            data-testid={heading}
+          >
             {heading}
           </span>,
         )}

@@ -48,7 +48,10 @@ export class SummaryRenderer extends React.Component<Props> {
               <h3 className="govuk-heading-m dfe-dash-tiles__heading">
                 {indicatorMeta[key].label}
               </h3>
-              <p className="govuk-heading-xl govuk-!-margin-bottom-2">
+              <p
+                className="govuk-heading-xl govuk-!-margin-bottom-2"
+                data-testid={`tile ${indicatorMeta[key].label}`}
+              >
                 {indicators[key]}
                 {indicatorMeta[key].unit}
               </p>

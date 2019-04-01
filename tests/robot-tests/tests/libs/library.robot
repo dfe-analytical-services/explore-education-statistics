@@ -10,8 +10,8 @@ Library    file_operations.py
 ${browser}    chrome
 ${headless}   1
 
-${timeout}    2
-${implicit_wait}   2
+${timeout}    3
+${implicit_wait}   3
 
 ${url}        about:blank
 ${urlAdmin}   about:blank
@@ -169,6 +169,10 @@ user clicks element
 user clicks link
   [Arguments]   ${text}
   click link  ${text}
+
+user clicks button
+  [Arguments]   ${text}
+  click button  ${text}
 
 user checks element attribute value should be
   [Arguments]   ${locator}  ${attribute}    ${expected}
