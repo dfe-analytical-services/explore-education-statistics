@@ -3,6 +3,7 @@ import SchoolType from 'src/services/types/SchoolType';
 export interface FilterOption {
   label: string;
   value: string;
+  unit?: string;
 }
 
 export interface GroupedFilterOptions {

@@ -6,14 +6,12 @@ import PublicationMenu, {
 } from 'src/modules/table-tool/components/PublicationMenu';
 import PublicationSubjectMenu from 'src/modules/table-tool/components/PublicationSubjectMenu';
 import PrototypePage from 'src/prototypes/components/PrototypePage';
-import FiltersForm, {
-  FilterFormSubmitHandler,
-} from 'src/prototypes/table-tool/components/FiltersForm';
+import { FilterFormSubmitHandler } from 'src/prototypes/table-tool/components/FiltersForm';
 import initialMetaSpecification, {
   MetaSpecification,
 } from 'src/prototypes/table-tool/components/meta/initialSpec';
 import publicationSubjectSpec from 'src/prototypes/table-tool/components/meta/publicationSubjectSpec';
-import PrototypeDataTable from 'src/prototypes/table-tool/components/PrototypeDataTable';
+import TimePeriodDataTable from 'src/prototypes/table-tool/components/TimePeriodDataTable';
 import tableBuilderService, {
   DataTableResult,
   PublicationMeta,
@@ -71,8 +69,23 @@ interface State {
 
 class PrototypeTableToolPage extends Component<{}, State> {
   private readonly defaultFilters: State['filters'] = {
-    categorical: {},
-    indicators: [],
+    categorical: {
+      characteristics: [
+        'Ethnicity_Major_Black_Total',
+        'Ethnicity_Major_White_Total',
+      ],
+      schoolTypes: [
+        SchoolType.State_Funded_Primary,
+        SchoolType.State_Funded_Secondary,
+        SchoolType.Special,
+      ],
+    },
+    indicators: [
+      'sess_authorised',
+      'sess_authorised_percent',
+      'sess_unauthorised',
+      'sess_unauthorised_percent',
+    ],
     years: [],
   };
 
@@ -106,20 +119,40 @@ class PrototypeTableToolPage extends Component<{}, State> {
       publicationId,
     );
 
-    this.setState({
-      publicationId,
-      publicationMeta,
-      publicationName,
-      filters: {
-        ...this.defaultFilters,
-      },
-      metaSpecification: {
-        ...this.state.metaSpecification,
-        categoricalFilters: {
-          ...this.state.metaSpecification.categoricalFilters,
-          characteristics: {
-            ...this.state.metaSpecification.categoricalFilters.characteristics,
-            options: Object.entries(publicationMeta.characteristics).reduce(
+    this.setState(
+      {
+        publicationId,
+        publicationMeta,
+        publicationName,
+        filters: {
+          ...this.defaultFilters,
+        },
+        metaSpecification: {
+          ...this.state.metaSpecification,
+          categoricalFilters: {
+            ...this.state.metaSpecification.categoricalFilters,
+            characteristics: {
+              ...this.state.metaSpecification.categoricalFilters
+                .characteristics,
+              options: Object.entries(publicationMeta.characteristics).reduce(
+                (acc, [groupKey, group]) => {
+                  return {
+                    ...acc,
+                    [groupKey]: {
+                      label: groupKey,
+                      options: group.map(option => ({
+                        label: option.label,
+                        value: option.name,
+                      })),
+                    },
+                  };
+                },
+                {},
+              ),
+            },
+          },
+          indicators: {
+            ...Object.entries(publicationMeta.indicators).reduce(
               (acc, [groupKey, group]) => {
                 return {
                   ...acc,
@@ -127,6 +160,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
                     label: groupKey,
                     options: group.map(option => ({
                       label: option.label,
+                      unit: option.unit,
                       value: option.name,
                     })),
                   },
@@ -136,28 +170,55 @@ class PrototypeTableToolPage extends Component<{}, State> {
             ),
           },
         },
-        indicators: {
-          ...Object.entries(publicationMeta.indicators).reduce(
-            (acc, [groupKey, group]) => {
-              return {
-                ...acc,
-                [groupKey]: {
-                  label: groupKey,
-                  options: group.map(option => ({
-                    label: option.label,
-                    unit: option.unit,
-                    value: option.name,
-                  })),
-                },
-              };
-            },
-            {},
-          ),
-        },
+        publicationSubjectName: '',
+        tableData: [],
       },
-      publicationSubjectName: '',
-      tableData: [],
-    });
+      async () => {
+        const { indicators, categorical } = this.state.filters;
+        const { characteristics } = categorical;
+        const schoolTypes = categorical.schoolTypes as SchoolType[];
+
+        const formatToAcademicYear = (year: string | number) => {
+          const nextYear = parseInt(year as string, 0) + 1;
+          return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
+        };
+
+        const startDate = 2012;
+        const endDate = 2016;
+
+        const {
+          result,
+        } = await tableBuilderService.getNationalCharacteristicsData({
+          characteristics,
+          indicators,
+          schoolTypes,
+          endYear: formatToAcademicYear(endDate),
+          publicationId: this.state.publicationId,
+          startYear: formatToAcademicYear(startDate),
+        });
+
+        const years = range(startDate, endDate + 1).map(formatToAcademicYear);
+
+        this.setState(
+          {
+            filters: {
+              categorical,
+              indicators,
+              years,
+            },
+            tableData: result,
+          },
+          () => {
+            if (this.dataTableRef.current) {
+              this.dataTableRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
+            }
+          },
+        );
+      },
+    );
   };
 
   private handleFilterFormSubmit: FilterFormSubmitHandler = async ({
@@ -281,27 +342,20 @@ class PrototypeTableToolPage extends Component<{}, State> {
           </div>
         </section>
 
-        {publicationSubjectName && (
-          <section className="govuk-form-group" ref={this.filtersRef}>
-            <h2>
-              3. Choose your filters for '{publicationName}'
-              <span className="govuk-hint">
-                Select any combination of filters.
-              </span>
-            </h2>
-
-            <FiltersForm
-              specification={metaSpecification}
-              onSubmit={this.handleFilterFormSubmit}
-            />
-          </section>
-        )}
+        {/*{publicationSubjectName && (*/}
+        {/*<section className="govuk-form-group" ref={this.filtersRef}>*/}
+        {/*<h2>*/}
+        {/*3. Choose your filters for '{publicationName}'*/}
+        {/*<span className="govuk-hint">*/}
+        {/*Select any combination of filters.*/}
+        {/*</span>*/}
+        {/*</h2>*/}
 
         {tableData.length > 0 && (
           <section ref={this.dataTableRef}>
             <h2>4. Explore data for '{publicationName}'</h2>
 
-            <PrototypeDataTable
+            <TimePeriodDataTable
               filters={filters}
               specification={metaSpecification}
               results={tableData}

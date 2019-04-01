@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import React, { Component } from 'react';
-import styles from './PrototypeGroupedDataTable.module.scss';
+import styles from 'src/prototypes/table-tool/components/TimePeriodDataTable.module.scss';
 
 export interface HeaderGroup {
   label: string;

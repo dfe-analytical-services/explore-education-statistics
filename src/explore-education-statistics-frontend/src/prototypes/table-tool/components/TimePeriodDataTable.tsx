@@ -1,8 +1,8 @@
-import groupBy from 'lodash/groupBy';
 import max from 'lodash/max';
 import min from 'lodash/min';
 import React, { Component } from 'react';
 import {
+  FilterOption,
   GroupedFilterOptions,
   MetaSpecification,
 } from 'src/prototypes/table-tool/components/meta/initialSpec';
@@ -11,17 +11,6 @@ import PrototypeGroupedDataTable, {
   RowGroup,
 } from 'src/prototypes/table-tool/components/PrototypeGroupedDataTable';
 import { DataTableResult } from 'src/services/tableBuilderService';
-import SchoolType from 'src/services/types/SchoolType';
-
-const schoolKeys: {
-  [key: string]: string;
-} = {
-  [SchoolType.Dummy]: 'Dummy',
-  [SchoolType.State_Funded_Primary]: 'State funded primary schools',
-  [SchoolType.State_Funded_Secondary]: 'State funded secondary schools',
-  [SchoolType.Special]: 'Special schools',
-  [SchoolType.Total]: 'Total',
-};
 
 interface Props {
   filters: {
@@ -35,7 +24,7 @@ interface Props {
   results: DataTableResult[];
 }
 
-class PrototypeDataTable extends Component<Props> {
+class TimePeriodDataTable extends Component<Props> {
   private parseYear(year?: number): string {
     if (!year) {
       return '';
@@ -50,12 +39,21 @@ class PrototypeDataTable extends Component<Props> {
     return `${year}/${Number(yearString.substring(2, 4)) + 1}`;
   }
 
-  private groupByValue(groupedValues: {
-    [group: string]: {
-      options: { value: string; label: string; unit?: string }[];
-    };
-  }): any {
-    return Object.values(groupedValues)
+  private groupByValue(
+    options: GroupedFilterOptions | FilterOption[],
+  ): { [key: string]: FilterOption } {
+    if (Array.isArray(options)) {
+      return options.reduce((acc, option) => {
+        return {
+          ...acc,
+          [option.value]: {
+            ...option,
+          },
+        };
+      }, {});
+    }
+
+    return Object.values(options)
       .flatMap(group => group.options)
       .reduce((acc, option) => {
         return {
@@ -74,41 +72,44 @@ class PrototypeDataTable extends Component<Props> {
     const firstYear = this.parseYear(min(filters.years));
     const lastYear = this.parseYear(max(filters.years));
 
-    const characteristicByValue = this.groupByValue(specification
-      .categoricalFilters.characteristics.options as GroupedFilterOptions);
+    const columnGroupsByValue = this.groupByValue(
+      specification.categoricalFilters.schoolTypes.options,
+    );
+    const rowGroupsByValue = this.groupByValue(
+      specification.categoricalFilters.characteristics.options,
+    );
+
     const indicatorsByValue = this.groupByValue(specification.indicators);
 
-    const dataBySchool = groupBy(results, 'schoolType');
-
-    const header: HeaderGroup[] = categorical.schoolTypes
-      .filter(schoolType => dataBySchool[schoolType])
-      .map(schoolType => {
-        return {
-          columns: years.map(this.parseYear),
-          label: schoolKeys[schoolType],
-        };
-      });
+    const header: HeaderGroup[] = categorical.schoolTypes.map(columnGroup => {
+      return {
+        columns: years.map(this.parseYear),
+        label: columnGroupsByValue[columnGroup].label,
+      };
+    });
 
     const groupedData: RowGroup[] = categorical.characteristics.map(
-      characteristic => {
+      rowGroup => {
         const rows = indicators.map(indicator => {
-          const columnGroups = categorical.schoolTypes.map(schoolType => {
-            return years.map(year => {
+          const columnGroups = categorical.schoolTypes.map(schoolType =>
+            years.map(year => {
               const matchingResult = results.find(result => {
                 return Boolean(
-                  result.indicators[indicator] &&
+                  result.indicators[indicator] !== undefined &&
                     result.characteristic &&
-                    result.characteristic.name === characteristic &&
+                    result.characteristic.name === rowGroup &&
                     result.timePeriod === year &&
                     result.schoolType === schoolType,
                 );
               });
 
               return matchingResult
-                ? matchingResult.indicators[indicator]
+                ? `${matchingResult.indicators[indicator]}${indicatorsByValue[
+                    indicator
+                  ].unit || ''}`
                 : '--';
-            });
-          });
+            }),
+          );
 
           return {
             columnGroups,
@@ -118,7 +119,7 @@ class PrototypeDataTable extends Component<Props> {
 
         return {
           rows,
-          label: characteristicByValue[characteristic].label,
+          label: rowGroupsByValue[rowGroup].label,
         };
       },
     );
@@ -132,7 +133,7 @@ class PrototypeDataTable extends Component<Props> {
           <h3>{`Comparing statistics between ${firstYear} and ${lastYear}`}</h3>
         )}
         <PrototypeGroupedDataTable
-          caption="Test caption"
+          caption=""
           header={header}
           rowGroups={groupedData}
         />
@@ -141,4 +142,4 @@ class PrototypeDataTable extends Component<Props> {
   }
 }
 
-export default PrototypeDataTable;
+export default TimePeriodDataTable;
