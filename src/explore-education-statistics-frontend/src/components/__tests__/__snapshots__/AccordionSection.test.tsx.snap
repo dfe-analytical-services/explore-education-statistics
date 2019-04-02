@@ -3,11 +3,11 @@
 exports[`AccordionSection renders correctly with required props 1`] = `
 
 <div class="govuk-accordion__section">
-  <div class="govuk-accordion__section-header">
+  <div class="govuk-accordion__section-header"
+       data-testid="SectionHeader Test heading"
+  >
     <h2 class="govuk-accordion__section-heading">
-      <span class="govuk-accordion__section-button"
-            data-testid="Test heading"
-      >
+      <span class="govuk-accordion__section-button">
         Test heading
       </span>
     </h2>
@@ -31,11 +31,11 @@ exports[`AccordionSection renders correctly with required props 1`] = `
 exports[`AccordionSection renders with caption 1`] = `
 
 <div class="govuk-accordion__section">
-  <div class="govuk-accordion__section-header">
+  <div class="govuk-accordion__section-header"
+       data-testid="SectionHeader Test heading"
+  >
     <h2 class="govuk-accordion__section-heading">
-      <span class="govuk-accordion__section-button"
-            data-testid="Test heading"
-      >
+      <span class="govuk-accordion__section-button">
         Test heading
       </span>
     </h2>
@@ -62,11 +62,11 @@ exports[`AccordionSection renders with caption 1`] = `
 exports[`AccordionSection renders with different heading size 1`] = `
 
 <div class="govuk-accordion__section">
-  <div class="govuk-accordion__section-header">
+  <div class="govuk-accordion__section-header"
+       data-testid="SectionHeader Test heading"
+  >
     <h3 class="govuk-accordion__section-heading">
-      <span class="govuk-accordion__section-button"
-            data-testid="Test heading"
-      >
+      <span class="govuk-accordion__section-button">
         Test heading
       </span>
     </h3>

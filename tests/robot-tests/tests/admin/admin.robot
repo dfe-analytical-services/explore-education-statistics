@@ -1,6 +1,8 @@
 *** Settings ***
 Resource    ../libs/library.robot
 
+Force Tags  Admin
+
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
 

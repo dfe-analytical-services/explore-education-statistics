@@ -1,12 +1,7 @@
 *** Settings ***
-Documentation   DFE-115 Setup automated testing framework
-...             DFE-98 General Public - 'Where Does The Data Come From?'
-...             DFE-100 General Public - See All (4) Updates
-...             DFE-101 General Public - See Previous Year/s
-...             DFE-102 General Public - Getting the data
-...             DFE-103 General Public - Publication Page
-
 Resource    ../libs/library.robot
+
+Force Tags  GeneralPublic
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -18,8 +13,8 @@ Navigate to Absence publication
     user clicks link  Find statistics and data
     user waits until page contains  Browse to find the statistics and data you’re looking for
 
-    user clicks element   css:[data-testid="Absence and exclusions"]
-    element attribute value should be  css:[data-testid="Absence and exclusions"]   aria-expanded   true
+    user clicks element   css:[data-testid="SectionHeader Absence and exclusions"] button
+    element attribute value should be  css:[data-testid="SectionHeader Absence and exclusions"] button   aria-expanded   true
 
     user clicks element   css:[data-testid="view-stats-pupil-absence-in-schools-in-england"]
     user waits until page contains  Pupil absence data and statistics for schools in England
@@ -30,8 +25,78 @@ Validate URL
     ${current_url}=  get location
     should be equal   ${current_url}   ${url}/statistics/pupil-absence-in-schools-in-england
 
-Validate Key Statistics data block
+Validate "About these statistics" -- "For school year"
+    [Documentation]  DFE-197
+    [Tags]  HappyPath
+    user checks element contains  css:[data-testid="release-period"]    2016 to 2017 (latest data)
+
+    user clicks element  css:[data-testid="See previous 7 releases"] [data-testid="details--expand"]
+    element attribute value should be  css:[data-testid="See previous 7 releases"] summary   aria-expanded   true
+
+    user checks element contains  css:[data-testid="previous-releases-list"] li:nth-child(1) a    2015 to 2016
+    user checks element contains  css:[data-testid="previous-releases-list"] li:nth-child(2) a    2014 to 2015
+    user checks element contains  css:[data-testid="previous-releases-list"] li:nth-child(3) a    2013 to 2014
+    user checks element contains  css:[data-testid="previous-releases-list"] li:nth-child(4) a    2012 to 2013
+    user checks element contains  css:[data-testid="previous-releases-list"] li:nth-child(5) a    2011 to 2012
+    user checks element contains  css:[data-testid="previous-releases-list"] li:nth-child(6) a    2010 to 2011
+    user checks element contains  css:[data-testid="previous-releases-list"] li:nth-child(7) a    2009 to 2010
+
+    user clicks element  css:[data-testid="See previous 7 releases"] [data-testid="details--expand"]
+    element attribute value should be  css:[data-testid="See previous 7 releases"] summary   aria-expanded   false
+
+
+Validate "About these statistics" -- "Published"
+    [Tags]     HappyPath
+    user checks element contains  css:[data-testid="published-date"] time   22 March 2017
+
+Validate "About these statistics" -- "Last updated"
+    [Tags]     HappyPath
+    user checks element contains  css:[data-testid="last-updated"] time     19 April 2017
+
+    user clicks element   css:[data-testid="See all 2 updates"] [data-testid="details--expand"]
+    element attribute value should be  css:[data-testid="See all 2 updates"] summary   aria-expanded   true
+
+    user checks element contains  css:[data-testid="last-updated-element"]:nth-child(1) time   19 April 2017
+    user checks element contains  css:[data-testid="last-updated-element"]:nth-child(1) p   Underlying data file updated to include absence data
+
+    user checks element contains  css:[data-testid="last-updated-element"]:nth-child(2) time   22 March 2017
+    user checks element contains  css:[data-testid="last-updated-element"]:nth-child(2) p   First published.
+
+    user clicks element   css:[data-testid="See all 2 updates"] [data-testid="details--expand"]
+    element attribute value should be  css:[data-testid="See all 2 updates"] summary   aria-expanded   false
+
+Validate Key Statistics data block -- Summary tab
     [Tags]  HappyPath
     user checks element contains  css:[data-testid="tile Overall absence rate       4.7%
     user checks element contains  css:[data-testid="tile Authorised absence rate    3.4%
     user checks element contains  css:[data-testid="tile Unauthorised absence rate  1.3%
+
+    user checks element contains  css:[data-testid="Summary"] li:nth-child(1)   pupils missed on average 8.2 school days
+    user checks element contains  css:[data-testid="Summary"] li:nth-child(2)   overall and unauthorised absence rates up on previous year
+    user checks element contains  css:[data-testid="Summary"] li:nth-child(3)   unauthorised rise due to higher rates of unauthorised holidays
+    user checks element contains  css:[data-testid="Summary"] li:nth-child(4)   10% of pupils persistently absent during 2016/17
+
+Validate Contents section headings
+    [Tags]  HappyPath
+    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader About this release"]
+    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader Absence rates"]
+    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader Persistent absence"]
+    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader Reasons for absence"]
+    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader Distribution of absence"]
+    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader Absence by pupil characteristics"]
+    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader Absence for four year olds"]
+    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader Pupil referral unit absence"]
+    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader Pupil absence by local authority"]
+
+Validate Extra Information section headings
+    [Tags]  HappyPath
+    user waits until page contains element  css:[data-testid="extra-information"]+div [data-testid="SectionHeader Where does this data come from"]
+    user waits until page contains element  css:[data-testid="extra-information"]+div [data-testid="SectionHeader Feedback and questions"]
+    user waits until page contains element  css:[data-testid="extra-information"]+div [data-testid="SectionHeader Contact us"]
+
+Clicking "Go to top" move user to the top of the page
+    [Tags]  HappyPath
+    scroll element into view  link:Go to top
+    user clicks element  link:Go to top
+    user should be at top of page
+
