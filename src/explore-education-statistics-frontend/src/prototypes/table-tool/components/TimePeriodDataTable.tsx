@@ -103,11 +103,15 @@ class TimePeriodDataTable extends Component<Props> {
                 );
               });
 
-              return matchingResult
-                ? `${matchingResult.indicators[indicator]}${indicatorsByValue[
-                    indicator
-                  ].unit || ''}`
-                : '--';
+              if (!matchingResult) {
+                return '--';
+              }
+
+              const value = Number(
+                matchingResult.indicators[indicator],
+              ).toLocaleString('en-GB');
+
+              return `${value}${indicatorsByValue[indicator].unit}`;
             }),
           );
 
