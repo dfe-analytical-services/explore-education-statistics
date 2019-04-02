@@ -20,11 +20,6 @@
     text-align: center;
   }
 
-  .govuk-table__header--border-left,
-  .govuk-table__cell--border-left {
-    border-left: 1px solid $govuk-border-colour;
-  }
-
   caption {
     @extend .govuk-table__caption;
   }

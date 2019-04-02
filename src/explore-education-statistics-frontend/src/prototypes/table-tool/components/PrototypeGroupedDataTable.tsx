@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import React, { Component } from 'react';
-import styles from 'src/prototypes/table-tool/components/TimePeriodDataTable.module.scss';
+import styles from 'src/prototypes/table-tool/components/PrototypeGroupedDataTable.module.scss';
 
 export interface HeaderGroup {
   label: string;
@@ -26,7 +26,7 @@ class PrototypeGroupedDataTable extends Component<Props> {
     const { caption, headers, rowGroups } = this.props;
 
     return (
-      <div className={styles.tableContainer}>
+      <div className={styles.container}>
         <table className="govuk-table">
           <caption>{caption}</caption>
 
@@ -35,7 +35,10 @@ class PrototypeGroupedDataTable extends Component<Props> {
               <th colSpan={2} />
               {headers.map((group, index) => (
                 <th
-                  className="govuk-table__header--center govuk-table__header--border-left"
+                  className={classNames(
+                    'govuk-table__header--center',
+                    styles.borderLeft,
+                  )}
                   colSpan={group.columns.length || 1}
                   scope="colgroup"
                   key={`${group.label}-${index}`}
@@ -44,13 +47,13 @@ class PrototypeGroupedDataTable extends Component<Props> {
                 </th>
               ))}
             </tr>
-            <tr>
+            <tr className={styles.borderBottom}>
               <th colSpan={2} />
               {headers.flatMap(group =>
                 group.columns.map((column, index) => (
                   <th
                     className={classNames('govuk-table__header--numeric', {
-                      'govuk-table__header--border-left': index === 0,
+                      [styles.borderLeft]: index === 0,
                     })}
                     scope="col"
                     key={`${group.label}-${column}-${index}`}
@@ -65,7 +68,7 @@ class PrototypeGroupedDataTable extends Component<Props> {
             const groupKey = `${group.label}-${groupIndex}`;
 
             return (
-              <tbody key={groupKey}>
+              <tbody key={groupKey} className={styles.borderBottom}>
                 {group.rows.map((row, rowIndex) => {
                   const rowKey = `${groupKey}-${row.label}-${rowIndex}`;
 
@@ -76,7 +79,15 @@ class PrototypeGroupedDataTable extends Component<Props> {
                           {group.label}
                         </th>
                       )}
-                      <th scope="row">{row.label}</th>
+                      <th
+                        scope="row"
+                        className={classNames(
+                          'govuk-table__cell--numeric',
+                          styles.borderRight,
+                        )}
+                      >
+                        {row.label}
+                      </th>
                       {row.columnGroups.flatMap((colGroup, colGroupIndex) =>
                         colGroup.map((column, columnIndex) => {
                           return (
@@ -84,8 +95,7 @@ class PrototypeGroupedDataTable extends Component<Props> {
                               className={classNames(
                                 'govuk-table__cell--numeric',
                                 {
-                                  'govuk-table__cell--border-left':
-                                    columnIndex === 0,
+                                  [styles.borderLeft]: columnIndex === 0,
                                 },
                               )}
                               key={`${rowKey}-${colGroupIndex}-${column}-${columnIndex}`}
