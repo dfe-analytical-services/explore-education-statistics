@@ -45,17 +45,16 @@ const AccordionSection = ({
         'govuk-accordion__section--expanded': open,
       })}
     >
-      <div className="govuk-accordion__section-header">
+      <div
+        className="govuk-accordion__section-header"
+        data-testid={`SectionHeader ${heading}`}
+      >
         {createElement(
           headingTag,
           {
             className: 'govuk-accordion__section-heading',
           },
-          <span
-            className="govuk-accordion__section-button"
-            id={headingId}
-            data-testid={heading}
-          >
+          <span className="govuk-accordion__section-button" id={headingId}>
             {heading}
           </span>,
         )}
