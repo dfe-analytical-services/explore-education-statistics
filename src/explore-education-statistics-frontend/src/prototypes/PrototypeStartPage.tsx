@@ -32,7 +32,7 @@ const StartPage = () => {
               className="govuk-link"
               href="https://www.education-ni.gov.uk/topics/statistics-and-research/statistics"
             >
-              Northern Ireland not the southern bit
+              Northern Ireland
             </a>
             ,{' '}
             <a
