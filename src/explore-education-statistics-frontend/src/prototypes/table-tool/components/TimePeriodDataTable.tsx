@@ -134,7 +134,7 @@ class TimePeriodDataTable extends Component<Props> {
         )}
         <PrototypeGroupedDataTable
           caption=""
-          header={header}
+          headers={header}
           rowGroups={groupedData}
         />
       </div>

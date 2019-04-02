@@ -17,13 +17,13 @@ export interface RowGroup {
 
 interface Props {
   caption: string;
-  header: HeaderGroup[];
+  headers: HeaderGroup[];
   rowGroups: RowGroup[];
 }
 
 class PrototypeGroupedDataTable extends Component<Props> {
   public render() {
-    const { caption, header, rowGroups } = this.props;
+    const { caption, headers, rowGroups } = this.props;
 
     return (
       <div className={styles.tableContainer}>
@@ -33,7 +33,7 @@ class PrototypeGroupedDataTable extends Component<Props> {
           <thead>
             <tr>
               <th colSpan={2} />
-              {header.map((group, index) => (
+              {headers.map((group, index) => (
                 <th
                   className="govuk-table__header--center govuk-table__header--border-left"
                   colSpan={group.columns.length || 1}
@@ -46,7 +46,7 @@ class PrototypeGroupedDataTable extends Component<Props> {
             </tr>
             <tr>
               <th colSpan={2} />
-              {header.flatMap(group =>
+              {headers.flatMap(group =>
                 group.columns.map((column, index) => (
                   <th
                     className={classNames('govuk-table__header--numeric', {
@@ -73,8 +73,8 @@ class PrototypeGroupedDataTable extends Component<Props> {
                         </th>
                       )}
                       <th scope="row">{row.label}</th>
-                      {row.columnGroups.flatMap(columnGroup => {
-                        return columnGroup.map((column, columnIndex) => {
+                      {row.columnGroups.flatMap(columnGroup =>
+                        columnGroup.map((column, columnIndex) => {
                           return (
                             <td
                               className={classNames(
@@ -91,8 +91,8 @@ class PrototypeGroupedDataTable extends Component<Props> {
                               {column}
                             </td>
                           );
-                        });
-                      })}
+                        }),
+                      )}
                     </tr>
                   );
                 })}
