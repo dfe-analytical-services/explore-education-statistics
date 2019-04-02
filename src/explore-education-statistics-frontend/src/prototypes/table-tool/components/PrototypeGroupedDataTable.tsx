@@ -62,19 +62,23 @@ class PrototypeGroupedDataTable extends Component<Props> {
             </tr>
           </thead>
           {rowGroups.map((group, groupIndex) => {
+            const groupKey = `${group.label}-${groupIndex}`;
+
             return (
-              <tbody key={`${group.label}-${groupIndex}`}>
+              <tbody key={groupKey}>
                 {group.rows.map((row, rowIndex) => {
+                  const rowKey = `${groupKey}-${row.label}-${rowIndex}`;
+
                   return (
-                    <tr key={`${group.label}-${row.label}-${rowIndex}`}>
+                    <tr key={rowKey}>
                       {rowIndex === 0 && (
                         <th scope="rowgroup" rowSpan={group.rows.length || 1}>
                           {group.label}
                         </th>
                       )}
                       <th scope="row">{row.label}</th>
-                      {row.columnGroups.flatMap(columnGroup =>
-                        columnGroup.map((column, columnIndex) => {
+                      {row.columnGroups.flatMap((colGroup, colGroupIndex) =>
+                        colGroup.map((column, columnIndex) => {
                           return (
                             <td
                               className={classNames(
@@ -84,9 +88,7 @@ class PrototypeGroupedDataTable extends Component<Props> {
                                     columnIndex === 0,
                                 },
                               )}
-                              key={`${group.label}-${
-                                row.label
-                              }-${column}-${columnIndex}`}
+                              key={`${rowKey}-${colGroupIndex}-${column}-${columnIndex}`}
                             >
                               {column}
                             </td>
