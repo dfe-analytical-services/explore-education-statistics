@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder
 {
     public class
-        LaCharacteristicResultBuilder : IResultBuilder<ICharacteristicGeographicData, TableBuilderLaCharacteristicData>
+        LaCharacteristicResultBuilder : IResultBuilder<ICharacteristicData, TableBuilderLaCharacteristicData>
     {
         private readonly IMapper _mapper;
 
@@ -16,16 +16,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             _mapper = mapper;
         }
 
-        public TableBuilderLaCharacteristicData BuildResult(ICharacteristicGeographicData data,
+        public TableBuilderLaCharacteristicData BuildResult(ICharacteristicData data,
             ICollection<string> indicatorFilter)
         {
             return new TableBuilderLaCharacteristicData
             {
                 TimePeriod = data.TimePeriod,
                 TimeIdentifier = data.TimeIdentifier,
-                Country = data.Country,
-                Region = data.Region,
-                LocalAuthority = data.LocalAuthority,
+                Country = data.Level.Country,
+                Region = data.Level.Region,
+                LocalAuthority = data.Level.LocalAuthority,
                 SchoolType = data.SchoolType,
                 // TODO Label is not currently set in CharacteristicViewModel. Not sure if it needs to be?
                 // TODO If Label is not used then is CharacteristicViewModel needed?

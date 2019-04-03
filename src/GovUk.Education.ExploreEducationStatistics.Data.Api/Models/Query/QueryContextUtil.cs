@@ -11,26 +11,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public static Expression<Func<T, bool>> ReleaseExpression<T>(long releaseId)
             where T : ITidyData
         {
-            return x => x.ReleaseId == releaseId;
+            return x => x.Subject.ReleaseId == releaseId;
         }
 
         public static Expression<Func<T, bool>> LevelExpression<T>(Level level)
             where T : ITidyData
         {
-            return x => x.Level == level;
+            return x => x.Level.Level == level;
         }
 
         public static Expression<Func<T, bool>> RegionsExpression<T>(IEnumerable<string> regions)
-            where T : IGeographicData
+            where T : ITidyData
         {
-            return x => regions == null || !regions.Any() || regions.Contains(x.RegionCode);
+            return x => regions == null || !regions.Any() || regions.Contains(x.Level.Region.Code);
         }
 
         public static Expression<Func<T, bool>> LocalAuthoritiesExpression<T>(IEnumerable<string> localAuthorities)
-            where T : IGeographicData
+            where T : ITidyData
         {
             return x => localAuthorities == null || !localAuthorities.Any() ||
-                        localAuthorities.Contains(x.LocalAuthorityCode);
+                        localAuthorities.Contains(x.Level.LocalAuthority.Code);
         }
 
         public static Expression<Func<T, bool>> SchoolTypeExpression<T>(IEnumerable<SchoolType> schoolTypes)

@@ -15,15 +15,12 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
         public DebugControllerTests()
         {
             var geographicDataService = new Mock<IGeographicDataService>();
-            var nationalCharacteristicDataService = new Mock<INationalCharacteristicDataService>();
-            var laCharacteristicDataService = new Mock<ILaCharacteristicDataService>();
+            var characteristicDataService = new Mock<ICharacteristicDataService>();
 
             geographicDataService.Setup(g => g.Count()).Returns(Task.FromResult(100));
-            nationalCharacteristicDataService.Setup(g => g.Count()).Returns(Task.FromResult(200));
-            laCharacteristicDataService.Setup(g => g.Count()).Returns(Task.FromResult(300));
+            characteristicDataService.Setup(g => g.Count()).Returns(Task.FromResult(200));
 
-            _controller = new DebugController(geographicDataService.Object, nationalCharacteristicDataService.Object,
-                laCharacteristicDataService.Object);
+            _controller = new DebugController(geographicDataService.Object, characteristicDataService.Object);
         }
 
         [Fact]
@@ -36,8 +33,7 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
             var actionResult = await result;
             
             Assert.Equal(100, actionResult.Value.geographicCount);
-            Assert.Equal(200, actionResult.Value.nationalCharacteristicCount);
-            Assert.Equal(300, actionResult.Value.laCharacteristicCount);
+            Assert.Equal(200, actionResult.Value.characteristicCount);
         }
     }
 }

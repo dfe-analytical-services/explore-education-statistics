@@ -4,9 +4,9 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class LaCharacteristicDataService : AbstractDataService<CharacteristicDataLa>, ILaCharacteristicDataService
+    public class CharacteristicDataService : AbstractDataService<CharacteristicData, long>, ICharacteristicDataService
     {
-        public LaCharacteristicDataService(ApplicationDbContext context, ILogger<LaCharacteristicDataService> logger) :
+        public CharacteristicDataService(ApplicationDbContext context, ILogger<CharacteristicDataService> logger) :
             base(context, logger)
         {
         }

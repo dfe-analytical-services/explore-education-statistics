@@ -34,10 +34,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                 .AddJsonFile("appsettings.json", true, true)
                 .Build();
 
+            services.AddMemoryCache();
+
             services.AddLogging(builder => builder.AddConsole().AddConfiguration(configuration.GetSection("Logging")))
                 .AddDbContext<ApplicationDbContext>(options =>
                     options
-                        .UseSqlServer("Server=db;Database=master;User=SA;Password=Your_Password123;")
+                        .UseSqlServer("Server=localhost;Database=master;User=SA;Password=Your_Password123;")
                         .EnableSensitiveDataLogging()
                 )
                 .AddSingleton<ISeedService, SeedService>()

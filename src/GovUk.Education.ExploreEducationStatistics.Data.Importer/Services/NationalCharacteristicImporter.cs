@@ -3,20 +3,21 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
     public class NationalCharacteristicImporter : Importer
     {
-        public NationalCharacteristicImporter(ApplicationDbContext context,
-            ILogger<NationalCharacteristicImporter> logger) : base(context, logger)
+        public NationalCharacteristicImporter(IMemoryCache cache, ApplicationDbContext context, ILogger<NationalCharacteristicImporter> logger)
+            : base(cache, context, logger)
         {
         }
 
         protected override TidyData TidyDataFromCsv(string csvLine,
             List<string> headers,
-            Release release)
+            Subject subject)
         {
             var headerValues = new[]
             {
@@ -24,18 +25,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 "characteristic_breakdown", "characteristic_label"
             };
             var values = csvLine.Split(',');
-            var model = new CharacteristicDataNational
+            var model = new CharacteristicData
             {
-                PublicationId = release.PublicationId,
-                Release = release,
+                Subject = subject,
                 TimePeriod = int.Parse(values[headers.FindIndex(h => h.Equals("time_period"))]),
                 TimeIdentifier = values[headers.FindIndex(h => h.Equals("time_identifier"))],
-                Level = Levels.EnumFromStringForImport(values[headers.FindIndex(h => h.Equals("level"))]),
-                Country = new Country
-                {
-                    Code = values[headers.FindIndex(h => h.Equals("country_code"))],
-                    Name = values[headers.FindIndex(h => h.Equals("country_name"))]
-                },
                 SchoolType =
                     SchoolTypes.EnumFromStringForImport(values[headers.FindIndex(h => h.Equals("school_type"))]),
                 Indicators = new Dictionary<string, string>(),
@@ -53,6 +47,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     model.Indicators.Add(headers[i], values[i]);
                 }
             }
+
+            var level = Levels.EnumFromStringForImport(values[headers.FindIndex(h => h.Equals("level"))]);
+
+            var country = new Country
+            {
+                Code = values[headers.FindIndex(h => h.Equals("country_code"))],
+                Name = values[headers.FindIndex(h => h.Equals("country_name"))]
+            };
+
+            model.Level = LookupCachedLevelOrSet(level, country);
 
             return model;
         }
