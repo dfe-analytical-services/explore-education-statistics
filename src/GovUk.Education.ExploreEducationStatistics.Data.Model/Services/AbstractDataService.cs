@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public abstract class AbstractDataService<TEntity> : IDataService<TEntity> where TEntity : class
+    public abstract class AbstractDataService<TEntity, TKey> : IDataService<TEntity, TKey> where TEntity : class
     {
         private readonly ApplicationDbContext _context;
 
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return DbSet();
         }
 
-        public TEntity Find(object id, List<Expression<Func<TEntity, object>>> include)
+        public TEntity Find(TKey id, List<Expression<Func<TEntity, object>>> include)
         {
             var queryable = DbSet().AsQueryable();
             include.ForEach(i => queryable = queryable.Include(i));
@@ -50,8 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .FilterByPrimaryKey(_context, id)
                 .SingleOrDefault();
         }
-        
-        public TEntity Find(object id)
+
+        public TEntity Find(TKey id)
         {
             return DbSet().Find(id);
         }

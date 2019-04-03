@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces
 {
-    public interface ISubjectService : IDataService<Subject>
+    public interface ISubjectService : IDataService<Subject, long>
     {
         IEnumerable<SubjectMetaViewModel> GetSubjectMetas(Guid publicationId);
 

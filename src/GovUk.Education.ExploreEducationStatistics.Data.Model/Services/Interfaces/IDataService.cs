@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces
 {
-    public interface IDataService<TEntity> where TEntity : class
+    public interface IDataService<TEntity, in TKey> where TEntity : class
     {
         Task<int> Count();
 
@@ -13,9 +13,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 
         IEnumerable<TEntity> All();
 
-        TEntity Find(object id);
+        TEntity Find(TKey id);
         
-        TEntity Find(object id, List<Expression<Func<TEntity, object>>> include);
+        TEntity Find(TKey id, List<Expression<Func<TEntity, object>>> include);
         
         IEnumerable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression,
             List<Expression<Func<TEntity, object>>> include = null);

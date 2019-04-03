@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
-    public class SubjectService : AbstractDataService<Subject>, ISubjectService
+    public class SubjectService : AbstractDataService<Subject, long>, ISubjectService
     {
         private readonly IReleaseService _releaseService;
         private readonly IMapper _mapper;

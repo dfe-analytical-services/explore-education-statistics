@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
-    public class ReleaseService : AbstractDataService<Release>, IReleaseService
+    public class ReleaseService : AbstractDataService<Release, long>, IReleaseService
     {
 
         public ReleaseService(ApplicationDbContext context, ILogger<ReleaseService> logger) :

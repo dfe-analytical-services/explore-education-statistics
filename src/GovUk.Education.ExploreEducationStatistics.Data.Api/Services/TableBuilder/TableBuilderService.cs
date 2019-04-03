@@ -49,17 +49,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             return BuildResult(_characteristicDataService, query, _characteristicResultBuilder);
         }
 
-        private IEnumerable<T> GetData<T>(IDataService<T> dataService, IQueryContext<T> queryContext) where T : TidyData
+        private IEnumerable<TEntity> GetData<TEntity, TKey>(IDataService<TEntity, TKey> dataService,
+            IQueryContext<TEntity> queryContext) where TEntity : TidyData
         {
             var releaseId = _releaseService.GetLatestRelease(queryContext.PublicationId);
             return dataService.FindMany(queryContext.FindExpression(releaseId),
-                new List<Expression<Func<T, object>>> {data => data.Level, data => data.Subject, data => data.Subject.Release}
+                new List<Expression<Func<TEntity, object>>>
+                    {data => data.Level, data => data.Subject, data => data.Subject.Release}
             );
         }
 
-        private TableBuilderResult BuildResult<T>(IDataService<T> dataService,
-            IQueryContext<T> queryContext,
-            IResultBuilder<T, ITableBuilderData> resultBuilder) where T : TidyData
+        private TableBuilderResult BuildResult<TEntity, TKey>(IDataService<TEntity, TKey> dataService,
+            IQueryContext<TEntity> queryContext,
+            IResultBuilder<TEntity, ITableBuilderData> resultBuilder) where TEntity : TidyData
         {
             var data = GetData(dataService, queryContext);
 

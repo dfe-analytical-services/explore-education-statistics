@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces
 {
-    public interface ICharacteristicDataService : IDataService<CharacteristicData>
+    public interface ICharacteristicDataService : IDataService<CharacteristicData, long>
     {
     }
 }
