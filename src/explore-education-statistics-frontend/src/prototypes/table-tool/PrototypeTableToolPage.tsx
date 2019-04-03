@@ -173,29 +173,20 @@ class PrototypeTableToolPage extends Component<{}, State> {
         <PageTitle caption="Table tool" title="Create your own tables online" />
 
         <p>
-          Choose the statistics and data and geographical subject area you want
-          to explore and then use the following filters to create your table:
+          Choose the data and area of interest you want to explore and then use
+          the filters to create your table.
         </p>
 
-        <ul>
-          <li>academic years</li>
-          <li>school types</li>
-          <li>statistical indicators</li>
-          <li>pupil charactertistics</li>
-        </ul>
-
         <p>
-          Once you've built your table, you can download the statistics and data
-          for your own analysis.
+          Once you've built your table, you can download the data it contains
+          for your own offline analysis.
         </p>
 
         <section className="govuk-grid-row">
           <div className="govuk-grid-column-one-half">
             <h2>
-              1. Choose your statistics and data
-              <span className="govuk-hint">
-                Select a statistical and data set.
-              </span>
+              1. Choose your data
+              <span className="govuk-hint">Select a data set.</span>
             </h2>
 
             <PublicationMenu
@@ -208,9 +199,9 @@ class PrototypeTableToolPage extends Component<{}, State> {
             {publicationId && (
               <>
                 <h2>
-                  2. Choose your subject area
+                  2. Choose your area of interest
                   <span className="govuk-hint">
-                    Select a geographical subject area for '{publicationName}'.
+                    Select an area of interest.
                   </span>
                 </h2>
 
@@ -275,7 +266,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
 
         {tableData.length > 0 && (
           <section ref={this.dataTableRef}>
-            <h2>3. Explore statistics and data for '{publicationName}'</h2>
+            <h2>4. Explore data for '{publicationName}'</h2>
 
             <CharacteristicsDataTable
               characteristics={filters.characteristics}

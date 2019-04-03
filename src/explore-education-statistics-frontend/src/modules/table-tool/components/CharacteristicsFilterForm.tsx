@@ -60,7 +60,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
   private schoolTypeOptions = [
     {
       id: 'filter-schoolTypes-total',
-      label: 'Total',
+      label: 'All schools',
       value: SchoolType.Total,
     },
     {
@@ -75,7 +75,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
     },
     {
       id: 'filter-schoolTypes-special',
-      label: 'Special',
+      label: 'Special schools',
       value: SchoolType.Special,
     },
   ];
@@ -123,7 +123,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
           startYear: 2012,
         }}
         validationSchema={Yup.object({
-          characteristics: Yup.array().required('Select at least one option'),
+          characteristics: Yup.array().required('Select at least 1 option'),
           endYear: Yup.number()
             .required('End year is required')
             .oneOf(this.yearValues, 'Must be one of provided years')
@@ -131,8 +131,8 @@ class CharacteristicsFilterForm extends Component<Props, State> {
               Yup.ref('startYear'),
               'Must be after or same as start year',
             ),
-          indicators: Yup.array().required('Select at least one option'),
-          schoolTypes: Yup.array().required('Select at least one option'),
+          indicators: Yup.array().required('Select at least 1 option'),
+          schoolTypes: Yup.array().required('Select at least 1 option'),
           startYear: Yup.number()
             .required('Start year is required')
             .oneOf(this.yearValues, 'Must be one of provided years')
@@ -194,7 +194,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                       id="filter-schoolTypes"
                       name="schoolTypes"
                       legend="School types"
-                      hint="Select school types."
+                      hint="Select types of school."
                       options={this.schoolTypeOptions}
                       selectAll
                     />
@@ -203,7 +203,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                     <FormFieldset
                       id="filter-indicators"
                       legend="Indicators"
-                      hint="Select at least 1 statistical indicator."
+                      hint="Select at least 1 indicator."
                       error={getError('indicators')}
                     >
                       <SearchableFilterMenus<FormValues>
@@ -218,7 +218,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                     <FormFieldset
                       id="filter-characteristics"
                       legend="Characteristics"
-                      hint="Select at least 1 pupil characteristic."
+                      hint="Select at least 1 group."
                       error={getError('characteristics')}
                     >
                       <SearchableFilterMenus<FormValues>
@@ -236,7 +236,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
 
                   <FormTextInput
                     id="characteristic-search"
-                    label="Enter a characteristic or indicator."
+                    label="Enter a group or indicator."
                     name="characteristicSearch"
                     onChange={event => {
                       event.persist();
