@@ -232,7 +232,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                 </div>
 
                 <FormGroup>
-                  <h3>Search for characteristics and indicators</h3>
+                  <h3>Search for groups and indicators</h3>
 
                   <FormTextInput
                     id="characteristic-search"

@@ -39,30 +39,33 @@ const PublicationPage = () => {
           </dl>
 
           <p className="govuk-body">
-            Read national statistical summaries and definitions, view charts and
-            tables and download data files across a range of pupil absence
-            subject areas.
+            Read national statistical summaries, view charts and tables and
+            download pupil absence data files.
           </p>
-          <p className="govuk-body">
-            You can also view a regional breakdown of statistics and data within
-            the{' '}
+
+          <p className="govuk-inset-text">
+            View a regional breakdown of statistics and data within the{' '}
             <a href="#contents-sections-heading-9">
-              <strong>local authorities section</strong>
+              'Pupil absence by local authority' section
             </a>
           </p>
 
           <p>
+            Find out more -{' '}
             <Link to="/prototypes/methodology-absence">
-              Find out more about our pupil absence data and statistics
-              methodology and terminology
+              Pupil absence statistics: methodology
             </Link>
           </p>
 
-          <Details summary="Download underlying data files">
+          <Details summary="Download data files">
+            <p>
+              You can customise and download data as Excel or .csv files. Our
+              data can also be accessed via an API.
+            </p>
             <ul className="govuk-list">
               <li>
                 <a href="#" className="govuk-link">
-                  Download pdf files
+                  Download .csv files
                 </a>
               </li>
               <li>
@@ -72,12 +75,16 @@ const PublicationPage = () => {
               </li>
               <li>
                 <a href="#" className="govuk-link">
-                  Download .csv files
+                  Download pdf files
                 </a>
               </li>
               <li>
                 <a href="#" className="govuk-link">
                   Access API
+                </a>{' '}
+                -{' '}
+                <a href="#" className="govuk-link">
+                  What is an API?
                 </a>
               </li>
             </ul>
@@ -177,7 +184,7 @@ const PublicationPage = () => {
               <ul className="govuk-list">
                 <li>
                   <Link to="/prototypes/methodology-absence">
-                    Pupil absence statistics: guidance and methodology
+                    Pupil absence statistics: methodology
                   </Link>
                 </li>
               </ul>
@@ -186,9 +193,7 @@ const PublicationPage = () => {
         </div>
       </div>
       <hr />
-      <h2 className="govuk-heading-l">
-        Latest headline facts and figures - 2016/17
-      </h2>
+      <h2 className="govuk-heading-l">Headline facts and figures - 2016/17</h2>
       <PrototypeDataSample
         sectionId="headlines"
         chartTitle="change in absence types in England"
@@ -228,7 +233,7 @@ const PublicationPage = () => {
         ]}
         chartDataKeys={['unauthorised', 'authorised', 'overall']}
       />
-      <h2 className="govuk-heading-l">Contents</h2>
+
       <Accordion id="contents-sections">
         <AccordionSection heading="About this release">
           <p className="govuk-body">
@@ -248,7 +253,7 @@ const PublicationPage = () => {
           </p>
         </AccordionSection>
 
-        <AccordionSection heading="Absence rates">
+        <AccordionSection heading="Pupil absence rates">
           <Details summary="Overall absence rate definition">
             The overall absence rate is the total number of overall absence
             sessions for all pupils as a percentage of the total number of
@@ -655,19 +660,19 @@ const PublicationPage = () => {
       </h2>
       <Accordion id="extra-information-sections">
         <AccordionSection
-          heading="Where does this data come from?"
-          caption="Our methodology, how we collect and process the data"
+          heading="Pupil absence statistics: methodology"
+          caption="Wow we collect and process statistics and data"
           headingTag="h3"
         >
           <ul className="govuk-list">
             <li>
               <a href="/prototypes/methodology-absence" className="govuk-link">
-                How do we collect it?
+                How we collect statistics and data?
               </a>
             </li>
             <li>
               <a href="/prototypes/methodology-absence" className="govuk-link">
-                What do we do with it?
+                What do we do with statistics and data?
               </a>
             </li>
             <li>
@@ -731,15 +736,14 @@ const PublicationPage = () => {
         </AccordionSection>
       </Accordion>
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
-        Explore our statistics and data
+        Create your own tables online
       </h2>
       <p>
-        Our statistics and data can be viewed as reports, or you can customise
-        and download as excel or .csv files . The data can also be accessed via
-        an API. <a href="#">What is an API?</a>
+        Use our tool to build tables using our range of national and regional
+        data.
       </p>
       <Link to="/prototypes/table-tool" className="govuk-button">
-        Create your own tables
+        Create tables
       </Link>
       <div className="govuk-!-margin-top-9">
         <a href="#print" className="govuk-link">
