@@ -30,6 +30,8 @@ class App extends BaseApp {
     }
 
     document.body.classList.add('js-enabled');
+
+    import('src/polyfill');
   }
 
   public render() {
