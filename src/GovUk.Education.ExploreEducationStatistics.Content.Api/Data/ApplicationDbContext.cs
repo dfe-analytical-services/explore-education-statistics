@@ -721,8 +721,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     PublicationId = new Guid("bfdcaae1-ce6b-4f63-9b2b-0a1f3942887f"),
                     Published = new DateTime(2018, 6, 20),
                     Slug = "2016-17",
-                    Summary = "",
-
+                    Summary = "This statistical first release (SFR) provides information on the achievements in GCSE examinations and other qualifications of young people in academic year 2016 to 2017. This typically covers those starting the academic year aged 15. \n\n" +
+                              "You can also view a regional breakdown of statistics and data within the [local authorities section](#contents-sections-content-6) \n\n" +
+                              "[Find out more about our GCSE and equivalent results methodology and terminology](#extra-information-sections-heading-1)",
                     KeyStatistics = new DataBlock
                     {
                         Heading = "Latest headline facts and figures - 2016 to 2017",
@@ -759,8 +760,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                             {
                                 new MarkDownBlock
                                 {
-                                    Body ="This release shows results for GCSE and equivalent Key Stage 4 (KS4) qualifications in 2018 across a range of measures, broken down by pupil characteristics and education institutions. Results are also provided on schools below the floor standards and meeting the coasting definition.  \n" +
-                                          "This is an update to Provisional figures released in October 2018. Users should be careful when comparing headline measures to results in previous years given recent methodological changes \n" +
+                                    Body ="This release shows results for GCSE and equivalent Key Stage 4 (KS4) qualifications in 2018 across a range of measures, broken down by pupil characteristics and education institutions. Results are also provided on schools below the floor standards and meeting the coasting definition.  \n\n" +
+                                          "This is an update to Provisional figures released in October 2018. Users should be careful when comparing headline measures to results in previous years given recent methodological changes \n\n" +
                                           "Figures are available at national, regional, local authority, and school level. Figures held in this release are used for policy development and count towards the secondary performance tables. Schools and local authorities also use the statistics to compare their local performance to regional and national averages for different pupil groups."
                                 }
                             }
@@ -775,21 +776,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                 new DataBlock
                                 {
                                     Heading = "Average headline performance measures over time",
-                                    Summary = new Summary
-                                    {
-                                        dataKeys = new List<string>(),
-                                        description = new MarkDownBlock
-                                        {
-                                            Body = ""
-                                        }
-                                    },
-                                    DataQuery = new DataQuery(),
-                                    Charts = new List<IContentBlockChart>()
                                 },
                                 new MarkDownBlock
                                 {
-                                    Body = "Results for 2018 show an increases across all headline measures compared to 2017. **When drawing comparison over time, however, it is very important to note any changes to methodology or data changes underpinning these measures**. For example, changes in Attainment 8 may have been affected by the introduction of further reformed GCSEs graded on the 9-1 scale which have a higher maximum score than unreformed GCSEs. Similarly, in 2016 there were significant changes to the Attainment in English and Maths measure. \n" +
-                                           "These results cover state-funded schools but results for all schools are available in the supporting tables and show slightly lower performance across all headline measures on average. Differences between the figures for all schools and state-funded schools are primarily due to the impact of unapproved and unregulated qualifications such as international GCSEs taken more commonly in independent schools. These qualification are not included in school performance tables. \n" +
+                                    Body = "Results for 2018 show an increases across all headline measures compared to 2017. **When drawing comparison over time, however, it is very important to note any changes to methodology or data changes underpinning these measures**. For example, changes in Attainment 8 may have been affected by the introduction of further reformed GCSEs graded on the 9-1 scale which have a higher maximum score than unreformed GCSEs. Similarly, in 2016 there were significant changes to the Attainment in English and Maths measure. \n\n" +
+                                           "These results cover state-funded schools but results for all schools are available in the supporting tables and show slightly lower performance across all headline measures on average. Differences between the figures for all schools and state-funded schools are primarily due to the impact of unapproved and unregulated qualifications such as international GCSEs taken more commonly in independent schools. These qualification are not included in school performance tables. \n\n" +
                                            "There are five primary headline measures used throughout this report: \n" +
                                            " * **Attainment8** - measures the average achievement of pupils in up to 8 qualifications (including English and Maths). \n" +
                                            " * **Attainment in English & Maths (9-5)** - measures the percentage of pupils achieving a grade 5 or above in both English and maths.\n" +
@@ -837,7 +828,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                            "* girls continue to do better than boys \n" +
                                            "* non-disadvantaged pupils continue to do better than disadvantaged pupils \n" +
                                            "* pupils with no identified Special Educational Needs (SEN) continue to do better perform than SEN pupils \n" +
-                                           "In general the pattern of attainment gaps for Attainment 8 in 2018 remained the same as in 2017 although differences in Attainment 8 scores widened slightly across all groups. This is to be expected due to changes to reformed GCSEs in 2018, meaning more points are available for higher scores.  \n" +
+                                           "In general the pattern of attainment gaps for Attainment 8 in 2018 remained the same as in 2017 although differences in Attainment 8 scores widened slightly across all groups. This is to be expected due to changes to reformed GCSEs in 2018, meaning more points are available for higher scores.  \n\n" +
                                            "Due to changes in performance measures over time, comparability over time is complicated. As such, for disadvantaged pupils is recommended to use to disadvantage gap index instead with is more resilient to changes in grading systems over time. The gap between disadvantaged pupils and others, measured using the gap index, has remained broadly stable, widening by 0.6% in 2018, and narrowing by 9.5% since 2011." 
                                 },
                                 new DataBlock
@@ -859,9 +850,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                 },
                                 new MarkDownBlock
                                 {
-                                    Body = "Results across headline measures differ by ethnicity with Chinese pupils in particular achieving scores above the national average. \n" +
-                                           "Performance across headline measures increased for all major ethnic groups from 2017 to 2018, with the exception of EBacc entries for white pupils were there was a small decrease. \n" +
-                                           "Within the more detailed ethnic groupings, pupils from an Indian background are the highest performing group in key stage 4 headline measures other than Chinese pupils. Gypsy/Roma pupils and traveller of Irish heritage pupils are the lowest performing groups. \n" +
+                                    Body = "Results across headline measures differ by ethnicity with Chinese pupils in particular achieving scores above the national average. \n\n" +
+                                           "Performance across headline measures increased for all major ethnic groups from 2017 to 2018, with the exception of EBacc entries for white pupils were there was a small decrease. \n\n" +
+                                           "Within the more detailed ethnic groupings, pupils from an Indian background are the highest performing group in key stage 4 headline measures other than Chinese pupils. Gypsy/Roma pupils and traveller of Irish heritage pupils are the lowest performing groups. \n\n" +
                                            "For context, White pupils made up 75.8% of pupils at the end of key stage 4 in 2018, 10.6% were Asian, 5.5% were black, 4.7% were mixed, 0.4% were Chinese. The remainder are in smaller breakdowns or unclassified."
                                 }
                             }
@@ -894,7 +885,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                 {
                                     Body ="It is compulsory for pupils to study English and Maths at key stage 4 in state-funded schools.  \n " +
                                           "### Science\n" +
-                                          "It is compulsory for schools to teach Science at Key Stage 4. For these subjects, the proportion of pupils entering continues to increase.  \n " +
+                                          "It is compulsory for schools to teach Science at Key Stage 4. For these subjects, the proportion of pupils entering continues to increase.  \n\n " +
                                           "In 2018, 68.0% of the cohort entered the new combined science pathway rather than the individual science subjects like Chemistry, Biology, Physics or Computer Science. The general pattern is for pupils with higher prior attainment tend to take single sciences; those with lower prior attainment to opt for the combined science pathway; and those with the lowest prior attainment to take no science qualifications. \n " +
                                           "### Humanities \n" +
                                           "The proportion of pupils entering EBacc humanities continued to increase in 2018, to 78.3% in state-funded schools, a rise of 1.5 percentage points since 2017. This was driven by small increases in entries across the majority of prior attainment groups for geography, and small increases in entries for pupils with low and average prior attainment for history. In history, the slight increase in entries from pupils with low and average prior attainment groups was counter-balanced by continued decreases in proportion of entries for high prior attainers. This trend has continued since 2016. \n " +
@@ -918,8 +909,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                 },
                                 new MarkDownBlock
                                 {
-                                    Body ="Schools in England can be divided into state-funded and independent schools (funded by fees paid by attendees). Independent schools are considered separately, because the department holds state-funded schools accountable for their performance.  \n " +
-                                          "The vast majority of pupils in state-funded schools are in either academies (68%) or LA maintained schools (29%). *Converter academies* were high performing schools that chose to convert to academies and have on average higher attainment across the headline measures. *Sponsored academies* were schools that were low performing prior to conversion and tend to perform below the average for state-funded schools.  \n " +
+                                    Body ="Schools in England can be divided into state-funded and independent schools (funded by fees paid by attendees). Independent schools are considered separately, because the department holds state-funded schools accountable for their performance.  \n\n " +
+                                          "The vast majority of pupils in state-funded schools are in either academies (68%) or LA maintained schools (29%). *Converter academies* were high performing schools that chose to convert to academies and have on average higher attainment across the headline measures. *Sponsored academies* were schools that were low performing prior to conversion and tend to perform below the average for state-funded schools.  \n\n " +
                                           "Between 2017 and 2018 EBacc entry remained stable for sponsored academies, with an increase of 0.1 percentage points to 30.1%. EBacc entry fell marginally for converter academies by 0.3 percentage points (from 44.2% to 43.8%). Over the same period, EBacc entry in local authority maintained schools increased by 0.2 percentage points to 37.0%."
                                 }
                             }
@@ -933,8 +924,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                             {
                                 new MarkDownBlock
                                 {
-                                    Body ="Academies are state schools directly funded by the government, each belonging to a trust. Multi-Academy Trusts (MATs) can be responsible for a group of academies and cover around 13.6% of state-funded mainstream pupils. Most MATs are responsible for between 3 and 5 schools but just over 10% cover 11 or more schools.  \n" +
-                                          "Generally speaking MATs are typically more likely to cover previously poor-performing schools and pupils are more likely to have lower prior attainment, be disadvantaged, have special educational needs (SEN) or have English as an additional language (EAL) than the national average. \n" +
+                                    Body ="Academies are state schools directly funded by the government, each belonging to a trust. Multi-Academy Trusts (MATs) can be responsible for a group of academies and cover around 13.6% of state-funded mainstream pupils. Most MATs are responsible for between 3 and 5 schools but just over 10% cover 11 or more schools.  \n\n" +
+                                          "Generally speaking MATs are typically more likely to cover previously poor-performing schools and pupils are more likely to have lower prior attainment, be disadvantaged, have special educational needs (SEN) or have English as an additional language (EAL) than the national average. \n\n" +
                                           "The number of eligible MATs included in Key Stage 4 measures increased from 62 in 2017 to 85 in 2018. This is an increase from 384 to 494 schools, and from 54,356 to 69,169 pupils. "
                                 },
                                 new DataBlock
@@ -943,8 +934,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                 },
                                 new MarkDownBlock
                                 {
-                                    Body ="On Progress8 measures, in 2018, 32.9% of MATs were below the national average and 7.1% well below average. 29.4% were not above or below the national average by a statistically significant amount. \n" +
-                                          "Entry rate in EBacc is lower in MATs compared to the national average – in 2018 43.5% of MATs had an entry rate higher than the national average of 39.1%. The EBacc average point score is also lower in MATs – 32.9% of MATs had an APS higher than the national average. \n" +
+                                    Body ="On Progress8 measures, in 2018, 32.9% of MATs were below the national average and 7.1% well below average. 29.4% were not above or below the national average by a statistically significant amount. \n\n" +
+                                          "Entry rate in EBacc is lower in MATs compared to the national average – in 2018 43.5% of MATs had an entry rate higher than the national average of 39.1%. The EBacc average point score is also lower in MATs – 32.9% of MATs had an APS higher than the national average. \n\n" +
                                           "Analysis by characteristics shows that in 2018 disadvantaged pupils in MATs made more progress than the national average for disadvantaged. However, non-disadvantaged pupils, SEN and non-SEN pupils, pupils with English as a first language and high prior attainment pupils made less progress than the national average for their respective group."
                                 }
                             }
@@ -1028,6 +1019,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     On = new DateTime(2018, 9, 11),
                     Reason =
                         "Added open document version of 'Schools pupils and their characteristics 2018 - Cross-border movement local authority tables'."
+                },
+                new Update
+                {
+                    Id = new Guid("8900bab9-74ec-4b5d-8be1-648ff4870167"),
+                    ReleaseId = new Guid("e7ae88fb-afaf-4d51-a78a-bbb2de671daf"),
+                    On = new DateTime(2018, 6, 2),
+                    Reason = "First published."
                 }
             );
 
