@@ -188,9 +188,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                 },
                 new Publication
                 {
-                    Id = new Guid("bfdcaae1-ce6b-4f63-9b2b-0a1f3942887f"), Title = "KS4 statistics",
-                    Summary = "Lorem ipsum dolor sit amet.", TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"),
-                    Slug = "ks4-statistics"
+                    Id = new Guid("bfdcaae1-ce6b-4f63-9b2b-0a1f3942887f"), 
+                    Title = "GCSE and equivalent results in England",
+                    Summary = "View statistics, create charts and tables and download data files for GCSE and equivalent results in England", 
+                    TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"),
+                    Slug = "gcse-and-equivalent-results-in-england"
                 },
 
                 // Teacher Numbers

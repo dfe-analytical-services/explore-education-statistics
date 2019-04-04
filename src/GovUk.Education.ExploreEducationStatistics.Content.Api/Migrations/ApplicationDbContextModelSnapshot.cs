@@ -286,9 +286,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("bfdcaae1-ce6b-4f63-9b2b-0a1f3942887f"),
-                            Slug = "ks4-statistics",
-                            Summary = "Lorem ipsum dolor sit amet.",
-                            Title = "KS4 statistics",
+                            Slug = "gcse-and-equivalent-results-in-england",
+                            Summary = "View statistics, create charts and tables and download data files for GCSE and equivalent results in England",
+                            Title = "GCSE and equivalent results in England",
                             TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769")
                         },
                         new
