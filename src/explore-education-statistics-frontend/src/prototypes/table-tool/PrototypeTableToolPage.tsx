@@ -73,6 +73,8 @@ class PrototypeTableToolPage extends Component<{}, State> {
       characteristics: [
         'Ethnicity_Major_Black_Total',
         'Ethnicity_Major_White_Total',
+        'Ethnicity_Major_Chinese',
+        'Ethnicity_Major_Mixed_Total',
       ],
       schoolTypes: [
         SchoolType.State_Funded_Primary,
@@ -350,6 +352,13 @@ class PrototypeTableToolPage extends Component<{}, State> {
         {/*Select any combination of filters.*/}
         {/*</span>*/}
         {/*</h2>*/}
+
+        {/*<FiltersForm*/}
+        {/*onSubmit={this.handleFilterFormSubmit}*/}
+        {/*specification={metaSpecification}*/}
+        {/*/>*/}
+        {/*</section>*/}
+        {/*)}*/}
 
         {tableData.length > 0 && (
           <section ref={this.dataTableRef}>

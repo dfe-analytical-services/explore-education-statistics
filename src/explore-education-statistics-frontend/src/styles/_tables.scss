@@ -2,6 +2,8 @@
 
 /* stylelint-disable scss/at-extend-no-missing-placeholder */
 .govuk-table {
+  background: #fff;
+
   th {
     @extend .govuk-table__header;
   }
@@ -22,6 +24,7 @@
 
   caption {
     @extend .govuk-table__caption;
+    background: #fff;
   }
 }
 

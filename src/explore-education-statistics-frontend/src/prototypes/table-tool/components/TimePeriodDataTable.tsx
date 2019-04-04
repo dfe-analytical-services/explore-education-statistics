@@ -1,15 +1,15 @@
 import max from 'lodash/max';
 import min from 'lodash/min';
 import React, { Component } from 'react';
+import FixedHeaderGroupedDataTable, {
+  HeaderGroup,
+  RowGroup,
+} from 'src/prototypes/table-tool/components/FixedHeaderGroupedDataTable';
 import {
   FilterOption,
   GroupedFilterOptions,
   MetaSpecification,
 } from 'src/prototypes/table-tool/components/meta/initialSpec';
-import PrototypeGroupedDataTable, {
-  HeaderGroup,
-  RowGroup,
-} from 'src/prototypes/table-tool/components/PrototypeGroupedDataTable';
 import { DataTableResult } from 'src/services/tableBuilderService';
 
 interface Props {
@@ -136,8 +136,8 @@ class TimePeriodDataTable extends Component<Props> {
         {firstYear !== lastYear && (
           <h3>{`Comparing statistics between ${firstYear} and ${lastYear}`}</h3>
         )}
-        <PrototypeGroupedDataTable
-          caption=""
+        <FixedHeaderGroupedDataTable
+          caption="Test caption"
           headers={header}
           rowGroups={groupedData}
         />
