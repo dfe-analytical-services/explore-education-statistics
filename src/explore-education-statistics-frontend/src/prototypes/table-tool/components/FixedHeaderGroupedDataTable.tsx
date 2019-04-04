@@ -257,6 +257,7 @@ class FixedHeaderGroupedDataTable extends Component<Props> {
           {...this.props}
           className={styles.stickyIntersectionTable}
           ref={this.intersectionTableRef}
+          ariaHidden
           isStickyColumn
           isStickyHeader
         />
