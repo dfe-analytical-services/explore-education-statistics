@@ -75,7 +75,7 @@ class PublicationReleasePage extends Component<Props> {
                 </strong>
               </dd>
             </dl>
-              
+
             <ReactMarkdown className="govuk-body" source={data.summary} />
 
             <Details summary="Download underlying data files">
@@ -164,7 +164,7 @@ class PublicationReleasePage extends Component<Props> {
         </div>
 
         <hr />
-        
+
         <h2>Latest headline facts and figures - {data.releaseName}</h2>
 
         {data.keyStatistics && <DataBlock {...data.keyStatistics} />}
@@ -274,7 +274,10 @@ class PublicationReleasePage extends Component<Props> {
           API. <a href="#">What is an API?</a>
         </p>
 
-        <Link to={`/table-tool/${data.publication.slug}`} className="govuk-button">
+        <Link
+          to={`/table-tool/${data.publication.slug}`}
+          className="govuk-button"
+        >
           Create charts and tables
         </Link>
 
