@@ -67,21 +67,17 @@ class PublicationReleasePage extends Component<Props> {
 
             <PageTitle title={data.title} />
 
-            <ReactMarkdown className="govuk-body-l" source={data.summary} />
+            <dl className="dfe-meta-content">
+              <dt className="govuk-caption-m">Published: </dt>
+              <dd>
+                <strong>
+                  <FormattedDate>{data.published}</FormattedDate>
+                </strong>
+              </dd>
+            </dl>
+              
+            <ReactMarkdown className="govuk-body" source={data.summary} />
 
-            <Details summary="Read more about our methodology">
-              <p>
-                To help you analyse and understand the statistics the following
-                sections include:
-              </p>
-
-              <div className="govuk-inset-text">
-                <Link to="#">
-                  Find out more about our pupil absence data and statistics
-                  methodology and terminology
-                </Link>
-              </div>
-            </Details>
             <Details summary="Download underlying data files">
               <ul className="govuk-list">
                 <li>
@@ -135,11 +131,6 @@ class PublicationReleasePage extends Component<Props> {
                     )}
                   </ul>
                 </Details>
-              </h4>
-
-              <h4 data-testid="published-date">
-                <span className="govuk-caption-m">Published: </span>
-                <FormattedDate>{data.published}</FormattedDate>
               </h4>
 
               <h4 data-testid="last-updated">
@@ -281,7 +272,7 @@ class PublicationReleasePage extends Component<Props> {
           API. <a href="#">What is an API?</a>
         </p>
 
-        <Link to="/table-tool" className="govuk-button">
+        <Link to={`/table-tool/${data.publication.slug}`} className="govuk-button">
           Create charts and tables
         </Link>
 
