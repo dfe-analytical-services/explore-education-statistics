@@ -164,6 +164,8 @@ class PublicationReleasePage extends Component<Props> {
         </div>
 
         <hr />
+        
+        <h2>Latest headline facts and figures - {data.releaseName}</h2>
 
         {data.keyStatistics && <DataBlock {...data.keyStatistics} />}
 

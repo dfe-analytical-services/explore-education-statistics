@@ -265,13 +265,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Published = new DateTime(2017, 3, 22),
                     Slug = "2016-17",
-                    Summary =
-                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
+                    Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas. \n\n",
 
                     KeyStatistics = new DataBlock
                     {
-                        Heading = "Latest headline facts and figures - 2016 to 2017",
-
                         DataQuery = new DataQuery
                         {
                             method = "POST",
@@ -291,8 +288,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
 
                             description = new MarkDownBlock
                             {
-                                Body =
-                                    " * pupils missed on average 8.2 school days \n * overall and unauthorised absence rates up on previous year \n * unauthorised rise due to higher rates of unauthorised holidays \n * 10% of pupils persistently absent during 2016/17"
+                                Body = " * pupils missed on average 8.2 school days \n " +
+                                       " * overall and unauthorised absence rates up on previous year \n" +
+                                       " * unauthorised rise due to higher rates of unauthorised holidays \n" +
+                                       " * 10% of pupils persistently absent during 2016/17"
                             }
                         },
 
@@ -469,13 +468,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Published = new DateTime(2016, 3, 25),
                     Slug = "2015-16",
-                    Summary =
-                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
+                    Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
 
                     KeyStatistics = new DataBlock
                     {
-                        Heading = "Latest headline facts and figures - 2016 to 2017",
-
                         Summary = new Summary
                         {
                             dataKeys = new List<string>
@@ -513,12 +509,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Published = new DateTime(2018, 7, 19),
                     Slug = "2016-17",
-                    Summary =
-                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of permanent and fixed-period exclusion subject areas.",
+                    Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of permanent and fixed-period exclusion subject areas. \n\n" +
+                              "You can also view a regional breakdown of statistics and data within the [local authorities section](#contents-sections-heading-9)",
                     KeyStatistics = new DataBlock
                     {
-                        Heading = "Latest headline facts and figures - 2016 to 2017",
-
                         Summary = new Summary
                         {
                             dataKeys = new List<string>
@@ -530,7 +524,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
 
                             description = new MarkDownBlock
                             {
-                                Body = ""
+                                Body = " * overall rate of permanent exclusions has increased from 0.08 per cent of pupil enrolments in 2015/16 to 0.10 per cent in 2016/17 \n" +
+                                       " * number of exclusions has also increased, from 6,685 to 7,720 \n" +
+                                       " * overall rate of fixed period exclusions increased, from 4.29 per cent of pupil enrolments in 2015/16 to 4.76 per cent in 2016/17 \n" +
+                                       " * number of exclusions has also increased, from 339,360 to 381,865. \n"
                             }
                         }
                     },
@@ -559,6 +556,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                     Body =
                                         "A permanent exclusion refers to a pupil who is excluded and who will not come back to that school (unless the exclusion is overturned). The number of permanent exclusions across all state-funded primary, secondary and special schools has increased from 6,685 in 2015/16 to 7,720 in 2016/17. This corresponds to around 40.6 permanent exclusions per day in 2016/17, up from an average of 35.2 per day in 2015/16."
                                 },
+                                new DataBlock
+                                {
+                                    Heading = "Chart showing permanent exclusions in England",
+                                },
                                 new MarkDownBlock
                                 {
                                     Body =
@@ -576,6 +577,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                     Heading = "Fixed-period exclusion rate definition",
                                     Body =
                                         "Fixed-period exclusion refers to a pupil who is excluded from a school for a set period of time. A fixed-period exclusion can involve a part of the school day and it does not have to be for a continuous period. A pupil may be excluded for one or more fixed periods up to a maximum of 45 school days in a single academic year. This total includes exclusions from previous schools covered by the exclusion legislation. A pupil may receive more than one fixed-period exclusion, so pupils with repeat exclusions can inflate fixed-period exclusion rates."
+                                },
+                                new DataBlock
+                                {
+                                    Heading = "Chart showing fixed-period exclusions in England",
                                 },
                                 new MarkDownBlock
                                 {
