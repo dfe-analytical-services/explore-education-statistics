@@ -13,6 +13,7 @@ import { default as BrowseReleasesPage } from "./pages/prototypes/browse-release
 import { default as StartPage } from "./pages/prototypes/start";
 import { default as AdminDashboardPage } from "./pages/prototypes/admin-dashboard";
 import { default as PublicationCreateNew } from "./pages/prototypes/publication-create-new";
+import { default as PublicationCreateNewAbsence } from "./pages/prototypes/publication-create-new-absence";
 
 const history = createBrowserHistory();
 
@@ -47,6 +48,11 @@ class App extends Component {
           exact
           path="/prototypes/publication-create-new"
           component={PublicationCreateNew}
+        />
+        <Route
+          exact
+          path="/prototypes/publication-create-new-absence"
+          component={PublicationCreateNewAbsence}
         />
       </Router>
     );

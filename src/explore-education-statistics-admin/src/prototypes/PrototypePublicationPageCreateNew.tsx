@@ -25,7 +25,7 @@ const PublicationPage = () => {
       ]}
     >
       <h1 className="govuk-heading-xl">Create new release</h1>
-      <form action="/prototypes/admin-dashboard">
+      <form action="/prototypes/publication-create-new-absence">
         <div className="govuk-form-group">
           <label htmlFor="title" className="govuk-label govuk-label--s">
             Publication title
