@@ -513,13 +513,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                               "You can also view a regional breakdown of statistics and data within the [local authorities section](#contents-sections-heading-9)",
                     KeyStatistics = new DataBlock
                     {
+                        DataQuery = new DataQuery
+                        {
+                            method = "POST",
+                            path = "/api/tablebuilder/characteristics/national",
+                            body =
+                                "{ \"indicators\": [\"perm_excl_rate\",\"perm_excl\",\"fixed_excl_rate\" ], \"characteristics\": [ \"Total\" ], \"endYear\": 201617, \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\", \"schoolTypes\": [ \"Total\" ], \"startYear\": 201213}"
+                        },
+                        
                         Summary = new Summary
                         {
                             dataKeys = new List<string>
                             {
-                                "--",
-                                "--",
-                                "--"
+                                "perm_excl_rate",
+                                "perm_excl",
+                                "fixed_excl_rate"
                             },
 
                             description = new MarkDownBlock
