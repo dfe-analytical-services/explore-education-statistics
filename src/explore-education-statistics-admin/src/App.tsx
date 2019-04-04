@@ -7,10 +7,12 @@ import "./App.scss";
 import { Route, Router } from "react-router";
 
 import { default as PublicationPage } from "./pages/prototypes/publication";
+import { default as PublicationEditPage } from "./pages/prototypes/publication-edit";
 import { default as PrototypesIndexPage } from "./pages/prototypes/index";
 import { default as BrowseReleasesPage } from "./pages/prototypes/browse-releases";
 import { default as StartPage } from "./pages/prototypes/start";
 import { default as AdminDashboardPage } from "./pages/prototypes/admin-dashboard";
+import { default as PublicationCreateNew } from "./pages/prototypes/publication-create-new";
 
 const history = createBrowserHistory();
 
@@ -30,11 +32,21 @@ class App extends Component {
           path="/prototypes/publication"
           component={PublicationPage}
         />
+        <Route
+          exact
+          path="/prototypes/publication-edit"
+          component={PublicationEditPage}
+        />
         <Route exact path="/prototypes/tester" component={BrowseReleasesPage} />
         <Route
           exact
           path="/prototypes/admin-dashboard"
           component={AdminDashboardPage}
+        />
+        <Route
+          exact
+          path="/prototypes/publication-create-new"
+          component={PublicationCreateNew}
         />
       </Router>
     );

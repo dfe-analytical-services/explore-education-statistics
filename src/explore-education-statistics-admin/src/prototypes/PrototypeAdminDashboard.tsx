@@ -36,7 +36,7 @@ const BrowseReleasesPage = () => {
                     </dd>
                   </dl>
                   <div className="govuk-!-margin-top-0">
-                    <Link to="#">Edit</Link>
+                    <Link to="/prototypes/publication-edit">Edit</Link>
                   </div>
                 </li>
                 <li className="govuk-!-margin-top-6">
@@ -88,7 +88,7 @@ const BrowseReleasesPage = () => {
             <nav role="navigation" aria-labelledby="subsection-title">
               <ul className="govuk-list">
                 <li>
-                  <Link to="#">Example notification</Link>
+                  <Link to="#">Example release</Link>
                 </li>
               </ul>
             </nav>
@@ -141,10 +141,39 @@ const BrowseReleasesPage = () => {
                 <div className="govuk-!-margin-top-0">
                   <div className="govuk-grid-row">
                     <div className="govuk-grid-column-one-third">
-                      <Link to="#">Edit current release</Link>
+                      <Link to="/prototypes/publication-edit">
+                        Edit current release
+                      </Link>
                     </div>
                     <div className="govuk-grid-column-one-third">
-                      <Link to="#">Create new release</Link>
+                      <Link to="/prototypes/publication-create-new">
+                        Create new release
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                {" "}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Pupil absence statistics{" "}
+                  <span className="govuk-tag">New release in progress</span>
+                </h4>
+                <dl className="dfe-meta-content govuk-!-margin-0">
+                  <dt className="govuk-caption-m">Date to be published: </dt>
+                  <dd>
+                    22 September 2019 in <strong>100</strong> days <br />
+                  </dd>
+                  <dt className="govuk-caption-m">Last edited: </dt>
+                  <dd>
+                    20 March 2019 at 17:37 by <a href="#">me</a>
+                    <br />
+                  </dd>
+                </dl>
+                <div className="govuk-!-margin-top-0">
+                  <div className="govuk-grid-row">
+                    <div className="govuk-grid-column-one-third">
+                      <Link to="#">Edit this new release</Link>
                     </div>
                   </div>
                 </div>
