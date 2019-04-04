@@ -21,7 +21,7 @@ class App extends BaseApp {
   }
 
   public componentDidMount(): void {
-    if (process.env.GA_TRACKING_ID !== undefined) {
+    if (process.env.GA_TRACKING_ID !== 'UA-xxxxxxxxx-1') {
       logPageView();
 
       if (Router.router !== null) {

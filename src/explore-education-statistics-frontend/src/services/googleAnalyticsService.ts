@@ -2,7 +2,7 @@ import ReactGA from 'react-ga';
 
 let initialised = false;
 
-if (process.env.GA_TRACKING_ID !== undefined) {
+if (process.env.GA_TRACKING_ID !== 'UA-xxxxxxxxx-1') {
   ReactGA.initialize(process.env.GA_TRACKING_ID);
   initialised = true;
 
