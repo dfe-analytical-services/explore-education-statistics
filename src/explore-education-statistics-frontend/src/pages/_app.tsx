@@ -21,11 +21,11 @@ class App extends BaseApp {
   }
 
   public componentDidMount(): void {
-      logPageView();
+    logPageView();
 
-      if (Router.router !== null) {
-        Router.router.events.on('routeChangeComplete', logPageView);
-      }
+    if (Router.router !== null) {
+      Router.router.events.on('routeChangeComplete', logPageView);
+    }
 
     document.body.classList.add('js-enabled');
 
