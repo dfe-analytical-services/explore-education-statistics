@@ -55,14 +55,16 @@ jobs:
           customCommand: 'ci'
       - script: 'npm audit --json >> audit.json'
         workingDirectory: 'src/explore-education-statistics-frontend'
-        displayName: 'Command Line Script Create audit.json'
+        displayName: 'Run npm audit'
         continueOnError: true
+        enabled: false
       - task: PublishPipelineArtifact@0
         displayName: 'Publish Pipeline Artifact audit_results'
         inputs:
           artifactName: 'audit_results'
           targetPath: 'src/explore-education-statistics-frontend/audit.json'
         continueOnError: true
+        enabled: false
       - task: 'Npm@1'
         displayName: 'npm run lint'
         inputs:
