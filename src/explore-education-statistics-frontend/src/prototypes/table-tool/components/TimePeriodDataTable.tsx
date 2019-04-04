@@ -107,11 +107,15 @@ class TimePeriodDataTable extends Component<Props> {
                 return '--';
               }
 
-              const value = Number(
-                matchingResult.indicators[indicator],
-              ).toLocaleString('en-GB');
+              const value = Number(matchingResult.indicators[indicator]);
 
-              return `${value}${indicatorsByValue[indicator].unit}`;
+              if (Number.isNaN(value)) {
+                return '--';
+              }
+
+              return `${value.toLocaleString('en-GB')}${
+                indicatorsByValue[indicator].unit
+              }`;
             }),
           );
 
