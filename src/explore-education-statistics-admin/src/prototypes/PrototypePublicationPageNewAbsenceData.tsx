@@ -11,9 +11,7 @@ import PrototypePage from "./components/PrototypePage";
 import { PrototypeEditableContent } from "./components/PrototypeEditableContent";
 import TabsSection from "../components/TabsSection";
 
-const PublicationPage = () => {
-  let mapRef: PrototypeMap | null = null;
-
+const PublicationDataPage = () => {
   return (
     <PrototypePage
       wide
@@ -28,8 +26,20 @@ const PublicationPage = () => {
       <PrototypeAdminNavigation sectionId="addData" />
 
       <h2 className="govuk-heading-m">Add data to release</h2>
+
+      <div className="govuk-form-group">
+        <label className="govuk-label" htmlFor="file-upload-1">
+          Upload a file
+        </label>
+        <input
+          className="govuk-file-upload"
+          id="file-upload-1"
+          name="file-upload-1"
+          type="file"
+        />
+      </div>
     </PrototypePage>
   );
 };
 
-export default PublicationPage;
+export default PublicationDataPage;

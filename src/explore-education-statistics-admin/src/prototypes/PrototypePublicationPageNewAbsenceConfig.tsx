@@ -12,7 +12,7 @@ import PrototypePublicationConfig from "./components/PrototypePublicationPageCon
 import { PrototypeEditableContent } from "./components/PrototypeEditableContent";
 import TabsSection from "../components/TabsSection";
 
-const PublicationPage = () => {
+const PublicationConfigPage = () => {
   let sectionId = "setup";
 
   return (
@@ -32,4 +32,4 @@ const PublicationPage = () => {
   );
 };
 
-export default PublicationPage;
+export default PublicationConfigPage;

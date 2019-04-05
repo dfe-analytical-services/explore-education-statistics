@@ -57,9 +57,18 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
               Add / edit content
             </a>
           </li>
-          <li>
-            <a href="#" className="govuk-link govuk-link--no-visited-state">
-              Schedule release date
+          <li
+            className={
+              sectionId === "schedule"
+                ? "app-navigation--current-page"
+                : "app-navigation--non-selected-page"
+            }
+          >
+            <a
+              href="/prototypes/publication-create-new-absence-schedule"
+              className="govuk-link govuk-link--no-visited-state"
+            >
+              Schedule publish date
             </a>
           </li>
           <li>
