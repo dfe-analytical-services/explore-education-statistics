@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
 {
-    public class PublicationMetaViewModel
+    public class SubjectMetaViewModel
     {
         public Guid PublicationId { get; set; }
         public Dictionary<string, IEnumerable<IndicatorMetaViewModel>> Indicators { get; set; }

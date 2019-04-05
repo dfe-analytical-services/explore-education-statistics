@@ -14,7 +14,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
         IEnumerable<TEntity> All();
 
         TEntity Find(TKey id);
-        
+
+        IEnumerable<TEntity> Find(TKey[] ids);
+
         TEntity Find(TKey id, List<Expression<Func<TEntity, object>>> include);
         
         IEnumerable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression,
