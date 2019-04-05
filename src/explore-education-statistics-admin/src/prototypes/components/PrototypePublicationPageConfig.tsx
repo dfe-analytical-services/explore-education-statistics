@@ -57,6 +57,51 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                   Calendar year
                 </label>
               </div>
+              <div className="govuk-radios__item">
+                <input
+                  className="govuk-radios__input"
+                  type="radio"
+                  name="release-type"
+                  id="release-type-quarter"
+                  value="calendar-quarter"
+                />
+                <label
+                  className="govuk-label govuk-radios__label"
+                  htmlFor="release-type-quarter"
+                >
+                  Year quarter
+                </label>
+              </div>
+              <div className="govuk-radios__item">
+                <input
+                  className="govuk-radios__input"
+                  type="radio"
+                  name="release-type"
+                  id="release-academic-term"
+                  value="academic term"
+                />
+                <label
+                  className="govuk-label govuk-radios__label"
+                  htmlFor="release-type-academic-term"
+                >
+                  Academic term
+                </label>
+              </div>
+              <div className="govuk-radios__item">
+                <input
+                  className="govuk-radios__input"
+                  type="radio"
+                  name="release-type"
+                  id="release-month"
+                  value="month"
+                />
+                <label
+                  className="govuk-label govuk-radios__label"
+                  htmlFor="release-type-month"
+                >
+                  Month
+                </label>
+              </div>
             </div>
           </fieldset>
         </div>
