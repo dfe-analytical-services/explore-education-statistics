@@ -1,0 +1,14 @@
+{
+    "IsEncrypted": false,
+    "Values": {
+        "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+        "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+        "NotifyApiKey" : "exploreeducationstatistics_publication_notifier_test-d21ddfef-9094-4376-a66c-02591ca62134-96a44623-3a09-406d-886d-bc8d9a034b73",
+        "VerificationEmailTemplateId" : "cdb9134c-eb77-4659-bb37-74472a02f343",
+        "PublicationNotificationEmailTemplateId" : "75e6bfe3-3671-4a2e-85e6-90656894a205"
+        
+    },
+    "ConnectionStrings": {
+        "TableStorageConnString": "AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;DefaultEndpointsProtocol=http;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
+    }
+}
