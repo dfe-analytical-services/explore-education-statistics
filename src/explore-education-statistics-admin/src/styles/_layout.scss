@@ -1,5 +1,9 @@
 @import './variables';
 
+.dfe-admin-header {
+  border-bottom: 10px solid  govuk-colour("pink")	;
+}
+
 .dfe-width-container--wide {
   max-width: $dfe-page-width-wide;
 }

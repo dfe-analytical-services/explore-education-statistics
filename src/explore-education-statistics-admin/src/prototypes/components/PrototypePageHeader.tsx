@@ -17,6 +17,7 @@ const PageHeader = ({ wide }: Props) => (
         className={classNames(
           "govuk-header__container",
           "govuk-width-container",
+          "dfe-admin-header",
           {
             "dfe-width-container--wide": wide
           }
