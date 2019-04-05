@@ -8,8 +8,27 @@ interface Props {
 const PrototypeAdminNavigation = ({ sectionId }: Props) => {
   return (
     <>
+      <span className="govuk-tag">New release in progress</span>
+      <span className="govuk-caption-l">Academic year 2018 to 2019</span>
+      <h1 className="govuk-heading-l">
+        Pupil absence statistics and data for schools in England
+      </h1>
       <nav className="app-navigation govuk-!-margin-bottom-9">
         <ul className="app-navigation__list govuk-!-margin-bottom-0">
+          <li
+            className={
+              sectionId === "setup"
+                ? "app-navigation--current-page"
+                : "app-navigation--non-selected-page"
+            }
+          >
+            <a
+              href="/prototypes/publication-create-new-absence-config"
+              className="govuk-link govuk-link--no-visited-state"
+            >
+              Release setup
+            </a>
+          </li>
           <li
             className={
               sectionId === "addData"

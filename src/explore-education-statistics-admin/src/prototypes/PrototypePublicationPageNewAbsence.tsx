@@ -26,11 +26,6 @@ const PublicationPage = () => {
         { text: "Create new release", link: "#" }
       ]}
     >
-      <span className="govuk-tag">New release in progress</span>
-      <span className="govuk-caption-l">Academic year 2018 to 2019</span>
-      <h1 className="govuk-heading-l">
-        Pupil absence statistics and data for schools in England
-      </h1>
       <PrototypeAdminNavigation sectionId="addContent" />
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
@@ -96,12 +91,38 @@ const PublicationPage = () => {
             </h2>
 
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <span className="govuk-caption-m govuk-caption-inline">
-                For school year:{" "}
-              </span>
-              2016/17 (latest data)
+              <span className="govuk-caption-m">Last updated: </span>20 June
+              2018
             </h3>
 
+            <Details summary="See all 2 updates">
+              <div data-testid="publication-page--update-element">
+                <h3 className="govuk-heading-s">19 April 2017</h3>
+                <p>
+                  Underlying data file updated to include absence data by pupil
+                  residency and school location, andupdated metadata document.
+                </p>
+              </div>
+              <div data-testid="publication-page--update-element">
+                <h3 className="govuk-heading-s">22 March 2017</h3>
+                <p>First published.</p>
+              </div>
+            </Details>
+
+            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+              <span className="govuk-caption-m">Next update: </span>22 March
+              2019
+            </h3>
+            <p className="govuk-caption-m govuk-!-margin-top-0">
+              <a href="#">Notify me</a>
+            </p>
+
+            <h2
+              className="govuk-heading-s govuk-!-margin-bottom-0"
+              id="subsection-title"
+            >
+              Archived releases
+            </h2>
             <Details summary="See previous 7 releases">
               <ul className="govuk-list">
                 <li>
@@ -144,33 +165,6 @@ const PublicationPage = () => {
                 </li>
               </ul>
             </Details>
-
-            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <span className="govuk-caption-m">Last updated: </span>20 June
-              2018
-            </h3>
-
-            <Details summary="See all 2 updates">
-              <div data-testid="publication-page--update-element">
-                <h3 className="govuk-heading-s">19 April 2017</h3>
-                <p>
-                  Underlying data file updated to include absence data by pupil
-                  residency and school location, andupdated metadata document.
-                </p>
-              </div>
-              <div data-testid="publication-page--update-element">
-                <h3 className="govuk-heading-s">22 March 2017</h3>
-                <p>First published.</p>
-              </div>
-            </Details>
-
-            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <span className="govuk-caption-m">Next update: </span>22 March
-              2019
-            </h3>
-            <p className="govuk-caption-m govuk-!-margin-top-0">
-              <a href="#">Notify me</a>
-            </p>
 
             <h2
               className="govuk-heading-m govuk-!-margin-top-6"

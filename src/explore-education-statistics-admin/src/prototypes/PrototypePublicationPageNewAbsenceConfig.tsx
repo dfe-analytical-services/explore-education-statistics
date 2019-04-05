@@ -4,6 +4,7 @@ import AccordionSection from "../components/AccordionSection";
 import Details from "../components/Details";
 import Link from "../components/Link";
 import PrototypeAbsenceData from "./components/PrototypeAbsenceData";
+import PrototypeAdminNavigation from "./components/PrototypeAdminNavigation";
 import PrototypeDataSample from "./components/PrototypeDataSample";
 import PrototypeMap from "./components/PrototypeMap";
 import PrototypePage from "./components/PrototypePage";
@@ -12,7 +13,7 @@ import { PrototypeEditableContent } from "./components/PrototypeEditableContent"
 import TabsSection from "../components/TabsSection";
 
 const PublicationPage = () => {
-  let mapRef: PrototypeMap | null = null;
+  let sectionId = "setup";
 
   return (
     <PrototypePage
@@ -25,8 +26,8 @@ const PublicationPage = () => {
         { text: "Create new release", link: "#" }
       ]}
     >
-      <h1 className="govuk-heading-xl">Create new release</h1>
-      <PrototypePublicationConfig />
+      <PrototypeAdminNavigation sectionId={sectionId} />
+      <PrototypePublicationConfig sectionId={sectionId} />
     </PrototypePage>
   );
 };
