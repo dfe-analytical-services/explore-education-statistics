@@ -32,6 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         private IEnumerable<LevelComposite> GetLevels(long subjectId)
         {
+//            TODO Ideally want one db query as follows but this is translated into invalid SQL
+//            TODO See https://github.com/aspnet/EntityFrameworkCore/issues/12304
 //            return (from l in _context.Set<LevelComposite>()
 //                join
 //                    d in _context.GeographicData.Where(data => data.SubjectId == subjectId)
