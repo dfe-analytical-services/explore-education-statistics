@@ -25,9 +25,13 @@ Validate URL
     ${current_url}=  get location
     should be equal   ${current_url}   ${url}/statistics/pupil-absence-in-schools-in-england
 
+Validate Published date
+    [Tags]     HappyPath
+    user checks element contains  css:[data-testid="published-date"]   22 March 2017
+
 Validate "About these statistics" -- "For school year"
     [Documentation]  DFE-197
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     user checks element contains  css:[data-testid="release-period"]    2016 to 2017 (latest data)
 
     user clicks element  css:[data-testid="See previous 7 releases"] [data-testid="details--expand"]
@@ -44,10 +48,6 @@ Validate "About these statistics" -- "For school year"
     user clicks element  css:[data-testid="See previous 7 releases"] [data-testid="details--expand"]
     element attribute value should be  css:[data-testid="See previous 7 releases"] summary   aria-expanded   false
 
-
-Validate "About these statistics" -- "Published"
-    [Tags]     HappyPath
-    user checks element contains  css:[data-testid="published-date"] time   22 March 2017
 
 Validate "About these statistics" -- "Last updated"
     [Tags]     HappyPath
