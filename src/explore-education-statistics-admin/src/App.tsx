@@ -17,6 +17,8 @@ import { default as AdminDocumentationGlossary } from "./pages/prototypes/docume
 
 import { default as PublicationCreateNew } from "./pages/prototypes/publication-create-new";
 import { default as PublicationCreateNewAbsence } from "./pages/prototypes/publication-create-new-absence";
+import { default as PublicationCreateNewAbsenceConfig } from "./pages/prototypes/publication-create-new-absence-config";
+import { default as PublicationCreateNewAbsenceData } from "./pages/prototypes/publication-create-new-absence-data";
 
 const history = createBrowserHistory();
 
@@ -59,12 +61,27 @@ class App extends Component {
         />
         <Route
           exact
-          path="/prototypes/documentation"
+          path="/prototypes/publication-create-new-absence-config"
+          component={PublicationCreateNewAbsenceConfig}
+        />
+        <Route
+          exact
+          path="/prototypes/publication-create-new-absence-data"
+          component={PublicationCreateNewAbsenceData}
+        />
+        <Route
+          exact
+          path="/prototypes/documentation/"
           component={AdminDocumentation}
         />
         <Route
           exact
           path="/prototypes/documentation/glossary"
+          component={AdminDocumentationGlossary}
+        />
+        <Route
+          exact
+          path="/prototypes/documentation/style-guide"
           component={AdminDocumentationGlossary}
         />
       </Router>
