@@ -12,6 +12,8 @@ import { default as PrototypesIndexPage } from "./pages/prototypes/index";
 import { default as BrowseReleasesPage } from "./pages/prototypes/browse-releases";
 import { default as StartPage } from "./pages/prototypes/start";
 import { default as AdminDashboardPage } from "./pages/prototypes/admin-dashboard";
+import { default as AdminDocumentation } from "./pages/prototypes/documentation-home";
+
 import { default as PublicationCreateNew } from "./pages/prototypes/publication-create-new";
 import { default as PublicationCreateNewAbsence } from "./pages/prototypes/publication-create-new-absence";
 
@@ -53,6 +55,11 @@ class App extends Component {
           exact
           path="/prototypes/publication-create-new-absence"
           component={PublicationCreateNewAbsence}
+        />
+        <Route
+          exact
+          path="/prototypes/documentation"
+          component={AdminDocumentation}
         />
       </Router>
     );
