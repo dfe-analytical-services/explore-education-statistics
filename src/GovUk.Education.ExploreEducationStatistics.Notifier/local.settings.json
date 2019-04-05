@@ -3,7 +3,7 @@
     "Values": {
         "AzureWebJobsStorage": "UseDevelopmentStorage=true",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-        "NotifyApiKey" : "exploreeducationstatistics_publication_notifier_test-d21ddfef-9094-4376-a66c-02591ca62134-96a44623-3a09-406d-886d-bc8d9a034b73",
+        "NotifyApiKey" : "replace-me-with-gov-uk-notfiy-key",
         "VerificationEmailTemplateId" : "cdb9134c-eb77-4659-bb37-74472a02f343",
         "PublicationNotificationEmailTemplateId" : "75e6bfe3-3671-4a2e-85e6-90656894a205"
         
