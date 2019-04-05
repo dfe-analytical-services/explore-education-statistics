@@ -15,7 +15,7 @@ const PrototypeBreadcrumbs = ({ items }: Props) => {
     <div className="govuk-breadcrumbs">
       <ol className="govuk-breadcrumbs__list">
         <li className="govuk-breadcrumbs__list-item">
-          <Link className="govuk-breadcrumbs__link" to="/prototypes/home-v2">
+          <Link className="govuk-breadcrumbs__link" to="/prototypes/admin-dashboard">
             Home
           </Link>
         </li>
