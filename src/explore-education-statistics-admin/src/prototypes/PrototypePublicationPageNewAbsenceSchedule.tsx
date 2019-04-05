@@ -45,6 +45,7 @@ const PublicationSchedulePage = () => {
                   name="schedule-day"
                   type="number"
                   pattern="[0-9]*"
+                  value="22"
                 />
               </div>
             </div>
@@ -62,6 +63,7 @@ const PublicationSchedulePage = () => {
                   name="schedule-month"
                   type="number"
                   pattern="[0-9]*"
+                  value="3"
                 />
               </div>
             </div>
@@ -79,6 +81,7 @@ const PublicationSchedulePage = () => {
                   name="schedule-year"
                   type="number"
                   pattern="[0-9]*"
+                  value="2019"
                 />
               </div>
             </div>
@@ -125,6 +128,11 @@ const PublicationSchedulePage = () => {
                 />
               </div>
             </div>
+          </div>
+          <div className="govuk-form-group govuk-!-margin-top-6">
+            <button type="submit" className="govuk-button">
+              Update scheduled publish date and time
+            </button>
           </div>
         </fieldset>
       </form>
