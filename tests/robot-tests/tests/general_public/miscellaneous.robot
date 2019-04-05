@@ -13,7 +13,7 @@ Verify Public Page Loads
 Validate names of cookies appear on Cookie Page
     [Tags]  HappyPath
     user clicks link   Cookies
-    user waits until element contains   css:h1   Cookies
+    user waits until page contains element   css:[data-testid="page-title Cookies"]
     user waits until page contains  How cookies are used on this service
     cookie names should be on page
 
@@ -38,4 +38,4 @@ Validate Privacy Policy page
 Validate Feedback page
     [Tags]  HappyPath
     user clicks link  feedback
-    user waits until element contains  css:h1   Feedback
+    user waits until page contains element  css:[data-testid="page-title Feedback"]

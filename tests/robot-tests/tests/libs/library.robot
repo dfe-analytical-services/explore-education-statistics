@@ -10,8 +10,8 @@ Library    file_operations.py
 ${browser}    chrome
 ${headless}   1
 
-${timeout}          3
-${implicit_wait}    3
+${timeout}          10
+${implicit_wait}    10
 ${run_on_failure}   Capture Page Screenshot
 
 ${url}        about:blank
