@@ -1,6 +1,6 @@
-import classNames from 'classnames';
-import logo from 'govuk-frontend/assets/images/govuk-logotype-crown.png';
-import React from 'react';
+import classNames from "classnames";
+import logo from "govuk-frontend/assets/images/govuk-logotype-crown.png";
+import React from "react";
 
 interface Props {
   wide?: boolean;
@@ -15,11 +15,11 @@ const PageHeader = ({ wide }: Props) => (
     <header className="govuk-header " role="banner" data-module="header">
       <div
         className={classNames(
-          'govuk-header__container',
-          'govuk-width-container',
+          "govuk-header__container",
+          "govuk-width-container",
           {
-            'dfe-width-container--wide': wide,
-          },
+            "dfe-width-container--wide": wide
+          }
         )}
       >
         <div className="govuk-header__logo">
@@ -39,11 +39,47 @@ const PageHeader = ({ wide }: Props) => (
         </div>
         <div className="govuk-header__content">
           <a
-            href="/prototypes/home-v2"
+            href="/prototypes/admin-dashboard"
             className="govuk-header__link govuk-header__link--service-name"
           >
             Explore education statistics
           </a>
+
+          <button
+            type="button"
+            role="button"
+            className="govuk-header__menu-button js-header-toggle"
+            aria-controls="navigation"
+            aria-label="Show or hide Top Level Navigation"
+          >
+            Menu
+          </button>
+          <nav>
+            <ul
+              id="navigation"
+              className="govuk-header__navigation "
+              aria-label="Top Level Navigation"
+            >
+              <li className="govuk-header__navigation-item">
+                <a
+                  className="govuk-header__link"
+                  href="/prototypes/documentation"
+                >
+                  Documentation
+                </a>
+              </li>
+              <li className="govuk-header__navigation-item">
+                <a className="govuk-header__link" href="#">
+                  John Smith
+                </a>
+              </li>
+              <li className="govuk-header__navigation-item">
+                <a className="govuk-header__link" href="#">
+                  Sign out
+                </a>
+              </li>
+            </ul>
+          </nav>
         </div>
       </div>
     </header>
