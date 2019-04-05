@@ -3,6 +3,8 @@ import throttle from 'lodash/throttle';
 import React, { Component, createRef, forwardRef } from 'react';
 import styles from 'src/prototypes/table-tool/components/FixedHeaderGroupedDataTable.module.scss';
 
+const dataTableCaption = 'dataTableCaption';
+
 export interface HeaderGroup {
   label: string;
   columns: string[];
@@ -33,7 +35,6 @@ const GroupedDataTable = forwardRef<HTMLTableElement, InnerTableProps>(
   (
     {
       ariaHidden,
-      caption,
       className,
       headers,
       isStickyColumn,
@@ -44,12 +45,11 @@ const GroupedDataTable = forwardRef<HTMLTableElement, InnerTableProps>(
   ) => {
     return (
       <table
+        aria-hidden={ariaHidden}
+        aria-labelledby={dataTableCaption}
         className={classNames('govuk-table', className)}
         ref={ref}
-        aria-hidden={ariaHidden}
       >
-        <caption>{caption}</caption>
-
         <thead>
           <tr>
             <th
@@ -230,54 +230,62 @@ class FixedHeaderGroupedDataTable extends Component<Props> {
   }, 200);
 
   public render() {
+    const { caption } = this.props;
+
     return (
-      <div
-        className={styles.container}
-        ref={this.containerRef}
-        role="region"
-        tabIndex={0}
-        onScroll={event => {
-          const { scrollLeft, scrollTop } = event.currentTarget;
+      <figure className={styles.figure}>
+        <figcaption>
+          <strong id={dataTableCaption}>{caption}</strong>
+        </figcaption>
 
-          if (this.headerTableRef.current) {
-            this.headerTableRef.current.style.top = `${scrollTop}px`;
-          }
+        <div
+          className={styles.container}
+          ref={this.containerRef}
+          role="region"
+          tabIndex={0}
+          onScroll={event => {
+            const { scrollLeft, scrollTop } = event.currentTarget;
 
-          if (this.columnTableRef.current) {
-            this.columnTableRef.current.style.left = `${scrollLeft}px`;
-          }
+            if (this.headerTableRef.current) {
+              this.headerTableRef.current.style.top = `${scrollTop}px`;
+            }
 
-          if (this.intersectionTableRef.current) {
-            this.intersectionTableRef.current.style.top = `${scrollTop}px`;
-            this.intersectionTableRef.current.style.left = `${scrollLeft}px`;
-          }
-        }}
-      >
-        <GroupedDataTable
-          {...this.props}
-          className={styles.stickyIntersectionTable}
-          ref={this.intersectionTableRef}
-          ariaHidden
-          isStickyColumn
-          isStickyHeader
-        />
+            if (this.columnTableRef.current) {
+              this.columnTableRef.current.style.left = `${scrollLeft}px`;
+            }
 
-        <GroupedDataTable
-          {...this.props}
-          className={styles.stickyColumnTable}
-          ref={this.columnTableRef}
-          ariaHidden
-          isStickyColumn
-        />
-        <GroupedDataTable
-          {...this.props}
-          className={styles.stickyHeaderTable}
-          ref={this.headerTableRef}
-          ariaHidden
-          isStickyHeader
-        />
-        <GroupedDataTable ref={this.mainTableRef} {...this.props} />
-      </div>
+            if (this.intersectionTableRef.current) {
+              this.intersectionTableRef.current.style.top = `${scrollTop}px`;
+              this.intersectionTableRef.current.style.left = `${scrollLeft}px`;
+            }
+          }}
+        >
+          <GroupedDataTable
+            {...this.props}
+            className={styles.intersectionTable}
+            ref={this.intersectionTableRef}
+            ariaHidden
+            isStickyColumn
+            isStickyHeader
+          />
+          <GroupedDataTable
+            {...this.props}
+            className={styles.columnTable}
+            ref={this.columnTableRef}
+            ariaHidden
+            isStickyColumn
+          />
+          <GroupedDataTable
+            {...this.props}
+            className={styles.headerTable}
+            ref={this.headerTableRef}
+            ariaHidden
+            isStickyHeader
+          />
+
+          <GroupedDataTable ref={this.mainTableRef} {...this.props} />
+        </div>
+      </figure>
     );
   }
 }
