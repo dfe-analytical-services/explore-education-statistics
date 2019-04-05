@@ -1,11 +1,11 @@
-import React from 'react';
-import Details from '../../components/Details';
-import Tabs from '../../components/Tabs';
-import TabsSection from '../../components/TabsSection';
-import PrototypeChartSample from './PrototypeChartSample';
-import PrototypeDataTilesHighlights from './PrototypeDataTilesHighlights';
-import PrototypeTableSample from './PrototypeTableSample';
-import {PrototypeEditableContent} from "./PrototypeEditableContent";
+import React from "react";
+import Details from "../../components/Details";
+import Tabs from "../../components/Tabs";
+import TabsSection from "../../components/TabsSection";
+import PrototypeChartSample from "./PrototypeChartSample";
+import PrototypeDataTilesHighlights from "./PrototypeDataTilesHighlights";
+import PrototypeTableSample from "./PrototypeTableSample";
+import { PrototypeEditableContent } from "./PrototypeEditableContent";
 
 interface Props {
   sectionId?: string;
@@ -22,12 +22,12 @@ const PrototypeDataSample = ({
   xAxisLabel,
   yAxisLabel,
   chartData,
-  chartDataKeys,
+  chartDataKeys
 }: Props) => {
   return (
     <>
       <Tabs>
-        {sectionId === 'headlines' && (
+        {sectionId === "headlines" && (
           <TabsSection id={`${sectionId}SummaryData`} title="Summary">
             <PrototypeDataTilesHighlights />
             <PrototypeEditableContent
@@ -42,7 +42,8 @@ const PrototypeDataSample = ({
               </li>
               <li>10% of pupils persistently absent during 2016/17</li>
             </ul>
-          `} />
+          `}
+            />
           </TabsSection>
         )}
         <TabsSection id={`${sectionId}TableData`} title="Data tables">

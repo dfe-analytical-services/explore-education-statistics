@@ -4,10 +4,12 @@ import AccordionSection from "../components/AccordionSection";
 import Details from "../components/Details";
 import Link from "../components/Link";
 import PrototypeAbsenceData from "./components/PrototypeAbsenceData";
+import PrototypeAdminNavigation from "./components/PrototypeAdminNavigation";
 import PrototypeDataSample from "./components/PrototypeDataSample";
 import PrototypeMap from "./components/PrototypeMap";
 import PrototypePage from "./components/PrototypePage";
 import { PrototypeEditableContent } from "./components/PrototypeEditableContent";
+import Tabs from "../components/Tabs";
 import TabsSection from "../components/TabsSection";
 
 const PublicationPage = () => {
@@ -24,50 +26,21 @@ const PublicationPage = () => {
         { text: "Create new release", link: "#" }
       ]}
     >
-      <h1 className="govuk-heading-xl">Create new release</h1>
-
-      <nav className="app-navigation">
-        <ul className="app-navigation__list govuk-!-margin-bottom-0">
-          <li>
-            <a href="#" className="govuk-link govuk-link--no-visited-state">
-              Add data
-            </a>
-          </li>
-          <li className="app-navigation--current-page">
-            <a href="#" className="govuk-link govuk-link--no-visited-state">
-              Add / edit content
-            </a>
-          </li>
-          <li>
-            <a href="#" className="govuk-link govuk-link--no-visited-state">
-              Schedule release date
-            </a>
-          </li>
-          <li>
-            <a href="#" className="govuk-link govuk-link--no-visited-state">
-              Set status
-            </a>
-          </li>
-        </ul>
-      </nav>
-
+      <span className="govuk-tag">New release in progress</span>
+      <span className="govuk-caption-l">Academic year 2018 to 2019</span>
+      <h1 className="govuk-heading-l">
+        Pupil absence statistics and data for schools in England
+      </h1>
+      <PrototypeAdminNavigation sectionId="addContent" />
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <PrototypeEditableContent
-            content={`
-          <h1 className="govuk-heading-l">
-            Pupil absence statistics and data for schools in England
-          </h1>
-          `}
-          />
-
+          {" "}
           <dl className="dfe-meta-content">
             <dt className="govuk-caption-m">Published:</dt>
             <dd>
               <strong>22 March 2018</strong>
             </dd>
           </dl>
-
           <PrototypeEditableContent
             content={`
           <p className="govuk-body">
@@ -84,14 +57,12 @@ const PublicationPage = () => {
           </p>
           `}
           />
-
           <p>
             <Link to="/prototypes/methodology-absence">
               Find out more about our pupil absence data and statistics
               methodology and terminology
             </Link>
           </p>
-
           <Details summary="Download underlying data files">
             <ul className="govuk-list">
               <li>
