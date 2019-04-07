@@ -8,15 +8,16 @@ import PublicationSubjectMenu from 'src/modules/table-tool/components/Publicatio
 import PrototypePage from 'src/prototypes/components/PrototypePage';
 import { FilterFormSubmitHandler } from 'src/prototypes/table-tool/components/FiltersForm';
 import initialMetaSpecification, {
+  FilterOption,
+  IndicatorOption,
   MetaSpecification,
 } from 'src/prototypes/table-tool/components/meta/initialSpec';
 import publicationSubjectSpec from 'src/prototypes/table-tool/components/meta/publicationSubjectSpec';
 import TimePeriodDataTable from 'src/prototypes/table-tool/components/TimePeriodDataTable';
+import mapOptionValues from 'src/prototypes/table-tool/components/utils/mapOptionValues';
 import tableBuilderService, {
   DataTableResult,
-  PublicationMeta,
 } from 'src/services/tableBuilderService';
-import SchoolType from 'src/services/types/SchoolType';
 
 const defaultPublicationOptions = [
   {
@@ -53,15 +54,14 @@ const defaultPublicationOptions = [
 
 interface State {
   filters: {
-    indicators: string[];
+    indicators: IndicatorOption[];
     categorical: {
-      [key: string]: string[];
+      [key: string]: FilterOption[];
     };
     years: number[];
   };
   metaSpecification: MetaSpecification;
   publicationId: string;
-  publicationMeta: Pick<PublicationMeta, 'characteristics' | 'indicators'>;
   publicationName: string;
   publicationSubjectName: string;
   tableData: DataTableResult[];
@@ -70,24 +70,10 @@ interface State {
 class PrototypeTableToolPage extends Component<{}, State> {
   private readonly defaultFilters: State['filters'] = {
     categorical: {
-      characteristics: [
-        'Ethnicity_Major_Black_Total',
-        'Ethnicity_Major_White_Total',
-        'Ethnicity_Major_Chinese',
-        'Ethnicity_Major_Mixed_Total',
-      ],
-      schoolTypes: [
-        SchoolType.State_Funded_Primary,
-        SchoolType.State_Funded_Secondary,
-        SchoolType.Special,
-      ],
+      characteristics: [],
+      schoolTypes: [],
     },
-    indicators: [
-      'sess_authorised',
-      'sess_authorised_percent',
-      'sess_unauthorised',
-      'sess_unauthorised_percent',
-    ],
+    indicators: [],
     years: [],
   };
 
@@ -97,10 +83,6 @@ class PrototypeTableToolPage extends Component<{}, State> {
     },
     metaSpecification: initialMetaSpecification,
     publicationId: '',
-    publicationMeta: {
-      characteristics: {},
-      indicators: {},
-    },
     publicationName: '',
     publicationSubjectName: '',
     tableData: [],
@@ -124,7 +106,6 @@ class PrototypeTableToolPage extends Component<{}, State> {
     this.setState(
       {
         publicationId,
-        publicationMeta,
         publicationName,
         filters: {
           ...this.defaultFilters,
@@ -176,9 +157,25 @@ class PrototypeTableToolPage extends Component<{}, State> {
         tableData: [],
       },
       async () => {
-        const { indicators, categorical } = this.state.filters;
-        const { characteristics } = categorical;
-        const schoolTypes = categorical.schoolTypes as SchoolType[];
+        const characteristics = [
+          'Ethnicity_Major_Black_Total',
+          'Ethnicity_Major_White_Total',
+          'Ethnicity_Major_Chinese',
+          'Ethnicity_Major_Mixed_Total',
+        ];
+
+        const schoolTypes = [
+          'State_Funded_Primary',
+          'State_Funded_Secondary',
+          'Special',
+        ];
+
+        const indicators = [
+          'sess_authorised',
+          'sess_authorised_percent',
+          'sess_unauthorised',
+          'sess_unauthorised_percent',
+        ];
 
         const formatToAcademicYear = (year: string | number) => {
           const nextYear = parseInt(year as string, 0) + 1;
@@ -199,14 +196,35 @@ class PrototypeTableToolPage extends Component<{}, State> {
           startYear: formatToAcademicYear(startDate),
         });
 
+        const schoolTypesByValue = mapOptionValues(
+          this.state.metaSpecification.categoricalFilters.schoolTypes.options,
+        );
+        const characteristicsByValue = mapOptionValues(
+          this.state.metaSpecification.categoricalFilters.characteristics
+            .options,
+        );
+
+        const indicatorsByValue = mapOptionValues<IndicatorOption>(
+          this.state.metaSpecification.indicators,
+        );
+
         const years = range(startDate, endDate + 1).map(formatToAcademicYear);
 
         this.setState(
           {
             filters: {
-              categorical,
-              indicators,
               years,
+              categorical: {
+                characteristics: characteristics.map(
+                  characteristic => characteristicsByValue[characteristic],
+                ),
+                schoolTypes: schoolTypes.map(
+                  schoolType => schoolTypesByValue[schoolType],
+                ),
+              },
+              indicators: indicators.map(
+                indicator => indicatorsByValue[indicator],
+              ),
             },
             tableData: result,
           },
@@ -229,8 +247,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
     startDate,
     endDate,
   }) => {
-    const { characteristics } = categoricalFilters;
-    const schoolTypes = categoricalFilters.schoolTypes as SchoolType[];
+    const { characteristics, schoolTypes } = categoricalFilters;
 
     const formatToAcademicYear = (year: string | number) => {
       const nextYear = parseInt(year as string, 0) + 1;
@@ -248,14 +265,32 @@ class PrototypeTableToolPage extends Component<{}, State> {
       },
     );
 
+    const schoolTypesByValue = mapOptionValues(
+      this.state.metaSpecification.categoricalFilters.schoolTypes.options,
+    );
+    const characteristicsByValue = mapOptionValues(
+      this.state.metaSpecification.categoricalFilters.characteristics.options,
+    );
+
+    const indicatorsByValue = mapOptionValues<IndicatorOption>(
+      this.state.metaSpecification.indicators,
+    );
+
     const years = range(startDate, endDate + 1).map(formatToAcademicYear);
 
     this.setState(
       {
         filters: {
-          indicators,
           years,
-          categorical: categoricalFilters,
+          categorical: {
+            characteristics: characteristics.map(
+              characteristic => characteristicsByValue[characteristic],
+            ),
+            schoolTypes: schoolTypes.map(
+              schoolType => schoolTypesByValue[schoolType],
+            ),
+          },
+          indicators: indicators.map(indicator => indicatorsByValue[indicator]),
         },
         tableData: result,
       },
@@ -310,7 +345,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
               value={publicationId}
             />
           </div>
-          <div className="govuk-grid-column-one-third-from-desktop">
+          <div className="govuk-grid-column-two-thirds-from-desktop">
             {publicationId && (
               <>
                 <h2>
@@ -364,11 +399,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
           <section ref={this.dataTableRef}>
             <h2>4. Explore data for '{publicationName}'</h2>
 
-            <TimePeriodDataTable
-              filters={filters}
-              specification={metaSpecification}
-              results={tableData}
-            />
+            <TimePeriodDataTable filters={filters} results={tableData} />
 
             <ul className="govuk-list">
               <li>

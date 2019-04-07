@@ -1,9 +1,10 @@
-import SchoolType from 'src/services/types/SchoolType';
-
 export interface FilterOption {
   label: string;
   value: string;
-  unit?: string;
+}
+
+export interface IndicatorOption extends FilterOption {
+  unit: string;
 }
 
 export interface GroupedFilterOptions {
@@ -51,7 +52,7 @@ export interface MetaSpecification {
   indicators: {
     [key: string]: {
       label: string;
-      options: FilterOption[];
+      options: IndicatorOption[];
       unit: string;
     };
   };
@@ -70,19 +71,19 @@ const metaSpecification: MetaSpecification = {
       options: [
         {
           label: 'Total',
-          value: SchoolType.Total,
+          value: 'Total',
         },
         {
-          label: 'Primary',
-          value: SchoolType.State_Funded_Primary,
+          label: 'Primary schools',
+          value: 'State_Funded_Primary',
         },
         {
-          label: 'Secondary',
-          value: SchoolType.State_Funded_Secondary,
+          label: 'Secondary schools',
+          value: 'State_Funded_Secondary',
         },
         {
-          label: 'Special',
-          value: SchoolType.Special,
+          label: 'Special schools',
+          value: 'Special',
         },
       ],
     },
