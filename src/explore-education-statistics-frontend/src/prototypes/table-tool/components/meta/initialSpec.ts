@@ -33,12 +33,13 @@ export interface MetaSpecification {
         }
       };
     };
-    startEndDate: {
+    timePeriod: {
       hint?: string;
       legend: string;
       options: {
+        code: string;
         label: string;
-        value: string | number;
+        year: number;
       }[];
     };
   };
@@ -119,16 +120,16 @@ const metaSpecification: MetaSpecification = {
         },
       },
     },
-    startEndDate: {
+    timePeriod: {
       hint: 'Filter statistics by a given start and end date',
       legend: 'Academic Year',
       options: [
-        { value: 2011, label: '2011/12' },
-        { value: 2012, label: '2012/13' },
-        { value: 2013, label: '2013/14' },
-        { value: 2014, label: '2014/15' },
-        { value: 2015, label: '2015/16' },
-        { value: 2016, label: '2016/17' },
+        { code: 'ACADEMIC', label: '2011/12', year: 2011 },
+        { code: 'ACADEMIC', label: '2012/13', year: 2012 },
+        { code: 'ACADEMIC', label: '2013/14', year: 2013 },
+        { code: 'ACADEMIC', label: '2014/15', year: 2014 },
+        { code: 'ACADEMIC', label: '2015/16', year: 2015 },
+        { code: 'ACADEMIC', label: '2016/17', year: 2016 },
       ],
     },
   },

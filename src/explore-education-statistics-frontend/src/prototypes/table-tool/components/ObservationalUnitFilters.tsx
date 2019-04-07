@@ -5,6 +5,7 @@ import {
   FormFieldSelect,
   FormFieldset,
 } from 'src/components/form';
+import { SelectOption } from 'src/components/form/FormSelect';
 import {
   LocationLevel,
   MetaSpecification,
@@ -19,6 +20,15 @@ interface Props {
 const ObservationalUnitFilters = ({ form, specification }: Props) => {
   const locationSpecification =
     specification.observationalUnits.location.options;
+
+  const timePeriodOptions: SelectOption[] = specification.observationalUnits.timePeriod.options.map(
+    option => {
+      return {
+        label: option.label,
+        value: `${option.year}_${option.code}`,
+      };
+    },
+  );
 
   return (
     <>
@@ -85,20 +95,20 @@ const ObservationalUnitFilters = ({ form, specification }: Props) => {
 
       <FormFieldset
         id="filter-startEndDates"
-        legend={specification.observationalUnits.startEndDate.legend}
-        hint={specification.observationalUnits.startEndDate.hint}
+        legend={specification.observationalUnits.timePeriod.legend}
+        hint={specification.observationalUnits.timePeriod.hint}
       >
         <FormFieldSelect
-          name="startDate"
-          id="filter-startDate"
+          name="timePeriod.start"
+          id="filter-timePeriodStart"
           label="Start date"
-          options={specification.observationalUnits.startEndDate.options}
+          options={timePeriodOptions}
         />
         <FormFieldSelect
-          name="endDate"
-          id="filter-endDate"
+          name="timePeriod.end"
+          id="filter-timePeriodEnd"
           label="End date"
-          options={specification.observationalUnits.startEndDate.options}
+          options={timePeriodOptions}
         />
       </FormFieldset>
     </>

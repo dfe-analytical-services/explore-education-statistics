@@ -7,13 +7,14 @@ import ErrorSummary, { ErrorSummaryMessage } from 'src/components/ErrorSummary';
 import { FormFieldset, FormGroup } from 'src/components/form';
 import createErrorHelper from 'src/lib/validation/createErrorHelper';
 import Yup from 'src/lib/validation/yup';
+import TimePeriodInstant from 'src/services/types/TimePeriodInstant';
+import { Comparable, Overwrite } from 'src/types/util';
 import CategoricalFilters from './CategoricalFilters';
 import { MetaSpecification } from './meta/initialSpec';
 import ObservationalUnitFilters from './ObservationalUnitFilters';
 import SearchableGroupedFilterMenus from './SearchableGroupedFilterMenus';
 
 export interface FormValues {
-  endDate: number;
   indicators: string[];
   location: {
     level: string;
@@ -21,13 +22,26 @@ export interface FormValues {
     region: string;
     localAuthority: string;
   };
-  startDate: number;
   categoricalFilters: {
     [key: string]: string[];
   };
+  timePeriod: {
+    start: string;
+    end: string;
+  };
 }
 
-export type FilterFormSubmitHandler = (values: FormValues) => void;
+export type FilterFormSubmitHandler = (
+  values: Overwrite<
+    FormValues,
+    {
+      timePeriod: {
+        start: TimePeriodInstant;
+        end: TimePeriodInstant;
+      };
+    }
+  >,
+) => void;
 
 interface Props {
   specification: MetaSpecification;
@@ -71,8 +85,8 @@ class FiltersForm extends Component<Props, State> {
   public render() {
     const { specification } = this.props;
 
-    const startEndDateValues = specification.observationalUnits.startEndDate.options.map(
-      ({ value }) => value,
+    const startEndDateValues = specification.observationalUnits.timePeriod.options.map(
+      ({ code, year }) => `${year}_${code}`,
     );
 
     let locationRules = Yup.object<FormValues['location']>({
@@ -105,7 +119,6 @@ class FiltersForm extends Component<Props, State> {
             specification.categoricalFilters,
             () => [],
           ),
-          endDate: 2016,
           indicators: [],
           location: {
             level: '',
@@ -113,7 +126,10 @@ class FiltersForm extends Component<Props, State> {
             national: '',
             region: '',
           },
-          startDate: 2012,
+          timePeriod: {
+            end: '2016_ACADEMIC',
+            start: '2012_ACADEMIC',
+          },
         }}
         validationSchema={Yup.object<FormValues>({
           categoricalFilters: Yup.object(
@@ -123,28 +139,70 @@ class FiltersForm extends Component<Props, State> {
                 .required('Select at least one option'),
             ),
           ),
-          endDate: Yup.number()
-            .required('End date is required')
-            .oneOf(startEndDateValues, 'Must be one of provided dates')
-            .moreThanOrEqual(
-              Yup.ref('startDate'),
-              'Must be after or same as start date',
-            ),
           indicators: Yup.array()
             .of(Yup.string())
             .required('Select at least one option'),
           location: locationRules,
-          startDate: Yup.number()
-            .required('Start date is required')
-            .oneOf(startEndDateValues, 'Must be one of provided dates')
-            .lessThanOrEqual(
-              Yup.ref('endDate'),
-              'Must be before or same as end date',
-            ),
+          timePeriod: Yup.object<FormValues['timePeriod']>({
+            end: Yup.string()
+              .required('End date is required')
+              .oneOf(startEndDateValues, 'Must be one of provided dates')
+              .test(
+                'moreThanOrEqual',
+                'Must be after or same as start date',
+                function(value: string) {
+                  const start: string = this.resolve(Yup.ref('start'));
+
+                  if (!start) {
+                    return false;
+                  }
+
+                  const endTime = TimePeriodInstant.fromString(value);
+                  const startTime = TimePeriodInstant.fromString(start);
+
+                  const comparison = endTime.compare(startTime);
+
+                  return (
+                    comparison === Comparable.GreaterThan ||
+                    comparison === Comparable.Equal
+                  );
+                },
+              ),
+            start: Yup.string()
+              .required('Start date is required')
+              .oneOf(startEndDateValues, 'Must be one of provided dates')
+              .test(
+                'lessThanOrEqual',
+                'Must be before or same as end date',
+                function(value: string) {
+                  const end: string = this.resolve(Yup.ref('end'));
+
+                  if (!end) {
+                    return false;
+                  }
+
+                  const startTime = TimePeriodInstant.fromString(value);
+                  const endTime = TimePeriodInstant.fromString(end);
+
+                  const comparison = startTime.compare(endTime);
+
+                  return (
+                    comparison === Comparable.LessThan ||
+                    comparison === Comparable.Equal
+                  );
+                },
+              ),
+          }),
         })}
         onSubmit={async (form, actions) => {
           try {
-            await this.props.onSubmit(form);
+            await this.props.onSubmit({
+              ...form,
+              timePeriod: {
+                end: TimePeriodInstant.fromString(form.timePeriod.end),
+                start: TimePeriodInstant.fromString(form.timePeriod.start),
+              },
+            });
           } catch (error) {
             this.setState({
               submitError: error.message,

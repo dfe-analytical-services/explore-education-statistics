@@ -6,7 +6,9 @@ import PublicationMenu, {
 } from 'src/modules/table-tool/components/PublicationMenu';
 import PublicationSubjectMenu from 'src/modules/table-tool/components/PublicationSubjectMenu';
 import PrototypePage from 'src/prototypes/components/PrototypePage';
-import { FilterFormSubmitHandler } from 'src/prototypes/table-tool/components/FiltersForm';
+import FiltersForm, {
+  FilterFormSubmitHandler,
+} from 'src/prototypes/table-tool/components/FiltersForm';
 import initialMetaSpecification, {
   FilterOption,
   IndicatorOption,
@@ -156,101 +158,101 @@ class PrototypeTableToolPage extends Component<{}, State> {
         publicationSubjectName: '',
         tableData: [],
       },
-      async () => {
-        const characteristics = [
-          'Ethnicity_Major_Black_Total',
-          'Ethnicity_Major_White_Total',
-          'Ethnicity_Major_Chinese',
-          'Ethnicity_Major_Mixed_Total',
-        ];
-
-        const schoolTypes = [
-          'State_Funded_Primary',
-          'State_Funded_Secondary',
-          'Special',
-        ];
-
-        const indicators = [
-          'sess_authorised',
-          'sess_authorised_percent',
-          'sess_unauthorised',
-          'sess_unauthorised_percent',
-        ];
-
-        const formatToAcademicYear = (year: string | number) => {
-          const nextYear = parseInt(year as string, 0) + 1;
-          return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
-        };
-
-        const startDate = 2012;
-        const endDate = 2016;
-
-        const {
-          result,
-        } = await tableBuilderService.getNationalCharacteristicsData({
-          characteristics,
-          indicators,
-          schoolTypes,
-          endYear: formatToAcademicYear(endDate),
-          publicationId: this.state.publicationId,
-          startYear: formatToAcademicYear(startDate),
-        });
-
-        const schoolTypesByValue = mapOptionValues(
-          this.state.metaSpecification.categoricalFilters.schoolTypes.options,
-        );
-        const characteristicsByValue = mapOptionValues(
-          this.state.metaSpecification.categoricalFilters.characteristics
-            .options,
-        );
-
-        const indicatorsByValue = mapOptionValues<IndicatorOption>(
-          this.state.metaSpecification.indicators,
-        );
-
-        const years = range(startDate, endDate + 1).map(formatToAcademicYear);
-
-        this.setState(
-          {
-            filters: {
-              years,
-              categorical: {
-                characteristics: characteristics.map(
-                  characteristic => characteristicsByValue[characteristic],
-                ),
-                schoolTypes: schoolTypes.map(
-                  schoolType => schoolTypesByValue[schoolType],
-                ),
-              },
-              indicators: indicators.map(
-                indicator => indicatorsByValue[indicator],
-              ),
-            },
-            tableData: result,
-          },
-          () => {
-            if (this.dataTableRef.current) {
-              this.dataTableRef.current.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-            }
-          },
-        );
-      },
+      // async () => {
+      //   const characteristics = [
+      //     'Ethnicity_Major_Black_Total',
+      //     'Ethnicity_Major_White_Total',
+      //     'Ethnicity_Major_Chinese',
+      //     'Ethnicity_Major_Mixed_Total',
+      //   ];
+      //
+      //   const schoolTypes = [
+      //     'State_Funded_Primary',
+      //     'State_Funded_Secondary',
+      //     'Special',
+      //   ];
+      //
+      //   const indicators = [
+      //     'sess_authorised',
+      //     'sess_authorised_percent',
+      //     'sess_unauthorised',
+      //     'sess_unauthorised_percent',
+      //   ];
+      //
+      //   const formatToAcademicYear = (year: string | number) => {
+      //     const nextYear = parseInt(year as string, 0) + 1;
+      //     return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
+      //   };
+      //
+      //   const startDate = 2012;
+      //   const endDate = 2016;
+      //
+      //   const {
+      //     result,
+      //   } = await tableBuilderService.getNationalCharacteristicsData({
+      //     characteristics,
+      //     indicators,
+      //     schoolTypes,
+      //     endYear: formatToAcademicYear(endDate),
+      //     publicationId: this.state.publicationId,
+      //     startYear: formatToAcademicYear(startDate),
+      //   });
+      //
+      //   const schoolTypesByValue = mapOptionValues(
+      //     this.state.metaSpecification.categoricalFilters.schoolTypes.options,
+      //   );
+      //   const characteristicsByValue = mapOptionValues(
+      //     this.state.metaSpecification.categoricalFilters.characteristics
+      //       .options,
+      //   );
+      //
+      //   const indicatorsByValue = mapOptionValues<IndicatorOption>(
+      //     this.state.metaSpecification.indicators,
+      //   );
+      //
+      //   const years = range(startDate, endDate + 1).map(formatToAcademicYear);
+      //
+      //   this.setState(
+      //     {
+      //       filters: {
+      //         years,
+      //         categorical: {
+      //           characteristics: characteristics.map(
+      //             characteristic => characteristicsByValue[characteristic],
+      //           ),
+      //           schoolTypes: schoolTypes.map(
+      //             schoolType => schoolTypesByValue[schoolType],
+      //           ),
+      //         },
+      //         indicators: indicators.map(
+      //           indicator => indicatorsByValue[indicator],
+      //         ),
+      //       },
+      //       tableData: result,
+      //     },
+      //     () => {
+      //       if (this.dataTableRef.current) {
+      //         this.dataTableRef.current.scrollIntoView({
+      //           behavior: 'smooth',
+      //           block: 'start',
+      //         });
+      //       }
+      //     },
+      //   );
+      // },
     );
   };
 
   private handleFilterFormSubmit: FilterFormSubmitHandler = async ({
     categoricalFilters,
     indicators,
-    startDate,
-    endDate,
+    timePeriod,
   }) => {
     const { characteristics, schoolTypes } = categoricalFilters;
+    const { start, end } = timePeriod;
 
-    const formatToAcademicYear = (year: string | number) => {
-      const nextYear = parseInt(year as string, 0) + 1;
+    const formatToAcademicYear = (year: number) => {
+      const nextYear = year + 1;
       return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
     };
 
@@ -259,9 +261,9 @@ class PrototypeTableToolPage extends Component<{}, State> {
         characteristics,
         indicators,
         schoolTypes,
-        endYear: formatToAcademicYear(endDate),
+        endYear: formatToAcademicYear(end.year),
         publicationId: this.state.publicationId,
-        startYear: formatToAcademicYear(startDate),
+        startYear: formatToAcademicYear(start.year),
       },
     );
 
@@ -276,7 +278,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
       this.state.metaSpecification.indicators,
     );
 
-    const years = range(startDate, endDate + 1).map(formatToAcademicYear);
+    const years = range(start.year, end.year + 1).map(formatToAcademicYear);
 
     this.setState(
       {
@@ -379,21 +381,21 @@ class PrototypeTableToolPage extends Component<{}, State> {
           </div>
         </section>
 
-        {/*{publicationSubjectName && (*/}
-        {/*<section className="govuk-form-group" ref={this.filtersRef}>*/}
-        {/*<h2>*/}
-        {/*3. Choose your filters for '{publicationName}'*/}
-        {/*<span className="govuk-hint">*/}
-        {/*Select any combination of filters.*/}
-        {/*</span>*/}
-        {/*</h2>*/}
+        {publicationSubjectName && (
+          <section className="govuk-form-group" ref={this.filtersRef}>
+            <h2>
+              3. Choose your filters for '{publicationName}'
+              <span className="govuk-hint">
+                Select any combination of filters.
+              </span>
+            </h2>
 
-        {/*<FiltersForm*/}
-        {/*onSubmit={this.handleFilterFormSubmit}*/}
-        {/*specification={metaSpecification}*/}
-        {/*/>*/}
-        {/*</section>*/}
-        {/*)}*/}
+            <FiltersForm
+              onSubmit={this.handleFilterFormSubmit}
+              specification={metaSpecification}
+            />
+          </section>
+        )}
 
         {tableData.length > 0 && (
           <section ref={this.dataTableRef}>
