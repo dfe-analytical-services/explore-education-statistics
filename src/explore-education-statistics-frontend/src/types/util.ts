@@ -8,6 +8,10 @@ export enum Comparable {
   LessThan = -1,
 }
 
+export interface Dictionary<T> {
+  [key: string]: T;
+}
+
 /**
  * Extract a type which are the keys from T
  * that have value matching the type U.

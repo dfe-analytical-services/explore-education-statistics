@@ -1,6 +1,8 @@
+import mapValues from 'lodash/mapValues';
 import range from 'lodash/range';
 import React, { Component, createRef } from 'react';
 import PageTitle from 'src/components/PageTitle';
+import mapValuesWithKeys from 'src/lib/utils/mapValuesWithKeys';
 import PublicationMenu, {
   MenuChangeEventHandler,
 } from 'src/modules/table-tool/components/PublicationMenu';
@@ -267,11 +269,9 @@ class PrototypeTableToolPage extends Component<{}, State> {
       },
     );
 
-    const schoolTypesByValue = mapOptionValues(
-      this.state.metaSpecification.categoricalFilters.schoolTypes.options,
-    );
-    const characteristicsByValue = mapOptionValues(
-      this.state.metaSpecification.categoricalFilters.characteristics.options,
+    const categoricalFiltersByValue = mapValues(
+      this.state.metaSpecification.categoricalFilters,
+      value => mapOptionValues(value.options),
     );
 
     const indicatorsByValue = mapOptionValues<IndicatorOption>(
@@ -284,14 +284,13 @@ class PrototypeTableToolPage extends Component<{}, State> {
       {
         filters: {
           years,
-          categorical: {
-            characteristics: characteristics.map(
-              characteristic => characteristicsByValue[characteristic],
-            ),
-            schoolTypes: schoolTypes.map(
-              schoolType => schoolTypesByValue[schoolType],
-            ),
-          },
+          categorical: mapValuesWithKeys(
+            categoricalFilters,
+            ([filterGroup, selectedFilters]) =>
+              selectedFilters.map(
+                filter => categoricalFiltersByValue[filterGroup][filter],
+              ),
+          ),
           indicators: indicators.map(indicator => indicatorsByValue[indicator]),
         },
         tableData: result,
