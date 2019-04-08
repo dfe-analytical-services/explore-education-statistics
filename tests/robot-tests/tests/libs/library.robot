@@ -186,3 +186,7 @@ user checks element attribute value should be
 user selects from list by label
   [Arguments]   ${locator}   ${label}
   select from list by label   ${locator}   ${label}
+
+user presses keys
+  [Arguments]   ${keys}
+  press keys  ${None}    ${keys}

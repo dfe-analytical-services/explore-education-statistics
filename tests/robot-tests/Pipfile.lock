@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "eddb860d261c17e1e52b2219a9c0d4f429df55d108437fe431a86547e09d8731"
+            "sha256": "eba0c8cae82b3ad57fe5a685bbfef5da6af87865bd4507bc860639d58fff4ca0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -76,11 +76,11 @@
         },
         "robotframework-seleniumlibrary": {
             "hashes": [
-                "sha256:113ee01aa4fbfd322d4816e5704c0187ffcf6a047ea012a66d305f250ab485db",
-                "sha256:8a53ec6bc2f2969dbec9904400b539c4323bf6620da23dd17527928385a53466"
+                "sha256:6f3a0eba3f0a4f9b10d3271420f4430cc9e8230cc25e3deaa469d533d872a10f",
+                "sha256:f4c39ca0128e4774368ca59debf05991c218ef6cff9f726dd13c0738861f7a5c"
             ],
             "index": "pypi",
-            "version": "==3.2.0"
+            "version": "==3.3.1"
         },
         "robotremoteserver": {
             "hashes": [
