@@ -22,13 +22,13 @@ const CategoricalFilters = ({ form, specification }: Props) => {
 
         return (
           <div className={styles.group} key={filterKey}>
-            {Array.isArray(filterSpec.options) ? (
+            {Object.keys(filterSpec.options).length === 1 ? (
               <FormFieldCheckboxGroup<FormValues>
                 id={`filter-${filterKey}`}
                 name={filterName}
                 legend={filterSpec.legend}
                 hint={filterSpec.hint}
-                options={filterSpec.options.map(option => ({
+                options={filterSpec.options.default.options.map(option => ({
                   id: `${filterKey}-${option.value}`,
                   label: option.label,
                   value: option.value,

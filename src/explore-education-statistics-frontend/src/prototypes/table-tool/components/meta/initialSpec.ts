@@ -8,7 +8,7 @@ export interface IndicatorOption extends FilterOption {
 }
 
 export interface GroupedFilterOptions {
-  [name: string]: {
+  [groupKey: string]: {
     label: string;
     options: FilterOption[];
   };
@@ -47,7 +47,7 @@ export interface MetaSpecification {
     [key: string]: {
       legend: string;
       hint?: string;
-      options: FilterOption[] | GroupedFilterOptions;
+      options: GroupedFilterOptions;
     };
   };
   indicators: {
@@ -69,24 +69,29 @@ const metaSpecification: MetaSpecification = {
     schoolTypes: {
       hint: 'Filter by number of pupils in school type(s)',
       legend: 'School type',
-      options: [
-        {
-          label: 'Total',
-          value: 'Total',
+      options: {
+        default: {
+          label: '',
+          options: [
+            {
+              label: 'Total',
+              value: 'Total',
+            },
+            {
+              label: 'Primary schools',
+              value: 'State_Funded_Primary',
+            },
+            {
+              label: 'Secondary schools',
+              value: 'State_Funded_Secondary',
+            },
+            {
+              label: 'Special schools',
+              value: 'Special',
+            },
+          ],
         },
-        {
-          label: 'Primary schools',
-          value: 'State_Funded_Primary',
-        },
-        {
-          label: 'Secondary schools',
-          value: 'State_Funded_Secondary',
-        },
-        {
-          label: 'Special schools',
-          value: 'Special',
-        },
-      ],
+      },
     },
   },
   indicators: {},
