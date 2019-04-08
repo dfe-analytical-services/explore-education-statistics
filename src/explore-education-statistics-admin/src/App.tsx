@@ -21,6 +21,7 @@ import { default as PublicationCreateNewAbsenceConfig } from "./pages/prototypes
 import { default as PublicationCreateNewAbsenceConfigEdit } from "./pages/prototypes/publication-create-new-absence-config-edit";
 import { default as PublicationCreateNewAbsenceData } from "./pages/prototypes/publication-create-new-absence-data";
 import { default as PublicationCreateNewAbsenceSchedule } from "./pages/prototypes/publication-create-new-absence-schedule";
+import { default as PublicationCreateNewAbsenceScheduleEdit } from "./pages/prototypes/publication-create-new-absence-schedule-edit";
 import { default as PublicationCreateNewAbsenceStatus } from "./pages/prototypes/publication-create-new-absence-status";
 
 const history = createBrowserHistory();
@@ -81,6 +82,11 @@ class App extends Component {
           exact
           path="/prototypes/publication-create-new-absence-schedule"
           component={PublicationCreateNewAbsenceSchedule}
+        />
+        <Route
+          exact
+          path="/prototypes/publication-create-new-absence-schedule-edit"
+          component={PublicationCreateNewAbsenceScheduleEdit}
         />
         <Route
           exact

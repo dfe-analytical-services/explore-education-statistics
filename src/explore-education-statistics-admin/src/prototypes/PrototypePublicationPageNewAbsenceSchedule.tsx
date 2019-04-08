@@ -25,114 +25,21 @@ const PublicationSchedulePage = () => {
     >
       <PrototypeAdminNavigation sectionId="schedule" />
 
-      <form action="#">
-        <fieldset className="govuk-fieldset">
-          <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-            Schedule publish date
-          </legend>
-          <div className="govuk-date-input" id="schedule-publish-date">
-            <div className="govuk-date-input__item">
-              <div className="govuk-form-group">
-                <label
-                  htmlFor="schedule-day"
-                  className="govuk-label govuk-date-input__label"
-                >
-                  Day
-                </label>
-                <input
-                  className="govuk-input govuk-date-input__inout govuk-input--width-2"
-                  id="schedule-day"
-                  name="schedule-day"
-                  type="number"
-                  pattern="[0-9]*"
-                />
-              </div>
-            </div>
-            <div className="govuk-date-input__item">
-              <div className="govuk-form-group">
-                <label
-                  htmlFor="schedule-month"
-                  className="govuk-label govuk-date-input__label"
-                >
-                  Month
-                </label>
-                <input
-                  className="govuk-input govuk-date-input__inout govuk-input--width-2"
-                  id="schedule-month"
-                  name="schedule-month"
-                  type="number"
-                  pattern="[0-9]*"
-                />
-              </div>
-            </div>
-            <div className="govuk-date-input__item">
-              <div className="govuk-form-group">
-                <label
-                  htmlFor="schedule-year"
-                  className="govuk-label govuk-date-input__label"
-                >
-                  Year
-                </label>
-                <input
-                  className="govuk-input govuk-date-input__inout govuk-input--width-4"
-                  id="schedule-year"
-                  name="schedule-year"
-                  type="number"
-                  pattern="[0-9]*"
-                />
-              </div>
-            </div>
-          </div>
-        </fieldset>
-        <fieldset className="govuk-fieldset govuk-!-margin-top-9">
-          <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-            Schedule publish time
-          </legend>
-          <div className="govuk-date-input" id="schedule-publish-date">
-            <div className="govuk-date-input__item">
-              <div className="govuk-form-group">
-                <label
-                  htmlFor="schedule-hours"
-                  className="govuk-label govuk-date-input__label"
-                >
-                  Hour
-                </label>
-                <input
-                  className="govuk-input govuk-date-input__inout govuk-input--width-2"
-                  id="schedule-hours"
-                  name="schedule-hours"
-                  type="number"
-                  pattern="[0-9]*"
-                  value="09"
-                />
-              </div>
-            </div>
-            <div className="govuk-date-input__item">
-              <div className="govuk-form-group">
-                <label
-                  htmlFor="schedule-mins"
-                  className="govuk-label govuk-date-input__label"
-                >
-                  Minutes
-                </label>
-                <input
-                  className="govuk-input govuk-date-input__inout govuk-input--width-2"
-                  id="schedule-mins"
-                  name="schedule-mins"
-                  type="number"
-                  pattern="[0-9]*"
-                  value="30"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="govuk-form-group govuk-!-margin-top-6">
-            <button type="submit" className="govuk-button">
-              Update scheduled publish date and time
-            </button>
-          </div>
-        </fieldset>
-      </form>
+      <dl className="govuk-summary-list">
+        <div className="govuk-summary-list__row">
+          <dt className="govuk-summary-list__key">Scheduled publish date</dt>
+          <dd className="govuk-summary-list__value">To be set</dd>
+        </div>
+        <div className="govuk-summary-list__row">
+          <dt className="govuk-summary-list__key">Scheduled published time</dt>
+          <dd className="govuk-summary-list__value">
+            <time dateTime="20:00">09:30</time>
+          </dd>
+        </div>
+      </dl>
+      <a href="/prototypes/publication-create-new-absence-schedule-edit">
+        Edit scheduled publish date
+      </a>
     </PrototypePage>
   );
 };
