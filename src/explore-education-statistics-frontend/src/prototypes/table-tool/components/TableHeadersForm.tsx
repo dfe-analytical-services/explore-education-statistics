@@ -40,6 +40,7 @@ class TableHeadersForm extends Component<Props> {
         </p>
 
         <Formik<FormValues>
+          enableReinitialize={true}
           initialValues={{
             columnGroups: categorical.schoolTypes,
             columns: timePeriods,
