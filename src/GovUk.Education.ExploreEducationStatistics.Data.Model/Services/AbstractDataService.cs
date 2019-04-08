@@ -47,13 +47,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var queryable = DbSet().AsQueryable();
             include.ForEach(i => queryable = queryable.Include(i));
             return queryable
-                .FilterByPrimaryKey(_context, id)
+                .FindByPrimaryKey(_context, id)
                 .SingleOrDefault();
         }
 
         public TEntity Find(TKey id)
         {
             return DbSet().Find(id);
+        }
+
+        public IEnumerable<TEntity> Find(TKey[] ids)
+        {
+            return DbSet().FindAll(_context, ids.Cast<object>().ToArray());
         }
 
         public IEnumerable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression,

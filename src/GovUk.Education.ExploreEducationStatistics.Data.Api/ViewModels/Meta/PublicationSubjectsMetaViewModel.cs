@@ -3,10 +3,9 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
 {
-    public class PublicationSubjectsMetaViewModel
+    public class PublicationMetaViewModel
     {
-        public Guid PublicationId { get; set; }
-        
-        public IEnumerable<SubjectMetaViewModel> Subjects { get; set; }
+        public Guid PublicationId { get; set; }        
+        public IEnumerable<IdLabelViewModel> Subjects { get; set; }
     }
 }
