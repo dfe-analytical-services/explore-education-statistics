@@ -127,8 +127,8 @@ class FiltersForm extends Component<Props, State> {
             region: '',
           },
           timePeriod: {
-            end: '2016_ACADEMIC',
-            start: '2012_ACADEMIC',
+            end: '2016_AY',
+            start: '2012_AY',
           },
         }}
         validationSchema={Yup.object<FormValues>({

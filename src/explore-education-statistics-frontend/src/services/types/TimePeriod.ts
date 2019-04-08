@@ -1,8 +1,8 @@
 import { Comparison } from 'src/types/util';
 
-type TimePeriodCode = 'ACADEMIC';
+type TimePeriodCode = 'AY';
 
-const allowedTimePeriodCodes: TimePeriodCode[] = ['ACADEMIC'];
+const allowedTimePeriodCodes: TimePeriodCode[] = ['AY'];
 
 class TimePeriod {
   public constructor(
@@ -42,7 +42,7 @@ class TimePeriod {
 
   public get label(): string {
     switch (this.code) {
-      case 'ACADEMIC': {
+      case 'AY': {
         const yearString = this.year.toString();
         return `${yearString}/${Number(yearString.substring(2, 4)) + 1}`;
       }
@@ -55,14 +55,14 @@ class TimePeriod {
 
   public previousPeriod(): TimePeriod {
     switch (this.code) {
-      case 'ACADEMIC':
+      case 'AY':
         return new TimePeriod(this.year - 1, this.code);
     }
   }
 
   public nextPeriod(): TimePeriod {
     switch (this.code) {
-      case 'ACADEMIC':
+      case 'AY':
         return new TimePeriod(this.year + 1, this.code);
     }
   }
