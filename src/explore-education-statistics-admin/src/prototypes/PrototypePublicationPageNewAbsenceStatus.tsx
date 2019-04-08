@@ -54,7 +54,7 @@ const PublicationDataPage = () => {
                   type="radio"
                   name="status"
                   id="readyApproval"
-                  value="edit"
+                  value="readyApproval"
                 />
                 <label
                   className="govuk-label govuk-radios__label"
@@ -70,7 +70,7 @@ const PublicationDataPage = () => {
                   type="radio"
                   name="status"
                   id="cancelEdit"
-                  value="edit"
+                  value="delete"
                   data-aria-controls="content-for-approval"
                 />
                 <label
