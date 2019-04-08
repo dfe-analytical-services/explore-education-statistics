@@ -10,8 +10,9 @@ import PrototypeMap from "./components/PrototypeMap";
 import PrototypePage from "./components/PrototypePage";
 import { PrototypeEditableContent } from "./components/PrototypeEditableContent";
 import TabsSection from "../components/TabsSection";
+import { RouteProps } from "react-router";
 
-const PublicationDataPage = () => {
+const PublicationDataPage = ({ location: object }: RouteProps) => {
   return (
     <PrototypePage
       wide
@@ -24,6 +25,7 @@ const PublicationDataPage = () => {
       ]}
     >
       <PrototypeAdminNavigation sectionId="status" />
+      {location.search == "?status=edit" && <p>testtest</p>}
       <form action="/prototypes/publication-create-new-absence-status">
         <div className="govuk-form-group">
           <fieldset className="govuk-fieldset">
