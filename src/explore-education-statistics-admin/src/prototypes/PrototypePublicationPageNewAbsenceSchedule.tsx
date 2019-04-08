@@ -37,9 +37,9 @@ const PublicationSchedulePage = () => {
           </dd>
         </div>
       </dl>
-      <a href="/prototypes/publication-create-new-absence-schedule-edit">
+      <Link to="/prototypes/publication-create-new-absence-schedule-edit">
         Edit scheduled publish date
-      </a>
+      </Link>
     </PrototypePage>
   );
 };

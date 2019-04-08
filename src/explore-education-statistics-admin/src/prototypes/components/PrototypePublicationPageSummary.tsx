@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "../../components/Link";
 
 interface Props {
   sectionId?: string;
@@ -25,9 +26,9 @@ const PrototypePublicationSummary = ({ sectionId, action }: Props) => {
           <dd className="govuk-summary-list__value">2018 to 2019</dd>
         </div>
       </dl>
-      <a href="/prototypes/publication-create-new-absence-config-edit">
+      <Link to="/prototypes/publication-create-new-absence-config-edit">
         Edit release setup details
-      </a>
+      </Link>
     </>
   );
 };

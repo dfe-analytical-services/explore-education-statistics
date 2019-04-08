@@ -28,12 +28,12 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
                 : "app-navigation--non-selected-page"
             }
           >
-            <a
-              href="/prototypes/publication-create-new-absence-config"
+            <Link
+              to="/prototypes/publication-create-new-absence-config"
               className="govuk-link govuk-link--no-visited-state"
             >
               Release setup
-            </a>
+            </Link>
           </li>
           <li
             className={
@@ -42,12 +42,12 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
                 : "app-navigation--non-selected-page"
             }
           >
-            <a
-              href="/prototypes/publication-create-new-absence-data"
+            <Link
+              to="/prototypes/publication-create-new-absence-data"
               className="govuk-link govuk-link--no-visited-state"
             >
               Add data
-            </a>
+            </Link>
           </li>
           <li
             className={
@@ -56,12 +56,12 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
                 : "app-navigation--non-selected-page"
             }
           >
-            <a
-              href="/prototypes/publication-create-new-absence"
+            <Link
+              to="/prototypes/publication-create-new-absence"
               className="govuk-link govuk-link--no-visited-state"
             >
               Add / edit content
-            </a>
+            </Link>
           </li>
           <li
             className={
@@ -70,12 +70,12 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
                 : "app-navigation--non-selected-page"
             }
           >
-            <a
-              href="/prototypes/publication-create-new-absence-schedule"
+            <Link
+              to="/prototypes/publication-create-new-absence-schedule"
               className="govuk-link govuk-link--no-visited-state"
             >
               Schedule publish date
-            </a>
+            </Link>
           </li>
           <li
             className={
@@ -84,12 +84,12 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
                 : "app-navigation--non-selected-page"
             }
           >
-            <a
-              href="/prototypes/publication-create-new-absence-status"
+            <Link
+              to="/prototypes/publication-create-new-absence-status"
               className="govuk-link govuk-link--no-visited-state"
             >
               Set status
-            </a>
+            </Link>
           </li>
         </ul>
       </nav>

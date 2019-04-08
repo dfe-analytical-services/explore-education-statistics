@@ -133,6 +133,11 @@ const PublicationSchedulePage = () => {
           </div>
         </fieldset>
       </form>
+      <div className="govuk-!-margin-top-6">
+        <Link to="/prototypes/publication-create-new-absence-schedule">
+          Cancel update
+        </Link>
+      </div>
     </PrototypePage>
   );
 };

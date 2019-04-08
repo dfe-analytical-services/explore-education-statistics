@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "../../components/Link";
 
 interface Props {
   sectionId?: string;
@@ -198,12 +199,9 @@ const PrototypePublicationConfig = ({ sectionId, action }: Props) => {
             </button>
 
             <div className="govuk-!-margin-top-6">
-              <a
-                href="/prototypes/publication-create-new-absence-config"
-                className="govuk-link"
-              >
+              <Link to="/prototypes/publication-create-new-absence-config">
                 Cancel update
-              </a>
+              </Link>
             </div>
           </>
         )}
