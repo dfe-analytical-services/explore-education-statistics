@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
 {
-    public class TimePeriodsMetaViewModel
+    public class LegendOptionsMetaValueModel<OptionsType>
     {
         public string Hint { get; set; }
         public string Legend { get; set; }
-        public IEnumerable<TimePeriodMetaViewModel> Options { get; set; }
+        public OptionsType Options { get; set; }
     }
 }

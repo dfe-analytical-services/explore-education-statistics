@@ -622,7 +622,10 @@
 								"exec": [
 									"pm.test(\"Fields are present\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(\"subjects\"));",
-									"});"
+									"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+									"});",
+									"",
+									"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().publicationId).to.equal(pm.variables.get(\"publication_id\")); });"
 								]
 							}
 						}
@@ -647,11 +650,7 @@
 						"id": "31fb4c96-88b3-4e61-8c97-88941525fc5a",
 						"type": "text/javascript",
 						"exec": [
-							"pm.test(\"Fields are present\", function () {",
-							"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-							"});",
-							"",
-							"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().publicationId).to.equal(pm.variables.get(\"publication_id\")); });"
+							""
 						]
 					}
 				}

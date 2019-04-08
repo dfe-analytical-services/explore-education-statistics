@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             var subjectMetaViewModels = _subjectService.FindMany(subject => subject.Release.Id == releaseId)
                 .Select(subject => _mapper.Map<IdLabelViewModel>(subject));
-            
+
             return new PublicationMetaViewModel
             {
                 PublicationId = publicationId,
@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public SubjectMetaViewModel GetSubjectMeta(long subjectId)
         {
-            var subject = _subjectService.Find(subjectId, new List<Expression<Func<Subject, object>>> {s => s.Release});
+            var subject = _subjectService.Find(subjectId);
 
             var levelMetaGeographic = _geographicDataService.GetLevelMeta(subjectId);
             var levelMetaCharacteristic = _characteristicDataService.GetLevelMeta(subjectId);
@@ -64,19 +64,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             return new SubjectMetaViewModel
             {
-                PublicationId = subject.Release.PublicationId,
                 Characteristics = GetCharacteristicMetas(subject.Id),
                 Indicators = GetIndicatorMetas(subject.Id),
                 ObservationalUnits = new ObservationalUnitsMetaViewModel
                 {
-                    Location = new LocationMetaViewModel
+                    Location = new LegendOptionsMetaValueModel<LocationMetaViewModel>
                     {
-                        LocalAuthority = localAuthority,
-                        National = national,
-                        Region = region,
-                        School = new List<LabelValueViewModel>()
+                        Hint = "Filter statistics by location level",
+                        Legend = "Location",
+                        Options = new LocationMetaViewModel
+                        {
+                            LocalAuthority = new LabelOptionsMetaValueModel<LabelValueViewModel>
+                            {
+                                Label = "Local Authority",
+                                Options = localAuthority
+                            },
+                            National = new LabelOptionsMetaValueModel<LabelValueViewModel>
+                            {
+                                Label = "National",
+                                Options = national
+                            },
+                            Region = new LabelOptionsMetaValueModel<LabelValueViewModel>
+                            {
+                                Label = "Region",
+                                Options = region
+                            },
+                            School = new LabelOptionsMetaValueModel<LabelValueViewModel>
+                            {
+                                Label = "School",
+                                Options = new List<LabelValueViewModel>()
+                            }
+                        }
                     },
-                    TimePeriods = new TimePeriodsMetaViewModel
+                    TimePeriod = new LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>>
                     {
                         Hint = "Filter statistics by a given start and end date",
                         Legend = "Academic Year",
@@ -121,8 +141,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         }
                     }
                 }
-            }; 
-        } 
+            };
+        }
 
         private Dictionary<string, IEnumerable<IndicatorMetaViewModel>> GetIndicatorMetas(long subjectId)
         {
@@ -151,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             return _mapper.Map<CharacteristicMetaViewModel>(characteristicMeta);
         }
-        
+
         private LabelValueViewModel MapCountry(Country country)
         {
             return _mapper.Map<LabelValueViewModel>(country);
