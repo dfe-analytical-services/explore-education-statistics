@@ -179,6 +179,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
           'sess_unauthorised_percent',
         ];
 
+        // TODO: Remove this when timePeriod API finalised
         const formatToAcademicYear = (year: string | number) => {
           const nextYear = parseInt(year as string, 0) + 1;
           return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);

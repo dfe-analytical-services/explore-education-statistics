@@ -7,7 +7,7 @@ export interface IndicatorOption extends FilterOption {
   unit: string;
 }
 
-interface TimePeriodOption {
+export interface TimePeriodOption {
   code: string;
   label: string;
   year: number;

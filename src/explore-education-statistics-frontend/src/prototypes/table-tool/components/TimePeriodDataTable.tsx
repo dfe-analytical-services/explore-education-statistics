@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import FixedHeaderGroupedDataTable, {
   HeaderGroup,
   RowGroup,
@@ -7,7 +7,7 @@ import {
   FilterOption,
   IndicatorOption,
 } from 'src/prototypes/table-tool/components/meta/initialSpec';
-import TableDisplayOptionsForm from 'src/prototypes/table-tool/components/TableDisplayOptionsForm';
+import TableHeadersForm from 'src/prototypes/table-tool/components/TableHeadersForm';
 import { DataTableResult } from 'src/services/tableBuilderService';
 import TimePeriod from 'src/services/types/TimePeriod';
 
@@ -22,85 +22,98 @@ interface Props {
   results: DataTableResult[];
 }
 
-class TimePeriodDataTable extends Component<Props> {
-  public render() {
-    const { filters, results } = this.props;
-    const { categorical, indicators, timePeriods } = filters;
+const TimePeriodDataTable = (props: Props) => {
+  const { filters, results } = props;
+  const { categorical, indicators, timePeriods } = filters;
 
-    const startLabel = timePeriods[0].label;
-    const endLabel = timePeriods[timePeriods.length - 1].label;
+  const startLabel = timePeriods[0].label;
+  const endLabel = timePeriods[timePeriods.length - 1].label;
 
-    const caption =
-      startLabel !== endLabel
-        ? `Comparing statistics for ${startLabel}`
-        : `Comparing statistics between ${startLabel} and ${endLabel}`;
+  const caption =
+    startLabel !== endLabel
+      ? `Comparing statistics for ${startLabel}`
+      : `Comparing statistics between ${startLabel} and ${endLabel}`;
 
-    const header: HeaderGroup[] = categorical.schoolTypes.map(columnGroup => {
+  // TODO: Remove this when timePeriod API finalised
+  const formatToAcademicYear = (year: number) => {
+    const nextYear = year + 1;
+    return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
+  };
+
+  const [tableHeaders, setTableHeaders] = useState({
+    columnGroups: categorical.schoolTypes,
+    columns: timePeriods,
+    rowGroups: categorical.characteristics,
+    rows: indicators,
+  });
+
+  const headerRow: HeaderGroup[] = tableHeaders.columnGroups.map(
+    columnGroup => {
       return {
-        columns: timePeriods.map(timePeriod => timePeriod.label),
+        columns: tableHeaders.columns.map(column => column.label),
         label: columnGroup.label,
+      };
+    },
+  );
+
+  const groupedData: RowGroup[] = tableHeaders.rowGroups.map(rowGroup => {
+    const rows = tableHeaders.rows.map(row => {
+      const columnGroups = tableHeaders.columnGroups.map(colGroup =>
+        tableHeaders.columns.map(column => {
+          // TODO: Figure out how to make filter criteria dynamic
+          const matchingResult = results.find(result => {
+            return Boolean(
+              result.indicators[row.value] !== undefined &&
+                result.characteristic &&
+                result.characteristic.name === rowGroup.value &&
+                result.timePeriod ===
+                  formatToAcademicYear((column as any).year) &&
+                result.schoolType === colGroup.value,
+            );
+          });
+
+          if (!matchingResult) {
+            return '--';
+          }
+
+          const value = Number(matchingResult.indicators[row.value]);
+
+          if (Number.isNaN(value)) {
+            return '--';
+          }
+
+          return `${value.toLocaleString('en-GB')}${row.unit}`;
+        }),
+      );
+
+      return {
+        columnGroups,
+        label: row.label,
       };
     });
 
-    // TODO: Remove this when timePeriod API finalised
-    const formatToAcademicYear = (year: number) => {
-      const nextYear = year + 1;
-      return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
+    return {
+      rows,
+      label: rowGroup.label,
     };
+  });
 
-    const groupedData: RowGroup[] = categorical.characteristics.map(
-      rowGroup => {
-        const rows = indicators.map(indicator => {
-          const columnGroups = categorical.schoolTypes.map(schoolType =>
-            timePeriods.map(timePeriod => {
-              const matchingResult = results.find(result => {
-                return Boolean(
-                  result.indicators[indicator.value] !== undefined &&
-                    result.characteristic &&
-                    result.characteristic.name === rowGroup.value &&
-                    result.timePeriod ===
-                      formatToAcademicYear(timePeriod.year) &&
-                    result.schoolType === schoolType.value,
-                );
-              });
+  return (
+    <div>
+      <TableHeadersForm
+        filters={filters}
+        onSubmit={value => {
+          setTableHeaders(value as any);
+        }}
+      />
 
-              if (!matchingResult) {
-                return '--';
-              }
-
-              const value = Number(matchingResult.indicators[indicator.value]);
-
-              if (Number.isNaN(value)) {
-                return '--';
-              }
-
-              return `${value.toLocaleString('en-GB')}${indicator.unit}`;
-            }),
-          );
-
-          return {
-            columnGroups,
-            label: indicator.label,
-          };
-        });
-
-        return {
-          rows,
-          label: rowGroup.label,
-        };
-      },
-    );
-
-    return (
-      <div>
-        <FixedHeaderGroupedDataTable
-          caption={caption}
-          headers={header}
-          rowGroups={groupedData}
-        />
-      </div>
-    );
-  }
-}
+      <FixedHeaderGroupedDataTable
+        caption={caption}
+        headers={headerRow}
+        rowGroups={groupedData}
+      />
+    </div>
+  );
+};
 
 export default TimePeriodDataTable;

@@ -49,6 +49,10 @@ class TimePeriod {
     }
   }
 
+  public get value(): string {
+    return `${this.year}_${this.code}`;
+  }
+
   public previousPeriod(): TimePeriod {
     switch (this.code) {
       case 'ACADEMIC':
