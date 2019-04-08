@@ -76,7 +76,6 @@ class PublicationReleasePage extends Component<Props> {
 
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-
             <ReactMarkdown className="govuk-body" source={data.summary} />
 
             <Details summary="Download underlying data files">

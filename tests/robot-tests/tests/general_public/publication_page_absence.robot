@@ -100,3 +100,8 @@ Clicking "Go to top" move user to the top of the page
     user clicks element  link:Go to top
     user should be at top of page
 
+Clicking "Create charts and tables" takes user to Table Tool page
+    [Tags]  HappyPath   Failing
+    user clicks link    Create charts and tables
+    user waits until page contains element  css:[data-testid="page-title Create your own table"]
+
