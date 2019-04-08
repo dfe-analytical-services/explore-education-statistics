@@ -76,41 +76,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         Region = region,
                         School = new List<LabelValueViewModel>()
                     },
-                    TimePeriod = new TimePeriodMetaViewModel
+                    TimePeriods = new TimePeriodsMetaViewModel
                     {
                         Hint = "Filter statistics by a given start and end date",
                         Legend = "Academic Year",
-                        Options = new List<LabelValueViewModel>
+                        Options = new List<TimePeriodMetaViewModel>
                         {
-                            new LabelValueViewModel
+                            new TimePeriodMetaViewModel
                             {
+                                Code = TimePeriod.AY,
                                 Label = "2011/12",
-                                Value = "201112"
+                                Year = 2011
                             },
-                            new LabelValueViewModel
+                            new TimePeriodMetaViewModel
                             {
+                                Code = TimePeriod.AY,
                                 Label = "2012/13",
-                                Value = "201213"
+                                Year = 2012
                             },
-                            new LabelValueViewModel
+                            new TimePeriodMetaViewModel
                             {
+                                Code = TimePeriod.AY,
                                 Label = "2013/14",
-                                Value = "201314"
+                                Year = 2013
                             },
-                            new LabelValueViewModel
+                            new TimePeriodMetaViewModel
                             {
+                                Code = TimePeriod.AY,
                                 Label = "2014/15",
-                                Value = "201415"
+                                Year = 2014
                             },
-                            new LabelValueViewModel
+                            new TimePeriodMetaViewModel
                             {
+                                Code = TimePeriod.AY,
                                 Label = "2015/16",
-                                Value = "201516"
+                                Year = 2015
                             },
-                            new LabelValueViewModel
+                            new TimePeriodMetaViewModel
                             {
+                                Code = TimePeriod.AY,
                                 Label = "2016/17",
-                                Value = "201617"
+                                Year = 2016
                             }
                         }
                     }
