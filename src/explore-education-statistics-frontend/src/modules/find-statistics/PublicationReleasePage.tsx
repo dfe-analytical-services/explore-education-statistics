@@ -56,25 +56,26 @@ class PublicationReleasePage extends Component<Props> {
           { name: data.title },
         ]}
       >
+        {!release && (
+          <strong className="govuk-tag govuk-!-margin-bottom-2">
+            {' '}
+            This is the latest data{' '}
+          </strong>
+        )}
+
+        <PageTitle title={data.title} />
+
+        <dl className="dfe-meta-content">
+          <dt className="govuk-caption-m">Published: </dt>
+          <dd>
+            <strong>
+              <FormattedDate>{data.published}</FormattedDate>
+            </strong>
+          </dd>
+        </dl>
+
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            {!release && (
-              <strong className="govuk-tag govuk-!-margin-bottom-2">
-                {' '}
-                This is the latest data{' '}
-              </strong>
-            )}
-
-            <PageTitle title={data.title} />
-
-            <dl className="dfe-meta-content">
-              <dt className="govuk-caption-m">Published: </dt>
-              <dd>
-                <strong>
-                  <FormattedDate>{data.published}</FormattedDate>
-                </strong>
-              </dd>
-            </dl>
 
             <ReactMarkdown className="govuk-body" source={data.summary} />
 
