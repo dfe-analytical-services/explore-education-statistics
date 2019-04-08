@@ -17,11 +17,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
 {
     public class PublicationNotifier
     {                   
-        const string StorageTableName = "Subscriptions";
-        const string StorageConnectionName = "TableStorageConnString";
-        const string NotifyApiKeyName = "NotifyApiKey";
-        const string NotificationEmailTemplateIdName = "PublicationNotificationEmailTemplateId";
-        const string VerificationEmailTemplateIdName = "VerificationEmailTemplateId";
+        private const string StorageTableName = "Subscriptions";
+        private const string StorageConnectionName = "TableStorageConnString";
+        private const string NotifyApiKeyName = "NotifyApiKey";
+        private const string BaseUrlName = "BaseUrl";
+        private const string TokenSecretKeyName = "TokenSecretKey";
+        private const string NotificationEmailTemplateIdName = "PublicationNotificationEmailTemplateId";
+        private const string VerificationEmailTemplateIdName = "VerificationEmailTemplateId";
 
         // Dependency injection is not quite there yet in Azure functions so create the services.
         private readonly IEmailService _emailService = new EmailService();
@@ -30,12 +32,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         [FunctionName("PublicationNotifier")]
         public async void Run1([QueueTrigger("publication-queue", Connection = "")]
             string publicationId, ILogger log, ExecutionContext context)
-        {
-            log.LogInformation($"publicationId: {publicationId}");
-            
+        {            
             var config = LoadAppSettings(context);
             var emailTemplateId = config.GetValue<string>(NotificationEmailTemplateIdName);
+            var baseUrl = config.GetValue<string>(BaseUrlName);
             var client = GetNotifyClient(config);
+            var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
             var partitionKey = "publication-" + publicationId;
             var table = GetTable(config).Result;
             var query = new TableQuery<SubscriptionEntity>()
@@ -52,11 +54,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                 {
                     if (entity.Verified)
                     {
+                       var unsubscribeToken = _tokenService.GenerateToken(tokenSecretKey, entity.RowKey, log);
                        var vals = new Dictionary<string, dynamic>
                            {
                                {"publication_name", "My Publication"},
-                               {"publication_link", "https://somelink"}
+                               {"publication_link", "https://somelink"},
+                               {"unsubscribe_link", baseUrl + publicationId + "/unsubscribe/" + unsubscribeToken}
                            };
+                       
                        _emailService.sendEmail(client, entity.RowKey, emailTemplateId, vals); 
                     }
                 }
@@ -72,9 +77,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             var postData = await req.Content.ReadAsFormDataAsync();
             var missingFields = new List<string>();
             var config = LoadAppSettings(context);
+            var baseUrl = config.GetValue<string>(BaseUrlName);
             var client = GetNotifyClient(config);
             var emailTemplateId = config.GetValue<string>(VerificationEmailTemplateIdName);
-            var tokenSecretKey = config.GetValue<string>("TokenSecretKey");
+            var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
 
             if (postData["email"] == null)
             {
@@ -91,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             }
 
             var email = postData["email"];
-            var uri = req.RequestUri.ToString().Replace("/subscribe","");
+            var publicationId = postData["publication-id"];
            
             try
             {
@@ -102,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                 var vals = new Dictionary<string, dynamic>
                 {
                     {"publication_name", "My Publication"},
-                    {"verification_link", uri + "verify-subscription/" + activationCode}
+                    {"verification_link", baseUrl + publicationId + "/verify-subscription/" + activationCode}
                 };
                                 
                 _emailService.sendEmail(client, email, emailTemplateId, vals);
@@ -119,19 +125,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                 });
             }
         }
-       
-        [FunctionName("PublicationSubscriptionVerify")]
-        public async Task<HttpResponseMessage> Run3([HttpTrigger(AuthorizationLevel.Function, "get", Route = "publication/verify-subscription/{token}")]
-            HttpRequestMessage req, ILogger log, ExecutionContext context, string token)
+        
+        [FunctionName("PublicationUnsubscribe")]
+        public async Task<HttpResponseMessage> Run3([HttpTrigger(AuthorizationLevel.Function, "get", Route = "publication/{publicationId}/unsubscribe/{token}")]
+            HttpRequestMessage req, ILogger log, ExecutionContext context, string publicationId, string token)
         {
             var config = LoadAppSettings(context);
-            var tokenSecretKey = config.GetValue<string>("TokenSecretKey");
+            var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
             var email = _tokenService.GetEmailFromToken(token, tokenSecretKey, log);
             
             if (email != null)
             {
                 var table = GetTable(config).Result;
-                var sub = new SubscriptionEntity("1234", email);
+                var sub = new SubscriptionEntity(publicationId, email);
+                await RemoveSubscriber(table, sub);
+                return req.CreateResponse(HttpStatusCode.OK, "Thanks! Unsubscribed.");
+            }
+           
+            return req.CreateResponse(HttpStatusCode.BadRequest);
+        }
+       
+        [FunctionName("PublicationSubscriptionVerify")]
+        public async Task<HttpResponseMessage> Run4([HttpTrigger(AuthorizationLevel.Function, "get", Route = "publication/{publicationId}/verify-subscription/{token}")]
+            HttpRequestMessage req, ILogger log, ExecutionContext context, string publicationId, string token)
+        {
+            var config = LoadAppSettings(context);
+            var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
+            var email = _tokenService.GetEmailFromToken(token, tokenSecretKey, log);
+            
+            if (email != null)
+            {
+                var table = GetTable(config).Result;
+                var sub = new SubscriptionEntity(publicationId, email);
                 sub.Verified = true;
                 await AddSubscriber(table, sub);
                 return req.CreateResponse(HttpStatusCode.OK, "Thanks! Verified.");
@@ -152,6 +177,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         private static async Task AddSubscriber(CloudTable table, SubscriptionEntity subscription)
         {   
             await table.ExecuteAsync(TableOperation.InsertOrReplace(subscription));
+        }
+        
+        private static async Task RemoveSubscriber(CloudTable table, SubscriptionEntity subscription)
+        {   
+            await table.ExecuteAsync(TableOperation.Delete(subscription));
         }
 
         private static async Task<CloudTable> GetTable(IConfiguration config)
