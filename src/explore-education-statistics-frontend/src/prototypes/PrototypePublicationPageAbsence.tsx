@@ -661,7 +661,7 @@ const PublicationPage = () => {
       <Accordion id="extra-information-sections">
         <AccordionSection
           heading="Pupil absence statistics: methodology"
-          caption="Wow we collect and process statistics and data"
+          caption="How we collect and process statistics and data"
           headingTag="h3"
         >
           <ul className="govuk-list">
