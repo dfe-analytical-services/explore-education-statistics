@@ -1,5 +1,3 @@
-import max from 'lodash/max';
-import min from 'lodash/min';
 import React, { Component } from 'react';
 import FixedHeaderGroupedDataTable, {
   HeaderGroup,
@@ -9,8 +7,9 @@ import {
   FilterOption,
   IndicatorOption,
 } from 'src/prototypes/table-tool/components/meta/initialSpec';
-import parseAcademicYear from 'src/prototypes/table-tool/components/utils/parseAcademicYear';
+import TableDisplayOptionsForm from 'src/prototypes/table-tool/components/TableDisplayOptionsForm';
 import { DataTableResult } from 'src/services/tableBuilderService';
+import TimePeriod from 'src/services/types/TimePeriod';
 
 interface Props {
   filters: {
@@ -18,7 +17,7 @@ interface Props {
     categorical: {
       [key: string]: FilterOption[];
     };
-    years: number[];
+    timePeriods: TimePeriod[];
   };
   results: DataTableResult[];
 }
@@ -26,29 +25,41 @@ interface Props {
 class TimePeriodDataTable extends Component<Props> {
   public render() {
     const { filters, results } = this.props;
-    const { categorical, indicators, years } = filters;
+    const { categorical, indicators, timePeriods } = filters;
 
-    const firstYear = parseAcademicYear(min(filters.years));
-    const lastYear = parseAcademicYear(max(filters.years));
+    const startLabel = timePeriods[0].label;
+    const endLabel = timePeriods[timePeriods.length - 1].label;
+
+    const caption =
+      startLabel !== endLabel
+        ? `Comparing statistics for ${startLabel}`
+        : `Comparing statistics between ${startLabel} and ${endLabel}`;
 
     const header: HeaderGroup[] = categorical.schoolTypes.map(columnGroup => {
       return {
-        columns: years.map(parseAcademicYear),
+        columns: timePeriods.map(timePeriod => timePeriod.label),
         label: columnGroup.label,
       };
     });
+
+    // TODO: Remove this when timePeriod API finalised
+    const formatToAcademicYear = (year: number) => {
+      const nextYear = year + 1;
+      return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
+    };
 
     const groupedData: RowGroup[] = categorical.characteristics.map(
       rowGroup => {
         const rows = indicators.map(indicator => {
           const columnGroups = categorical.schoolTypes.map(schoolType =>
-            years.map(year => {
+            timePeriods.map(timePeriod => {
               const matchingResult = results.find(result => {
                 return Boolean(
                   result.indicators[indicator.value] !== undefined &&
                     result.characteristic &&
                     result.characteristic.name === rowGroup.value &&
-                    result.timePeriod === year &&
+                    result.timePeriod ===
+                      formatToAcademicYear(timePeriod.year) &&
                     result.schoolType === schoolType.value,
                 );
               });
@@ -79,11 +90,6 @@ class TimePeriodDataTable extends Component<Props> {
         };
       },
     );
-
-    const caption =
-      firstYear !== lastYear
-        ? `Comparing statistics for ${firstYear}`
-        : `Comparing statistics between ${firstYear} and ${lastYear}`;
 
     return (
       <div>

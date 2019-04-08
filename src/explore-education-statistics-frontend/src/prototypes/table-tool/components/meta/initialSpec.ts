@@ -7,6 +7,12 @@ export interface IndicatorOption extends FilterOption {
   unit: string;
 }
 
+interface TimePeriodOption {
+  code: string;
+  label: string;
+  year: number;
+}
+
 export interface GroupedFilterOptions {
   [groupKey: string]: {
     label: string;
@@ -36,11 +42,7 @@ export interface MetaSpecification {
     timePeriod: {
       hint?: string;
       legend: string;
-      options: {
-        code: string;
-        label: string;
-        year: number;
-      }[];
+      options: TimePeriodOption[];
     };
   };
   categoricalFilters: {
@@ -129,12 +131,12 @@ const metaSpecification: MetaSpecification = {
       hint: 'Filter statistics by a given start and end date',
       legend: 'Academic Year',
       options: [
-        { code: 'ACADEMIC', label: '2011/12', year: 2011 },
-        { code: 'ACADEMIC', label: '2012/13', year: 2012 },
-        { code: 'ACADEMIC', label: '2013/14', year: 2013 },
-        { code: 'ACADEMIC', label: '2014/15', year: 2014 },
-        { code: 'ACADEMIC', label: '2015/16', year: 2015 },
-        { code: 'ACADEMIC', label: '2016/17', year: 2016 },
+        { code: 'AY', label: '2011/12', year: 2011 },
+        { code: 'AY', label: '2012/13', year: 2012 },
+        { code: 'AY', label: '2013/14', year: 2013 },
+        { code: 'AY', label: '2014/15', year: 2014 },
+        { code: 'AY', label: '2015/16', year: 2015 },
+        { code: 'AY', label: '2016/17', year: 2016 },
       ],
     },
   },

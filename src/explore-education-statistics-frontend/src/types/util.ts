@@ -2,9 +2,9 @@
  * Enumerates the typical comparison
  * integers of 1, 0 and -1.
  */
-export enum Comparable {
+export enum Comparison {
   GreaterThan = 1,
-  Equal = 0,
+  EqualTo = 0,
   LessThan = -1,
 }
 

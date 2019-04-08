@@ -1,5 +1,4 @@
 import mapValues from 'lodash/mapValues';
-import range from 'lodash/range';
 import React, { Component, createRef } from 'react';
 import PageTitle from 'src/components/PageTitle';
 import mapValuesWithKeys from 'src/lib/utils/mapValuesWithKeys';
@@ -20,6 +19,7 @@ import mapOptionValues from 'src/prototypes/table-tool/components/utils/mapOptio
 import tableBuilderService, {
   DataTableResult,
 } from 'src/services/tableBuilderService';
+import TimePeriod from 'src/services/types/TimePeriod';
 
 const defaultPublicationOptions = [
   {
@@ -60,7 +60,7 @@ interface State {
     categorical: {
       [key: string]: FilterOption[];
     };
-    years: number[];
+    timePeriods: TimePeriod[];
   };
   metaSpecification: MetaSpecification;
   publicationId: string;
@@ -76,7 +76,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
       schoolTypes: [],
     },
     indicators: [],
-    years: [],
+    timePeriods: [],
   };
 
   public state: State = {
@@ -184,8 +184,8 @@ class PrototypeTableToolPage extends Component<{}, State> {
           return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
         };
 
-        const startDate = 2012;
-        const endDate = 2016;
+        const start = new TimePeriod(2012, 'ACADEMIC');
+        const end = new TimePeriod(2016, 'ACADEMIC');
 
         const {
           result,
@@ -193,9 +193,9 @@ class PrototypeTableToolPage extends Component<{}, State> {
           characteristics,
           indicators,
           schoolTypes,
-          endYear: formatToAcademicYear(endDate),
+          endYear: formatToAcademicYear(end.year),
           publicationId: this.state.publicationId,
-          startYear: formatToAcademicYear(startDate),
+          startYear: formatToAcademicYear(start.year),
         });
 
         const categoricalFiltersByValue = mapValues(
@@ -207,12 +207,12 @@ class PrototypeTableToolPage extends Component<{}, State> {
           this.state.metaSpecification.indicators,
         );
 
-        const years = range(startDate, endDate + 1).map(formatToAcademicYear);
+        const timePeriods = TimePeriod.createRange(start, end);
 
         this.setState(
           {
             filters: {
-              years,
+              timePeriods,
               categorical: mapValuesWithKeys(
                 {
                   characteristics,
@@ -250,6 +250,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
     const { characteristics, schoolTypes } = categoricalFilters;
     const { start, end } = timePeriod;
 
+    // TODO: Remove this when timePeriod API finalised
     const formatToAcademicYear = (year: number) => {
       const nextYear = year + 1;
       return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
@@ -275,12 +276,12 @@ class PrototypeTableToolPage extends Component<{}, State> {
       this.state.metaSpecification.indicators,
     );
 
-    const years = range(start.year, end.year + 1).map(formatToAcademicYear);
+    const timePeriods = TimePeriod.createRange(start, end);
 
     this.setState(
       {
         filters: {
-          years,
+          timePeriods,
           categorical: mapValuesWithKeys(
             categoricalFilters,
             ([filterGroup, selectedFilters]) =>

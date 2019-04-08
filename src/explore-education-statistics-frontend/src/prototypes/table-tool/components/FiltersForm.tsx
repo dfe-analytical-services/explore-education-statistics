@@ -7,8 +7,8 @@ import ErrorSummary, { ErrorSummaryMessage } from 'src/components/ErrorSummary';
 import { FormFieldset, FormGroup } from 'src/components/form';
 import createErrorHelper from 'src/lib/validation/createErrorHelper';
 import Yup from 'src/lib/validation/yup';
-import TimePeriodInstant from 'src/services/types/TimePeriodInstant';
-import { Comparable, Overwrite } from 'src/types/util';
+import TimePeriod from 'src/services/types/TimePeriod';
+import { Comparison, Overwrite } from 'src/types/util';
 import CategoricalFilters from './CategoricalFilters';
 import { MetaSpecification } from './meta/initialSpec';
 import ObservationalUnitFilters from './ObservationalUnitFilters';
@@ -36,8 +36,8 @@ export type FilterFormSubmitHandler = (
     FormValues,
     {
       timePeriod: {
-        start: TimePeriodInstant;
-        end: TimePeriodInstant;
+        start: TimePeriod;
+        end: TimePeriod;
       };
     }
   >,
@@ -157,14 +157,14 @@ class FiltersForm extends Component<Props, State> {
                     return false;
                   }
 
-                  const endTime = TimePeriodInstant.fromString(value);
-                  const startTime = TimePeriodInstant.fromString(start);
+                  const endTime = TimePeriod.fromString(value);
+                  const startTime = TimePeriod.fromString(start);
 
                   const comparison = endTime.compare(startTime);
 
                   return (
-                    comparison === Comparable.GreaterThan ||
-                    comparison === Comparable.Equal
+                    comparison === Comparison.GreaterThan ||
+                    comparison === Comparison.EqualTo
                   );
                 },
               ),
@@ -181,14 +181,14 @@ class FiltersForm extends Component<Props, State> {
                     return false;
                   }
 
-                  const startTime = TimePeriodInstant.fromString(value);
-                  const endTime = TimePeriodInstant.fromString(end);
+                  const startTime = TimePeriod.fromString(value);
+                  const endTime = TimePeriod.fromString(end);
 
                   const comparison = startTime.compare(endTime);
 
                   return (
-                    comparison === Comparable.LessThan ||
-                    comparison === Comparable.Equal
+                    comparison === Comparison.LessThan ||
+                    comparison === Comparison.EqualTo
                   );
                 },
               ),
@@ -199,8 +199,8 @@ class FiltersForm extends Component<Props, State> {
             await this.props.onSubmit({
               ...form,
               timePeriod: {
-                end: TimePeriodInstant.fromString(form.timePeriod.end),
-                start: TimePeriodInstant.fromString(form.timePeriod.start),
+                end: TimePeriod.fromString(form.timePeriod.end),
+                start: TimePeriod.fromString(form.timePeriod.start),
               },
             });
           } catch (error) {
