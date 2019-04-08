@@ -30,12 +30,6 @@ const PublicationPage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           {" "}
-          <dl className="dfe-meta-content">
-            <dt className="govuk-caption-m">Published:</dt>
-            <dd>
-              <strong>22 March 2018</strong>
-            </dd>
-          </dl>
           <PrototypeEditableContent
             content={`
           <p className="govuk-body">
@@ -86,86 +80,6 @@ const PublicationPage = () => {
 
         <div className="govuk-grid-column-one-third">
           <aside className="app-related-items">
-            <h2 className="govuk-heading-m" id="subsection-title">
-              About these statistics
-            </h2>
-
-            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <span className="govuk-caption-m">Last updated: </span>20 June
-              2018
-            </h3>
-
-            <Details summary="See all 2 updates">
-              <div data-testid="publication-page--update-element">
-                <h3 className="govuk-heading-s">19 April 2017</h3>
-                <p>
-                  Underlying data file updated to include absence data by pupil
-                  residency and school location, andupdated metadata document.
-                </p>
-              </div>
-              <div data-testid="publication-page--update-element">
-                <h3 className="govuk-heading-s">22 March 2017</h3>
-                <p>First published.</p>
-              </div>
-            </Details>
-
-            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <span className="govuk-caption-m">Next update: </span>22 March
-              2019
-            </h3>
-            <p className="govuk-caption-m govuk-!-margin-top-0">
-              <a href="#">Notify me</a>
-            </p>
-
-            <h2
-              className="govuk-heading-s govuk-!-margin-bottom-0"
-              id="subsection-title"
-            >
-              Archived releases
-            </h2>
-            <Details summary="See previous 7 releases">
-              <ul className="govuk-list">
-                <li>
-                  <a
-                    className="govuk-link"
-                    href="/themes/schools/absence-and-exclusions/pupil-absence-in-schools-in-england/2015-16"
-                  >
-                    2015 to 2016
-                  </a>
-                </li>
-                <li>
-                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015">
-                    2014 to 2015
-                  </a>
-                </li>
-                <li>
-                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014">
-                    2013 to 2014
-                  </a>
-                </li>
-                <li>
-                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013">
-                    2012 to 2013
-                  </a>
-                </li>
-                <li>
-                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics">
-                    2011 to 2012
-                  </a>
-                </li>
-                <li>
-                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011">
-                    2010 to 2011
-                  </a>
-                </li>
-                <li>
-                  <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010">
-                    2009 to 2010
-                  </a>
-                </li>
-              </ul>
-            </Details>
-
             <h2
               className="govuk-heading-m govuk-!-margin-top-6"
               id="related-content"
@@ -774,22 +688,6 @@ const PublicationPage = () => {
           </address>
         </AccordionSection>
       </Accordion>
-      <h2 className="govuk-heading-m govuk-!-margin-top-9">
-        Exploring the data
-      </h2>
-      <p>
-        The statistics can be viewed as reports, or you can customise and
-        download as excel or .csv files . The data can also be accessed via an
-        API. <a href="#">What is an API?</a>
-      </p>
-      <Link to="/prototypes/table-tool" className="govuk-button">
-        Create charts and tables
-      </Link>
-      <div className="govuk-!-margin-top-9">
-        <a href="#print" className="govuk-link">
-          Print this page
-        </a>
-      </div>
     </PrototypePage>
   );
 };

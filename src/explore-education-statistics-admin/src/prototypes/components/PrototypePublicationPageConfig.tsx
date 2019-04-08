@@ -2,12 +2,16 @@ import React from "react";
 
 interface Props {
   sectionId?: string;
+  action?: string;
 }
 
-const PrototypePublicationConfig = ({ sectionId }: Props) => {
+const PrototypePublicationConfig = ({ sectionId, action }: Props) => {
   return (
     <>
-      <form action="/prototypes/publication-create-new-absence">
+      {sectionId === "setup" && (
+        <h2 className="govuk-heading-m">Edit release setup</h2>
+      )}
+      <form action="/prototypes/publication-create-new-absence-config">
         <div className="govuk-form-group">
           <label htmlFor="title" className="govuk-label govuk-label--s">
             Publication title
@@ -146,7 +150,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                       Create from blank template
                     </label>
                   </div>
-                  <div className="govuk-radios__item">
+                  {/* <div className="govuk-radios__item">
                     <input
                       className="govuk-radios__input"
                       type="radio"
@@ -160,7 +164,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                     >
                       Copy structure of current release (2017 / 2018)
                     </label>
-                  </div>
+        </div> */}
                   <div className="govuk-radios__item">
                     <input
                       className="govuk-radios__input"
@@ -168,6 +172,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                       name="release-setup"
                       id="release-setup-copy-data-structure"
                       value="create-copy-data-structure"
+                      defaultChecked
                     />
                     <label
                       className="govuk-label govuk-radios__label"
@@ -187,9 +192,20 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
           </>
         )}
         {sectionId === "setup" && (
-          <button type="submit" className="govuk-button">
-            Update release setup
-          </button>
+          <>
+            <button type="submit" className="govuk-button">
+              Update release setup
+            </button>
+
+            <div className="govuk-!-margin-top-6">
+              <a
+                href="/prototypes/publication-create-new-absence-config"
+                className="govuk-link"
+              >
+                Cancel update
+              </a>
+            </div>
+          </>
         )}
       </form>
     </>

@@ -45,7 +45,6 @@ const PublicationSchedulePage = () => {
                   name="schedule-day"
                   type="number"
                   pattern="[0-9]*"
-                  value="22"
                 />
               </div>
             </div>
@@ -63,7 +62,6 @@ const PublicationSchedulePage = () => {
                   name="schedule-month"
                   type="number"
                   pattern="[0-9]*"
-                  value="3"
                 />
               </div>
             </div>
@@ -81,7 +79,6 @@ const PublicationSchedulePage = () => {
                   name="schedule-year"
                   type="number"
                   pattern="[0-9]*"
-                  value="2019"
                 />
               </div>
             </div>

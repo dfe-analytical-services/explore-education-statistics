@@ -13,7 +13,7 @@ import PrototypePublicationSummary from "./components/PrototypePublicationPageSu
 import { PrototypeEditableContent } from "./components/PrototypeEditableContent";
 import TabsSection from "../components/TabsSection";
 
-const PublicationConfigPage = () => {
+const PublicationConfigEditPage = () => {
   let sectionId = "setup";
 
   return (
@@ -28,10 +28,9 @@ const PublicationConfigPage = () => {
       ]}
     >
       <PrototypeAdminNavigation sectionId={sectionId} />
-
-      <PrototypePublicationSummary />
+      <PrototypePublicationConfig sectionId={sectionId} />
     </PrototypePage>
   );
 };
 
-export default PublicationConfigPage;
+export default PublicationConfigEditPage;
