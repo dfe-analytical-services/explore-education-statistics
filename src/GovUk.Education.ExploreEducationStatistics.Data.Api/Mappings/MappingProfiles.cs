@@ -23,6 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
                 .ForMember(dest => dest.Value, opts => { opts.MapFrom(country => country.Code); });
 
             CreateMap<IndicatorMeta, IndicatorMetaViewModel>()
+                .ForMember(dest => dest.Value, opts => opts.MapFrom(indicator => indicator.Name))
                 .ForMember(dest => dest.Unit, opts => opts.MapFrom(MapIndicatorMetaUnitExpression()));
 
             CreateMap<LocalAuthority, LabelValueViewModel>()

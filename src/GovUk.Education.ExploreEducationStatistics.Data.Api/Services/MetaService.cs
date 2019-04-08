@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
@@ -64,8 +63,265 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             return new SubjectMetaViewModel
             {
+                CategoricalFilters =
+                    new Dictionary<string,
+                        LegendOptionsMetaValueModel<Dictionary<string,
+                            LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>>
+                    {
+                        {
+                            "characteristics",
+                            new LegendOptionsMetaValueModel<Dictionary<string,
+                                LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>
+                            {
+                                Hint = "Filter by pupil characteristics",
+                                Legend = "Characteristics",
+                                Options =
+                                    new Dictionary<string, LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>
+                                    {
+                                        {
+                                            "age",
+                                            new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                                            {
+                                                Label = "Age",
+                                                Options = new List<LabelValueViewModel>
+                                                {
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Age 16",
+                                                        Value = "Age_16"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Age 15",
+                                                        Value = "Age_15"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Age 14",
+                                                        Value = "Age_14"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Age 13",
+                                                        Value = "Age_13"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Age 12",
+                                                        Value = "Age_12"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Age 11",
+                                                        Value = "Age_11"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Age 19 and over",
+                                                        Value = "Age_19_and_over"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Age 10",
+                                                        Value = "Age_10"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Age 8",
+                                                        Value = "Age_8"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Age 7",
+                                                        Value = "Age_7"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Age 6",
+                                                        Value = "Age_6"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Age 5",
+                                                        Value = "Age_5"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Age four and under",
+                                                        Value = "Age_4_and_under"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Age 18",
+                                                        Value = "Age_18"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Age 9",
+                                                        Value = "Age_9"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Age 17",
+                                                        Value = "Age_17"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "gender",
+                                            new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                                            {
+                                                Label = "Gender",
+                                                Options = new List<LabelValueViewModel>
+                                                {
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Girls",
+                                                        Value = "Gender_female"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Boys",
+                                                        Value = "Gender_male"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "sen_provision",
+                                            new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                                            {
+                                                Label = "SEN provision",
+                                                Options = new List<LabelValueViewModel>
+                                                {
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "SEN support",
+                                                        Value = "SEN_provision_SEN_Support"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "No identified SEN",
+                                                        Value = "SEN_provision_No_identified_SEN"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Statement of SEN or EHC plan",
+                                                        Value = "SEN_provision_Statement_or_EHCP"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "free_school_meals",
+                                            new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                                            {
+                                                Label = "Free school meals",
+                                                Options = new List<LabelValueViewModel>
+                                                {
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "FSM unclassified",
+                                                        Value = "FSM_unclassified"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "FSM not eligible",
+                                                        Value = "FSM_Not_eligible"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "FSM eligible",
+                                                        Value = "FSM_eligible"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "total",
+                                            new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                                            {
+                                                Label = "Total",
+                                                Options = new List<LabelValueViewModel>
+                                                {
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "All pupils",
+                                                        Value = "Total"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                            }
+                        },
+                        {
+                            "schoolTypes",
+                            new LegendOptionsMetaValueModel<Dictionary<string,
+                                LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>
+                            {
+                                Hint = "Filter by number of pupils in school type(s)",
+                                Legend = "School type",
+                                Options =
+                                    new Dictionary<string, LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>
+                                    {
+                                        {
+                                            "default",
+                                            new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                                            {
+                                                Label = "",
+                                                Options = new List<LabelValueViewModel>
+                                                {
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Total",
+                                                        Value = "Total"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Primary schools",
+                                                        Value = "State_Funded_Primary"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Secondary schools",
+                                                        Value = "State_Funded_Secondary"
+                                                    },
+                                                    new LabelValueViewModel
+                                                    {
+                                                        Label = "Special schools",
+                                                        Value = "Special"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                            }
+                        }
+                    },
                 Characteristics = GetCharacteristicMetas(subject.Id),
                 Indicators = GetIndicatorMetas(subject.Id),
+                IndicatorsPrototype = new Dictionary<string, LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>>
+                {
+                    {
+                        "absence_by_reason",
+                        new LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>
+                        {
+                            Label = "Absence by reason", Options = new List<IndicatorMetaViewModel>
+                            {
+                                new IndicatorMetaViewModel
+                                {
+                                    Label = "Number of excluded sessions",
+                                    // TODO DFE-412 Remove Name which was used by the original table tool
+                                    Name = "Not used",
+                                    Unit = "",
+                                    Value = "sess_auth_excluded"
+                                }
+                            }
+                        }
+                    }
+                },
                 ObservationalUnits = new ObservationalUnitsMetaViewModel
                 {
                     Location = new LegendOptionsMetaValueModel<LocationMetaViewModel>
@@ -74,22 +330,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         Legend = "Location",
                         Options = new LocationMetaViewModel
                         {
-                            LocalAuthority = new LabelOptionsMetaValueModel<LabelValueViewModel>
+                            LocalAuthority = new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
                             {
                                 Label = "Local Authority",
                                 Options = localAuthority
                             },
-                            National = new LabelOptionsMetaValueModel<LabelValueViewModel>
+                            National = new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
                             {
                                 Label = "National",
                                 Options = national
                             },
-                            Region = new LabelOptionsMetaValueModel<LabelValueViewModel>
+                            Region = new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
                             {
                                 Label = "Region",
                                 Options = region
                             },
-                            School = new LabelOptionsMetaValueModel<LabelValueViewModel>
+                            School = new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
                             {
                                 Label = "School",
                                 Options = new List<LabelValueViewModel>()
