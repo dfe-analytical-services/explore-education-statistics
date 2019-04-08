@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual';
 import React, { useState } from 'react';
 import FixedHeaderGroupedDataTable, {
   HeaderGroup,
@@ -40,12 +41,30 @@ const TimePeriodDataTable = (props: Props) => {
     return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
   };
 
-  const [tableHeaders, setTableHeaders] = useState({
-    columnGroups: categorical.schoolTypes,
-    columns: timePeriods,
-    rowGroups: categorical.characteristics,
-    rows: indicators,
+  interface TableHeaders {
+    columnGroups: FilterOption[];
+    columns: TimePeriod[];
+    rowGroups: FilterOption[];
+    rows: IndicatorOption[];
+  }
+
+  const [prevFilters, setPrevFilters] = useState<Props['filters']>();
+  const [tableHeaders, setTableHeaders] = useState<TableHeaders>({
+    columnGroups: [],
+    columns: [],
+    rowGroups: [],
+    rows: [],
   });
+
+  if (!isEqual(prevFilters, filters)) {
+    setPrevFilters(filters);
+    setTableHeaders({
+      columnGroups: categorical.schoolTypes,
+      columns: timePeriods,
+      rowGroups: categorical.characteristics,
+      rows: indicators,
+    });
+  }
 
   const headerRow: HeaderGroup[] = tableHeaders.columnGroups.map(
     columnGroup => {
