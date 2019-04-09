@@ -1,3 +1,3 @@
-import Page from 'src/modules/subscriptions/SubscriptionsPage';
+import Page from 'src/modules/subscriptions/SubscriptionPage';
 
 export default Page;

@@ -156,10 +156,8 @@ class PublicationReleasePage extends Component<Props> {
                 <span className="govuk-caption-m">
                   <Link
                     unvisited
-                    to={`/subsciptions/publication?publication=${
-                      data.publication.slug
-                    }`}
-                    as={`/subsciptions/${data.publication.slug}`}
+                    to={`/subscriptions?publication=${data.publication.slug}`}
+                    as={`/subscriptions/${data.publication.slug}`}
                     data-testid={`subsciptions-${data.publication.slug}`}
                   >
                     Notify me
