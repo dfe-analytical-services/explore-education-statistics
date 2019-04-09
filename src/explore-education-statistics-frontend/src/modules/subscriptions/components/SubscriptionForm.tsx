@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { baseUrl } from "../../../services/api";
 
 interface FormProps {
   /* The http path that the form will be posted to */
@@ -48,10 +49,6 @@ export class SubscriptionForm extends React.Component<FormProps, FormState> {
     return haveError;
   }
 
-  /**
-   * Handles form submission
-   * @param {React.FormEvent<HTMLFormElement>} e - The form event
-   */
   private handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
@@ -63,22 +60,31 @@ export class SubscriptionForm extends React.Component<FormProps, FormState> {
     }
   };
 
-  /**
-   * Executes the validation rules for all the fields on the form and sets the error state
-   * @returns {boolean} - Whether the form is valid or not
-   */
   private validateForm(): boolean {
-    // TODO - validate form
     return true;
   }
 
-  /**
-   * Submits the form to the http api
-   * @returns {boolean} - Whether the form submission was successful or not
-   */
   private async submitForm(): Promise<boolean> {
-    // TODO - submit the form
-    return true;
+    event.preventDefault();
+
+    const data = {
+      'email': this.state.values[0],
+      'publication-id': '123',
+    };
+
+    if (data.email !== '') {
+
+      const response = await fetch(`${baseUrl.data}/publication/subscribe/`, {
+        body: JSON.stringify(data),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        method: 'POST'
+      });
+
+      const json = await response.json();
+    }
   }
 
   public render() {
