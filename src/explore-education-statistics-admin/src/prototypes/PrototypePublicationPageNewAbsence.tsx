@@ -1,16 +1,16 @@
-import React from "react";
-import Accordion from "../components/Accordion";
-import AccordionSection from "../components/AccordionSection";
-import Details from "../components/Details";
-import Link from "../components/Link";
-import PrototypeAbsenceData from "./components/PrototypeAbsenceData";
-import PrototypeAdminNavigation from "./components/PrototypeAdminNavigation";
-import PrototypeDataSample from "./components/PrototypeDataSample";
-import PrototypeMap from "./components/PrototypeMap";
-import PrototypePage from "./components/PrototypePage";
-import { PrototypeEditableContent } from "./components/PrototypeEditableContent";
-import Tabs from "../components/Tabs";
-import TabsSection from "../components/TabsSection";
+import React from 'react';
+import Accordion from '../components/Accordion';
+import AccordionSection from '../components/AccordionSection';
+import Details from '../components/Details';
+import Link from '../components/Link';
+import PrototypeAbsenceData from './components/PrototypeAbsenceData';
+import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
+import PrototypeDataSample from './components/PrototypeDataSample';
+import PrototypeMap from './components/PrototypeMap';
+import PrototypePage from './components/PrototypePage';
+import { PrototypeEditableContent } from './components/PrototypeEditableContent';
+import Tabs from '../components/Tabs';
+import TabsSection from '../components/TabsSection';
 
 const PublicationPage = () => {
   let mapRef: PrototypeMap | null = null;
@@ -20,16 +20,16 @@ const PublicationPage = () => {
       wide
       breadcrumbs={[
         {
-          link: "/prototypes/admin-dashboard?status=editRelease",
-          text: "Administrator dashboard"
+          link: '/prototypes/admin-dashboard?status=editRelease',
+          text: 'Administrator dashboard',
         },
-        { text: "Create new release", link: "#" }
+        { text: 'Create new release', link: '#' },
       ]}
     >
       <PrototypeAdminNavigation sectionId="addContent" />
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          {" "}
+          {' '}
           <PrototypeEditableContent
             content={`
           <p className="govuk-body">
@@ -99,9 +99,7 @@ const PublicationPage = () => {
         </div>
       </div>
       <hr />
-      <h2 className="govuk-heading-l">
-        Latest headline facts and figures - 2016/17
-      </h2>
+      <h2 className="govuk-heading-l">Latest headline facts and figures</h2>
       <PrototypeDataSample
         sectionId="headlines"
         chartTitle="change in absence types in England"
@@ -110,36 +108,36 @@ const PublicationPage = () => {
         chartData={[
           {
             authorised: 4.2,
-            name: "2012/13",
+            name: '2012/13',
             overall: 5.3,
-            unauthorised: 1.1
+            unauthorised: 1.1,
           },
           {
             authorised: 3.5,
-            name: "2013/14",
+            name: '2013/14',
             overall: 4.5,
-            unauthorised: 1.1
+            unauthorised: 1.1,
           },
           {
             authorised: 3.5,
-            name: "2014/15",
+            name: '2014/15',
             overall: 4.6,
-            unauthorised: 1.1
+            unauthorised: 1.1,
           },
           {
             authorised: 3.4,
-            name: "2015/16",
+            name: '2015/16',
             overall: 4.6,
-            unauthorised: 1.1
+            unauthorised: 1.1,
           },
           {
             authorised: 3.4,
-            name: "2016/17",
+            name: '2016/17',
             overall: 4.7,
-            unauthorised: 1.3
-          }
+            unauthorised: 1.3,
+          },
         ]}
-        chartDataKeys={["unauthorised", "authorised", "overall"]}
+        chartDataKeys={['unauthorised', 'authorised', 'overall']}
       />
       <h2 className="govuk-heading-l">Contents</h2>
       <Accordion id="contents-sections">
@@ -182,37 +180,37 @@ const PublicationPage = () => {
             yAxisLabel="Absence Rate"
             chartData={[
               {
-                name: "2012/13",
+                name: '2012/13',
                 primary: 4.7,
-                "primary and secondary": 5.9,
-                secondary: 7.3
+                'primary and secondary': 5.9,
+                secondary: 7.3,
               },
               {
-                name: "2013/14",
+                name: '2013/14',
                 primary: 3.9,
-                "primary and secondary": 4.3,
-                secondary: 5.0
+                'primary and secondary': 4.3,
+                secondary: 5.0,
               },
               {
-                name: "2014/15",
+                name: '2014/15',
                 primary: 4.6,
-                "primary and secondary": 5.8,
-                secondary: 7.1
+                'primary and secondary': 5.8,
+                secondary: 7.1,
               },
               {
-                name: "2015/16",
+                name: '2015/16',
                 primary: 3.8,
-                "primary and secondary": 4.0,
-                secondary: 4.6
+                'primary and secondary': 4.0,
+                secondary: 4.6,
               },
               {
-                name: "2016/17",
+                name: '2016/17',
                 primary: 4.7,
-                "primary and secondary": 5.8,
-                secondary: 7.1
-              }
+                'primary and secondary': 5.8,
+                secondary: 7.1,
+              },
             ]}
-            chartDataKeys={["primary", "secondary", "primary and secondary"]}
+            chartDataKeys={['primary', 'secondary', 'primary and secondary']}
           />
           <PrototypeEditableContent
             content={`
@@ -290,37 +288,37 @@ const PublicationPage = () => {
             yAxisLabel="Persistent Absence Rate"
             chartData={[
               {
-                name: "2012/13",
+                name: '2012/13',
                 primary: 14.7,
-                "primary and secondary": 18.9,
-                secondary: 23.3
+                'primary and secondary': 18.9,
+                secondary: 23.3,
               },
               {
-                name: "2013/14",
+                name: '2013/14',
                 primary: 13.9,
-                "primary and secondary": 18.3,
-                secondary: 22.0
+                'primary and secondary': 18.3,
+                secondary: 22.0,
               },
               {
-                name: "2014/15",
+                name: '2014/15',
                 primary: 14.6,
-                "primary and secondary": 18.8,
-                secondary: 24.1
+                'primary and secondary': 18.8,
+                secondary: 24.1,
               },
               {
-                name: "2015/16",
+                name: '2015/16',
                 primary: 13.8,
-                "primary and secondary": 18.0,
-                secondary: 22.6
+                'primary and secondary': 18.0,
+                secondary: 22.6,
               },
               {
-                name: "2016/17",
+                name: '2016/17',
                 primary: 14.7,
-                "primary and secondary": 18.9,
-                secondary: 24.1
-              }
+                'primary and secondary': 18.9,
+                secondary: 24.1,
+              },
             ]}
-            chartDataKeys={["primary", "secondary", "primary and secondary"]}
+            chartDataKeys={['primary', 'secondary', 'primary and secondary']}
           />
           <PrototypeEditableContent
             content={`
@@ -385,37 +383,37 @@ const PublicationPage = () => {
             yAxisLabel="Absence Rate"
             chartData={[
               {
-                "family holiday": 0.7,
+                'family holiday': 0.7,
                 illness: 3.2,
-                name: "2012/13",
-                overall: 3.9
+                name: '2012/13',
+                overall: 3.9,
               },
               {
-                "family holiday": 0.7,
+                'family holiday': 0.7,
                 illness: 3.5,
-                name: "2013/14",
-                overall: 4.2
+                name: '2013/14',
+                overall: 4.2,
               },
               {
-                "family holiday": 0.7,
+                'family holiday': 0.7,
                 illness: 3.4,
-                name: "2014/15",
-                overall: 4.1
+                name: '2014/15',
+                overall: 4.1,
               },
               {
-                "family holiday": 0.7,
+                'family holiday': 0.7,
                 illness: 3.3,
-                name: "2015/16",
-                overall: 4.0
+                name: '2015/16',
+                overall: 4.0,
               },
               {
-                "family holiday": 0.7,
+                'family holiday': 0.7,
                 illness: 3.7,
-                name: "2016/17",
-                overall: 4.4
-              }
+                name: '2016/17',
+                overall: 4.4,
+              },
             ]}
-            chartDataKeys={["overall", "illness", "family holiday"]}
+            chartDataKeys={['overall', 'illness', 'family holiday']}
           />
           <PrototypeEditableContent
             content={`
