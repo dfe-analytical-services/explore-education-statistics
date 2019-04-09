@@ -19,12 +19,11 @@ div.ck.ck-editor__editable_inline {
   .editable-button {
     display: block;
     position: absolute;
-    top: 0;
+    top: -20px;
     right: 0px;
-    border-left: 2px solid black;
     background-color: #8f8;
-    opacity: 0.85;
-
+    border: solid 1px grey;
+    padding: 0 4px;
   }
 
   .unsaved {
@@ -34,7 +33,12 @@ div.ck.ck-editor__editable_inline {
 
 .editable-content-editing {
   .editable-button {
+    border: none;
     display: inline !important;
+    z-index: 1000;
+    margin: 6px;
+    padding: 0 0px;
+    top: 0px;
   }
 }
 
