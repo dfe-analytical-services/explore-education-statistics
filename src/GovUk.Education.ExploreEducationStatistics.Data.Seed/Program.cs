@@ -34,6 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                 .AddJsonFile("appsettings.json", true, true)
                 .Build();
 
+            services.AddMemoryCache();
+
             services.AddLogging(builder => builder.AddConsole().AddConfiguration(configuration.GetSection("Logging")))
                 .AddDbContext<ApplicationDbContext>(options =>
                     options

@@ -56,32 +56,28 @@ class PublicationReleasePage extends Component<Props> {
           { name: data.title },
         ]}
       >
+        {!release && (
+          <strong className="govuk-tag govuk-!-margin-bottom-2">
+            {' '}
+            This is the latest data{' '}
+          </strong>
+        )}
+
+        <PageTitle title={data.title} />
+
+        <dl className="dfe-meta-content">
+          <dt className="govuk-caption-m">Published: </dt>
+          <dd>
+            <strong>
+              <FormattedDate>{data.published}</FormattedDate>
+            </strong>
+          </dd>
+        </dl>
+
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            {!release && (
-              <strong className="govuk-tag govuk-!-margin-bottom-2">
-                {' '}
-                This is the latest data{' '}
-              </strong>
-            )}
+            <ReactMarkdown className="govuk-body" source={data.summary} />
 
-            <PageTitle title={data.title} />
-
-            <ReactMarkdown className="govuk-body-l" source={data.summary} />
-
-            <Details summary="Read more about our methodology">
-              <p>
-                To help you analyse and understand the statistics the following
-                sections include:
-              </p>
-
-              <div className="govuk-inset-text">
-                <Link to="#">
-                  Find out more about our pupil absence data and statistics
-                  methodology and terminology
-                </Link>
-              </div>
-            </Details>
             <Details summary="Download underlying data files">
               <ul className="govuk-list">
                 <li>
@@ -107,13 +103,13 @@ class PublicationReleasePage extends Component<Props> {
             <aside className="app-related-items">
               <h3 id="subsection-title">About these statistics</h3>
 
-              <h4 data-testid="publication-page--release-name">
+              <h4 data-testid="release-period">
                 <span className="govuk-caption-m">For school year: </span>
                 {data.releaseName} {!release && <span>(latest data)</span>}
                 <Details summary={`See previous ${releaseCount} releases`}>
                   <ul
                     className="govuk-list"
-                    data-testid="publication-page--release-name-list"
+                    data-testid="previous-releases-list"
                   >
                     {data.publication.releases
                       .slice(1)
@@ -137,21 +133,13 @@ class PublicationReleasePage extends Component<Props> {
                 </Details>
               </h4>
 
-              <h4>
-                <span className="govuk-caption-m">Published: </span>
-                <FormattedDate>{data.published}</FormattedDate>
-              </h4>
-
-              <h4 data-testid="publication-page--last-updated">
+              <h4 data-testid="last-updated">
                 <span className="govuk-caption-m">Last updated: </span>
                 <FormattedDate>{data.updates[0].on}</FormattedDate>
 
                 <Details summary={`See all ${data.updates.length} updates`}>
                   {data.updates.map(elem => (
-                    <div
-                      data-testid="publication-page--update-element"
-                      key={elem.on}
-                    >
+                    <div data-testid="last-updated-element" key={elem.on}>
                       <FormattedDate className="govuk-body govuk-!-font-weight-bold">
                         {elem.on}
                       </FormattedDate>
@@ -161,7 +149,7 @@ class PublicationReleasePage extends Component<Props> {
                 </Details>
               </h4>
 
-              <h4>
+              <h4 data-testid="next-update">
                 <span className="govuk-caption-m">Next update:</span>
                 <FormattedDate>{data.publication.nextUpdate}</FormattedDate>
 
@@ -177,11 +165,15 @@ class PublicationReleasePage extends Component<Props> {
 
         <hr />
 
+        <h2>Latest headline facts and figures - {data.releaseName}</h2>
+
         {data.keyStatistics && <DataBlock {...data.keyStatistics} />}
 
         {data.content.length > 0 && (
           <>
-            <h2 className="govuk-heading-l">Contents</h2>
+            <h2 className="govuk-heading-l" data-testid="contents">
+              Contents
+            </h2>
 
             <Accordion id="contents-sections">
               {data.content.map(({ heading, caption, order, content }) => (
@@ -197,7 +189,10 @@ class PublicationReleasePage extends Component<Props> {
           </>
         )}
 
-        <h2 className="govuk-heading-m govuk-!-margin-top-9">
+        <h2
+          className="govuk-heading-m govuk-!-margin-top-9"
+          data-testid="extra-information"
+        >
           Extra information
         </h2>
 
@@ -279,7 +274,10 @@ class PublicationReleasePage extends Component<Props> {
           API. <a href="#">What is an API?</a>
         </p>
 
-        <Link to="/table-tool" className="govuk-button">
+        <Link
+          to={`/table-tool/${data.publication.slug}`}
+          className="govuk-button"
+        >
           Create charts and tables
         </Link>
 

@@ -8,11 +8,12 @@ const HomePage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <h1 className="govuk-heading-xl">
-            Education statistics: guidance and methodology
+            Education statistics: methodology and glossary
           </h1>
           <p className="govuk-body-l">
-            Select an option to find the kind of guidance and methodology you're
-            looking for.
+            Select an option to find the methodology for specific statistics and
+            data or our glossary for a list of statistical terms and
+            definitions.
           </p>
         </div>
         <div className="govuk-grid-column-one-third">
@@ -35,23 +36,11 @@ const HomePage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-1">
-            <Link to="#">General guidance and methodology</Link>
+            <Link to="/prototypes/methodology-specific">Methodology</Link>
           </h2>
           <p className="govuk-body">
-            Browse to find out more about the general background of and
-            methodology behind education statistics and data and how and why
-            they're collected and published.
-          </p>
-
-          <h2 className="govuk-heading-m govuk-!-margin-bottom-1">
-            <Link to="/prototypes/methodology-specific">
-              Specific guidance and methodology
-            </Link>
-          </h2>
-          <p className="govuk-body">
-            Browse to find out more about the background of and methodology
-            behind specific education statistical topics and data sets and how
-            and why they're collected and published.
+            Browse to find out about the methodology behind specific education
+            statistics and data and how and why they're collected and published.
           </p>
 
           <h2 className="govuk-heading-m govuk-!-margin-bottom-1">

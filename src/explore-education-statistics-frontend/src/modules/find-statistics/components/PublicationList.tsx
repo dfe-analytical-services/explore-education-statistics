@@ -41,6 +41,15 @@ class PublicationList extends Component<Props> {
                       View statistics
                     </Link>
                   </div>
+                  <div className="govuk-grid-column-one-third">
+                    <Link
+                      className="govuk-link govuk-!-margin-right-9"
+                      to={`/table-tool/${slug}`}
+                      data-testid={`create-table-${slug}`}
+                    >
+                      Create charts and tables
+                    </Link>
+                  </div>
                 </div>
               </div>
             </li>

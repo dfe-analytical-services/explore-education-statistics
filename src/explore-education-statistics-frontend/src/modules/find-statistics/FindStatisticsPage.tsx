@@ -47,6 +47,10 @@ class FindStatisticsPage extends Component<Props> {
             charts and tables to help you compare, contrast and view national
             and regional statistical data and trends
           </li>
+          <li>
+            links to underlying data so you can download files and carry out
+            your own statistical analysis
+          </li>
         </ul>
 
         {themes.length > 0 ? (
