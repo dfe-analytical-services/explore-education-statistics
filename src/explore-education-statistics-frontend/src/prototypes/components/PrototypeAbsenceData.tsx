@@ -145,7 +145,7 @@ class PrototypeAbsenceData extends Component<
                   });
                 }}
                 options={[
-                  { text: 'Select a local authority', value: '' },
+                  { label: 'Select a local authority', value: '' },
                 ].concat(
                   localAuthorityOptions
                     .filter(
@@ -153,7 +153,7 @@ class PrototypeAbsenceData extends Component<
                         feature.properties && feature.properties.selectable,
                     )
                     .map(feature => ({
-                      text: feature.properties
+                      label: feature.properties
                         ? feature.properties.lad17nm
                         : '',
                       value: feature.properties

@@ -10,9 +10,9 @@ describe('FormSelect', () => {
         label="Test select"
         name="testSelect"
         options={[
-          { value: 'option-1', text: 'Option 1' },
-          { value: 'option-2', text: 'Option 2' },
-          { value: 'option-3', text: 'Option 3' },
+          { value: 'option-1', label: 'Option 1' },
+          { value: 'option-2', label: 'Option 2' },
+          { value: 'option-3', label: 'Option 3' },
         ]}
       />,
     );
@@ -29,9 +29,9 @@ describe('FormSelect', () => {
         label="Test select"
         name="testSelect"
         options={[
-          { value: 'option-1', text: 'Option 1' },
-          { value: 'option-2', text: 'Option 2' },
-          { value: 'option-3', text: 'Option 3' },
+          { value: 'option-1', label: 'Option 1' },
+          { value: 'option-2', label: 'Option 2' },
+          { value: 'option-3', label: 'Option 3' },
         ]}
       />,
     );

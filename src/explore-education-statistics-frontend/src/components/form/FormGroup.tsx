@@ -3,13 +3,14 @@ import React, { ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
+  className?: string;
   hasError?: boolean;
 }
 
-const FormGroup = ({ children, hasError = false }: Props) => {
+const FormGroup = ({ children, className, hasError = false }: Props) => {
   return (
     <div
-      className={classNames('govuk-form-group', {
+      className={classNames('govuk-form-group', className, {
         'govuk-form-group--error': hasError,
       })}
     >

@@ -1,0 +1,15 @@
+@import '../styles/govuk-base';
+
+.button {
+  @include govuk-focusable-fill;
+
+  background: none;
+  border-width: 0;
+  color: govuk-colour('blue');
+  cursor: pointer;
+  display: inline;
+
+  &:hover {
+    color: $govuk-link-hover-colour;
+  }
+}
