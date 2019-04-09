@@ -161,87 +161,38 @@ class PrototypeTableToolPage extends Component<{}, State> {
         tableData: [],
       },
       // async () => {
-      //   const characteristics = [
-      //     'Ethnicity_Major_Black_Total',
-      //     'Ethnicity_Major_White_Total',
-      //     'Ethnicity_Major_Chinese',
-      //     'Ethnicity_Major_Mixed_Total',
-      //   ];
-      //
-      //   const schoolTypes = [
-      //     'State_Funded_Primary',
-      //     'State_Funded_Secondary',
-      //     'Special',
-      //   ];
-      //
-      //   const indicators = [
-      //     'sess_authorised',
-      //     'sess_authorised_percent',
-      //     'sess_unauthorised',
-      //     'sess_unauthorised_percent',
-      //   ];
-      //
-      //   // TODO: Remove this when timePeriod API finalised
-      //   const formatToAcademicYear = (year: string | number) => {
-      //     const nextYear = parseInt(year as string, 0) + 1;
-      //     return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
-      //   };
-      //
-      //   const start = new TimePeriod(2012, 'ACADEMIC');
-      //   const end = new TimePeriod(2016, 'ACADEMIC');
-      //
-      //   const {
-      //     result,
-      //   } = await tableBuilderService.getNationalCharacteristicsData({
-      //     characteristics,
-      //     indicators,
-      //     schoolTypes,
-      //     endYear: formatToAcademicYear(end.year),
-      //     publicationId: this.state.publicationId,
-      //     startYear: formatToAcademicYear(start.year),
+      //   this.handleFilterFormSubmit({
+      //     categoricalFilters: {
+      //       characteristics: [
+      //         'Ethnicity_Major_Black_Total',
+      //         'Ethnicity_Major_White_Total',
+      //         'Ethnicity_Major_Chinese',
+      //         'Ethnicity_Major_Mixed_Total',
+      //       ],
+      //       schoolTypes: [
+      //         'State_Funded_Primary',
+      //         'State_Funded_Secondary',
+      //         'Special',
+      //       ],
+      //     },
+      //     indicators: [
+      //       'sess_authorised',
+      //       'sess_authorised_percent',
+      //       'sess_unauthorised',
+      //       'sess_unauthorised_percent',
+      //     ],
+      //     location: {
+      //       level: '',
+      //       localAuthority: '',
+      //       national: '',
+      //       region: '',
+      //     },
+      //     timePeriod: {
+      //       start: new TimePeriod(2012, 'AY'),
+      //       end: new TimePeriod(2016, 'AY')
+      //     },
       //   });
-      //
-      //   const categoricalFiltersByValue = mapValues(
-      //     this.state.metaSpecification.categoricalFilters,
-      //     value => mapOptionValues(value.options),
-      //   );
-      //
-      //   const indicatorsByValue = mapOptionValues<IndicatorOption>(
-      //     this.state.metaSpecification.indicators,
-      //   );
-      //
-      //   const timePeriods = TimePeriod.createRange(start, end);
-      //
-      //   this.setState(
-      //     {
-      //       filters: {
-      //         timePeriods,
-      //         categorical: mapValuesWithKeys(
-      //           {
-      //             characteristics,
-      //             schoolTypes,
-      //           },
-      //           ([filterGroup, selectedFilters]) =>
-      //             selectedFilters.map(
-      //               filter => categoricalFiltersByValue[filterGroup][filter],
-      //             ),
-      //         ),
-      //         indicators: indicators.map(
-      //           indicator => indicatorsByValue[indicator],
-      //         ),
-      //       },
-      //       tableData: result,
-      //     },
-      //     () => {
-      //       if (this.dataTableRef.current) {
-      //         this.dataTableRef.current.scrollIntoView({
-      //           behavior: 'smooth',
-      //           block: 'start',
-      //         });
-      //       }
-      //     },
-      //   );
-      // },
+      // }
     );
   };
 
