@@ -1,33 +1,35 @@
-import React from "react";
-import Accordion from "../components/Accordion";
-import AccordionSection from "../components/AccordionSection";
-import Link from "../components/Link";
-import PrototypeDownloadDropdown from "./components/PrototypeDownloadDropdown";
-import PrototypePage from "./components/PrototypePage";
-import Tabs from "../components/Tabs";
-import TabsSection from "../components/TabsSection";
-import { RouteProps } from "react-router";
+import React from 'react';
+import Accordion from '../components/Accordion';
+import AccordionSection from '../components/AccordionSection';
+import Link from '../components/Link';
+import PrototypeDownloadDropdown from './components/PrototypeDownloadDropdown';
+import PrototypePage from './components/PrototypePage';
+import Tabs from '../components/Tabs';
+import TabsSection from '../components/TabsSection';
+import { RouteProps } from 'react-router';
 
 const BrowseReleasesPage = ({ location: object }: RouteProps) => {
   return (
-    <PrototypePage wide breadcrumbs={[{ text: "Administrator dashboard" }]}>
+    <PrototypePage wide breadcrumbs={[{ text: 'Administrator dashboard' }]}>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <span className="govuk-caption-xl">Welcome</span>
           <h1 className="govuk-heading-xl">
-            John Smith{" "}
+            John Smith{' '}
             <span className="govuk-body-s">
               Not you? <Link to="#">Sign out</Link>
             </span>
           </h1>
           <Tabs>
-            <TabsSection id="task-in-progress" title="In progress">
-              {location.search == "?status=editRelease" && (
+            <TabsSection id="task-in-progress" title={`In progress ${
+                location.search == '?status=editRelease' ? '(2)' : '(1)'
+              }`}>
+              {location.search == '?status=editRelease' && (
                 <>
                   <h2 className="govuk-heading-m">New releases in progress</h2>
                   <ul className="govuk-list-bullet  govuk-!-margin-bottom-9">
                     <li>
-                      {" "}
+                      {' '}
                       <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
                         Pupil absence statistics
                       </h4>
@@ -64,13 +66,23 @@ const BrowseReleasesPage = ({ location: object }: RouteProps) => {
                 </li>
               </ul>
             </TabsSection>
-            <TabsSection id="task-ready-approval" title="Ready for approval">
-              {location.search == "?status=readyApproval" && (
+            <TabsSection
+              id="task-ready-approval"
+              title={`Ready for approval ${
+                location.search == '?status=readyApproval' ? '(1)' : ''
+              }`}
+            >
+              {location.search != '?status=readyApproval' && (
+                <div className="govuk-inset-text">
+                  There are currenly no releases ready for approval
+                </div>
+              )}
+              {location.search == '?status=readyApproval' && (
                 <>
                   <h2 className="govuk-heading-m">Ready for approval</h2>
                   <ul className="govuk-list-bullet">
                     <li>
-                      {" "}
+                      {' '}
                       <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
                         Pupil absence statistics
                       </h4>
@@ -91,13 +103,17 @@ const BrowseReleasesPage = ({ location: object }: RouteProps) => {
               )}
             </TabsSection>
             <TabsSection id="task-ready-approval" title="Needs work">
-              Needs work
+              <div className="govuk-inset-text">
+                There are currenly no releases requiring work
+              </div>
             </TabsSection>
             <TabsSection
               id="task-ready-approval"
               title="Approved for publication"
             >
-              Approved for publication
+              <div className="govuk-inset-text">
+                There are currenly no releases approved for publication
+              </div>
             </TabsSection>
           </Tabs>
         </div>
@@ -132,7 +148,7 @@ const BrowseReleasesPage = ({ location: object }: RouteProps) => {
               <ul className="govuk-list">
                 <li>
                   <Link to="/prototypes/methodology-home">
-                    Administrators guide{" "}
+                    Administrators guide{' '}
                   </Link>
                 </li>
               </ul>
@@ -149,9 +165,9 @@ const BrowseReleasesPage = ({ location: object }: RouteProps) => {
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <ul className="govuk-list-bullet">
               <li>
-                {" "}
+                {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Pupil absence statistics{" "}
+                  Pupil absence statistics{' '}
                 </h4>
                 <dl className="dfe-meta-content govuk-!-margin-0">
                   <dt className="govuk-caption-m">Published: </dt>
@@ -184,11 +200,11 @@ const BrowseReleasesPage = ({ location: object }: RouteProps) => {
                   </div>
                 </div>
               </li>
-              {location.search == "?status=editRelease" && (
+              {location.search == '?status=editRelease' && (
                 <li className="govuk-!-margin-top-6">
-                  {" "}
+                  {' '}
                   <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                    Pupil absence statistics{" "}
+                    Pupil absence statistics{' '}
                     <span className="govuk-tag">New release in progress</span>
                   </h4>
                   <dl className="dfe-meta-content govuk-!-margin-0">
@@ -262,9 +278,9 @@ const BrowseReleasesPage = ({ location: object }: RouteProps) => {
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <ul className="govuk-list-bullet">
               <li>
-                {" "}
+                {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  GCSE and equivalent results in England{" "}
+                  GCSE and equivalent results in England{' '}
                   <span className="govuk-tag">Editing in progress</span>
                 </h4>
                 <dl className="dfe-meta-content govuk-!-margin-0">
