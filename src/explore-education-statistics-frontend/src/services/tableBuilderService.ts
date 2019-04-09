@@ -1,4 +1,3 @@
-import SchoolType from 'src/services/types/SchoolType';
 import { dataApi } from './api';
 
 export interface PublicationMeta {
@@ -28,7 +27,7 @@ export interface CharacteristicsData {
   releaseDate: string;
   result: {
     timePeriod: number;
-    schoolType: SchoolType;
+    schoolType: string;
     indicators: {
       [indicator: string]: string;
     };
@@ -53,7 +52,7 @@ export default {
     publicationId: string;
     characteristics: string[];
     indicators: string[];
-    schoolTypes: SchoolType[];
+    schoolTypes: string[];
     startYear: number;
     endYear: number;
   }): Promise<CharacteristicsData> {

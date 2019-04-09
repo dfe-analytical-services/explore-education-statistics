@@ -1,0 +1,43 @@
+@import '../../../styles/govuk-base';
+
+.list {
+  padding: govuk-spacing(2);
+}
+
+.listDraggingOver {
+  background: govuk-colour('grey-4');
+  outline: $govuk-focus-width solid $govuk-focus-colour;
+  outline-offset: 0;
+}
+
+.optionRow {
+  @include govuk-focusable;
+
+  background: #fff;
+  border-bottom: 1px solid govuk-colour('grey-2');
+  padding: govuk-spacing(2);
+  user-select: none;
+
+  &:hover {
+    background: govuk-colour('grey-4');
+    // Fallback if grab is unsupported
+    cursor: move;
+    cursor: grab;
+  }
+}
+
+.optionText {
+  display: flex;
+  justify-content: space-between;
+}
+
+.optionActions {
+  display: flex;
+  flex-direction: column;
+}
+
+.optionCurrentDragging {
+  background: #fff;
+  outline: $govuk-focus-width solid $govuk-focus-colour;
+  outline-offset: 0;
+}
