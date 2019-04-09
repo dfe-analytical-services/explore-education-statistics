@@ -39,7 +39,7 @@ const PublicationDataPage = ({ location: object }: RouteProps) => {
               Edit status
             </Link>
           </div>
-          <Link to="/prototypes/admin-dashboard">
+          <Link to="/prototypes/admin-dashboard?status=readyApproval">
             Back to administrator dashboard
           </Link>
         </>
@@ -58,7 +58,7 @@ const PublicationDataPage = ({ location: object }: RouteProps) => {
                     type="radio"
                     name="status"
                     id="edit"
-                    value="edit"
+                    value="editRelease"
                     defaultChecked
                   />
                   <label

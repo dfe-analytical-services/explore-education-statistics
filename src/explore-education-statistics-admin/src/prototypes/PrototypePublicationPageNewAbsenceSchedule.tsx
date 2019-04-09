@@ -17,7 +17,7 @@ const PublicationSchedulePage = () => {
       wide
       breadcrumbs={[
         {
-          link: "/prototypes/admin-dashboard",
+          link: "/prototypes/admin-dashboard?status=editRelease",
           text: "Administrator dashboard"
         },
         { text: "Create new release", link: "#" }
