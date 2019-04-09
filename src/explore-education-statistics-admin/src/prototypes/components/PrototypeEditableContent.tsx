@@ -31,7 +31,9 @@ export class PrototypeEditableContent extends React.Component<Props, State> {
   };
 
   componentDidMount() {
-    this.setState({ content: this.props.content });
+
+    this.setState({ content: this.props.content, editing: false, unsaved: false });
+
     this.temporaryContent = this.props.content;
 
     if (!this.state.editing && this.ref) {
