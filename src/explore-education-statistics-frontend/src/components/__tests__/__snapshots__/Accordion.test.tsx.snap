@@ -27,6 +27,7 @@ exports[`Accordion renders with hidden content by default 1`] = `
     >
       <div
         class="govuk-accordion__section-header"
+        data-testid="SectionHeader Test heading"
       >
         <h2
           class="govuk-accordion__section-heading"
@@ -35,7 +36,6 @@ exports[`Accordion renders with hidden content by default 1`] = `
             aria-controls="test-sections-content-1"
             aria-expanded="false"
             class="govuk-accordion__section-button"
-            data-testid="Test heading"
             id="test-sections-heading-1"
             type="button"
           >
@@ -96,6 +96,7 @@ exports[`Accordion renders with visible content when \`open\` is true 1`] = `
     >
       <div
         class="govuk-accordion__section-header"
+        data-testid="SectionHeader Test heading"
       >
         <h2
           class="govuk-accordion__section-heading"
@@ -104,7 +105,6 @@ exports[`Accordion renders with visible content when \`open\` is true 1`] = `
             aria-controls="test-sections-content-1"
             aria-expanded="true"
             class="govuk-accordion__section-button"
-            data-testid="Test heading"
             id="test-sections-heading-1"
             type="button"
           >

@@ -21,15 +21,15 @@ class App extends BaseApp {
   }
 
   public componentDidMount(): void {
-    if (process.env.GA_TRACKING_ID !== undefined) {
-      logPageView();
+    logPageView();
 
-      if (Router.router !== null) {
-        Router.router.events.on('routeChangeComplete', logPageView);
-      }
+    if (Router.router !== null) {
+      Router.router.events.on('routeChangeComplete', logPageView);
     }
 
     document.body.classList.add('js-enabled');
+
+    import('src/polyfill');
   }
 
   public render() {

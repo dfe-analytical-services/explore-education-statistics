@@ -1,28 +1,34 @@
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Seed.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
 {
     public enum DataCsvFilename
     {
-        [DataFile(typeof(GeographicData))]
+        [DataFile(ImportFileType.Geographic)]
         absence_geoglevels,
-        [DataFile(typeof(GeographicData))]
+
+        [DataFile(ImportFileType.Geographic)]
         exclusion_geoglevels,
-        [DataFile(typeof(GeographicData))]
+
+        [DataFile(ImportFileType.Geographic)]
         schpupnum_geoglevels,
-        
-        [DataFile(typeof(CharacteristicDataLa))]
+
+        [DataFile(ImportFileType.La_Characteristic)]
         absence_lacharacteristics,
-        [DataFile(typeof(CharacteristicDataLa))]
+
+        [DataFile(ImportFileType.La_Characteristic)]
         exclusion_lacharacteristics,
-        [DataFile(typeof(CharacteristicDataLa))]
+
+        [DataFile(ImportFileType.La_Characteristic)]
         schpupnum_lacharacteristics,
-        
-        [DataFile(typeof(CharacteristicDataNational))]
+
+        [DataFile(ImportFileType.National_Characteristic)]
         absence_natcharacteristics,
-        [DataFile(typeof(CharacteristicDataNational))]
+
+        [DataFile(ImportFileType.National_Characteristic)]
         exclusion_natcharacteristics,
-        [DataFile(typeof(CharacteristicDataNational))]
+
+        [DataFile(ImportFileType.National_Characteristic)]
         schpupnum_natcharacteristics
     }
 }

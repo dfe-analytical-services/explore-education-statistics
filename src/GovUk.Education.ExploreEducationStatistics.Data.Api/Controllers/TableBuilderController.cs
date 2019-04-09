@@ -1,10 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
@@ -15,13 +15,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     {
         private readonly ITableBuilderService _tableBuilderService;
         private readonly IReleaseService _releaseService;
+        private readonly ISubjectService _subjectService;
 
         public TableBuilderController(
-            ITableBuilderService tableBuilderService,
-            IReleaseService releaseService)
+            IReleaseService releaseService,
+            ISubjectService subjectService,
+            ITableBuilderService tableBuilderService)
         {
-            _tableBuilderService = tableBuilderService;
             _releaseService = releaseService;
+            _subjectService = subjectService;
+            _tableBuilderService = tableBuilderService;
         }
 
         [HttpPost("geographic")]
@@ -61,96 +64,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpGet("meta/{typeName}/{publicationId}")]
-        public ActionResult<PublicationMetaViewModel> GetMeta(string typeName, Guid publicationId)
+        [Obsolete("Use subject instead")]
+        // TODO Remove me - Get meta by subject instead
+        public ActionResult<SubjectMetaViewModel> GetSubjectMeta(string typeName, Guid publicationId)
         {
-            var result = new PublicationMetaViewModel
+            // TODO Remove me once UI updated to get Meta by Subject.
+            // TODO Currently the UI only requests meta data for type "CharacteristicDataNational"
+            if (typeName == "CharacteristicDataNational")
             {
-                PublicationId = publicationId,
-                Indicators = _releaseService.GetIndicatorMetas(publicationId, typeName),
-                Characteristics = _releaseService.GetCharacteristicMetas(publicationId, typeName)
-            };
+                var latestRelease = _releaseService.GetLatestRelease(publicationId);
 
-            if (result.Indicators != null && result.Indicators.Any() ||
-                result.Characteristics != null && result.Characteristics.Any())
-            {
-                result.ObservationalUnits = new ObservationalUnitsViewModel
+                var subjectForPublication = _subjectService.FindMany(subject =>
+                    subject.Release.Id == latestRelease &&
+                    subject.Name == "National characteristics"
+                ).FirstOrDefault();
+
+                if (subjectForPublication != null)
                 {
-                    Country = new List<NameLabelViewModel>
+                    return RedirectToRoute(new
                     {
-                        new NameLabelViewModel {Name = "E92000001", Label = "England"}
-                    },
-                    LocalAuthority = new List<NameLabelViewModel>
-                    {
-                        new NameLabelViewModel
-                        {
-                            Name = "E09000007",
-                            Label = "Camden"
-                        },
-                        new NameLabelViewModel
-                        {
-                            Name = "E09000001",
-                            Label = "City of London"
-                        },
-                        new NameLabelViewModel
-                        {
-                            Name = "E09000011",
-                            Label = "Greenwich"
-                        }
-                    },
-                    Region = new List<NameLabelViewModel>
-                    {
-                        new NameLabelViewModel
-                        {
-                            Name = "E13000001",
-                            Label = "Inner London"
-                        },
-                        new NameLabelViewModel
-                        {
-                            Name = "E13000002",
-                            Label = "Outer London"
-                        }
-                    },
-                    TimePeriod = new TimePeriodMetaViewModel
-                    {
-                        Hint = "Filter statistics by a given start and end date",
-                        Legend = "Academic Year",
-                        Options = new List<NameLabelViewModel>
-                        {
-                            new NameLabelViewModel
-                            {
-                                Name = "201112",
-                                Label = "2011/12"
-                            },
-                            new NameLabelViewModel
-                            {
-                                Name = "201213",
-                                Label = "2012/13"
-                            },
-                            new NameLabelViewModel
-                            {
-                                Name = "201314",
-                                Label = "2013/14"
-                            },
-                            new NameLabelViewModel
-                            {
-                                Name = "201415",
-                                Label = "2014/15"
-                            },
-                            new NameLabelViewModel
-                            {
-                                Name = "201516",
-                                Label = "2015/16"
-                            },
-                            new NameLabelViewModel
-                            {
-                                Name = "201617",
-                                Label = "2016/17"
-                            }
-                        }
-                    }
-                };
-
-                return result;
+                        controller = "Meta",
+                        action = "GetSubjectMeta",
+                        subjectId = subjectForPublication.Id
+                    });
+                }
             }
 
             return NotFound();

@@ -1,11 +1,15 @@
-using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
 {
     public class TimePeriodMetaViewModel
     {
-        public string Hint { get; set; }
-        public string Legend { get; set; }
-        public IEnumerable<NameLabelViewModel> Options { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public TimePeriod Code { get; set; }
+
+        public string Label { get; set; }
+        public int Year { get; set; }
     }
 }

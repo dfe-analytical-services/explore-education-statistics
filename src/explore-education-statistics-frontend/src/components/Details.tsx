@@ -24,7 +24,12 @@ class Details extends Component<Props> {
     const { children, id, open, summary } = this.props;
 
     return (
-      <details className="govuk-details" open={open} ref={this.ref}>
+      <details
+        className="govuk-details"
+        open={open}
+        ref={this.ref}
+        data-testid={summary}
+      >
         <summary className="govuk-details__summary">
           <span
             className="govuk-details__summary-text"

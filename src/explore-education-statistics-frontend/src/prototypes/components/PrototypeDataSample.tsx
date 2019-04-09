@@ -53,29 +53,34 @@ const PrototypeDataSample = ({
             chartDataKeys={chartDataKeys}
           />
         </TabsSection>
-        <TabsSection id={`${sectionId}Downloads`} title="Data downloads">
-          <h2 className="govuk-heading-s">
-            Download overall absence data files
-          </h2>
+        <TabsSection id={`${sectionId}Downloads`} title="Download data">
+          <p>
+            You can customise and download data as Excel or .csv files. Our data
+            can also be accessed via an API.
+          </p>
           <ul className="govuk-list">
             <li>
-              <a className="govuk-link" href="#">
-                Excel table
+              <a href="#" className="govuk-link">
+                Download .csv files
               </a>
             </li>
             <li>
-              <a className="govuk-link" href="#">
-                csv
+              <a href="#" className="govuk-link">
+                Download Excel files
               </a>
             </li>
             <li>
-              <a className="govuk-link" href="#">
-                json
+              <a href="#" className="govuk-link">
+                Download json files
               </a>
             </li>
             <li>
-              <a className="govuk-link" href="#">
-                API
+              <a href="#" className="govuk-link">
+                Access API
+              </a>{' '}
+              -{' '}
+              <a href="#" className="govuk-link">
+                What is an API?
               </a>
             </li>
           </ul>

@@ -14,24 +14,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
     {
         private readonly IReleaseService _releaseService;
         private readonly IGeographicDataService _geographicDataService;
-        private readonly ILaCharacteristicDataService _laCharacteristicDataService;
-        private readonly INationalCharacteristicDataService _nationalCharacteristicDataService;
+        private readonly ICharacteristicDataService _characteristicDataService;
         private readonly GeographicResultBuilder _geographicResultBuilder;
         private readonly CharacteristicResultBuilder _characteristicResultBuilder;
         private readonly LaCharacteristicResultBuilder _laCharacteristicResultBuilder;
 
         public TableBuilderService(IReleaseService releaseService,
             IGeographicDataService geographicDataService,
-            ILaCharacteristicDataService laCharacteristicDataService,
-            INationalCharacteristicDataService nationalCharacteristicDataService,
+            ICharacteristicDataService characteristicDataService,
             GeographicResultBuilder geographicResultBuilder,
             CharacteristicResultBuilder characteristicResultBuilder,
             LaCharacteristicResultBuilder laCharacteristicResultBuilder)
         {
             _releaseService = releaseService;
             _geographicDataService = geographicDataService;
-            _laCharacteristicDataService = laCharacteristicDataService;
-            _nationalCharacteristicDataService = nationalCharacteristicDataService;
+            _characteristicDataService = characteristicDataService;
             _geographicResultBuilder = geographicResultBuilder;
             _characteristicResultBuilder = characteristicResultBuilder;
             _laCharacteristicResultBuilder = laCharacteristicResultBuilder;
@@ -44,25 +41,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 
         public TableBuilderResult GetLocalAuthority(LaQueryContext query)
         {
-            return BuildResult(_laCharacteristicDataService, query, _laCharacteristicResultBuilder);
+            return BuildResult(_characteristicDataService, query, _laCharacteristicResultBuilder);
         }
 
         public TableBuilderResult GetNational(NationalQueryContext query)
         {
-            return BuildResult(_nationalCharacteristicDataService, query, _characteristicResultBuilder);
+            return BuildResult(_characteristicDataService, query, _characteristicResultBuilder);
         }
 
-        private IEnumerable<T> GetData<T>(IDataService<T> dataService, IQueryContext<T> queryContext) where T : TidyData
+        private IEnumerable<TEntity> GetData<TEntity, TKey>(IDataService<TEntity, TKey> dataService,
+            IQueryContext<TEntity> queryContext) where TEntity : TidyData
         {
             var releaseId = _releaseService.GetLatestRelease(queryContext.PublicationId);
             return dataService.FindMany(queryContext.FindExpression(releaseId),
-                new List<Expression<Func<T, object>>> {data => data.Release}
+                new List<Expression<Func<TEntity, object>>>
+                    {data => data.Level, data => data.Subject, data => data.Subject.Release}
             );
         }
 
-        private TableBuilderResult BuildResult<T>(IDataService<T> dataService,
-            IQueryContext<T> queryContext,
-            IResultBuilder<T, ITableBuilderData> resultBuilder) where T : TidyData
+        private TableBuilderResult BuildResult<TEntity, TKey>(IDataService<TEntity, TKey> dataService,
+            IQueryContext<TEntity> queryContext,
+            IResultBuilder<TEntity, ITableBuilderData> resultBuilder) where TEntity : TidyData
         {
             var data = GetData(dataService, queryContext);
 
@@ -74,10 +73,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             var first = data.FirstOrDefault();
             return new TableBuilderResult
             {
-                PublicationId = first.PublicationId,
-                ReleaseId = first.Release.Id,
-                ReleaseDate = first.Release.ReleaseDate,
-                Level = first.Level,
+                PublicationId = first.Subject.Release.PublicationId,
+                ReleaseId = first.SubjectId,
+                ReleaseDate = first.Subject.Release.ReleaseDate,
+                Level = first.Level.Level,
                 Result = data.Select(tidyData => resultBuilder.BuildResult(tidyData, queryContext.Indicators))
             };
         }

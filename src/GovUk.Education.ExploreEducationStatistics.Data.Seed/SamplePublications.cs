@@ -1202,19 +1202,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                 "absence", new Publication
                 {
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Name = "Pupil absence in schools in England",
+                    Name = "Pupil absence statistics and data for schools in England",
                     Releases = new[]
                     {
                         new Release
                         {
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             ReleaseDate = new DateTime(2018, 4, 25),
-                            Name = "Pupil absence in schools in England",
-                            DataSets = new[]
+                            Name = "2016/17",
+                            Subjects = new[]
                             {
-                                new DataSet
+                                new Subject
                                 {
                                     Filename = DataCsvFilename.absence_geoglevels,
+                                    Name = "Geographic levels",
                                     IndicatorMetas = new[]
                                     {
                                         new MetaGroup<IndicatorMeta>
@@ -1283,9 +1284,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                     },
                                     CharacteristicMetas = new CharacteristicMeta[]{}
                                 },
-                                new DataSet
+                                new Subject
                                 {
                                     Filename = DataCsvFilename.absence_lacharacteristics,
+                                    Name = "Local authority characteristics",
                                     IndicatorMetas = new[]
                                     {
                                         new MetaGroup<IndicatorMeta>
@@ -1417,9 +1419,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                         GetCharacteristicMeta("First_language_Unclassified")
                                     }
                                 },
-                                new DataSet
+                                new Subject
                                 {
                                     Filename = DataCsvFilename.absence_natcharacteristics,
+                                    Name = "National characteristics",
                                     IndicatorMetas = new[]
                                     {
                                         new MetaGroup<IndicatorMeta>
@@ -1560,19 +1563,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                 "exclusion", new Publication
                 {
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                    Name = "Permanent and fixed period exclusions",
+                    Name = "Permanent and fixed-period exclusions statistics in England",
                     Releases = new[]
                     {
                         new Release
                         {
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             ReleaseDate = new DateTime(2018, 3, 22),
-                            Name = "Permanent and fixed period exclusions",
-                            DataSets = new[]
+                            Name = "2016/17",
+                            Subjects = new[]
                             {
-                                new DataSet
+                                new Subject
                                 {
                                     Filename = DataCsvFilename.exclusion_geoglevels,
+                                    Name = "Geographic levels",
                                     IndicatorMetas = new[]
                                     {
                                         new MetaGroup<IndicatorMeta>
@@ -1593,9 +1597,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                     },
                                     CharacteristicMetas = new CharacteristicMeta[]{}
                                 },
-                                new DataSet
+                                new Subject
                                 {
                                     Filename = DataCsvFilename.exclusion_lacharacteristics,
+                                    Name = "Local authority characteristics",
                                     IndicatorMetas = new[]
                                     {
                                         new MetaGroup<IndicatorMeta>
@@ -1712,9 +1717,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                         GetCharacteristicMeta("IDACI_decile_unclassified")
                                     }
                                 },
-                                new DataSet
+                                new Subject
                                 {
                                     Filename = DataCsvFilename.exclusion_natcharacteristics,
+                                    Name = "National characteristics",
                                     IndicatorMetas = new[]
                                     {
                                         new MetaGroup<IndicatorMeta>
@@ -1847,12 +1853,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                         {
                             PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
                             ReleaseDate = new DateTime(2018, 5, 30),
-                            Name = "Schools, pupils and their characteristics",
-                            DataSets = new[]
+                            Name = "2016/17",
+                            Subjects = new[]
                             {
-                                new DataSet
+                                new Subject
                                 {
                                     Filename = DataCsvFilename.schpupnum_geoglevels,
+                                    Name = "Geographic levels",
                                     IndicatorMetas = new[]
                                     {
                                         new MetaGroup<IndicatorMeta>
@@ -1867,9 +1874,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                     },
                                     CharacteristicMetas = new CharacteristicMeta[]{}
                                 },
-                                new DataSet
+                                new Subject
                                 {
                                     Filename = DataCsvFilename.schpupnum_lacharacteristics,
+                                    Name = "Local authority characteristics",
                                     IndicatorMetas = new[]
                                     {
                                         new MetaGroup<IndicatorMeta>
@@ -1979,9 +1987,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                         GetCharacteristicMeta("IDACI_decile_unclassified")
                                     }
                                 },
-                                new DataSet
+                                new Subject
                                 {
                                     Filename = DataCsvFilename.schpupnum_natcharacteristics,
+                                    Name = "National characteristics",
                                     IndicatorMetas = new[]
                                     {
                                         new MetaGroup<IndicatorMeta>

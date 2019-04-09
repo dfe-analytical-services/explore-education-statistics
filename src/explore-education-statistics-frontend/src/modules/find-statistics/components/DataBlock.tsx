@@ -151,7 +151,13 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
           )}
 
           <TabsSection id={`${id}2`} title="Data downloads">
-            downloads
+            <p>
+              You can customise and download data as Excel or .csv files. Our
+              data can also be accessed via an API.
+            </p>
+            <div className="govuk-inset-text">
+              Data downloads have not yet been implemented within the service.
+            </div>
           </TabsSection>
         </Tabs>
       </div>

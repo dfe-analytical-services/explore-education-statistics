@@ -1,21 +1,27 @@
 if (typeof Promise === 'undefined') {
+  // eslint-disable-next-line global-require
   window.Promise = require('core-js/es6/promise');
 }
 
-export const loadPolyfills = () => {
-  const polyfillCoreJs = new Promise(resolve => {
-    if (
-      'startsWith' in String.prototype &&
-      'endsWith' in String.prototype &&
-      'includes' in Array.prototype &&
-      'assign' in Object &&
-      'keys' in Object
-    ) {
-      return resolve();
-    }
+const polyfillCoreJs = new Promise(resolve => {
+  if (
+    'startsWith' in String.prototype &&
+    'endsWith' in String.prototype &&
+    'includes' in Array.prototype &&
+    'assign' in Object &&
+    'keys' in Object
+  ) {
+    return resolve();
+  }
 
-    import('core-js').then(resolve);
-  });
+  return import('core-js').then(resolve);
+});
 
-  return Promise.all([polyfillCoreJs]);
+const applyCustomPolyfills = () => {
+  // NodeList.forEach
+  if (window.NodeList && !NodeList.prototype.forEach) {
+    NodeList.prototype.forEach = Array.prototype.forEach;
+  }
 };
+
+polyfillCoreJs.then(applyCustomPolyfills);

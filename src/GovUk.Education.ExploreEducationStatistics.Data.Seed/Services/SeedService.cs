@@ -2,12 +2,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Seed.Models;
 using Microsoft.Extensions.Logging;
-using Release = GovUk.Education.ExploreEducationStatistics.Data.Seed.Models.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 {
@@ -16,9 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
         private readonly ILogger _logger;
         private readonly ApplicationDbContext _context;
         private readonly CsvImporterFactory _csvImporterFactory;
-
-        private const string indicatorMetaTableName = "IndicatorMeta";
-        private const string characteristicMetaTableName = "CharacteristicMeta";
 
         public SeedService(ILogger<SeedService> logger,
             ApplicationDbContext context,
@@ -40,10 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             {
                 _context.ChangeTracker.AutoDetectChangesEnabled = false;
 
-                SeedIndicators();
-                SeedCharacteristics();
-                _context.SaveChanges();
-
                 foreach (var publication in SamplePublications.Publications.Values)
                 {
                     Seed(publication);
@@ -56,34 +47,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 
             stopWatch.Stop();
             _logger.LogInformation("Seeding completed with duration {duration} ", stopWatch.Elapsed.ToString());
-        }
-
-        private void SeedIndicators()
-        {
-            _logger.LogInformation("Seeding {Table}", indicatorMetaTableName);
-
-            if (!_context.IndicatorMeta.Any())
-            {
-                _context.IndicatorMeta.AddRange(SamplePublications.IndicatorMetas.Values);
-            }
-            else
-            {
-                _logger.LogWarning("Not seeding {Table}. Table already contains values", indicatorMetaTableName);
-            }
-        }
-
-        private void SeedCharacteristics()
-        {
-            _logger.LogInformation("Seeding {Table}", characteristicMetaTableName);
-
-            if (!_context.CharacteristicMeta.Any())
-            {
-                _context.CharacteristicMeta.AddRange(SamplePublications.CharacteristicMetas.Values);
-            }
-            else
-            {
-                _logger.LogWarning("Not seeding {Table}. Table already contains values", characteristicMetaTableName);
-            }
         }
 
         private void Seed(Publication publication)
@@ -103,21 +66,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 
             var releaseDb = CreateRelease(release);
 
-            foreach (var dataSet in release.DataSets)
+            foreach (var subject in release.Subjects)
             {
-                SeedDataSet(releaseDb, dataSet);
+                SeedSubject(releaseDb, subject);
             }
         }
 
-        private void SeedDataSet(Model.Release release, DataSet dataSet)
+        private void SeedSubject(Model.Release release, Subject subject)
         {
-            SeedDataSetMeta(release, dataSet);
+            _logger.LogInformation("Seeding Subject for {Publication}, {Subject}", release.PublicationId,
+                subject.Name);
+
+            var subjectDb = CreateSubject(release, subject);
+
+            SeedMetaData(subjectDb, subject);
             _context.SaveChanges();
 
-            var importer = _csvImporterFactory.Importer(dataSet.Filename);
-            
-            _logger.LogInformation("Importing data from {Filename}.csv", dataSet.Filename);
-            importer.Import(GetCsvLines(dataSet.Filename), release);
+            var importer = _csvImporterFactory.Importer(subject.GetImportFileType());
+
+            var lines = GetCsvLines(subject.Filename);
+            importer.Import(lines, subjectDb);
         }
 
         private IEnumerable<string> GetCsvLines(DataCsvFilename dataCsvFilename)
@@ -130,40 +98,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             return File.ReadAllLines(path);
         }
 
-        private void SeedDataSetMeta(Model.Release releaseDb, DataSet dataSet)
+        private void SeedMetaData(Model.Subject subjectDb, Subject subject)
         {
-            SeedDataSetIndicators(releaseDb, dataSet);
-            SeedDataSetCharacteristics(releaseDb, dataSet);
+            SeedMetaDataIndicators(subjectDb, subject);
+            SeedMetaDataCharacteristics(subjectDb, subject);
         }
 
-        private void SeedDataSetIndicators(Model.Release releaseDb, DataSet dataSet)
+        private void SeedMetaDataIndicators(Model.Subject subjectDb, Subject subject)
         {
-            _context.AddRange(
-                from metaGroup in dataSet.IndicatorMetas
-                from indicatorMeta in metaGroup.Meta
-                let indicatorMetaDb = LookupIndicatorMeta(indicatorMeta.Name)
-                select new ReleaseIndicatorMeta
+            _context.IndicatorMeta.AddRange(subject.IndicatorMetas.SelectMany(group =>
+            {
+                return group.Meta.Select(meta => new IndicatorMeta
                 {
-                    Release = releaseDb,
-                    IndicatorMeta = indicatorMetaDb,
-                    DataType = dataSet.getDataType().Name,
-                    Group = metaGroup.Name
-                }
-            );
+                    Name = meta.Name,
+                    Group = group.Name,
+                    Label = meta.Label,
+                    Unit = meta.Unit,
+                    KeyIndicator = meta.KeyIndicator,
+                    Subject = subjectDb
+                });
+            }));
         }
 
-        private void SeedDataSetCharacteristics(Model.Release releaseDb, DataSet dataSet)
+        private void SeedMetaDataCharacteristics(Model.Subject subjectDb, Subject subject)
         {
-            _context.AddRange(dataSet.CharacteristicMetas
-                .Select(characteristicMeta => LookupCharacteristicMeta(characteristicMeta.Name))
-                .Select(characteristicMetaDb =>
-                    new ReleaseCharacteristicMeta
-                    {
-                        Release = releaseDb,
-                        CharacteristicMeta = characteristicMetaDb,
-                        DataType = dataSet.getDataType().Name
-                    })
-                .ToList());
+            _context.CharacteristicMeta.AddRange(subject.CharacteristicMetas.Select(meta => new CharacteristicMeta
+            {
+                Name = meta.Name,
+                Group = meta.Group,
+                Label = meta.Label,
+                Subject = subjectDb
+            }));
         }
 
         private Model.Release CreateRelease(Release release)
@@ -173,14 +138,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             return releaseDb;
         }
 
-        private IndicatorMeta LookupIndicatorMeta(string name)
+        private Model.Subject CreateSubject(Model.Release release, Subject subject)
         {
-            return _context.IndicatorMeta.FirstOrDefault(meta => meta.Name == name);
-        }
-
-        private CharacteristicMeta LookupCharacteristicMeta(string name)
-        {
-            return _context.CharacteristicMeta.FirstOrDefault(meta => meta.Name == name);
+            var subjectDb = _context.Subject.Add(new Model.Subject(subject.Name, release)).Entity;
+            _context.SaveChanges();
+            return subjectDb;
         }
     }
 }

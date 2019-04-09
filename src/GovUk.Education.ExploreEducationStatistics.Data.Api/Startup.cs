@@ -57,11 +57,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddScoped<LaCharacteristicResultBuilder>();
 
             services.AddTransient<ITableBuilderService, TableBuilderService>();
+            services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<IReleaseService, ReleaseService>();
+            services.AddTransient<ILevelService, LevelService>();
+            services.AddTransient<ISubjectService, SubjectService>();
 
             services.AddScoped<IGeographicDataService, GeographicDataService>();
-            services.AddScoped<ILaCharacteristicDataService, LaCharacteristicDataService>();
-            services.AddScoped<INationalCharacteristicDataService, NationalCharacteristicDataService>();
+            services.AddScoped<ICharacteristicDataService, CharacteristicDataService>();
 
             services.AddCors();
             services.AddAutoMapper();
