@@ -3,11 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@babel/polyfill": "^7.4.3",
-    "@babel/preset-env": "^7.4.3",
     "@ckeditor/ckeditor5-build-balloon-block": "^12.0.0",
     "@ckeditor/ckeditor5-build-classic": "^12.0.0",
     "@ckeditor/ckeditor5-react": "^1.1.2",
+    "@svgr/webpack": "4.1.0",
     "@types/geojson": "^7946.0.7",
     "@types/jest": "24.0.11",
     "@types/leaflet": "^1.4.3",
@@ -20,48 +19,144 @@
     "@types/recharts": "^1.1.16",
     "@types/yup": "^0.26.12",
     "axios": "^0.18.0",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-eslint": "9.0.0",
+    "babel-jest": "23.6.0",
+    "babel-loader": "8.0.5",
+    "babel-plugin-named-asset-import": "^0.3.1",
+    "babel-preset-react-app": "^7.0.2",
+    "bfj": "6.1.1",
+    "case-sensitive-paths-webpack-plugin": "2.2.0",
     "classnames": "^2.2.6",
-    "core-js": "^3.0.1",
+    "core-js": "^2.6.5",
+    "css-loader": "1.0.0",
     "date-fns": "^2.0.0-alpha.27",
+    "dotenv": "6.0.0",
+    "dotenv-expand": "4.2.0",
     "dotenv-webpack": "^1.7.0",
+    "eslint": "5.12.0",
+    "eslint-config-react-app": "^3.0.8",
+    "eslint-loader": "2.1.1",
+    "eslint-plugin-flowtype": "2.50.1",
+    "eslint-plugin-import": "2.14.0",
+    "eslint-plugin-jsx-a11y": "6.1.2",
+    "eslint-plugin-react": "7.12.4",
+    "file-loader": "2.0.0",
     "formik": "^1.5.1",
+    "fs-extra": "7.0.1",
     "geojson": "^0.5.0",
     "govuk-frontend": "^2.7.0",
+    "html-webpack-plugin": "4.0.0-alpha.2",
+    "identity-obj-proxy": "3.0.0",
+    "jest": "23.6.0",
+    "jest-pnp-resolver": "1.0.2",
+    "jest-resolve": "23.6.0",
+    "jest-watch-typeahead": "^0.2.1",
     "leaflet": "^1.4.0",
+    "mini-css-extract-plugin": "0.5.0",
     "node-sass": "^4.11.0",
     "normalize.css": "^8.0.1",
+    "optimize-css-assets-webpack-plugin": "5.0.1",
+    "pnp-webpack-plugin": "1.2.1",
+    "postcss-flexbugs-fixes": "4.1.0",
+    "postcss-loader": "3.0.0",
+    "postcss-preset-env": "6.5.0",
+    "postcss-safe-parser": "4.0.1",
     "react": "^16.8.6",
+    "react-app-polyfill": "^0.2.2",
     "react-app-rewired": "^2.1.1",
+    "react-dev-utils": "^8.0.0",
     "react-dom": "^16.8.6",
     "react-helmet": "^5.2.0",
     "react-leaflet": "^2.2.1",
     "react-markdown": "^4.0.6",
     "react-router": "^5.0.0",
     "react-router-dom": "^5.0.0",
-    "react-scripts": "2.1.8",
     "recharts": "^1.5.0",
+    "resolve": "1.10.0",
+    "sass-loader": "7.1.0",
+    "style-loader": "0.23.1",
     "stylelint": "^9.10.1",
     "stylelint-config-prettier": "^5.0.0",
     "stylelint-config-sass-guidelines": "^5.3.0",
     "stylelint-prettier": "^1.0.6",
     "stylelint-webpack-plugin": "^0.10.5",
+    "terser-webpack-plugin": "1.2.2",
     "typescript": "3.3.4000",
+    "url-loader": "1.1.2",
+    "webpack": "4.28.3",
+    "webpack-dev-server": "3.1.14",
+    "webpack-manifest-plugin": "2.0.4",
+    "workbox-webpack-plugin": "3.6.3",
     "yup": "^0.27.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "node scripts/start.js",
+    "build": "node scripts/build.js",
+    "test": "node scripts/test.js"
   },
   "eslintConfig": {
     "extends": "react-app"
   },
-
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.4.0",
+    "@babel/polyfill": "^7.4.3",
+    "@babel/preset-env": "^7.4.3",
+    "@babel/preset-typescript": "^7.3.3",
     "@babel/core": "7.2.2",
     "@types/classnames": "^2.2.7",
     "@types/react-draft-wysiwyg": "^1.12.2",
     "@types/react-router-dom": "^4.3.1"
-  }
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!src/**/*.d.ts"
+    ],
+    "resolver": "jest-pnp-resolver",
+    "setupFiles": [
+      "react-app-polyfill/jsdom"
+    ],
+    "testMatch": [
+      "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
+      "<rootDir>/src/**/?(*.)(spec|test).{js,jsx,ts,tsx}"
+    ],
+    "testEnvironment": "jsdom",
+    "testURL": "http://localhost",
+    "transform": {
+      "^.+\\.(js|jsx|ts|tsx)$": "<rootDir>/node_modules/babel-jest",
+      "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
+      "^(?!.*\\.(js|jsx|ts|tsx|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
+    },
+    "transformIgnorePatterns": [
+      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$",
+      "^.+\\.module\\.(css|sass|scss)$"
+    ],
+    "moduleNameMapper": {
+      "^react-native$": "react-native-web",
+      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
+    },
+    "moduleFileExtensions": [
+      "web.js",
+      "js",
+      "web.ts",
+      "ts",
+      "web.tsx",
+      "tsx",
+      "json",
+      "web.jsx",
+      "jsx",
+      "node"
+    ],
+    "watchPlugins": [
+      "C:\\Users\\Jim\\development\\dfe\\explore-education-statistics\\src\\explore-education-statistics-admin\\node_modules\\jest-watch-typeahead\\filename.js",
+      "C:\\Users\\Jim\\development\\dfe\\explore-education-statistics\\src\\explore-education-statistics-admin\\node_modules\\jest-watch-typeahead\\testname.js"
+    ]
+  },
+  "browserslist": [
+    "ie>=11",
+    "safari>=12",
+    "ios>=9.3",
+    "last 1 version"
+  ]
 }

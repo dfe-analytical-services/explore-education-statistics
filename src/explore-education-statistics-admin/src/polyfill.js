@@ -1,6 +1,9 @@
+
+console.log(typeof Promise === 'undefined');
+
 if (typeof Promise === 'undefined') {
   // eslint-disable-next-line global-require
-  window.Promise = require('core-js/es/promise');
+  window.Promise = require('core-js/fn/promise');
 }
 
 const loadPolyfill = () => {
@@ -29,3 +32,4 @@ const loadPolyfill = () => {
 };
 
 export default loadPolyfill;
+
