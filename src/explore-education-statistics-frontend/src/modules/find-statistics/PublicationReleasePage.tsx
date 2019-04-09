@@ -157,8 +157,7 @@ class PublicationReleasePage extends Component<Props> {
                   <Link
                     unvisited
                     to={`/subscriptions?publication=${data.publication.slug}`}
-                    as={`/subscriptions/${data.publication.slug}`}
-                    data-testid={`subsciptions-${data.publication.slug}`}
+                    data-testid={`subsciption-${data.publication.slug}`}
                   >
                     Notify me
                   </Link>
