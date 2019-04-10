@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -12,6 +12,9 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Notify.Client;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier
 {
@@ -38,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             var baseUrl = config.GetValue<string>(BaseUrlName);
             var client = GetNotifyClient(config);
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
-            var partitionKey = "publication-" + publicationId;
+            var partitionKey = publicationId;
             var table = GetTable(config).Result;
             var query = new TableQuery<SubscriptionEntity>()
                 .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
@@ -71,40 +74,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         }
         
         [FunctionName("PublicationSubscribe")]
-        public async Task<HttpResponseMessage> Run2([HttpTrigger(AuthorizationLevel.Function, "post", Route = "publication/subscribe/")]HttpRequestMessage req, 
+        public async Task<IActionResult> Run2([HttpTrigger(AuthorizationLevel.Function, "post", Route = "publication/subscribe/")]HttpRequest req, 
             ILogger log, ExecutionContext context)
-        {
-            var postData = await req.Content.ReadAsFormDataAsync();
-            var missingFields = new List<string>();
+        {            
+            string email = req.Query["email"];
+            string publicationId = req.Query["publicationId"];
+            
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic data = JsonConvert.DeserializeObject(requestBody);
+         
+            email = email ?? data?.email;
+            publicationId = publicationId ?? data?.publicationId;
+            
             var config = LoadAppSettings(context);
             var baseUrl = config.GetValue<string>(BaseUrlName);
             var client = GetNotifyClient(config);
             var emailTemplateId = config.GetValue<string>(VerificationEmailTemplateIdName);
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
 
-            if (postData["email"] == null)
+            if (email == null || publicationId == null)
             {
-                missingFields.Add("email");
-            }
-            if (postData["publication-id"] == null)
-            {
-                missingFields.Add("publication-id");
-            }
-            if (missingFields.Any())
-            {
-                var missingFieldsSummary = String.Join(", ", missingFields);
-                return req.CreateResponse(HttpStatusCode.BadRequest, $"Missing field(s): {missingFieldsSummary}");
+                log.LogInformation($"email {email} publicationId {publicationId}");
+                return new BadRequestObjectResult("Please pass a valid email & publication");
             }
 
-            var email = postData["email"];
-            var publicationId = postData["publication-id"];
-           
             try
             {
                 var table = GetTable(config).Result;
                 var activationCode = _tokenService.GenerateToken(tokenSecretKey, email, log);
                 
-                await AddSubscriber(table, new SubscriptionEntity(postData["publication-id"], email));
+                await AddSubscriber(table, new SubscriptionEntity(publicationId, email));
                 var vals = new Dictionary<string, dynamic>
                 {
                     {"publication_name", "My Publication"},
@@ -112,17 +111,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                 };
                                 
                 _emailService.sendEmail(client, email, emailTemplateId, vals);
-                return req.CreateResponse(HttpStatusCode.OK, "Thanks! Please check your email."); 
+                return (ActionResult) new OkObjectResult("Thanks! Please check your email.");
             }
             catch (Exception ex)
             {
-                log.LogError(ex.StackTrace);
-                
-                return req.CreateResponse(HttpStatusCode.InternalServerError, new
-                {
-                    status = false,
-                    message = $"There are problems storing your subscription: {ex.GetType()}"
-                });
+                return new BadRequestObjectResult($"There are problems storing your subscription: {ex.GetType()}");
             }
         }
         

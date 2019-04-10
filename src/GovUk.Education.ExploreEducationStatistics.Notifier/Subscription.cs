@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
 
         public SubscriptionEntity(string id, string email)
         {
-            this.PartitionKey = "publication-" + id;
+            this.PartitionKey = id;
             this.RowKey = email;
             this.Verified = false;
         }
