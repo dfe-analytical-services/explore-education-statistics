@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         }
         
         [FunctionName("PublicationSubscribe")]
-        public async Task<IActionResult> Run2([HttpTrigger(AuthorizationLevel.Function, "post", Route = "publication/subscribe/")]HttpRequest req, 
+        public async Task<IActionResult> Run2([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "publication/subscribe/")]HttpRequest req, 
             ILogger log, ExecutionContext context)
         {            
             string email = req.Query["email"];
@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         }
         
         [FunctionName("PublicationUnsubscribe")]
-        public async Task<HttpResponseMessage> Run3([HttpTrigger(AuthorizationLevel.Function, "get", Route = "publication/{publicationId}/unsubscribe/{token}")]
+        public async Task<HttpResponseMessage> Run3([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{publicationId}/unsubscribe/{token}")]
             HttpRequestMessage req, ILogger log, ExecutionContext context, string publicationId, string token)
         {
             var config = LoadAppSettings(context);
@@ -140,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         }
        
         [FunctionName("PublicationSubscriptionVerify")]
-        public async Task<HttpResponseMessage> Run4([HttpTrigger(AuthorizationLevel.Function, "get", Route = "publication/{publicationId}/verify-subscription/{token}")]
+        public async Task<HttpResponseMessage> Run4([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{publicationId}/verify-subscription/{token}")]
             HttpRequestMessage req, ILogger log, ExecutionContext context, string publicationId, string token)
         {
             var config = LoadAppSettings(context);
