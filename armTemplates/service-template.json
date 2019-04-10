@@ -500,7 +500,7 @@
       "kind": "web",
       "location": "[resourceGroup().location]",
       "tags": {
-          "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('functionAppName'))]": "Resource"
+          "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('notificationsAppName'))]": "Resource"
       },
       "properties": {
           "Application_Type": "web",
