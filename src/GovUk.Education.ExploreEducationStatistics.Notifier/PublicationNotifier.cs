@@ -92,9 +92,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             var emailTemplateId = config.GetValue<string>(VerificationEmailTemplateIdName);
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
 
+            log.LogInformation($"email {email} publicationId {publicationId}");
+
             if (email == null || publicationId == null)
             {
-                log.LogInformation($"email {email} publicationId {publicationId}");
                 return new BadRequestObjectResult("Please pass a valid email & publication");
             }
 
