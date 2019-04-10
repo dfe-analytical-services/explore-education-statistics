@@ -3,10 +3,10 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "NotifyApiKey" : "ees_new_publication_notification_key-d21ddfef-9094-4376-a66c-02591ca62134-401e4aa4-0676-4f38-9c39-191ef5fd7ac2",
-    "VerificationEmailTemplateId" : "cdb9134c-eb77-4659-bb37-74472a02f343",
-    "PublicationNotificationEmailTemplateId" : "75e6bfe3-3671-4a2e-85e6-90656894a205",
-    "TokenSecretKey" : "401b09eab3c013d4ca54922bb802bec8fd5318192b0a75f201d8b3727429090fb337591abd3e44453b954555b7a0812e1081c39b740293f765eae731f5a65ed1",
+    "NotifyApiKey" : "change-me",
+    "VerificationEmailTemplateId" : "change-me",
+    "PublicationNotificationEmailTemplateId" : "change-me",
+    "TokenSecretKey" : "chnage-me",
     "BaseUrl" : "http://localhost:7071/api/publication/"
   },
   "ConnectionStrings": {
