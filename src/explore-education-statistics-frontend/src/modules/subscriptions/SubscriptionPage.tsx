@@ -12,6 +12,10 @@ interface Props {
   data: Release;
 }
 
+interface State {
+  publicationId: string;
+}
+
 class SubscriptionPage extends Component<Props> {
 
   public static async getInitialProps({
@@ -31,6 +35,10 @@ class SubscriptionPage extends Component<Props> {
     };
   }
 
+  public state: State = {
+    publicationId: this.props.publication,
+  };
+
   private handleFilterFormSubmit: SubscriptionFormSubmitHandler = async ({
                                                                            email,
                                                                          }) => {
@@ -38,22 +46,22 @@ class SubscriptionPage extends Component<Props> {
 
       const data = {
         'email': email,
-        'publication-id': '123',
+        'publicationId': this.state.publicationId,
       };
 
-      const response = await fetch(`${baseUrl.data}/publication/subscribe/`, {
+      const response = await fetch(`${baseUrl.function}/api/publication/subscribe/`, {
         body: JSON.stringify(data),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
-        method: 'POST'
+        method: 'POST',
+        mode: 'no-cors'
       });
 
       const json = await response.json();
     }
   };
-
 
   public render() {
     const { data, publication } = this.props;
