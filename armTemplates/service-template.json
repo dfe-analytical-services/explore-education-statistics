@@ -562,6 +562,10 @@
               "value": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2015-05-01').InstrumentationKey]"
             },
             {
+              "name": "BaseUrl",
+              "value": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api/publication/')]"
+            },
+            {
               "name": "NotifyApiKey",
               "value": "[parameters('notifyApiKey')]"
             },
