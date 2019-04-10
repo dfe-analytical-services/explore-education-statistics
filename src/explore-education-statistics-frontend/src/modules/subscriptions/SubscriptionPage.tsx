@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 import GoToTopLink from 'src/components/GoToTopLink';
 import Page from 'src/components/Page';
 import PageTitle from 'src/components/PageTitle';
+import functionsService, { SubscriptionData } from 'src/services/functionsService';
 import publicationService, { Release } from 'src/services/publicationService';
-import {baseUrl} from "../../services/api";
 import SubscriptionForm, { SubscriptionFormSubmitHandler } from './components/SubscriptionForm';
 
 interface Props {
@@ -39,27 +39,15 @@ class SubscriptionPage extends Component<Props> {
     publicationId: this.props.publication,
   };
 
-  private handleFilterFormSubmit: SubscriptionFormSubmitHandler = async ({
-                                                                           email,
-                                                                         }) => {
+  private handleFormSubmit: SubscriptionFormSubmitHandler = async ({ email }) => {
     if (email !== '') {
-
-      const data = {
-        'email': email,
-        'publicationId': this.state.publicationId,
-      };
-
-      const response = await fetch(`${baseUrl.function}/api/publication/subscribe/`, {
-        body: JSON.stringify(data),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
+      const publicationId = this.state.publicationId;
+      const { result } = await functionsService.subscribe(
+        {
+          email,
+          publicationId,
         },
-        method: 'POST',
-        mode: 'no-cors'
-      });
-
-      const json = await response.json();
+      );
     }
   };
 
@@ -77,7 +65,7 @@ class SubscriptionPage extends Component<Props> {
         <PageTitle title={`${data.title} : Subscribe`} />
 
         <SubscriptionForm
-          onSubmit={this.handleFilterFormSubmit}
+          onSubmit={this.handleFormSubmit}
         />
 
         <hr />
