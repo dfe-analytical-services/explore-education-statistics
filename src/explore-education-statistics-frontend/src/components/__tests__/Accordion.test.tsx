@@ -137,4 +137,30 @@ describe('Accordion', () => {
 
     expect(content.scrollIntoView).toHaveBeenCalled();
   });
+
+  test('scrolls to and opens section if location hash matches an element in the section content', async () => {
+    location.hash = '#test-heading';
+
+    const { container, getByText } = render(
+      <Accordion id="test-sections">
+        <AccordionSection heading="Test heading 1">
+          Test content 1
+        </AccordionSection>
+        <AccordionSection heading="Test heading 2">
+          <h2 id="test-heading">Test content heading</h2>
+        </AccordionSection>
+      </Accordion>,
+    );
+
+    await wait();
+
+    expect(getByText('Test heading 2')).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+
+    const element = container.querySelector('#test-heading') as HTMLElement;
+
+    expect(element.scrollIntoView).toHaveBeenCalled();
+  });
 });
