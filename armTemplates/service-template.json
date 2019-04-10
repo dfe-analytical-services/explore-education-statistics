@@ -38,6 +38,20 @@
     },
     "environment": {
       "type": "string"
+    },
+    "verificationEmailTemplateId": {
+      "type": "securestring",
+      "defaultValue": ""
+    },
+    "publicationNotificationEmailTemplateId": {
+      "type": "securestring",
+      "defaultValue": ""
+    },
+    "notifyApiKey": {
+      "type": "securestring"
+    },
+    "notifyTokenSecretKey": {
+      "type": "securestring"
     }
   },
   "variables": {
@@ -526,6 +540,28 @@
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
               "value": "dotnet"
+            },
+            {
+              "name": "NotifyApiKey",
+              "value": "[parameters('notifyApiKey')]"
+            },
+            {
+              "name": "TokenSecretKey",
+              "value": "[parameters('notifyTokenSecretKey')]"
+            },
+            {
+              "name": "VerificationEmailTemplateId",
+              "value": "[parameters('verificationEmailTemplateId')]"
+            },
+            {
+              "name": "PublicationNotificationEmailTemplateId",
+              "value": "[parameters('publicationNotificationEmailTemplateId')]"
+            }
+          ],
+          "connectionStrings": [
+            {
+              "name": "TableStorageConnString",
+              "connectionString": ""
             }
           ]
         }
