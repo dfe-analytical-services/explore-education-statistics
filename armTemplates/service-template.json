@@ -68,6 +68,7 @@
 
     "notificationsAppName": "[concat('notifications-', parameters('webAppName'))]",
     "notificationsPlanName": "[concat('notifications-', parameters('hostingPlanName'))]",
+    "notificationsAppInsights": "[concat(variables('notificationsAppName'), '-insights')]",
 
     "notificationsstorageAccountName": "[concat(parameters('environment'), 'storageeesnotify')]",
     "notificationsstorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]"
@@ -493,6 +494,20 @@
       }
     },
     {
+      "apiVersion": "2015-05-01",
+      "name": "[variables('notificationsAppInsights')]",
+      "type": "Microsoft.Insights/components",
+      "kind": "web",
+      "location": "[resourceGroup().location]",
+      "tags": {
+          "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('functionAppName'))]": "Resource"
+      },
+      "properties": {
+          "Application_Type": "web",
+          "ApplicationId": "[variables('notificationsAppName')]"
+      }
+    },
+    {
       "type": "Microsoft.Web/serverfarms",
       "apiVersion": "2015-04-01",
       "name": "[variables('notificationsPlanName')]",
@@ -511,6 +526,7 @@
       "kind": "functionapp",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
+        "[resourceId('Microsoft.Insights/components', variables('notificationsAppInsights'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('notificationsstorageAccountName'))]"
       ],
       "properties": {
@@ -540,6 +556,10 @@
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
               "value": "dotnet"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2015-05-01').InstrumentationKey]"
             },
             {
               "name": "NotifyApiKey",
