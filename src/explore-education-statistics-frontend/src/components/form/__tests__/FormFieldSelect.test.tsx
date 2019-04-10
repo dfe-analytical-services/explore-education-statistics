@@ -22,10 +22,10 @@ describe('FormFieldSelect', () => {
             id="select"
             label="Test values"
             options={[
-              { value: '', text: '' },
-              { value: '1', text: 'Option 1' },
-              { value: '2', text: 'Option 2' },
-              { value: '3', text: 'Option 3' },
+              { value: '', label: '' },
+              { value: '1', label: 'Option 1' },
+              { value: '2', label: 'Option 2' },
+              { value: '3', label: 'Option 3' },
             ]}
             value={props.values.test}
           />
@@ -65,10 +65,10 @@ describe('FormFieldSelect', () => {
               id="select"
               label="Test values"
               options={[
-                { value: '', text: '' },
-                { value: '1', text: 'Option 1' },
-                { value: '2', text: 'Option 2' },
-                { value: '3', text: 'Option 3' },
+                { value: '', label: '' },
+                { value: '1', label: 'Option 1' },
+                { value: '2', label: 'Option 2' },
+                { value: '3', label: 'Option 3' },
               ]}
               value={props.values.test}
             />
@@ -100,10 +100,10 @@ describe('FormFieldSelect', () => {
                 id="select"
                 label="Test values"
                 options={[
-                  { value: '', text: '' },
-                  { value: '1', text: 'Option 1' },
-                  { value: '2', text: 'Option 2' },
-                  { value: '3', text: 'Option 3' },
+                  { value: '', label: '' },
+                  { value: '1', label: 'Option 1' },
+                  { value: '2', label: 'Option 2' },
+                  { value: '3', label: 'Option 3' },
                 ]}
                 value={props.values.test}
               />
@@ -146,10 +146,10 @@ describe('FormFieldSelect', () => {
                 id="select"
                 label="Test values"
                 options={[
-                  { value: '', text: '' },
-                  { value: '1', text: 'Option 1' },
-                  { value: '2', text: 'Option 2' },
-                  { value: '3', text: 'Option 3' },
+                  { value: '', label: '' },
+                  { value: '1', label: 'Option 1' },
+                  { value: '2', label: 'Option 2' },
+                  { value: '3', label: 'Option 3' },
                 ]}
                 value={props.values.test}
               />
@@ -183,9 +183,9 @@ describe('FormFieldSelect', () => {
               label="Test values"
               error="Invalid option"
               options={[
-                { value: '1', text: 'Option 1' },
-                { value: '2', text: 'Option 2' },
-                { value: '3', text: 'Option 3' },
+                { value: '1', label: 'Option 1' },
+                { value: '2', label: 'Option 2' },
+                { value: '3', label: 'Option 3' },
               ]}
               value={props.values.test}
             />
@@ -218,10 +218,10 @@ describe('FormFieldSelect', () => {
                 label="Test values"
                 showError={false}
                 options={[
-                  { value: '', text: '' },
-                  { value: '1', text: 'Option 1' },
-                  { value: '2', text: 'Option 2' },
-                  { value: '3', text: 'Option 3' },
+                  { value: '', label: '' },
+                  { value: '1', label: 'Option 1' },
+                  { value: '2', label: 'Option 2' },
+                  { value: '3', label: 'Option 3' },
                 ]}
                 value={props.values.test}
               />
@@ -265,10 +265,10 @@ describe('FormFieldSelect', () => {
                 label="Test values"
                 showError={false}
                 options={[
-                  { value: '', text: '' },
-                  { value: '1', text: 'Option 1' },
-                  { value: '2', text: 'Option 2' },
-                  { value: '3', text: 'Option 3' },
+                  { value: '', label: '' },
+                  { value: '1', label: 'Option 1' },
+                  { value: '2', label: 'Option 2' },
+                  { value: '3', label: 'Option 3' },
                 ]}
                 value={props.values.test}
               />

@@ -62,9 +62,9 @@ url = "about:blank"
 localUrl = "http://localhost:3000"
 localAdminUrl = ""
 testUrl = "https://%s:%s@public-explore-education-statistics-test.azurewebsites.net" % (basicAuthUser, basicAuthPass)
-testAdminUrl = "https://admin-explore-education-statistics-test.azurewebsites.net"
-stageUrl = "https://public-explore-education-statistics-stage.azurewebsites.net"
-stageAdminUrl = "https://admin-explore-education-statistics-stage.azurewebsites.net"
+testAdminUrl = "https://eesadminprototype.z33.web.core.windows.net/prototypes/admin-dashboard"
+stageUrl = "https://%s:%s@public-explore-education-statistics-stage.azurewebsites.net" % (basicAuthUser, basicAuthPass)
+stageAdminUrl = ""
 prodUrl = ""
 prodAdminUrl = ""
 

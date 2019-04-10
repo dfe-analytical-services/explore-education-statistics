@@ -31,7 +31,7 @@ const HomePage = () => {
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">
             Use our tool to build tables using our range of national and
-            regional statistics and data.
+            regional data.
           </p>
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
             <Link to="/prototypes/browse-releases">Download data files</Link>

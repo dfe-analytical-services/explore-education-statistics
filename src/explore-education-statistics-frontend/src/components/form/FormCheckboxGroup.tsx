@@ -48,13 +48,13 @@ class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
   public render() {
     const { value, onAllChange, name, id, options, selectAll } = this.props;
     const isAllChecked = options.every(
-      option => (value as string[]).indexOf(option.value) > -1,
+      option => value.indexOf(option.value) > -1,
     );
 
     return (
       <FormFieldset {...this.props}>
         <div className="govuk-checkboxes" ref={this.ref}>
-          {selectAll && (
+          {options.length > 1 && selectAll && (
             <FormCheckbox
               id={`${id}-all`}
               label="Select all"

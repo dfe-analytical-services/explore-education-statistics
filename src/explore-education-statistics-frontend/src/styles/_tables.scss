@@ -2,6 +2,8 @@
 
 /* stylelint-disable scss/at-extend-no-missing-placeholder */
 .govuk-table {
+  background: #fff;
+
   th {
     @extend .govuk-table__header;
   }
@@ -12,11 +14,17 @@
 
   .govuk-table__header--numeric,
   .govuk-table__cell--numeric {
+    padding: govuk-spacing(2);
     text-align: right;
+  }
+
+  .govuk-table__header--center {
+    text-align: center;
   }
 
   caption {
     @extend .govuk-table__caption;
+    background: #fff;
   }
 }
 

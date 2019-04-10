@@ -56,32 +56,28 @@ class PublicationReleasePage extends Component<Props> {
           { name: data.title },
         ]}
       >
+        {!release && (
+          <strong className="govuk-tag govuk-!-margin-bottom-2">
+            {' '}
+            This is the latest data{' '}
+          </strong>
+        )}
+
+        <PageTitle title={data.title} />
+
+        <dl className="dfe-meta-content">
+          <dt className="govuk-caption-m">Published: </dt>
+          <dd>
+            <strong>
+              <FormattedDate>{data.published}</FormattedDate>
+            </strong>
+          </dd>
+        </dl>
+
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            {!release && (
-              <strong className="govuk-tag govuk-!-margin-bottom-2">
-                {' '}
-                This is the latest data{' '}
-              </strong>
-            )}
+            <ReactMarkdown className="govuk-body" source={data.summary} />
 
-            <PageTitle title={data.title} />
-
-            <ReactMarkdown className="govuk-body-l" source={data.summary} />
-
-            <Details summary="Read more about our methodology">
-              <p>
-                To help you analyse and understand the statistics the following
-                sections include:
-              </p>
-
-              <div className="govuk-inset-text">
-                <Link to="#">
-                  Find out more about our pupil absence data and statistics
-                  methodology and terminology
-                </Link>
-              </div>
-            </Details>
             <Details summary="Download underlying data files">
               <ul className="govuk-list">
                 <li>
@@ -100,6 +96,15 @@ class PublicationReleasePage extends Component<Props> {
                   </a>
                 </li>
               </ul>
+              <h2 className="govuk-heading-m govuk-!-margin-top-9">
+                Explore and edit this data online
+              </h2>
+
+              <p>Use our table tool to add and remove data for this table.</p>
+
+              <Link to={`/table-tool/`} className="govuk-button">
+                Explore data
+              </Link>
             </Details>
           </div>
 
@@ -137,11 +142,6 @@ class PublicationReleasePage extends Component<Props> {
                 </Details>
               </h4>
 
-              <h4 data-testid="published-date">
-                <span className="govuk-caption-m">Published: </span>
-                <FormattedDate>{data.published}</FormattedDate>
-              </h4>
-
               <h4 data-testid="last-updated">
                 <span className="govuk-caption-m">Last updated: </span>
                 <FormattedDate>{data.updates[0].on}</FormattedDate>
@@ -173,6 +173,8 @@ class PublicationReleasePage extends Component<Props> {
         </div>
 
         <hr />
+
+        <h2>Latest headline facts and figures - {data.releaseName}</h2>
 
         {data.keyStatistics && <DataBlock {...data.keyStatistics} />}
 
@@ -281,7 +283,10 @@ class PublicationReleasePage extends Component<Props> {
           API. <a href="#">What is an API?</a>
         </p>
 
-        <Link to="/table-tool" className="govuk-button">
+        <Link
+          to={`/table-tool/${data.publication.slug}`}
+          className="govuk-button"
+        >
           Create charts and tables
         </Link>
 

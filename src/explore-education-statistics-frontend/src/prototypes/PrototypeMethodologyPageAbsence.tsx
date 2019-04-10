@@ -44,9 +44,8 @@ const PublicationPage = () => {
             <span className="govuk-caption-m">Published: </span>March 2018
           </h2>
           <p className="govuk-body-l">
-            Find out about the background of and methodology behind pupil
-            absence statistics and data and how and why they're collected and
-            published.
+            Find out about the methodology behind pupil absence statistics and
+            data and how and why they're collected and published.
           </p>
         </div>
 
@@ -65,7 +64,7 @@ const PublicationPage = () => {
           </aside>
         </div>
       </div>
-      <h2 className="govuk-heading-l govuk-!-margin-top-6">Contents</h2>
+
       <Accordion id="contents-sections">
         <AccordionSection heading="Introduction">
           <div className="govuk-grid-row">
@@ -218,31 +217,6 @@ const PublicationPage = () => {
             </div>
             <div className="govuk-grid-column-three-quarters">
               <PrototypeSection5 />
-            </div>
-          </div>
-        </AccordionSection>
-
-        <AccordionSection heading="Research relating to pupil absence">
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-quarter">
-              <h3 className="govuk-heading-s">In this section</h3>
-              <ul className="govuk-body-s">
-                <li>
-                  <a href="#section6-1">The impact of absenteeism on pupils</a>
-                </li>
-                <li>
-                  <a href="#section6-2">Factors associated with absenteeism</a>
-                </li>
-                <li>
-                  <a href="#section6-3">Approaches to reduce absenteeism</a>
-                </li>
-                <li>
-                  <a href="#section6-4">References</a>
-                </li>
-              </ul>
-            </div>
-            <div className="govuk-grid-column-three-quarters">
-              <PrototypeSection6 />
             </div>
           </div>
         </AccordionSection>

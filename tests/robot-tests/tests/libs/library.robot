@@ -1,5 +1,5 @@
 *** Settings ***
-Library     SeleniumLibrary  timeout=${timeout}  implicit_wait=${implicit_wait}  run_on_failure=${run_on_failure}
+Library     SeleniumLibrary  timeout=${timeout}  implicit_wait=${implicit_wait}  run_on_failure=do this on failure
 Library     OperatingSystem
 #Library     XvfbRobot           # sudo apt install xvfb + pip install robotframework-xvfb
 
@@ -10,14 +10,18 @@ Library    file_operations.py
 ${browser}    chrome
 ${headless}   1
 
-${timeout}          3
-${implicit_wait}    3
-${run_on_failure}   Capture Page Screenshot
+${timeout}          10
+${implicit_wait}    10
 
 ${url}        about:blank
 ${urlAdmin}   about:blank
 
 *** Keywords ***
+do this on failure
+  capture page screenshot
+  set selenium timeout  3
+  set selenium implicit wait  3
+
 user opens the browser
   run keyword if    "${browser}" == "chrome"    user opens chrome
   run keyword if    "${browser}" == "firefox"   user opens firefox
@@ -182,3 +186,7 @@ user checks element attribute value should be
 user selects from list by label
   [Arguments]   ${locator}   ${label}
   select from list by label   ${locator}   ${label}
+
+user presses keys
+  [Arguments]   ${keys}
+  press keys  ${None}    ${keys}

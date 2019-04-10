@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "c1c786cb-182b-4aca-9e57-5d31779b1d12",
+		"_postman_id": "aa265841-0046-4ac0-8950-28152e5a2063",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -9,7 +9,7 @@
 			"name": "Meta",
 			"item": [
 				{
-					"name": "Meta Detail",
+					"name": "Subject",
 					"item": [
 						{
 							"name": "Meta - Geographic - Pupil absence in schools in England",
@@ -33,12 +33,11 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{data_api_url}}/tablebuilder/meta/subject/1",
+									"raw": "{{data_api_url}}/meta/subject/1",
 									"host": [
 										"{{data_api_url}}"
 									],
 									"path": [
-										"tablebuilder",
 										"meta",
 										"subject",
 										"1"
@@ -69,12 +68,11 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{data_api_url}}/tablebuilder/meta/subject/2",
+									"raw": "{{data_api_url}}/meta/subject/2",
 									"host": [
 										"{{data_api_url}}"
 									],
 									"path": [
-										"tablebuilder",
 										"meta",
 										"subject",
 										"2"
@@ -105,12 +103,11 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{data_api_url}}/tablebuilder/meta/subject/3",
+									"raw": "{{data_api_url}}/meta/subject/3",
 									"host": [
 										"{{data_api_url}}"
 									],
 									"path": [
-										"tablebuilder",
 										"meta",
 										"subject",
 										"3"
@@ -141,12 +138,11 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{data_api_url}}/tablebuilder/meta/subject/4",
+									"raw": "{{data_api_url}}/meta/subject/4",
 									"host": [
 										"{{data_api_url}}"
 									],
 									"path": [
-										"tablebuilder",
 										"meta",
 										"subject",
 										"4"
@@ -177,12 +173,11 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{data_api_url}}/tablebuilder/meta/subject/5",
+									"raw": "{{data_api_url}}/meta/subject/5",
 									"host": [
 										"{{data_api_url}}"
 									],
 									"path": [
-										"tablebuilder",
 										"meta",
 										"subject",
 										"5"
@@ -213,12 +208,11 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{data_api_url}}/tablebuilder/meta/subject/6",
+									"raw": "{{data_api_url}}/meta/subject/6",
 									"host": [
 										"{{data_api_url}}"
 									],
 									"path": [
-										"tablebuilder",
 										"meta",
 										"subject",
 										"6"
@@ -249,12 +243,11 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{data_api_url}}/tablebuilder/meta/subject/7",
+									"raw": "{{data_api_url}}/meta/subject/7",
 									"host": [
 										"{{data_api_url}}"
 									],
 									"path": [
-										"tablebuilder",
 										"meta",
 										"subject",
 										"7"
@@ -285,12 +278,11 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{data_api_url}}/tablebuilder/meta/subject/8",
+									"raw": "{{data_api_url}}/meta/subject/8",
 									"host": [
 										"{{data_api_url}}"
 									],
 									"path": [
-										"tablebuilder",
 										"meta",
 										"subject",
 										"8"
@@ -321,12 +313,11 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{data_api_url}}/tablebuilder/meta/subject/9",
+									"raw": "{{data_api_url}}/meta/subject/9",
 									"host": [
 										"{{data_api_url}}"
 									],
 									"path": [
-										"tablebuilder",
 										"meta",
 										"subject",
 										"9"
@@ -504,7 +495,7 @@
 					"_postman_isSubFolder": true
 				},
 				{
-					"name": "Meta Subjects",
+					"name": "Publication",
 					"item": [
 						{
 							"name": "Meta - Pupil absence in schools in England",
@@ -528,13 +519,13 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}",
+									"raw": "{{data_api_url}}/meta/publication/{{publication_id}}",
 									"host": [
 										"{{data_api_url}}"
 									],
 									"path": [
-										"tablebuilder",
 										"meta",
+										"publication",
 										"{{publication_id}}"
 									]
 								}
@@ -563,13 +554,13 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}",
+									"raw": "{{data_api_url}}/meta/publication/{{publication_id}}",
 									"host": [
 										"{{data_api_url}}"
 									],
 									"path": [
-										"tablebuilder",
 										"meta",
+										"publication",
 										"{{publication_id}}"
 									]
 								}
@@ -598,13 +589,13 @@
 									"raw": ""
 								},
 								"url": {
-									"raw": "{{data_api_url}}/tablebuilder/meta/{{publication_id}}",
+									"raw": "{{data_api_url}}/meta/publication/{{publication_id}}",
 									"host": [
 										"{{data_api_url}}"
 									],
 									"path": [
-										"tablebuilder",
 										"meta",
+										"publication",
 										"{{publication_id}}"
 									]
 								}
@@ -631,7 +622,10 @@
 								"exec": [
 									"pm.test(\"Fields are present\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(\"subjects\"));",
-									"});"
+									"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+									"});",
+									"",
+									"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().publicationId).to.equal(pm.variables.get(\"publication_id\")); });"
 								]
 							}
 						}
@@ -656,11 +650,7 @@
 						"id": "31fb4c96-88b3-4e61-8c97-88941525fc5a",
 						"type": "text/javascript",
 						"exec": [
-							"pm.test(\"Fields are present\", function () {",
-							"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-							"});",
-							"",
-							"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().publicationId).to.equal(pm.variables.get(\"publication_id\")); });"
+							""
 						]
 					}
 				}

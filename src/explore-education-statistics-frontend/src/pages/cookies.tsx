@@ -37,9 +37,7 @@ class CookiesPage extends Component {
           </a>
         </p>
 
-        <h2 className="govuk-heading-m">
-          How cookies are used on this service
-        </h2>
+        <h2>How cookies are used on this service</h2>
         <h3>Measuring website usage (Google Analytics)</h3>
         <p>
           We use Google Analytics software to collect information about how you

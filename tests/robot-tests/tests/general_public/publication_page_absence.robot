@@ -25,9 +25,13 @@ Validate URL
     ${current_url}=  get location
     should be equal   ${current_url}   ${url}/statistics/pupil-absence-in-schools-in-england
 
+Validate Published date
+    [Tags]     HappyPath
+    user checks element contains  css:[data-testid="published-date"]   22 March 2017
+
 Validate "About these statistics" -- "For school year"
     [Documentation]  DFE-197
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     user checks element contains  css:[data-testid="release-period"]    2016 to 2017 (latest data)
 
     user clicks element  css:[data-testid="See previous 7 releases"] [data-testid="details--expand"]
@@ -44,10 +48,6 @@ Validate "About these statistics" -- "For school year"
     user clicks element  css:[data-testid="See previous 7 releases"] [data-testid="details--expand"]
     element attribute value should be  css:[data-testid="See previous 7 releases"] summary   aria-expanded   false
 
-
-Validate "About these statistics" -- "Published"
-    [Tags]     HappyPath
-    user checks element contains  css:[data-testid="published-date"] time   22 March 2017
 
 Validate "About these statistics" -- "Last updated"
     [Tags]     HappyPath
@@ -99,4 +99,9 @@ Clicking "Go to top" move user to the top of the page
     scroll element into view  link:Go to top
     user clicks element  link:Go to top
     user should be at top of page
+
+Clicking "Create charts and tables" takes user to Table Tool page
+    [Tags]  HappyPath   Failing
+    user clicks link    Create charts and tables
+    user waits until page contains element  css:[data-testid="page-title Create your own table"]
 

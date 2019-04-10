@@ -1,22 +1,27 @@
-import range from 'lodash/range';
+import mapValues from 'lodash/mapValues';
 import React, { Component, createRef } from 'react';
 import PageTitle from 'src/components/PageTitle';
-import Tabs from 'src/components/Tabs';
-import TabsSection from 'src/components/TabsSection';
-import CharacteristicsDataTable from 'src/modules/table-tool/components/CharacteristicsDataTable';
-import CharacteristicsFilterForm, {
-  CharacteristicsFilterFormSubmitHandler,
-} from 'src/modules/table-tool/components/CharacteristicsFilterForm';
+import mapValuesWithKeys from 'src/lib/utils/mapValuesWithKeys';
 import PublicationMenu, {
   MenuChangeEventHandler,
 } from 'src/modules/table-tool/components/PublicationMenu';
 import PublicationSubjectMenu from 'src/modules/table-tool/components/PublicationSubjectMenu';
 import PrototypePage from 'src/prototypes/components/PrototypePage';
+import FiltersForm, {
+  FilterFormSubmitHandler,
+} from 'src/prototypes/table-tool/components/FiltersForm';
+import initialMetaSpecification, {
+  FilterOption,
+  IndicatorOption,
+  MetaSpecification,
+} from 'src/prototypes/table-tool/components/meta/initialSpec';
+import publicationSubjectSpec from 'src/prototypes/table-tool/components/meta/publicationSubjectSpec';
+import TimePeriodDataTable from 'src/prototypes/table-tool/components/TimePeriodDataTable';
+import mapOptionValues from 'src/prototypes/table-tool/components/utils/mapOptionValues';
 import tableBuilderService, {
   DataTableResult,
-  PublicationMeta,
 } from 'src/services/tableBuilderService';
-import SchoolType from 'src/services/types/SchoolType';
+import TimePeriod from 'src/services/types/TimePeriod';
 
 const defaultPublicationOptions = [
   {
@@ -53,37 +58,37 @@ const defaultPublicationOptions = [
 
 interface State {
   filters: {
-    characteristics: string[];
-    indicators: string[];
-    schoolTypes: SchoolType[];
-    years: number[];
+    indicators: IndicatorOption[];
+    categorical: {
+      [key: string]: FilterOption[];
+    };
+    timePeriods: TimePeriod[];
   };
+  metaSpecification: MetaSpecification;
   publicationId: string;
-  publicationMeta: Pick<PublicationMeta, 'characteristics' | 'indicators'>;
   publicationName: string;
-  publicationSubjectId: string;
+  publicationSubjectName: string;
   tableData: DataTableResult[];
 }
 
 class PrototypeTableToolPage extends Component<{}, State> {
   private readonly defaultFilters: State['filters'] = {
-    characteristics: [],
+    categorical: {
+      characteristics: [],
+      schoolTypes: [],
+    },
     indicators: [],
-    schoolTypes: [],
-    years: [],
+    timePeriods: [],
   };
 
   public state: State = {
     filters: {
       ...this.defaultFilters,
     },
+    metaSpecification: initialMetaSpecification,
     publicationId: '',
-    publicationMeta: {
-      characteristics: {},
-      indicators: {},
-    },
     publicationName: '',
-    publicationSubjectId: '',
+    publicationSubjectName: '',
     tableData: [],
   };
 
@@ -102,48 +107,143 @@ class PrototypeTableToolPage extends Component<{}, State> {
       publicationId,
     );
 
-    this.setState({
-      publicationId,
-      publicationMeta,
-      publicationName,
-      filters: {
-        ...this.defaultFilters,
+    this.setState(
+      {
+        publicationId,
+        publicationName,
+        filters: {
+          ...this.defaultFilters,
+        },
+        metaSpecification: {
+          ...this.state.metaSpecification,
+          categoricalFilters: {
+            ...this.state.metaSpecification.categoricalFilters,
+            characteristics: {
+              ...this.state.metaSpecification.categoricalFilters
+                .characteristics,
+              options: Object.entries(publicationMeta.characteristics).reduce(
+                (acc, [groupKey, group]) => {
+                  return {
+                    ...acc,
+                    [groupKey]: {
+                      label: groupKey,
+                      options: group.map(option => ({
+                        label: option.label,
+                        value: option.name,
+                      })),
+                    },
+                  };
+                },
+                {},
+              ),
+            },
+          },
+          indicators: {
+            ...Object.entries(publicationMeta.indicators).reduce(
+              (acc, [groupKey, group]) => {
+                return {
+                  ...acc,
+                  [groupKey]: {
+                    label: groupKey,
+                    options: group.map(option => ({
+                      label: option.label,
+                      unit: option.unit,
+                      value: option.name,
+                    })),
+                  },
+                };
+              },
+              {},
+            ),
+          },
+        },
+        publicationSubjectName: '',
+        tableData: [],
       },
-      publicationSubjectId: '',
-      tableData: [],
-    });
+      // async () => {
+      //   this.handleFilterFormSubmit({
+      //     categoricalFilters: {
+      //       characteristics: [
+      //         'Ethnicity_Major_Black_Total',
+      //         'Ethnicity_Major_White_Total',
+      //         'Ethnicity_Major_Chinese',
+      //         'Ethnicity_Major_Mixed_Total',
+      //       ],
+      //       schoolTypes: [
+      //         'State_Funded_Primary',
+      //         'State_Funded_Secondary',
+      //         'Special',
+      //       ],
+      //     },
+      //     indicators: [
+      //       'sess_authorised',
+      //       'sess_authorised_percent',
+      //       'sess_unauthorised',
+      //       'sess_unauthorised_percent',
+      //     ],
+      //     location: {
+      //       level: '',
+      //       localAuthority: '',
+      //       national: '',
+      //       region: '',
+      //     },
+      //     timePeriod: {
+      //       start: new TimePeriod(2012, 'AY'),
+      //       end: new TimePeriod(2016, 'AY')
+      //     },
+      //   });
+      // }
+    );
   };
 
-  private handleFilterFormSubmit: CharacteristicsFilterFormSubmitHandler = async ({
-    characteristics,
+  private handleFilterFormSubmit: FilterFormSubmitHandler = async ({
+    categoricalFilters,
     indicators,
-    schoolTypes,
-    startYear,
-    endYear,
+    timePeriod,
   }) => {
-    const formatToAcademicYear = (year: number) =>
-      parseInt(`${year}${`${year + 1}`.substring(2, 4)}`, 0);
+    const { characteristics, schoolTypes } = categoricalFilters;
+    const { start, end } = timePeriod;
+
+    // TODO: Remove this when timePeriod API finalised
+    const formatToAcademicYear = (year: number) => {
+      const nextYear = year + 1;
+      return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
+    };
 
     const { result } = await tableBuilderService.getNationalCharacteristicsData(
       {
         characteristics,
         indicators,
         schoolTypes,
-        endYear: formatToAcademicYear(endYear),
+        endYear: formatToAcademicYear(end.year),
         publicationId: this.state.publicationId,
-        startYear: formatToAcademicYear(startYear),
+        startYear: formatToAcademicYear(start.year),
       },
     );
 
-    const years = range(startYear, endYear + 1).map(formatToAcademicYear);
+    const categoricalFiltersByValue = mapValues(
+      this.state.metaSpecification.categoricalFilters,
+      value => mapOptionValues(value.options),
+    );
+
+    const indicatorsByValue = mapOptionValues<IndicatorOption>(
+      this.state.metaSpecification.indicators,
+    );
+
+    const timePeriods = TimePeriod.createRange(start, end);
 
     this.setState(
       {
         filters: {
-          characteristics,
-          indicators,
-          schoolTypes,
-          years,
+          timePeriods,
+          categorical: mapValuesWithKeys(
+            categoricalFilters,
+            ([filterGroup, selectedFilters]) =>
+              selectedFilters.map(
+                filter => categoricalFiltersByValue[filterGroup][filter],
+              ),
+          ),
+          indicators: indicators.map(indicator => indicatorsByValue[indicator]),
         },
         tableData: result,
       },
@@ -161,41 +261,35 @@ class PrototypeTableToolPage extends Component<{}, State> {
   public render() {
     const {
       filters,
-      publicationMeta,
+      metaSpecification,
       publicationId,
       publicationName,
-      publicationSubjectId,
+      publicationSubjectName,
       tableData,
     } = this.state;
 
     return (
-      <PrototypePage breadcrumbs={[{ text: 'Create your own tables online' }]}>
+      <PrototypePage
+        breadcrumbs={[{ text: 'Create your own tables online' }]}
+        wide
+      >
         <PageTitle caption="Table tool" title="Create your own tables online" />
 
         <p>
-          Choose the statistics and data and geographical subject area you want
-          to explore and then use the following filters to create your table:
+          Choose the data and area of interest you want to explore and then use
+          the filters to create your table.
         </p>
-
-        <ul>
-          <li>academic years</li>
-          <li>school types</li>
-          <li>statistical indicators</li>
-          <li>pupil charactertistics</li>
-        </ul>
 
         <p>
-          Once you've built your table, you can download the statistics and data
-          for your own analysis.
+          Once you've built your table, you can download the data it contains
+          for your own offline analysis.
         </p>
 
-        <section className="govuk-grid-row">
-          <div className="govuk-grid-column-one-half">
+        <section className="govuk-grid-row govuk-form-group">
+          <div className="govuk-grid-column-one-third-from-desktop">
             <h2>
-              1. Choose your statistics and data
-              <span className="govuk-hint">
-                Select a statistical and data set.
-              </span>
+              1. Choose your data
+              <span className="govuk-hint">Select a data set.</span>
             </h2>
 
             <PublicationMenu
@@ -204,13 +298,13 @@ class PrototypeTableToolPage extends Component<{}, State> {
               value={publicationId}
             />
           </div>
-          <div className="govuk-grid-column-one-half">
+          <div className="govuk-grid-column-two-thirds-from-desktop">
             {publicationId && (
               <>
                 <h2>
-                  2. Choose your subject area
+                  2. Choose your area of interest
                   <span className="govuk-hint">
-                    Select a geographical subject area for '{publicationName}'.
+                    Select an area of interest.
                   </span>
                 </h2>
 
@@ -218,7 +312,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
                   onChange={event =>
                     this.setState(
                       {
-                        publicationSubjectId: event.target.value,
+                        publicationSubjectName: event.target.value,
                       },
                       () => {
                         if (this.filtersRef.current) {
@@ -230,62 +324,35 @@ class PrototypeTableToolPage extends Component<{}, State> {
                       },
                     )
                   }
-                  options={[
-                    {
-                      id: 'natcharacteristics',
-                      name: 'National characteristics',
-                    },
-                    {
-                      id: 'lacharacteristics',
-                      name: 'Local authority characteristics',
-                    },
-                    {
-                      id: 'geoglevels',
-                      name: 'Geographic levels',
-                    },
-                  ]}
-                  value={publicationSubjectId}
+                  options={publicationSubjectSpec.subjects}
+                  value={publicationSubjectName}
                 />
               </>
             )}
           </div>
         </section>
 
-        {publicationSubjectId && (
-          <section className="govuk-grid-row" ref={this.filtersRef}>
-            <div className="govuk-grid-column-full">
-              <h2>
-                3. Choose your filters for '{publicationName}'
-                <span className="govuk-hint">
-                  Select any combination of filters.
-                </span>
-              </h2>
+        {publicationSubjectName && (
+          <section className="govuk-form-group" ref={this.filtersRef}>
+            <h2>
+              3. Choose your filters for '{publicationName}'
+              <span className="govuk-hint">
+                Select any combination of filters.
+              </span>
+            </h2>
 
-              <Tabs>
-                <TabsSection id="characteristics" title="Filters">
-                  <CharacteristicsFilterForm
-                    publicationMeta={publicationMeta}
-                    onSubmit={this.handleFilterFormSubmit}
-                  />
-                </TabsSection>
-              </Tabs>
-            </div>
+            <FiltersForm
+              onSubmit={this.handleFilterFormSubmit}
+              specification={metaSpecification}
+            />
           </section>
         )}
 
         {tableData.length > 0 && (
           <section ref={this.dataTableRef}>
-            <h2>3. Explore statistics and data for '{publicationName}'</h2>
+            <h2>4. Explore data for '{publicationName}'</h2>
 
-            <CharacteristicsDataTable
-              characteristics={filters.characteristics}
-              characteristicsMeta={publicationMeta.characteristics}
-              indicators={filters.indicators}
-              indicatorsMeta={publicationMeta.indicators}
-              results={tableData}
-              schoolTypes={filters.schoolTypes}
-              years={filters.years}
-            />
+            <TimePeriodDataTable filters={filters} results={tableData} />
 
             <ul className="govuk-list">
               <li>
