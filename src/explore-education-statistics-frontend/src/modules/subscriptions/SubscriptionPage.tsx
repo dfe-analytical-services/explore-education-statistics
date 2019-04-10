@@ -1,10 +1,8 @@
 import { NextContext } from 'next';
 import React, { Component } from 'react';
-import FormattedDate from 'src/components/FormattedDate';
 import GoToTopLink from 'src/components/GoToTopLink';
 import Page from 'src/components/Page';
 import PageTitle from 'src/components/PageTitle';
-import { baseUrl } from 'src/services/api';
 import publicationService, { Release } from 'src/services/publicationService';
 import SubscriptionForm from './components/SubscriptionForm';
 
