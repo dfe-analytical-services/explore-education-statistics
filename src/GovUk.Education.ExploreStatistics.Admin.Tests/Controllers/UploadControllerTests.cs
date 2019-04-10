@@ -23,14 +23,14 @@ namespace GovUk.Education.ExploreStatistics.Admin.Tests.Controllers
         {
             // Arrange
             var mockRepo = new Mock<IFileStorageService>();
-            var logger = new Mock<ILogger<UploadController>>();
+            var logger = new Mock<ILogger<FileController>>();
 
             mockRepo.Setup(repo => repo.ListFiles("releases")).Returns(GetTestFiles());
 
-            var controller = new UploadController(logger.Object, mockRepo.Object);
+            var controller = new FileController(logger.Object, mockRepo.Object);
 
             // Act
-            var result = await controller.Index();
+            var result = await controller.List();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -43,11 +43,11 @@ namespace GovUk.Education.ExploreStatistics.Admin.Tests.Controllers
         {
             // Arrange
             var mockRepo = new Mock<IFileStorageService>();
-            var logger = new Mock<ILogger<UploadController>>();
+            var logger = new Mock<ILogger<FileController>>();
 
             mockRepo.Setup(repo => repo.ListFiles("releases")).Returns(GetTestFiles());
 
-            var controller = new UploadController(logger.Object, mockRepo.Object);
+            var controller = new FileController(logger.Object, mockRepo.Object);
 
             // Act
             var result = await controller.Upload();
@@ -61,11 +61,11 @@ namespace GovUk.Education.ExploreStatistics.Admin.Tests.Controllers
         {
             // Arrange
             var mockRepo = new Mock<IFileStorageService>();
-            var logger = new Mock<ILogger<UploadController>>();
+            var logger = new Mock<ILogger<FileController>>();
 
             mockRepo.Setup(repo => repo.UploadFileAsync("releases", "", new Guid()));
 
-            var controller = new UploadController(logger.Object, mockRepo.Object);
+            var controller = new FileController(logger.Object, mockRepo.Object);
 
             // Act
             var result = await controller.Post(TestFiles());
