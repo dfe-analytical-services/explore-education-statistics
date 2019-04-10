@@ -52,7 +52,7 @@
     "notificationsAppName": "[concat('notifications-', parameters('webAppName'))]",
     "notificationsPlanName": "[concat('notifications-', parameters('hostingPlanName'))]",
 
-    "notificationsstorageAccountName": "[concat(notifications;, parameters('storageAccountName'))]",
+    "notificationsstorageAccountName": "[concat('notifications-', parameters('storageAccountName'))]",
     "notificationsstorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]"
   },
   "resources": [
