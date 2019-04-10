@@ -37,8 +37,7 @@
       "type": "securestring"
     },
     "environment": {
-      "type": "string",
-      "defaultValue": "s101d01"
+      "type": "string"
     }
   },
   "variables": {
@@ -56,7 +55,7 @@
     "notificationsAppName": "[concat('notifications-', parameters('webAppName'))]",
     "notificationsPlanName": "[concat('notifications-', parameters('hostingPlanName'))]",
 
-    "notificationsstorageAccountName": "[concat(parameters('environment'), storageeesnotify)]",
+    "notificationsstorageAccountName": "[concat(parameters('environment'), 'storageeesnotify')]",
     "notificationsstorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]"
   },
   "resources": [
