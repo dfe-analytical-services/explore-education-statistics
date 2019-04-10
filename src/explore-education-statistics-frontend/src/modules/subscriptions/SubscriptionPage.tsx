@@ -4,7 +4,8 @@ import GoToTopLink from 'src/components/GoToTopLink';
 import Page from 'src/components/Page';
 import PageTitle from 'src/components/PageTitle';
 import publicationService, { Release } from 'src/services/publicationService';
-import SubscriptionForm from './components/SubscriptionForm';
+import {baseUrl} from "../../services/api";
+import SubscriptionForm, { SubscriptionFormSubmitHandler } from './components/SubscriptionForm';
 
 interface Props {
   publication: string;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 class SubscriptionPage extends Component<Props> {
+
   public static async getInitialProps({
     query,
   }: NextContext<{
@@ -29,6 +31,30 @@ class SubscriptionPage extends Component<Props> {
     };
   }
 
+  private handleFilterFormSubmit: SubscriptionFormSubmitHandler = async ({
+                                                                           email,
+                                                                         }) => {
+    if (email !== '') {
+
+      const data = {
+        'email': email,
+        'publication-id': '123',
+      };
+
+      const response = await fetch(`${baseUrl.data}/publication/subscribe/`, {
+        body: JSON.stringify(data),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        method: 'POST'
+      });
+
+      const json = await response.json();
+    }
+  };
+
+
   public render() {
     const { data, publication } = this.props;
 
@@ -42,7 +68,9 @@ class SubscriptionPage extends Component<Props> {
       >
         <PageTitle title={`${data.title} : Subscribe`} />
 
-        <SubscriptionForm />
+        <SubscriptionForm
+          onSubmit={this.handleFilterFormSubmit}
+        />
 
         <hr />
 
