@@ -112,6 +112,7 @@ class SearchableGroupedFilterMenus<
               options={options}
               id={compositeKey}
               selectAll
+              small
               showError={false}
             />
           </MenuDetails>

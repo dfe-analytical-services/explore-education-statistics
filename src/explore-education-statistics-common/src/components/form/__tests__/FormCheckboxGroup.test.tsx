@@ -57,15 +57,39 @@ describe('FormCheckboxGroup', () => {
         id="test-checkboxes"
         name="test-checkboxes"
         options={[
-          { id: 'radio-1', label: 'Test radio 1', value: '1' },
-          { id: 'radio-2', label: 'Test radio 2', value: '2' },
-          { id: 'radio-3', label: 'Test radio 3', value: '3' },
+          { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
+          { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
+          { id: 'checkbox-3', label: 'Test checkbox 3', value: '3' },
         ]}
       />,
     );
 
     expect(getByText('Choose some checkboxes')).toBeDefined();
     expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders correctly with small size variants', () => {
+    const { container, getAllByLabelText } = render(
+      <FormCheckboxGroup
+        id="test-checkboxes"
+        name="test-checkboxes"
+        small
+        options={[
+          { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
+          { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
+          { id: 'checkbox-3', label: 'Test checkbox 3', value: '3' },
+        ]}
+      />,
+    );
+
+    const checkboxes = getAllByLabelText(/Test checkbox/) as HTMLInputElement[];
+
+    expect(checkboxes).toHaveLength(3);
+    expect(checkboxes[0].parentElement).toHaveClass('itemSmall');
+    expect(checkboxes[1].parentElement).toHaveClass('itemSmall');
+    expect(checkboxes[2].parentElement).toHaveClass('itemSmall');
+
+    expect(container).toMatchSnapshot();
   });
 
   test('renders unchecked `Select all` option when `selectAll` is true', () => {
@@ -108,6 +132,27 @@ describe('FormCheckboxGroup', () => {
     const selectAllCheckbox = getByLabelText('Select all') as HTMLInputElement;
 
     expect(selectAllCheckbox.checked).toBe(true);
+  });
+
+  test('renders `Select all` with small variant', () => {
+    const { getByLabelText } = render(
+      <FormCheckboxGroup
+        value={[]}
+        id="test-checkboxes"
+        name="test-checkboxes"
+        selectAll
+        small
+        options={[
+          { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
+          { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
+          { id: 'checkbox-3', label: 'Test checkbox 3', value: '3' },
+        ]}
+      />,
+    );
+
+    const selectAllCheckbox = getByLabelText('Select all') as HTMLInputElement;
+
+    expect(selectAllCheckbox.parentElement).toHaveClass('itemSmall');
   });
 
   test('does not render checked `Select all` checkbox when checked values do not match options', () => {

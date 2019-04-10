@@ -1,0 +1,72 @@
+@import '../styles/govuk-base';
+
+$selected-tab-colour: govuk-colour('blue');
+$selected-tab-border-width: 4px;
+
+.container {
+  @include govuk-responsive-margin(6, 'bottom');
+  display: flex;
+  flex-direction: column;
+}
+
+.tabList {
+  list-style: none;
+  margin: 0 0 govuk-spacing(4);
+  padding: 0 govuk-spacing(2) 0 0;
+}
+
+.tabItem {
+  margin-bottom: govuk-spacing(2);
+
+  &::before {
+    content: '— ';
+  }
+}
+
+.tabLink {
+  color: $govuk-link-colour !important;
+  display: inline-block;
+
+  &:focus {
+    background-color: #fff;
+  }
+}
+
+:global(.js-enabled) {
+  @include mq($from: tablet) {
+    .container {
+      flex-direction: row;
+    }
+
+    .tabList {
+      border-right: 1px solid $govuk-border-colour;
+      margin: 0;
+    }
+
+    .tabItem {
+      margin-bottom: 0;
+
+      &::before {
+        content: none;
+      }
+    }
+
+    .tabLink {
+      border-left: $selected-tab-border-width solid transparent;
+      display: block;
+      padding: govuk-spacing(2) govuk-spacing(5);
+      text-decoration: none;
+
+      &:hover {
+        border-left: $selected-tab-border-width solid $selected-tab-colour;
+        color: $govuk-link-hover-colour !important;
+      }
+    }
+
+    .tabLinkSelected {
+      background: govuk-colour('grey-4');
+      border-left: $selected-tab-border-width solid $selected-tab-colour;
+      font-weight: $govuk-font-weight-bold;
+    }
+  }
+}

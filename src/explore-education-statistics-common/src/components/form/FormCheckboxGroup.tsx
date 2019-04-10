@@ -15,6 +15,7 @@ export type FormCheckboxGroupProps = {
   onChange?: CheckboxChangeEventHandler;
   options: CheckboxOption[];
   selectAll?: boolean;
+  small?: boolean;
   value: string[];
 } & FieldSetProps;
 
@@ -30,6 +31,7 @@ class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
   public static defaultProps = {
     legendSize: 'm',
     selectAll: false,
+    small: false,
     value: [],
   };
 
@@ -54,6 +56,7 @@ class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
       id,
       options,
       selectAll,
+      small,
     } = this.props;
     const isAllChecked = options.every(
       option => value.indexOf(option.value) > -1,
@@ -67,6 +70,7 @@ class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
               id={`${id}-all`}
               label="Select all"
               name={name}
+              small={small}
               value="select-all"
               checked={isAllChecked}
               onChange={event => {
@@ -81,6 +85,7 @@ class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
             <FormCheckbox
               {...option}
               name={name}
+              small={small}
               key={option.id}
               checked={value.indexOf(option.value) > -1}
               onChange={event => {
