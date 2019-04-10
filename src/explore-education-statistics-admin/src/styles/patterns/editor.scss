@@ -57,7 +57,6 @@ div.ck.ck-editor__editable_inline {
   width: 100%;
 }
 
-
 /*
 .govuk-accordion__drag_icon:after,
 .govuk-accordion__drag_icon:before {
@@ -79,3 +78,26 @@ div.ck.ck-editor__editable_inline {
 .govuk-accordion__drag_icon:after {
   height: 100%;
 }*/
+
+.drag-handle {
+  height: 0;
+  position: relative;
+  &:before {
+    content: '\2630';
+    font-size: 2.25rem;
+    width: 2.25rem;
+
+    position: absolute;
+    z-index:1000;
+    left: -2.25rem;
+    top: 10px;
+
+    color: #999;
+  }
+
+  &.small:before {
+    width: 1.125rem;
+    font-size: 1.125rem;
+    left: -1.125rem;
+  }
+}

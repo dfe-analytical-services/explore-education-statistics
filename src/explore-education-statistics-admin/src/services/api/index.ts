@@ -7,7 +7,10 @@ export const baseUrl = {
   data: process.env.DATA_API_BASE_URL,
 };
 
+console.log("CONTENT API : " + process.env.CONTENT_API_BASE_URL);
+
 export const contentApi = new Client(
+
   axios.create({
     baseURL: `${baseUrl.content}/api/`,
     paramsSerializer: commaSeparated,

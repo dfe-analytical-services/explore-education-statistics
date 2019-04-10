@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
-import ContentBlock from './components/ContentBlock';
+import EditableContentBlock from './components/EditableContentBlock';
 import { DataBlock } from './components/DataBlock';
 import publicationService, {Release} from "../../services/publicationService";
 import Page from "../../components/Page";
@@ -188,7 +188,7 @@ class PublicationReleasePage extends Component<Props> {
                   caption={caption}
                   key={order}
                 >
-                  <ContentBlock content={content} />
+                  <EditableContentBlock content={content} />
                 </AccordionSection>
               ))}
             </Accordion>

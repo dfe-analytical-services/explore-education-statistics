@@ -1,9 +1,6 @@
 import React from 'react';
 import Accordion from '../components/Accordion';
 import AccordionSection from '../components/AccordionSection';
-import Details from '../components/Details';
-import GoToTopLink from '../components/GoToTopLink';
-import Link from '../components/Link';
 import PrototypeAnnexA from './components/methodology/absence/PrototypeAnnexA';
 import PrototypeAnnexB from './components/methodology/absence/PrototypeAnnexB';
 import PrototypeAnnexC from './components/methodology/absence/PrototypeAnnexC';
@@ -16,9 +13,6 @@ import PrototypeSection4 from './components/methodology/absence/PrototypeSection
 import PrototypeSection5 from './components/methodology/absence/PrototypeSection5';
 import PrototypeSection6 from './components/methodology/absence/PrototypeSection6';
 import PrototypeSection7 from './components/methodology/absence/PrototypeSection7';
-import PrototypeAbsenceData from './components/PrototypeAbsenceData';
-import PrototypeDataSample from './components/PrototypeDataSample';
-import PrototypeMap from './components/PrototypeMap';
 import PrototypePage from './components/PrototypePage';
 
 const PublicationPage = () => {

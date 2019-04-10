@@ -6,7 +6,6 @@
       "@babel/preset-env",
       {
         "useBuiltIns": "entry",
-        "debug": true,
         "targets": {
           "browsers": [
             "ie>=11",

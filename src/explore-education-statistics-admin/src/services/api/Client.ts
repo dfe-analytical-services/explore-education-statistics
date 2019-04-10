@@ -1,7 +1,9 @@
 import { AxiosInstance, AxiosPromise, AxiosRequestConfig } from 'axios';
 
 class Client {
-  constructor(public api: AxiosInstance) {}
+  constructor(public api: AxiosInstance) {
+    this.api=api;
+  }
 
   public get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
     return this.unboxResponse(this.api.get(url, config));
