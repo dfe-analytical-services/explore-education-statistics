@@ -49,12 +49,12 @@ class CharacteristicsFilterForm extends Component<Props, State> {
   private ref = createRef<HTMLDivElement>();
 
   private yearOptions = [
-    { value: 2011, text: '2011/12' },
-    { value: 2012, text: '2012/13' },
-    { value: 2013, text: '2013/14' },
-    { value: 2014, text: '2014/15' },
-    { value: 2015, text: '2015/16' },
-    { value: 2016, text: '2016/17' },
+    { value: 2011, label: '2011/12' },
+    { value: 2012, label: '2012/13' },
+    { value: 2013, label: '2013/14' },
+    { value: 2014, label: '2014/15' },
+    { value: 2015, label: '2015/16' },
+    { value: 2016, label: '2016/17' },
   ];
 
   private schoolTypeOptions = [

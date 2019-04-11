@@ -129,4 +129,19 @@ describe('FormCheckboxGroup', () => {
 
     expect(selectAllCheckbox.checked).toBe(false);
   });
+
+  test('does not render `Select all` checkbox when there is only one option', () => {
+    const { queryByLabelText } = render(
+      <FormCheckboxGroup
+        value={[]}
+        id="test-checkboxes"
+        name="test-checkboxes"
+        selectAll
+        options={[{ id: 'checkbox-1', label: 'Test checkbox 1', value: '1' }]}
+      />,
+    );
+
+    expect(queryByLabelText('Select all')).toBeNull();
+    expect(queryByLabelText('Test checkbox 1')).not.toBeNull();
+  });
 });

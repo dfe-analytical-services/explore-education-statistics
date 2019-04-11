@@ -35,6 +35,23 @@
     },
     "publicAppBasicAuthPassword": {
       "type": "securestring"
+    },
+    "environment": {
+      "type": "string"
+    },
+    "verificationEmailTemplateId": {
+      "type": "securestring",
+      "defaultValue": ""
+    },
+    "publicationNotificationEmailTemplateId": {
+      "type": "securestring",
+      "defaultValue": ""
+    },
+    "notifyApiKey": {
+      "type": "securestring"
+    },
+    "notifyTokenSecretKey": {
+      "type": "securestring"
     }
   },
   "variables": {
@@ -47,7 +64,14 @@
     "adminPlanName": "[concat('admin-', parameters('hostingPlanName'))]",
     "publicPlanName": "[concat('public-', parameters('hostingPlanName'))]",
     "importFunctionName": "[concat('data-', parameters('webAppName'))]",
-    "sqlserverName": "[parameters('webAppName')]"
+    "sqlserverName": "[parameters('webAppName')]",
+
+    "notificationsAppName": "[concat('notifications-', parameters('webAppName'))]",
+    "notificationsPlanName": "[concat('notifications-', parameters('hostingPlanName'))]",
+    "notificationsAppInsights": "[concat(variables('notificationsAppName'), '-insights')]",
+
+    "notificationsstorageAccountName": "[concat(parameters('environment'), 'storageeesnotify')]",
+    "notificationsstorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]"
   },
   "resources": [
     {
@@ -388,7 +412,6 @@
       },
       "kind": "StorageV2"
     },
-
     {
       "name": "[variables('sqlserverName')]",
       "type": "Microsoft.Sql/servers",
@@ -411,7 +434,9 @@
             "displayName": "Database"
           },
           "apiVersion": "2015-01-01",
-          "dependsOn": ["[variables('sqlserverName')]"],
+          "dependsOn": [
+            "[variables('sqlserverName')]"
+          ],
           "properties": {
             "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
@@ -427,7 +452,9 @@
             "displayName": "Database"
           },
           "apiVersion": "2015-01-01",
-          "dependsOn": ["[variables('sqlserverName')]"],
+          "dependsOn": [
+            "[variables('sqlserverName')]"
+          ],
           "properties": {
             "edition": "Basic",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
@@ -438,7 +465,9 @@
         {
           "type": "firewallrules",
           "apiVersion": "2014-04-01",
-          "dependsOn": ["[variables('sqlserverName')]"],
+          "dependsOn": [
+            "[variables('sqlserverName')]"
+          ],
           "location": "[resourceGroup().location]",
           "name": "AllowAllWindowsAzureIps",
           "properties": {
@@ -447,6 +476,121 @@
           }
         }
       ]
+    },
+
+
+
+
+
+
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('notificationsstorageAccountName')]",
+      "apiVersion": "2016-12-01",
+      "location": "[resourceGroup().location]",
+      "kind": "Storage",
+      "sku": {
+        "name": "Standard_LRS"
+      }
+    },
+    {
+      "apiVersion": "2015-05-01",
+      "name": "[variables('notificationsAppInsights')]",
+      "type": "Microsoft.Insights/components",
+      "kind": "web",
+      "location": "[resourceGroup().location]",
+      "tags": {
+          "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('notificationsAppName'))]": "Resource"
+      },
+      "properties": {
+          "Application_Type": "web",
+          "ApplicationId": "[variables('notificationsAppName')]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2015-04-01",
+      "name": "[variables('notificationsPlanName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "name": "[variables('notificationsPlanName')]",
+        "computeMode": "Dynamic",
+        "sku": "Dynamic"
+      }
+    },
+    {
+      "apiVersion": "2015-08-01",
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('notificationsAppName')]",
+      "location": "[resourceGroup().location]",
+      "kind": "functionapp",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
+        "[resourceId('Microsoft.Insights/components', variables('notificationsAppInsights'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('notificationsstorageAccountName'))]"
+      ],
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "AzureWebJobsDashboard",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "WEBSITE_CONTENTSHARE",
+              "value": "[toLower(variables('notificationsAppName'))]"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~2"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "dotnet"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "BaseUrl",
+              "value": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api/publication/')]"
+            },
+            {
+              "name": "NotifyApiKey",
+              "value": "[parameters('notifyApiKey')]"
+            },
+            {
+              "name": "TokenSecretKey",
+              "value": "[parameters('notifyTokenSecretKey')]"
+            },
+            {
+              "name": "VerificationEmailTemplateId",
+              "value": "[parameters('verificationEmailTemplateId')]"
+            },
+            {
+              "name": "PublicationNotificationEmailTemplateId",
+              "value": "[parameters('publicationNotificationEmailTemplateId')]"
+            }
+          ],
+          "connectionStrings": [
+            {
+              "name": "TableStorageConnString",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]"
+            }
+          ]
+        }
+      }
     }
+
   ]
 }
