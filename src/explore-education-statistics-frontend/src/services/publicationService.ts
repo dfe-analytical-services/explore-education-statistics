@@ -79,6 +79,9 @@ export interface Release {
 }
 
 export default {
+  getPublication(publicationSlug: string): Promise<Release> {
+    return contentApi.get(`publication/${publicationSlug}`);
+  },
   getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
     return contentApi.get(`publication/${publicationSlug}/latest`);
   },

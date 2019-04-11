@@ -174,7 +174,11 @@ class PublicationReleasePage extends Component<Props> {
                 <FormattedDate>{data.publication.nextUpdate}</FormattedDate>
 
                 <span className="govuk-caption-m">
-                  <Link to="#" unvisited>
+                  <Link
+                    unvisited
+                    to={`/subscriptions?slug=${data.publication.slug}`}
+                    data-testid={`subsciption-${data.publication.slug}`}
+                  >
                     Notify me
                   </Link>
                 </span>

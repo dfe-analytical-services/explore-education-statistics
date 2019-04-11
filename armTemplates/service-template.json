@@ -611,6 +611,10 @@
               "value": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api/publication/')]"
             },
             {
+              "name": "WebApplicationBaseUrl",
+              "value": "[concat(concat('https://', variables('publicAppName')), '.azurewebsites.net/')]"
+            },
+            {
               "name": "NotifyApiKey",
               "value": "[parameters('notifyApiKey')]"
             },
