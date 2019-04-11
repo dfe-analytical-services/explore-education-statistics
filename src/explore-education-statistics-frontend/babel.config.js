@@ -13,9 +13,4 @@ module.exports = {
     ],
     '@zeit/next-typescript/babel',
   ],
-  env: {
-    test: {
-      plugins: ['dynamic-import-node'],
-    },
-  },
 };
