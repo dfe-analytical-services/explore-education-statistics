@@ -3,9 +3,13 @@ import React, { Component } from 'react';
 import GoToTopLink from 'src/components/GoToTopLink';
 import Page from 'src/components/Page';
 import PageTitle from 'src/components/PageTitle';
-import functionsService, { SubscriptionData } from 'src/services/functionsService';
+import functionsService, {
+  SubscriptionData,
+} from 'src/services/functionsService';
 import publicationService, { Release } from 'src/services/publicationService';
-import SubscriptionForm, { SubscriptionFormSubmitHandler } from './components/SubscriptionForm';
+import SubscriptionForm, {
+  SubscriptionFormSubmitHandler,
+} from './components/SubscriptionForm';
 
 interface Props {
   slug: string;
@@ -18,7 +22,6 @@ interface State {
 }
 
 class SubscriptionPage extends Component<Props> {
-
   public static async getInitialProps({
     query,
   }: NextContext<{
@@ -41,17 +44,17 @@ class SubscriptionPage extends Component<Props> {
     title: this.props.data.title,
   };
 
-  private handleFormSubmit: SubscriptionFormSubmitHandler = async ({ email }) => {
+  private handleFormSubmit: SubscriptionFormSubmitHandler = async ({
+    email,
+  }) => {
     if (email !== '') {
       const slug = this.state.slug;
       const title = this.state.title;
-      await functionsService.subscribeToPublication(
-        {
-          email,
-          slug,
-          title,
-        },
-      );
+      await functionsService.subscribeToPublication({
+        email,
+        slug,
+        title,
+      });
     }
   };
 
@@ -68,9 +71,7 @@ class SubscriptionPage extends Component<Props> {
       >
         <PageTitle title={`${data.title} : Subscribe`} />
 
-        <SubscriptionForm
-          onSubmit={this.handleFormSubmit}
-        />
+        <SubscriptionForm onSubmit={this.handleFormSubmit} />
 
         <hr />
 

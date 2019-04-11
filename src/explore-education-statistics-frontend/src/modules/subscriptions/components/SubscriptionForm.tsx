@@ -4,15 +4,13 @@ import Button from 'src/components/Button';
 import ErrorSummary, { ErrorSummaryMessage } from 'src/components/ErrorSummary';
 import createErrorHelper from 'src/lib/validation/createErrorHelper';
 import Yup from 'src/lib/validation/yup';
-import { FormFieldset, FormFieldTextInput } from "../../../components/form";
+import { FormFieldset, FormFieldTextInput } from '../../../components/form';
 
 interface FormValues {
   email: string;
 }
 
-export type SubscriptionFormSubmitHandler = (
-  values: FormValues,
-) => void;
+export type SubscriptionFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
   onSubmit: SubscriptionFormSubmitHandler;
@@ -24,7 +22,6 @@ interface State {
 }
 
 class SubscriptionForm extends Component<Props, State> {
-
   public state: State = {
     isSubmitted: false,
     submitError: '',
@@ -62,7 +59,7 @@ class SubscriptionForm extends Component<Props, State> {
         validationSchema={Yup.object({
           email: Yup.string()
             .required('Email is required')
-            .email("Please enter a valid email"),
+            .email('Please enter a valid email'),
         })}
         onSubmit={async (form, actions) => {
           try {
@@ -76,11 +73,11 @@ class SubscriptionForm extends Component<Props, State> {
           actions.setSubmitting(false);
         }}
         render={({
-                   errors,
-                   touched,
-                   values,
-                   ...form
-                 }: FormikProps<FormValues>) => {
+          errors,
+          touched,
+          values,
+          ...form
+        }: FormikProps<FormValues>) => {
           const { getError } = createErrorHelper({ errors, touched });
 
           return (
@@ -91,7 +88,6 @@ class SubscriptionForm extends Component<Props, State> {
               />
 
               <Form>
-
                 <FormFieldset
                   id="email-address"
                   legend="Email address"
@@ -128,9 +124,7 @@ class SubscriptionForm extends Component<Props, State> {
                   }}
                   type="submit"
                 >
-                  {form.isSubmitting && form.isValid
-                    ? 'Submitting'
-                    : 'Submit'}
+                  {form.isSubmitting && form.isValid ? 'Submitting' : 'Submit'}
                 </Button>
               </Form>
             </div>
