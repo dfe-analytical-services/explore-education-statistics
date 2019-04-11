@@ -1,1 +1,1 @@
-export * from '@common/types/govuk-frontend';
+export * from '@common/types/govuk-frontend.d.ts';

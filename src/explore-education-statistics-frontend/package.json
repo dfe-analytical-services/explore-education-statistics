@@ -160,15 +160,16 @@
     "testURL": "http://localhost",
     "transform": {
       "^.+\\.(js|jsx|ts|tsx)$": "<rootDir>/node_modules/babel-jest",
-      "^.+\\.css$": "<rootDir>/test/cssTransform.js",
-      "^(?!.*\\.(js|jsx|ts|tsx|css|json)$)": "<rootDir>/test/fileTransform.js"
+      "^.+\\.css$": "<rootDir>/../explore-education-statistics-common/test/cssTransform.js",
+      "^(?!.*\\.(js|jsx|ts|tsx|css|json)$)": "<rootDir>/../explore-education-statistics-common/test/fileTransform.js"
     },
     "transformIgnorePatterns": [
       "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$",
       "^.+\\.module\\.(css|sass|scss)$"
     ],
     "moduleNameMapper": {
-      "^@common/(.*)$": "<rootDir>/node_modules/@dfe-ees/common/src/$1",
+      "^@common/(.*)$": "<rootDir>/../explore-education-statistics-common/src/$1",
+      "^@common-test/(.*)$": "<rootDir>/../explore-education-statistics-common/test/$1",
       "^src/(.*)$": "<rootDir>/src/$1",
       "^test/(.*)$": "<rootDir>/test/$1",
       "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
