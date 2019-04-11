@@ -5,27 +5,23 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class MetaService : IMetaService
     {
-        private readonly ICharacteristicDataService _characteristicDataService;
-        private readonly IGeographicDataService _geographicDataService;
+        private readonly IObservationService _observationService;
         private readonly IReleaseService _releaseService;
         private readonly ISubjectService _subjectService;
         private readonly IMapper _mapper;
 
-        public MetaService(ICharacteristicDataService characteristicDataService,
-            IGeographicDataService geographicDataService,
+        public MetaService(IObservationService observationService,
             IReleaseService releaseService,
             ISubjectService subjectService,
             IMapper mapper)
         {
-            _characteristicDataService = characteristicDataService;
-            _geographicDataService = geographicDataService;
+            _observationService = observationService;
             _releaseService = releaseService;
             _subjectService = subjectService;
             _mapper = mapper;
@@ -47,19 +43,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public SubjectMetaViewModel GetSubjectMeta(long subjectId)
         {
+            // TODO check subject exists
             var subject = _subjectService.Find(subjectId);
 
-            var levelMetaGeographic = _geographicDataService.GetLevelMeta(subjectId);
-            var levelMetaCharacteristic = _characteristicDataService.GetLevelMeta(subjectId);
+            var locationMeta = _observationService.GetLocationMeta(subject.Id);
 
-            var national = levelMetaGeographic.Country.Concat(levelMetaCharacteristic.Country)
-                .Distinct().Select(MapCountry);
+            var national = locationMeta.Country.Distinct().Select(MapCountry);
 
-            var localAuthority = levelMetaGeographic.LocalAuthority.Concat(levelMetaCharacteristic.LocalAuthority)
-                .Distinct().Select(MapLocalAuthority);
+            var localAuthority = locationMeta.LocalAuthority.Distinct().Select(MapLocalAuthority);
 
-            var region = levelMetaGeographic.Region.Concat(levelMetaCharacteristic.Region)
-                .Distinct().Select(MapRegion);
+            var localAuthorityDistrict = locationMeta.LocalAuthorityDistrict.Distinct().Select(MapLocalAuthorityDistrict);
+
+            var region = locationMeta.Region.Distinct().Select(MapRegion);
 
             return new SubjectMetaViewModel
             {
@@ -300,28 +295,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                             }
                         }
                     },
-                Characteristics = GetCharacteristicMetas(subject.Id),
-                Indicators = GetIndicatorMetas(subject.Id),
-                IndicatorsPrototype = new Dictionary<string, LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>>
-                {
+                Indicators = 
+                    new Dictionary<string, LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>>
                     {
-                        "absence_by_reason",
-                        new LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>
                         {
-                            Label = "Absence by reason", Options = new List<IndicatorMetaViewModel>
+                            "absence_by_reason",
+                            new LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>
                             {
-                                new IndicatorMetaViewModel
+                                Label = "Absence by reason", Options = new List<IndicatorMetaViewModel>
                                 {
-                                    Label = "Number of excluded sessions",
-                                    // TODO DFE-412 Remove Name which was used by the original table tool
-                                    Name = "Not used",
-                                    Unit = "",
-                                    Value = "sess_auth_excluded"
+                                    new IndicatorMetaViewModel
+                                    {
+                                        Label = "Number of excluded sessions",
+                                        Unit = "",
+                                        Value = "sess_auth_excluded"
+                                    }
                                 }
                             }
                         }
-                    }
-                },
+                    },
                 ObservationalUnits = new ObservationalUnitsMetaViewModel
                 {
                     Location = new LegendOptionsMetaValueModel<LocationMetaViewModel>
@@ -334,6 +326,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                             {
                                 Label = "Local Authority",
                                 Options = localAuthority
+                            },
+                            LocalAuthorityDistrict = new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                            {
+                                Label = "Local Authority District",
+                                Options = localAuthorityDistrict
                             },
                             National = new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
                             {
@@ -400,34 +397,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        private Dictionary<string, IEnumerable<IndicatorMetaViewModel>> GetIndicatorMetas(long subjectId)
-        {
-            return _subjectService.GetIndicatorMetaGroups(subjectId)
-                .ToDictionary(
-                    pair => pair.Key,
-                    pair => pair.Value.Select(MapIndicatorMeta)
-                );
-        }
-
-        private Dictionary<string, IEnumerable<CharacteristicMetaViewModel>> GetCharacteristicMetas(long subjectId)
-        {
-            return _subjectService.GetCharacteristicMetaGroups(subjectId)
-                .ToDictionary(
-                    pair => pair.Key,
-                    pair => pair.Value.Select(MapCharacteristicMeta)
-                );
-        }
-
-        private IndicatorMetaViewModel MapIndicatorMeta(IndicatorMeta indicatorMeta)
-        {
-            return _mapper.Map<IndicatorMetaViewModel>(indicatorMeta);
-        }
-
-        private CharacteristicMetaViewModel MapCharacteristicMeta(CharacteristicMeta characteristicMeta)
-        {
-            return _mapper.Map<CharacteristicMetaViewModel>(characteristicMeta);
-        }
-
         private LabelValueViewModel MapCountry(Country country)
         {
             return _mapper.Map<LabelValueViewModel>(country);
@@ -436,6 +405,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private LabelValueViewModel MapLocalAuthority(LocalAuthority localAuthority)
         {
             return _mapper.Map<LabelValueViewModel>(localAuthority);
+        }
+
+        private LabelValueViewModel MapLocalAuthorityDistrict(LocalAuthorityDistrict localAuthorityDistrict)
+        {
+            return _mapper.Map<LabelValueViewModel>(localAuthorityDistrict);
         }
 
         private LabelValueViewModel MapRegion(Region region)

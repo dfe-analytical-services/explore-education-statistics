@@ -8,10 +8,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Models
         public DataCsvFilename Filename { get; set; }
         public MetaGroup<IndicatorMeta>[] IndicatorMetas { get; set; }
         public string Name { get; set; }
-
-        public ImportFileType GetImportFileType()
-        {
-            return Filename.GetImportFileTypeFromDataFileAttributeOfEnumType(Filename.GetType());
-        }
     }
 }

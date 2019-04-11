@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Meta;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 {
@@ -13,52 +11,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             Database.SetCommandTimeout(int.MaxValue);
         }
 
-        public DbSet<IndicatorMeta> IndicatorMeta { get; set; }
-        public DbSet<CharacteristicMeta> CharacteristicMeta { get; set; }
+        public DbSet<Filter> Filter { get; set; }
+        public DbSet<FilterItem> FilterItem { get; set; }
+        public DbSet<FilterGroup> FilterGroup { get; set; }
+        public DbSet<IndicatorGroup> IndicatorGroup { get; set; }
+        public DbSet<Indicator> Indicator { get; set; }
+        public DbSet<Location> Location { get; set; }
+        public DbSet<Measure> Measure { get; set; }
+        public DbSet<Observation> Observation { get; set; }
         public DbSet<Release> Release { get; set; }
+        public DbSet<School> School { get; set; }
         public DbSet<Subject> Subject { get; set; }
-        public DbSet<LevelComposite> Level { get; set; }
-        public DbSet<GeographicData> GeographicData { get; set; }
-        public DbSet<CharacteristicData> CharacteristicData { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            ConfigureMeasure(modelBuilder);
+            ConfigureObservationFilterItem(modelBuilder);
             ConfigureUnit(modelBuilder);
-            ConfigureIndicatorMeta(modelBuilder);
-            ConfigureCharacteristicMeta(modelBuilder);
             ConfigurePublication(modelBuilder);
-            ConfigureTimePeriod(modelBuilder);
+            ConfigureTime(modelBuilder);
             ConfigureLevel(modelBuilder);
-            ConfigureSchoolType(modelBuilder);
-            ConfigureSchool(modelBuilder);
-            ConfigureCharacteristic(modelBuilder);
-            ConfigureIndicators(modelBuilder);
             ConfigureCountry(modelBuilder);
             ConfigureLocalAuthority(modelBuilder);
+            ConfigureLocalAuthorityDistrict(modelBuilder);
             ConfigureRegion(modelBuilder);
+        }
+
+        private static void ConfigureMeasure(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Measure>()
+                .HasOne(measure => measure.Observation)
+                .WithMany(observation => observation.Measures)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+
+        private static void ConfigureObservationFilterItem(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ObservationFilterItem>()
+                .HasKey(item => new {item.ObservationId, item.FilterItemId});
+
+            modelBuilder.Entity<ObservationFilterItem>()
+                .HasOne(observationFilterItem => observationFilterItem.Observation)
+                .WithMany(observation => observation.FilterItems)
+                .HasForeignKey(observationFilterItem => observationFilterItem.ObservationId);
+
+            modelBuilder.Entity<ObservationFilterItem>()
+                .HasOne(observationFilterItem => observationFilterItem.FilterItem)
+                .WithMany(filterItem => filterItem.Observations)
+                .HasForeignKey(observationFilterItem => observationFilterItem.FilterItemId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         private static void ConfigureUnit(ModelBuilder modelBuilder)
         {
             var unitConverter = new EnumToStringConverter<Unit>();
 
-            modelBuilder.Entity<IndicatorMeta>()
-                .Property(data => data.Unit)
+            modelBuilder.Entity<Indicator>()
+                .Property(indicator => indicator.Unit)
                 .HasConversion(unitConverter);
-        }
-
-        private static void ConfigureIndicatorMeta(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<IndicatorMeta>()
-                .HasOne(indicatorMeta => indicatorMeta.Subject)
-                .WithMany(subject => subject.Indicators);
-        }
-
-        private static void ConfigureCharacteristicMeta(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<CharacteristicMeta>()
-                .HasOne(characteristicMeta => characteristicMeta.Subject)
-                .WithMany(subject => subject.Characteristics);
         }
 
         private static void ConfigurePublication(ModelBuilder modelBuilder)
@@ -67,120 +77,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .HasIndex(data => data.PublicationId);
         }
 
-        private static void ConfigureTimePeriod(ModelBuilder modelBuilder)
+        private static void ConfigureTime(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<GeographicData>()
-                .HasIndex(data => data.TimePeriod);
+            modelBuilder.Entity<Observation>()
+                .HasIndex(observation => observation.Year);
 
-            modelBuilder.Entity<CharacteristicData>()
-                .HasIndex(data => data.TimePeriod);
+            modelBuilder.Entity<Observation>()
+                .HasIndex(observation => observation.TimePeriod);
         }
 
         private static void ConfigureLevel(ModelBuilder modelBuilder)
         {
             var levelConverter = new EnumToStringConverter<Level>();
 
-            modelBuilder.Entity<LevelComposite>()
-                .Property(data => data.Level)
+            modelBuilder.Entity<Observation>()
+                .Property(observation => observation.Level)
                 .HasConversion(levelConverter);
-
-            modelBuilder.Entity<LevelComposite>()
-                .HasIndex(data => data.Level);
-
-            modelBuilder.Entity<GeographicData>()
-                .HasOne(data => data.Level)
-                .WithMany();
-
-            modelBuilder.Entity<CharacteristicData>()
-                .HasOne(data => data.Level)
-                .WithMany();
-        }
-
-        private static void ConfigureSchoolType(ModelBuilder modelBuilder)
-        {
-            var schoolTypeConverter = new EnumToStringConverter<SchoolType>();
-
-            modelBuilder.Entity<GeographicData>()
-                .Property(data => data.SchoolType)
-                .HasConversion(schoolTypeConverter);
-
-            modelBuilder.Entity<GeographicData>()
-                .HasIndex(data => data.SchoolType);
-
-            modelBuilder.Entity<CharacteristicData>()
-                .Property(data => data.SchoolType)
-                .HasConversion(schoolTypeConverter);
-
-            modelBuilder.Entity<CharacteristicData>()
-                .HasIndex(data => data.SchoolType);
-        }
-        
-        private static void ConfigureSchool(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<GeographicData>()
-                .Property(data => data.School)
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<School>(v));
-
-            modelBuilder.Entity<GeographicData>()
-                .Property(data => data.SchoolLaEstab)
-                .HasComputedColumnSql("JSON_VALUE(School, '$.laestab')");
-
-            modelBuilder.Entity<GeographicData>()
-                .HasIndex(data => data.SchoolLaEstab);
-        }
-
-        private static void ConfigureIndicators(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<GeographicData>()
-                .Property(data => data.Indicators)
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<Dictionary<string, string>>(v));
-
-            modelBuilder.Entity<CharacteristicData>()
-                .Property(data => data.Indicators)
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<Dictionary<string, string>>(v));
         }
 
         private static void ConfigureCountry(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<LevelComposite>()
+            modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.Country,
                     builder => builder.HasIndex(country => country.Code));
         }
 
         private static void ConfigureLocalAuthority(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<LevelComposite>()
+            modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.LocalAuthority,
                     builder => builder.HasIndex(localAuthority => localAuthority.Code));
         }
 
-        private static void ConfigureRegion(ModelBuilder modelBuilder)
+        private static void ConfigureLocalAuthorityDistrict(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<LevelComposite>()
-                .OwnsOne(level => level.Region,
-                    builder => builder.HasIndex(region => region.Code));
+            modelBuilder.Entity<Location>()
+                .OwnsOne(level => level.LocalAuthorityDistrict,
+                    builder => builder.HasIndex(localAuthorityDistrict => localAuthorityDistrict.Code));
         }
 
-        private static void ConfigureCharacteristic(ModelBuilder modelBuilder)
+        private static void ConfigureRegion(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<CharacteristicData>()
-                .Property(data => data.Characteristic)
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<Characteristic>(v));
-
-            modelBuilder.Entity<CharacteristicData>()
-                .Property(data => data.CharacteristicName)
-                .HasComputedColumnSql("JSON_VALUE(Characteristic, '$.characteristic_breakdown')");
-
-            modelBuilder.Entity<CharacteristicData>()
-                .HasIndex(data => data.CharacteristicName);
+            modelBuilder.Entity<Location>()
+                .OwnsOne(level => level.Region,
+                    builder => builder.HasIndex(region => region.Code));
         }
     }
 }

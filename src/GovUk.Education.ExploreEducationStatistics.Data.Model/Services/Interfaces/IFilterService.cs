@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces
 {
-    public interface ISubjectService : IDataService<Subject, long>
+    public interface IFilterService : IDataService<Filter, long>
     {
     }
 }

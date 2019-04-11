@@ -1,6 +1,9 @@
+using System;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Meta
 {
-    public class CharacteristicMeta : IMeta
+    [Obsolete]
+    public class CharacteristicMeta
     {
         public long Id { get; set; }
         public string Name { get; set; }

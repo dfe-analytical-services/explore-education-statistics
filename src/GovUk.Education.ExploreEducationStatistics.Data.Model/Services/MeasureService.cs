@@ -4,10 +4,10 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class SubjectService : AbstractDataService<Subject, long>, ISubjectService
+    public class MeasureService : AbstractDataService<Measure, long>, IMeasureService
     {
-        public SubjectService(ApplicationDbContext context,
-            ILogger<SubjectService> logger) : base(context, logger)
+        public MeasureService(ApplicationDbContext context, ILogger<MeasureService> logger)
+            : base(context, logger)
         {
         }
     }

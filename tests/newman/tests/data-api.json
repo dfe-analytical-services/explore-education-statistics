@@ -355,146 +355,6 @@
 					"_postman_isSubFolder": true
 				},
 				{
-					"name": "Meta Detail Old - TODO - Remove Me",
-					"item": [
-						{
-							"name": "Meta - Characteristics National - Pupil absence in schools in England",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
-										"exec": [
-											"pm.variables.set('publication_id', 'cbbd299f-8297-44bc-92ac-558bcf51f8ad')"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{data_api_url}}/tablebuilder/meta/CharacteristicDataNational/{{publication_id}}",
-									"host": [
-										"{{data_api_url}}"
-									],
-									"path": [
-										"tablebuilder",
-										"meta",
-										"CharacteristicDataNational",
-										"{{publication_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Meta - Characteristics National - Permanent and fixed period exclusions",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"id": "172e5a61-30d3-454a-9a6c-d29b57b2aabd",
-										"exec": [
-											"pm.variables.set('publication_id', 'bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9')"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{data_api_url}}/tablebuilder/meta/CharacteristicDataNational/{{publication_id}}",
-									"host": [
-										"{{data_api_url}}"
-									],
-									"path": [
-										"tablebuilder",
-										"meta",
-										"CharacteristicDataNational",
-										"{{publication_id}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Meta - Characteristics National - Schools, pupils and their characteristics",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"id": "1566cb5c-7ac9-4134-8be3-03a5184ae3da",
-										"exec": [
-											"pm.variables.set('publication_id', 'a91d9e05-be82-474c-85ae-4913158406d0')"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{data_api_url}}/tablebuilder/meta/CharacteristicDataNational/{{publication_id}}",
-									"host": [
-										"{{data_api_url}}"
-									],
-									"path": [
-										"tablebuilder",
-										"meta",
-										"CharacteristicDataNational",
-										"{{publication_id}}"
-									]
-								}
-							},
-							"response": []
-						}
-					],
-					"description": "UI is  requesting meta data for type \"CharacteristicDataNational\". This can be removed once it requests meta data by subject.",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "595f2dce-cc95-43ef-abfe-be98632b442f",
-								"type": "text/javascript",
-								"exec": [
-									""
-								]
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "f42619e7-fe77-47ac-a97a-0b143cf1d4eb",
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Fields are present\", function () {",
-									"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"characteristics\"));",
-									"});"
-								]
-							}
-						}
-					],
-					"_postman_isSubFolder": true
-				},
-				{
 					"name": "Publication",
 					"item": [
 						{
@@ -2173,12 +2033,36 @@
 							"script": {
 								"id": "90830933-d7da-4502-b316-ed7887c913cf",
 								"exec": [
-									"pm.test(\"Geographic count matches the expected count\", function () {",
-									"    pm.expect(pm.response.json().geographicCount).to.equal(725845);",
+									"pm.test(\"Filter count matches the expected count\", function () {",
+									"    pm.expect(pm.response.json().filterCount).to.equal(0);",
 									"});",
 									"",
-									"pm.test(\"Characteristic count matches the expected count\", function () {",
-									"    pm.expect(pm.response.json().characteristicCount).to.equal(590812);",
+									"pm.test(\"Indicator count matches the expected count\", function () {",
+									"    pm.expect(pm.response.json().indicatorCount).to.equal(0);",
+									"});",
+									"",
+									"pm.test(\"Location count matches the expected count\", function () {",
+									"    pm.expect(pm.response.json().locationCount).to.equal(0);",
+									"});",
+									"",
+									"pm.test(\"Measure count matches the expected count\", function () {",
+									"    pm.expect(pm.response.json().measureCount).to.equal(0);",
+									"});",
+									"",
+									"pm.test(\"Observation count matches the expected count\", function () {",
+									"    pm.expect(pm.response.json().observationCount).to.equal(0);",
+									"});",
+									"",
+									"pm.test(\"Release count matches the expected count\", function () {",
+									"    pm.expect(pm.response.json().releaseCount).to.equal(0);",
+									"});",
+									"",
+									"pm.test(\"School count matches the expected count\", function () {",
+									"    pm.expect(pm.response.json().schoolCount).to.equal(0);",
+									"});",
+									"",
+									"pm.test(\"Subject count matches the expected count\", function () {",
+									"    pm.expect(pm.response.json().subjectCount).to.equal(0);",
 									"});"
 								],
 								"type": "text/javascript"

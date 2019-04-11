@@ -1,5 +1,8 @@
+using System;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Meta
 {
+    [Obsolete]
     public class IndicatorMeta : IMeta
     {
         public long Id { get; set; }

@@ -16,7 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
 
-
             var serviceProvider = serviceCollection.BuildServiceProvider();
 
             var logger = serviceProvider.GetService<ILoggerFactory>()
@@ -42,11 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                         .UseSqlServer("Server=db;Database=master;User=SA;Password=Your_Password123;")
                         .EnableSensitiveDataLogging()
                 )
-                .AddSingleton<ISeedService, SeedService>()
-                .AddSingleton<CsvImporterFactory>()
-                .AddSingleton<GeographicImporter>()
-                .AddSingleton<LaCharacteristicImporter>()
-                .AddSingleton<NationalCharacteristicImporter>()
+                .AddTransient<ISeedService, SeedService>()
+                .AddTransient<IImporterService, ImporterService>()
+                .AddTransient<ImporterLocationService>()
+                .AddTransient<ImporterSchoolService>()
                 .BuildServiceProvider();
         }
     }

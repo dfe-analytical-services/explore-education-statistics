@@ -4,10 +4,9 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class SubjectService : AbstractDataService<Subject, long>, ISubjectService
+    public class LocationService : AbstractDataService<Location, long>, ILocationService
     {
-        public SubjectService(ApplicationDbContext context,
-            ILogger<SubjectService> logger) : base(context, logger)
+        public LocationService(ApplicationDbContext context, ILogger<LocationService> logger) : base(context, logger)
         {
         }
     }
