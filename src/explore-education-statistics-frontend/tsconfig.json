@@ -3,7 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@common/*": ["node_modules/@dfe-ees/common/src/*"]
+      "@common/*": ["../explore-education-statistics-common/src/*"],
+      "@common-test/*": ["../explore-education-statistics-common/test/*"]
     }
   },
   "include": [
