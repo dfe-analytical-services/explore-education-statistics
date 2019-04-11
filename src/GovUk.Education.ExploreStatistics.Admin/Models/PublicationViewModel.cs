@@ -7,5 +7,7 @@ namespace GovUk.Education.ExploreStatistics.Admin.Models
         public string Name { get; set; }
         
         public string PublicationId { get; set; }
+        
+        public string Slug { get; set; }
     }
 }
