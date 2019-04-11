@@ -8,12 +8,13 @@ import publicationService, { Release } from 'src/services/publicationService';
 import SubscriptionForm, { SubscriptionFormSubmitHandler } from './components/SubscriptionForm';
 
 interface Props {
-  publication: string;
+  slug: string;
   data: Release;
 }
 
 interface State {
-  publicationId: string;
+  slug: string;
+  title: string;
 }
 
 class SubscriptionPage extends Component<Props> {
@@ -21,44 +22,47 @@ class SubscriptionPage extends Component<Props> {
   public static async getInitialProps({
     query,
   }: NextContext<{
-    publication: string;
+    slug: string;
   }>) {
-    const { publication } = query;
+    const { slug } = query;
 
-    const request = publicationService.getPublication(publication);
+    const request = publicationService.getPublication(slug);
 
     const data = await request;
 
     return {
       data,
-      publication,
+      slug,
     };
   }
 
   public state: State = {
-    publicationId: this.props.publication,
+    slug: this.props.slug,
+    title: this.props.data.title,
   };
 
   private handleFormSubmit: SubscriptionFormSubmitHandler = async ({ email }) => {
     if (email !== '') {
-      const publicationId = this.state.publicationId;
-      const { result } = await functionsService.subscribe(
+      const slug = this.state.slug;
+      const title = this.state.title;
+      await functionsService.subscribeToPublication(
         {
           email,
-          publicationId,
+          slug,
+          title,
         },
       );
     }
   };
 
   public render() {
-    const { data, publication } = this.props;
+    const { data, slug } = this.props;
 
     return (
       <Page
         breadcrumbs={[
           { name: 'Find statistics and data', link: '/statistics' },
-          { name: data.title, link: `/statistics/${publication}` },
+          { name: data.title, link: `/statistics/${slug}` },
           { name: 'subscribe' },
         ]}
       >

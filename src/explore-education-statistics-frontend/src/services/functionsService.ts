@@ -1,17 +1,16 @@
 import { functionApi } from './api';
 
 export interface SubscriptionData {
-  publicationId: string;
   email: string;
-  result: {
-
-  }[];
+  slug: string;
+  title: string;
 }
 
 export default {
-  subscribe(query: {
+  subscribeToPublication(query: {
     email: string;
-    publicationId: string;
+    slug: string;
+    title: string;
   }): Promise<SubscriptionData> {
     return functionApi.post('/publication/subscribe', query);
   },
