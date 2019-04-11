@@ -5,116 +5,97 @@ import {DragDropContext, Droppable} from "react-beautiful-dnd";
 import EditableAccordionSection, {EditableAccordionSectionProps} from "./EditableAccordionSection";
 
 export interface EditableAccordionProps {
-  children: ReactNode;
-  id: string;
-  index: number
+    children: ReactNode;
+    id: string;
+    index: number
 }
 
 interface State {
-  hash: string;
+    hash: string;
 }
 
 class EditableAccordion extends Component<EditableAccordionProps, State> {
-  public state = {
-    hash: '',
-  };
+    public state = {
+        hash: '',
+    };
 
-  private ref = createRef<HTMLDivElement>();
+    private ref = createRef<HTMLDivElement>();
 
-  private accordion : any;
+    private accordion: any;
 
-  public componentDidMount(): void {
-    import('govuk-frontend/components/accordion/accordion').then(
-      ({default: GovUkAccordion}) => {
-        if (this.ref.current) {
-          this.accordion =    new GovUkAccordion(this.ref.current);
-          this.accordion.init();
-        }
-      },
-    );
+    public componentDidMount(): void {
+        import('govuk-frontend/components/accordion/accordion').then(
+            ({default: GovUkAccordion}) => {
+                if (this.ref.current) {
+                    this.accordion = new GovUkAccordion(this.ref.current);
+                    this.accordion.init();
+                }
+            },
+        );
 
-    this.goToHash();
-    window.addEventListener('hashchange', this.goToHash);
-  }
-
-  public componentDidUpdate() {
-    import('govuk-frontend/components/accordion/accordion').then(
-      ({default: GovUkAccordion}) => {
-        if (this.ref.current) {
-          //this.accordion.initSectionHeaders();
-          //new GovUkAccordion(this.ref.current).init();
-        }
-      }
-    );
-  }
-
-  public componentWillUnmount(): void {
-    window.removeEventListener('hashchange', this.goToHash);
-  }
-
-  private goToHash = () => {
-    this.setState({hash: location.hash});
-
-    if (this.ref.current && location.hash) {
-      const anchor = this.ref.current.querySelector(
-        location.hash,
-      ) as HTMLButtonElement;
-
-      if (anchor) {
-        anchor.scrollIntoView();
-      }
+        this.goToHash();
+        window.addEventListener('hashchange', this.goToHash);
     }
-  };
 
-  public onDragEnd() {
+    public componentDidUpdate() {
+        import('govuk-frontend/components/accordion/accordion').then(
+            ({default: GovUkAccordion}) => {
+                if (this.ref.current) {
+                    //this.accordion.initSectionHeaders();
+                    //new GovUkAccordion(this.ref.current).init();
+                }
+            }
+        );
+    }
 
-  }
+    public componentWillUnmount(): void {
+        window.removeEventListener('hashchange', this.goToHash);
+    }
 
-  public render() {
-    const {children, id, index} = this.props;
-    const {hash} = this.state;
+    private goToHash = () => {
+        this.setState({hash: location.hash});
 
-    let sectionId = 0;
+        if (this.ref.current && location.hash) {
+            const anchor = this.ref.current.querySelector(
+                location.hash,
+            ) as HTMLButtonElement;
 
-    return (
+            if (anchor) {
+                anchor.scrollIntoView();
+            }
+        }
+    };
 
-      <Droppable
-        droppableId={`accordion(${index})`}
-        type="accordion"
-      >
+    public onDragEnd() {
 
-        {(provided, snapshot) => (
+    }
 
-          <div
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-          >
+    public render() {
+        const {children, id, index} = this.props;
+        const {hash} = this.state;
 
+        let sectionId = 0;
+
+        return (
 
             <div className="govuk-accordion" ref={this.ref} id={id}>
 
-              {React.Children.map(children, (child,thisIndex) => {
-                if (isComponentType(child, EditableAccordionSection)) {
-                  return cloneElement<EditableAccordionSectionProps>(child, {
-                    index: thisIndex,
-                    droppableIndex: index
-                  });
-                }
+                {React.Children.map(children, (child, thisIndex) => {
+                    if (isComponentType(child, EditableAccordionSection)) {
+                        return cloneElement<EditableAccordionSectionProps>(child, {
+                            index: thisIndex,
+                            droppableIndex: index
+                        });
+                    }
 
-                return child;
-              })}
+                    return child;
+                })}
 
 
-
-              {provided.placeholder}
             </div>
 
-          </div>
-
-        )}
-      </Droppable>
-    );
-  }
+        );
+    }
 }
 
 export default EditableAccordion;

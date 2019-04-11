@@ -50,7 +50,7 @@ class EditableContentSubBlockRenderer extends Component<Props> {
       index
     } = this.props;
 
-    //return this.getBlockHTML(block);
+    return this.getBlockHTML(block);
 
     return (
       <Draggable draggableId={`draggable_block_${id}_${index}`} index={index}>

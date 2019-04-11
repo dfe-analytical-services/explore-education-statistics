@@ -17,30 +17,16 @@ class EditableContentBlock extends Component<Props> {
     } = this.props;
 
 
-    return content.length > 0 ? (
-      <Droppable droppableId={`content-block-droppable-${id}`} type="content">
-
-        {(provided, snapshot) => (
-
-          <div
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-          >
-
-
-            {content.map((block, index) => (
+    return content.length > 0 ?
+        content.map((block, index) => (
               <EditableContentSubBlockRenderer
                 block={block}
                 key={`${index}-${block.heading}-${block.type}`}
                 id={ id }
                 index={index}
               />
-            ))}
-
-          </div>
-        )}
-      </Droppable>
-    ) : (
+           ))
+     : (
       <div className="govuk-inset-text">
         There is no content for this section.
       </div>

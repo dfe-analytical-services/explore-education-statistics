@@ -81,7 +81,8 @@ div.ck.ck-editor__editable_inline {
 
 .drag-handle {
   height: 0;
-  position: relative;
+  position: absolute;
+  right: 0px;
   &:before {
     content: '\2630';
     font-size: 2.25rem;
@@ -89,7 +90,7 @@ div.ck.ck-editor__editable_inline {
 
     position: absolute;
     z-index:1000;
-    left: -2.25rem;
+
     top: 10px;
 
     color: #999;
@@ -100,4 +101,18 @@ div.ck.ck-editor__editable_inline {
     font-size: 1.125rem;
     left: -1.125rem;
   }
+}
+
+.reorderable {
+  font-size: 1rem;
+  right: 0px;
+  position: absolute;
+}
+
+.reorderable-relative {
+  position: relative;
+}
+
+.reorderable-absolute {
+  position: absolute;
 }
