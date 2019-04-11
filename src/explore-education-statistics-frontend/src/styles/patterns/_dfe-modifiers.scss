@@ -18,3 +18,10 @@
     margin-left: 0;
   }
 }
+
+.govuk-grid-column-one-quarter {
+  .fixed {
+    position: relative;
+    top: 0;
+  }
+}
