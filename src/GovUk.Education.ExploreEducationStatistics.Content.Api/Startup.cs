@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             app.UseHttpsRedirection();
-            app.UseCors(options => options.WithOrigins("http://localhost:3000").AllowAnyMethod());
+            app.UseCors(options => options.WithOrigins("http://localhost:3000", "http://localhost:3001").AllowAnyMethod());
             app.UseMvc();
 
             var option = new RewriteOptions();

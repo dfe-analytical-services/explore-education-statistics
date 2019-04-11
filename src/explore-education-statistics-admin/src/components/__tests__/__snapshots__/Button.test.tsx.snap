@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button renders correctly with required props 1`] = `
+
+<button aria-disabled="false"
+        class="govuk-button"
+        type="button"
+>
+  Test button
+</button>
+
+`;

@@ -1,0 +1,74 @@
+// Override standard gds styling
+
+.dfe-interactive-map {
+  width: 100%;
+}
+
+.dfe-font-style-normal {
+  font-style: normal;
+}
+
+.dfe-meta-content {
+  .govuk-caption-m {
+    display: inline;
+  }
+
+  dd {
+    display: inline;
+    margin-left: 0;
+  }
+}
+
+.dfe-align--centre {
+  text-align: center;
+}
+
+.dfe-align--left {
+  text-align: left;
+}
+
+.dfe-align--right {
+  text-align: right;
+}
+
+h1.govuk-panel__title {
+  color: govuk-colour('white');
+}
+// Admin navigation
+
+.app-navigation {
+  background: govuk-colour('grey-4');
+  display: block;
+  margin-bottom: 2rem;
+}
+
+.app-navigation__list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.app-navigation__list li {
+  margin-bottom: 0;
+  padding: 1rem 0.5rem;
+}
+
+.app-navigation__list li a {
+  font-weight: 700;
+  padding: 1rem 1rem 0.7rem;
+  text-decoration: none;
+}
+
+.app-navigation__list li a:hover {
+  border-bottom: 0.3rem solid $govuk-link-hover-colour;
+}
+
+.app-navigation--current-page a:visited {
+  border-bottom: 0.3rem solid $govuk-link-colour;
+}
+
+.app-navigation--current-page a {
+  border-bottom: 0.3rem solid $govuk-link-colour;
+}

@@ -1,0 +1,119 @@
+// Dashboard tiles
+
+.dfe-dash-tiles {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.dfe-dash-tiles__tile--hidden {
+  display: none;
+}
+
+.dfe-dash-tiles--2-in-row {
+  margin-top: 0;
+  padding-top: 0;
+
+  .dfe-dash-tiles__tile {
+    flex-basis: 48%;
+    margin: 1%;
+    @include govuk-media-query($until: tablet) {
+      flex-basis: 100%;
+    }
+  }
+}
+
+.dfe-dash-tiles--3-in-row {
+  margin-top: 0;
+  padding-top: 0;
+
+  .dfe-dash-tiles__tile {
+    flex-basis: 32%;
+    margin: 1% 1% 2% 0;
+    @include govuk-media-query($until: tablet) {
+      flex-basis: 100%;
+    }
+  }
+}
+
+.dfe-dash-tiles--4-in-row {
+  margin-top: 0;
+  padding-top: 0;
+
+  .dfe-dash-tiles__tile {
+    flex-basis: 24.5%;
+    margin: 1% 0.5% 2% 0;
+    @include govuk-media-query($until: tablet) {
+      flex-basis: 100%;
+    }
+  }
+}
+
+.dfe-dash-tiles__tile {
+  background: govuk-colour('grey-4');
+  // border-top: 1px solid $govuk-border-colour;
+  box-sizing: border-box;
+  display: flex;
+  // flex-basis: 23%;
+  flex-direction: column;
+  // justify-content: space-between;
+  // margin: 2% 2% 1% 0;
+  padding: 16px 16px 0;
+  // position: relative;
+
+  .dfe-dash-tiles__heading {
+    margin-bottom: 0;
+  }
+
+  .govuk-details__summary-text {
+    font-size: 1rem;
+    line-height: 0.8rem;
+  }
+
+  /*.referenceLink {
+    @include govuk-font(14);
+    line-height: 1rem !important;
+  }
+
+  .govuk-tag {
+    background: none;
+    bottom: 100%;
+    color: $govuk-text-colour;
+    font-weight: normal;
+    left: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    position: absolute;
+  }
+
+  .increase,
+  .decrease,
+  .level {
+    color: $govuk-text-colour;
+    font-size: 1.3rem;
+    font-weight: normal;
+  }
+
+  .decrease::after,
+  .increase::after,
+  .level::after {
+    color: $govuk-border-colour;
+    display: inline-block;
+    padding-right: 0.1em;
+  }
+
+  .decrease::after {
+    content: '\25BC';
+  }
+
+  .increase::after {
+    content: '\25B2';
+  }
+
+  .level::after {
+    color: $govuk-border-colour;
+    content: '\25CF';
+    margin-left: 2px;
+    margin-right: 5px;
+  }
+  */
+}
