@@ -76,6 +76,7 @@ const PublicationPage = () => {
               </li>
             </ul>
           </Details>
+          <img src="/static/images/govuk-crest.png" alt="" />
         </div>
 
         <div className="govuk-grid-column-one-third">
