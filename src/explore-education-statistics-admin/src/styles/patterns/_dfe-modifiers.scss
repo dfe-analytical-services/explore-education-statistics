@@ -19,13 +19,25 @@
   }
 }
 
+.dfe-align--centre {
+  text-align: center;
+}
+
+.dfe-align--left {
+  text-align: left;
+}
+
+.dfe-align--right {
+  text-align: right;
+}
+
 h1.govuk-panel__title {
-  color: govuk-colour("white");
+  color: govuk-colour('white');
 }
 // Admin navigation
 
 .app-navigation {
-  background: govuk-colour("grey-4");
+  background: govuk-colour('grey-4');
   display: block;
   margin-bottom: 2rem;
 }

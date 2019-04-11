@@ -1,16 +1,16 @@
-import React from "react";
+import React from 'react';
 
-import Details from "../components/Details";
-import Link from "../components/Link";
-import PrototypeAbsenceData from "./components/PrototypeAbsenceData";
-import PrototypeDataSample from "./components/PrototypeDataSample";
-import PrototypeMap from "./components/PrototypeMap";
-import PrototypePage from "./components/PrototypePage";
-import {PrototypeEditableContent} from "./components/PrototypeEditableContent";
-import TabsSection from "../components/TabsSection";
+import Details from '../components/Details';
+import Link from '../components/Link';
+import PrototypeAbsenceData from './components/PrototypeAbsenceData';
+import PrototypeDataSample from './components/PrototypeDataSample';
+import PrototypeMap from './components/PrototypeMap';
+import PrototypePage from './components/PrototypePage';
+import { PrototypeEditableContent } from './components/PrototypeEditableContent';
+import TabsSection from '../components/TabsSection';
 
-import PrototypeEditableAccordionSection from "./components/PrototypeEditableAccordionSection";
-import PrototypeAccordion from "./components/PrototypeAccordion";
+import PrototypeEditableAccordionSection from './components/PrototypeEditableAccordionSection';
+import PrototypeAccordion from './components/PrototypeAccordion';
 
 const PublicationPage = () => {
   let mapRef: PrototypeMap | null = null;
@@ -19,47 +19,50 @@ const PublicationPage = () => {
     <PrototypePage
       breadcrumbs={[
         {
-          link: "/prototypes/browse-releases-find",
-          text: "Find statistics and download data"
+          link: '/prototypes/browse-releases-find',
+          text: 'Find statistics and download data',
         },
-        {text: "Absence statistics for schools in England", link: "#"}
+        { text: 'Absence statistics for schools in England', link: '#' },
       ]}
     >
+      <strong className="govuk-tag govuk-!-margin-bottom-2">
+        {' '}
+        This is the latest data{' '}
+      </strong>
+      <h1 className="govuk-heading-xl">
+        Pupil absence statistics and data for schools in England
+      </h1>
+      <dl className="dfe-meta-content">
+        <dt className="govuk-caption-m">Published:</dt>
+        <dd>
+          <strong>22 March 2018</strong>
+        </dd>
+      </dl>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <strong className="govuk-tag govuk-!-margin-bottom-2">
-            {" "}
-            This is the latest data{" "}
-          </strong>
-          <PrototypeEditableContent
-            content={`
-          <h1 className="govuk-heading-xl">
-            Pupil absence statistics and data for schools in England
-          </h1>
-          `} />
-
-          <dl className="dfe-meta-content">
-            <dt className="govuk-caption-m">Published:</dt>
-            <dd>
-              <strong>22 March 2018</strong>
-            </dd>
-          </dl>
-
-          <PrototypeEditableContent
-            content={`
-          <p className="govuk-body">
-            Read national statistical summaries and definitions, view charts and
-            tables and download data files across a range of pupil absence
-            subject areas.
-          </p>
-          <p className="govuk-body">
-            You can also view a regional breakdown of statistics and data within
-            the
-            <a href="#contents-sections-heading-9">
-              <strong>local authorities section</strong>
-            </a>
-          </p>
-          `} />
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-three-quarters">
+              <p className="govuk-body">
+                Read national statistical summaries and definitions, view charts
+                and tables and download data files across a range of pupil
+                absence subject areas.
+              </p>
+              <p className="govuk-body">
+                You can also view a regional breakdown of statistics and data
+                within the
+                <a href="#contents-sections-heading-9">
+                  <strong>local authorities section</strong>
+                </a>
+              </p>
+            </div>
+            <div className="govk-grid-column-one-quarter dfe-align--centre">
+              <img
+                src="/static/images/UKSA-quality-mark.jpg"
+                width="120"
+                alt=""
+              />
+            </div>
+          </div>
 
           <p>
             <Link to="/prototypes/methodology-absence">
@@ -67,31 +70,34 @@ const PublicationPage = () => {
               methodology and terminology
             </Link>
           </p>
-
-          <Details summary="Download underlying data files">
-            <ul className="govuk-list">
-              <li>
-                <a href="#" className="govuk-link">
-                  Download pdf files
-                </a>
-              </li>
-              <li>
-                <a href="#" className="govuk-link">
-                  Download Excel files
-                </a>
-              </li>
-              <li>
-                <a href="#" className="govuk-link">
-                  Download .csv files
-                </a>
-              </li>
-              <li>
-                <a href="#" className="govuk-link">
-                  Access API
-                </a>
-              </li>
-            </ul>
-          </Details>
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-one-half">
+              <Details summary="Download underlying data files">
+                <ul className="govuk-list">
+                  <li>
+                    <a href="#" className="govuk-link">
+                      Download pdf files
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="govuk-link">
+                      Download Excel files
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="govuk-link">
+                      Download .csv files
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="govuk-link">
+                      Access API
+                    </a>
+                  </li>
+                </ul>
+              </Details>
+            </div>
+          </div>
         </div>
 
         <div className="govuk-grid-column-one-third">
@@ -102,7 +108,7 @@ const PublicationPage = () => {
 
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <span className="govuk-caption-m govuk-caption-inline">
-                For school year:{" "}
+                For school year:{' '}
               </span>
               2016/17 (latest data)
             </h3>
@@ -170,7 +176,8 @@ const PublicationPage = () => {
             </Details>
 
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <span className="govuk-caption-m">Next update: </span><PrototypeEditableContent content={`22 March 2019`} />
+              <span className="govuk-caption-m">Next update: </span>
+              <PrototypeEditableContent content={`22 March 2019`} />
             </h3>
             <p className="govuk-caption-m govuk-!-margin-top-0">
               <a href="#">Notify me</a>
@@ -194,7 +201,7 @@ const PublicationPage = () => {
           </aside>
         </div>
       </div>
-      <hr/>
+      <hr />
       <h2 className="govuk-heading-l">
         Latest headline facts and figures - 2016/17
       </h2>
@@ -206,36 +213,36 @@ const PublicationPage = () => {
         chartData={[
           {
             authorised: 4.2,
-            name: "2012/13",
+            name: '2012/13',
             overall: 5.3,
-            unauthorised: 1.1
+            unauthorised: 1.1,
           },
           {
             authorised: 3.5,
-            name: "2013/14",
+            name: '2013/14',
             overall: 4.5,
-            unauthorised: 1.1
+            unauthorised: 1.1,
           },
           {
             authorised: 3.5,
-            name: "2014/15",
+            name: '2014/15',
             overall: 4.6,
-            unauthorised: 1.1
+            unauthorised: 1.1,
           },
           {
             authorised: 3.4,
-            name: "2015/16",
+            name: '2015/16',
             overall: 4.6,
-            unauthorised: 1.1
+            unauthorised: 1.1,
           },
           {
             authorised: 3.4,
-            name: "2016/17",
+            name: '2016/17',
             overall: 4.7,
-            unauthorised: 1.3
-          }
+            unauthorised: 1.3,
+          },
         ]}
-        chartDataKeys={["unauthorised", "authorised", "overall"]}
+        chartDataKeys={['unauthorised', 'authorised', 'overall']}
       />
       <h2 className="govuk-heading-l">Contents</h2>
       <PrototypeAccordion id="contents-sections">
@@ -255,7 +262,8 @@ const PublicationPage = () => {
               local authorities also use the statistics to compare their local
               absence rates to regional and national averages for different pupil
               groups.
-            </p>`} />
+            </p>`}
+          />
         </PrototypeEditableAccordionSection>
 
         <PrototypeEditableAccordionSection heading="Absence rates">
@@ -267,7 +275,8 @@ const PublicationPage = () => {
             possible sessions for all pupils, where overall absence is the sum
             of authorised and unauthorised absence and one session is equal to
             half a day.
-            `} />
+            `}
+            />
           </Details>
           <PrototypeDataSample
             sectionId="absenceRates"
@@ -276,37 +285,37 @@ const PublicationPage = () => {
             yAxisLabel="Absence Rate"
             chartData={[
               {
-                name: "2012/13",
+                name: '2012/13',
                 primary: 4.7,
-                "primary and secondary": 5.9,
-                secondary: 7.3
+                'primary and secondary': 5.9,
+                secondary: 7.3,
               },
               {
-                name: "2013/14",
+                name: '2013/14',
                 primary: 3.9,
-                "primary and secondary": 4.3,
-                secondary: 5.0
+                'primary and secondary': 4.3,
+                secondary: 5.0,
               },
               {
-                name: "2014/15",
+                name: '2014/15',
                 primary: 4.6,
-                "primary and secondary": 5.8,
-                secondary: 7.1
+                'primary and secondary': 5.8,
+                secondary: 7.1,
               },
               {
-                name: "2015/16",
+                name: '2015/16',
                 primary: 3.8,
-                "primary and secondary": 4.0,
-                secondary: 4.6
+                'primary and secondary': 4.0,
+                secondary: 4.6,
               },
               {
-                name: "2016/17",
+                name: '2016/17',
                 primary: 4.7,
-                "primary and secondary": 5.8,
-                secondary: 7.1
-              }
+                'primary and secondary': 5.8,
+                secondary: 7.1,
+              },
             ]}
-            chartDataKeys={["primary", "secondary", "primary and secondary"]}
+            chartDataKeys={['primary', 'secondary', 'primary and secondary']}
           />
           <PrototypeEditableContent
             content={`
@@ -353,7 +362,8 @@ const PublicationPage = () => {
             session during the school year, this is similar to the previous year
             (91.7 per cent in 2015/16).
           </p>
-          `} />
+          `}
+          />
         </PrototypeEditableAccordionSection>
 
         <PrototypeEditableAccordionSection heading="Persistent absence">
@@ -373,7 +383,8 @@ const PublicationPage = () => {
               the methodologies used in previous years, please see the
               <a href="#">guide to absence statistics</a>.
             </p>
-            `} />
+            `}
+            />
           </Details>
           <PrototypeDataSample
             sectionId="persistentAbsence"
@@ -382,37 +393,37 @@ const PublicationPage = () => {
             yAxisLabel="Persistent Absence Rate"
             chartData={[
               {
-                name: "2012/13",
+                name: '2012/13',
                 primary: 14.7,
-                "primary and secondary": 18.9,
-                secondary: 23.3
+                'primary and secondary': 18.9,
+                secondary: 23.3,
               },
               {
-                name: "2013/14",
+                name: '2013/14',
                 primary: 13.9,
-                "primary and secondary": 18.3,
-                secondary: 22.0
+                'primary and secondary': 18.3,
+                secondary: 22.0,
               },
               {
-                name: "2014/15",
+                name: '2014/15',
                 primary: 14.6,
-                "primary and secondary": 18.8,
-                secondary: 24.1
+                'primary and secondary': 18.8,
+                secondary: 24.1,
               },
               {
-                name: "2015/16",
+                name: '2015/16',
                 primary: 13.8,
-                "primary and secondary": 18.0,
-                secondary: 22.6
+                'primary and secondary': 18.0,
+                secondary: 22.6,
               },
               {
-                name: "2016/17",
+                name: '2016/17',
                 primary: 14.7,
-                "primary and secondary": 18.9,
-                secondary: 24.1
-              }
+                'primary and secondary': 18.9,
+                secondary: 24.1,
+              },
             ]}
-            chartDataKeys={["primary", "secondary", "primary and secondary"]}
+            chartDataKeys={['primary', 'secondary', 'primary and secondary']}
           />
           <PrototypeEditableContent
             content={`
@@ -441,7 +452,8 @@ const PublicationPage = () => {
             times higher for persistent absentees compared to other pupils, at
             7.6 per cent and 2.0 per cent respectively.
           </p>
-          `} />
+          `}
+          />
         </PrototypeEditableAccordionSection>
 
         <PrototypeEditableAccordionSection heading="Reasons for absence">
@@ -466,7 +478,8 @@ const PublicationPage = () => {
               One or more sessions missed due to each reason: The number of
               pupil enrolments missing at least one session due to each reason.
             </p>
-            `} />
+            `}
+            />
           </div>
           <PrototypeDataSample
             sectionId="reasonAbsence"
@@ -475,37 +488,37 @@ const PublicationPage = () => {
             yAxisLabel="Absence Rate"
             chartData={[
               {
-                "family holiday": 0.7,
+                'family holiday': 0.7,
                 illness: 3.2,
-                name: "2012/13",
-                overall: 3.9
+                name: '2012/13',
+                overall: 3.9,
               },
               {
-                "family holiday": 0.7,
+                'family holiday': 0.7,
                 illness: 3.5,
-                name: "2013/14",
-                overall: 4.2
+                name: '2013/14',
+                overall: 4.2,
               },
               {
-                "family holiday": 0.7,
+                'family holiday': 0.7,
                 illness: 3.4,
-                name: "2014/15",
-                overall: 4.1
+                name: '2014/15',
+                overall: 4.1,
               },
               {
-                "family holiday": 0.7,
+                'family holiday': 0.7,
                 illness: 3.3,
-                name: "2015/16",
-                overall: 4.0
+                name: '2015/16',
+                overall: 4.0,
               },
               {
-                "family holiday": 0.7,
+                'family holiday': 0.7,
                 illness: 3.7,
-                name: "2016/17",
-                overall: 4.4
-              }
+                name: '2016/17',
+                overall: 4.4,
+              },
             ]}
-            chartDataKeys={["overall", "illness", "family holiday"]}
+            chartDataKeys={['overall', 'illness', 'family holiday']}
           />
           <PrototypeEditableContent
             content={`
@@ -553,7 +566,8 @@ const PublicationPage = () => {
             ‘regularly’ means ‘in accordance with the rules prescribed by the
             school’.
           </p>
-          `} />
+          `}
+          />
         </PrototypeEditableAccordionSection>
         <PrototypeEditableAccordionSection heading="Distribution of absence">
           <PrototypeEditableContent
@@ -581,7 +595,8 @@ const PublicationPage = () => {
             highest in the spring term and lowest in the summer term, and the
             unauthorised rate is highest in the summer term.
           </p>
-          `} />
+          `}
+          />
         </PrototypeEditableAccordionSection>
         <PrototypeEditableAccordionSection heading="Absence by pupil characteristics">
           <PrototypeEditableContent
@@ -637,7 +652,8 @@ const PublicationPage = () => {
             Traveller of Irish heritage pupils had the highest rate at 64 per
             cent and Chinese pupils had the lowest rate at 3.1 per cent.
           </p>
-          `} />
+          `}
+          />
         </PrototypeEditableAccordionSection>
         <PrototypeEditableAccordionSection heading="Absence for four year olds">
           <PrototypeEditableContent
@@ -651,7 +667,9 @@ const PublicationPage = () => {
             Absence recorded for four year olds is not treated as 'authorised'
             or 'unauthorised' and is therefore reported as overall absence only.
           </p>
-          `} />
+          <p>The Department has a set of <a href="#">statistical policies</a> in line with the Code of Practice for Official Statistics.</p>
+          `}
+          />
         </PrototypeEditableAccordionSection>
         <PrototypeEditableAccordionSection heading="Pupil referral unit absence">
           <PrototypeEditableContent
@@ -662,13 +680,14 @@ const PublicationPage = () => {
             of enrolments in pupil referral units who were persistent absentees
             was 73.9 per cent in 2016/17, compared to 72.5 per cent in 2015/16.
           </p>
-          `} />
+          `}
+          />
         </PrototypeEditableAccordionSection>
         <PrototypeEditableAccordionSection
           heading="Pupil absence by local authority"
           onToggle={isOpen => mapRef && mapRef.refresh()}
         >
-          <PrototypeAbsenceData ref={el => el && (mapRef = el.mapRef)}/>
+          <PrototypeAbsenceData ref={el => el && (mapRef = el.mapRef)} />
 
           <PrototypeEditableContent
             content={`
@@ -690,7 +709,8 @@ const PublicationPage = () => {
             published within this release, in the accompanying underlying data
             files.
           </p>
-          `} />
+          `}
+          />
         </PrototypeEditableAccordionSection>
       </PrototypeAccordion>
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
@@ -720,7 +740,39 @@ const PublicationPage = () => {
             </li>
           </ul>
         </PrototypeEditableAccordionSection>
-        <PrototypeEditableAccordionSection heading="Feedback and questions" headingTag="h3">
+        <PrototypeEditableAccordionSection
+          heading="National statistics"
+          headingTag="h3"
+        >
+          <p>
+            The United Kingdom Statistics Authority designated these statistics
+            as National Statistics in <a href="#">Month Year</a> in accordance
+            with the Statistics and Registration Service Act 2007 and signifying
+            compliance with the Code of Practice for Statistics.
+          </p>
+          <p>
+            Designation can be broadly interpreted to mean that the statistics:
+          </p>
+          <ul className="govuk-list govuk-list--bullet">
+            <li>meet identified user needs;</li>
+            <li>are well explained and readily accessible;</li>
+            <li>are produced according to sound methods, and</li>
+            <li>
+              are managed impartially and objectively in the public interest
+            </li>
+          </ul>
+          <p>
+            Once statistics have been designated as National Statistics it is a
+            statutory requirement that the Code of Practice shall continue to be
+            observed. Information on improvements made to these statistics to
+            continue their compliance with the Code of Practice are provided in
+            this <a href="#">accompanying document</a>
+          </p>
+        </PrototypeEditableAccordionSection>
+        <PrototypeEditableAccordionSection
+          heading="Feedback and questions"
+          headingTag="h3"
+        >
           <ul className="govuk-list">
             <li>
               <a href="#" className="govuk-link">
@@ -743,31 +795,31 @@ const PublicationPage = () => {
           <h4 className="govuk-heading-">Media enquiries</h4>
           <address className="govuk-body dfe-font-style-normal">
             Press Office News Desk
-            <br/>
-            Department for Education <br/>
-            Sanctuary Buildings <br/>
-            Great Smith Street <br/>
+            <br />
+            Department for Education <br />
+            Sanctuary Buildings <br />
+            Great Smith Street <br />
             London
-            <br/>
-            SW1P 3BT <br/>
+            <br />
+            SW1P 3BT <br />
             Telephone: 020 7783 8300
           </address>
 
           <h4 className="govuk-heading-">Other enquiries</h4>
           <address className="govuk-body dfe-font-style-normal">
             Data Insight and Statistics Division
-            <br/>
-            Level 1<br/>
+            <br />
+            Level 1<br />
             Department for Education
-            <br/>
-            Sanctuary Buildings <br/>
+            <br />
+            Sanctuary Buildings <br />
             Great Smith Street
-            <br/>
+            <br />
             London
-            <br/>
-            SW1P 3BT <br/>
+            <br />
+            SW1P 3BT <br />
             Telephone: 020 7783 8300
-            <br/>
+            <br />
             Email: <a href="#">Schools.statistics@education.gov.uk</a>
           </address>
         </PrototypeEditableAccordionSection>
