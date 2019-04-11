@@ -15,18 +15,18 @@ using Microsoft.Extensions.Logging;
 namespace GovUk.Education.ExploreStatistics.Admin.Controllers
 {
     [Authorize]
-    public class UploadController : Controller
+    public class FileController : Controller
     {
         private IFileStorageService _fileStorageService;
         private readonly ILogger _logger;
 
-        public UploadController(ILogger<UploadController> logger, IFileStorageService fileStorageService)
+        public FileController(ILogger<FileController> logger, IFileStorageService fileStorageService)
         {
             _logger = logger;
             _fileStorageService = fileStorageService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> List()
         {
             var files = _fileStorageService.ListFiles("releases");
             
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreStatistics.Admin.Controllers
                 await _fileStorageService.UploadFileAsync(filePath, file.FileName, releaseId);
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction("List");
         }
     }
 }

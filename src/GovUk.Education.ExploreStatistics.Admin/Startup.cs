@@ -53,6 +53,7 @@ namespace GovUk.Education.ExploreStatistics.Admin
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddTransient<IFileStorageService, FileStorageService>();
+            services.AddTransient<INotificationService, NotificationService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
