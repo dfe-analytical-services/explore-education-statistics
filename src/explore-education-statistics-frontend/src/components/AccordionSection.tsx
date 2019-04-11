@@ -18,6 +18,12 @@ export interface AccordionSectionProps {
   onToggle?: (open: boolean) => void;
 }
 
+export const classes = {
+  section: 'govuk-accordion__section',
+  sectionButton: 'govuk-accordion__section-button',
+  sectionContent: 'govuk-accordion__section-content',
+};
+
 const AccordionSection = ({
   caption,
   className,
@@ -41,7 +47,7 @@ const AccordionSection = ({
           );
         }
       }}
-      className={classNames('govuk-accordion__section', className, {
+      className={classNames(classes.section, className, {
         'govuk-accordion__section--expanded': open,
       })}
     >
@@ -54,7 +60,7 @@ const AccordionSection = ({
           {
             className: 'govuk-accordion__section-heading',
           },
-          <span className="govuk-accordion__section-button" id={headingId}>
+          <span className={classes.sectionButton} id={headingId}>
             {heading}
           </span>,
         )}
@@ -64,7 +70,7 @@ const AccordionSection = ({
       </div>
 
       <div
-        className="govuk-accordion__section-content"
+        className={classes.sectionContent}
         aria-labelledby={headingId}
         id={contentId}
       >
