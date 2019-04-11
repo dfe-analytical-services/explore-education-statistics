@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -12,6 +13,9 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Notify.Client;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier
 {
@@ -21,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         private const string StorageConnectionName = "TableStorageConnString";
         private const string NotifyApiKeyName = "NotifyApiKey";
         private const string BaseUrlName = "BaseUrl";
+        private const string WebApplicationBaseUrlName = "WebApplicationBaseUrl";
         private const string TokenSecretKeyName = "TokenSecretKey";
         private const string NotificationEmailTemplateIdName = "PublicationNotificationEmailTemplateId";
         private const string VerificationEmailTemplateIdName = "VerificationEmailTemplateId";
@@ -31,14 +36,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
 
         [FunctionName("PublicationNotifier")]
         public async void Run1([QueueTrigger("publication-queue", Connection = "")]
-            string publicationId, ILogger log, ExecutionContext context)
+            string slug, ILogger log, ExecutionContext context)
         {            
             var config = LoadAppSettings(context);
             var emailTemplateId = config.GetValue<string>(NotificationEmailTemplateIdName);
             var baseUrl = config.GetValue<string>(BaseUrlName);
+            var webApplicationBaseUrl = config.GetValue<string>(WebApplicationBaseUrlName);
             var client = GetNotifyClient(config);
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
-            var partitionKey = "publication-" + publicationId;
+            var partitionKey = slug;
             var table = GetTable(config).Result;
             var query = new TableQuery<SubscriptionEntity>()
                 .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
@@ -57,9 +63,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                        var unsubscribeToken = _tokenService.GenerateToken(tokenSecretKey, entity.RowKey, log);
                        var vals = new Dictionary<string, dynamic>
                            {
-                               {"publication_name", "My Publication"},
-                               {"publication_link", "https://somelink"},
-                               {"unsubscribe_link", baseUrl + publicationId + "/unsubscribe/" + unsubscribeToken}
+                               {"publication_name", entity.title},
+                               {"publication_link", webApplicationBaseUrl + "statistics/" + entity.PartitionKey},
+                               {"unsubscribe_link", baseUrl + slug + "/unsubscribe/" + unsubscribeToken}
                            };
                        
                        _emailService.sendEmail(client, entity.RowKey, emailTemplateId, vals); 
@@ -71,64 +77,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         }
         
         [FunctionName("PublicationSubscribe")]
-        public async Task<HttpResponseMessage> Run2([HttpTrigger(AuthorizationLevel.Function, "post", Route = "publication/subscribe/")]HttpRequestMessage req, 
+        public async Task<IActionResult> Run2([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "publication/subscribe/")]HttpRequest req, 
             ILogger log, ExecutionContext context)
-        {
-            var postData = await req.Content.ReadAsFormDataAsync();
-            var missingFields = new List<string>();
+        {            
+            string email = req.Query["email"];
+            string slug = req.Query["slug"];
+            string title = req.Query["title"];
+            
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic data = JsonConvert.DeserializeObject(requestBody);
+         
+            email = email ?? data?.email;
+            slug = slug ?? data?.slug;
+            title = title ?? data?.title;
+            
             var config = LoadAppSettings(context);
             var baseUrl = config.GetValue<string>(BaseUrlName);
             var client = GetNotifyClient(config);
             var emailTemplateId = config.GetValue<string>(VerificationEmailTemplateIdName);
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
 
-            if (postData["email"] == null)
+            log.LogInformation($"email: {email} slug: {slug} title: {title}");
+
+            if (email == null || slug == null || title == null)
             {
-                missingFields.Add("email");
-            }
-            if (postData["publication-id"] == null)
-            {
-                missingFields.Add("publication-id");
-            }
-            if (missingFields.Any())
-            {
-                var missingFieldsSummary = String.Join(", ", missingFields);
-                return req.CreateResponse(HttpStatusCode.BadRequest, $"Missing field(s): {missingFieldsSummary}");
+                return new BadRequestObjectResult("Please pass a valid email & publication");
             }
 
-            var email = postData["email"];
-            var publicationId = postData["publication-id"];
-           
             try
             {
                 var table = GetTable(config).Result;
                 var activationCode = _tokenService.GenerateToken(tokenSecretKey, email, log);
                 
-                await AddSubscriber(table, new SubscriptionEntity(postData["publication-id"], email));
+                await UpdateSubscriber(table, new SubscriptionEntity(slug, email, title));
                 var vals = new Dictionary<string, dynamic>
                 {
-                    {"publication_name", "My Publication"},
-                    {"verification_link", baseUrl + publicationId + "/verify-subscription/" + activationCode}
+                    {"publication_name", title},
+                    {"verification_link", baseUrl + slug + "/verify-subscription/" + activationCode}
                 };
                                 
                 _emailService.sendEmail(client, email, emailTemplateId, vals);
-                return req.CreateResponse(HttpStatusCode.OK, "Thanks! Please check your email."); 
+                return (ActionResult) new OkObjectResult("Thanks! Please check your email.");
             }
             catch (Exception ex)
             {
-                log.LogError(ex.StackTrace);
-                
-                return req.CreateResponse(HttpStatusCode.InternalServerError, new
-                {
-                    status = false,
-                    message = $"There are problems storing your subscription: {ex.GetType()}"
-                });
+                return new BadRequestObjectResult($"There are problems storing your subscription: {ex.GetType()}");
             }
         }
         
         [FunctionName("PublicationUnsubscribe")]
-        public async Task<HttpResponseMessage> Run3([HttpTrigger(AuthorizationLevel.Function, "get", Route = "publication/{publicationId}/unsubscribe/{token}")]
-            HttpRequestMessage req, ILogger log, ExecutionContext context, string publicationId, string token)
+        public async Task<HttpResponseMessage> Run3([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{slug}/unsubscribe/{token}")]
+            HttpRequestMessage req, ILogger log, ExecutionContext context, string slug, string token)
         {
             var config = LoadAppSettings(context);
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
@@ -137,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             if (email != null)
             {
                 var table = GetTable(config).Result;
-                var sub = new SubscriptionEntity(publicationId, email);
+                var sub = new SubscriptionEntity(slug, email, null);
                 await RemoveSubscriber(table, sub);
                 return req.CreateResponse(HttpStatusCode.OK, "Thanks! Unsubscribed.");
             }
@@ -146,8 +145,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         }
        
         [FunctionName("PublicationSubscriptionVerify")]
-        public async Task<HttpResponseMessage> Run4([HttpTrigger(AuthorizationLevel.Function, "get", Route = "publication/{publicationId}/verify-subscription/{token}")]
-            HttpRequestMessage req, ILogger log, ExecutionContext context, string publicationId, string token)
+        public async Task<HttpResponseMessage> Run4([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{slug}/verify-subscription/{token}")]
+            HttpRequestMessage req, ILogger log, ExecutionContext context, string slug, string token)
         {
             var config = LoadAppSettings(context);
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
@@ -156,9 +155,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             if (email != null)
             {
                 var table = GetTable(config).Result;
-                var sub = new SubscriptionEntity(publicationId, email);
+                var sub = new SubscriptionEntity(slug, email, null);
                 sub.Verified = true;
-                await AddSubscriber(table, sub);
+                await UpdateSubscriber(table, sub);
                 return req.CreateResponse(HttpStatusCode.OK, "Thanks! Verified.");
             }
            
@@ -174,9 +173,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                 .Build();
         }
         
-        private static async Task AddSubscriber(CloudTable table, SubscriptionEntity subscription)
+        private static async Task UpdateSubscriber(CloudTable table, SubscriptionEntity subscription)
         {   
-            await table.ExecuteAsync(TableOperation.InsertOrReplace(subscription));
+            await table.ExecuteAsync(TableOperation.InsertOrMerge(subscription));
         }
         
         private static async Task RemoveSubscriber(CloudTable table, SubscriptionEntity subscription)
