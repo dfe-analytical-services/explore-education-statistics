@@ -591,7 +591,12 @@
               "name": "TableStorageConnString",
               "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]"
             }
-          ]
+          ],
+          "cors": {
+            "allowedOrigins": [
+              "*"
+            ]
+          }
         }
       }
     }
