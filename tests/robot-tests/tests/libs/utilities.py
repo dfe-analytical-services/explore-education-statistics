@@ -27,11 +27,43 @@ def css_should_match_x_times(css, times):
     raise AssertionError("\"CSS Should Match X Times\" found " + str(len(elements)) + " matching elements, not " + str(times) + " elements!")
 
 def user_deletes_text_until_block_is_empty(selector):
+  element = None
   if selector.startswith('xpath:'):
     selector = selector[6:]
     element = s2l._current_browser().find_element_by_xpath(selector)
   elif selector.startswith('css:'):
     selector = selector[4:]
-    element = s2l._current_browser().find_element_by_css(selector)
+    element = s2l._current_browser().find_element_by_css_selector(selector)
   while element.text:
     ActionChains(s2l.driver).send_keys(Keys.DELETE).perform()
+
+def user_clicks_element_containing_text(text):
+  s2l._current_browser().find_element_by_xpath('//*[contains(text(), "%s")]' % text).click()
+
+def user_clicks_element_child_containing_text(selector, text):
+  element = None
+  if selector.startswith('xpath:'):
+    selector = selector[6:]
+    element = s2l._current_browser().find_element_by_xpath(selector)
+  elif selector.startswith('css:'):
+    selector = selector[4:]
+    element = s2l._current_browser().find_element_by_css_selector(selector)
+
+  element.find_element_by_xpath('.//*[contains(text(), "%s")]' % text).click()
+
+def user_drags_and_drops(drag_selector, drop_selector):
+  drag_elem = None
+  drop_elem = None
+  if drag_selector.startswith('css:'):
+    drag_selector = drag_selector[4:]
+    drag_elem = s2l._current_browser().find_element_by_css_selector(drag_selector)
+  if drop_selector.startswith('css:'):
+    drop_selector = drop_selector[4:]
+    drop_elem = s2l._current_browser().find_element_by_css_selector(drop_selector)
+
+  # https://github.com/react-dnd/react-dnd/issues/1195#issuecomment-456370983
+  action = ActionChains(s2l.driver)
+  action.click_and_hold(drag_elem).perform()
+  action.move_to_element(drop_elem).perform()
+  action.move_by_offset(0, 0).pause(0.01).perform()
+  action.release().perform()
