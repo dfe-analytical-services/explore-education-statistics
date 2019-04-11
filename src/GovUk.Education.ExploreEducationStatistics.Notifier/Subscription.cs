@@ -6,12 +6,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
     public class SubscriptionEntity : TableEntity
     {
         public Boolean Verified { get; set; }
-
-        public SubscriptionEntity(string id, string email)
+        
+        public string title { get; set; }
+        
+        public SubscriptionEntity(string id, string email, string title)
         {
-            this.PartitionKey = id;
-            this.RowKey = email;
-            this.Verified = false;
+            PartitionKey = id;
+            RowKey = email;
+            Verified = false;
+            this.title = title;
         }
 
         public SubscriptionEntity()
