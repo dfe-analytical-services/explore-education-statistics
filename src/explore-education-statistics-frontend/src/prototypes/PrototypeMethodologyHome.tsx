@@ -5,15 +5,30 @@ import PrototypePage from './components/PrototypePage';
 const HomePage = () => {
   return (
     <PrototypePage>
+      <h1 className="govuk-heading-xl">
+        Education statistics: methodology and glossary
+      </h1>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">
-            Education statistics: methodology and glossary
-          </h1>
           <p className="govuk-body-l">
             Select an option to find the methodology for specific statistics and
             data or our glossary for a list of statistical terms and
             definitions.
+          </p>
+          <h2 className="govuk-heading-m govuk-!-margin-bottom-1">
+            <Link to="/prototypes/methodology-specific">Methodology</Link>
+          </h2>
+          <p className="govuk-body">
+            Browse to find out about the methodology behind specific education
+            statistics and data and how and why they're collected and published.
+          </p>
+
+          <h2 className="govuk-heading-m govuk-!-margin-bottom-1">
+            <Link to="#">Glossary</Link>
+          </h2>
+          <p className="govuk-body">
+            Browse our A to Z list of definitions for terms used across
+            education statistics and data.
           </p>
         </div>
         <div className="govuk-grid-column-one-third">
@@ -33,25 +48,7 @@ const HomePage = () => {
           </aside>
         </div>
       </div>
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-three-quarters">
-          <h2 className="govuk-heading-m govuk-!-margin-bottom-1">
-            <Link to="/prototypes/methodology-specific">Methodology</Link>
-          </h2>
-          <p className="govuk-body">
-            Browse to find out about the methodology behind specific education
-            statistics and data and how and why they're collected and published.
-          </p>
 
-          <h2 className="govuk-heading-m govuk-!-margin-bottom-1">
-            <Link to="#">Glossary</Link>
-          </h2>
-          <p className="govuk-body">
-            Browse our A to Z list of definitions for terms used across
-            education statistics and data.
-          </p>
-        </div>
-      </div>
       <hr />
       <h3 className="govuk-heading-m govuk-!-margin-top-9">Related services</h3>
       <p className="govuk-body">

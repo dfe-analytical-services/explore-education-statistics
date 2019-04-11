@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Converters;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -21,21 +22,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
     }
 
     [JsonConverter(typeof(ContentBlockConverter))]
-    public interface IContentBlock
-    {
-         string Type { get; }
+    [KnownType(typeof(MarkDownBlock))]
+    [KnownType(typeof(InsetTextBlock))]
+    [KnownType(typeof(DataBlock))]
+    public abstract class IContentBlock {
+        
+        public abstract string Type { get;  }
     }
 
     public class MarkDownBlock : IContentBlock
     {
-        public string Type => "MarkDownBlock";
+        public override string Type => "MarkDownBlock";
 
         public string Body { get; set; }
     }
     
     public class InsetTextBlock : IContentBlock
     {
-        public string Type => "InsetTextBlock";
+        public override string Type => "InsetTextBlock";
 
         public string Heading { get; set; }
         
@@ -44,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
 
     public class DataBlock : IContentBlock 
     {
-        public string Type => "DataBlock";
+        public override string Type => "DataBlock";
 
         public string Heading { get; set; }
         

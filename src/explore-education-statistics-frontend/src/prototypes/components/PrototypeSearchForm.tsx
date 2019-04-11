@@ -4,18 +4,21 @@ import styles from './PrototypeSearchForm.module.scss';
 const PrototypeSearchForm = () => (
   <form className={styles.container}>
     <div className="govuk-form-group govuk-!-margin-bottom-0">
-      <label className="govuk-label" htmlFor="search">
-        Find any DfE statistic, publication or indicator
+      <label className="govuk-label govuk-visually-hidden" htmlFor="search">
+        Find on this page
       </label>
 
       <input
-        className="govuk-input govuk-!-width-three-quarters"
+        className="govuk-input"
         id="search"
+        placeholder="Search this page"
         type="search"
       />
-      <button type="submit" className="govuk-button govuk-!-margin-bottom-0">
-        Search
-      </button>
+      <input
+        type="submit"
+        className={styles.dfeSearchButton}
+        value="Search this page"
+      />
     </div>
   </form>
 );

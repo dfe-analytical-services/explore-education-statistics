@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Link from '../../../components/Link';
 import Tabs from '../../../components/Tabs';
 import TabsSection from '../../../components/TabsSection';
 import { baseUrl } from '../../../services/api';
@@ -134,6 +135,13 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
               {this.state.tables.map((table: any, idx) => (
                 <TableRenderer key={`${id}0_table_${idx}`} {...table} />
               ))}
+              <h2 className="govuk-heading-m govuk-!-margin-top-9">
+                Explore and edit this data online
+              </h2>
+              <p>Use our table tool to add and remove data for this table.</p>
+              <Link to={`/table-tool/`} className="govuk-button">
+                Explore data
+              </Link>
             </TabsSection>
           )}
 
@@ -147,6 +155,13 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
                   height={this.props.height}
                 />
               ))}
+              <h2 className="govuk-heading-m govuk-!-margin-top-9">
+                Explore and edit this data online
+              </h2>
+              <p>Use our table tool to add and remove data for this chart.</p>
+              <Link to={`/table-tool/`} className="govuk-button">
+                Explore chart data
+              </Link>
             </TabsSection>
           )}
 
@@ -158,6 +173,13 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
             <div className="govuk-inset-text">
               Data downloads have not yet been implemented within the service.
             </div>
+            <h2 className="govuk-heading-m govuk-!-margin-top-9">
+              Explore and edit this data online
+            </h2>
+            <p>Use our table tool to explore this data.</p>
+            <Link to={`/table-tool/`} className="govuk-button">
+              Explore data
+            </Link>
           </TabsSection>
         </Tabs>
       </div>

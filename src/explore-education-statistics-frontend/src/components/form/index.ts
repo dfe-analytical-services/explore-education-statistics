@@ -9,3 +9,4 @@ export { default as FormRadio } from './FormRadio';
 export { default as FormRadioGroup } from './FormRadioGroup';
 export { default as FormSelect } from './FormSelect';
 export { default as FormTextInput } from './FormTextInput';
+export { default as FormFieldTextInput } from './FormFieldTextInput';

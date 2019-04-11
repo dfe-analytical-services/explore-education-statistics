@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import React, { MouseEventHandler, ReactNode } from 'react';
 
-interface Props {
+export interface ButtonProps {
   children: ReactNode;
   className?: string;
   disabled?: boolean;
@@ -17,7 +17,7 @@ const Button = ({
   onClick,
   disabled = false,
   type = 'button',
-}: Props) => {
+}: ButtonProps) => {
   const classes = classNames(
     'govuk-button',
     {

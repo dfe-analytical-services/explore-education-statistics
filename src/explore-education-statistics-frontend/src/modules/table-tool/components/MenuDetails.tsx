@@ -5,7 +5,7 @@ interface Props {
   children?: ReactNode;
   onToggle?: (isOpen: boolean) => void;
   open?: boolean;
-  summary: string;
+  summary: string | ReactNode;
 }
 
 class MenuDetails extends Component<Props> {

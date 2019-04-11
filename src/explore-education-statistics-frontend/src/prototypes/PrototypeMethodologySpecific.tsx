@@ -18,11 +18,9 @@ const BrowseReleasesPage = () => {
         },
       ]}
     >
+      <h1 className="govuk-heading-xl">Education statistics: methodology</h1>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">
-            Education statistics: methodology
-          </h1>
           <p className="govuk-body-l">
             Browse to find out about the methodology behind specific education
             statistics and data and how and why they're collected and published.

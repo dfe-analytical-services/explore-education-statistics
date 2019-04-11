@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ErrorSummary renders correctly with some errors 1`] = `
+
+<div aria-labelledby="test-errors-title"
+     class="govuk-error-summary"
+     role="alert"
+     tabindex="-1"
+>
+  <h2 class="govuk-error-summary__title"
+      id="test-errors-title"
+  >
+    There is a problem
+  </h2>
+  <div class="govuk-error-summary__body">
+    <ul class="govuk-list govuk-error-summary__list">
+      <li>
+        <a href="#test-error-1">
+          Something went wrong 1
+        </a>
+      </li>
+      <li>
+        <a href="#test-error-2">
+          Something went wrong 2
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+`;

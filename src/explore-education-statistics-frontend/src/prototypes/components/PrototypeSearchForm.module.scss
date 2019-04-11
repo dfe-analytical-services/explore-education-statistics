@@ -1,14 +1,32 @@
 @import '../../styles/govuk-base';
 
 .container {
-  @include govuk-responsive-padding(3);
-
-  background: govuk-colour('grey-3');
-  margin-bottom: govuk-spacing(6);
+  margin-bottom: govuk-spacing(0);
+  position: relative;
 
   @include govuk-media-query($until: tablet) {
     button {
       margin-top: govuk-spacing(2);
     }
+  }
+
+  .dfeSearchButton {
+    background: $govuk-link-colour url('/static/images/search-button.png') 1px -17px;
+    border: 2px solid $govuk-input-border-colour;
+    box-sizing: content-box;
+    height: 36px;
+    padding: 0;
+    position: absolute;
+    right: 0;
+    text-indent: -5000px;
+    width: 36px;
+  }
+
+  .dfeSearchButton:focus,
+  .dfeSearchButton:hover {
+    background: $govuk-link-hover-colour url('/static/images/search-button.png')
+      1px -17px;
+    border: 2px solid $govuk-focus-colour;
+    outline: 0;
   }
 }
