@@ -30,34 +30,46 @@ const PublicationPage = () => {
         { text: 'GCSE and equivalent results in England', link: '#' },
       ]}
     >
+      <strong className="govuk-tag govuk-!-margin-bottom-2">
+        {' '}
+        This is the latest data{' '}
+      </strong>
+      <h1 className="govuk-heading-xl">
+        GCSE and equivalent results in England, 2016 to 2017
+      </h1>
+      <dl className="dfe-meta-content">
+        <dt className="govuk-caption-m">Published: </dt>
+        <dd>
+          <strong>22 March 2018</strong>
+        </dd>
+      </dl>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <strong className="govuk-tag govuk-!-margin-bottom-2">
-            {' '}
-            This is the latest data{' '}
-          </strong>
-          <h1 className="govuk-heading-xl">
-            GCSE and equivalent results in England, 2016 to 2017
-          </h1>
-          <dl className="dfe-meta-content">
-            <dt className="govuk-caption-m">Published: </dt>
-            <dd>
-              <strong>22 March 2018</strong>
-            </dd>
-          </dl>
-          <p className="govuk-body">
-            This statistical first release (SFR) provides information on the
-            achievements in GCSE examinations and other qualifications of young
-            people in academic year 2016 to 2017. This typically covers those
-            starting the academic year aged 15.
-          </p>
-          <p className="govuk-body">
-            You can also view a regional breakdown of statistics and data within
-            the{' '}
-            <a href="#contents-sections-heading-6">
-              <strong>local authorities section</strong>
-            </a>
-          </p>
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-three-quarters">
+              <p className="govuk-body">
+                This statistical first release (SFR) provides information on the
+                achievements in GCSE examinations and other qualifications of
+                young people in academic year 2016 to 2017. This typically
+                covers those starting the academic year aged 15.
+              </p>
+              <p className="govuk-body">
+                You can also view a regional breakdown of statistics and data
+                within the{' '}
+                <a href="#contents-sections-heading-6">
+                  <strong>local authorities section</strong>
+                </a>
+              </p>
+            </div>
+            <div className="govuk-grid-column-one-quarter">
+              <img
+                src="/static/images/UKSA-quality-mark.jpg"
+                alt="UK statistics authority quality mark"
+                height="130"
+                width="130"
+              />
+            </div>
+          </div>
 
           <p>
             <Link to="#">
@@ -624,6 +636,32 @@ const PublicationPage = () => {
               </a>
             </li>
           </ul>
+        </AccordionSection>
+        <AccordionSection heading="National statistics" headingTag="h3">
+          <p className="govuk-body">
+            The United Kingdom Statistics Authority designated these statistics
+            as National Statistics in <a href="#">Month Year</a> in accordance
+            with the Statistics and Registration Service Act 2007 and signifying
+            compliance with the Code of Practice for Statistics.
+          </p>
+          <p className="govuk-body">
+            Designation can be broadly interpreted to mean that the statistics:
+          </p>
+          <ul className="govuk-list govuk-list--bullet">
+            <li>meet identified user needs;</li>
+            <li>are well explained and readily accessible;</li>
+            <li>are produced according to sound methods, and</li>
+            <li>
+              are managed impartially and objectively in the public interest
+            </li>
+          </ul>
+          <p className="govuk-body">
+            Once statistics have been designated as National Statistics it is a
+            statutory requirement that the Code of Practice shall continue to be
+            observed. Information on improvements made to these statistics to
+            continue their compliance with the Code of Practice are provided in
+            this <a href="#">accompanying document</a>
+          </p>
         </AccordionSection>
         <AccordionSection heading="Feedback and questions" headingTag="h3">
           <ul className="govuk-list">

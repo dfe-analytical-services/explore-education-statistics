@@ -76,8 +76,19 @@ class PublicationReleasePage extends Component<Props> {
 
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            <ReactMarkdown className="govuk-body" source={data.summary} />
-
+            <div className="govuk-grid-row">
+              <div className="govuk-grid-column-three-quarters">
+                <ReactMarkdown className="govuk-body" source={data.summary} />
+              </div>
+              <div className="govuk-grid-column-one-quarter">
+                <img
+                  src="/static/images/UKSA-quality-mark.jpg"
+                  alt="UK statistics authority quality mark"
+                  height="130"
+                  width="130"
+                />
+              </div>
+            </div>
             <Details summary="Download underlying data files">
               <ul className="govuk-list">
                 <li>
@@ -222,6 +233,34 @@ class PublicationReleasePage extends Component<Props> {
                 <a href="#">Related policies</a>
               </li>
             </ul>
+          </AccordionSection>
+          <AccordionSection heading="National statistics" headingTag="h3">
+            <p className="govuk-body">
+              The United Kingdom Statistics Authority designated these
+              statistics as National Statistics in <a href="#">Month Year</a> in
+              accordance with the Statistics and Registration Service Act 2007
+              and signifying compliance with the Code of Practice for
+              Statistics.
+            </p>
+            <p className="govuk-body">
+              Designation can be broadly interpreted to mean that the
+              statistics:
+            </p>
+            <ul className="govuk-list govuk-list--bullet">
+              <li>meet identified user needs;</li>
+              <li>are well explained and readily accessible;</li>
+              <li>are produced according to sound methods, and</li>
+              <li>
+                are managed impartially and objectively in the public interest
+              </li>
+            </ul>
+            <p className="govuk-body">
+              Once statistics have been designated as National Statistics it is
+              a statutory requirement that the Code of Practice shall continue
+              to be observed. Information on improvements made to these
+              statistics to continue their compliance with the Code of Practice
+              are provided in this <a href="#">accompanying document</a>
+            </p>
           </AccordionSection>
           <AccordionSection heading="Feedback and questions" headingTag="h3">
             <ul className="govuk-list">
