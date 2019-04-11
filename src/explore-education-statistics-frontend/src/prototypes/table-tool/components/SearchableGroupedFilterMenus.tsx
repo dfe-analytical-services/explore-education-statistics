@@ -43,6 +43,9 @@ class SearchableGroupedFilterMenus<
     const containsSearchTerm = (value: string) =>
       value.search(new RegExp(searchTerm, 'i')) > -1;
 
+    // Remove dots from field name as this does not work well in Robot tests
+    const compositeKeyName = (name as string).replace('.', '-');
+
     const groups = sortBy(Object.entries(menuOptions), ([groupKey]) => groupKey)
       .filter(
         ([_, group]) =>
@@ -53,7 +56,7 @@ class SearchableGroupedFilterMenus<
           ),
       )
       .map(([groupKey, group]) => {
-        const compositeKey = `${name}-${camelCase(groupKey)}`;
+        const compositeKey = `${compositeKeyName}-${camelCase(groupKey)}`;
 
         const isMenuOpen = Boolean(
           group.options.some(
