@@ -139,10 +139,7 @@ const config = {
       src: path.resolve(__dirname, 'src'),
       react: path.resolve(__dirname, 'node_modules/react'),
       formik: path.resolve(__dirname, 'node_modules/formik'),
-      '@common': path.resolve(
-        __dirname,
-        '../explore-education-statistics-common/src',
-      ),
+      '@common': path.resolve(__dirname, 'node_modules/@dfe-ees/common/src'),
     };
 
     config.module.rules

@@ -1,0 +1,7 @@
+{
+  "packages": [
+    "src/explore-education-statistics-common",
+    "src/explore-education-statistics-frontend"
+  ],
+  "version": "0.0.0"
+}

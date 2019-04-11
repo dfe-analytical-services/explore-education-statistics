@@ -1,6 +1,6 @@
 {
-  "name": "explore-education-statistics-common",
-  "version": "1.0.0",
+  "name": "@dfe-ees/common",
+  "version": "0.1.0",
   "description": "",
   "dependencies": {
     "@zeit/next-typescript": "^1.1.1",

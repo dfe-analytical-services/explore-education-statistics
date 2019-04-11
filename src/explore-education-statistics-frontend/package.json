@@ -1,9 +1,10 @@
 {
-  "name": "explore-education-statistics-frontend",
+  "name": "@dfe-ees/frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@babel/polyfill": "^7.4.0",
+    "@dfe-ees/common": "file:../explore-education-statistics-common",
     "@types/react-beautiful-dnd": "^10.1.1",
     "@zeit/next-css": "^1.0.1",
     "@zeit/next-typescript": "^1.1.1",
@@ -167,7 +168,7 @@
       "^.+\\.module\\.(css|sass|scss)$"
     ],
     "moduleNameMapper": {
-      "^@common/(.*)$": "<rootDir>/../explore-education-statistics-common/src/$1",
+      "^@common/(.*)$": "<rootDir>/node_modules/@dfe-ees/common/src/$1",
       "^src/(.*)$": "<rootDir>/src/$1",
       "^test/(.*)$": "<rootDir>/test/$1",
       "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
