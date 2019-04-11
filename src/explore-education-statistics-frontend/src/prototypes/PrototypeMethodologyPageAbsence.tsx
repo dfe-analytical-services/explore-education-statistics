@@ -16,6 +16,7 @@ import { MethodologyContent } from './components/MethodologyContent';
 import { MethodologyHeader } from './components/MethodologyHeader';
 import { MethodologySection } from './components/MethodologySection';
 import PrototypePage from './components/PrototypePage';
+import PrototypeSearchForm from './components/PrototypeSearchForm';
 
 const PublicationPage = () => {
   return (
@@ -31,14 +32,26 @@ const PublicationPage = () => {
         },
       ]}
     >
+      <h1 className="govuk-heading-xl">
+        Pupil absence statistics: guidance and methodology
+      </h1>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">
-            Pupil absence statistics: guidance and methodology
-          </h1>
-          <h2 className="govuk-heading-s">
-            <span className="govuk-caption-m">Published: </span>March 2018
-          </h2>
+          <dl className="dfe-meta-content govuk-!-margin-0">
+            <dt className="govuk-caption-m">Published: </dt>
+            <dd>
+              <strong>22 March 2018</strong>
+            </dd>
+          </dl>
+        </div>
+        <div className="govuk-grid-column-one-third">
+          <PrototypeSearchForm />
+        </div>
+      </div>
+
+      <hr />
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">
             Find out about the methodology behind pupil absence statistics and
             data and how and why they're collected and published.

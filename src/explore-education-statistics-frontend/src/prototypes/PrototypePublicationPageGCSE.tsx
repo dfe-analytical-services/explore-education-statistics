@@ -18,6 +18,7 @@ import {
 } from './components/PrototypeDataFactory';
 import PrototypeDataSampleGCSE from './components/PrototypeDataSampleGCSE';
 import PrototypePage from './components/PrototypePage';
+import PrototypeSearchForm from './components/PrototypeSearchForm';
 
 const PublicationPage = () => {
   return (
@@ -37,12 +38,22 @@ const PublicationPage = () => {
       <h1 className="govuk-heading-xl">
         GCSE and equivalent results in England, 2016 to 2017
       </h1>
-      <dl className="dfe-meta-content">
-        <dt className="govuk-caption-m">Published: </dt>
-        <dd>
-          <strong>22 March 2018</strong>
-        </dd>
-      </dl>
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-two-thirds">
+          <dl className="dfe-meta-content govuk-!-margin-0">
+            <dt className="govuk-caption-m">Published: </dt>
+            <dd>
+              <strong>22 March 2018</strong>
+            </dd>
+          </dl>
+        </div>
+        <div className="govuk-grid-column-one-third">
+          <PrototypeSearchForm />
+        </div>
+      </div>
+
+      <hr />
+
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <div className="govuk-grid-row">
