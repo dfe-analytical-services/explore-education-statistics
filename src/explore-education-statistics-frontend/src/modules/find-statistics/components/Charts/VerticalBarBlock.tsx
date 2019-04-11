@@ -1,17 +1,9 @@
 import React, { Component } from 'react';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { ChartProps, colours } from './Charts';
 
-export class VerticalBarBlock extends React.Component<ChartProps> {
+export class VerticalBarBlock extends Component<ChartProps> {
   public render() {
     const chartData = this.props.characteristicsData.result.map(data => {
       return data.indicators;

@@ -1,26 +1,21 @@
+import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import mapValues from 'lodash/mapValues';
 import React, { Component, createRef } from 'react';
 import PageTitle from 'src/components/PageTitle';
-import mapValuesWithKeys from 'src/lib/utils/mapValuesWithKeys';
-import PublicationMenu, {
-  MenuChangeEventHandler,
-} from 'src/modules/table-tool/components/PublicationMenu';
+import PublicationMenu, { MenuChangeEventHandler } from 'src/modules/table-tool/components/PublicationMenu';
 import PublicationSubjectMenu from 'src/modules/table-tool/components/PublicationSubjectMenu';
 import PrototypePage from 'src/prototypes/components/PrototypePage';
-import FiltersForm, {
-  FilterFormSubmitHandler,
-} from 'src/prototypes/table-tool/components/FiltersForm';
+import FiltersForm, { FilterFormSubmitHandler } from 'src/prototypes/table-tool/components/FiltersForm';
 import initialMetaSpecification, {
   FilterOption,
   IndicatorOption,
   MetaSpecification,
 } from 'src/prototypes/table-tool/components/meta/initialSpec';
-import publicationSubjectSpec from 'src/prototypes/table-tool/components/meta/publicationSubjectSpec';
+import publicationSubjectSpec
+  from 'src/prototypes/table-tool/components/meta/publicationSubjectSpec';
 import TimePeriodDataTable from 'src/prototypes/table-tool/components/TimePeriodDataTable';
 import mapOptionValues from 'src/prototypes/table-tool/components/utils/mapOptionValues';
-import tableBuilderService, {
-  DataTableResult,
-} from 'src/services/tableBuilderService';
+import tableBuilderService, { DataTableResult } from 'src/services/tableBuilderService';
 import TimePeriod from 'src/services/types/TimePeriod';
 
 const defaultPublicationOptions = [

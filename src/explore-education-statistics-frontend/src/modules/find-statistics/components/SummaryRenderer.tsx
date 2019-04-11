@@ -1,10 +1,7 @@
+import Details from '@common/components/Details';
 import * as React from 'react';
 import ReactMarkdown from 'react-markdown';
-import Details from '../../../components/Details';
-import {
-  CharacteristicsData,
-  PublicationMeta,
-} from '../../../services/tableBuilderService';
+import { CharacteristicsData, PublicationMeta } from 'src/services/tableBuilderService';
 
 interface Props {
   data: any;

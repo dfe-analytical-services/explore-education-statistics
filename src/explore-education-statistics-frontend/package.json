@@ -28,9 +28,9 @@
     "next": "^8.0.3",
     "next-images": "^1.1.0",
     "normalize.css": "^8.0.1",
-    "react": "^16.8.3",
+    "react": "^16.8.6",
     "react-beautiful-dnd": "^11.0.0-beta",
-    "react-dom": "^16.8.3",
+    "react-dom": "^16.8.6",
     "react-ga": "^2.5.7",
     "react-helmet": "^5.2.0",
     "react-leaflet": "^2.2.1",
@@ -167,10 +167,12 @@
       "^.+\\.module\\.(css|sass|scss)$"
     ],
     "moduleNameMapper": {
+      "^@common/(.*)$": "<rootDir>/../explore-education-statistics-common/src/$1",
       "^src/(.*)$": "<rootDir>/src/$1",
       "^test/(.*)$": "<rootDir>/test/$1",
-      "^react-native$": "react-native-web",
-      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
+      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
+      "^react$": "<rootDir>/node_modules/react",
+      "^formik$": "<rootDir>/node_modules/formik"
     },
     "moduleFileExtensions": [
       "web.js",

@@ -13,3 +13,5 @@ tags
 tests/robot-tests/webdriver
 tests/robot-tests/.env
 data/
+
+node_modules/

@@ -1,10 +1,11 @@
+import { FormFieldCheckboxGroup, FormFieldset } from '@common/components/form';
+import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import { FormikState } from 'formik';
 import React from 'react';
-import { FormFieldCheckboxGroup, FormFieldset } from 'src/components/form';
-import createErrorHelper from 'src/lib/validation/createErrorHelper';
 import { FormValues } from 'src/prototypes/table-tool/components/FiltersForm';
 import { MetaSpecification } from 'src/prototypes/table-tool/components/meta/initialSpec';
-import SearchableGroupedFilterMenus from 'src/prototypes/table-tool/components/SearchableGroupedFilterMenus';
+import SearchableGroupedFilterMenus
+  from 'src/prototypes/table-tool/components/SearchableGroupedFilterMenus';
 import styles from './CategoricalFilters.module.scss';
 
 interface Props {
@@ -13,7 +14,7 @@ interface Props {
 }
 
 const CategoricalFilters = ({ form, specification }: Props) => {
-  const { getError } = createErrorHelper<any>(form);
+  const { getError } = createErrorHelper<any>(form as any);
 
   return (
     <div className={styles.columns}>

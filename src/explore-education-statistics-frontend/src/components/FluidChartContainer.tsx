@@ -1,6 +1,6 @@
+import FluidWidthContainer from '@common/components/FluidWidthContainer';
 import React, { FunctionComponent } from 'react';
 import { ResponsiveContainer } from 'recharts';
-import FluidWidthContainer from './FluidWidthContainer';
 
 interface Props {
   className?: string;

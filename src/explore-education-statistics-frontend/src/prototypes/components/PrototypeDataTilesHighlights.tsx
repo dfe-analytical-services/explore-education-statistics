@@ -1,5 +1,5 @@
+import Details from '@common/components/Details';
 import React from 'react';
-import Details from '../../components/Details';
 
 const PrototypeDataTileHighlights = () => (
   <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">

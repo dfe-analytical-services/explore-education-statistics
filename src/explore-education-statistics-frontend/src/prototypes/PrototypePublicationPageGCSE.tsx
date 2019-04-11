@@ -1,9 +1,8 @@
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
+import Details from '@common/components/Details';
 import React from 'react';
-import Accordion from '../components/Accordion';
-import AccordionSection from '../components/AccordionSection';
-import Details from '../components/Details';
 import Link from '../components/Link';
-import { ChartRenderer } from '../modules/find-statistics/components/ChartRenderer';
 import { DataBlock } from '../modules/find-statistics/components/DataBlock';
 import {
   ks4AverageAttainment8ScorePerPupilByLocalAuthority,

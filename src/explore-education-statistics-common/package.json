@@ -1,0 +1,106 @@
+{
+  "name": "explore-education-statistics-common",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "@zeit/next-typescript": "^1.1.1",
+    "babel-jest": "^24.7.1",
+    "classnames": "^2.2.6",
+    "date-fns": "^2.0.0-alpha.27",
+    "formik": "^1.5.2",
+    "govuk-frontend": "^2.9.0",
+    "next": "^8.0.4",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-helmet": "^5.2.0",
+    "yup": "^0.27.0"
+  },
+  "devDependencies": {
+    "@types/classnames": "^2.2.7",
+    "@types/jest": "^24.0.9",
+    "@types/lodash": "^4.14.121",
+    "@types/lodash-es": "^4.17.2",
+    "@types/next": "^8.0.1",
+    "@types/node": "^11.10.4",
+    "@types/react": "^16.8.6",
+    "@types/react-dom": "^16.8.3",
+    "@types/react-helmet": "^5.0.8",
+    "@types/yup": "^0.26.11",
+    "babel-plugin-dynamic-import-node": "^2.2.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^24.7.1",
+    "jest-dom": "^3.1.2",
+    "jest-junit": "^6.3.0",
+    "jest-resolve": "^24.7.1",
+    "jest-serializer-html": "^6.0.0",
+    "jest-watch-typeahead": "^0.2.1",
+    "react-testing-library": "^6.1.2",
+    "stylelint": "^9.10.1",
+    "stylelint-config-prettier": "^5.0.0",
+    "stylelint-config-sass-guidelines": "^5.3.0",
+    "stylelint-prettier": "^1.0.6",
+    "typescript": "^3.4.3",
+    "whatwg-fetch": "^3.0.0"
+  },
+  "scripts": {
+    "tsc": "tsc --noEmit",
+    "test": "jest"
+  },
+  "author": "",
+  "license": "MIT",
+  "private": true,
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie < 11",
+    "not op_mini all"
+  ],
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!src/**/*.d.ts"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/setupTests.js"
+    ],
+    "testMatch": [
+      "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
+      "<rootDir>/src/**/?(*.)(spec|test).{js,jsx,ts,tsx}"
+    ],
+    "testEnvironment": "jsdom",
+    "testURL": "http://localhost",
+    "transform": {
+      "^.+\\.(js|jsx|ts|tsx)$": "<rootDir>/node_modules/babel-jest",
+      "^.+\\.css$": "<rootDir>/test/cssTransform.js",
+      "^(?!.*\\.(js|jsx|ts|tsx|css|json)$)": "<rootDir>/test/fileTransform.js"
+    },
+    "transformIgnorePatterns": [
+      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$",
+      "^.+\\.module\\.(css|sass|scss)$"
+    ],
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/src/$1",
+      "^test/(.*)$": "<rootDir>/test/$1",
+      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
+    },
+    "moduleFileExtensions": [
+      "web.js",
+      "js",
+      "web.ts",
+      "ts",
+      "web.tsx",
+      "tsx",
+      "json",
+      "web.jsx",
+      "jsx",
+      "node"
+    ],
+    "resetMocks": true,
+    "snapshotSerializers": [
+      "jest-serializer-html"
+    ]
+  },
+  "jest-junit": {
+    "ancestorSeparator": " › "
+  }
+}

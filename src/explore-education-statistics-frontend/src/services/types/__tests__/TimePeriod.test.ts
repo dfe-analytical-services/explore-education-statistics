@@ -1,4 +1,4 @@
-import { Comparison } from 'src/types/util';
+import { Comparison } from '@common/types/util';
 import TimePeriod from '../TimePeriod';
 
 describe('TimePeriod', () => {

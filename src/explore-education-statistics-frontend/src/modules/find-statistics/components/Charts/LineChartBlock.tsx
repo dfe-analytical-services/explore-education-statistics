@@ -1,21 +1,6 @@
 import React, { Component } from 'react';
-import {
-  AxisDomain,
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  Symbols,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
-import {
-  ChartProps,
-  colours,
-  parseCondensedTimePeriodRange,
-  symbols,
-} from './Charts';
+import { CartesianGrid, Legend, Line, LineChart, Symbols, Tooltip, XAxis, YAxis } from 'recharts';
+import { ChartProps, colours, parseCondensedTimePeriodRange, symbols } from './Charts';
 
 const CustomToolTip = (props: any) => {
   if (props.active) {

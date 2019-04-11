@@ -1,5 +1,5 @@
+import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import React from 'react';
-import FormRadioGroup from 'src/components/form/FormRadioGroup';
 import MenuDetails from './MenuDetails';
 
 export type MenuChangeEventHandler = (values: {

@@ -1,14 +1,10 @@
+import Tabs from '@common/components/Tabs';
+import TabsSection from '@common/components/TabsSection';
 import React, { Component } from 'react';
-import Link from '../../../components/Link';
-import Tabs from '../../../components/Tabs';
-import TabsSection from '../../../components/TabsSection';
-import { baseUrl } from '../../../services/api';
-import {
-  Chart,
-  DataQuery,
-  Summary,
-} from '../../../services/publicationService';
-import { PublicationMeta } from '../../../services/tableBuilderService';
+import Link from 'src/components/Link';
+import { baseUrl } from 'src/services/api';
+import { Chart, DataQuery, Summary } from 'src/services/publicationService';
+import { PublicationMeta } from 'src/services/tableBuilderService';
 import { ChartRenderer } from './ChartRenderer';
 import { SummaryRenderer } from './SummaryRenderer';
 import { TableRenderer } from './TableRenderer';

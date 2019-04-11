@@ -1,10 +1,4 @@
-import {
-  Feature,
-  FeatureCollection,
-  GeoJsonProperties,
-  Geometry,
-  GeometryCollection,
-} from 'geojson';
+import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { LatLngBounds } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import React, { Component } from 'react';

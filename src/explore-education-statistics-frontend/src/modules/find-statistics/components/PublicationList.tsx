@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Link from 'src/components/Link';
-import { contentApi } from 'src/services/api';
 
 export interface Publication {
   id: string;

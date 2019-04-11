@@ -1,6 +1,5 @@
 import React from 'react';
-import Details from '../../components/Details';
-import Link from '../../components/Link';
+import Link from 'src/components/Link';
 
 interface Props {
   viewType?: string;

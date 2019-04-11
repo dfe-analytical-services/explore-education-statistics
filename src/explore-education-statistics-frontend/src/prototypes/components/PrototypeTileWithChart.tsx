@@ -1,5 +1,5 @@
+import Details from '@common/components/Details';
 import React from 'react';
-import Details from '../../components/Details';
 import Link from '../../components/Link';
 import PrototypeIckleChart from '../components/PrototypeIckleChart';
 

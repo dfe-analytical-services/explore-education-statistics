@@ -1,13 +1,5 @@
 import React, { Component } from 'react';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { ChartProps, colours } from './Charts';
 
@@ -15,9 +7,7 @@ interface StackedBarHorizontalProps extends ChartProps {
   stacked?: boolean;
 }
 
-export class HorizontalBarBlock extends React.Component<
-  StackedBarHorizontalProps
-> {
+export class HorizontalBarBlock extends Component<StackedBarHorizontalProps> {
   public render() {
     const chartData = this.props.characteristicsData.result.map(data => {
       return data.indicators;

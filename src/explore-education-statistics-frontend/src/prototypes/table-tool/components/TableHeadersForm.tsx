@@ -1,7 +1,7 @@
+import Button from '@common/components/Button';
+import Details from '@common/components/Details';
 import { Form, Formik } from 'formik';
 import React, { Component } from 'react';
-import Button from 'src/components/Button';
-import Details from 'src/components/Details';
 import FormFieldSortableList from 'src/prototypes/table-tool/components/FormFieldSortableList';
 import { SortableOption } from 'src/prototypes/table-tool/components/FormSortableList';
 import {

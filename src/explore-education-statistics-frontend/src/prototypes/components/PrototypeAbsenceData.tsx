@@ -1,8 +1,8 @@
+import Details from '@common/components/Details';
+import { FormSelect } from '@common/components/form';
 import classNames from 'classnames';
 import dynamic from 'next-server/dynamic';
 import React, { Component, RefAttributes } from 'react';
-import Details from '../../components/Details';
-import { FormSelect } from '../../components/form';
 import styles from './PrototypeAbsenceData.module.scss';
 import PrototypeMap from './PrototypeMap';
 import {

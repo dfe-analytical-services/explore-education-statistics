@@ -1,9 +1,9 @@
+import { FormFieldset } from '@common/components/form';
+import { FieldSetProps } from '@common/components/form/FormFieldset';
+import reorder from '@common/lib/utils/reorder';
 import classNames from 'classnames';
 import React from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { FormFieldset } from 'src/components/form';
-import { FieldSetProps } from 'src/components/form/FormFieldset';
-import reorder from 'src/lib/utils/reorder';
 import styles from './FormSortableList.module.scss';
 
 export interface SortableOption {

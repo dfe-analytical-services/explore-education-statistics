@@ -1,5 +1,5 @@
+import Details from '@common/components/Details';
 import React from 'react';
-import Details from '../../components/Details';
 
 interface Props {
   period: string;
