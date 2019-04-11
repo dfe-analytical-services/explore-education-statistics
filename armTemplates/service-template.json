@@ -56,14 +56,17 @@
   },
   "variables": {
     "dataAppName": "[concat('data-', parameters('webAppName'))]",
-    "contentAppName": "[concat('content-', parameters('webAppName'))]",
-    "adminAppName": "[concat('admin-', parameters('webAppName'))]",
-    "publicAppName": "[concat('public-', parameters('webAppName'))]",
     "dataPlanName": "[concat('data-', parameters('hostingPlanName'))]",
+
+    "contentAppName": "[concat('content-', parameters('webAppName'))]",
     "contentPlanName": "[concat('content-', parameters('hostingPlanName'))]",
+
+    "adminAppName": "[concat('admin-', parameters('webAppName'))]",
     "adminPlanName": "[concat('admin-', parameters('hostingPlanName'))]",
+
+    "publicAppName": "[concat('public-', parameters('webAppName'))]",
     "publicPlanName": "[concat('public-', parameters('hostingPlanName'))]",
-    "importFunctionName": "[concat('data-', parameters('webAppName'))]",
+
     "sqlserverName": "[parameters('webAppName')]",
 
     "notificationsAppName": "[concat('notifications-', parameters('webAppName'))]",
@@ -94,9 +97,23 @@
         }
       ],
       "properties": {
+        "name": "[variables('dataAppName')]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
+        "hostingEnvironment": "",
         "httpsOnly": true,
         "clientAffinityEnabled": false,
         "siteConfig": {
+          "http20Enabled": true,
+          "phpVersion": "off",
+          "cors": {
+            "allowedOrigins": [
+              "[concat('https://', variables('publicAppName'),'.azurewebsites.net/')]",
+              "[concat('http://', variables('publicAppName'),'.azurewebsites.net/')]",
+              "https://localhost:3000",
+              "http://localhost:3000",
+              "http://127.0.0.1"
+            ]
+          },
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -117,12 +134,8 @@
               "type": "SQLAzure",
               "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
             }
-          ],
-          "phpVersion": "off"
-        },
-        "name": "[variables('dataAppName')]",
-        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
-        "hostingEnvironment": ""
+          ]
+        }
       },
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
@@ -179,8 +192,23 @@
         }
       ],
       "properties": {
+        "name": "[variables('contentAppName')]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
+        "hostingEnvironment": "",
+        "httpsOnly": true,
+        "clientAffinityEnabled": false,
         "siteConfig": {
-          "clientAffinityEnabled": false,
+          "http20Enabled": true,
+          "phpVersion": "off",
+          "cors": {
+            "allowedOrigins": [
+              "[concat('https://', variables('publicAppName'),'.azurewebsites.net/')]",
+              "[concat('http://', variables('publicAppName'),'.azurewebsites.net/')]",
+              "https://localhost:3000",
+              "http://localhost:3000",
+              "http://127.0.0.1"
+            ]
+          },
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -197,12 +225,8 @@
               "type": "SQLAzure",
               "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
             }
-          ],
-          "phpVersion": "off"
-        },
-        "name": "[variables('contentAppName')]",
-        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
-        "hostingEnvironment": ""
+          ]
+        }
       },
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
@@ -251,7 +275,7 @@
         {
           "type": "siteextensions",
           "name": "Microsoft.ApplicationInsights.AzureWebSites",
-          "apiVersion": "2015-08-01",
+          "apiVersion": "2016-08-01",
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
           ],
@@ -259,8 +283,19 @@
         }
       ],
       "properties": {
+        "name": "[variables('adminAppName')]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('adminPlanName'))]",
+        "hostingEnvironment": "",
+        "httpsOnly": true,
+        "clientAffinityEnabled": true,
         "siteConfig": {
-          "httpsOnly": true,
+          "http20Enabled": true,
+          "phpVersion": "off",
+          "cors": {
+            "allowedOrigins": [
+              "*"
+            ]
+          },
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -281,12 +316,9 @@
               "type": "SQLAzure",
               "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
             }
-          ],
-          "phpVersion": "off"
-        },
-        "name": "[variables('adminAppName')]",
-        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
-        "hostingEnvironment": ""
+          ]
+          
+        }
       },
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('adminPlanName'))]",
@@ -332,11 +364,15 @@
         "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]": "empty"
       },
       "properties": {
+        "name": "[variables('publicAppName')]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
+        "hostingEnvironment": "",
+        "httpsOnly": true,
+        "clientAffinityEnabled": false,
         "siteConfig": {
-          "name": "[variables('publicAppName')]",
-          "httpsOnly": true,
+          "http20Enabled": true,
+          "phpVersion": "off",
           "AlwaysOn": true,
-          "clientAffinityEnabled": false,
           "appSettings": [
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
@@ -370,11 +406,8 @@
               "name": "WEBSITE_RUN_FROM_PACKAGE",
               "value": "1"
             }
-          ],
-          "phpVersion": "off"
-        },
-        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
-        "hostingEnvironment": ""
+          ]
+        }
       },
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]"
@@ -519,7 +552,7 @@
       }
     },
     {
-      "apiVersion": "2015-08-01",
+      "apiVersion": "2016-08-01",
       "type": "Microsoft.Web/sites",
       "name": "[variables('notificationsAppName')]",
       "location": "[resourceGroup().location]",
@@ -531,7 +564,15 @@
       ],
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
+        "httpsOnly": true,
         "siteConfig": {
+          "http20Enabled": true,
+          "phpVersion": "off",
+          "cors": {
+            "allowedOrigins": [
+              "*"
+            ]
+          },
           "appSettings": [
             {
               "name": "AzureWebJobsDashboard",
@@ -591,12 +632,7 @@
               "name": "TableStorageConnString",
               "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]"
             }
-          ],
-          "cors": {
-            "allowedOrigins": [
-              "*"
-            ]
-          }
+          ]          
         }
       }
     }
