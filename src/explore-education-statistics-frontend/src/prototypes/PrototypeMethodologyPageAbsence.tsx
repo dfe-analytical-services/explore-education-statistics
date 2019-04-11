@@ -1,9 +1,6 @@
 import React from 'react';
 import Accordion from '../components/Accordion';
 import AccordionSection from '../components/AccordionSection';
-import Details from '../components/Details';
-import GoToTopLink from '../components/GoToTopLink';
-import Link from '../components/Link';
 import PrototypeAnnexA from './components/methodology/absence/PrototypeAnnexA';
 import PrototypeAnnexB from './components/methodology/absence/PrototypeAnnexB';
 import PrototypeAnnexC from './components/methodology/absence/PrototypeAnnexC';
@@ -14,11 +11,10 @@ import PrototypeSection2 from './components/methodology/absence/PrototypeSection
 import PrototypeSection3 from './components/methodology/absence/PrototypeSection3';
 import PrototypeSection4 from './components/methodology/absence/PrototypeSection4';
 import PrototypeSection5 from './components/methodology/absence/PrototypeSection5';
-import PrototypeSection6 from './components/methodology/absence/PrototypeSection6';
 import PrototypeSection7 from './components/methodology/absence/PrototypeSection7';
-import PrototypeAbsenceData from './components/PrototypeAbsenceData';
-import PrototypeDataSample from './components/PrototypeDataSample';
-import PrototypeMap from './components/PrototypeMap';
+import { MethodologyContent } from './components/MethodologyContent';
+import { MethodologyHeader } from './components/MethodologyHeader';
+import { MethodologySection } from './components/MethodologySection';
 import PrototypePage from './components/PrototypePage';
 
 const PublicationPage = () => {
@@ -67,8 +63,8 @@ const PublicationPage = () => {
 
       <Accordion id="contents-sections">
         <AccordionSection heading="Introduction">
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-quarter">
+          <MethodologySection>
+            <MethodologyHeader>
               <h3 className="govuk-heading-s">In this section</h3>
               <ul className="govuk-body-s">
                 <li>
@@ -82,16 +78,17 @@ const PublicationPage = () => {
                   </a>
                 </li>
               </ul>
-            </div>
-            <div className="govuk-grid-column-three-quarters">
+            </MethodologyHeader>
+
+            <MethodologyContent>
               <PrototypeSection1 />
-            </div>
-          </div>
+            </MethodologyContent>
+          </MethodologySection>
         </AccordionSection>
 
         <AccordionSection heading="Background">
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-quarter">
+          <MethodologySection>
+            <MethodologyHeader>
               <h3 className="govuk-heading-s">In this section</h3>
               <ul className="govuk-body-s">
                 <li>
@@ -130,16 +127,16 @@ const PublicationPage = () => {
                   </a>
                 </li>
               </ul>
-            </div>
-            <div className="govuk-grid-column-three-quarters">
+            </MethodologyHeader>
+            <MethodologyContent>
               <PrototypeSection2 />
-            </div>
-          </div>
+            </MethodologyContent>
+          </MethodologySection>
         </AccordionSection>
 
         <AccordionSection heading="Methodology">
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-quarter">
+          <MethodologySection>
+            <MethodologyHeader>
               <h3 className="govuk-heading-s">In this section</h3>
               <ul className="govuk-body-s">
                 <li>
@@ -149,16 +146,16 @@ const PublicationPage = () => {
                   <a href="#section3-2">Persistent absence methodology</a>
                 </li>
               </ul>
-            </div>
-            <div className="govuk-grid-column-three-quarters">
+            </MethodologyHeader>
+            <MethodologyContent>
               <PrototypeSection3 />
-            </div>
-          </div>
+            </MethodologyContent>
+          </MethodologySection>
         </AccordionSection>
 
         <AccordionSection heading="Data collection">
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-quarter">
+          <MethodologySection>
+            <MethodologyHeader>
               <h3 className="govuk-heading-s">In this section</h3>
               <ul className="govuk-body-s">
                 <li>
@@ -186,16 +183,16 @@ const PublicationPage = () => {
                   <a href="#section4-6">What absence data is not collected</a>
                 </li>
               </ul>
-            </div>
-            <div className="govuk-grid-column-three-quarters">
+            </MethodologyHeader>
+            <MethodologyContent>
               <PrototypeSection4 />
-            </div>
-          </div>
+            </MethodologyContent>
+          </MethodologySection>
         </AccordionSection>
 
         <AccordionSection heading="Data processing">
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-quarter">
+          <MethodologySection>
+            <MethodologyHeader>
               <h3 className="govuk-heading-s">In this section</h3>
               <ul className="govuk-body-s">
                 <li>
@@ -214,11 +211,11 @@ const PublicationPage = () => {
                   <a href="#section5-5">Data quality</a>
                 </li>
               </ul>
-            </div>
-            <div className="govuk-grid-column-three-quarters">
+            </MethodologyHeader>
+            <MethodologyContent>
               <PrototypeSection5 />
-            </div>
-          </div>
+            </MethodologyContent>
+          </MethodologySection>
         </AccordionSection>
 
         <AccordionSection heading="Contacts">
