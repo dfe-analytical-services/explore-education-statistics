@@ -64,8 +64,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                        var unsubscribeToken = _tokenService.GenerateToken(tokenSecretKey, entity.RowKey, log);
                        var vals = new Dictionary<string, dynamic>
                            {
-                               {"publication_name", entity.title},
-                               {"publication_link", webApplicationBaseUrl + "statistics/" + entity.Slug},
+                               // Use values from the queue just in case the name or slug of the publication chnages
+                               {"publication_name", publicationNotification.Name},
+                               {"publication_link", webApplicationBaseUrl + "statistics/" + publicationNotification.Slug},
                                {"unsubscribe_link", baseUrl + entity.PartitionKey + "/unsubscribe/" + unsubscribeToken}
                            };
                        
