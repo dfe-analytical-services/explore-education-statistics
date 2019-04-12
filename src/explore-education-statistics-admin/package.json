@@ -84,9 +84,6 @@
     "sass-loader": "7.1.0",
     "style-loader": "0.23.1",
     "stylelint": "^9.10.1",
-    "stylelint-config-prettier": "^5.0.0",
-    "stylelint-config-sass-guidelines": "^5.3.0",
-    "stylelint-prettier": "^1.0.6",
     "stylelint-webpack-plugin": "^0.10.5",
     "terser-webpack-plugin": "1.2.2",
     "typescript": "3.3.4000",
@@ -100,6 +97,7 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
+    "lint:js": "tslint --project tsconfig.json src/**/*.{ts,tsx}",
     "test": "node scripts/test.js --no-watch",
     "test:watch": "node scripts/test.js",
     "tsc": "tsc --noEmit"
