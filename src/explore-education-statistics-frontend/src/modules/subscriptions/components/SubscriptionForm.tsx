@@ -91,7 +91,7 @@ class SubscriptionForm extends Component<Props, State> {
                 <FormFieldset
                   id="email-address"
                   legend="Email address"
-                  hint="Enter a valid email address."
+                  hint="We’ll only use this to send you subscriptions. You can unsubscribe from these at any time."
                 >
                   <FormFieldTextInput<FormValues>
                     id="email-id"

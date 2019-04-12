@@ -9,6 +9,7 @@ export interface SubscriptionData {
 export default {
   subscribeToPublication(query: {
     email: string;
+    id: string;
     slug: string;
     title: string;
   }): Promise<SubscriptionData> {
