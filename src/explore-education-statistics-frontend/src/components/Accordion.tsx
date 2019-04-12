@@ -1,5 +1,7 @@
+import classNames from 'classnames';
 import React, { cloneElement, Component, createRef, ReactNode } from 'react';
 import isComponentType from '../lib/type-guards/components/isComponentType';
+import styles from './Accordion.module.scss';
 import AccordionSection, {
   AccordionSectionProps,
   classes,
@@ -76,7 +78,11 @@ class Accordion extends Component<AccordionProps, State> {
     let sectionCounter = 0;
 
     return (
-      <div className="govuk-accordion" ref={this.ref} id={id}>
+      <div
+        className={classNames('govuk-accordion', styles.accordionPrint)}
+        ref={this.ref}
+        id={id}
+      >
         {React.Children.map(children, child => {
           if (isComponentType(child, AccordionSection)) {
             sectionCounter += 1;
