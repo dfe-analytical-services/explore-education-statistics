@@ -22,8 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
         {   
             // Need to define the extra columns to retrieve
             var columns = new List<string>(){ "Verified", "Slug", "Title" };
-            var result = await table.ExecuteAsync(TableOperation.Retrieve(subscription.PartitionKey, subscription.RowKey, columns));
-            return (SubscriptionEntity)result.Result;
+            var result = await table.ExecuteAsync(TableOperation.Retrieve<SubscriptionEntity>(subscription.PartitionKey, subscription.RowKey, columns));
+            return (SubscriptionEntity) result.Result;
         }
 
         public async Task<CloudTable> GetTable(IConfiguration config, string connectionStr, string storageTableName)
