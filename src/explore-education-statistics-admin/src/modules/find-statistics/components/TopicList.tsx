@@ -1,7 +1,7 @@
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
 import React, { Component } from 'react';
 import PublicationList, { Publication } from '../components/PublicationList';
-import Accordion from "../../../components/Accordion";
-import AccordionSection from "../../../components/AccordionSection";
 
 export interface Topic {
   id: string;

@@ -1,12 +1,12 @@
 import classNames from 'classnames';
-import React, { AnchorHTMLAttributes, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
+import { Link as RouterLink, LinkProps } from 'react-router-dom';
 
 type Props = {
   children: ReactNode;
   className?: string;
   disabled?: boolean;
-  to?: string ;
-} & AnchorHTMLAttributes<HTMLAnchorElement>;
+} & LinkProps;
 
 const ButtonLink = ({
   children,
@@ -16,25 +16,22 @@ const ButtonLink = ({
   type = 'button',
   ...props
 }: Props) => {
-  // We support href and to for backwards
-  // compatibility with react-router.
-  const href = props.href || to;
-
   return (
-      <a
-        {...props}
-        className={classNames(
-          'govuk-button',
-          {
-            'govuk-button--disabled': disabled,
-          },
-          className,
-        )}
-        role="button"
-        aria-disabled={disabled}
-      >
-        {children}
-      </a>
+    <RouterLink
+      {...props}
+      to={to}
+      className={classNames(
+        'govuk-button',
+        {
+          'govuk-button--disabled': disabled,
+        },
+        className,
+      )}
+      role="button"
+      aria-disabled={disabled}
+    >
+      {children}
+    </RouterLink>
   );
 };
 

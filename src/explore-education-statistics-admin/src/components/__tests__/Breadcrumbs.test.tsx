@@ -1,10 +1,15 @@
 import React from 'react';
+import { MemoryRouter } from 'react-router';
 import { render } from 'react-testing-library';
 import Breadcrumbs from '../Breadcrumbs';
 
 describe('Breadcrumbs', () => {
   test('renders correctly with just home breadcrumb', () => {
-    const { container } = render(<Breadcrumbs breadcrumbs={[]} />);
+    const { container } = render(
+      <MemoryRouter initialEntries={['/']}>
+        <Breadcrumbs breadcrumbs={[]} />
+      </MemoryRouter>,
+    );
 
     const breadcrumbs = container.querySelectorAll('li');
 
@@ -17,18 +22,20 @@ describe('Breadcrumbs', () => {
 
   test('renders correctly with multiple breadcrumbs', () => {
     const { container } = render(
-      <Breadcrumbs
-        breadcrumbs={[
-          {
-            link: '/publications',
-            name: 'Publications',
-          },
-          {
-            link: '/test-publication',
-            name: 'Test publication',
-          },
-        ]}
-      />,
+      <MemoryRouter initialEntries={['/publications', '/test-publication']}>
+        <Breadcrumbs
+          breadcrumbs={[
+            {
+              link: '/publications',
+              name: 'Publications',
+            },
+            {
+              link: '/test-publication',
+              name: 'Test publication',
+            },
+          ]}
+        />
+      </MemoryRouter>,
     );
 
     const breadcrumbs = container.querySelectorAll('li');
@@ -48,17 +55,20 @@ describe('Breadcrumbs', () => {
 
   test('does not render a link if breadcrumb is missing a link', () => {
     const { container } = render(
-      <Breadcrumbs
-        breadcrumbs={[
-          {
-            name: 'Publications',
-          },
-          {
-            link: '/test-publication',
-            name: 'Test publication',
-          },
-        ]}
-      />,
+      <MemoryRouter>
+        <Breadcrumbs
+          breadcrumbs={[
+            {
+              name: 'Publications',
+            },
+            {
+              link: '/test-publication',
+              name: 'Test publication',
+            },
+          ]}
+        />
+        ,
+      </MemoryRouter>,
     );
 
     const breadcrumbs = container.querySelectorAll('li');
@@ -70,18 +80,21 @@ describe('Breadcrumbs', () => {
 
   test('does not render last breadcrumb as a link', () => {
     const { container } = render(
-      <Breadcrumbs
-        breadcrumbs={[
-          {
-            link: '/publications',
-            name: 'Publications',
-          },
-          {
-            link: '/test-publication',
-            name: 'Test publication',
-          },
-        ]}
-      />,
+      <MemoryRouter>
+        <Breadcrumbs
+          breadcrumbs={[
+            {
+              link: '/publications',
+              name: 'Publications',
+            },
+            {
+              link: '/test-publication',
+              name: 'Test publication',
+            },
+          ]}
+        />
+        ,
+      </MemoryRouter>,
     );
 
     const lastBreadcrumb = container.querySelector('li:last-child');

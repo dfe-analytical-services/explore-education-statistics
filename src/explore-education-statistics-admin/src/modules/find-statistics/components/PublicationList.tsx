@@ -35,7 +35,6 @@ class PublicationList extends Component<Props> {
                     <Link
                       className="govuk-link govuk-!-margin-right-9"
                       to={`/statistics/publication?publication=${slug}`}
-                      as={`/statistics/${slug}`}
                     >
                       View statistics
                     </Link>
