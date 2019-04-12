@@ -1,8 +1,8 @@
 const basicAuth = require('express-basic-auth');
 const express = require('express');
-const helmet = require('helmet')
+const helmet = require('helmet');
 const next = require('next');
-const referrerPolicy = require('referrer-policy')
+const referrerPolicy = require('referrer-policy');
 const url = require('url');
 
 const app = next({
@@ -26,7 +26,6 @@ async function startServer(port = process.env.PORT || 3000) {
   server.disable('x-powered-by');
   server.use(helmet());
   server.use(referrerPolicy({ policy: 'no-referrer-when-downgrade' }));
-
 
   // Strip trailing slashes as these
   // don't work well with Next

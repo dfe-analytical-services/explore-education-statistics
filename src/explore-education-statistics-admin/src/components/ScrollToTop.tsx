@@ -1,9 +1,6 @@
-
 import React, { Component } from 'react';
 
-interface Props {
-
-}
+interface Props {}
 
 class ScrollToTop extends Component<Props> {
   public componentDidUpdate(prevProps: Props) {
@@ -23,5 +20,5 @@ class ScrollToTop extends Component<Props> {
   }
 }
 
-export default ScrollToTop;//
+export default ScrollToTop; //
 // withRouter(ScrollToTop);

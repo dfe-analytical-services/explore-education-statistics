@@ -7,9 +7,9 @@ import {
 } from '../../../services/tableBuilderService';
 import { HorizontalBarBlock } from './Charts/HorizontalBarBlock';
 import { LineChartBlock } from './Charts/LineChartBlock';
-import { VerticalBarBlock } from './Charts/VerticalBarBlock';
 
-import  DynamicMapBlock from './Charts/MapBlock';
+import DynamicMapBlock from './Charts/MapBlock';
+import { VerticalBarBlock } from './Charts/VerticalBarBlock';
 
 interface ChartRendererProps {
   type: string;

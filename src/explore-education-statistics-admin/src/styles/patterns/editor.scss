@@ -1,4 +1,3 @@
-
 div.ck.ck-editor__editable_inline {
   background-color: #eee;
 }
@@ -44,7 +43,7 @@ div.ck.ck-editor__editable_inline {
 
 .govuk-accordion__drag_icon {
   position: absolute;
-  content: "H";
+  content: 'H';
   top: 20%;
   right: -38px;
   //width: 16px;
@@ -53,7 +52,7 @@ div.ck.ck-editor__editable_inline {
 }
 
 .govuk-accordion__drag_icon:before {
-  content: "H";
+  content: 'H';
   width: 100%;
 }
 
@@ -89,7 +88,7 @@ div.ck.ck-editor__editable_inline {
     width: 2.25rem;
 
     position: absolute;
-    z-index:1000;
+    z-index: 1000;
 
     top: 10px;
 

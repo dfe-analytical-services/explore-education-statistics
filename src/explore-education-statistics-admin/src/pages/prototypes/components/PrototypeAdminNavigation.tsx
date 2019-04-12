@@ -1,5 +1,5 @@
-import React from "react";
-import Link from "../../../components/Link";
+import React from 'react';
+import Link from '../../../components/Link';
 
 interface Props {
   sectionId?: string;
@@ -23,9 +23,9 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
         <ul className="app-navigation__list govuk-!-margin-bottom-0">
           <li
             className={
-              sectionId === "setup"
-                ? "app-navigation--current-page"
-                : "app-navigation--non-selected-page"
+              sectionId === 'setup'
+                ? 'app-navigation--current-page'
+                : 'app-navigation--non-selected-page'
             }
           >
             <Link
@@ -37,9 +37,9 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
           </li>
           <li
             className={
-              sectionId === "addData"
-                ? "app-navigation--current-page"
-                : "app-navigation--non-selected-page"
+              sectionId === 'addData'
+                ? 'app-navigation--current-page'
+                : 'app-navigation--non-selected-page'
             }
           >
             <Link
@@ -51,9 +51,9 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
           </li>
           <li
             className={
-              sectionId === "addContent"
-                ? "app-navigation--current-page"
-                : "app-navigation--non-selected-page"
+              sectionId === 'addContent'
+                ? 'app-navigation--current-page'
+                : 'app-navigation--non-selected-page'
             }
           >
             <Link
@@ -65,9 +65,9 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
           </li>
           <li
             className={
-              sectionId === "schedule"
-                ? "app-navigation--current-page"
-                : "app-navigation--non-selected-page"
+              sectionId === 'schedule'
+                ? 'app-navigation--current-page'
+                : 'app-navigation--non-selected-page'
             }
           >
             <Link
@@ -79,9 +79,9 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
           </li>
           <li
             className={
-              sectionId === "status"
-                ? "app-navigation--current-page"
-                : "app-navigation--non-selected-page"
+              sectionId === 'status'
+                ? 'app-navigation--current-page'
+                : 'app-navigation--non-selected-page'
             }
           >
             <Link

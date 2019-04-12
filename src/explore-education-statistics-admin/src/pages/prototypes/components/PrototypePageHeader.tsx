@@ -1,6 +1,6 @@
-import classNames from "classnames";
-import logo from "govuk-frontend/assets/images/govuk-logotype-crown.png";
-import React from "react";
+import classNames from 'classnames';
+import logo from 'govuk-frontend/assets/images/govuk-logotype-crown.png';
+import React from 'react';
 
 interface Props {
   wide?: boolean;
@@ -15,12 +15,12 @@ const PageHeader = ({ wide }: Props) => (
     <header className="govuk-header " role="banner" data-module="header">
       <div
         className={classNames(
-          "govuk-header__container",
-          "govuk-width-container",
-          "dfe-admin-header",
+          'govuk-header__container',
+          'govuk-width-container',
+          'dfe-admin-header',
           {
-            "dfe-width-container--wide": wide
-          }
+            'dfe-width-container--wide': wide,
+          },
         )}
       >
         <div className="govuk-header__logo">

@@ -1,5 +1,5 @@
-import React from "react";
-import Link from "../../../components/Link";
+import React from 'react';
+import Link from '../../../components/Link';
 
 interface Props {
   sectionId?: string;
@@ -9,7 +9,7 @@ interface Props {
 const PrototypePublicationConfig = ({ sectionId, action }: Props) => {
   return (
     <>
-      {sectionId === "setup" && (
+      {sectionId === 'setup' && (
         <h2 className="govuk-heading-m">Edit release setup</h2>
       )}
       <form action="/prototypes/publication-create-new-absence-config">
@@ -192,7 +192,7 @@ const PrototypePublicationConfig = ({ sectionId, action }: Props) => {
             </button>
           </>
         )}
-        {sectionId === "setup" && (
+        {sectionId === 'setup' && (
           <>
             <button type="submit" className="govuk-button">
               Update release setup
