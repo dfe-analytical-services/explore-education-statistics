@@ -2,14 +2,18 @@
   "name": "explore-education-statistics",
   "private": true,
   "devDependencies": {
-    "lerna": "^3.11.1"
-  },
-  "dependencies": {
-    "prettier": "^1.16.4"
+    "lerna": "^3.11.1",
+    "prettier": "^1.16.4",
+    "stylelint": "^9.10.1",
+    "stylelint-config-prettier": "^5.0.0",
+    "stylelint-config-sass-guidelines": "^5.3.0",
+    "stylelint-prettier": "^1.0.6"
   },
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,scss,html}'",
-    "format:check": "prettier --list-different 'src/**/*.{js,jsx,ts,tsx,css,scss,html}'"
+    "fix:style": "stylelint --fix src/**/*.{scss,css}",
+    "format": "prettier --write src/**/*.{js,jsx,ts,tsx,css,scss,html}",
+    "format:check": "prettier --list-different src/**/*.{js,jsx,ts,tsx,css,scss,html}",
+    "lint:style": "stylelint src/**/*.{scss,css}"
   }
 }

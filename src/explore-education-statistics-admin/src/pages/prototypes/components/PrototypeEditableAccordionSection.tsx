@@ -87,7 +87,7 @@ class PrototypeEditableAccordionSection extends React.Component<
           )}
         </div>
         <span
-          className="govuk-accordion__drag_icon"
+          className="govuk-accordion__drag-icon"
           onClick={e => {
             e.nativeEvent.preventDefault();
           }}

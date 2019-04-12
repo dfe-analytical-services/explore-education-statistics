@@ -31,6 +31,7 @@
   text-align: right;
 }
 
+// stylelint-disable-next-line selector-no-qualifying-type
 h1.govuk-panel__title {
   color: govuk-colour('white');
 }
