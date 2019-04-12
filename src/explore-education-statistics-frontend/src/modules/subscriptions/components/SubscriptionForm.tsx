@@ -1,10 +1,12 @@
+import Button from '@common/components/Button';
+import ErrorSummary, {
+  ErrorSummaryMessage,
+} from '@common/components/ErrorSummary';
+import { FormFieldset, FormFieldTextInput } from '@common/components/form';
+import createErrorHelper from '@common/lib/validation/createErrorHelper';
+import Yup from '@common/lib/validation/yup';
 import { Form, Formik, FormikErrors, FormikProps, FormikTouched } from 'formik';
 import React, { Component, createRef } from 'react';
-import Button from 'src/components/Button';
-import ErrorSummary, { ErrorSummaryMessage } from 'src/components/ErrorSummary';
-import createErrorHelper from 'src/lib/validation/createErrorHelper';
-import Yup from 'src/lib/validation/yup';
-import { FormFieldset, FormFieldTextInput } from '../../../components/form';
 
 interface FormValues {
   email: string;

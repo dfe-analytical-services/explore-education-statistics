@@ -1,6 +1,6 @@
 import { Field, FieldProps } from 'formik';
 import React from 'react';
-import createErrorHelper from 'src/lib/validation/createErrorHelper';
+import createErrorHelper from '../../lib/validation/createErrorHelper';
 import FormGroup from './FormGroup';
 import FormTextInput, { FormTextInputProps } from './FormTextInput';
 

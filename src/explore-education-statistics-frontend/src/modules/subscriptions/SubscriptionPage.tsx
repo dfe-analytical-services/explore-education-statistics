@@ -1,11 +1,9 @@
+import GoToTopLink from '@common/components/GoToTopLink';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
-import GoToTopLink from 'src/components/GoToTopLink';
 import Page from 'src/components/Page';
 import PageTitle from 'src/components/PageTitle';
-import functionsService, {
-  SubscriptionData,
-} from 'src/services/functionsService';
+import functionsService from 'src/services/functionsService';
 import publicationService, { Release } from 'src/services/publicationService';
 import SubscriptionForm, {
   SubscriptionFormSubmitHandler,
