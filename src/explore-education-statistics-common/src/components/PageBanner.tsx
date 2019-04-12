@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from './Link';
+import Link from '../../../explore-education-statistics-frontend/src/components/Link';
 
 const PageBanner = () => {
   return (

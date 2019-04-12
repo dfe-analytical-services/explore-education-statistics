@@ -1,3 +1,4 @@
+import SchoolType from '@common/services/types/SchoolType';
 import groupBy from 'lodash/groupBy';
 import max from 'lodash/max';
 import min from 'lodash/min';
@@ -7,7 +8,6 @@ import {
   DataTableResult,
   IndicatorsMeta,
 } from 'src/services/tableBuilderService';
-import SchoolType from 'src/services/types/SchoolType';
 import GroupedDataTable, { GroupedDataSet } from './GroupedDataTable';
 
 const schoolKeys: {

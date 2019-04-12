@@ -1,14 +1,16 @@
 import Button from '@common/components/Button';
-import ErrorSummary, { ErrorSummaryMessage } from '@common/components/ErrorSummary';
+import ErrorSummary, {
+  ErrorSummaryMessage,
+} from '@common/components/ErrorSummary';
 import { FormFieldset, FormGroup } from '@common/components/form';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
+import TimePeriod from '@common/services/types/TimePeriod';
 import { Comparison, Overwrite } from '@common/types/util';
 import { Form, Formik, FormikErrors, FormikProps, FormikTouched } from 'formik';
 import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
 import React, { Component, createRef } from 'react';
-import TimePeriod from 'src/services/types/TimePeriod';
 import CategoricalFilters from './CategoricalFilters';
 import { MetaSpecification } from './meta/initialSpec';
 import ObservationalUnitFilters from './ObservationalUnitFilters';

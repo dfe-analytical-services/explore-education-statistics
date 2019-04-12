@@ -1,15 +1,21 @@
 import Button from '@common/components/Button';
-import ErrorSummary, { ErrorSummaryMessage } from '@common/components/ErrorSummary';
-import { FormFieldset, FormGroup, FormTextInput } from '@common/components/form';
+import ErrorSummary, {
+  ErrorSummaryMessage,
+} from '@common/components/ErrorSummary';
+import {
+  FormFieldset,
+  FormGroup,
+  FormTextInput,
+} from '@common/components/form';
 import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
+import SchoolType from '@common/services/types/SchoolType';
 import { Form, Formik, FormikErrors, FormikProps, FormikTouched } from 'formik';
 import debounce from 'lodash/debounce';
 import React, { ChangeEvent, Component, createRef } from 'react';
 import { PublicationMeta } from 'src/services/tableBuilderService';
-import SchoolType from 'src/services/types/SchoolType';
 import SearchableFilterMenus from './SearchableFilterMenus';
 
 interface FormValues {

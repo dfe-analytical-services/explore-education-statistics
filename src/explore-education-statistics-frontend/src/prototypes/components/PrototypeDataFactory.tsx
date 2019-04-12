@@ -1,3 +1,4 @@
+import SchoolType from '@common/services/types/SchoolType';
 import React from 'react';
 import {
   DataBlock,
@@ -9,7 +10,6 @@ import {
   DataTableResult,
   PublicationMeta,
 } from '../../services/tableBuilderService';
-import SchoolType from '../../services/types/SchoolType';
 import { data as OriginalData } from './PrototypeMapBoundaries';
 
 function createDataValues(
