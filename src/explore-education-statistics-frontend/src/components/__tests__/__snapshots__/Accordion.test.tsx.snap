@@ -3,7 +3,7 @@
 exports[`Accordion renders with hidden content by default 1`] = `
 <div>
   <div
-    class="govuk-accordion"
+    class="govuk-accordion accordionPrint"
     id="test-sections"
   >
     <div
@@ -72,7 +72,7 @@ exports[`Accordion renders with hidden content by default 1`] = `
 exports[`Accordion renders with visible content when \`open\` is true 1`] = `
 <div>
   <div
-    class="govuk-accordion"
+    class="govuk-accordion accordionPrint"
     id="test-sections"
   >
     <div
