@@ -5,6 +5,7 @@ interface SearchResult {
   element: Element;
   scrollIntoView: () => void;
   text: string;
+  location: string[];
 }
 
 interface State {
@@ -23,9 +24,47 @@ class PrototypeSearchForm extends Component<{}, State> {
   private textChangeTimeoutHandle?: any;
 
   private findElementsWithText(text: string) {
+    const lowerCase = text.toLocaleLowerCase();
     return Array.from(document.querySelectorAll('p')).filter(e =>
-      e.innerHTML.includes(text),
+      e.innerHTML.toLocaleLowerCase().includes(lowerCase),
     );
+  }
+
+  private static parentUntilClassname(element: Element, className: string) {
+    let parentElement = element.parentElement;
+    while (
+      parentElement &&
+      parentElement !== document.documentElement &&
+      !parentElement.classList.contains(className)
+    ) {
+      parentElement = parentElement.parentElement;
+    }
+    return parentElement || document.documentElement;
+  }
+
+  private static findSiblingsBeforeOfElementType(
+    element: Element,
+    ...types: string[]
+  ) {
+    let sibling = element.previousElementSibling;
+
+    const typesUpper = types.map(_ => _.toUpperCase());
+
+    while (sibling && !typesUpper.includes(sibling.nodeName)) {
+      sibling = sibling.previousElementSibling;
+    }
+
+    return sibling;
+  }
+
+  private static substring(str: string, length: number) {
+    if (str) {
+      if (str.length > length) {
+        return `${str.substring(0, length - 1)}…`;
+      }
+      return str;
+    }
+    return '';
   }
 
   private performSearch(search: string) {
@@ -33,10 +72,29 @@ class PrototypeSearchForm extends Component<{}, State> {
 
     const searchResults: SearchResult[] = elements.map(element => {
       let scrollIntoView: () => void;
+
       const potentialAccordion = PrototypeSearchForm.parentUntilClassname(
         element,
         'govuk-accordion__section',
       );
+
+      const locationHeaderElement = PrototypeSearchForm.findSiblingsBeforeOfElementType(
+        element,
+        'h3',
+        'h2',
+        'h4',
+      );
+
+      const location = [];
+
+      if (locationHeaderElement) {
+        location.push(
+          PrototypeSearchForm.substring(
+            locationHeaderElement.textContent || '',
+            20,
+          ),
+        );
+      }
 
       const insideAccordion = potentialAccordion.classList.contains(
         'govuk-accordion__section',
@@ -55,24 +113,13 @@ class PrototypeSearchForm extends Component<{}, State> {
 
       return {
         element,
+        location,
         scrollIntoView,
-        text: (element.textContent || '').substring(0, 10),
+        text: PrototypeSearchForm.substring(element.textContent || '', 30),
       };
     });
 
     this.setState({ searchResults });
-  }
-
-  private static parentUntilClassname(element: Element, className: string) {
-    let parentElement = element.parentElement;
-    while (
-      parentElement &&
-      parentElement !== document.documentElement &&
-      !parentElement.classList.contains(className)
-    ) {
-      parentElement = parentElement.parentElement;
-    }
-    return parentElement || document.documentElement;
   }
 
   private textChanged = (e: ChangeEvent<HTMLInputElement>) => {
@@ -162,7 +209,7 @@ class PrototypeSearchForm extends Component<{}, State> {
               >
                 <span className={styles.resultHeader}>{result.text}</span>
                 <span className={styles.resultLocation}>
-                  Location &gt; Location{' '}
+                  {result.location.join(' > ')}
                 </span>
               </li>
             ))}
