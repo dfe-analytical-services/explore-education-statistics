@@ -24,6 +24,7 @@ const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 const DotEnvPlugin = require('dotenv-webpack');
+const StylelintPlugin = require('stylelint-webpack-plugin');
 
 const DEPLOY_ENV = process.env.DEPLOY_ENV;
 
@@ -603,6 +604,8 @@ module.exports = function(webpackEnv) {
         path: DEPLOY_ENV ? `./.env.${DEPLOY_ENV}` : './.env',
         safe: true,
       }),
+
+      new StylelintPlugin(),
     ].filter(Boolean),
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.
