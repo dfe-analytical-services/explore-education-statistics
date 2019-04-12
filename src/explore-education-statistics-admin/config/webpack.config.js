@@ -270,9 +270,11 @@ module.exports = function (webpackEnv) {
         .map(ext => `.${ext}`)
         .filter(ext => useTypeScript || !ext.includes('ts')),
       alias: {
-        // Support React Native Web
-        // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
-        'react-native': 'react-native-web',
+        '@common': 'explore-education-statistics-common/src',
+        '@common-test': 'explore-education-statistics-common/test',
+        formik: path.resolve(paths.appNodeModules, 'formik'),
+        src: paths.appSrc,
+        react: path.resolve(paths.appNodeModules, 'react'),
       },
       plugins: [
         // Adds support for installing with Plug'n'Play, leading to faster installs and adding
@@ -366,12 +368,10 @@ module.exports = function (webpackEnv) {
             // Process any JS outside of the app with Babel.
             // Unlike the application JS, we only compile the standard ES features.
             {
-              test: /\.(js|mjs)$/,
+              test: /\.(js|mjs|jsx|ts|tsx)$/,
               exclude: /@babel(?:\/|\\{1,2})runtime/,
               loader: require.resolve('babel-loader'),
               options: {
-                babelrc: false,
-                configFile: false,
                 compact: false,
                 presets: [
                   [
