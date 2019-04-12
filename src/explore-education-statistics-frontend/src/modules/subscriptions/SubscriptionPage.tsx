@@ -14,11 +14,15 @@ import SubscriptionForm, {
 interface Props {
   slug: string;
   data: Release;
+  unsubscribed: string;
+  verified: string;
 }
 
 interface State {
+  id: string;
   slug: string;
   title: string;
+  subscribed: boolean;
 }
 
 class SubscriptionPage extends Component<Props> {
@@ -26,8 +30,10 @@ class SubscriptionPage extends Component<Props> {
     query,
   }: NextContext<{
     slug: string;
+    unsubscribed?: string;
+    verified?: string;
   }>) {
-    const { slug } = query;
+    const { slug, unsubscribed, verified } = query;
 
     const request = publicationService.getPublication(slug);
 
@@ -36,11 +42,15 @@ class SubscriptionPage extends Component<Props> {
     return {
       data,
       slug,
+      unsubscribed,
+      verified,
     };
   }
 
   public state: State = {
+    id: this.props.data.id,
     slug: this.props.slug,
+    subscribed: false,
     title: this.props.data.title,
   };
 
@@ -50,16 +60,32 @@ class SubscriptionPage extends Component<Props> {
     if (email !== '') {
       const slug = this.state.slug;
       const title = this.state.title;
+      const id = this.state.id;
+
       await functionsService.subscribeToPublication({
         email,
+        id,
         slug,
         title,
+      });
+      this.setState({
+        subscribed: true,
       });
     }
   };
 
   public render() {
-    const { data, slug } = this.props;
+    const { data, slug, unsubscribed, verified } = this.props;
+    let message;
+
+    if (unsubscribed) {
+      message = 'You have successfully unsubscribed from this publication.';
+    } else if (verified) {
+      message = 'You have successfully subscribed to this publication.';
+    } else if (this.state.subscribed) {
+      message =
+        'Thank you. Please check your email to verify the subscription.';
+    }
 
     return (
       <Page
@@ -69,13 +95,13 @@ class SubscriptionPage extends Component<Props> {
           { name: 'subscribe' },
         ]}
       >
-        <PageTitle title={`${data.title} : Subscribe`} />
+        <PageTitle title={`${data.title}`} caption={'Subscription'} />
 
-        <SubscriptionForm onSubmit={this.handleFormSubmit} />
-
-        <hr />
-
-        <GoToTopLink />
+        {message ? (
+          <p>{message}</p>
+        ) : (
+          <SubscriptionForm onSubmit={this.handleFormSubmit} />
+        )}
       </Page>
     );
   }
