@@ -5,7 +5,7 @@ import Link from '../../../../components/Link';
 const PrototypeMethodologySection = () => {
   return (
     <>
-      <h3 id="section4-1"> The collection process 2005/06 to present</h3>
+      <h3 id="section4-1">4.1 The collection process 2005/06 to present</h3>
       <p>
         The school census collects information for a pupil’s absence in the term
         prior to the census i.e. one term in arrears. For example, the spring
@@ -78,7 +78,7 @@ const PrototypeMethodologySection = () => {
         </a>
         .
       </p>
-      <h3 id="section4-2">Background of absence data collection</h3>
+      <h3 id="section4-2">4.2 Background of absence data collection</h3>
       <p>
         The following sections outline how absence data collection has changed
         since it was first collected in 1993/94. A timeline is also available in
@@ -417,7 +417,7 @@ const PrototypeMethodologySection = () => {
           </tr>
         </tbody>
       </table>
-      <h3 id="section4-3">Data coverage</h3>
+      <h3 id="section4-3">4.3 Data coverage</h3>
       <h4>Coverage for 2006/07 to present</h4>
       <p>
         Schools provide, via the school census, individual level attendance data
@@ -528,7 +528,7 @@ const PrototypeMethodologySection = () => {
         and independent schools. Information on academy absence was first
         collected for the 2002/03 academic year.
       </p>
-      <h3 id="section4-4">What absence information is collected</h3>
+      <h3 id="section4-4">4.4 What absence information is collected</h3>
       <p>
         Schools are expected to supply the following via their school census
         returns:
@@ -904,7 +904,9 @@ const PrototypeMethodologySection = () => {
         overall absence only.{' '}
       </p>
 
-      <h3 id="section4-5"> No longer collected but available historically</h3>
+      <h3 id="section4-5">
+        4.5 No longer collected but available historically
+      </h3>
       <p>
         The authorised absence code “extended family holiday” was discontinued
         as of September 2014 and should not be used by schools. As of the Pupil
@@ -924,7 +926,7 @@ const PrototypeMethodologySection = () => {
         collected from PRUs.
       </p>
 
-      <h3 id="section4-6"> What absence information is not collected</h3>
+      <h3 id="section4-6">4.6 What absence information is not collected</h3>
       <p>
         The following section outlines information the Department does not
         collect, including areas regularly queried by users.

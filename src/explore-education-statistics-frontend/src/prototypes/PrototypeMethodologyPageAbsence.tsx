@@ -75,19 +75,19 @@ const PublicationPage = () => {
       </div>
 
       <Accordion id="contents-sections">
-        <AccordionSection heading="Introduction">
+        <AccordionSection heading="1. Introduction">
           <MethodologySection>
             <MethodologyHeader>
               <h3 className="govuk-heading-s">In this section</h3>
               <ul className="govuk-body-s">
                 <li>
                   <a href="#section1-1">
-                    Pupil attendance requirements for schools
+                    1.1 Pupil attendance requirements for schools
                   </a>
                 </li>
                 <li>
                   <a href="#section1-2">
-                    Uses and users of absence statistics and data
+                    1.2 Uses and users of absence statistics and data
                   </a>
                 </li>
               </ul>
@@ -99,44 +99,44 @@ const PublicationPage = () => {
           </MethodologySection>
         </AccordionSection>
 
-        <AccordionSection heading="Background">
+        <AccordionSection heading="2. Background">
           <MethodologySection>
             <MethodologyHeader>
               <h3 className="govuk-heading-s">In this section</h3>
               <ul className="govuk-body-s">
                 <li>
-                  <a href="#section2-1">Current termly publications</a>
+                  <a href="#section2-1">2.1 Current termly publications</a>
                 </li>
                 <li>
-                  <a href="#section2-2">Key absence measures</a>
+                  <a href="#section2-2">2.2 Key absence measures</a>
                 </li>
                 <li>
-                  <a href="#section2-3">Cohort used in absence measures</a>
+                  <a href="#section2-3">2.3 Cohort used in absence measures</a>
                 </li>
                 <li>
                   <a href="#section2-4">
-                    The school year (five half terms vs six half terms)
+                    2.4 The school year (five half terms vs six half terms)
                   </a>
                 </li>
                 <li>
                   <a href="#section2-5">
-                    Published geographical and characteristics breakdowns
+                    2.5 Published geographical and characteristics breakdowns
                   </a>
                 </li>
                 <li>
                   <a href="#section2-6">
-                    Underlying data provided alongside publications
+                    2.6 Underlying data provided alongside publications
                   </a>
                 </li>
                 <li>
-                  <a href="#section2-7">Suppression of absence data</a>
+                  <a href="#section2-7">2.7 Suppression of absence data</a>
                 </li>
                 <li>
-                  <a href="#section2-8">Other related publications</a>
+                  <a href="#section2-8">2.8 Other related publications</a>
                 </li>
                 <li>
                   <a href="#section2-9">
-                    Devolved administration statistics on absence
+                    2.9 Devolved administration statistics on absence
                   </a>
                 </li>
               </ul>
@@ -147,16 +147,16 @@ const PublicationPage = () => {
           </MethodologySection>
         </AccordionSection>
 
-        <AccordionSection heading="Methodology">
+        <AccordionSection heading="3. Methodology">
           <MethodologySection>
             <MethodologyHeader>
               <h3 className="govuk-heading-s">In this section</h3>
               <ul className="govuk-body-s">
                 <li>
-                  <a href="#section3-1">Overall absence methodology</a>
+                  <a href="#section3-1">3.1 Overall absence methodology</a>
                 </li>
                 <li>
-                  <a href="#section3-2">Persistent absence methodology</a>
+                  <a href="#section3-2">3.2 Persistent absence methodology</a>
                 </li>
               </ul>
             </MethodologyHeader>
@@ -166,34 +166,36 @@ const PublicationPage = () => {
           </MethodologySection>
         </AccordionSection>
 
-        <AccordionSection heading="Data collection">
+        <AccordionSection heading="4. Data collection">
           <MethodologySection>
             <MethodologyHeader>
               <h3 className="govuk-heading-s">In this section</h3>
               <ul className="govuk-body-s">
                 <li>
                   <a href="#section4-1">
-                    The current process 2005/06 to present
+                    4.1 The current process 2005/06 to present
                   </a>
                 </li>
                 <li>
                   <a href="#section4-2">
-                    Background of absence data collection
+                    4.2 Background of absence data collection
                   </a>
                 </li>
                 <li>
-                  <a href="#section4-3">Data coverage</a>
+                  <a href="#section4-3">4.3 Data coverage</a>
                 </li>
                 <li>
-                  <a href="#section4-4">What absence data is collected</a>
+                  <a href="#section4-4">4.4 What absence data is collected</a>
                 </li>
                 <li>
                   <a href="#section4-5">
-                    No longer collected but available historically
+                    4.5 No longer collected but available historically
                   </a>
                 </li>
                 <li>
-                  <a href="#section4-6">What absence data is not collected</a>
+                  <a href="#section4-6">
+                    4.6 What absence data is not collected
+                  </a>
                 </li>
               </ul>
             </MethodologyHeader>
@@ -203,25 +205,25 @@ const PublicationPage = () => {
           </MethodologySection>
         </AccordionSection>
 
-        <AccordionSection heading="Data processing">
+        <AccordionSection heading="5. Data processing">
           <MethodologySection>
             <MethodologyHeader>
               <h3 className="govuk-heading-s">In this section</h3>
               <ul className="govuk-body-s">
                 <li>
-                  <a href="#section5-1">Data linking</a>
+                  <a href="#section5-1">5.1 Data linking</a>
                 </li>
                 <li>
-                  <a href="#section5-2">Data removed</a>
+                  <a href="#section5-2">5.2 Data removed</a>
                 </li>
                 <li>
-                  <a href="#section5-3">Variables added</a>
+                  <a href="#section5-3">5.3 Variables added</a>
                 </li>
                 <li>
-                  <a href="#section5-4">Consistency checks</a>
+                  <a href="#section5-4">5.4 Consistency checks</a>
                 </li>
                 <li>
-                  <a href="#section5-5">Data quality</a>
+                  <a href="#section5-5">5.5 Data quality</a>
                 </li>
               </ul>
             </MethodologyHeader>
@@ -231,7 +233,7 @@ const PublicationPage = () => {
           </MethodologySection>
         </AccordionSection>
 
-        <AccordionSection heading="Contacts">
+        <AccordionSection heading="6. Contacts">
           <PrototypeSection7 />
         </AccordionSection>
       </Accordion>

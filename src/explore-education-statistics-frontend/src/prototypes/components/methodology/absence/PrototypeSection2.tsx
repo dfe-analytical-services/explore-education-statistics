@@ -5,7 +5,7 @@ import Link from '../../../../components/Link';
 const PrototypeMethodologySection = () => {
   return (
     <>
-      <h3 id="section2-1">Current termly publications</h3>
+      <h3 id="section2-1">2.1 Current termly publications</h3>
       <p>
         DfE publishes termly pupil absence data and statistics via the following
         3 National Statistics releases each year:
@@ -75,7 +75,7 @@ const PrototypeMethodologySection = () => {
         Statistical bulletins. Links to all absence publications can be found in{' '}
         <a href="#">Annex D</a>.
       </p>
-      <h3 id="section2-2">Key absence measures</h3>
+      <h3 id="section2-2">2.2 Key absence measures</h3>
       <p>
         DfE monitors pupil absence levels using 2 key measures - overall absence
         rate and persistent absence (PA) rate.
@@ -110,7 +110,7 @@ const PrototypeMethodologySection = () => {
         to 10% or more of their possible sessions.
       </p>
       <p>See persistent absence methodology section for further information.</p>
-      <h3 id="section2-3">Cohort used in absence measures</h3>
+      <h3 id="section2-3">2.3 Cohort used in absence measures</h3>
       <p>
         Absence information is collected and disseminated at enrolment level
         rather than pupil level.
@@ -138,7 +138,9 @@ const PrototypeMethodologySection = () => {
         The number of pupil enrolments is approximately 4% higher than the
         number of pupils.
       </p>
-      <h3 id="section2-4">The school year (5 half terms vs 6 half terms)</h3>
+      <h3 id="section2-4">
+        2.4 The school year (5 half terms vs 6 half terms)
+      </h3>
       <p>
         Generally, the academic year is made up of 3 terms - autumn, spring and
         summer.
@@ -288,7 +290,7 @@ const PrototypeMethodologySection = () => {
         the 5 and 6 half term absence measures.
       </p>
       <h3 id="section2-5">
-        Published geographical and characteristics breakdowns
+        2.5 Published geographical and characteristics breakdowns
       </h3>
       <p>
         DfE routinely publishes pupil absence information at national, local
@@ -428,7 +430,9 @@ const PrototypeMethodologySection = () => {
         more variability in absence rates which use the number of possible
         sessions as a denominator.
       </p>
-      <h3 id="section2-6">Underlying data provided alongside publications</h3>
+      <h3 id="section2-6">
+        2.6 Underlying data provided alongside publications
+      </h3>
       <p>
         From the 2009/10 academic year, each National Statistics release has
         been accompanied by underlying data, including national, local authority
@@ -457,7 +461,7 @@ const PrototypeMethodologySection = () => {
         This additional data is intended to provide users with all information
         in one place and give them the option of producing their own analysis.
       </p>
-      <h3 id="section2-7">Suppression of absence data</h3>
+      <h3 id="section2-7">2.7 Suppression of absence data</h3>
       <p>
         The Code of Practice for Official Statistics requires reasonable steps
         are taken to ensure all published or disseminated statistics produced by
@@ -515,7 +519,7 @@ const PrototypeMethodologySection = () => {
           </tr>
         </tbody>
       </table>
-      <h3 id="section2-8">Other related publications</h3>
+      <h3 id="section2-8">2.8 Other related publications</h3>
       <p>
         Pupil absence information is also available in the following
         publications:
@@ -550,7 +554,7 @@ const PrototypeMethodologySection = () => {
           inclusive
         </li>
       </ul>
-      <h3 id="section2-9">Devolved administration statistics on absence</h3>
+      <h3 id="section2-9">2.9 Devolved administration statistics on absence</h3>
       <p>
         The Department collects and reports on absence information from schools
         in England. For information for Wales, Scotland and Northern Ireland,

@@ -10,7 +10,7 @@ const PrototypeMethodologySection = () => {
         census returns to a finalised dataset used to prepare National
         Statistics releases.
       </p>
-      <h3 id="section5-1">Data linking</h3>
+      <h3 id="section5-1">5.1 Data linking</h3>
       <p>
         Annual and combined termly absence data are derived by linking pupil
         records collected in each relevant school census to calculate overall
@@ -70,7 +70,7 @@ const PrototypeMethodologySection = () => {
           </tr>
         </tbody>
       </table>
-      <h3 id="section5-2">Data removed</h3>
+      <h3 id="section5-2">5.2 Data removed</h3>
       <p>
         To prepare the absence data for publication routine checks are applied
         to the linked data and where necessary data is removed as follows.
@@ -146,7 +146,7 @@ const PrototypeMethodologySection = () => {
         Year on year comparisons of local authority data may be affected by
         schools converting to academies.
       </p>{' '}
-      <h3 id="section5-3">Variables added</h3>
+      <h3 id="section5-3">5.3 Variables added</h3>
       <p>
         Most of the variables needed to produce national level absence
         statistics can be calculated directly from the fields collected via the
@@ -192,7 +192,7 @@ const PrototypeMethodologySection = () => {
         National Statistics, academies are only indicated as academies if they
         were open as of the 12th September.
       </p>
-      <h3 id="section5-4">Consistency checks</h3>
+      <h3 id="section5-4">5.4 Consistency checks</h3>
       <p>
         After the data is processed as set out above, consistency checks are
         performed against the Schools, pupils and their characteristics National
@@ -203,7 +203,7 @@ const PrototypeMethodologySection = () => {
         Further checks are carried out on the consistency of figures compared
         with previous years, both nationally and at local authority level.
       </p>
-      <h3 id="section5-5">Data quality</h3>
+      <h3 id="section5-5">5.5 Data quality</h3>
       <p>
         The following should be taken into account when reviewing published
         pupil absence statistics.

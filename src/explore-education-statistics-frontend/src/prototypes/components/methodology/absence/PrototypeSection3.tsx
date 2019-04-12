@@ -5,7 +5,7 @@ import Link from '../../../../components/Link';
 const PrototypeMethodologySection = () => {
   return (
     <>
-      <h3 id="section3-1">Overall absence methodology</h3>
+      <h3 id="section3-1">3.1 Overall absence methodology</h3>
       <p>
         An enrolment’s overall absence rate is the total number of overall
         absence sessions as a percentage of the total number of possible
@@ -22,7 +22,7 @@ const PrototypeMethodologySection = () => {
         Overall absence rate = (Total overall absence sessions) / Total sessions
         possible) X 100
       </p>
-      <h3 id="section3-2">Persistent absence methodology</h3>
+      <h3 id="section3-2">3.2 Persistent absence methodology</h3>
       <p>
         The persistent absence measure was introduced in 2005/06. The sections
         below outline how the measure has changed since it was implemented.
