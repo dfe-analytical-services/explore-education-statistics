@@ -1,5 +1,5 @@
 {
-  "name": "root",
+  "name": "explore-education-statistics",
   "private": true,
   "devDependencies": {
     "lerna": "^3.11.1"
@@ -8,6 +8,7 @@
     "prettier": "^1.16.4"
   },
   "scripts": {
+    "bootstrap": "lerna bootstrap",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,scss,html}'",
     "format:check": "prettier --list-different 'src/**/*.{js,jsx,ts,tsx,css,scss,html}'"
   }
