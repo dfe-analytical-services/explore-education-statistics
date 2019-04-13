@@ -17,8 +17,8 @@ function useRendered() {
 
   return {
     isRendered,
-    onRendered(value: any, unRenderedValue?: any) {
-      return isRendered ? value : unRenderedValue;
+    onRendered<T, R>(value: T, defaultValue?: R): T | R | undefined {
+      return isRendered ? value : defaultValue;
     },
   };
 }

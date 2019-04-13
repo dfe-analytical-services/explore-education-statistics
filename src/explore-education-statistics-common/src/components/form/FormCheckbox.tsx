@@ -1,8 +1,6 @@
 import React, { ChangeEventHandler } from 'react';
 
-export type CheckboxChangeEventHandler<
-  T = HTMLInputElement
-> = ChangeEventHandler<T>;
+export type CheckboxChangeEventHandler = ChangeEventHandler<HTMLInputElement>;
 
 interface Props {
   checked?: boolean;

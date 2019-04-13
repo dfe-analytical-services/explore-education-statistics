@@ -12,7 +12,7 @@ export interface CheckboxOption {
 export type FormCheckboxGroupProps = {
   name: string;
   onAllChange?: CheckboxChangeEventHandler;
-  onChange?: CheckboxChangeEventHandler<any>;
+  onChange?: CheckboxChangeEventHandler;
   options: CheckboxOption[];
   selectAll?: boolean;
   value: string[];

@@ -1,8 +1,8 @@
 enum SchoolType {
   Dummy = 'Dummy',
   Total = 'Total',
-  State_Funded_Primary = 'State_Funded_Primary',
-  State_Funded_Secondary = 'State_Funded_Secondary',
+  StateFundedPrimary = 'State_Funded_Primary',
+  StateFundedSecondary = 'State_Funded_Secondary',
   Special = 'Special',
 }
 

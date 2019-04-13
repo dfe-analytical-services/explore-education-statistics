@@ -13,7 +13,7 @@ interface RadioOption {
 export type FormRadioGroupProps = {
   inline?: boolean;
   name: string;
-  onChange?: RadioChangeEventHandler<any>;
+  onChange?: RadioChangeEventHandler;
   options: RadioOption[];
   value: string | null;
 } & FieldSetProps;

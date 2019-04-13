@@ -13,7 +13,6 @@ const ButtonLink = ({
   className,
   disabled = false,
   to,
-  type = 'button',
   ...props
 }: Props) => {
   return (

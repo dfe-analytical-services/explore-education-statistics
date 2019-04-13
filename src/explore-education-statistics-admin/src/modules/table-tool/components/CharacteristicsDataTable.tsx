@@ -14,8 +14,8 @@ const schoolKeys: {
   [key: string]: string;
 } = {
   [SchoolType.Dummy]: 'Dummy',
-  [SchoolType.State_Funded_Primary]: 'State funded primary schools',
-  [SchoolType.State_Funded_Secondary]: 'State funded secondary schools',
+  [SchoolType.StateFundedPrimary]: 'State funded primary schools',
+  [SchoolType.StateFundedSecondary]: 'State funded secondary schools',
   [SchoolType.Special]: 'Special schools',
   [SchoolType.Total]: 'Total',
 };

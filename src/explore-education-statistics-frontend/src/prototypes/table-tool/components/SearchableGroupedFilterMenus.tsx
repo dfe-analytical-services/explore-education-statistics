@@ -45,7 +45,7 @@ class SearchableGroupedFilterMenus<
 
     const groups = sortBy(Object.entries(menuOptions), ([groupKey]) => groupKey)
       .filter(
-        ([groupKey, group]) =>
+        ([_, group]) =>
           searchTerm === '' ||
           group.options.some(
             item =>

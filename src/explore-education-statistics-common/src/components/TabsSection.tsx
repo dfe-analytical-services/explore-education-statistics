@@ -1,12 +1,5 @@
 import classNames from 'classnames';
-import React, {
-  forwardRef,
-  FunctionComponent,
-  HTMLAttributes,
-  ReactNode,
-  Ref,
-  useState,
-} from 'react';
+import React, { forwardRef, FunctionComponent, HTMLAttributes, ReactNode, Ref } from 'react';
 import useRendered from '../hooks/useRendered';
 import styles from './TabsSection.module.scss';
 
@@ -23,10 +16,9 @@ export interface TabsSectionProps {
 
 const TabsSection: FunctionComponent<TabsSectionProps> = forwardRef(
   (
-    { children, id, lazy = false, ...restProps }: TabsSectionProps,
+    { children, id, ...restProps }: TabsSectionProps,
     ref: Ref<HTMLElement>,
   ) => {
-    const [mouseDown, setMouseDown] = useState(false);
     const { onRendered } = useRendered();
 
     // Hide additional props from the component's public API to
@@ -43,13 +35,6 @@ const TabsSection: FunctionComponent<TabsSectionProps> = forwardRef(
         id={id}
         hidden={tabProps.hidden}
         ref={ref}
-        onFocus={event => {
-          if (mouseDown) {
-            event.target.blur();
-          }
-        }}
-        onMouseDown={() => setMouseDown(true)}
-        onMouseUp={() => setMouseDown(false)}
         role={onRendered('tabpanel')}
         tabIndex={onRendered(-1)}
         data-testid={tabProps.title}

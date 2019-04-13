@@ -13,7 +13,7 @@ describe('FormTextInput', () => {
   });
 
   test('renders correctly with hint', () => {
-    const { container, getByLabelText, getByText } = render(
+    const { container, getByText } = render(
       <FormTextInput
         id="test-input"
         label="Test input"
@@ -23,9 +23,8 @@ describe('FormTextInput', () => {
     );
 
     const hint = getByText('Fill me in');
-    expect(hint).toBeDefined();
-    expect(hint.id).toBe('test-input-hint');
 
+    expect(hint.id).toBe('test-input-hint');
     expect(container.innerHTML).toMatchSnapshot();
   });
 
@@ -40,9 +39,8 @@ describe('FormTextInput', () => {
     );
 
     const error = getByText('Field is required');
-    expect(error).toBeDefined();
-    expect(error.id).toBe('test-input-error');
 
+    expect(error.id).toBe('test-input-error');
     expect(container.innerHTML).toMatchSnapshot();
   });
 

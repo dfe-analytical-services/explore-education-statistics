@@ -5,10 +5,13 @@ type TimePeriodCode = 'AY';
 const allowedTimePeriodCodes: TimePeriodCode[] = ['AY'];
 
 class TimePeriod {
-  public constructor(
-    public readonly year: number,
-    public readonly code: TimePeriodCode,
-  ) {}
+  public readonly year: number;
+  public readonly code: TimePeriodCode;
+
+  public constructor(year: number, code: TimePeriodCode) {
+    this.code = code;
+    this.year = year;
+  }
 
   public static fromString(value: string): TimePeriod {
     const [year, code] = value.split('_');

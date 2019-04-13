@@ -9,19 +9,19 @@ interface MethodologySectionProps {
 export class MethodologySection extends Component<MethodologySectionProps> {
   private container: HTMLElement | null;
 
-  constructor(props: MethodologySectionProps) {
+  public constructor(props: MethodologySectionProps) {
     super(props);
     this.container = null;
   }
 
-  get height() {
+  public get height() {
     if (this.container) {
       return this.container.offsetHeight;
     }
     return 0;
   }
 
-  get scrollTop() {
+  public get scrollTop() {
     if (this.container) {
       return this.container.getBoundingClientRect().top;
     }

@@ -2,7 +2,7 @@ import 'core-js/fn/array/virtual/flat-map';
 import 'core-js/fn/array/virtual/includes';
 import 'cross-fetch/polyfill';
 
-import { Container, default as BaseApp } from 'next/app';
+import { Container, default as BaseApp, NextAppContext } from 'next/app';
 import Router from 'next/router';
 import React from 'react';
 import Helmet from 'react-helmet';
@@ -10,7 +10,7 @@ import { logPageView } from 'src/services/googleAnalyticsService';
 import './_app.scss';
 
 class App extends BaseApp {
-  public static async getInitialProps({ Component, ctx }: any) {
+  public static async getInitialProps({ Component, ctx }: NextAppContext) {
     let pageProps = {};
 
     if (Component.getInitialProps) {

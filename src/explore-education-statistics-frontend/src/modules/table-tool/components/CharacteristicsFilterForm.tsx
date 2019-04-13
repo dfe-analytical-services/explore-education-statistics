@@ -1,12 +1,6 @@
 import Button from '@common/components/Button';
-import ErrorSummary, {
-  ErrorSummaryMessage,
-} from '@common/components/ErrorSummary';
-import {
-  FormFieldset,
-  FormGroup,
-  FormTextInput,
-} from '@common/components/form';
+import ErrorSummary, { ErrorSummaryMessage } from '@common/components/ErrorSummary';
+import { FormFieldset, FormGroup, FormTextInput } from '@common/components/form';
 import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
@@ -72,12 +66,12 @@ class CharacteristicsFilterForm extends Component<Props, State> {
     {
       id: 'filter-schoolTypes-primary',
       label: 'Primary',
-      value: SchoolType.State_Funded_Primary,
+      value: SchoolType.StateFundedPrimary,
     },
     {
       id: 'filter-schoolTypes-secondary',
       label: 'Secondary',
-      value: SchoolType.State_Funded_Secondary,
+      value: SchoolType.StateFundedSecondary,
     },
     {
       id: 'filter-schoolTypes-special',

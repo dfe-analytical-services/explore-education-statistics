@@ -72,7 +72,7 @@ const ObservationalUnitFilters = ({ form, specification }: Props) => {
             />
           )}
 
-          {form.values.location.level === LocationLevel.Local_Authority && (
+          {form.values.location.level === LocationLevel.LocalAuthority && (
             <FormFieldSelect
               name="location.localAuthority"
               id="filter-localAuthority"

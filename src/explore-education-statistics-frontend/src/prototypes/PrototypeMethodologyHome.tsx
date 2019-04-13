@@ -32,7 +32,7 @@ const HomePage = () => {
           </p>
         </div>
         <div className="govuk-grid-column-one-third">
-          <aside className="app-related-items" role="complementary">
+          <aside className="app-related-items">
             <h2 className="govuk-heading-m" id="releated-content">
               Related content
             </h2>

@@ -31,6 +31,7 @@ class PrivacyPolicyPage extends Component {
             <a
               href="https://www.gov.uk/government/organisations/department-for-education"
               target="_blank"
+              rel="noopener noreferrer"
             >
               www.gov.uk/government/organisations/department-for-education{' '}
               <span> opens in a new window </span>
@@ -125,6 +126,7 @@ class PrivacyPolicyPage extends Component {
             <a
               href="https://ico.org.uk/for-organisations/guide-to-data-protection/principle-6-rights/"
               target="_blank"
+              rel="noopener noreferrer"
             >
               your data protection rights <span> opens in a new window </span>
             </a>{' '}
@@ -136,7 +138,11 @@ class PrivacyPolicyPage extends Component {
           <p>
             You have the right to raise any concerns with the Information
             Commissioner’s Office (ICO) via their website at{' '}
-            <a href="https://ico.org.uk/concerns/" target="_blank">
+            <a
+              href="https://ico.org.uk/concerns/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               https://ico.org.uk/concerns/ <span> opens in a new window </span>
             </a>
             .

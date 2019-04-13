@@ -14,7 +14,7 @@ interface Props {
 }
 
 const CategoricalFilters = ({ form, specification }: Props) => {
-  const { getError } = createErrorHelper<any>(form as any);
+  const { getError } = createErrorHelper(form);
 
   return (
     <div className={styles.columns}>

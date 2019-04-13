@@ -1,8 +1,6 @@
 import React, { ChangeEventHandler } from 'react';
 
-export type RadioChangeEventHandler<T = HTMLInputElement> = ChangeEventHandler<
-  T
->;
+export type RadioChangeEventHandler = ChangeEventHandler<HTMLInputElement>;
 
 interface Props {
   checked?: boolean;

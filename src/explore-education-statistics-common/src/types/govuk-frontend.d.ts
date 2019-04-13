@@ -1,5 +1,5 @@
 declare class GovUkModule {
-  constructor(selector: HTMLElement | null);
+  public constructor(selector: HTMLElement | null);
   public init(): void;
 }
 

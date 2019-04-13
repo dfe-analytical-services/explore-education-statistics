@@ -18,7 +18,7 @@ class FindStatisticsPage extends Component<Props> {
     themes: [],
   };
 
-  public static async getInitialProps(): Promise<Props> {
+  public static async getInitialProps() {
     const themes = await contentApi.get('/Content/tree');
 
     return {
@@ -55,7 +55,7 @@ class FindStatisticsPage extends Component<Props> {
 
         {themes.length > 0 ? (
           <>
-            {themes.map(({ id, slug, title, topics }) => (
+            {themes.map(({ id, title, topics }) => (
               <div key={id}>
                 <h2 className="govuk-heading-l">{title}</h2>
 

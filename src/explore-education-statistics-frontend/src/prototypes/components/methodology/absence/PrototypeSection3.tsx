@@ -1,6 +1,4 @@
-import classNames from 'classnames';
 import React from 'react';
-import Link from '../../../../components/Link';
 
 const PrototypeMethodologySection = () => {
   return (

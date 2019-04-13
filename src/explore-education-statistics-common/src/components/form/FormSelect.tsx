@@ -1,7 +1,9 @@
 import classNames from 'classnames';
-import React, { ChangeEventHandler, ReactNode } from 'react';
+import React, { ChangeEventHandler, FocusEventHandler, ReactNode } from 'react';
 import ErrorMessage from '../ErrorMessage';
 import styles from './FormSelect.module.scss';
+
+export type SelectChangeEventHandler = ChangeEventHandler<HTMLSelectElement>;
 
 export interface SelectOption {
   label: string;
@@ -13,7 +15,8 @@ export interface FormSelectProps {
   id: string;
   label: ReactNode | string;
   name: string;
-  onChange?: ChangeEventHandler<any>;
+  onBlur?: FocusEventHandler;
+  onChange?: SelectChangeEventHandler;
   options: SelectOption[];
   value?: string | number;
 }
@@ -23,6 +26,7 @@ const FormSelect = ({
   id,
   label,
   name,
+  onBlur,
   onChange,
   options,
   value,
@@ -39,6 +43,7 @@ const FormSelect = ({
         })}
         id={id}
         name={name}
+        onBlur={onBlur}
         onChange={onChange}
         value={value}
       >

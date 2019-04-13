@@ -1,5 +1,7 @@
 @import '../styles/govuk-base';
 
 .panel {
-  @include govuk-focusable;
+  &:focus {
+    outline: none;
+  }
 }

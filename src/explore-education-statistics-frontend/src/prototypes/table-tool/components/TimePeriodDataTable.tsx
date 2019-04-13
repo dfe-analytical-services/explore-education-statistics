@@ -85,8 +85,7 @@ const TimePeriodDataTable = (props: Props) => {
               result.indicators[row.value] !== undefined &&
                 result.characteristic &&
                 result.characteristic.name === rowGroup.value &&
-                result.timePeriod ===
-                  formatToAcademicYear((column as any).year) &&
+                result.timePeriod === formatToAcademicYear(column.year) &&
                 result.schoolType === colGroup.value,
             );
           });
@@ -122,7 +121,7 @@ const TimePeriodDataTable = (props: Props) => {
       <TableHeadersForm
         filters={filters}
         onSubmit={value => {
-          setTableHeaders(value as any);
+          setTableHeaders(value as TableHeaders);
         }}
       />
 

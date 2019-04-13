@@ -14,8 +14,8 @@ describe('Breadcrumbs', () => {
     const breadcrumbs = container.querySelectorAll('li');
 
     expect(breadcrumbs).toHaveLength(1);
-    expect(breadcrumbs[0]!.textContent).toBe('Home');
-    expect(breadcrumbs[0]!.querySelector('a')).toHaveAttribute('href', '/');
+    expect(breadcrumbs[0].textContent).toBe('Home');
+    expect(breadcrumbs[0].querySelector('a')).toHaveAttribute('href', '/');
 
     expect(container.innerHTML).toMatchSnapshot();
   });
@@ -41,14 +41,14 @@ describe('Breadcrumbs', () => {
     const breadcrumbs = container.querySelectorAll('li');
 
     expect(breadcrumbs).toHaveLength(3);
-    expect(breadcrumbs[0]!.textContent).toBe('Home');
-    expect(breadcrumbs[0]!.querySelector('a')).toHaveAttribute('href', '/');
-    expect(breadcrumbs[1]!.textContent).toBe('Publications');
-    expect(breadcrumbs[1]!.querySelector('a')).toHaveAttribute(
+    expect(breadcrumbs[0].textContent).toBe('Home');
+    expect(breadcrumbs[0].querySelector('a')).toHaveAttribute('href', '/');
+    expect(breadcrumbs[1].textContent).toBe('Publications');
+    expect(breadcrumbs[1].querySelector('a')).toHaveAttribute(
       'href',
       '/publications',
     );
-    expect(breadcrumbs[2]!.textContent).toBe('Test publication');
+    expect(breadcrumbs[2].textContent).toBe('Test publication');
 
     expect(container.innerHTML).toMatchSnapshot();
   });
@@ -74,8 +74,8 @@ describe('Breadcrumbs', () => {
     const breadcrumbs = container.querySelectorAll('li');
 
     expect(breadcrumbs).toHaveLength(3);
-    expect(breadcrumbs[1]!.textContent).toBe('Publications');
-    expect(breadcrumbs[1]!.querySelector('a')).toBe(null);
+    expect(breadcrumbs[1].textContent).toBe('Publications');
+    expect(breadcrumbs[1].querySelector('a')).toBe(null);
   });
 
   test('does not render last breadcrumb as a link', () => {
@@ -97,9 +97,9 @@ describe('Breadcrumbs', () => {
       </MemoryRouter>,
     );
 
-    const lastBreadcrumb = container.querySelector('li:last-child');
+    const lastBreadcrumb = container.querySelector('li:last-child') as HTMLElement;
 
     expect(lastBreadcrumb).toBeDefined();
-    expect(lastBreadcrumb!.querySelector('a')).toBeNull();
+    expect(lastBreadcrumb.querySelector('a')).toBeNull();
   });
 });

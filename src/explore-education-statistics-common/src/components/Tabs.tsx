@@ -64,10 +64,7 @@ const Tabs = ({ children }: Props) => {
               id={`${props.id}-tab`}
               ref={(element: HTMLAnchorElement) => tabElements.push(element)}
               role={onRendered('tab')}
-              onClick={event => {
-                event.preventDefault();
-                setSelectedTab(index);
-              }}
+              onClick={() => setSelectedTab(index)}
               onKeyDown={event => {
                 switch (event.key) {
                   case 'ArrowLeft': {

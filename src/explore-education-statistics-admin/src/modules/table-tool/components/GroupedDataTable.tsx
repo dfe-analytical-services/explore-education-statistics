@@ -51,7 +51,7 @@ class GroupedDataTable extends Component<Props> {
                 {group.rows.map((row, rowIndex) => {
                   return (
                     <tr key={`${group.name}-${row}-${rowIndex}`}>
-                      <td role="colgroup">{row.name}</td>
+                      <td>{row.name}</td>
                       {row.columns.map((column, columnIndex) => {
                         return (
                           <td

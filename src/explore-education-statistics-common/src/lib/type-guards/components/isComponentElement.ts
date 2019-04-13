@@ -7,11 +7,11 @@ export default function isComponentElement<P>(
     return false;
   }
 
-  const element = value as ReactElement<any>;
+  const element = value as ReactElement<P>;
 
   if (element.type !== undefined) {
     return (
-      (element.type as any) instanceof Component ||
+      element.type instanceof Component ||
       typeof element.type === 'function'
     );
   }

@@ -6,7 +6,7 @@
  */
 function mockObject<T>(
   instance: object,
-  defaultImplementation?: () => any,
+  defaultImplementation?: () => T,
 ): jest.Mocked<T> {
   return Object.entries(instance).reduce((acc, [key, value]) => {
     if (typeof value === 'function') {

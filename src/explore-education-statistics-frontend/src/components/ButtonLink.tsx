@@ -15,7 +15,6 @@ const ButtonLink = ({
   className,
   disabled = false,
   to,
-  type = 'button',
   ...props
 }: Props) => {
   // We support href and to for backwards

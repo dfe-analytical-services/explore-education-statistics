@@ -20,6 +20,25 @@
   ],
   "rules": {
     "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { "argsIgnorePattern": "^_$" }
+    ],
+    "react/no-unescaped-entities": [
+      "error",
+      {
+        "forbid": [
+          {
+            "char": ">",
+            "alternatives": ["&gt;"]
+          },
+          {
+            "char": "}",
+            "alternatives": ["&#125;"]
+          }
+        ]
+      }
+    ],
     "react/prop-types": "off",
     "jsx-a11y/anchor-is-valid": "off"
   },

@@ -1,41 +1,45 @@
 import { AxiosInstance, AxiosPromise, AxiosRequestConfig } from 'axios';
 
 class Client {
-  constructor(public api: AxiosInstance) {}
+  public readonly api: AxiosInstance;
 
-  public get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  public constructor(api: AxiosInstance) {
+    this.api = api;
+  }
+
+  public get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {
     return this.unboxResponse(this.api.get(url, config));
   }
 
-  public post<T = any>(
+  public post<T = unknown>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: AxiosRequestConfig,
   ): Promise<T> {
     return this.unboxResponse(this.api.post(url, data, config));
   }
 
-  public put<T = any>(
+  public put<T = unknown>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: AxiosRequestConfig,
   ): Promise<T> {
     return this.unboxResponse(this.api.put(url, data, config));
   }
 
-  public patch<T = any>(
+  public patch<T = unknown>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: AxiosRequestConfig,
   ): Promise<T> {
     return this.unboxResponse(this.api.patch(url, data, config));
   }
 
-  public delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  public delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {
     return this.unboxResponse(this.api.delete(url, config));
   }
 
-  private unboxResponse(promise: AxiosPromise<any>) {
+  private unboxResponse<T>(promise: AxiosPromise<T>) {
     return promise.then(({ data }) => data);
   }
 }

@@ -50,6 +50,7 @@ const AccordionSection = ({
       className={classNames(classes.section, className, {
         'govuk-accordion__section--expanded': open,
       })}
+      role="presentation"
     >
       <div
         className="govuk-accordion__section-header"

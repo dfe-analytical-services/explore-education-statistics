@@ -1,9 +1,6 @@
 import Button from '@common/components/Button';
-import ErrorSummary, {
-  ErrorSummaryMessage,
-} from '@common/components/ErrorSummary';
+import ErrorSummary, { ErrorSummaryMessage } from '@common/components/ErrorSummary';
 import { FormFieldset, FormFieldTextInput } from '@common/components/form';
-import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
 import { Form, Formik, FormikErrors, FormikProps, FormikTouched } from 'formik';
 import React, { Component, createRef } from 'react';
@@ -77,11 +74,8 @@ class SubscriptionForm extends Component<Props, State> {
         render={({
           errors,
           touched,
-          values,
           ...form
         }: FormikProps<FormValues>) => {
-          const { getError } = createErrorHelper({ errors, touched });
-
           return (
             <div ref={this.ref}>
               <ErrorSummary
