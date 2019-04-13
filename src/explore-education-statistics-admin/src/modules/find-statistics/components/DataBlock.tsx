@@ -1,9 +1,9 @@
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import { baseUrl } from '@common/services/api';
+import { Chart, DataQuery, Summary } from '@common/services/publicationService';
+import { PublicationMeta } from '@common/services/tableBuilderService';
 import React, { Component } from 'react';
-import { baseUrl } from 'src/services/api';
-import { Chart, DataQuery, Summary } from 'src/services/publicationService';
-import { PublicationMeta } from 'src/services/tableBuilderService';
 import { ChartRenderer } from './ChartRenderer';
 import { SummaryRenderer } from './SummaryRenderer';
 import { TableRenderer } from './TableRenderer';

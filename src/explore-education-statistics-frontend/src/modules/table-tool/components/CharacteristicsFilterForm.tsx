@@ -5,11 +5,11 @@ import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGro
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
+import { PublicationMeta } from '@common/services/tableBuilderService';
 import SchoolType from '@common/services/types/SchoolType';
 import { Form, Formik, FormikErrors, FormikProps, FormikTouched } from 'formik';
 import debounce from 'lodash/debounce';
 import React, { ChangeEvent, Component, createRef } from 'react';
-import { PublicationMeta } from 'src/services/tableBuilderService';
 import SearchableFilterMenus from './SearchableFilterMenus';
 
 interface FormValues {

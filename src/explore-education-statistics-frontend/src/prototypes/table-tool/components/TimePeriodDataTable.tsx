@@ -1,3 +1,4 @@
+import { DataTableResult } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import isEqual from 'lodash/isEqual';
 import React, { useState } from 'react';
@@ -10,7 +11,6 @@ import {
   IndicatorOption,
 } from 'src/prototypes/table-tool/components/meta/initialSpec';
 import TableHeadersForm from 'src/prototypes/table-tool/components/TableHeadersForm';
-import { DataTableResult } from 'src/services/tableBuilderService';
 
 interface Props {
   filters: {

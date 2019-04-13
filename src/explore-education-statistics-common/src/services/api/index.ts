@@ -1,6 +1,6 @@
-import Client from '@common/services/api/Client';
-import { commaSeparated } from '@common/services/util/paramSerializers';
 import axios from 'axios';
+import { commaSeparated } from '../util/paramSerializers';
+import Client from './Client';
 
 export const baseUrl = {
   content: process.env.CONTENT_API_BASE_URL,

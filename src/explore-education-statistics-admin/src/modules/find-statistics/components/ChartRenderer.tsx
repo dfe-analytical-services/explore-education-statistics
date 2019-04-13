@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import { Axis } from '../../../services/publicationService';
+import { Axis } from '@common/services/publicationService';
 import {
   CharacteristicsData,
   IndicatorsMetaItem,
   PublicationMeta,
-} from '../../../services/tableBuilderService';
+} from '@common/services/tableBuilderService';
+import React, { Component } from 'react';
 import { HorizontalBarBlock } from './Charts/HorizontalBarBlock';
 import { LineChartBlock } from './Charts/LineChartBlock';
 

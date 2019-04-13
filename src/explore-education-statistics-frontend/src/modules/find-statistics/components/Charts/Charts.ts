@@ -1,5 +1,5 @@
-import { Axis } from 'src/services/publicationService';
-import { CharacteristicsData } from 'src/services/tableBuilderService';
+import { Axis } from '@common/services/publicationService';
+import { CharacteristicsData } from '@common/services/tableBuilderService';
 
 export const colours: string[] = [
   '#b10e1e',

@@ -1,5 +1,5 @@
+import { Release } from '@common/services/publicationService';
 import React from 'react';
-import { Release } from '../../../services/publicationService';
 import ContentSubBlockRenderer from './ContentSubBlockRenderer';
 
 interface Props {

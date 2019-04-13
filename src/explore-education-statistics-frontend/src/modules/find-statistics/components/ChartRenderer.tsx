@@ -1,11 +1,11 @@
-import dynamic from 'next-server/dynamic';
-import React, { Component } from 'react';
-import { Axis } from 'src/services/publicationService';
+import { Axis } from '@common/services/publicationService';
 import {
   CharacteristicsData,
   IndicatorsMetaItem,
   PublicationMeta,
-} from 'src/services/tableBuilderService';
+} from '@common/services/tableBuilderService';
+import dynamic from 'next-server/dynamic';
+import React, { Component } from 'react';
 import { HorizontalBarBlock } from './Charts/HorizontalBarBlock';
 import { LineChartBlock } from './Charts/LineChartBlock';
 import { VerticalBarBlock } from './Charts/VerticalBarBlock';

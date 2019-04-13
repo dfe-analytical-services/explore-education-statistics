@@ -1,9 +1,9 @@
+import publicationService, { Release } from '@common/services/publicationService';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import Page from 'src/components/Page';
 import PageTitle from 'src/components/PageTitle';
 import functionsService from 'src/services/functionsService';
-import publicationService, { Release } from 'src/services/publicationService';
 import SubscriptionForm, { SubscriptionFormSubmitHandler } from './components/SubscriptionForm';
 
 interface Props {

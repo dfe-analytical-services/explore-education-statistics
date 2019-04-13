@@ -1,4 +1,4 @@
-import mockObject from '@common-test/mockObject';
+import mockObject from 'test/mockObject';
 
 const service = jest.requireActual('../tableBuilderService').default;
 

@@ -1,15 +1,12 @@
-import SchoolType from '@common/services/types/SchoolType';
-import React from 'react';
-import {
-  DataBlock,
-  DataBlockProps,
-} from '../../modules/find-statistics/components/DataBlock';
-import { Axis, Chart } from '../../services/publicationService';
+import { Axis, Chart } from '@common/services/publicationService';
 import {
   CharacteristicsData,
   DataTableResult,
   PublicationMeta,
-} from '../../services/tableBuilderService';
+} from '@common/services/tableBuilderService';
+import SchoolType from '@common/services/types/SchoolType';
+import React from 'react';
+import { DataBlock, DataBlockProps } from '../../modules/find-statistics/components/DataBlock';
 import { data as OriginalData } from './PrototypeMapBoundaries';
 
 function createDataValues(

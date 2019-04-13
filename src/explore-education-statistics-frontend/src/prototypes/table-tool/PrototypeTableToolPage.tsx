@@ -1,4 +1,5 @@
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
+import tableBuilderService, { DataTableResult } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import mapValues from 'lodash/mapValues';
 import React, { Component, createRef } from 'react';
@@ -16,7 +17,6 @@ import publicationSubjectSpec
   from 'src/prototypes/table-tool/components/meta/publicationSubjectSpec';
 import TimePeriodDataTable from 'src/prototypes/table-tool/components/TimePeriodDataTable';
 import mapOptionValues from 'src/prototypes/table-tool/components/utils/mapOptionValues';
-import tableBuilderService, { DataTableResult } from 'src/services/tableBuilderService';
 
 const defaultPublicationOptions = [
   {

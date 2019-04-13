@@ -1,6 +1,7 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
+import publicationService, { Release } from '@common/services/publicationService';
 import React, { Component, Fragment } from 'react';
 import {
   DragDropContext,
@@ -9,7 +10,6 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
-import publicationService, { Release } from 'src/services/publicationService';
 import EditableAccordion from '../../components/EditableAccordion';
 import EditableAccordionSection from '../../components/EditableAccordionSection';
 import Link from '../../components/Link';

@@ -1,7 +1,7 @@
+import { contentApi } from '@common/services/api';
 import React, { Component } from 'react';
 import Page from 'src/components/Page';
 import PageTitle from 'src/components/PageTitle';
-import { contentApi } from 'src/services/api';
 import TopicList, { Topic } from './components/TopicList';
 
 interface Props {
