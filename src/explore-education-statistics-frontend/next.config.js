@@ -91,6 +91,26 @@ const withSassModules = createPlugin((config, options) => {
   return config;
 });
 
+const withESLint = createPlugin((config, options) => {
+  const { isServer } = options;
+
+  if (!isServer) {
+    config.module.rules.push({
+      enforce: 'pre',
+      test: /\.(ts|tsx|js|jsx)$/,
+      exclude: /node_modules/,
+      use: {
+        loader: 'eslint-loader',
+        options: {
+          failOnError: true,
+        },
+      },
+    });
+  }
+
+  return config;
+});
+
 const config = {
   webpack(config, options) {
     const { dev, isServer } = options;
@@ -99,7 +119,6 @@ const config = {
       config.plugins.push(
         new ForkTsCheckerPlugin({
           tsconfig: path.resolve(__dirname, 'tsconfig.json'),
-          tslint: path.resolve(__dirname, 'tslint.json'),
         }),
       );
     }
@@ -161,10 +180,10 @@ const config = {
 };
 
 module.exports = compose(
-  // withTranspileModules,
   withFonts,
   withImages,
   withCss,
   withSassModules,
   withTypescript,
+  withESLint,
 )(config);
