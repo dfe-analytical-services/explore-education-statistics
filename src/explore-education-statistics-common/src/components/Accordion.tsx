@@ -2,10 +2,7 @@ import classNames from 'classnames';
 import React, { cloneElement, Component, createRef, ReactNode } from 'react';
 import isComponentType from '../lib/type-guards/components/isComponentType';
 import styles from './Accordion.module.scss';
-import AccordionSection, {
-  AccordionSectionProps,
-  classes,
-} from './AccordionSection';
+import AccordionSection, { AccordionSectionProps, classes } from './AccordionSection';
 
 export interface AccordionProps {
   children: ReactNode;
@@ -13,12 +10,12 @@ export interface AccordionProps {
 }
 
 interface State {
-  hash: string;
+  openSectionId: string;
 }
 
 class Accordion extends Component<AccordionProps, State> {
   public state = {
-    hash: '',
+    openSectionId: '',
   };
 
   private ref = createRef<HTMLDivElement>();
@@ -41,24 +38,41 @@ class Accordion extends Component<AccordionProps, State> {
   }
 
   private goToHash = () => {
-    this.setState({ hash: location.hash });
-
     if (this.ref.current && location.hash) {
-      const anchor = this.ref.current.querySelector(
-        location.hash,
-      ) as HTMLButtonElement;
+      const locationHashEl = this.ref.current.querySelector(location.hash);
 
-      if (anchor) {
-        anchor.scrollIntoView();
+      if (locationHashEl) {
+        const sectionEl = locationHashEl.closest(`.${classes.section}`);
+
+        if (sectionEl) {
+          const contentEl = sectionEl.querySelector(
+            `.${classes.sectionContent}`,
+          );
+
+          if (contentEl) {
+            if (window.sessionStorage.getItem(contentEl.id) === 'false') {
+              window.sessionStorage.removeItem(contentEl.id);
+            }
+
+            this.setState(
+              {
+                openSectionId: contentEl.id,
+              },
+              () => {
+                locationHashEl.scrollIntoView({ block: 'start' });
+              },
+            );
+          }
+        }
       }
     }
   };
 
   public render() {
     const { children, id } = this.props;
-    const { hash } = this.state;
+    const { openSectionId } = this.state;
 
-    let sectionId = 0;
+    let sectionCounter = 0;
 
     return (
       <div
@@ -68,18 +82,18 @@ class Accordion extends Component<AccordionProps, State> {
       >
         {React.Children.map(children, child => {
           if (isComponentType(child, AccordionSection)) {
-            sectionId += 1;
+            sectionCounter += 1;
 
-            const contentId = `${id}-content-${sectionId}`;
-            const headingId = `${id}-heading-${sectionId}`;
+            const contentId = `${id}-content-${sectionCounter}`;
+            const headingId = `${id}-heading-${sectionCounter}`;
 
-            const isLocationHashMatching =
-              hash === `#${headingId}` || hash === `#${contentId}`;
+            const isSectionOpen =
+              openSectionId === headingId || openSectionId === contentId;
 
             return cloneElement<AccordionSectionProps>(child, {
               contentId,
               headingId,
-              open: child.props.open || isLocationHashMatching,
+              open: child.props.open || isSectionOpen,
             });
           }
 

@@ -54,7 +54,7 @@ class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
     return (
       <FormFieldset {...this.props}>
         <div className="govuk-checkboxes" ref={this.ref}>
-          {selectAll && (
+          {options.length > 1 && selectAll && (
             <FormCheckbox
               id={`${id}-all`}
               label="Select all"
