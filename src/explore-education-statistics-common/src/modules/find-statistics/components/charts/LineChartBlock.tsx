@@ -52,10 +52,10 @@ export class LineChartBlock extends Component<ChartProps> {
     const chartData = characteristicsData.result.map(result => {
       return chartDataKeys.reduce(
         (v, indicatorName) => {
-          if (result.indicators[indicatorName]) {
-            v[indicatorName] = result.indicators[indicatorName];
-          }
-          return v;
+          return {
+            ...v,
+            [indicatorName]: result.indicators[indicatorName],
+          };
         },
         { name: parseCondensedTimePeriodRange(`${result.timePeriod}`) },
       );
