@@ -1,3 +1,8 @@
+import { HorizontalBarBlock } from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
+import { LineChartBlock } from '@common/modules/find-statistics/components/charts/LineChartBlock';
+
+import DynamicMapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
+import { VerticalBarBlock } from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
 import { Axis } from '@common/services/publicationService';
 import {
   CharacteristicsData,
@@ -5,11 +10,6 @@ import {
   PublicationMeta,
 } from '@common/services/tableBuilderService';
 import React, { Component } from 'react';
-import { HorizontalBarBlock } from './Charts/HorizontalBarBlock';
-import { LineChartBlock } from './Charts/LineChartBlock';
-
-import DynamicMapBlock from './Charts/MapBlock';
-import { VerticalBarBlock } from './Charts/VerticalBarBlock';
 
 interface ChartRendererProps {
   type: string;

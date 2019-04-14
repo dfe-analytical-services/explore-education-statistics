@@ -1,13 +1,13 @@
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import { SummaryRenderer } from '@common/modules/find-statistics/components/SummaryRenderer';
+import { TableRenderer } from '@common/modules/find-statistics/components/TableRenderer';
 import { baseUrl } from '@common/services/api';
 import { Chart, DataQuery, Summary } from '@common/services/publicationService';
 import { PublicationMeta } from '@common/services/tableBuilderService';
 import React, { Component } from 'react';
 import Link from 'src/components/Link';
 import { ChartRenderer } from './ChartRenderer';
-import { SummaryRenderer } from './SummaryRenderer';
-import { TableRenderer } from './TableRenderer';
 
 export interface DataBlockProps {
   type: string;

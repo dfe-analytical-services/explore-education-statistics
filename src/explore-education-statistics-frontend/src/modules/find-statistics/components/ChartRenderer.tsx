@@ -1,3 +1,6 @@
+import { HorizontalBarBlock } from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
+import { LineChartBlock } from '@common/modules/find-statistics/components/charts/LineChartBlock';
+import { VerticalBarBlock } from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
 import { Axis } from '@common/services/publicationService';
 import {
   CharacteristicsData,
@@ -6,13 +9,13 @@ import {
 } from '@common/services/tableBuilderService';
 import dynamic from 'next-server/dynamic';
 import React, { Component } from 'react';
-import { HorizontalBarBlock } from './Charts/HorizontalBarBlock';
-import { LineChartBlock } from './Charts/LineChartBlock';
-import { VerticalBarBlock } from './Charts/VerticalBarBlock';
 
-const DynamicMapBlock = dynamic(() => import('./Charts/MapBlock'), {
-  ssr: false,
-});
+const DynamicMapBlock = dynamic(
+  () => import('@common/modules/find-statistics/components/charts/MapBlock'),
+  {
+    ssr: false,
+  },
+);
 
 interface ChartRendererProps {
   type: string;

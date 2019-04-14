@@ -1,5 +1,6 @@
+import CharacteristicsDataTable
+  from '@common/modules/table-tool/components/CharacteristicsDataTable';
 import React, { Component } from 'react';
-import CharacteristicsDataTable from '../../table-tool/components/CharacteristicsDataTable';
 
 interface TableRendererProps {
   data: any;
