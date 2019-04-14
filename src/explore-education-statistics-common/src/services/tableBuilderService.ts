@@ -31,7 +31,7 @@ export interface CharacteristicsData {
     indicators: {
       [indicator: string]: string;
     };
-    characteristic?: {
+    characteristic: {
       label: string;
       name: string;
       description?: string | null;

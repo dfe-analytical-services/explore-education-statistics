@@ -10,7 +10,13 @@ import React, { Component, RefAttributes } from 'react';
 import styles from './PrototypeAbsenceData.module.scss';
 
 interface State {
-  absenceData?: any;
+  absenceData?: {
+    values: {
+      authorised: number;
+      overall: number;
+      unauthorised: number;
+    };
+  };
   boundaries?: PrototypeMapBoundariesFeatureCollection;
   data?: PrototypeMapBoundariesFeatureCollection;
   legend?: {
@@ -88,7 +94,7 @@ class PrototypeAbsenceData extends Component<
     const parsedData = {
       ...data,
       features: data.features.map(feature => {
-        let className: string = '';
+        let className = '';
 
         if (feature.properties.selectable) {
           const rate = Math.floor(
@@ -217,7 +223,7 @@ class PrototypeAbsenceData extends Component<
             <h3 className="govuk-heading-s">Key to overall absence rate</h3>
             <dl className="govuk-list">
               {legend &&
-                legend.map(({ min, max, idx }: any) => (
+                legend.map(({ min, max, idx }) => (
                   <dd key={idx}>
                     <span className={styles[`rate${idx}`]}>&nbsp;</span> {min}%
                     to {max}%{' '}

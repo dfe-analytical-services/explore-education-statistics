@@ -1,10 +1,10 @@
 import React from 'react';
-import { RouteProps } from 'react-router';
+import { RouteChildrenProps } from 'react-router';
 import Link from '../../components/Link';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
 
-const PublicationDataPage = ({ location: object }: RouteProps) => {
+const PublicationDataPage = ({ location }: RouteChildrenProps) => {
   return (
     <PrototypePage
       wide

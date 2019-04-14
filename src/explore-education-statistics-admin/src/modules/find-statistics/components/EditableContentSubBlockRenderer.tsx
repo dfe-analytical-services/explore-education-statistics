@@ -56,7 +56,7 @@ class EditableContentSubBlockRenderer extends Component<Props> {
 
     return (
       <Draggable draggableId={`draggable_block_${id}_${index}`} index={index}>
-        {(provided, snapshot) => (
+        {(provided) => (
           <div ref={provided.innerRef} {...provided.draggableProps}>
             <div className="drag-handle small" {...provided.dragHandleProps} />
 

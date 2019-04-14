@@ -9,7 +9,12 @@ export const colours: string[] = [
   '#C0C0C0',
 ];
 
-export const symbols: any[] = ['circle', 'square', 'triangle', 'cross', 'star'];
+export const symbols: (
+  | 'circle'
+  | 'cross'
+  | 'square'
+  | 'star'
+  | 'triangle')[] = ['circle', 'square', 'triangle', 'cross', 'star'];
 
 export function parseCondensedTimePeriodRange(
   range: string,

@@ -8,7 +8,7 @@ interface Props {
 }
 
 class EditableContentBlock extends Component<Props> {
-  render() {
+  public render() {
     let { content, id = '' } = this.props;
 
     return content.length > 0 ? (

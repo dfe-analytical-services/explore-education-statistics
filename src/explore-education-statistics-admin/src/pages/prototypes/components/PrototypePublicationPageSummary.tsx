@@ -6,7 +6,7 @@ interface Props {
   action?: string;
 }
 
-const PrototypePublicationSummary = ({ sectionId, action }: Props) => {
+const PrototypePublicationSummary = () => {
   return (
     <>
       <h2 className="govuk-heading-m">Release setup summary</h2>

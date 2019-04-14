@@ -24,10 +24,10 @@ class TopicList extends Component<Props> {
       <>
         {topics.length > 0 ? (
           <Accordion id={theme}>
-            {topics.map(({ id, slug, title, summary, publications }) => (
+            {topics.map(({ id, title, summary, publications }) => (
               <AccordionSection heading={title} caption={summary} key={id}>
                 <ul className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-                  <PublicationList publications={publications} topic={slug} />
+                  <PublicationList publications={publications} />
                 </ul>
               </AccordionSection>
             ))}

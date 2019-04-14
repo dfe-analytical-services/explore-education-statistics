@@ -1,6 +1,7 @@
+import { Feature } from 'geojson';
 import { LatLngBounds, Path } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import React, { ChangeEvent, Component, RefAttributes } from 'react';
+import React, { Component, RefAttributes } from 'react';
 import { GeoJSON, Map } from 'react-leaflet';
 
 import styles from './PrototypeMap.module.scss';
@@ -41,7 +42,7 @@ class PrototypeMap extends Component<PrototypeMapProps, State> {
   private mapRef: Map | null = null;
 
   public refresh() {
-    requestAnimationFrame(_ => {
+    requestAnimationFrame(() => {
       if (this.mapRef) {
         this.mapRef.leafletElement.invalidateSize();
       }
@@ -80,7 +81,11 @@ class PrototypeMap extends Component<PrototypeMapProps, State> {
       const currentSelectedLayer = this.state.selectedFeature.properties.layer;
 
       if (currentSelectedLayer) {
-        currentSelectedLayer.getElement()!.classList.remove(styles.selected);
+        const element = currentSelectedLayer.getElement();
+
+        if (element) {
+          element.classList.remove(styles.selected);
+        }
       }
     }
 
@@ -91,11 +96,15 @@ class PrototypeMap extends Component<PrototypeMapProps, State> {
         }
       }
 
-      if (feature !== undefined) {
+      if (feature) {
         const selectedLayer = feature.properties.layer;
 
         if (selectedLayer) {
-          selectedLayer.getElement()!.classList.add(styles.selected);
+          const element = selectedLayer.getElement();
+
+          if (element) {
+            element.classList.add(styles.selected);
+          }
 
           // @ts-ignore
           this.mapRef.leafletElement.fitBounds(selectedLayer.getBounds(), {
@@ -123,36 +132,30 @@ class PrototypeMap extends Component<PrototypeMapProps, State> {
     }
   };
 
-  private handleClick = (e: any) => {
+  private handleClick = (e: {
+    sourceTarget: { feature: PrototypeMapBoundariesFeature };
+  }) => {
     if (e.sourceTarget.feature) {
       this.selectFeature(e.sourceTarget.feature);
     }
   };
 
-  private selectAuthority = (e: ChangeEvent<HTMLSelectElement>) => {
-    const selectedFeatureName = e.currentTarget.value;
-
-    const feature = this.props.boundaries.features.find(
-      f => f.properties.lad17nm === selectedFeatureName,
-    );
-
-    this.selectFeature(feature);
-  };
-
-  private styleFeature = (f: any) => {
-    return { className: f.properties && f.properties.className };
-  };
+  // private selectAuthority = (e: ChangeEvent<HTMLSelectElement>) => {
+  //   const selectedFeatureName = e.currentTarget.value;
+  //
+  //   const feature = this.props.boundaries.features.find(
+  //     f => f.properties.lad17nm === selectedFeatureName,
+  //   );
+  //
+  //   this.selectFeature(feature);
+  // };
 
   public componentDidMount() {
     // force a refresh to fix a bug
     requestAnimationFrame(() => this.refresh());
   }
 
-  public componentDidUpdate(
-    prevProps: Readonly<PrototypeMapProps>,
-    prevState: Readonly<State>,
-    snapshot?: any,
-  ): void {
+  public componentDidUpdate(prevProps: Readonly<PrototypeMapProps>): void {
     if (prevProps.selectedAuthority !== this.props.selectedAuthority) {
       const feature = this.props.boundaries.features.find(
         f => f.properties.lad17nm === this.props.selectedAuthority,
@@ -188,7 +191,10 @@ class PrototypeMap extends Component<PrototypeMapProps, State> {
           <GeoJSON
             data={boundaries}
             onEachFeature={this.onEachFeature}
-            style={this.styleFeature}
+            style={(feature?: Feature) => ({
+              className:
+                feature && feature.properties && feature.properties.className,
+            })}
             onClick={this.handleClick}
           />
         </Map>

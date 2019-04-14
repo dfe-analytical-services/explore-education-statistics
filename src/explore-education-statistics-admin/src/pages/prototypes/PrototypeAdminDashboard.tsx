@@ -3,11 +3,11 @@ import AccordionSection from '@common/components/AccordionSection';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React from 'react';
-import { RouteProps } from 'react-router';
+import { RouteChildrenProps } from 'react-router';
 import Link from '../../components/Link';
 import PrototypePage from './components/PrototypePage';
 
-const BrowseReleasesPage = ({ location: object }: RouteProps) => {
+const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
   return (
     <PrototypePage wide breadcrumbs={[{ text: 'Administrator dashboard' }]}>
       <div className="govuk-grid-row">
@@ -120,7 +120,7 @@ const BrowseReleasesPage = ({ location: object }: RouteProps) => {
           </Tabs>
         </div>
         <div className="govuk-grid-column-one-third">
-          <aside className="app-related-items" role="complementary">
+          <aside className="app-related-items">
             <h2 className="govuk-heading-m" id="releated-content">
               Notifications
             </h2>

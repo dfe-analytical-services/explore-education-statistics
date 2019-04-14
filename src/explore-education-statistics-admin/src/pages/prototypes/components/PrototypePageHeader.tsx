@@ -48,7 +48,6 @@ const PageHeader = ({ wide }: Props) => (
 
           <button
             type="button"
-            role="button"
             className="govuk-header__menu-button js-header-toggle"
             aria-controls="navigation"
             aria-label="Show or hide Top Level Navigation"

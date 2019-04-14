@@ -2,7 +2,7 @@
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // @ts-ignore
 import CKEditor from '@ckeditor/ckeditor5-react';
-import React, { Fragment } from 'react';
+import React, { ChangeEvent, Fragment } from 'react';
 
 // import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
@@ -47,7 +47,7 @@ export class PrototypeEditableContent extends React.Component<Props, State> {
     }
   }
 
-  public setEditing = (event: React.MouseEvent<HTMLElement>) => {
+  public setEditing = () => {
     if (!this.state.editing) {
       this.setState({ editing: true });
     }
@@ -72,19 +72,17 @@ export class PrototypeEditableContent extends React.Component<Props, State> {
             <CKEditor
               editor={ClassicEditor}
               data={this.state.content}
-              onChange={(event: any, editor: any) => {
+              onChange={(event: ChangeEvent, editor: { getData(): string }) => {
                 this.temporaryContent = editor.getData();
               }}
-              onInit={(editor: any) => {
+              onInit={(editor: { editing: { view: { focus(): void } } }) => {
                 editor.editing.view.focus();
               }}
             />
           </div>
         ) : (
-          <div
-            className="editable-content"
-            onClick={event => this.setEditing(event)}
-          >
+          // eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events
+          <div className="editable-content" onClick={this.setEditing}>
             {this.state.unsaved ? (
               <div className="editable-button unsaved">Click to edit</div>
             ) : (

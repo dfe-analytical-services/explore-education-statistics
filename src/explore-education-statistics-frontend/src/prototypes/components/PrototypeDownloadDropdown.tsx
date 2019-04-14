@@ -7,7 +7,7 @@ interface Props {
   link?: string;
 }
 
-const PrototypeDownloadDropdown = ({ viewType, topic, link }: Props) => {
+const PrototypeDownloadDropdown = ({ link }: Props) => {
   return (
     <>
       <div className="govuk-grid-row">

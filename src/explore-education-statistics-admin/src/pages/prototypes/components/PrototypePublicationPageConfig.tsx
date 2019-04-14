@@ -6,7 +6,7 @@ interface Props {
   action?: string;
 }
 
-const PrototypePublicationConfig = ({ sectionId, action }: Props) => {
+const PrototypePublicationConfig = ({ sectionId }: Props) => {
   return (
     <>
       {sectionId === 'setup' && (

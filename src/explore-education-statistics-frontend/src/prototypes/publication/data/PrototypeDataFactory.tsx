@@ -6,74 +6,71 @@ import {
   PublicationMeta,
 } from '@common/services/tableBuilderService';
 import SchoolType from '@common/services/types/SchoolType';
-import { DataBlock, DataBlockProps } from 'src/modules/find-statistics/components/DataBlock';
+import { DataBlockProps } from 'src/modules/find-statistics/components/DataBlock';
 
 function createDataValues(
   indicators: string[],
   labels: string[],
-  schooltype: SchoolType,
-  year: number | undefined,
+  schoolType: SchoolType,
+  year: number,
   data: (string | number | undefined)[][],
   characteristic: string = 'Total',
 ) {
+  const characteristicsData: CharacteristicsData = {
+    publicationId: '',
+    releaseDate: '',
+    releaseId: '',
+    result: data.map((row: (string | number | undefined)[], rowIndex) => {
+      const initialData = {
+        schoolType,
+        characteristic: {
+          description: null,
+          label: '',
+          name: characteristic,
+          name2: null,
+        },
+        indicators: {},
+        timePeriod: year !== undefined ? year + rowIndex * 101 : 0,
+      };
+
+      return row.reduce(
+        (result: DataTableResult, next: string | number | undefined, index) => {
+          if (next) result.indicators[indicators[index]] = `${next}`;
+          return result;
+        },
+        initialData,
+      );
+    }),
+  };
+
+  const meta: PublicationMeta = {
+    indicators: {
+      Test: indicators.map((key: string, index: number) => ({
+        label: labels[index],
+        name: key,
+        unit: '',
+      })),
+    },
+
+    characteristics: {
+      Test: [
+        {
+          label: 'Total',
+          name: 'Total',
+        },
+        {
+          label: 'Year',
+          name: 'Year',
+        },
+      ],
+    },
+
+    publicationId: '',
+  };
+
   return {
-    data: {
-      indicators,
-
-      publicationId: '',
-      releaseDate: '',
-      releaseId: '',
-      result: data.map((row: (string | number | undefined)[], rowIndex) => {
-        const initialData: any = {
-          characteristic: {
-            description: null,
-            label: '',
-            name: characteristic,
-            name2: null,
-          },
-          indicators: {},
-          schoolType: schooltype,
-          timePeriod: year !== undefined ? year + rowIndex * 101 : undefined,
-        };
-
-        return row.reduce(
-          (
-            result: DataTableResult,
-            next: string | number | undefined,
-            index,
-          ) => {
-            if (next) result.indicators[indicators[index]] = `${next}`;
-            return result;
-          },
-          initialData,
-        );
-      }),
-    } as CharacteristicsData,
-
-    meta: {
-      indicators: {
-        Test: indicators.map((key: string, index: number) => ({
-          label: labels[index],
-          name: key,
-          unit: '',
-        })),
-      },
-
-      characteristics: {
-        Test: [
-          {
-            label: 'Total',
-            name: 'Total',
-          },
-          {
-            label: 'Year',
-            name: 'Year',
-          },
-        ],
-      },
-
-      publicationId: '',
-    } as PublicationMeta,
+    data: characteristicsData,
+    meta,
   };
 }
 
@@ -93,37 +90,12 @@ function createBasicChart(
   };
 }
 
-function createFullChartWithData(
-  type: string,
-  xAxis: Axis,
-  yAxis: Axis,
-  indicators: string[],
-  labels: string[],
-  schooltype: SchoolType,
-  year: number,
-  data: (string | number | undefined)[][],
-  stacked: boolean = false,
-  characteristic: string = 'Total',
-) {
-  return {
-    ...createBasicChart(type, indicators, xAxis, yAxis, stacked),
-
-    ...createDataValues(
-      indicators.filter(name => name !== xAxis.key && name !== yAxis.key),
-      labels,
-      schooltype,
-      year,
-      data,
-    ),
-  };
-}
-
 function createDataBlockWithChart(
   heading: string,
   indicators: string[],
   labels: string[],
   schooltype: SchoolType,
-  year: number | undefined,
+  year: number,
   data: (string | number | undefined)[][],
   charts?: Chart[],
   characteristic: string = 'Total',
@@ -317,7 +289,7 @@ export const ks4RevisedAttainmentData = createDataBlockWithChart(
   ['label', 'label_0', 'label_1'],
   ['', '2017', '2018'],
   SchoolType.Total,
-  undefined,
+  201819,
   [
     ['Science', '91.3', '95.5'],
     ['Humanities', '76.8', '78.3'],

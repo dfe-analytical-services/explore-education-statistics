@@ -1,23 +1,23 @@
-import * as React from 'react';
+import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
 import Details from '../../../components/Details';
 import { CharacteristicsData, PublicationMeta } from '../../../services/tableBuilderService';
 
-interface Props {
-  data: any;
+export interface SummaryRendererProps {
+  data: CharacteristicsData;
   meta: PublicationMeta;
   dataKeys: string[];
   description: { type: string; body: string };
 }
 
-export class SummaryRenderer extends React.Component<Props> {
+export class SummaryRenderer extends Component<SummaryRendererProps> {
   public render() {
-    let indicators: any = {};
-    let indicatorMeta: any = {};
+    let indicators: { [key: string]: string } = {};
+    let indicatorMeta: { [key: string]: { label: string; unit: string } } = {};
     const dataKeys = this.props.dataKeys;
 
     if (this.props.data) {
-      const characteristicsData: CharacteristicsData = this.props.data;
+      const characteristicsData = this.props.data;
 
       const result = [...characteristicsData.result];
 

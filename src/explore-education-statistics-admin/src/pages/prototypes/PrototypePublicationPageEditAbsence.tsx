@@ -1,7 +1,6 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
-import PrototypeMap from '@common/prototypes/publication/components/PrototypeMap';
 import publicationService, { Release } from '@common/services/publicationService';
 import React, { Component, Fragment } from 'react';
 import {
@@ -90,7 +89,6 @@ class PublicationPage extends Component<{}, State> {
 
     const data: Release = (this.state.data as unknown) as Release;
 
-    let mapRef: PrototypeMap | null = null;
     return (
       <PrototypePage
         wide
@@ -395,39 +393,38 @@ class PublicationPage extends Component<{}, State> {
                 <div className="govuk-accordion__controls">&nbsp;</div>
 
                 <Droppable droppableId={`accordion(0)`} type="accordion">
-                  {(droppableProvided, snapshot) => (
+                  {droppableProvided => (
                     <div
                       {...droppableProvided.droppableProps}
                       ref={droppableProvided.innerRef}
                     >
-                      {data.content.map(
-                        ({ heading, caption, order, content }, index) => (
-                          <Draggable
-                            draggableId={`section(${index})`}
-                            index={index}
-                          >
-                            {draggableProvided => (
-                              <div
-                                className="govuk-accordion__section"
-                                ref={draggableProvided.innerRef}
-                                {...draggableProvided.draggableProps}
-                              >
-                                <div className="govuk-accordion__section-header">
-                                  <h2 className="govuk-accordion__section-heading reorderable-relative">
-                                    <span
-                                      className="drag-handle"
-                                      {...draggableProvided.dragHandleProps}
-                                    />
-                                    <button className="govuk-accordion__section-button">
-                                      {heading}
-                                    </button>
-                                  </h2>
-                                </div>
+                      {data.content.map(({ heading }, index) => (
+                        <Draggable
+                          draggableId={`section(${index})`}
+                          index={index}
+                          key={`${heading}_${index}`}
+                        >
+                          {draggableProvided => (
+                            <div
+                              className="govuk-accordion__section"
+                              ref={draggableProvided.innerRef}
+                              {...draggableProvided.draggableProps}
+                            >
+                              <div className="govuk-accordion__section-header">
+                                <h2 className="govuk-accordion__section-heading reorderable-relative">
+                                  <span
+                                    className="drag-handle"
+                                    {...draggableProvided.dragHandleProps}
+                                  />
+                                  <button className="govuk-accordion__section-button">
+                                    {heading}
+                                  </button>
+                                </h2>
                               </div>
-                            )}
-                          </Draggable>
-                        ),
-                      )}
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
 
                       {droppableProvided.placeholder}
                     </div>

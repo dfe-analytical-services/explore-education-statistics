@@ -39,6 +39,6 @@ declare module 'govuk-frontend/components/tabs/tabs' {
 }
 
 declare module '*.json' {
-  const value: any;
+  const value: object;
   export default value;
 }

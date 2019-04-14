@@ -9,13 +9,12 @@ export interface Publication {
 }
 
 interface Props {
-  topic: string;
   publications: Publication[];
 }
 
 class PublicationList extends Component<Props> {
   public render() {
-    const { topic, publications } = this.props;
+    const { publications } = this.props;
 
     return (
       <>

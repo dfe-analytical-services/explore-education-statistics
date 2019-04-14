@@ -578,7 +578,7 @@ const PublicationPage = () => {
         </AccordionSection>
         <AccordionSection
           heading="Pupil absence by local authority"
-          onToggle={isOpen => mapRef && mapRef.refresh()}
+          onToggle={() => mapRef && mapRef.refresh()}
         >
           <PrototypeAbsenceData ref={el => el && (mapRef = el.mapRef)} />
 

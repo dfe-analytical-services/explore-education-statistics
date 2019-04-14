@@ -6,12 +6,12 @@ import { GeoJSON, Map } from 'react-leaflet';
 
 import { ChartProps } from './Charts';
 
-interface MapFeature extends Feature<Geometry, GeoJsonProperties> {}
+export type MapFeature = Feature<Geometry, GeoJsonProperties>;
 
 interface MapState {
   position: { lat: number; lng: number };
   maxBounds: LatLngBounds;
-  geometry: MapFeature;
+  geometry?: MapFeature;
 }
 
 interface MapProps extends ChartProps {
@@ -19,26 +19,16 @@ interface MapProps extends ChartProps {
 }
 
 export class MapBlock extends Component<MapProps, MapState> {
-  protected mapRef: Map | null;
+  protected mapRef: Map | null = null;
 
   public state = {
     maxBounds: new LatLngBounds({ lat: 48, lng: -6.5 }, { lat: 60, lng: 2 }),
-
     position: {
       lat: 53.009865,
       lng: -3.2524038,
     },
-  } as any;
-
-  constructor(props: MapProps) {
-    super(props);
-    this.mapRef = null;
-
-    if (props.geometry !== undefined) {
-      // @ts-ignore
-      this.state.geometry = props.geometry;
-    }
-  }
+    geometry: this.props.geometry,
+  };
 
   private renderGeoJson() {
     if (this.state.geometry === undefined) return '';
@@ -54,7 +44,7 @@ export class MapBlock extends Component<MapProps, MapState> {
   }
 
   public refresh() {
-    requestAnimationFrame(_ => {
+    requestAnimationFrame(() => {
       if (this.mapRef) {
         this.mapRef.leafletElement.invalidateSize();
       }

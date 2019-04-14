@@ -31,8 +31,6 @@ const EditableAccordionSection = ({
   headingTag = 'h2',
   open = false,
   onToggle,
-  index,
-  droppableIndex = -1,
 }: EditableAccordionSectionProps) => {
   return (
     <div
@@ -48,6 +46,7 @@ const EditableAccordionSection = ({
       className={classNames('govuk-accordion__section', className, {
         'govuk-accordion__section--expanded': open,
       })}
+      role="presentation"
     >
       <div className="govuk-accordion__section-header">
         {createElement(

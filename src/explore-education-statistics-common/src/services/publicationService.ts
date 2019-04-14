@@ -1,3 +1,4 @@
+import { MapFeature } from '../modules/find-statistics/components/charts/MapBlock';
 import { contentApi } from './api';
 
 export interface Publication {
@@ -38,7 +39,8 @@ export interface Chart {
   indicators: string[];
   xAxis?: Axis;
   yAxis?: Axis;
-  [property: string]: any;
+  stacked?: boolean;
+  geometry?: MapFeature;
 }
 
 export interface Summary {

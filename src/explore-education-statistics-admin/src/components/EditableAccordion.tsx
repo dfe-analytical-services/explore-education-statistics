@@ -19,31 +19,17 @@ class EditableAccordion extends Component<EditableAccordionProps, State> {
 
   private ref = createRef<HTMLDivElement>();
 
-  private accordion: any;
-
   public componentDidMount(): void {
     import('govuk-frontend/components/accordion/accordion').then(
       ({ default: GovUkAccordion }) => {
         if (this.ref.current) {
-          this.accordion = new GovUkAccordion(this.ref.current);
-          this.accordion.init();
+          new GovUkAccordion(this.ref.current).init();
         }
       },
     );
 
     this.goToHash();
     window.addEventListener('hashchange', this.goToHash);
-  }
-
-  public componentDidUpdate() {
-    import('govuk-frontend/components/accordion/accordion').then(
-      ({ default: GovUkAccordion }) => {
-        if (this.ref.current) {
-          //this.accordion.initSectionHeaders();
-          //new GovUkAccordion(this.ref.current).init();
-        }
-      },
-    );
   }
 
   public componentWillUnmount(): void {
@@ -64,13 +50,8 @@ class EditableAccordion extends Component<EditableAccordionProps, State> {
     }
   };
 
-  public onDragEnd() {}
-
   public render() {
     const { children, id, index } = this.props;
-    const { hash } = this.state;
-
-    let sectionId = 0;
 
     return (
       <div className="govuk-accordion" ref={this.ref} id={id}>

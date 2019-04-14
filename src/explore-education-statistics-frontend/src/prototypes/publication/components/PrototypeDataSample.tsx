@@ -11,7 +11,7 @@ interface Props {
   chartTitle?: string;
   xAxisLabel?: string;
   yAxisLabel?: string;
-  chartData?: any;
+  chartData?: object[];
   chartDataKeys: string[];
 }
 

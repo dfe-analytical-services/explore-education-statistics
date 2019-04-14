@@ -1,23 +1,39 @@
 import React, { Component } from 'react';
-import { CartesianGrid, Legend, Line, LineChart, Symbols, Tooltip, XAxis, YAxis } from 'recharts';
+import {
+  AxisDomain,
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  Symbols,
+  Tooltip,
+  TooltipProps,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import { ChartProps, colours, parseCondensedTimePeriodRange, symbols } from './Charts';
 
-const CustomToolTip = (props: any) => {
+const CustomToolTip = (props: TooltipProps) => {
   if (props.active) {
     const { payload, label } = props;
 
     return (
       <div className="graph-tooltip">
         <p>{label}</p>
-        {payload
-          .sort((a: any, b: any) => {
-            return b.value - a.value;
-          })
-          .map((_: any, index: number) => (
-            <p key={index}>{`${payload[index].name} : ${
-              payload[index].value
-            }`}</p>
-          ))}
+        {payload &&
+          payload
+            .sort((a, b) => {
+              if (typeof b.value === 'number' && typeof a.value === 'number') {
+                return b.value - a.value;
+              }
+
+              return 0;
+            })
+            .map((_, index) => (
+              <p key={index}>{`${payload[index].name} : ${
+                payload[index].value
+              }`}</p>
+            ))}
       </div>
     );
   }
@@ -35,7 +51,7 @@ export class LineChartBlock extends Component<ChartProps> {
 
     const chartData = characteristicsData.result.map(result => {
       return chartDataKeys.reduce(
-        (v: any, indicatorName) => {
+        (v, indicatorName) => {
           if (result.indicators[indicatorName]) {
             v[indicatorName] = result.indicators[indicatorName];
           }
@@ -45,7 +61,7 @@ export class LineChartBlock extends Component<ChartProps> {
       );
     });
 
-    let yAxisDomain: any;
+    let yAxisDomain: [AxisDomain, AxisDomain] = [0, 0];
 
     if (yAxis.min !== undefined && yAxis.max !== undefined) {
       yAxisDomain = [yAxis.min, yAxis.max];
@@ -86,7 +102,7 @@ export class LineChartBlock extends Component<ChartProps> {
           unit="%"
           domain={yAxisDomain}
         />
-        {chartDataKeys.map((dataKey: any, index: any) => (
+        {chartDataKeys.map((dataKey, index) => (
           <Line
             key={index}
             name={labels[dataKey]}

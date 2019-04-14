@@ -1,12 +1,22 @@
 import React from 'react';
-import { CartesianGrid, Legend, Line, LineChart, Symbols, Tooltip, XAxis, YAxis } from 'recharts';
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  Symbols,
+  Tooltip,
+  TooltipProps,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import styles from './PrototypeChartSample.module.scss';
 
 interface Props {
   xAxisLabel?: string;
   yAxisLabel?: string;
-  chartData?: any;
-  chartDataKeys: any[];
+  chartData?: object[];
+  chartDataKeys: string[];
 }
 
 const colours: string[] = [
@@ -17,20 +27,30 @@ const colours: string[] = [
   '#C0C0C0',
 ];
 
-const symbols: any[] = ['circle', 'square', 'triangle', 'cross', 'star'];
+const symbols: ('circle' | 'square' | 'triangle' | 'cross' | 'star')[] = [
+  'circle',
+  'square',
+  'triangle',
+  'cross',
+  'star',
+];
 
-const CustomToolTip = (props: any) => {
-  if (props.active) {
-    const { payload, label } = props;
+const CustomToolTip = (props: TooltipProps) => {
+  const { active, payload, label } = props;
+
+  if (active) {
+    if (!payload) {
+      return null;
+    }
 
     return (
       <div className={styles.tooltip}>
         <p>{label}</p>
         {payload
-          .sort((a: any, b: any) => {
-            return b.value - a.value;
+          .sort((a, b) => {
+            return (b.value as number) - (a.value as number);
           })
-          .map((_: any, index: number) => (
+          .map((_, index) => (
             <p key={index}>{`${payload[index].name} : ${
               payload[index].value
             }`}</p>

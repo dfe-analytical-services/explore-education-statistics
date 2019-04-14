@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
+import { CharacteristicsData, PublicationMeta } from '../../../services/tableBuilderService';
 import CharacteristicsDataTable from '../../table-tool/components/CharacteristicsDataTable';
 
-interface TableRendererProps {
-  data: any;
-  meta: any;
+export interface TableRendererProps {
+  data: CharacteristicsData;
+  meta: PublicationMeta;
 }
 
 export class TableRenderer extends Component<TableRendererProps> {
   public render() {
-    const results: any[] = this.props.data.result;
+    const results = this.props.data.result;
 
     const characteristics: string[] = Array.from(
       new Set(results.map(result => result.characteristic.name)),
