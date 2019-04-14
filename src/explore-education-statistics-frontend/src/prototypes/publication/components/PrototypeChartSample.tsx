@@ -1,14 +1,5 @@
 import React from 'react';
-import {
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  Symbols,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { CartesianGrid, Legend, Line, LineChart, Symbols, Tooltip, XAxis, YAxis } from 'recharts';
 import styles from './PrototypeChartSample.module.scss';
 
 interface Props {

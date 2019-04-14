@@ -1,5 +1,5 @@
 import React from 'react';
-import { MethodologySection } from './MethodologySection';
+import { MethodologySection } from 'src/prototypes/methodology/components/MethodologySection';
 
 export interface MethodologyHeaderProps {
   children: React.ReactNode;

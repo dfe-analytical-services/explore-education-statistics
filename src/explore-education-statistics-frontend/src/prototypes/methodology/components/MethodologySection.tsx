@@ -1,6 +1,9 @@
 import isComponentType from '@common/lib/type-guards/components/isComponentType';
 import React, { cloneElement, Component, ReactNode } from 'react';
-import { MethodologyHeader, MethodologyHeaderProps } from './MethodologyHeader';
+import {
+  MethodologyHeader,
+  MethodologyHeaderProps,
+} from 'src/prototypes/methodology/components/MethodologyHeader';
 
 interface MethodologySectionProps {
   children: React.ReactNode;

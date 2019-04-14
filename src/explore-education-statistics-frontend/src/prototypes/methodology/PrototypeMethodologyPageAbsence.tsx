@@ -1,22 +1,22 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import React from 'react';
-import PrototypeAnnexA from './components/methodology/absence/PrototypeAnnexA';
-import PrototypeAnnexB from './components/methodology/absence/PrototypeAnnexB';
-import PrototypeAnnexC from './components/methodology/absence/PrototypeAnnexC';
-import PrototypeAnnexD from './components/methodology/absence/PrototypeAnnexD';
-import PrototypeAnnexE from './components/methodology/absence/PrototypeAnnexE';
-import PrototypeSection1 from './components/methodology/absence/PrototypeSection1';
-import PrototypeSection2 from './components/methodology/absence/PrototypeSection2';
-import PrototypeSection3 from './components/methodology/absence/PrototypeSection3';
-import PrototypeSection4 from './components/methodology/absence/PrototypeSection4';
-import PrototypeSection5 from './components/methodology/absence/PrototypeSection5';
-import PrototypeSection7 from './components/methodology/absence/PrototypeSection7';
-import { MethodologyContent } from './components/MethodologyContent';
-import { MethodologyHeader } from './components/MethodologyHeader';
-import { MethodologySection } from './components/MethodologySection';
-import PrototypePage from './components/PrototypePage';
-import PrototypeSearchForm from './components/PrototypeSearchForm';
+import PrototypePage from 'src/prototypes/components/PrototypePage';
+import PrototypeSearchForm from 'src/prototypes/components/PrototypeSearchForm';
+import PrototypeAnnexA from 'src/prototypes/methodology/absence/PrototypeAnnexA';
+import PrototypeAnnexB from 'src/prototypes/methodology/absence/PrototypeAnnexB';
+import PrototypeAnnexC from 'src/prototypes/methodology/absence/PrototypeAnnexC';
+import PrototypeAnnexD from 'src/prototypes/methodology/absence/PrototypeAnnexD';
+import PrototypeAnnexE from 'src/prototypes/methodology/absence/PrototypeAnnexE';
+import PrototypeSection1 from 'src/prototypes/methodology/absence/PrototypeSection1';
+import PrototypeSection2 from 'src/prototypes/methodology/absence/PrototypeSection2';
+import PrototypeSection3 from 'src/prototypes/methodology/absence/PrototypeSection3';
+import PrototypeSection4 from 'src/prototypes/methodology/absence/PrototypeSection4';
+import PrototypeSection5 from 'src/prototypes/methodology/absence/PrototypeSection5';
+import PrototypeSection7 from 'src/prototypes/methodology/absence/PrototypeSection7';
+import { MethodologyContent } from 'src/prototypes/methodology/components/MethodologyContent';
+import { MethodologyHeader } from 'src/prototypes/methodology/components/MethodologyHeader';
+import { MethodologySection } from 'src/prototypes/methodology/components/MethodologySection';
 
 const PublicationPage = () => {
   return (

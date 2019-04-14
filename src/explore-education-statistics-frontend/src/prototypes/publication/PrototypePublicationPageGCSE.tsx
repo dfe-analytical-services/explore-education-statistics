@@ -2,8 +2,11 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import React from 'react';
-import Link from '../components/Link';
-import { DataBlock } from '../modules/find-statistics/components/DataBlock';
+import Link from 'src/components/Link';
+import { DataBlock } from 'src/modules/find-statistics/components/DataBlock';
+import PrototypePage from 'src/prototypes/components/PrototypePage';
+import PrototypeSearchForm from 'src/prototypes/components/PrototypeSearchForm';
+import PrototypeDataSampleGCSE from 'src/prototypes/publication/components/PrototypeDataSampleGCSE';
 import {
   ks4AverageAttainment8ScorePerPupilByLocalAuthority,
   ks4AverageHeadlineScoresByPupilEthnicity,
@@ -14,10 +17,7 @@ import {
   ks4SchoolRevisedAttainmentChart,
   ks4StateFundedSchoolsPerformance,
   ks4TrendInDisavdantagePuilsAttainmentGapIndex,
-} from './components/PrototypeDataFactory';
-import PrototypeDataSampleGCSE from './components/PrototypeDataSampleGCSE';
-import PrototypePage from './components/PrototypePage';
-import PrototypeSearchForm from './components/PrototypeSearchForm';
+} from 'src/prototypes/publication/data/PrototypeDataFactory';
 
 const PublicationPage = () => {
   return (

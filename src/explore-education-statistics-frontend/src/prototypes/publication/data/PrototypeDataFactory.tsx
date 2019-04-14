@@ -5,9 +5,8 @@ import {
   PublicationMeta,
 } from '@common/services/tableBuilderService';
 import SchoolType from '@common/services/types/SchoolType';
-import React from 'react';
-import { DataBlock, DataBlockProps } from '../../modules/find-statistics/components/DataBlock';
-import { data as OriginalData } from './PrototypeMapBoundaries';
+import { DataBlock, DataBlockProps } from 'src/modules/find-statistics/components/DataBlock';
+import { data as OriginalData } from 'src/prototypes/publication/components/PrototypeMapBoundaries';
 
 function createDataValues(
   indicators: string[],
