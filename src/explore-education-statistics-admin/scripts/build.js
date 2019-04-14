@@ -64,8 +64,10 @@ checkBrowsers(paths.appPath, isInteractive)
     // if you're in it, you don't end up in Trash
     fs.emptyDirSync(paths.appBuild);
     // Merge with the public folder
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     copyPublicFolder();
     // Start the webpack build
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return build(previousFileSizes);
   })
   .then(
