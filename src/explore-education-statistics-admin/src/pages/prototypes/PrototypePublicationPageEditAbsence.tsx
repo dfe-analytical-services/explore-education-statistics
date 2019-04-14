@@ -1,6 +1,7 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
+import PrototypeMap from '@common/prototypes/publication/components/PrototypeMap';
 import publicationService, { Release } from '@common/services/publicationService';
 import React, { Component, Fragment } from 'react';
 import {
@@ -10,13 +11,12 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
+import PrototypeDataSample from 'src/pages/prototypes/publication/components/PrototypeDataSample';
 import EditableAccordion from '../../components/EditableAccordion';
 import EditableAccordionSection from '../../components/EditableAccordionSection';
 import Link from '../../components/Link';
 import EditableContentBlock from '../../modules/find-statistics/components/EditableContentBlock';
-import PrototypeDataSample from './components/PrototypeDataSample';
 import { PrototypeEditableContent } from './components/PrototypeEditableContent';
-import PrototypeMap from './components/PrototypeMap';
 import PrototypePage from './components/PrototypePage';
 
 interface State {

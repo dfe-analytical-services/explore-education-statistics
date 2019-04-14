@@ -1,13 +1,13 @@
 import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
-import classNames from 'classnames';
-import React, { Component, RefAttributes } from 'react';
-import styles from './PrototypeAbsenceData.module.scss';
-import PrototypeMap from './PrototypeMap';
+import PrototypeMap from '@common/prototypes/publication/components/PrototypeMap';
 import {
   PrototypeMapBoundariesFeature,
   PrototypeMapBoundariesFeatureCollection,
-} from './PrototypeMapBoundaries';
+} from '@common/prototypes/publication/components/PrototypeMapBoundaries';
+import classNames from 'classnames';
+import React, { Component, RefAttributes } from 'react';
+import styles from './PrototypeAbsenceData.module.scss';
 
 interface State {
   absenceData?: any;
@@ -33,9 +33,11 @@ class PrototypeAbsenceData extends Component<
   public mapRef: PrototypeMap | null = null;
 
   public componentDidMount(): void {
-    import('./PrototypeMapBoundaries').then(({ boundaries }) => {
-      this.generateLegendData(this.preprocessBoundaryData(boundaries));
-    });
+    import('@common/prototypes/publication/components/PrototypeMapBoundaries').then(
+      ({ boundaries }) => {
+        this.generateLegendData(this.preprocessBoundaryData(boundaries));
+      },
+    );
   }
 
   private preprocessBoundaryData(

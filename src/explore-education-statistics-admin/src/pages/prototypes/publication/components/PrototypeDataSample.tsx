@@ -1,10 +1,11 @@
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import PrototypeDataTilesHighlights
+  from '@common/prototypes/publication/components/PrototypeDataTilesHighlights';
+import PrototypeTableSample from '@common/prototypes/publication/components/PrototypeTableSample';
 import React from 'react';
-import PrototypeChartSample from './PrototypeChartSample';
-import PrototypeDataTilesHighlights from './PrototypeDataTilesHighlights';
-import { PrototypeEditableContent } from './PrototypeEditableContent';
-import PrototypeTableSample from './PrototypeTableSample';
+import { PrototypeEditableContent } from 'src/pages/prototypes/components/PrototypeEditableContent';
+import PrototypeChartSample from 'src/pages/prototypes/publication/components/PrototypeChartSample';
 
 interface Props {
   sectionId?: string;

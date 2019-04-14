@@ -1,9 +1,9 @@
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import PrototypeTableSample from '@common/prototypes/publication/components/PrototypeTableSample';
 import React from 'react';
 import PrototypeChartSample from './PrototypeChartSample';
 import PrototypeDataTilesHighlights from './PrototypeDataTilesHighlightsExclusions';
-import PrototypeTableSample from './PrototypeTableSample';
 
 interface Props {
   sectionId?: string;

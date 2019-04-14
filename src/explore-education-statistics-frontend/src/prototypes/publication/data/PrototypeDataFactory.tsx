@@ -1,3 +1,4 @@
+import { data as OriginalData } from '@common/prototypes/publication/components/PrototypeMapBoundaries';
 import { Axis, Chart } from '@common/services/publicationService';
 import {
   CharacteristicsData,
@@ -6,7 +7,6 @@ import {
 } from '@common/services/tableBuilderService';
 import SchoolType from '@common/services/types/SchoolType';
 import { DataBlock, DataBlockProps } from 'src/modules/find-statistics/components/DataBlock';
-import { data as OriginalData } from 'src/prototypes/publication/components/PrototypeMapBoundaries';
 
 function createDataValues(
   indicators: string[],

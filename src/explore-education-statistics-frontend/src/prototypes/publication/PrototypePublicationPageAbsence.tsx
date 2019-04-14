@@ -1,12 +1,12 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
+import PrototypeMap from '@common/prototypes/publication/components/PrototypeMap';
 import React from 'react';
 import Link from 'src/components/Link';
 import PrototypePage from 'src/prototypes/components/PrototypePage';
 import PrototypeAbsenceData from './components/PrototypeAbsenceData';
 import PrototypeDataSample from './components/PrototypeDataSample';
-import PrototypeMap from './components/PrototypeMap';
 
 const PublicationPage = () => {
   let mapRef: PrototypeMap | null = null;

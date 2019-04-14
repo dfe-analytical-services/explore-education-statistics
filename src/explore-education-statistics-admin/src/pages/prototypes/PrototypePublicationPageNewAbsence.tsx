@@ -1,13 +1,13 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
+import PrototypeMap from '@common/prototypes/publication/components/PrototypeMap';
 import React from 'react';
 import Link from 'src/components/Link';
-import PrototypeAbsenceData from './components/PrototypeAbsenceData';
+import PrototypeAbsenceData from 'src/pages/prototypes/publication/components/PrototypeAbsenceData';
+import PrototypeDataSample from 'src/pages/prototypes/publication/components/PrototypeDataSample';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
-import PrototypeDataSample from './components/PrototypeDataSample';
 import { PrototypeEditableContent } from './components/PrototypeEditableContent';
-import PrototypeMap from './components/PrototypeMap';
 import PrototypePage from './components/PrototypePage';
 
 const PublicationPage = () => {

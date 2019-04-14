@@ -1,18 +1,21 @@
 import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
+import PrototypeMap from '@common/prototypes/publication/components/PrototypeMap';
+import {
+  PrototypeMapBoundariesFeature,
+  PrototypeMapBoundariesFeatureCollection,
+} from '@common/prototypes/publication/components/PrototypeMapBoundaries';
 import classNames from 'classnames';
 import dynamic from 'next-server/dynamic';
 import React, { Component, RefAttributes } from 'react';
 import styles from './PrototypeAbsenceData.module.scss';
-import PrototypeMap from './PrototypeMap';
-import {
-  PrototypeMapBoundariesFeature,
-  PrototypeMapBoundariesFeatureCollection,
-} from './PrototypeMapBoundaries';
 
-const DynamicPrototypeMap = dynamic(() => import('./PrototypeMap'), {
-  ssr: false,
-});
+const DynamicPrototypeMap = dynamic(
+  () => import('@common/prototypes/publication/components/PrototypeMap'),
+  {
+    ssr: false,
+  },
+);
 
 interface State {
   absenceData?: any;
@@ -38,9 +41,11 @@ class PrototypeAbsenceData extends Component<
   public mapRef: PrototypeMap | null = null;
 
   public componentDidMount(): void {
-    import('src/prototypes/publication/components/PrototypeMapBoundaries').then(({ boundaries }) => {
-      this.generateLegendData(this.preprocessBoundaryData(boundaries));
-    });
+    import('@common/prototypes/publication/components/PrototypeMapBoundaries').then(
+      ({ boundaries }) => {
+        this.generateLegendData(this.preprocessBoundaryData(boundaries));
+      },
+    );
   }
 
   private preprocessBoundaryData(
