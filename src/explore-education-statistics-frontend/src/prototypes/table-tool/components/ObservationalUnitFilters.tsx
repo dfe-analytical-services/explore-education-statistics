@@ -1,4 +1,8 @@
-import { FormFieldRadioGroup, FormFieldSelect, FormFieldset } from '@common/components/form';
+import {
+  FormFieldRadioGroup,
+  FormFieldSelect,
+  FormFieldset,
+} from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import { FormikState } from 'formik';
 import React from 'react';

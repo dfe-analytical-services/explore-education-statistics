@@ -35,13 +35,12 @@
   },
   "husky": {
     "hooks": {
-      "precommit": "lint-staged"
+      "pre-commit": "lint-staged"
     }
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
-      "eslint",
-      "jest --findRelatedTests"
+      "eslint"
     ],
     "*.{scss,css}": [
       "stylelint"

@@ -49,6 +49,13 @@ jobs:
       demands: 'npm'
     steps:
       - task: 'Npm@1'
+        displayName: 'npm run ci'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'ci'
+      - task: 'Npm@1'
         displayName: 'npm run bootstrap'
         inputs:
           command: 'custom'

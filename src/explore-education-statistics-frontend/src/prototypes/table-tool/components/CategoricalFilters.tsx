@@ -4,8 +4,7 @@ import { FormikState } from 'formik';
 import React from 'react';
 import { FormValues } from 'src/prototypes/table-tool/components/FiltersForm';
 import { MetaSpecification } from 'src/prototypes/table-tool/components/meta/initialSpec';
-import SearchableGroupedFilterMenus
-  from 'src/prototypes/table-tool/components/SearchableGroupedFilterMenus';
+import SearchableGroupedFilterMenus from 'src/prototypes/table-tool/components/SearchableGroupedFilterMenus';
 import styles from './CategoricalFilters.module.scss';
 
 interface Props {
