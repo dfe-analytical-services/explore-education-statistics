@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Seed.Models;
@@ -78,55 +76,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 
             var subjectDb = CreateSubject(release, subject);
 
-            //SeedMetaData(subjectDb, subject);
-            _context.SaveChanges();
-
-            var lines = GetCsvLines(subject.Filename);
-            _importerService.Import(lines, subjectDb);
+            var lines = subject.GetCsvLines();
+            var metaLines = subject.GetMetaLines();
+            
+            _importerService.Import(lines, metaLines, subjectDb);
         }
-
-        private IEnumerable<string> GetCsvLines(DataCsvFilename dataCsvFilename)
-        {
-            var file = dataCsvFilename + ".csv";
-            var path = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "Files/" + file));
-
-            _logger.LogInformation("Reading data from: {path}", path);
-
-            return File.ReadAllLines(path);
-        }
-
-//        private void SeedMetaData(Model.Subject subjectDb, Subject subject)
-//        {
-//            SeedMetaDataIndicators(subjectDb, subject);
-//            SeedMetaDataCharacteristics(subjectDb, subject);
-//        }
-
-//        private void SeedMetaDataIndicators(Model.Subject subjectDb, Subject subject)
-//        {
-//            _context.IndicatorMeta.AddRange(subject.IndicatorMetas.SelectMany(group =>
-//            {
-//                return group.Meta.Select(meta => new IndicatorMeta
-//                {
-//                    Name = meta.Name,
-//                    Group = group.Name,
-//                    Label = meta.Label,
-//                    Unit = meta.Unit,
-//                    KeyIndicator = meta.KeyIndicator,
-//                    Subject = subjectDb
-//                });
-//            }));
-//        }
-
-//        private void SeedMetaDataCharacteristics(Model.Subject subjectDb, Subject subject)
-//        {
-//            _context.CharacteristicMeta.AddRange(subject.CharacteristicMetas.Select(meta => new CharacteristicMeta
-//            {
-//                Name = meta.Name,
-//                Group = meta.Group,
-//                Label = meta.Label,
-//                Subject = subjectDb
-//            }));
-//        }
 
         private Model.Release CreateRelease(Release release)
         {

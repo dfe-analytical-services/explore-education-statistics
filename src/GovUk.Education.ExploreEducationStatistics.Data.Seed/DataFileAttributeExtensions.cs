@@ -7,12 +7,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
 {
     public static class DataFileAttributeExtensions
     {
-        public static ImportFileType GetImportFileTypeFromDataFileAttributeOfEnumType(this Enum enumValue,
+        public static DataCsvMetaFilename GetMetaFilenameFromDataFileAttributeOfEnumType(this Enum enumValue,
             Type enumType)
         {
             return enumType.GetMember(enumValue.ToString())
                 .First()
-                .GetCustomAttribute<DataFileAttribute>().ImportFileType;
+                .GetCustomAttribute<DataFileAttribute>().MetaFilename;
         }
     }
 }
