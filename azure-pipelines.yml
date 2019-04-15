@@ -49,12 +49,12 @@ jobs:
       demands: 'npm'
     steps:
       - task: 'Npm@1'
-        displayName: 'npm ci'
+        displayName: 'npm run bootstrap'
         inputs:
           command: 'custom'
-          workingDir: 'src/explore-education-statistics-frontend'
+          workingDir: '.'
           verbose: false
-          customCommand: 'ci'
+          customCommand: 'run bootstrap'
       - script: 'npm audit --json >> audit.json'
         workingDirectory: 'src/explore-education-statistics-frontend'
         displayName: 'Run npm audit'
@@ -71,21 +71,21 @@ jobs:
         displayName: 'npm run lint'
         inputs:
           command: 'custom'
-          workingDir: 'src/explore-education-statistics-frontend'
+          workingDir: '.'
           verbose: false
           customCommand: 'run lint'
       - task: 'Npm@1'
         displayName: 'npm run format:check'
         inputs:
           command: 'custom'
-          workingDir: 'src/explore-education-statistics-frontend'
+          workingDir: '.'
           verbose: false
           customCommand: 'run format:check'
       - task: 'Npm@1'
         displayName: 'npm run test:ci'
         inputs:
           command: 'custom'
-          workingDir: 'src/explore-education-statistics-frontend'
+          workingDir: '.'
           verbose: false
           customCommand: 'run test:ci'
       - task: 'PublishTestResults@2'
@@ -93,18 +93,18 @@ jobs:
         inputs:
           testResultsFormat: 'JUnit'
           testResultsFiles: '**/junit.xml'
-          searchFolder: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend'
+          searchFolder: './src'
           testRunTitle: 'Frontend Jest tests'
       - task: 'Bash@3'
         displayName: 'Remove node_modules'
         inputs:
           targetType: 'inline'
-          script: 'rm -rf $(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend/node_modules/'
+          script: 'rm -rf ./src/explore-education-statistics-frontend/node_modules/'
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
         inputs:
           artifactName: 'frontend'
-          targetPath: 'src/explore-education-statistics-frontend'
+          targetPath: './src/explore-education-statistics-frontend'
   - job: 'MiscellaneousArtifacts'
     pool:
       vmImage: 'ubuntu-16.04'
