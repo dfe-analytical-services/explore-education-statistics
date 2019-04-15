@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Meta;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 {
@@ -17,7 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<IndicatorGroup> IndicatorGroup { get; set; }
         public DbSet<Indicator> Indicator { get; set; }
         public DbSet<Location> Location { get; set; }
-        public DbSet<Measure> Measure { get; set; }
         public DbSet<Observation> Observation { get; set; }
         public DbSet<Release> Release { get; set; }
         public DbSet<School> School { get; set; }
@@ -25,24 +26,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            ConfigureMeasure(modelBuilder);
             ConfigureObservationFilterItem(modelBuilder);
             ConfigureUnit(modelBuilder);
             ConfigurePublication(modelBuilder);
+            ConfigureMeasures(modelBuilder);
             ConfigureTime(modelBuilder);
             ConfigureLevel(modelBuilder);
             ConfigureCountry(modelBuilder);
             ConfigureLocalAuthority(modelBuilder);
             ConfigureLocalAuthorityDistrict(modelBuilder);
             ConfigureRegion(modelBuilder);
-        }
-
-        private static void ConfigureMeasure(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Measure>()
-                .HasOne(measure => measure.Observation)
-                .WithMany(observation => observation.Measures)
-                .OnDelete(DeleteBehavior.Restrict);
+            ConfigureSchool(modelBuilder);
         }
 
         private static void ConfigureObservationFilterItem(ModelBuilder modelBuilder)
@@ -77,6 +71,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .HasIndex(data => data.PublicationId);
         }
 
+        private static void ConfigureMeasures(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Observation>()
+                .Property(data => data.Measures)
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<Dictionary<string, string>>(v));
+        }
+        
         private static void ConfigureTime(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Observation>()

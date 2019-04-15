@@ -10,6 +10,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         [JsonProperty(PropertyName = "region_name")]
         public string Name { get; set; }
 
+        private Region()
+        {
+        }
+
+        public Region(string code, string name)
+        {
+            Code = code;
+            Name = name;
+        }
+
+        public static Region Empty()
+        {
+            return new Region(null, null);
+        }
+
         protected bool Equals(Region other)
         {
             return string.Equals(Code, other.Code);

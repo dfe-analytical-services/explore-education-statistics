@@ -1,12 +1,11 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class School
     {
-        public long Id { get; set; }
-
         [JsonProperty(PropertyName = "acad_opendate")]
         public string AcademyOpenDate { get; set; }
 
@@ -15,6 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         [JsonProperty(PropertyName = "estab")] public string Estab { get; set; }
 
+        [Key]
         [JsonProperty(PropertyName = "laestab")]
         public string LaEstab { get; set; }
 

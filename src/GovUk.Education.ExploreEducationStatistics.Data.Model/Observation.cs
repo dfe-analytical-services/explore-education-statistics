@@ -11,10 +11,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public Location Location { get; set; }
         public long LocationId { get; set; }
         public School School { get; set; }
-        public long SchoolId { get; set; }
+        public string SchoolLaEstab { get; set; }
         public int Year { get; set; }
         public TimePeriod TimePeriod { get; set; }
+        public Dictionary<string, string> Measures { get; set; }
         public IEnumerable<ObservationFilterItem> FilterItems { get; set; }
-        public IEnumerable<Measure> Measures { get; set; }
     }
 }

@@ -61,7 +61,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IFilterService, FilterService>();
             services.AddTransient<IIndicatorService, IndicatorService>();
             services.AddTransient<ILocationService, LocationService>();
-            services.AddTransient<IMeasureService, MeasureService>();
             services.AddTransient<IObservationService, ObservationService>();
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<ISchoolService, SchoolService>();

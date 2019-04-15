@@ -47,17 +47,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 name: "School",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    LaEstab = table.Column<string>(nullable: false),
                     AcademyOpenDate = table.Column<string>(nullable: true),
                     AcademyType = table.Column<string>(nullable: true),
                     Estab = table.Column<string>(nullable: true),
-                    LaEstab = table.Column<string>(nullable: true),
                     Urn = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_School", x => x.Id);
+                    table.PrimaryKey("PK_School", x => x.LaEstab);
                 });
 
             migrationBuilder.CreateTable(
@@ -129,9 +127,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     SubjectId = table.Column<long>(nullable: false),
                     Level = table.Column<string>(nullable: false),
                     LocationId = table.Column<long>(nullable: false),
-                    SchoolId = table.Column<long>(nullable: false),
+                    SchoolLaEstab = table.Column<string>(nullable: true),
                     Year = table.Column<int>(nullable: false),
-                    TimePeriod = table.Column<int>(nullable: false)
+                    TimePeriod = table.Column<int>(nullable: false),
+                    Measures = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -143,11 +142,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Observation_School_SchoolId",
-                        column: x => x.SchoolId,
+                        name: "FK_Observation_School_SchoolLaEstab",
+                        column: x => x.SchoolLaEstab,
                         principalTable: "School",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "LaEstab",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Observation_Subject_SubjectId",
                         column: x => x.SubjectId,
@@ -163,6 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Label = table.Column<string>(nullable: true),
+                    Hint = table.Column<string>(nullable: true),
                     FilterGroupId = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
@@ -215,33 +215,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         principalTable: "Filter",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Measure",
-                columns: table => new
-                {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Value = table.Column<string>(nullable: true),
-                    IndicatorId = table.Column<long>(nullable: false),
-                    ObservationId = table.Column<long>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Measure", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Measure_Indicator_IndicatorId",
-                        column: x => x.IndicatorId,
-                        principalTable: "Indicator",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Measure_Observation_ObservationId",
-                        column: x => x.ObservationId,
-                        principalTable: "Observation",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -314,24 +287,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 column: "Region_Code");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Measure_IndicatorId",
-                table: "Measure",
-                column: "IndicatorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Measure_ObservationId",
-                table: "Measure",
-                column: "ObservationId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Observation_LocationId",
                 table: "Observation",
                 column: "LocationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Observation_SchoolId",
+                name: "IX_Observation_SchoolLaEstab",
                 table: "Observation",
-                column: "SchoolId");
+                column: "SchoolLaEstab");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Observation_SubjectId",
@@ -367,22 +330,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Measure");
+                name: "Indicator");
 
             migrationBuilder.DropTable(
                 name: "ObservationFilterItem");
 
             migrationBuilder.DropTable(
-                name: "Indicator");
+                name: "IndicatorGroup");
 
             migrationBuilder.DropTable(
                 name: "FilterItem");
 
             migrationBuilder.DropTable(
                 name: "Observation");
-
-            migrationBuilder.DropTable(
-                name: "IndicatorGroup");
 
             migrationBuilder.DropTable(
                 name: "Filter");

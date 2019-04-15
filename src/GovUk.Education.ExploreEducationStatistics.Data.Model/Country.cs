@@ -4,8 +4,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class Country
     {
-        [JsonProperty(PropertyName = "country_code")] public string Code { get; set; }
-        [JsonProperty(PropertyName = "country_name")] public string Name { get; set; }
+        [JsonProperty(PropertyName = "country_code")]
+        public string Code { get; set; }
+
+        [JsonProperty(PropertyName = "country_name")]
+        public string Name { get; set; }
+
+        private Country()
+        {
+        }
+
+        public Country(string code, string name)
+        {
+            Code = code;
+            Name = name;
+        }
+
+        public static Country Empty()
+        {
+            return new Country(null, null);
+        }
 
         protected bool Equals(Country other)
         {

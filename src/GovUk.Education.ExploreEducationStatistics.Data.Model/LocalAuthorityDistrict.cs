@@ -10,6 +10,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         [JsonProperty(PropertyName = "sch_lad_name")]
         public string Name { get; set; }
 
+        private LocalAuthorityDistrict()
+        {
+        }
+
+        public LocalAuthorityDistrict(string code, string name)
+        {
+            Code = code;
+            Name = name;
+        }
+
+        public static LocalAuthorityDistrict Empty()
+        {
+            return new LocalAuthorityDistrict(null, null);
+        }
+
         protected bool Equals(LocalAuthorityDistrict other)
         {
             return string.Equals(Code, other.Code);

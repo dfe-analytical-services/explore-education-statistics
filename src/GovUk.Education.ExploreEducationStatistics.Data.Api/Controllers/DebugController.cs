@@ -12,7 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         private readonly IFilterService _filterService;
         private readonly IIndicatorService _indicatorService;
         private readonly ILocationService _locationService;
-        private readonly IMeasureService _measureService;
         private readonly IObservationService _observationService;
         private readonly IReleaseService _releaseService;
         private readonly ISchoolService _schoolService;
@@ -21,7 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         public DebugController(IFilterService filterService,
             IIndicatorService indicatorService,
             ILocationService locationService,
-            IMeasureService measureService,
             IObservationService observationService,
             IReleaseService releaseService,
             ISchoolService schoolService,
@@ -30,7 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             _filterService = filterService;
             _indicatorService = indicatorService;
             _locationService = locationService;
-            _measureService = measureService;
             _observationService = observationService;
             _releaseService = releaseService;
             _schoolService = schoolService;
@@ -43,7 +40,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             var filterCount = _filterService.Count();
             var indicatorCount = _indicatorService.Count();
             var locationCount = _locationService.Count();
-            var measureCount = _measureService.Count();
             var observationCount = _observationService.Count();
             var releaseCount = _releaseService.Count();
             var schoolCount = _schoolService.Count();
@@ -53,7 +49,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 filterCount,
                 indicatorCount,
                 locationCount,
-                measureCount,
                 observationCount,
                 releaseCount,
                 schoolCount,

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190411125737_InitialCreate")]
+    [Migration("20190415131637_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,6 +28,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<long>("FilterGroupId");
+
+                    b.Property<string>("Hint");
 
                     b.Property<string>("Label");
 
@@ -120,27 +122,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.ToTable("Location");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Measure", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long>("IndicatorId");
-
-                    b.Property<long>("ObservationId");
-
-                    b.Property<string>("Value");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IndicatorId");
-
-                    b.HasIndex("ObservationId");
-
-                    b.ToTable("Measure");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Observation", b =>
                 {
                     b.Property<long>("Id")
@@ -152,7 +133,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                     b.Property<long>("LocationId");
 
-                    b.Property<long>("SchoolId");
+                    b.Property<string>("Measures");
+
+                    b.Property<string>("SchoolLaEstab");
 
                     b.Property<long>("SubjectId");
 
@@ -164,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.HasIndex("SchoolId");
+                    b.HasIndex("SchoolLaEstab");
 
                     b.HasIndex("SubjectId");
 
@@ -207,9 +190,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.School", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("LaEstab")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("AcademyOpenDate");
 
@@ -217,11 +199,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                     b.Property<string>("Estab");
 
-                    b.Property<string>("LaEstab");
-
                     b.Property<string>("Urn");
 
-                    b.HasKey("Id");
+                    b.HasKey("LaEstab");
 
                     b.ToTable("School");
                 });
@@ -376,19 +356,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         });
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Measure", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Indicator", "Indicator")
-                        .WithMany()
-                        .HasForeignKey("IndicatorId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Observation", "Observation")
-                        .WithMany("Measures")
-                        .HasForeignKey("ObservationId")
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Observation", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location", "Location")
@@ -398,8 +365,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.School", "School")
                         .WithMany("Observations")
-                        .HasForeignKey("SchoolId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("SchoolLaEstab");
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", "Subject")
                         .WithMany("Observations")
