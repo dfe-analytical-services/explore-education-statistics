@@ -98,7 +98,7 @@
     "build:test": "cross-env BUILD_ENV=test next build ./src",
     "build:stage": "cross-env BUILD_ENV=stage next build ./src",
     "build:live": "cross-env BUILD_ENV=live next build ./src",
-    "lint": "npm run lint:js && lint:style",
+    "lint": "npm run lint:js && npm run lint:style",
     "lint:js": "eslint src/**/*.{ts,tsx}",
     "lint:style": "stylelint src/**/*.{scss,css}",
     "test": "jest",
