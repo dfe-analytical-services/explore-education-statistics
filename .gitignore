@@ -26,6 +26,7 @@ yarn-error.log*
 
 ## Tests
 
+junit.xml
 **/test-results/
 /tests/robot-tests/webdriver
 /tests/robot-tests/.env
