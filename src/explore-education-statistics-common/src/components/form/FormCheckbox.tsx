@@ -1,6 +1,4 @@
-import classNames from 'classnames';
 import React, { ChangeEventHandler } from 'react';
-import styles from './FormCheckbox.module.scss';
 
 export type CheckboxChangeEventHandler = ChangeEventHandler<HTMLInputElement>;
 
@@ -11,7 +9,6 @@ interface Props {
   label: string;
   name: string;
   onChange?: CheckboxChangeEventHandler;
-  small?: boolean;
   value: string | string[] | number;
 }
 
@@ -22,15 +19,10 @@ const FormCheckbox = ({
   label,
   name,
   onChange,
-  small = false,
   value,
 }: Props) => {
   return (
-    <div
-      className={classNames('govuk-checkboxes__item', {
-        [styles.itemSmall]: small,
-      })}
-    >
+    <div className="govuk-checkboxes__item">
       <input
         aria-describedby={hint ? `${id}-item-hint` : undefined}
         className="govuk-checkboxes__input"

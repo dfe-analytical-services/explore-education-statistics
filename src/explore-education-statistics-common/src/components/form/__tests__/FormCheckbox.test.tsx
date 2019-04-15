@@ -38,22 +38,4 @@ describe('FormCheckbox', () => {
 
     expect(container.innerHTML).toMatchSnapshot();
   });
-
-  test('renders small size variant when `small` is true', () => {
-    const { container, getByLabelText } = render(
-      <FormCheckbox
-        name="test"
-        hint="Click me to proceed"
-        id="test-checkbox"
-        label="Test checkbox"
-        value="true"
-        small
-      />,
-    );
-
-    expect(getByLabelText('Test checkbox').parentElement).toHaveClass(
-      'itemSmall',
-    );
-    expect(container).toMatchSnapshot();
-  });
 });

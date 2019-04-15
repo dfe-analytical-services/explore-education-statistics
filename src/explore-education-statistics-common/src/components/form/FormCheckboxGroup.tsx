@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import React, { Component, createRef } from 'react';
 import FormCheckbox, { CheckboxChangeEventHandler } from './FormCheckbox';
 import FormFieldset, { FieldSetProps } from './FormFieldset';
@@ -64,13 +65,17 @@ class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
 
     return (
       <FormFieldset {...this.props}>
-        <div className="govuk-checkboxes" ref={this.ref}>
+        <div
+          className={classNames('govuk-checkboxes', {
+            'govuk-checkboxes--small': small,
+          })}
+          ref={this.ref}
+        >
           {options.length > 1 && selectAll && (
             <FormCheckbox
               id={`${id}-all`}
               label="Select all"
               name={name}
-              small={small}
               value="select-all"
               checked={isAllChecked}
               onChange={event => {
@@ -85,7 +90,6 @@ class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
             <FormCheckbox
               {...option}
               name={name}
-              small={small}
               key={option.id}
               checked={value.indexOf(option.value) > -1}
               onChange={event => {

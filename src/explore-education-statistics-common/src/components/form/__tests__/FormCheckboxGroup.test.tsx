@@ -69,7 +69,7 @@ describe('FormCheckboxGroup', () => {
   });
 
   test('renders correctly with small size variants', () => {
-    const { container, getAllByLabelText } = render(
+    const { container } = render(
       <FormCheckboxGroup
         id="test-checkboxes"
         name="test-checkboxes"
@@ -82,13 +82,7 @@ describe('FormCheckboxGroup', () => {
       />,
     );
 
-    const checkboxes = getAllByLabelText(/Test checkbox/) as HTMLInputElement[];
-
-    expect(checkboxes).toHaveLength(3);
-    expect(checkboxes[0].parentElement).toHaveClass('itemSmall');
-    expect(checkboxes[1].parentElement).toHaveClass('itemSmall');
-    expect(checkboxes[2].parentElement).toHaveClass('itemSmall');
-
+    expect(container.querySelector('.govuk-checkboxes--small')).not.toBeNull();
     expect(container).toMatchSnapshot();
   });
 
@@ -135,7 +129,7 @@ describe('FormCheckboxGroup', () => {
   });
 
   test('renders `Select all` with small variant', () => {
-    const { getByLabelText } = render(
+    const { container } = render(
       <FormCheckboxGroup
         value={[]}
         id="test-checkboxes"
@@ -150,9 +144,7 @@ describe('FormCheckboxGroup', () => {
       />,
     );
 
-    const selectAllCheckbox = getByLabelText('Select all') as HTMLInputElement;
-
-    expect(selectAllCheckbox.parentElement).toHaveClass('itemSmall');
+    expect(container.querySelector('.govuk-checkboxes--small')).not.toBeNull();
   });
 
   test('does not render checked `Select all` checkbox when checked values do not match options', () => {
