@@ -1,4 +1,3 @@
-
 console.log(typeof Promise === 'undefined');
 
 if (typeof Promise === 'undefined') {
@@ -32,4 +31,3 @@ const loadPolyfill = () => {
 };
 
 export default loadPolyfill;
-

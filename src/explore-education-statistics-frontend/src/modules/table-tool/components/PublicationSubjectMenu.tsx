@@ -1,6 +1,6 @@
+import { RadioChangeEventHandler } from '@common/components/form/FormRadio';
+import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import React from 'react';
-import { RadioChangeEventHandler } from 'src/components/form/FormRadio';
-import FormRadioGroup from 'src/components/form/FormRadioGroup';
 
 export interface PublicationSubjectMenuOption {
   value: string;

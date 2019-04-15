@@ -1,57 +1,42 @@
-import React, { Component } from "react";
-import { createBrowserHistory } from "history";
+import { createBrowserHistory } from 'history';
+import React, { Component } from 'react';
+import { Route, Router } from 'react-router';
 
-import logo from "./logo.svg";
+import './App.scss';
+import { default as AdminDashboardPage } from './pages/prototypes/PrototypeAdminDashboard';
+import { default as AdminDocumentationGlossary } from './pages/prototypes/PrototypeDocumentationGlossary';
+import { default as AdminDocumentationHome } from './pages/prototypes/PrototypeDocumentationHome';
 
-import "./App.scss";
-import { Route, Router } from "react-router";
+import { default as PublicationCreateNew } from './pages/prototypes/PrototypePublicationPageCreateNew';
 
-import { default as PublicationPage } from "./pages/prototypes/publication";
-import { default as PublicationEditPage } from "./pages/prototypes/publication-edit";
-import { default as PrototypesIndexPage } from "./pages/prototypes/index";
-import { default as BrowseReleasesPage } from "./pages/prototypes/browse-releases";
-import { default as StartPage } from "./pages/prototypes/start";
-import { default as AdminDashboardPage } from "./pages/prototypes/admin-dashboard";
-import { default as AdminDocumentation } from "./pages/prototypes/documentation-home";
-import { default as AdminDocumentationGlossary } from "./pages/prototypes/documentation-glossary";
-
-import { default as PublicationCreateNew } from "./pages/prototypes/publication-create-new";
-import { default as PublicationCreateNewAbsence } from "./pages/prototypes/publication-create-new-absence";
-import { default as PublicationCreateNewAbsenceConfig } from "./pages/prototypes/publication-create-new-absence-config";
-import { default as PublicationCreateNewAbsenceConfigEdit } from "./pages/prototypes/publication-create-new-absence-config-edit";
-import { default as PublicationCreateNewAbsenceData } from "./pages/prototypes/publication-create-new-absence-data";
-import { default as PublicationCreateNewAbsenceSchedule } from "./pages/prototypes/publication-create-new-absence-schedule";
-import { default as PublicationCreateNewAbsenceScheduleEdit } from "./pages/prototypes/publication-create-new-absence-schedule-edit";
-import { default as PublicationCreateNewAbsenceStatus } from "./pages/prototypes/publication-create-new-absence-status";
+import { default as PublicationEditPage } from './pages/prototypes/PrototypePublicationPageEditAbsence';
+import { default as PublicationCreateNewAbsence } from './pages/prototypes/PrototypePublicationPageNewAbsence';
+import { default as PublicationCreateNewAbsenceConfig } from './pages/prototypes/PrototypePublicationPageNewAbsenceConfig';
+import { default as PublicationCreateNewAbsenceConfigEdit } from './pages/prototypes/PrototypePublicationPageNewAbsenceConfigEdit';
+import { default as PublicationCreateNewAbsenceData } from './pages/prototypes/PrototypePublicationPageNewAbsenceData';
+import { default as PublicationCreateNewAbsenceSchedule } from './pages/prototypes/PrototypePublicationPageNewAbsenceSchedule';
+import { default as PublicationCreateNewAbsenceScheduleEdit } from './pages/prototypes/PrototypePublicationPageNewAbsenceScheduleEdit';
+import { default as PublicationCreateNewAbsenceStatus } from './pages/prototypes/PrototypePublicationPageNewAbsenceStatus';
+import { default as PrototypesIndexPage } from './pages/prototypes/PrototypesIndexPage';
 
 const history = createBrowserHistory();
 
 class App extends Component {
-  render() {
+  public render() {
     return (
       <Router history={history}>
+        <Route exact path="/" component={PrototypesIndexPage} />
         <Route exact path="/prototypes/" component={PrototypesIndexPage} />
-        <Route exact path="/prototypes/start" component={StartPage} />
+
         <Route
           exact
-          path="/prototypes/browse-releases"
-          component={BrowseReleasesPage}
-        />
-        <Route
-          exact
-          path="/prototypes/publication"
-          component={PublicationPage}
+          path="/prototypes/admin-dashboard"
+          component={AdminDashboardPage}
         />
         <Route
           exact
           path="/prototypes/publication-edit"
           component={PublicationEditPage}
-        />
-        <Route exact path="/prototypes/tester" component={BrowseReleasesPage} />
-        <Route
-          exact
-          path="/prototypes/admin-dashboard"
-          component={AdminDashboardPage}
         />
         <Route
           exact
@@ -96,7 +81,7 @@ class App extends Component {
         <Route
           exact
           path="/prototypes/documentation/"
-          component={AdminDocumentation}
+          component={AdminDocumentationHome}
         />
         <Route
           exact

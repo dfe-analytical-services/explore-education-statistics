@@ -9,6 +9,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "private": true,
   "dependencies": {
     "azure-storage": "^2.10.2",
     "co": "^4.6.0",

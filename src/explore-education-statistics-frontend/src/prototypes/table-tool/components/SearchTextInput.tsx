@@ -1,6 +1,6 @@
+import { FormTextInput } from '@common/components/form';
 import debounce from 'lodash/debounce';
 import React, { ChangeEvent, ChangeEventHandler } from 'react';
-import { FormTextInput } from 'src/components/form';
 
 interface Props {
   id: string;

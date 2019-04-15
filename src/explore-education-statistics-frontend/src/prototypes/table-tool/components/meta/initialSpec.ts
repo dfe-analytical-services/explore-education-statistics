@@ -23,7 +23,7 @@ export interface GroupedFilterOptions {
 export enum LocationLevel {
   National = 'national',
   Region = 'region',
-  Local_Authority = 'localAuthority',
+  LocalAuthority = 'localAuthority',
   School = 'school',
 }
 
@@ -81,11 +81,11 @@ const metaSpecification: MetaSpecification = {
             },
             {
               label: 'Primary schools',
-              value: 'State_Funded_Primary',
+              value: 'StateFundedPrimary',
             },
             {
               label: 'Secondary schools',
-              value: 'State_Funded_Secondary',
+              value: 'StateFundedSecondary',
             },
             {
               label: 'Special schools',

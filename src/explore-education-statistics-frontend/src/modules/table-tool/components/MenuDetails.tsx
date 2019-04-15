@@ -26,8 +26,11 @@ class MenuDetails extends Component<Props> {
 
     return (
       <details className={styles.details} open={open} ref={this.ref}>
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
         <summary
           className="govuk-details__summary"
+          role="button"
+          tabIndex={0}
           onClick={event => {
             if (onToggle) {
               event.preventDefault();

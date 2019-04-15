@@ -1,12 +1,9 @@
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
 import React from 'react';
-import Accordion from '../components/Accordion';
-import AccordionSection from '../components/AccordionSection';
 import Link from '../components/Link';
-import PrototypeDataTile from './components/PrototypeDataTile';
 import PrototypeDownloadDropdown from './components/PrototypeDownloadDropdown';
 import PrototypePage from './components/PrototypePage';
-import PrototypeSearchForm from './components/PrototypeSearchForm';
-import PrototypeTileWithChart from './components/PrototypeTileWithChart';
 
 const BrowseReleasesPage = () => {
   return (
@@ -38,7 +35,7 @@ const BrowseReleasesPage = () => {
           </ul>
         </div>
         <div className="govuk-grid-column-one-third">
-          <aside className="app-related-items" role="complementary">
+          <aside className="app-related-items">
             <h2 className="govuk-heading-m" id="releated-content">
               Related content
             </h2>

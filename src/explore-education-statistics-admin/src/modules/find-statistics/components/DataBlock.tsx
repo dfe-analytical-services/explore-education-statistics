@@ -1,16 +1,18 @@
-import React, { Component } from 'react';
-import Tabs from '../../../components/Tabs';
-import TabsSection from '../../../components/TabsSection';
-import { baseUrl } from '../../../services/api';
+import Tabs from '@common/components/Tabs';
+import TabsSection from '@common/components/TabsSection';
 import {
-  Chart,
-  DataQuery,
-  Summary,
-} from '../../../services/publicationService';
-import { PublicationMeta } from '../../../services/tableBuilderService';
-import { ChartRenderer } from './ChartRenderer';
-import { SummaryRenderer } from './SummaryRenderer';
-import { TableRenderer } from './TableRenderer';
+  SummaryRenderer,
+  SummaryRendererProps,
+} from '@common/modules/find-statistics/components/SummaryRenderer';
+import {
+  TableRenderer,
+  TableRendererProps,
+} from '@common/modules/find-statistics/components/TableRenderer';
+import { baseUrl } from '@common/services/api';
+import { Chart, DataQuery, Summary } from '@common/services/publicationService';
+import { PublicationMeta } from '@common/services/tableBuilderService';
+import React, { Component } from 'react';
+import { ChartRenderer, ChartRendererProps } from './ChartRenderer';
 
 export interface DataBlockProps {
   type: string;
@@ -24,19 +26,14 @@ export interface DataBlockProps {
 }
 
 interface DataBlockState {
-  charts?: any[];
-  downloads?: any[];
-  tables?: any[];
-  summary?: any;
+  charts?: ChartRendererProps[];
+  // downloads?: any[];
+  tables?: TableRendererProps[];
+  summary?: SummaryRendererProps;
 }
 
 export class DataBlock extends Component<DataBlockProps, DataBlockState> {
-  public state: DataBlockState = {
-    charts: undefined,
-    downloads: undefined,
-    summary: undefined,
-    tables: undefined,
-  };
+  public state: DataBlockState = {};
 
   private currentDataQuery?: DataQuery = undefined;
 
@@ -128,7 +125,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
           {this.state.tables && (
             <TabsSection id={`${id}0`} title="Data tables">
               <h3>{this.props.heading}</h3>
-              {this.state.tables.map((table: any, idx) => (
+              {this.state.tables.map((table, idx) => (
                 <TableRenderer key={`${id}0_table_${idx}`} {...table} />
               ))}
             </TabsSection>
@@ -137,7 +134,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
           {this.state.charts && (
             <TabsSection id={`${id}1`} title="Charts" lazy={false}>
               <h3>{this.props.heading}</h3>
-              {this.state.charts.map((chart: any, idx) => (
+              {this.state.charts.map((chart, idx) => (
                 <ChartRenderer
                   key={`${id}_chart_${idx}`}
                   {...chart}

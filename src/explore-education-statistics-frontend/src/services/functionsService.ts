@@ -1,4 +1,4 @@
-import { functionApi } from './api';
+import { functionApi } from '@common/services/api';
 
 export interface SubscriptionData {
   email: string;

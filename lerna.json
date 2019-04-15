@@ -1,0 +1,15 @@
+{
+  "packages": [
+    "src/explore-education-statistics-admin",
+    "src/explore-education-statistics-common",
+    "src/explore-education-statistics-frontend"
+  ],
+  "version": "0.0.0",
+  "command": {
+    "bootstrap": {
+      "npmClientArgs": [
+        "--no-package-lock"
+      ]
+    }
+  }
+}

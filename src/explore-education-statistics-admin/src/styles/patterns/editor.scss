@@ -1,29 +1,31 @@
-
+// stylelint-disable-next-line selector-no-qualifying-type, selector-class-pattern
 div.ck.ck-editor__editable_inline {
   background-color: #eee;
 }
 
 .editable-content {
-  padding: 0;
-  margin: 0;
-  position: relative;
   cursor: pointer;
+  margin: 0;
+  padding: 0;
+  position: relative;
 
   &:hover {
     background-color: #f8f8f8;
+
+    // stylelint-disable-next-line max-nesting-depth
     .editable-button {
       display: none;
     }
   }
 
   .editable-button {
-    display: block;
-    position: absolute;
-    top: -20px;
-    right: 0px;
     background-color: #8f8;
-    border: solid 1px grey;
+    border: solid 1px #808080;
+    display: block;
     padding: 0 4px;
+    position: absolute;
+    right: 0;
+    top: -20px;
   }
 
   .unsaved {
@@ -33,33 +35,33 @@ div.ck.ck-editor__editable_inline {
 
 .editable-content-editing {
   .editable-button {
-    border: none;
+    border: 0;
     display: inline !important;
-    z-index: 1000;
     margin: 6px;
-    padding: 0 0px;
-    top: 0px;
+    padding: 0;
+    top: 0;
+    z-index: 1000;
   }
 }
 
-.govuk-accordion__drag_icon {
+.govuk-accordion__drag-icon {
+  content: 'H';
   position: absolute;
-  content: "H";
-  top: 20%;
   right: -38px;
+  top: 20%;
   //width: 16px;
   //height: 16px;
   //margin-top: 0px;
-}
 
-.govuk-accordion__drag_icon:before {
-  content: "H";
-  width: 100%;
+  &::before {
+    content: 'H';
+    width: 100%;
+  }
 }
 
 /*
-.govuk-accordion__drag_icon:after,
-.govuk-accordion__drag_icon:before {
+.govuk-accordion__drag-icon:after,
+.govuk-accordion__drag-icon:before {
 
   box-sizing: border-box;
   position: absolute;
@@ -75,38 +77,36 @@ div.ck.ck-editor__editable_inline {
 }
 
 
-.govuk-accordion__drag_icon:after {
+.govuk-accordion__drag-icon:after {
   height: 100%;
 }*/
 
 .drag-handle {
   height: 0;
   position: absolute;
-  right: 0px;
-  &:before {
+  right: 0;
+
+  &::before {
+    color: #999;
     content: '\2630';
     font-size: 2.25rem;
-    width: 2.25rem;
-
     position: absolute;
-    z-index:1000;
-
     top: 10px;
-
-    color: #999;
+    width: 2.25rem;
+    z-index: 1000;
   }
 
-  &.small:before {
-    width: 1.125rem;
+  &.small::before {
     font-size: 1.125rem;
     left: -1.125rem;
+    width: 1.125rem;
   }
 }
 
 .reorderable {
   font-size: 1rem;
-  right: 0px;
   position: absolute;
+  right: 0;
 }
 
 .reorderable-relative {

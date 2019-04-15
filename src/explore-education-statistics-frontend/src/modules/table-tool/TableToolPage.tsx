@@ -1,21 +1,18 @@
+import Tabs from '@common/components/Tabs';
+import TabsSection from '@common/components/TabsSection';
+import CharacteristicsDataTable
+  from '@common/modules/table-tool/components/CharacteristicsDataTable';
+import tableBuilderService, {
+  DataTableResult,
+  PublicationMeta,
+} from '@common/services/tableBuilderService';
+import SchoolType from '@common/services/types/SchoolType';
 import range from 'lodash/range';
 import React, { Component, createRef } from 'react';
 import Page from 'src/components/Page';
 import PageTitle from 'src/components/PageTitle';
-import Tabs from 'src/components/Tabs';
-import TabsSection from 'src/components/TabsSection';
-import tableBuilderService, {
-  DataTableResult,
-  PublicationMeta,
-} from 'src/services/tableBuilderService';
-import SchoolType from 'src/services/types/SchoolType';
-import CharacteristicsDataTable from './components/CharacteristicsDataTable';
-import CharacteristicsFilterForm, {
-  CharacteristicsFilterFormSubmitHandler,
-} from './components/CharacteristicsFilterForm';
-import PublicationMenu, {
-  MenuChangeEventHandler,
-} from './components/PublicationMenu';
+import CharacteristicsFilterForm, { CharacteristicsFilterFormSubmitHandler } from './components/CharacteristicsFilterForm';
+import PublicationMenu, { MenuChangeEventHandler } from './components/PublicationMenu';
 
 const defaultPublicationOptions = [
   {
