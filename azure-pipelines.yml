@@ -235,7 +235,7 @@ jobs:
           command: 'custom'
           workingDir: './src/explore-education-statistics-frontend'
           verbose: false
-          customCommand: 'run build:test'
+          customCommand: 'run build:live'
       - task: 'Npm@1'
         displayName: 'Remove dev dependencies'
         inputs:
