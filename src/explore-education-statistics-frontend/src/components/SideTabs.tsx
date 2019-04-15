@@ -1,3 +1,5 @@
+import useRendered from '@common/hooks/useRendered';
+import isComponentType from '@common/lib/type-guards/components/isComponentType';
 import classNames from 'classnames';
 import React, {
   cloneElement,
@@ -10,8 +12,6 @@ import React, {
 import SideTabsSection, {
   SideTabsSectionProps,
 } from 'src/components/SideTabsSection';
-import useRendered from '../hooks/useRendered';
-import isComponentType from '../lib/type-guards/components/isComponentType';
 import styles from './SideTabs.module.scss';
 
 function filterSections(

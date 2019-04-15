@@ -1,3 +1,4 @@
+import useRendered from '@common/hooks/useRendered';
 import classNames from 'classnames';
 import React, {
   forwardRef,
@@ -6,23 +7,18 @@ import React, {
   ReactNode,
   Ref,
 } from 'react';
-import useRendered from 'src/hooks/useRendered';
 import styles from './SideTabsSection.module.scss';
 
 export interface SideTabsSectionProps {
   children: ReactNode;
   id: string;
-  /**
-   * Set to true if children should not be
-   * rendered until tab has been selected.
-   */
   lazy?: boolean;
   title: string;
 }
 
 const SideTabsSection: FunctionComponent<SideTabsSectionProps> = forwardRef(
   (
-    { children, id, lazy = false, ...restProps }: SideTabsSectionProps,
+    { children, id, ...restProps }: SideTabsSectionProps,
     ref: Ref<HTMLElement>,
   ) => {
     const { onRendered } = useRendered();

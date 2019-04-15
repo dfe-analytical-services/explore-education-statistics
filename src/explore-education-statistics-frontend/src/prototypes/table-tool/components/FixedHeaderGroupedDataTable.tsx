@@ -308,6 +308,10 @@ class FixedHeaderGroupedDataTable extends Component<Props> {
   }
 }
 
-export default forwardRef<HTMLElement, Props>((props, ref) => (
+const TableWithRef = forwardRef<HTMLElement, Props>((props, ref) => (
   <FixedHeaderGroupedDataTable {...props} innerRef={ref} />
 ));
+
+TableWithRef.displayName = 'FixedHeaderGroupedDataTable';
+
+export default TableWithRef;
