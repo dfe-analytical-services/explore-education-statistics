@@ -16,11 +16,11 @@ interface State {
 }
 
 class PrototypeSearchForm extends Component<{}, State> {
-  public state = {
-    currentlyHighlighted: undefined,
+  public state: State = {
     searchResults: [],
     searchValue: '',
   };
+  private readonly boundPerformSearch: () => void;
 
   private findElementsWithText(text: string) {
     const lowerCase = text.toLocaleLowerCase();
@@ -66,6 +66,12 @@ class PrototypeSearchForm extends Component<{}, State> {
     return '';
   }
 
+  public constructor(props: {}) {
+    super(props);
+
+    this.boundPerformSearch = this.performSearch.bind(this);
+  }
+
   private performSearch() {
     if (this.state.searchValue.length <= 3) {
       return;
@@ -81,37 +87,26 @@ class PrototypeSearchForm extends Component<{}, State> {
         'govuk-accordion__section',
       );
 
-      const locationHeaderElement = PrototypeSearchForm.findSiblingsBeforeOfElementType(
-        element,
-        'h3',
-        'h2',
-        'h4',
-      );
-
-      const location = [];
-
-      if (locationHeaderElement) {
-        location.push(
-          PrototypeSearchForm.substring(
-            locationHeaderElement.textContent || '',
-            20,
-          ),
-        );
-      }
-
       const insideAccordion = potentialAccordion.classList.contains(
         'govuk-accordion__section',
+      );
+      const location = PrototypeSearchForm.calculateLocationOfElement(
+        element,
+        insideAccordion,
+        potentialAccordion,
       );
 
       if (insideAccordion) {
         scrollIntoView = () => {
-          potentialAccordion.classList.add(
-            'govuk-accordion__section--expanded',
-          );
+          PrototypeSearchForm.openAccordion(potentialAccordion);
+          this.resetSearch();
           element.scrollIntoView();
         };
       } else {
-        scrollIntoView = () => element.scrollIntoView();
+        scrollIntoView = () => {
+          this.resetSearch();
+          element.scrollIntoView();
+        };
       }
 
       return {
@@ -125,9 +120,58 @@ class PrototypeSearchForm extends Component<{}, State> {
     this.setState({ searchResults });
   }
 
-  private handleTextChange = debounce(() => {
-    this.performSearch();
-  }, 1000);
+  private static openAccordion(potentialAccordion: HTMLElement) {
+    potentialAccordion.classList.add('govuk-accordion__section--expanded');
+  }
+
+  private resetSearch() {
+    this.setState({
+      currentlyHighlighted: undefined,
+      searchResults: [],
+      searchValue: '',
+    });
+  }
+
+  private static calculateLocationOfElement(
+    element: HTMLElement,
+    insideAccordion: boolean,
+    potentialAccordion: HTMLElement,
+  ) {
+    const location: string[] = [];
+
+    const locationHeaderElement = PrototypeSearchForm.findSiblingsBeforeOfElementType(
+      element,
+      'h3',
+      'h2',
+      'h4',
+    );
+
+    if (locationHeaderElement) {
+      location.unshift(
+        PrototypeSearchForm.substring(
+          locationHeaderElement.textContent || '',
+          20,
+        ),
+      );
+    }
+
+    if (insideAccordion) {
+      const accordionHeader = potentialAccordion.querySelector(
+        '.govuk-accordion__section-heading button',
+      );
+      if (accordionHeader) {
+        location.unshift(
+          PrototypeSearchForm.substring(accordionHeader.textContent || '', 20),
+        );
+      }
+    }
+
+    return location;
+  }
+
+  private handleTextChange() {
+    debounce(this.boundPerformSearch, 1000);
+  }
 
   private onKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
@@ -150,6 +194,16 @@ class PrototypeSearchForm extends Component<{}, State> {
       }
 
       this.setState({ currentlyHighlighted });
+    }
+
+    if (e.key === 'Enter') {
+      if (this.state.currentlyHighlighted !== undefined) {
+        this.state.searchResults[
+          this.state.currentlyHighlighted
+        ].scrollIntoView();
+
+        e.preventDefault();
+      }
     }
   };
 

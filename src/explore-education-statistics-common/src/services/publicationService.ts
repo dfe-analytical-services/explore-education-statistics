@@ -1,6 +1,6 @@
-import { FeatureCollection } from 'geojson';
 import { MapFeature } from '../modules/find-statistics/components/charts/MapBlock';
 import { contentApi } from './api';
+import {FeatureCollection} from "geojson";
 
 export interface Publication {
   id: string;
@@ -41,7 +41,7 @@ export interface Chart {
   xAxis?: Axis;
   yAxis?: Axis;
   stacked?: boolean;
-  geometry?: MapFeature | FeatureCollection;
+  geometry?: MapFeature | FeatureCollection ;
 }
 
 export interface Summary {

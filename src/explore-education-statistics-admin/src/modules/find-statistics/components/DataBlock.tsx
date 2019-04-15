@@ -10,9 +10,13 @@ import {
 } from '@common/modules/find-statistics/components/TableRenderer';
 import { baseUrl } from '@common/services/api';
 import { Chart, DataQuery, Summary } from '@common/services/publicationService';
-import { PublicationMeta } from '@common/services/tableBuilderService';
+import {
+  PublicationMeta,
+  CharacteristicsData,
+} from '@common/services/tableBuilderService';
 import React, { Component } from 'react';
 import { ChartRenderer, ChartRendererProps } from './ChartRenderer';
+import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
 
 export interface DataBlockProps {
   type: string;
@@ -20,7 +24,7 @@ export interface DataBlockProps {
   dataQuery?: DataQuery;
   charts?: Chart[];
   summary?: Summary;
-  data?: any;
+  data?: CharacteristicsData;
   meta?: PublicationMeta;
   height?: number;
 }
@@ -64,7 +68,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
       method: dataQuery.method,
     });
 
-    const json = await response.json();
+    const json: CharacteristicsData = await response.json();
 
     const publicationId = json.publicationId;
 
@@ -81,8 +85,11 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
     }
   }
 
-  private parseDataResponse(json?: any, jsonMeta?: PublicationMeta): void {
-    const newState: any = {};
+  private parseDataResponse(
+    json?: CharacteristicsData,
+    jsonMeta?: PublicationMeta,
+  ): void {
+    const newState: DataBlockState = {};
 
     if (json && jsonMeta) {
       if (json.result.length > 0) {
@@ -90,20 +97,21 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
       }
 
       if (this.props.charts) {
-        newState.charts = this.props.charts.map(chart => ({
+        newState.charts = this.props.charts.map((chart: Chart) => ({
           ...chart,
+          geometry: chart.geometry as MapFeature,
           data: json,
           meta: jsonMeta,
         }));
       }
-    }
 
-    if (this.props.summary) {
-      newState.summary = {
-        ...this.props.summary,
-        data: json,
-        meta: jsonMeta,
-      };
+      if (this.props.summary) {
+        newState.summary = {
+          ...this.props.summary,
+          data: json,
+          meta: jsonMeta,
+        };
+      }
     }
 
     this.setState(newState);
