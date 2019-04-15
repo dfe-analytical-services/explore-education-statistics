@@ -212,6 +212,7 @@ module.exports = function(webpackEnv) {
               comments: false,
               // Turned on because emoji and regex is not minified properly using default
               // https://github.com/facebook/create-react-app/issues/2488
+              // eslint-disable-next-line @typescript-eslint/camelcase
               ascii_only: true,
             },
           },
@@ -616,6 +617,7 @@ module.exports = function(webpackEnv) {
       fs: 'empty',
       net: 'empty',
       tls: 'empty',
+      // eslint-disable-next-line @typescript-eslint/camelcase
       child_process: 'empty',
     },
     // Turn off performance processing because we utilize
