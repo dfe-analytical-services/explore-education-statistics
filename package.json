@@ -20,7 +20,7 @@
     "typescript": "^3.4.3"
   },
   "scripts": {
-    "bootstrap": "lerna bootstrap",
+    "bootstrap": "lerna bootstrap --ci --force-local",
     "fix": "npm run fix:js && npm run fix:style",
     "fix:js": "eslint --fix --ext .ts,.tsx,.js,.jsx src",
     "fix:style": "stylelint --fix src/**/*.{scss,css}",
