@@ -1,6 +1,8 @@
 import isComponentType from '@common/lib/type-guards/components/isComponentType';
 import React, { cloneElement, Component, createRef, ReactNode } from 'react';
-import EditableAccordionSection, { EditableAccordionSectionProps } from './EditableAccordionSection';
+import EditableAccordionSection, {
+  EditableAccordionSectionProps,
+} from './EditableAccordionSection';
 
 export interface EditableAccordionProps {
   children: ReactNode;

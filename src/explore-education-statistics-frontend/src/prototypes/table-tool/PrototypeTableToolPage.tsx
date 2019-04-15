@@ -1,20 +1,25 @@
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
-import tableBuilderService, { DataTableResult } from '@common/services/tableBuilderService';
+import tableBuilderService, {
+  DataTableResult,
+} from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import mapValues from 'lodash/mapValues';
 import React, { Component, createRef } from 'react';
 import PageTitle from 'src/components/PageTitle';
-import PublicationMenu, { MenuChangeEventHandler } from 'src/modules/table-tool/components/PublicationMenu';
+import PublicationMenu, {
+  MenuChangeEventHandler,
+} from 'src/modules/table-tool/components/PublicationMenu';
 import PublicationSubjectMenu from 'src/modules/table-tool/components/PublicationSubjectMenu';
 import PrototypePage from 'src/prototypes/components/PrototypePage';
-import FiltersForm, { FilterFormSubmitHandler } from 'src/prototypes/table-tool/components/FiltersForm';
+import FiltersForm, {
+  FilterFormSubmitHandler,
+} from 'src/prototypes/table-tool/components/FiltersForm';
 import initialMetaSpecification, {
   FilterOption,
   IndicatorOption,
   MetaSpecification,
 } from 'src/prototypes/table-tool/components/meta/initialSpec';
-import publicationSubjectSpec
-  from 'src/prototypes/table-tool/components/meta/publicationSubjectSpec';
+import publicationSubjectSpec from 'src/prototypes/table-tool/components/meta/publicationSubjectSpec';
 import TimePeriodDataTable from 'src/prototypes/table-tool/components/TimePeriodDataTable';
 import mapOptionValues from 'src/prototypes/table-tool/components/utils/mapOptionValues';
 
