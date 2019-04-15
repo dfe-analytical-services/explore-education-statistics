@@ -22,7 +22,7 @@ export interface ChartRendererProps {
   yAxis?: Axis;
   height?: number;
   stacked?: boolean;
-  geometry?: MapFeature ;
+  geometry?: MapFeature;
 }
 
 export class ChartRenderer extends Component<ChartRendererProps> {
@@ -55,8 +55,8 @@ export class ChartRenderer extends Component<ChartRendererProps> {
         : 0;
     });
 
-    const xAxis = this.props.xAxis || { title: "" };
-    const yAxis = this.props.yAxis || { title: "" };
+    const xAxis = this.props.xAxis || { title: '' };
+    const yAxis = this.props.yAxis || { title: '' };
 
     switch (this.props.type.toLowerCase()) {
       case 'line':
