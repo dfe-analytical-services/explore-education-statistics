@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import loadPolyfill from './polyfill';
 
 import * as serviceWorker from './serviceWorker';

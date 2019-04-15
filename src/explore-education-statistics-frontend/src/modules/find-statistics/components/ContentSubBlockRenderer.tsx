@@ -1,6 +1,6 @@
+import { ContentBlock } from '@common/services/publicationService';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { ContentBlock } from 'src/services/publicationService';
 import { DataBlock } from './DataBlock';
 
 interface Props {

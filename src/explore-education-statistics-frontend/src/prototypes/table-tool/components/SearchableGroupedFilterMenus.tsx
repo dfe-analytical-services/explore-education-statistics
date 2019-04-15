@@ -1,9 +1,9 @@
+import { FormGroup } from '@common/components/form';
+import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
 import classNames from 'classnames';
 import camelCase from 'lodash/camelCase';
 import sortBy from 'lodash/sortBy';
 import React, { PureComponent } from 'react';
-import { FormGroup } from 'src/components/form';
-import FormFieldCheckboxGroup from 'src/components/form/FormFieldCheckboxGroup';
 import MenuDetails from 'src/modules/table-tool/components/MenuDetails';
 import { GroupedFilterOptions } from 'src/prototypes/table-tool/components/meta/initialSpec';
 import SearchTextInput from 'src/prototypes/table-tool/components/SearchTextInput';
@@ -45,7 +45,7 @@ class SearchableGroupedFilterMenus<
 
     const groups = sortBy(Object.entries(menuOptions), ([groupKey]) => groupKey)
       .filter(
-        ([groupKey, group]) =>
+        ([_, group]) =>
           searchTerm === '' ||
           group.options.some(
             item =>

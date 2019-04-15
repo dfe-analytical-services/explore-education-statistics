@@ -1,16 +1,16 @@
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
+import Details from '@common/components/Details';
+import FormattedDate from '@common/components/FormattedDate';
+import GoToTopLink from '@common/components/GoToTopLink';
+import { baseUrl } from '@common/services/api';
+import publicationService, { Release } from '@common/services/publicationService';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
-import Accordion from 'src/components/Accordion';
-import AccordionSection from 'src/components/AccordionSection';
-import Details from 'src/components/Details';
-import FormattedDate from 'src/components/FormattedDate';
-import GoToTopLink from 'src/components/GoToTopLink';
 import Link from 'src/components/Link';
 import Page from 'src/components/Page';
 import PageTitle from 'src/components/PageTitle';
-import { baseUrl } from 'src/services/api';
-import publicationService, { Release } from 'src/services/publicationService';
 import ContentBlock from './components/ContentBlock';
 import { DataBlock } from './components/DataBlock';
 

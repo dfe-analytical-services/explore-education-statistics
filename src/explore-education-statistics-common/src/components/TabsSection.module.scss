@@ -1,0 +1,7 @@
+@import '../styles/govuk-base';
+
+.panel {
+  &:focus {
+    outline: none;
+  }
+}

@@ -91,6 +91,26 @@ const withSassModules = createPlugin((config, options) => {
   return config;
 });
 
+const withESLint = createPlugin((config, options) => {
+  const { isServer } = options;
+
+  if (!isServer) {
+    config.module.rules.push({
+      enforce: 'pre',
+      test: /\.(ts|tsx|js|jsx)$/,
+      exclude: /node_modules/,
+      use: {
+        loader: 'eslint-loader',
+        options: {
+          failOnError: true,
+        },
+      },
+    });
+  }
+
+  return config;
+});
+
 const config = {
   webpack(config, options) {
     const { dev, isServer } = options;
@@ -99,7 +119,6 @@ const config = {
       config.plugins.push(
         new ForkTsCheckerPlugin({
           tsconfig: path.resolve(__dirname, 'tsconfig.json'),
-          tslint: path.resolve(__dirname, 'tslint.json'),
         }),
       );
     }
@@ -134,7 +153,27 @@ const config = {
       },
     });
 
-    config.resolve.alias.src = path.resolve(__dirname, 'src');
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      src: path.resolve(__dirname, 'src'),
+      react: path.resolve(__dirname, 'node_modules/react'),
+      formik: path.resolve(__dirname, 'node_modules/formik'),
+      '@common': path.resolve(
+        __dirname,
+        '../explore-education-statistics-common/src',
+      ),
+    };
+
+    config.module.rules
+      .filter(rule => rule.test.test('test.tsx'))
+      .forEach(rule => {
+        rule.include = undefined;
+      });
+
+    options.defaultLoaders.babel.options.configFile = path.resolve(
+      __dirname,
+      'babel.config.js',
+    );
 
     return config;
   },
@@ -146,4 +185,5 @@ module.exports = compose(
   withCss,
   withSassModules,
   withTypescript,
+  withESLint,
 )(config);

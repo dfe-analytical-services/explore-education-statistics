@@ -1,31 +1,33 @@
-import dynamic from 'next-server/dynamic';
-import React, { Component } from 'react';
-import { Axis } from '../../../services/publicationService';
+import { HorizontalBarBlock } from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
+import { LineChartBlock } from '@common/modules/find-statistics/components/charts/LineChartBlock';
+import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
+import { VerticalBarBlock } from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
+import { Axis } from '@common/services/publicationService';
 import {
   CharacteristicsData,
   IndicatorsMetaItem,
   PublicationMeta,
-} from '../../../services/tableBuilderService';
-import { HorizontalBarBlock } from './Charts/HorizontalBarBlock';
-import { LineChartBlock } from './Charts/LineChartBlock';
-import { VerticalBarBlock } from './Charts/VerticalBarBlock';
+} from '@common/services/tableBuilderService';
+import dynamic from 'next-server/dynamic';
+import React, { Component } from 'react';
 
-const DynamicMapBlock = dynamic(() => import('./Charts/MapBlock'), {
-  ssr: false,
-});
+const DynamicMapBlock = dynamic(
+  () => import('@common/modules/find-statistics/components/charts/MapBlock'),
+  {
+    ssr: false,
+  },
+);
 
-interface ChartRendererProps {
+export interface ChartRendererProps {
   type: string;
   indicators: string[];
-
-  data: any;
+  data: CharacteristicsData;
   meta: PublicationMeta;
-
-  xAxis?: Axis;
-  yAxis?: Axis;
-
+  xAxis: Axis;
+  yAxis: Axis;
   height?: number;
-  [property: string]: any;
+  stacked?: boolean;
+  geometry: MapFeature;
 }
 
 export class ChartRenderer extends Component<ChartRendererProps> {
@@ -40,9 +42,11 @@ export class ChartRenderer extends Component<ChartRendererProps> {
       )
       .filter(_ => _ !== undefined) as IndicatorsMetaItem[]; // just in case
 
-    const labels = usedIndicatorLabels.reduce((obj: any, next) => {
-      obj[next.name] = next.label;
-      return obj;
+    const labels = usedIndicatorLabels.reduce((obj, next) => {
+      return {
+        ...obj,
+        [next.name]: next.label,
+      };
     }, {});
 
     const characteristicsData: CharacteristicsData = this.props.data;
@@ -56,9 +60,7 @@ export class ChartRenderer extends Component<ChartRendererProps> {
         : 0;
     });
 
-    // @ts-ignore
     const xAxis: Axis = this.props.xAxis;
-    // @ts-ignore
     const yAxis: Axis = this.props.yAxis;
 
     switch (this.props.type.toLowerCase()) {

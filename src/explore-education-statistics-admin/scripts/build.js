@@ -14,7 +14,6 @@ process.on('unhandledRejection', err => {
 // Ensure environment variables are read.
 require('../config/env');
 
-
 const path = require('path');
 const chalk = require('react-dev-utils/chalk');
 const fs = require('fs-extra');
@@ -65,8 +64,10 @@ checkBrowsers(paths.appPath, isInteractive)
     // if you're in it, you don't end up in Trash
     fs.emptyDirSync(paths.appBuild);
     // Merge with the public folder
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     copyPublicFolder();
     // Start the webpack build
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return build(previousFileSizes);
   })
   .then(
@@ -77,12 +78,12 @@ checkBrowsers(paths.appPath, isInteractive)
         console.log(
           '\nSearch for the ' +
             chalk.underline(chalk.yellow('keywords')) +
-            ' to learn more about each warning.'
+            ' to learn more about each warning.',
         );
         console.log(
           'To ignore, add ' +
             chalk.cyan('// eslint-disable-next-line') +
-            ' to the line before.\n'
+            ' to the line before.\n',
         );
       } else {
         console.log(chalk.green('Compiled successfully.\n'));
@@ -94,7 +95,7 @@ checkBrowsers(paths.appPath, isInteractive)
         previousFileSizes,
         paths.appBuild,
         WARN_AFTER_BUNDLE_GZIP_SIZE,
-        WARN_AFTER_CHUNK_GZIP_SIZE
+        WARN_AFTER_CHUNK_GZIP_SIZE,
       );
       console.log();
 
@@ -107,14 +108,14 @@ checkBrowsers(paths.appPath, isInteractive)
         publicUrl,
         publicPath,
         buildFolder,
-        useYarn
+        useYarn,
       );
     },
     err => {
       console.log(chalk.red('Failed to compile.\n'));
       printBuildError(err);
       process.exit(1);
-    }
+    },
   )
   .catch(err => {
     if (err && err.message) {
@@ -141,7 +142,7 @@ function build(previousFileSizes) {
         });
       } else {
         messages = formatWebpackMessages(
-          stats.toJson({ all: false, warnings: true, errors: true })
+          stats.toJson({ all: false, warnings: true, errors: true }),
         );
       }
       if (messages.errors.length) {
@@ -161,8 +162,8 @@ function build(previousFileSizes) {
         console.log(
           chalk.yellow(
             '\nTreating warnings as errors because process.env.CI = true.\n' +
-              'Most CI servers set it automatically.\n'
-          )
+              'Most CI servers set it automatically.\n',
+          ),
         );
         return reject(new Error(messages.warnings.join('\n\n')));
       }

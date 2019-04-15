@@ -1,15 +1,10 @@
+import publicationService, { Release } from '@common/services/publicationService';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
-import GoToTopLink from 'src/components/GoToTopLink';
 import Page from 'src/components/Page';
 import PageTitle from 'src/components/PageTitle';
-import functionsService, {
-  SubscriptionData,
-} from 'src/services/functionsService';
-import publicationService, { Release } from 'src/services/publicationService';
-import SubscriptionForm, {
-  SubscriptionFormSubmitHandler,
-} from './components/SubscriptionForm';
+import functionsService from 'src/services/functionsService';
+import SubscriptionForm, { SubscriptionFormSubmitHandler } from './components/SubscriptionForm';
 
 interface Props {
   slug: string;

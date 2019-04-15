@@ -1,10 +1,9 @@
+import Button from '@common/components/Button';
+import ErrorSummary, { ErrorSummaryMessage } from '@common/components/ErrorSummary';
+import { FormFieldset, FormFieldTextInput } from '@common/components/form';
+import Yup from '@common/lib/validation/yup';
 import { Form, Formik, FormikErrors, FormikProps, FormikTouched } from 'formik';
 import React, { Component, createRef } from 'react';
-import Button from 'src/components/Button';
-import ErrorSummary, { ErrorSummaryMessage } from 'src/components/ErrorSummary';
-import createErrorHelper from 'src/lib/validation/createErrorHelper';
-import Yup from 'src/lib/validation/yup';
-import { FormFieldset, FormFieldTextInput } from '../../../components/form';
 
 interface FormValues {
   email: string;
@@ -72,14 +71,7 @@ class SubscriptionForm extends Component<Props, State> {
 
           actions.setSubmitting(false);
         }}
-        render={({
-          errors,
-          touched,
-          values,
-          ...form
-        }: FormikProps<FormValues>) => {
-          const { getError } = createErrorHelper({ errors, touched });
-
+        render={({ errors, touched, ...form }: FormikProps<FormValues>) => {
           return (
             <div ref={this.ref}>
               <ErrorSummary

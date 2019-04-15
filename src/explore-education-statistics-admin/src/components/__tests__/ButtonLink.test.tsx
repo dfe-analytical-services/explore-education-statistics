@@ -1,16 +1,25 @@
 import React from 'react';
+import { MemoryRouter } from 'react-router';
 import { render } from 'react-testing-library';
 import ButtonLink from '../ButtonLink';
 
 describe('ButtonLink', () => {
   test('renders correctly with required props', () => {
-    const { container } = render(<ButtonLink to="/">Test button</ButtonLink>);
+    const { container } = render(
+      <MemoryRouter>
+        <ButtonLink to="/">Test button</ButtonLink>
+      </MemoryRouter>,
+    );
 
     expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('correctly set disabled attributes', () => {
-    const { getByText } = render(<ButtonLink to="/">Test button</ButtonLink>);
+    const { getByText } = render(
+      <MemoryRouter>
+        <ButtonLink to="/">Test button</ButtonLink>
+      </MemoryRouter>,
+    );
 
     const button = getByText('Test button');
 
