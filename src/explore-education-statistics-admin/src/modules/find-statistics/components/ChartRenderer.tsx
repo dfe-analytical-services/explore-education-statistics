@@ -20,7 +20,7 @@ export interface ChartRendererProps {
   yAxis: Axis;
   height?: number;
   stacked?: boolean;
-  geometry?: MapFeature
+  geometry?: MapFeature;
 }
 
 export class ChartRenderer extends Component<ChartRendererProps> {

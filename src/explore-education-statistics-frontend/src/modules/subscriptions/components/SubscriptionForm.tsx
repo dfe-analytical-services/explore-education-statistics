@@ -71,11 +71,7 @@ class SubscriptionForm extends Component<Props, State> {
 
           actions.setSubmitting(false);
         }}
-        render={({
-          errors,
-          touched,
-          ...form
-        }: FormikProps<FormValues>) => {
+        render={({ errors, touched, ...form }: FormikProps<FormValues>) => {
           return (
             <div ref={this.ref}>
               <ErrorSummary

@@ -5,7 +5,10 @@ import { Dictionary } from '../../types/util';
  * but newly mapped values using a {@param mappingFunction}
  * that takes both the key and value (the entry).
  */
-export default function mapValuesWithKeys<T extends Dictionary<T[keyof T]>, TResult>(
+export default function mapValuesWithKeys<
+  T extends Dictionary<T[keyof T]>,
+  TResult
+>(
   object: T,
   mappingFunction: (entry: [string, T[keyof T]]) => TResult,
 ): Dictionary<TResult> {

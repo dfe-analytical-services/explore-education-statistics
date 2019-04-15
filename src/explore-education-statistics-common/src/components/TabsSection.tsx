@@ -15,10 +15,7 @@ export interface TabsSectionProps {
 }
 
 const TabsSection: FunctionComponent<TabsSectionProps> = forwardRef(
-  (
-    { children, id, ...restProps }: TabsSectionProps,
-    ref: Ref<HTMLElement>,
-  ) => {
+  ({ children, id, ...restProps }: TabsSectionProps, ref: Ref<HTMLElement>) => {
     const { onRendered } = useRendered();
 
     // Hide additional props from the component's public API to

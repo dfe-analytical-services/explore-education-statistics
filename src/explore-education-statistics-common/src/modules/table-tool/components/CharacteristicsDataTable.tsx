@@ -53,7 +53,7 @@ class CharacteristicsDataTable extends Component<Props> {
     [name: string]: {
       label: string;
       unit: string;
-    }
+    };
   } {
     return Object.values(groupedValues)
       .flatMap(groups => groups)

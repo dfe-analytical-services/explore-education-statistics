@@ -11,8 +11,7 @@ export default function isComponentElement<P>(
 
   if (element.type !== undefined) {
     return (
-      element.type instanceof Component ||
-      typeof element.type === 'function'
+      element.type instanceof Component || typeof element.type === 'function'
     );
   }
 

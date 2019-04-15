@@ -123,7 +123,7 @@ export function register(config?: Config) {
         navigator.serviceWorker.ready.then(() => {
           console.log(
             'This web app is being served cache-first by a service ' +
-            'worker. To learn more, visit https://bit.ly/CRA-PWA',
+              'worker. To learn more, visit https://bit.ly/CRA-PWA',
           );
         });
       } else {

@@ -97,7 +97,9 @@ describe('Breadcrumbs', () => {
       </MemoryRouter>,
     );
 
-    const lastBreadcrumb = container.querySelector('li:last-child') as HTMLElement;
+    const lastBreadcrumb = container.querySelector(
+      'li:last-child',
+    ) as HTMLElement;
 
     expect(lastBreadcrumb).toBeDefined();
     expect(lastBreadcrumb.querySelector('a')).toBeNull();

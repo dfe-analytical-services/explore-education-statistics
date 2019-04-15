@@ -7,7 +7,10 @@ class Client {
     this.api = api;
   }
 
-  public get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  public get<T = unknown>(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<T> {
     return this.unboxResponse(this.api.get(url, config));
   }
 
@@ -35,7 +38,10 @@ class Client {
     return this.unboxResponse(this.api.patch(url, data, config));
   }
 
-  public delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  public delete<T = unknown>(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<T> {
     return this.unboxResponse(this.api.delete(url, config));
   }
 

@@ -25,7 +25,7 @@ export class MethodologyHeader extends React.Component<MethodologyHeaderProps> {
   }
 
   public componentWillUnmount(): void {
-      window.removeEventListener('scroll', this.scroll);
+    window.removeEventListener('scroll', this.scroll);
   }
 
   private updateElements() {
@@ -41,7 +41,7 @@ export class MethodologyHeader extends React.Component<MethodologyHeaderProps> {
           this.staticRef.style.top = `${-parentTop}px`;
         } else {
           this.staticRef.style.top = `${this.props.parent.height -
-          headerHeight}px`;
+            headerHeight}px`;
         }
       } else {
         this.staticRef.classList.remove('fixed');
