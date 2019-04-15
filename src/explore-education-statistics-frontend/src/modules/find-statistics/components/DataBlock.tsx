@@ -10,11 +10,14 @@ import {
 } from '@common/modules/find-statistics/components/TableRenderer';
 import { baseUrl } from '@common/services/api';
 import { Chart, DataQuery, Summary } from '@common/services/publicationService';
-import { PublicationMeta, CharacteristicsData } from '@common/services/tableBuilderService';
+import {
+  PublicationMeta,
+  CharacteristicsData,
+} from '@common/services/tableBuilderService';
 import React, { Component } from 'react';
 import Link from 'src/components/Link';
 import { ChartRenderer, ChartRendererProps } from './ChartRenderer';
-import {MapFeature} from '@common/modules/find-statistics/components/charts/MapBlock';
+import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
 
 export interface DataBlockProps {
   type: string;
@@ -66,7 +69,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
       method: dataQuery.method,
     });
 
-    const json : CharacteristicsData = await response.json();
+    const json: CharacteristicsData = await response.json();
 
     const publicationId = json.publicationId;
 
@@ -83,7 +86,10 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
     }
   }
 
-  private parseDataResponse(json?: CharacteristicsData, jsonMeta?: PublicationMeta): void {
+  private parseDataResponse(
+    json?: CharacteristicsData,
+    jsonMeta?: PublicationMeta,
+  ): void {
     const newState: DataBlockState = {};
 
     if (json && jsonMeta) {
@@ -94,7 +100,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
       if (this.props.charts) {
         newState.charts = this.props.charts.map(chart => ({
           ...chart,
-          geometry:  chart.geometry as MapFeature,
+          geometry: chart.geometry as MapFeature,
           data: json,
           meta: jsonMeta,
         }));
@@ -107,9 +113,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
           meta: jsonMeta,
         };
       }
-
     }
-
 
     this.setState(newState);
   }
