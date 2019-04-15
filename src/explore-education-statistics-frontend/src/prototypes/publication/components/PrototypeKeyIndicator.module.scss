@@ -1,0 +1,34 @@
+.keyStatsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.keyStatTile {
+  background: #f8f8f8;
+  flex: 1 0 32%;
+  margin: 0.5%;
+  max-width: 32%;
+  padding: 1rem;
+
+  details {
+    font-size: 1rem;
+    margin: 0.25rem 0 0;
+  }
+
+  @media (max-width: 767px) {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+.keyStatHeading {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.keyStatLarge {
+  font-size: 2.4rem;
+  font-weight: bold;
+  margin: 0;
+}

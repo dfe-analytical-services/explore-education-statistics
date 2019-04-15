@@ -2,7 +2,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React from 'react';
 import PrototypeChartSample from './PrototypeChartSample';
-import PrototypeDataTilesHighlightsGCSE from './PrototypeDataTilesHighlightsGCSE';
+import PrototypeDataTilesHighlightsGCSE from './PrototypeKeyIndicatorHighlightsGCSE';
 import PrototypeTableSampleGCSE from './PrototypeTableSampleGCSE';
 
 interface Props {
