@@ -81,7 +81,7 @@ class PrototypeSearchForm extends Component<{}, State> {
       const insideAccordion = potentialAccordion.classList.contains(
         'govuk-accordion__section',
       );
-      const location = this.calculateLocationOfElement(
+      const location = PrototypeSearchForm.calculateLocationOfElement(
         element,
         insideAccordion,
         potentialAccordion,
@@ -89,13 +89,15 @@ class PrototypeSearchForm extends Component<{}, State> {
 
       if (insideAccordion) {
         scrollIntoView = () => {
-          potentialAccordion.classList.add(
-            'govuk-accordion__section--expanded',
-          );
+          PrototypeSearchForm.openAccordion(potentialAccordion);
+          this.resetSearch();
           element.scrollIntoView();
         };
       } else {
-        scrollIntoView = () => element.scrollIntoView();
+        scrollIntoView = () => {
+          this.resetSearch();
+          element.scrollIntoView();
+        };
       }
 
       return {
@@ -109,7 +111,19 @@ class PrototypeSearchForm extends Component<{}, State> {
     this.setState({ searchResults });
   }
 
-  private calculateLocationOfElement(
+  private static openAccordion(potentialAccordion: HTMLElement) {
+    potentialAccordion.classList.add('govuk-accordion__section--expanded');
+  }
+
+  private resetSearch() {
+    this.setState({
+      currentlyHighlighted: undefined,
+      searchResults: [],
+      searchValue: '',
+    });
+  }
+
+  private static calculateLocationOfElement(
     element: HTMLElement,
     insideAccordion: boolean,
     potentialAccordion: HTMLElement,
@@ -195,6 +209,8 @@ class PrototypeSearchForm extends Component<{}, State> {
         this.state.searchResults[
           this.state.currentlyHighlighted
         ].scrollIntoView();
+
+        e.preventDefault();
       }
     }
   };
