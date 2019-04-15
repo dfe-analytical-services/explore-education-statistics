@@ -147,6 +147,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
 
             var email = _tokenService.GetEmailFromToken(token, tokenSecretKey, log);
 
+            log.LogInformation($"Unsubscribe:{ email } from {id}");
+            
             if (email != null)
             {
                 var table = GetCloudTable(config);
