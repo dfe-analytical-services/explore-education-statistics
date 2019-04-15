@@ -22,6 +22,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         public School Find(School source)
         {
+            if (source == null)
+            {
+                return null;
+            }
+
             var cacheKey = GetCacheKey(source);
 
             if (_cache.TryGetValue(cacheKey, out School school))

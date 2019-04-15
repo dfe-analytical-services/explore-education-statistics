@@ -79,10 +79,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 var entityEntry = _context.Location.Add(new Location
                 {
-                    Country = country,
-                    Region = region,
-                    LocalAuthority = localAuthority,
-                    LocalAuthorityDistrict = localAuthorityDistrict
+                    Country = country ?? Country.Empty(),
+                    Region = region ?? Region.Empty(),
+                    LocalAuthority = localAuthority ?? LocalAuthority.Empty(),
+                    LocalAuthorityDistrict = localAuthorityDistrict ?? LocalAuthorityDistrict.Empty()
                 });
 
                 _context.SaveChanges();
