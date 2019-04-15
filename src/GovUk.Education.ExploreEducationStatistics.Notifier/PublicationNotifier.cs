@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier
 {
@@ -34,8 +35,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
 
         [FunctionName("PublicationNotifier")]
         public async void Run1([QueueTrigger("publication-queue", Connection = "")]
-            PublicationNotification publicationNotification, ILogger log, ExecutionContext context)
+            JObject pn, ILogger log, ExecutionContext context)
         {            
+            
+            log.LogInformation($"C# Queue trigger function processed: {pn.ToString()}");
+            
+            var publicationNotification = extractNotification(pn);
+            
             var config = LoadAppSettings(context);
             var emailTemplateId = config.GetValue<string>(NotificationEmailTemplateIdName);
             var baseUrl = config.GetValue<string>(BaseUrlName);
@@ -199,6 +205,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         {
             var connectionStr = config.GetConnectionString(StorageConnectionName);
             return _storageTableService.GetTable(config, connectionStr, StorageTableName).Result;
+        }
+        
+        private PublicationNotification extractNotification(JObject publicationNotification)
+        {
+            return publicationNotification.ToObject<PublicationNotification>();          
         }
     }
 }
