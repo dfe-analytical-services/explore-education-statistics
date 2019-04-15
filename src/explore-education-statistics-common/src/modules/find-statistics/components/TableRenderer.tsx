@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
-import { CharacteristicsData, PublicationMeta } from '../../../services/tableBuilderService';
+import {
+  CharacteristicsData,
+  PublicationMeta,
+} from '../../../services/tableBuilderService';
 import CharacteristicsDataTable from '../../table-tool/components/CharacteristicsDataTable';
 
 export interface TableRendererProps {

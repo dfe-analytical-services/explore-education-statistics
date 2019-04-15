@@ -1,7 +1,9 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
-import publicationService, { Release } from '@common/services/publicationService';
+import publicationService, {
+  Release,
+} from '@common/services/publicationService';
 import React, { Component, Fragment } from 'react';
 import {
   DragDropContext,

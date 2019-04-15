@@ -1,4 +1,6 @@
-import _tableBuilderService, { PublicationMeta } from '@common/services/tableBuilderService';
+import _tableBuilderService, {
+  PublicationMeta,
+} from '@common/services/tableBuilderService';
 import React from 'react';
 import { fireEvent, render, wait, within } from 'react-testing-library';
 import TableToolPage from '../TableToolPage';

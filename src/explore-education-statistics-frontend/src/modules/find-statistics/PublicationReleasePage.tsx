@@ -4,7 +4,9 @@ import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import GoToTopLink from '@common/components/GoToTopLink';
 import { baseUrl } from '@common/services/api';
-import publicationService, { Release } from '@common/services/publicationService';
+import publicationService, {
+  Release,
+} from '@common/services/publicationService';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
