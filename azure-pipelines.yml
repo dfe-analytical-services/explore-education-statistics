@@ -117,7 +117,7 @@ jobs:
           verbose: false
           customCommand: 'ci'
       - task: 'Npm@1'
-        displayName: 'Install subproject dependencies'
+        displayName: 'Install subproject dev dependencies'
         inputs:
           command: 'custom'
           workingDir: '.'
@@ -130,6 +130,20 @@ jobs:
           workingDir: './src/explore-education-statistics-frontend'
           verbose: false
           customCommand: 'run build:test'
+      - task: 'Npm@1'
+        displayName: 'Remove dev dependencies'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run clean'
+      - task: 'Npm@1'
+        displayName: 'Install prod dependencies'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run bootstrap:prod'
       - task: 'ArchiveFiles@2'
         displayName: 'Archive frontend'
         inputs:
@@ -156,7 +170,7 @@ jobs:
           verbose: false
           customCommand: 'ci'
       - task: 'Npm@1'
-        displayName: 'Install subproject dependencies'
+        displayName: 'Install subproject dev dependencies'
         inputs:
           command: 'custom'
           workingDir: '.'
@@ -169,6 +183,20 @@ jobs:
           workingDir: './src/explore-education-statistics-frontend'
           verbose: false
           customCommand: 'run build:stage'
+      - task: 'Npm@1'
+        displayName: 'Remove dev dependencies'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run clean'
+      - task: 'Npm@1'
+        displayName: 'Install subproject prod dependencies'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run bootstrap:prod'
       - task: 'ArchiveFiles@2'
         displayName: 'Archive frontend'
         inputs:
@@ -195,7 +223,7 @@ jobs:
           verbose: false
           customCommand: 'ci'
       - task: 'Npm@1'
-        displayName: 'Install subproject dependencies'
+        displayName: 'Install subproject dev dependencies'
         inputs:
           command: 'custom'
           workingDir: '.'
@@ -208,6 +236,20 @@ jobs:
           workingDir: './src/explore-education-statistics-frontend'
           verbose: false
           customCommand: 'run build:test'
+      - task: 'Npm@1'
+        displayName: 'Remove dev dependencies'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run clean'
+      - task: 'Npm@1'
+        displayName: 'Install subproject prod dependencies'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run bootstrap:prod'
       - task: 'ArchiveFiles@2'
         displayName: 'Archive frontend'
         inputs:

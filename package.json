@@ -21,6 +21,8 @@
   },
   "scripts": {
     "bootstrap": "lerna bootstrap --ci --force-local",
+    "bootstrap:prod": "lerna bootstrap --ci --force-local -- --only=prod",
+    "clean": "lerna clean -y",
     "fix": "npm run fix:js && npm run fix:style",
     "fix:js": "eslint --fix --ext .ts,.tsx,.js,.jsx src",
     "fix:style": "stylelint --fix src/**/*.{scss,css}",

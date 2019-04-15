@@ -1,12 +1,9 @@
 const withCss = require('@zeit/next-css');
 const cssLoaderConfig = require('@zeit/next-css/css-loader-config');
 const withTypescript = require('@zeit/next-typescript');
-const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const DotEnvPlugin = require('dotenv-webpack');
-const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin');
 const compose = require('lodash/fp/compose');
 const withImages = require('next-images');
-const StylelintPlugin = require('stylelint-webpack-plugin');
 const path = require('path');
 
 const createPlugin = plugin => {
@@ -92,9 +89,9 @@ const withSassModules = createPlugin((config, options) => {
 });
 
 const withESLint = createPlugin((config, options) => {
-  const { isServer } = options;
+  const { dev } = options;
 
-  if (!isServer) {
+  if (dev) {
     config.module.rules.push({
       enforce: 'pre',
       test: /\.(ts|tsx|js|jsx)$/,
@@ -116,6 +113,8 @@ const config = {
     const { dev, isServer } = options;
 
     if (isServer) {
+      const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin');
+
       config.plugins.push(
         new ForkTsCheckerPlugin({
           tsconfig: path.resolve(__dirname, 'tsconfig.json'),
@@ -124,7 +123,17 @@ const config = {
     }
 
     if (dev) {
-      config.plugins.push(new CaseSensitivePathsPlugin());
+      const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
+      const StylelintPlugin = require('stylelint-webpack-plugin');
+
+      config.plugins.push(
+        new CaseSensitivePathsPlugin(),
+        new StylelintPlugin({
+          // Next doesn't play nicely with emitted errors
+          // so we'll just display warnings instead
+          emitErrors: !dev,
+        }),
+      );
     }
 
     config.plugins.push(
@@ -135,23 +144,7 @@ const config = {
         ),
         safe: true,
       }),
-      new StylelintPlugin({
-        // Next doesn't play nicely with emitted errors
-        // so we'll just display warnings instead
-        emitErrors: !dev,
-      }),
     );
-
-    config.module.rules.push({
-      test: /\.jsx?$/,
-      enforce: 'pre',
-      exclude: /node_modules/,
-      loader: 'eslint-loader',
-      options: {
-        emitError: !dev,
-        emitWarning: dev,
-      },
-    });
 
     config.resolve.alias = {
       ...config.resolve.alias,
