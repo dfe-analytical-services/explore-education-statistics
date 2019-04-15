@@ -29,7 +29,9 @@
     "lint:style": "stylelint src/**/*.{scss,css}"
   },
   "husky": {
-    "precommit": "lint-staged"
+    "hooks": {
+      "precommit": "lint-staged"
+    }
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
