@@ -8,11 +8,15 @@ import {
   TableRenderer,
   TableRendererProps,
 } from '@common/modules/find-statistics/components/TableRenderer';
-import {baseUrl} from '@common/services/api';
-import {Chart, DataQuery, Summary,} from '@common/services/publicationService';
-import {PublicationMeta, CharacteristicsData} from '@common/services/tableBuilderService';
-import React, {Component} from 'react';
-import {ChartRenderer, ChartRendererProps} from './ChartRenderer';
+import { baseUrl } from '@common/services/api';
+import { Chart, DataQuery, Summary } from '@common/services/publicationService';
+import {
+  PublicationMeta,
+  CharacteristicsData,
+} from '@common/services/tableBuilderService';
+import React, { Component } from 'react';
+import { ChartRenderer, ChartRendererProps } from './ChartRenderer';
+import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
 
 export interface DataBlockProps {
   type: string;
@@ -38,7 +42,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
   private currentDataQuery?: DataQuery = undefined;
 
   public async componentDidMount() {
-    const {dataQuery} = this.props;
+    const { dataQuery } = this.props;
 
     if (dataQuery) {
       await this.getData(dataQuery);
@@ -64,14 +68,14 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
       method: dataQuery.method,
     });
 
-    const json : CharacteristicsData = await response.json();
+    const json: CharacteristicsData = await response.json();
 
     const publicationId = json.publicationId;
 
     const metaResponse = await fetch(
       `${
         baseUrl.data
-        }/api/TableBuilder/meta/CharacteristicDataNational/${publicationId}`,
+      }/api/TableBuilder/meta/CharacteristicDataNational/${publicationId}`,
     );
 
     const jsonMeta: PublicationMeta = await metaResponse.json();
@@ -81,31 +85,32 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
     }
   }
 
-  private parseDataResponse(json?: CharacteristicsData, jsonMeta?: PublicationMeta): void {
+  private parseDataResponse(
+    json?: CharacteristicsData,
+    jsonMeta?: PublicationMeta,
+  ): void {
     const newState: DataBlockState = {};
 
     if (json && jsonMeta) {
-
       if (json.result.length > 0) {
-        newState.tables = [{data: json, meta: jsonMeta}];
+        newState.tables = [{ data: json, meta: jsonMeta }];
       }
 
       if (this.props.charts) {
         newState.charts = this.props.charts.map((chart: Chart) => ({
           ...chart,
+          geometry: chart.geometry as MapFeature,
           data: json,
           meta: jsonMeta,
         }));
       }
 
-
       if (this.props.summary) {
         newState.summary = {
           ...this.props.summary,
           data: json,
-          meta: jsonMeta
+          meta: jsonMeta,
         };
-
       }
     }
 

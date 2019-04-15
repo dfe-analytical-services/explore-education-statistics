@@ -1,5 +1,5 @@
 import debounce from 'lodash/debounce';
-import React, {Component, KeyboardEvent} from 'react';
+import React, { Component, KeyboardEvent } from 'react';
 import styles from './PrototypeSearchForm.module.scss';
 
 interface SearchResult {
@@ -17,10 +17,10 @@ interface State {
 
 class PrototypeSearchForm extends Component<{}, State> {
   public state: State = {
-    currentlyHighlighted: undefined,
     searchResults: [],
     searchValue: '',
   };
+  private readonly boundPerformSearch: () => void;
 
   private findElementsWithText(text: string) {
     const lowerCase = text.toLocaleLowerCase();
@@ -64,6 +64,12 @@ class PrototypeSearchForm extends Component<{}, State> {
       return str;
     }
     return '';
+  }
+
+  public constructor(props: {}) {
+    super(props);
+
+    this.boundPerformSearch = this.performSearch.bind(this);
   }
 
   private performSearch() {
@@ -131,7 +137,7 @@ class PrototypeSearchForm extends Component<{}, State> {
     insideAccordion: boolean,
     potentialAccordion: HTMLElement,
   ) {
-    const location = [];
+    const location: string[] = [];
 
     const locationHeaderElement = PrototypeSearchForm.findSiblingsBeforeOfElementType(
       element,
@@ -164,7 +170,7 @@ class PrototypeSearchForm extends Component<{}, State> {
   }
 
   private handleTextChange() {
-    debounce(this.performSearch.bind(this), 1000);
+    debounce(this.boundPerformSearch, 1000);
   }
 
   private onKeyDown = (e: KeyboardEvent) => {
@@ -190,7 +196,7 @@ class PrototypeSearchForm extends Component<{}, State> {
       this.setState({ currentlyHighlighted });
     }
 
-    if (e.keyCode === 13) {
+    if (e.key === 'Enter') {
       if (this.state.currentlyHighlighted !== undefined) {
         this.state.searchResults[
           this.state.currentlyHighlighted
