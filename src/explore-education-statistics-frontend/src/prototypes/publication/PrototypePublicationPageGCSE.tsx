@@ -288,6 +288,7 @@ const PublicationPage = () => {
           caption="School performance for 2018 shows small increases across all headline measures compared to 2017"
         >
           <DataBlock {...kS4SchoolPerformanceDataBlock} />
+
           <p>
             Results for 2018 show an increases across all headline measures
             compared to 2017.{' '}
