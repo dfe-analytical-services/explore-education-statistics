@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react';
-import PageBanner from '../../../explore-education-statistics-common/src/components/PageBanner';
-import PageFooter from '../../../explore-education-statistics-common/src/components/PageFooter';
-import PageHeader from '../../../explore-education-statistics-common/src/components/PageHeader';
 import Breadcrumbs, { BreadcrumbsProps } from './Breadcrumbs';
+import PageBanner from './PageBanner';
+import PageFooter from './PageFooter';
+import PageHeader from './PageHeader';
 
 type Props = {
   children: ReactNode;
