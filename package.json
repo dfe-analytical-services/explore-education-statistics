@@ -50,5 +50,8 @@
       "prettier --write",
       "git add"
     ]
+  },
+  "dependencies": {
+    "tslint": "^5.15.0"
   }
 }

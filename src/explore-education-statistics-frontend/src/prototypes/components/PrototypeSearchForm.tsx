@@ -1,5 +1,5 @@
 import debounce from 'lodash/debounce';
-import React, {ChangeEvent, Component, KeyboardEvent} from 'react';
+import React, {Component, KeyboardEvent} from 'react';
 import styles from './PrototypeSearchForm.module.scss';
 
 interface SearchResult {
@@ -164,9 +164,7 @@ class PrototypeSearchForm extends Component<{}, State> {
   }
 
   private handleTextChange() {
-    debounce(() => {
-      this.performSearch();
-    }, 1000);
+    debounce(this.performSearch.bind(this), 1000);
   }
 
   private onKeyDown = (e: KeyboardEvent) => {
