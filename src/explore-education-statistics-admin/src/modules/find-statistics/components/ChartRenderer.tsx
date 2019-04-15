@@ -1,7 +1,9 @@
 import { HorizontalBarBlock } from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
 import { LineChartBlock } from '@common/modules/find-statistics/components/charts/LineChartBlock';
 
-import DynamicMapBlock, { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
+import DynamicMapBlock, {
+  MapFeature,
+} from '@common/modules/find-statistics/components/charts/MapBlock';
 import { VerticalBarBlock } from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
 import { Axis } from '@common/services/publicationService';
 import {

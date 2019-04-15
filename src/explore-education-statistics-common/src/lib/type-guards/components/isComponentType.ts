@@ -1,4 +1,10 @@
-import { Component, ComponentElement, ComponentState, ComponentType, ReactElement } from 'react';
+import {
+  Component,
+  ComponentElement,
+  ComponentState,
+  ComponentType,
+  ReactElement,
+} from 'react';
 
 export default function isComponentType<P>(
   value: unknown,

@@ -39,11 +39,11 @@ class PrototypeAbsenceData extends Component<
   public mapRef: PrototypeMap | null = null;
 
   public componentDidMount(): void {
-    import('@common/prototypes/publication/components/PrototypeMapBoundaries').then(
-      ({ boundaries }) => {
-        this.generateLegendData(this.preprocessBoundaryData(boundaries));
-      },
-    );
+    import(
+      '@common/prototypes/publication/components/PrototypeMapBoundaries'
+    ).then(({ boundaries }) => {
+      this.generateLegendData(this.preprocessBoundaryData(boundaries));
+    });
   }
 
   private preprocessBoundaryData(

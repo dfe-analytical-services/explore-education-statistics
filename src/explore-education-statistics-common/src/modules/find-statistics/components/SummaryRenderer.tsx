@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
 import Details from '../../../components/Details';
-import { CharacteristicsData, PublicationMeta } from '../../../services/tableBuilderService';
+import {
+  CharacteristicsData,
+  PublicationMeta,
+} from '../../../services/tableBuilderService';
 
 export interface SummaryRendererProps {
   data: CharacteristicsData;

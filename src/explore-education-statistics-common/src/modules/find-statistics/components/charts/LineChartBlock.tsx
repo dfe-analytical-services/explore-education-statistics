@@ -11,7 +11,12 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { ChartProps, colours, parseCondensedTimePeriodRange, symbols } from './Charts';
+import {
+  ChartProps,
+  colours,
+  parseCondensedTimePeriodRange,
+  symbols,
+} from './Charts';
 
 const CustomToolTip = (props: TooltipProps) => {
   if (props.active) {

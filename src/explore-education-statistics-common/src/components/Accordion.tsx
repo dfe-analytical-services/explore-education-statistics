@@ -2,7 +2,10 @@ import classNames from 'classnames';
 import React, { cloneElement, Component, createRef, ReactNode } from 'react';
 import isComponentType from '../lib/type-guards/components/isComponentType';
 import styles from './Accordion.module.scss';
-import AccordionSection, { AccordionSectionProps, classes } from './AccordionSection';
+import AccordionSection, {
+  AccordionSectionProps,
+  classes,
+} from './AccordionSection';
 
 export interface AccordionProps {
   children: ReactNode;

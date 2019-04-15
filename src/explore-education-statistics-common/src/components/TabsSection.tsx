@@ -1,5 +1,11 @@
 import classNames from 'classnames';
-import React, { forwardRef, FunctionComponent, HTMLAttributes, ReactNode, Ref } from 'react';
+import React, {
+  forwardRef,
+  FunctionComponent,
+  HTMLAttributes,
+  ReactNode,
+  Ref,
+} from 'react';
 import useRendered from '../hooks/useRendered';
 import styles from './TabsSection.module.scss';
 
