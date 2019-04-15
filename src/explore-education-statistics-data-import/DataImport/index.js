@@ -31,6 +31,7 @@ module.exports = async function(context, myQueueItem) {
       parse({
         columns: true,
         separator: ',',
+        // eslint-disable-next-line @typescript-eslint/camelcase
         skip_empty_lines: true,
         trim: true,
       })

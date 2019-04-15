@@ -2,7 +2,9 @@
 
 exports[`AccordionSection renders correctly with required props 1`] = `
 
-<div class="govuk-accordion__section">
+<div class="govuk-accordion__section"
+     role="presentation"
+>
   <div class="govuk-accordion__section-header"
        data-testid="SectionHeader Test heading"
   >
@@ -30,7 +32,9 @@ exports[`AccordionSection renders correctly with required props 1`] = `
 
 exports[`AccordionSection renders with caption 1`] = `
 
-<div class="govuk-accordion__section">
+<div class="govuk-accordion__section"
+     role="presentation"
+>
   <div class="govuk-accordion__section-header"
        data-testid="SectionHeader Test heading"
   >
@@ -61,7 +65,9 @@ exports[`AccordionSection renders with caption 1`] = `
 
 exports[`AccordionSection renders with different heading size 1`] = `
 
-<div class="govuk-accordion__section">
+<div class="govuk-accordion__section"
+     role="presentation"
+>
   <div class="govuk-accordion__section-header"
        data-testid="SectionHeader Test heading"
   >

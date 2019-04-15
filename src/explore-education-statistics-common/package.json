@@ -59,7 +59,10 @@
     "lint:js": "eslint --ext .ts,.tsx,.js,.jsx .",
     "lint:style": "stylelint src/**/*.{scss,css}",
     "tsc": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "test:ci": "jest --ci --reporters=default --reporters=jest-junit",
+    "test:watch": "jest --watch",
+    "test:snapshot": "jest --updateSnapshot"
   },
   "author": "",
   "license": "MIT",

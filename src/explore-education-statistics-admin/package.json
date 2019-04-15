@@ -102,7 +102,9 @@
     "lint:js": "eslint --ext .ts,.tsx,.js,.jsx .",
     "lint:style": "stylelint src/**/*.{scss,css}",
     "test": "node scripts/test.js --no-watch",
+    "test:ci": "jest --ci --reporters=default --reporters=jest-junit",
     "test:watch": "node scripts/test.js",
+    "test:snapshot": "jest --updateSnapshot",
     "tsc": "tsc --noEmit"
   },
   "devDependencies": {

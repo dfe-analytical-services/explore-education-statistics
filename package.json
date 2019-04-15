@@ -21,12 +21,17 @@
   },
   "scripts": {
     "bootstrap": "lerna bootstrap",
+    "fix": "npm run fix:js && npm run fix:style",
+    "fix:js": "eslint --fix --ext .ts,.tsx,.js,.jsx src",
     "fix:style": "stylelint --fix src/**/*.{scss,css}",
     "format": "prettier --write src/**/*.{js,jsx,ts,tsx,css,scss,html}",
     "format:check": "prettier --list-different src/**/*.{js,jsx,ts,tsx,css,scss,html}",
     "lint": "npm run lint:js && npm run lint:style",
-    "lint:js": "eslint --ext .ts,.tsx src",
-    "lint:style": "stylelint src/**/*.{scss,css}"
+    "lint:js": "eslint --ext .ts,.tsx,.js,.jsx src",
+    "lint:style": "stylelint src/**/*.{scss,css}",
+    "test": "lerna run test",
+    "test:ci": "lerna run test:ci",
+    "tsc": "lerna run tsc"
   },
   "husky": {
     "hooks": {
