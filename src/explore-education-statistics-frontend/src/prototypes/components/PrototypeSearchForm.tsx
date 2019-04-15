@@ -15,7 +15,7 @@ interface State {
 }
 
 class PrototypeSearchForm extends Component<{}, State> {
-  public state = {
+  public state: State = {
     currentlyHighlighted: undefined,
     searchResults: [],
     searchValue: '',
@@ -188,6 +188,14 @@ class PrototypeSearchForm extends Component<{}, State> {
       }
 
       this.setState({ currentlyHighlighted });
+    }
+
+    if (e.keyCode === 13) {
+      if (this.state.currentlyHighlighted !== undefined) {
+        this.state.searchResults[
+          this.state.currentlyHighlighted
+        ].scrollIntoView();
+      }
     }
   };
 
