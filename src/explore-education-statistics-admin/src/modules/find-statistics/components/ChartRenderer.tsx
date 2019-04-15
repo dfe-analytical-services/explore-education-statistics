@@ -16,11 +16,11 @@ export interface ChartRendererProps {
   indicators: string[];
   data: CharacteristicsData;
   meta: PublicationMeta;
-  xAxis: Axis;
-  yAxis: Axis;
+  xAxis?: Axis;
+  yAxis?: Axis;
   height?: number;
   stacked?: boolean;
-  geometry?: MapFeature;
+  geometry?: MapFeature ;
 }
 
 export class ChartRenderer extends Component<ChartRendererProps> {
@@ -53,8 +53,8 @@ export class ChartRenderer extends Component<ChartRendererProps> {
         : 0;
     });
 
-    const xAxis: Axis = this.props.xAxis;
-    const yAxis: Axis = this.props.yAxis;
+    const xAxis = this.props.xAxis || { title: "" };
+    const yAxis = this.props.yAxis || { title: "" };
 
     switch (this.props.type.toLowerCase()) {
       case 'line':
