@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             {
                 return new TableBuilderResult();
             }
-
+            
             var first = observations.FirstOrDefault();
             return new TableBuilderResult
             {
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
                 ReleaseDate = first.Subject.Release.ReleaseDate,
                 Level = first.Level,
                 Result = observations.Select(observation =>
-                    _resultBuilder.BuildResult(observation))
+                    _resultBuilder.BuildResult(observation, queryContext.Indicators))
             };
         }
 

@@ -36,7 +36,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureLocalAuthority(modelBuilder);
             ConfigureLocalAuthorityDistrict(modelBuilder);
             ConfigureRegion(modelBuilder);
-            ConfigureSchool(modelBuilder);
         }
 
         private static void ConfigureObservationFilterItem(ModelBuilder modelBuilder)

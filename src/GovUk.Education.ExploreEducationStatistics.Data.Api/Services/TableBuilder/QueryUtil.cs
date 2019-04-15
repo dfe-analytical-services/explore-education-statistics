@@ -6,18 +6,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 {
     public static class QueryUtil
     {
-        public static Dictionary<string, string> FilterIndicators(
-            Dictionary<string, string> indicators,
-            ICollection<string> filter)
+        public static Dictionary<string, string> FilterMeasures(
+            Dictionary<string, string> measures,
+            ICollection<string> indicators)
         {
             return (
-                from kvp in indicators
-                where filter.Contains(kvp.Key)
+                from kvp in measures
+                where indicators.Contains(kvp.Key)
                 select kvp
             ).ToDictionary(pair => pair.Key, pair => pair.Value);
         }
-        
-        
+
+
         public static IEnumerable<int> YearsQuery(ICollection<int> specificYears, int start, int end)
         {
             if (specificYears != null && specificYears.Count > 0)
@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             if (start > end)
             {
                 throw new ArgumentOutOfRangeException(
-                    "StartYear cannot be greater than EndYear");                    
+                    "StartYear cannot be greater than EndYear");
             }
 
             var startYearLength = start.ToString().Length;
@@ -59,21 +59,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 
             return startYearLength == 4 ? FourDigitYearRange(start, end) : SixDigitYearRange(start, end);
         }
-        
+
         private static IEnumerable<int> FourDigitYearRange(int start, int end)
         {
             return Enumerable.Range(start, end - start + 1);
         }
-        
+
         private static IEnumerable<int> SixDigitYearRange(int start, int end)
-        {            
+        {
             var years = new List<int>();
             var year = start;
             while (year <= end)
             {
                 years.Add(year);
                 year += 101;
-                    
             }
 
             return years;
