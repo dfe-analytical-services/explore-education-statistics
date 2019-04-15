@@ -19,6 +19,8 @@ import {
   ks4TrendInDisavdantagePuilsAttainmentGapIndex,
 } from 'src/prototypes/publication/data/PrototypeDataFactory';
 
+import styles from './prototype.module.scss';
+
 const PublicationPage = () => {
   return (
     <PrototypePage
@@ -360,7 +362,9 @@ const PublicationPage = () => {
               coasting and floor standard by region
             </strong>
           </p>
-          <DataBlock {...ks4SchoolRevisedAttainmentChart} />
+          <div className={styles['hide-dates-from-datablock']}>
+            <DataBlock {...ks4SchoolRevisedAttainmentChart} />
+          </div>
           <p>
             The floor and coasting standards give measures of whether schools
             are helping pupils to fulfil their potential based on progress
@@ -485,7 +489,9 @@ const PublicationPage = () => {
           heading="Pupil subject areas"
           caption="Pupil subject entries are highest for science and humanities and continue to increase"
         >
-          <DataBlock {...ks4RevisedAttainmentData} />
+          <div className={styles['hide-dates-from-datablock']}>
+            <DataBlock {...ks4RevisedAttainmentData} />
+          </div>
           <p>
             It is compulsory for pupils to study English and Maths at key stage
             4 in state-funded schools.{' '}

@@ -12,9 +12,9 @@ function createDataValues(
   indicators: string[],
   labels: string[],
   schoolType: SchoolType,
-  year: number,
+  year: number | undefined,
   data: (string | number | undefined)[][],
-  characteristic: string = 'Total',
+  characteristic: string[] = ['Total'],
 ) {
   const characteristicsData: CharacteristicsData = {
     publicationId: '',
@@ -26,10 +26,11 @@ function createDataValues(
         characteristic: {
           description: null,
           label: '',
-          name: characteristic,
+          name: characteristic[rowIndex % characteristic.length],
           name2: null,
         },
         indicators: {},
+
         timePeriod: year !== undefined ? year + rowIndex * 101 : 0,
       };
 
@@ -62,6 +63,15 @@ function createDataValues(
           label: 'Year',
           name: 'Year',
         },
+        { label: 'London', name: 'London' },
+        { label: 'Yorkshire', name: 'Yorkshire' },
+        { label: 'East', name: 'East' },
+        { label: 'South East', name: 'South East' },
+        { label: 'South West', name: 'South West' },
+        { label: 'West Midlands', name: 'West Midlands' },
+        { label: 'East Midlands', name: 'East Midlands' },
+        { label: 'North West', name: 'North West' },
+        { label: 'North East', name: 'North East' },
       ],
     },
 
@@ -95,10 +105,10 @@ function createDataBlockWithChart(
   indicators: string[],
   labels: string[],
   schooltype: SchoolType,
-  year: number,
+  year: number | undefined,
   data: (string | number | undefined)[][],
   charts?: Chart[],
-  characteristic: string = 'Total',
+  characteristic: string[] = ['Total'],
 ): DataBlockProps {
   return {
     charts,
@@ -150,7 +160,7 @@ export const ks4SchoolRevisedAttainmentChart = createDataBlockWithChart(
   ['Region', 'Floor Standards', 'Coasting'],
 
   SchoolType.Total,
-  201819,
+  201418,
   [
     ['London', 5, 3.5],
     ['Yorkshire', 7, 6],
@@ -170,6 +180,7 @@ export const ks4SchoolRevisedAttainmentChart = createDataBlockWithChart(
       { title: '' },
     ),
   ],
+  //['London', 'Yorkshire', 'East', 'South East', 'South West', 'West Midlands', 'East Midlands', 'North West', 'North East' ]
 );
 
 export const ks4SchoolAverageHeadlineScoresByPupilCharacteristics = createDataBlockWithChart(
@@ -297,7 +308,7 @@ export const ks4RevisedAttainmentData = createDataBlockWithChart(
     ['Art', '46.5', '44.3'],
   ],
   undefined,
-  'Year',
+  ['Year'],
 );
 
 export const ks4StateFundedSchoolsPerformance2 = createDataBlockWithChart(
