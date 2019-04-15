@@ -31,9 +31,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         public ActionResult<Publication> Get(string id)
         {
             return Guid.TryParse(id, out var newGuid)
-                ? _context.Publications.Include(x => x.Releases).Include(x => x.LegacyReleases)
+                ? _context.Publications.Include(x => x.Releases.OrderByDescending(r => r.Published)).Include(x => x.LegacyReleases)
                     .FirstOrDefault(t => t.Id == newGuid)
-                : _context.Publications.Include(x => x.Releases).Include(x => x.LegacyReleases)
+                : _context.Publications.Include(x => x.Releases.OrderByDescending(r => r.Published)).Include(x => x.LegacyReleases)
                     .FirstOrDefault(t => t.Slug == id);
         }
 
