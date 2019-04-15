@@ -1,5 +1,5 @@
 import debounce from 'lodash/debounce';
-import React, { Component, KeyboardEvent } from 'react';
+import React, { Component, FormEvent, KeyboardEvent } from 'react';
 import styles from './PrototypeSearchForm.module.scss';
 
 interface SearchResult {
@@ -69,7 +69,7 @@ class PrototypeSearchForm extends Component<{}, State> {
   public constructor(props: {}) {
     super(props);
 
-    this.boundPerformSearch = this.performSearch.bind(this);
+    this.boundPerformSearch = debounce(this.performSearch, 1000);
   }
 
   private performSearch() {
@@ -169,10 +169,6 @@ class PrototypeSearchForm extends Component<{}, State> {
     return location;
   }
 
-  private handleTextChange() {
-    debounce(this.boundPerformSearch, 1000);
-  }
-
   private onKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
       const direction = e.key === 'ArrowUp' ? -1 : 1;
@@ -207,6 +203,18 @@ class PrototypeSearchForm extends Component<{}, State> {
     }
   };
 
+  private onChange = (e: FormEvent<HTMLInputElement>) => {
+    e.persist();
+
+    this.setState({
+      searchValue: e.currentTarget.value,
+      searchResults: [],
+      currentlyHighlighted: undefined,
+    });
+
+    this.boundPerformSearch();
+  };
+
   public render() {
     return (
       <form
@@ -227,17 +235,7 @@ class PrototypeSearchForm extends Component<{}, State> {
             type="search"
             value={this.state.searchValue}
             onKeyDown={this.onKeyDown}
-            onChange={e => {
-              e.persist();
-
-              this.setState({
-                searchValue: e.target.value,
-                searchResults: [],
-                currentlyHighlighted: undefined,
-              });
-
-              this.handleTextChange();
-            }}
+            onInput={this.onChange}
           />
           <input
             type="submit"
