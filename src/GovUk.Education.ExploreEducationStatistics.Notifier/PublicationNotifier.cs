@@ -154,10 +154,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                 var table = GetCloudTable(config);
 
                 var sub = new SubscriptionEntity(id, email, null, null);
-                await _storageTableService.RemoveSubscriber(table, sub);
-                log.LogInformation($"redirect to:{ webApplicationBaseUrl }subscriptions?slug={sub.Slug}?unsubscribed=true");
+                sub = _storageTableService.RetrieveSubscriber(table, sub).Result;
 
-                return new RedirectResult(webApplicationBaseUrl + $"subscriptions?slug={sub.Slug}&unsubscribed=true", true);
+                if (sub != null)
+                {
+                    await _storageTableService.RemoveSubscriber(table, sub);
+                    log.LogInformation(
+                        $"redirect to:{webApplicationBaseUrl}subscriptions?slug={sub.Slug}?unsubscribed=true");
+
+                    return new RedirectResult(
+                        webApplicationBaseUrl + $"subscriptions?slug={sub.Slug}&unsubscribed=true", true);
+                }
             }
            
             return new BadRequestObjectResult("Unable to unsubscribe");
@@ -178,11 +185,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                 var table = GetCloudTable(config);
                 var sub = new SubscriptionEntity(id, email, null, null);
                 sub = _storageTableService.RetrieveSubscriber(table, sub).Result;
-                sub.Verified = true;
-                await _storageTableService.UpdateSubscriber(table, sub);
-                log.LogInformation($"redirect to:{ webApplicationBaseUrl }subscriptions?slug={sub.Slug}?verified=true");
-
-                return new RedirectResult(webApplicationBaseUrl + $"subscriptions?slug={sub.Slug}&verified=true", true);
+                log.LogInformation($"trying to verify subscription for {email}. Found? {sub != null}");
+                
+                if (sub != null)
+                {
+                    sub.Verified = true;
+                    await _storageTableService.UpdateSubscriber(table, sub);
+                    log.LogInformation(
+                        $"redirect to:{webApplicationBaseUrl}subscriptions?slug={sub.Slug}?verified=true");
+                    return new RedirectResult(webApplicationBaseUrl + $"subscriptions?slug={sub.Slug}&verified=true", true);
+                }
             }  
            
             return new BadRequestObjectResult("Unable to verify subscription");
