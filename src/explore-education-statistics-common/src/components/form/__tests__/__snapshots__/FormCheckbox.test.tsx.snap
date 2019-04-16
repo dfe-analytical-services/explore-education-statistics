@@ -41,32 +41,3 @@ exports[`FormCheckbox renders correctly with required props 1`] = `
 </div>
 
 `;
-
-exports[`FormCheckbox renders small size variant when \`small\` is true 1`] = `
-<div>
-  <div
-    class="govuk-checkboxes__item itemSmall"
-  >
-    <input
-      aria-describedby="test-checkbox-item-hint"
-      class="govuk-checkboxes__input"
-      id="test-checkbox"
-      name="test"
-      type="checkbox"
-      value="true"
-    />
-    <label
-      class="govuk-label govuk-checkboxes__label"
-      for="test-checkbox"
-    >
-      Test checkbox
-    </label>
-    <span
-      class="govuk-hint govuk-checkboxes__hint"
-      id="test-checkbox-item-hint"
-    >
-      Click me to proceed
-    </span>
-  </div>
-</div>
-`;

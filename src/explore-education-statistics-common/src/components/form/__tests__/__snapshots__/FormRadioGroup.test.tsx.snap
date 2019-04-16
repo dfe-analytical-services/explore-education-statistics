@@ -112,3 +112,78 @@ exports[`FormRadioGroup renders list of radios in correct order 1`] = `
 </div>
 
 `;
+
+exports[`FormRadioGroup renders option with conditional contents 1`] = `
+
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset"
+            id="test-radios"
+  >
+    <div class="govuk-radios">
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input"
+               id="radio-1"
+               name="test-radios"
+               type="radio"
+               data-testid="Test radio 1"
+               value="1"
+        >
+        <label class="govuk-label govuk-radios__label"
+               for="radio-1"
+        >
+          Test radio 1
+        </label>
+      </div>
+      <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
+           hidden
+      >
+        <p>
+          Conditional 1
+        </p>
+      </div>
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input"
+               id="radio-2"
+               name="test-radios"
+               type="radio"
+               data-testid="Test radio 2"
+               value="2"
+               checked
+        >
+        <label class="govuk-label govuk-radios__label"
+               for="radio-2"
+        >
+          Test radio 2
+        </label>
+      </div>
+      <div class="govuk-radios__conditional">
+        <p>
+          Conditional 2
+        </p>
+      </div>
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input"
+               id="radio-3"
+               name="test-radios"
+               type="radio"
+               data-testid="Test radio 3"
+               value="3"
+        >
+        <label class="govuk-label govuk-radios__label"
+               for="radio-3"
+        >
+          Test radio 3
+        </label>
+      </div>
+      <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
+           hidden
+      >
+        <p>
+          Conditional 3
+        </p>
+      </div>
+    </div>
+  </fieldset>
+</div>
+
+`;

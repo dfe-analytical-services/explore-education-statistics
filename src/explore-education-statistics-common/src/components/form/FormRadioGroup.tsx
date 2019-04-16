@@ -1,14 +1,13 @@
+import { Omit } from '@common/types/util';
 import classNames from 'classnames';
 import React, { Component, createRef } from 'react';
 import FormFieldset, { FieldSetProps } from './FormFieldset';
-import FormRadio, { RadioChangeEventHandler } from './FormRadio';
+import FormRadio, {
+  FormRadioProps,
+  RadioChangeEventHandler,
+} from './FormRadio';
 
-interface RadioOption {
-  hint?: string;
-  id: string;
-  label: string;
-  value: string;
-}
+type RadioOption = Omit<FormRadioProps, 'checked' | 'name' | 'onChange'>;
 
 export type FormRadioGroupProps = {
   inline?: boolean;

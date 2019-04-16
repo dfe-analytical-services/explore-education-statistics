@@ -118,10 +118,10 @@ exports[`FormCheckboxGroup renders correctly with small size variants 1`] = `
       id="test-checkboxes"
     >
       <div
-        class="govuk-checkboxes"
+        class="govuk-checkboxes govuk-checkboxes--small"
       >
         <div
-          class="govuk-checkboxes__item itemSmall"
+          class="govuk-checkboxes__item"
         >
           <input
             class="govuk-checkboxes__input"
@@ -138,7 +138,7 @@ exports[`FormCheckboxGroup renders correctly with small size variants 1`] = `
           </label>
         </div>
         <div
-          class="govuk-checkboxes__item itemSmall"
+          class="govuk-checkboxes__item"
         >
           <input
             class="govuk-checkboxes__input"
@@ -155,7 +155,7 @@ exports[`FormCheckboxGroup renders correctly with small size variants 1`] = `
           </label>
         </div>
         <div
-          class="govuk-checkboxes__item itemSmall"
+          class="govuk-checkboxes__item"
         >
           <input
             class="govuk-checkboxes__input"

@@ -129,4 +129,41 @@ describe('FormRadioGroup', () => {
     expect(getByText('Choose a radio')).toBeDefined();
     expect(container.innerHTML).toMatchSnapshot();
   });
+
+  test('renders option with conditional contents', () => {
+    const { container, getByText } = render(
+      <FormRadioGroup
+        value="2"
+        id="test-radios"
+        name="test-radios"
+        options={[
+          {
+            id: 'radio-1',
+            label: 'Test radio 1',
+            value: '1',
+            conditional: <p>Conditional 1</p>,
+          },
+          {
+            id: 'radio-2',
+            label: 'Test radio 2',
+            value: '2',
+            conditional: <p>Conditional 2</p>,
+          },
+          {
+            id: 'radio-3',
+            label: 'Test radio 3',
+            value: '3',
+            conditional: <p>Conditional 3</p>,
+          },
+        ]}
+      />,
+    );
+
+    expect(getByText('Conditional 1').parentElement).toHaveAttribute('hidden');
+    expect(getByText('Conditional 2').parentElement).not.toHaveAttribute(
+      'hidden',
+    );
+    expect(getByText('Conditional 3').parentElement).toHaveAttribute('hidden');
+    expect(container.innerHTML).toMatchSnapshot();
+  });
 });

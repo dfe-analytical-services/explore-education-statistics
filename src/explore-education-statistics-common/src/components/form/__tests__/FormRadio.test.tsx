@@ -33,4 +33,40 @@ describe('FormRadio', () => {
 
     expect(container.innerHTML).toMatchSnapshot();
   });
+
+  test('renders conditional content when checked', () => {
+    const { container, getByText } = render(
+      <FormRadio
+        name="test"
+        id="test-radio"
+        label="Test radio"
+        value="true"
+        checked
+        onChange={() => {}}
+        conditional={<p>The conditional content</p>}
+      />,
+    );
+
+    expect(
+      getByText('The conditional content').parentElement,
+    ).not.toHaveAttribute('hidden');
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('does not render conditional content when not checked', () => {
+    const { container, getByText } = render(
+      <FormRadio
+        name="test"
+        id="test-radio"
+        label="Test radio"
+        value="true"
+        conditional={<p>The conditional content</p>}
+      />,
+    );
+
+    expect(getByText('The conditional content').parentElement).toHaveAttribute(
+      'hidden',
+    );
+    expect(container.innerHTML).toMatchSnapshot();
+  });
 });
