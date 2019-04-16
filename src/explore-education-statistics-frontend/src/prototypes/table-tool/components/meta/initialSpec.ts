@@ -81,11 +81,11 @@ const metaSpecification: MetaSpecification = {
             },
             {
               label: 'Primary schools',
-              value: 'StateFundedPrimary',
+              value: 'State_Funded_Primary',
             },
             {
               label: 'Secondary schools',
-              value: 'StateFundedSecondary',
+              value: 'State_Funded_Secondary',
             },
             {
               label: 'Special schools',
