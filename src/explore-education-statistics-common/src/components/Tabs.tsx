@@ -1,3 +1,5 @@
+import useRendered from '@common/hooks/useRendered';
+import isComponentType from '@common/lib/type-guards/components/isComponentType';
 import classNames from 'classnames';
 import React, {
   cloneElement,
@@ -7,8 +9,6 @@ import React, {
   RefAttributes,
   useState,
 } from 'react';
-import useRendered from '../hooks/useRendered';
-import isComponentType from '../lib/type-guards/components/isComponentType';
 import TabsSection, { TabsSectionProps } from './TabsSection';
 
 function filterSections(children: ReactNode): ReactElement<TabsSectionProps>[] {

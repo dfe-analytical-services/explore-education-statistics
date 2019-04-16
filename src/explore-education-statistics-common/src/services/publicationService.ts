@@ -1,6 +1,6 @@
-import { MapFeature } from '../modules/find-statistics/components/charts/MapBlock';
-import { contentApi } from './api';
+import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
 import { FeatureCollection } from 'geojson';
+import { contentApi } from './api';
 
 export interface Publication {
   id: string;

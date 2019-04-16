@@ -1,4 +1,4 @@
-import { Dictionary } from '../../types/util';
+import { Dictionary } from '@common/types/util';
 
 /**
  * Map an {@param object} to a new object with the same keys,

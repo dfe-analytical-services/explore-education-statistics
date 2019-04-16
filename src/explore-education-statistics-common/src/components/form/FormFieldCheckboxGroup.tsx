@@ -1,9 +1,9 @@
+import createErrorHelper from '@common/lib/validation/createErrorHelper';
+import { Omit } from '@common/types/util';
 import { FieldArray } from 'formik';
 import difference from 'lodash/difference';
 import get from 'lodash/get';
 import React from 'react';
-import createErrorHelper from '../../lib/validation/createErrorHelper';
-import { Omit } from '../../types/util';
 import FormCheckboxGroup, { FormCheckboxGroupProps } from './FormCheckboxGroup';
 
 type Props<FormValues> = {

@@ -1,4 +1,4 @@
-import { Comparison } from '../../types/util';
+import { Comparison } from '@common/types/util';
 
 type TimePeriodCode = 'AY';
 

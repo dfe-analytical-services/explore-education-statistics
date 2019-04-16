@@ -1,3 +1,4 @@
+import useRendered from '@common/hooks/useRendered';
 import classNames from 'classnames';
 import React, {
   forwardRef,
@@ -6,7 +7,6 @@ import React, {
   ReactNode,
   Ref,
 } from 'react';
-import useRendered from '../hooks/useRendered';
 import styles from './TabsSection.module.scss';
 
 export interface TabsSectionProps {

@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import ReactMarkdown from 'react-markdown';
-import Details from '../../../components/Details';
+import Details from '@common/components/Details';
 import {
   CharacteristicsData,
   PublicationMeta,
-} from '../../../services/tableBuilderService';
+} from '@common/services/tableBuilderService';
+import React, { Component } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 export interface SummaryRendererProps {
   data: CharacteristicsData;

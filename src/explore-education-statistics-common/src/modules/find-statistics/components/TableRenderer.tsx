@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import CharacteristicsDataTable from '@common/modules/table-tool/components/CharacteristicsDataTable';
 import {
   CharacteristicsData,
   PublicationMeta,
-} from '../../../services/tableBuilderService';
-import CharacteristicsDataTable from '../../table-tool/components/CharacteristicsDataTable';
+} from '@common/services/tableBuilderService';
+import React, { Component } from 'react';
 
 export interface TableRendererProps {
   data: CharacteristicsData;

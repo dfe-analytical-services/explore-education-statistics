@@ -1,13 +1,13 @@
-import groupBy from 'lodash/groupBy';
-import max from 'lodash/max';
-import min from 'lodash/min';
-import React, { Component } from 'react';
 import {
   CharacteristicsMeta,
   DataTableResult,
   IndicatorsMeta,
-} from '../../../services/tableBuilderService';
-import SchoolType from '../../../services/types/SchoolType';
+} from '@common/services/tableBuilderService';
+import SchoolType from '@common/services/types/SchoolType';
+import groupBy from 'lodash/groupBy';
+import max from 'lodash/max';
+import min from 'lodash/min';
+import React, { Component } from 'react';
 import GroupedDataTable, { GroupedDataSet } from './GroupedDataTable';
 
 const schoolKeys: {
