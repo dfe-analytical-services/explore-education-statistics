@@ -130,13 +130,11 @@ jobs:
           workingDir: './src/explore-education-statistics-frontend'
           verbose: false
           customCommand: 'run build:test'
-      - task: 'Npm@1'
-        displayName: 'Remove dev dependencies'
-        inputs:
-          command: 'custom'
-          workingDir: '.'
-          verbose: false
-          customCommand: 'run clean'
+      - task: 'Bash@3'
+          displayName: 'Remove dev dependencies'
+          inputs:
+            targetType: 'inline'
+            script: 'rm -rf ./src/**/node_modules'
       - task: 'Npm@1'
         displayName: 'Install prod dependencies'
         inputs:
@@ -183,13 +181,11 @@ jobs:
           workingDir: './src/explore-education-statistics-frontend'
           verbose: false
           customCommand: 'run build:stage'
-      - task: 'Npm@1'
-        displayName: 'Remove dev dependencies'
-        inputs:
-          command: 'custom'
-          workingDir: '.'
-          verbose: false
-          customCommand: 'run clean'
+      - task: 'Bash@3'
+          displayName: 'Remove dev dependencies'
+          inputs:
+            targetType: 'inline'
+            script: 'rm -rf ./src/**/node_modules'
       - task: 'Npm@1'
         displayName: 'Install subproject prod dependencies'
         inputs:
@@ -236,13 +232,11 @@ jobs:
           workingDir: './src/explore-education-statistics-frontend'
           verbose: false
           customCommand: 'run build:live'
-      - task: 'Npm@1'
-        displayName: 'Remove dev dependencies'
-        inputs:
-          command: 'custom'
-          workingDir: '.'
-          verbose: false
-          customCommand: 'run clean'
+      - task: 'Bash@3'
+          displayName: 'Remove dev dependencies'
+          inputs:
+            targetType: 'inline'
+            script: 'rm -rf ./src/**/node_modules'
       - task: 'Npm@1'
         displayName: 'Install subproject prod dependencies'
         inputs:
