@@ -1,6 +1,8 @@
 *** Settings ***
 Resource    ../libs/library.robot
 
+Force Tags  GeneralPublic
+
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
 
@@ -38,4 +40,4 @@ Validate Privacy Policy page
 Validate Feedback page
     [Tags]  HappyPath
     user clicks link  feedback
-    user waits until page contains element  css:[data-testid="page-title Feedback"]
+    user waits until page contains      Explore Education Statistics - Beta banner feedback survey

@@ -64,7 +64,7 @@ localAdminUrl = ""
 testUrl = "https://%s:%s@public-explore-education-statistics-test.azurewebsites.net" % (basicAuthUser, basicAuthPass)
 testAdminUrl = "https://eesadminprototype.z33.web.core.windows.net/prototypes/admin-dashboard"
 stageUrl = "https://%s:%s@public-explore-education-statistics-stage.azurewebsites.net" % (basicAuthUser, basicAuthPass)
-stageAdminUrl = ""
+stageAdminUrl = "https://eesadminprototype.z33.web.core.windows.net/prototypes/admin-dashboard"
 prodUrl = ""
 prodAdminUrl = ""
 

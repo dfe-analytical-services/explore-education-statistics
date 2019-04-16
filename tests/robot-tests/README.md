@@ -24,6 +24,8 @@ Then in the robot-tests directory run
 pipenv install
 ```
 
+You will also need to create a .env file which contains the basic auth username and password. You can copy the .env.example file in the robot-tests directory, replacing `user` and `pass` with the actual username and password.
+
 # How do I run the tests?
 
 ```
@@ -32,7 +34,9 @@ pipenv run python run_tests.py
 
 Further instructions on how to use the test runner are included inside the run\_tests.py file itself.
 
-# Organisation
+# Directory structure
+
+This section details what the various directories in robot-tests contain.
 
 ### scripts
 This directory holds scripts used by the run\_tests.py and the Azure pipeline.
@@ -41,9 +45,9 @@ This directory holds scripts used by the run\_tests.py and the Azure pipeline.
 This directory holds the output of a test run, including the test report and log.
 
 ### tests
-This holds the actual robot framework/selenium tests. The `libs` folder holds python and robot framework libraries used by the tests themselves.
+This holds the actual robot framework/selenium tests. The tests are themselves organised into different folders. The `libs` folder holds python and robot framework libraries used by the tests themselves.
 
-### lib
+### webdriver
 This holds chromedriver, used by selenium to interact with the browser. It is automatically downloaded when the tests are run.
 
 # Guidelines for people writing tests

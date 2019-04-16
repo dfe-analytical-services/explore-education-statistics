@@ -24,9 +24,15 @@ def css_should_match_x_times(css, times):
     css = css[4:]
   elements = s2l._current_browser().find_elements(By.CSS_SELECTOR, css)
   if len(elements) != int(times):
-    raise AssertionError("\"CSS Should Match X Times\" found " + str(len(elements)) + " matching elements, not " + str(times) + " elements!")
+    raise AssertionError("\"CSS Should Match X Times\" found %s matching elements, not %s elements!" % (str(len(elements)), times))
 
-def user_deletes_text_until_block_is_empty(selector):
+def elements_containing_text_should_match_x_times(text, times):
+  elements = s2l._current_browser().find_elements_by_xpath('//*[contains(text(), "%s")]' % text)
+  if len(elements) != int(times):
+    raise AssertionError("\"Element Containing Text Should Match X Times\" found %s matching elements, not %s elements!" % (str(len(elements)), times))
+
+
+def user_deletes_text_from_element_until_block_is_empty(selector, text=None):
   element = None
   if selector.startswith('xpath:'):
     selector = selector[6:]
@@ -34,6 +40,10 @@ def user_deletes_text_until_block_is_empty(selector):
   elif selector.startswith('css:'):
     selector = selector[4:]
     element = s2l._current_browser().find_element_by_css_selector(selector)
+
+  if text:
+    element = element.find_element_by_xpath('..//*[contains(text(), "%s")]' % text)
+
   while element.text:
     ActionChains(s2l.driver).send_keys(Keys.DELETE).perform()
 
@@ -67,3 +77,18 @@ def user_drags_and_drops(drag_selector, drop_selector):
   action.move_to_element(drop_elem).perform()
   action.move_by_offset(0, 0).pause(0.01).perform()
   action.release().perform()
+
+def italic_x_characters_before_cursor(num):
+  action = ActionChains(s2l.driver).key_down(Keys.SHIFT).send_keys(Keys.ARROW_LEFT).key_up(Keys.SHIFT)
+  for x in range(0, int(num)):
+    action.perform()
+
+  s2l._current_browser().find_element_by_css_selector('.ck-button:nth-child(4)').click()
+
+  action = ActionChains(s2l.driver).send_keys(Keys.ARROW_RIGHT)
+  for x in range(0, int(num)):
+    action.perform()
+
+def insert_image():
+  s2l._current_browser().find_element_by_css_selector('span.ck-file-dialog-button:nth-of-type(2)').click()
+  s2l._current_browser().send_keys("Screenshot")
