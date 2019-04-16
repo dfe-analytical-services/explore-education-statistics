@@ -15,6 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
         
         public async Task RemoveSubscriber(CloudTable table, SubscriptionEntity subscription)
         {   
+            subscription.ETag = "*";
             table.ExecuteAsync(TableOperation.Delete(subscription));
         }
         
