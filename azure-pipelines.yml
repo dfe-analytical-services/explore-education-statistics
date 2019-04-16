@@ -131,10 +131,10 @@ jobs:
           verbose: false
           customCommand: 'run build:test'
       - task: 'Bash@3'
-          displayName: 'Remove dev dependencies'
-          inputs:
-            targetType: 'inline'
-            script: 'rm -rf ./src/**/node_modules'
+        displayName: 'Remove dev dependencies'
+        inputs:
+          targetType: 'inline'
+          script: 'rm -rf ./src/**/node_modules'
       - task: 'Npm@1'
         displayName: 'Install prod dependencies'
         inputs:
@@ -182,10 +182,10 @@ jobs:
           verbose: false
           customCommand: 'run build:stage'
       - task: 'Bash@3'
-          displayName: 'Remove dev dependencies'
-          inputs:
-            targetType: 'inline'
-            script: 'rm -rf ./src/**/node_modules'
+        displayName: 'Remove dev dependencies'
+        inputs:
+          targetType: 'inline'
+          script: 'rm -rf ./src/**/node_modules'
       - task: 'Npm@1'
         displayName: 'Install subproject prod dependencies'
         inputs:
@@ -233,10 +233,10 @@ jobs:
           verbose: false
           customCommand: 'run build:live'
       - task: 'Bash@3'
-          displayName: 'Remove dev dependencies'
-          inputs:
-            targetType: 'inline'
-            script: 'rm -rf ./src/**/node_modules'
+        displayName: 'Remove dev dependencies'
+        inputs:
+          targetType: 'inline'
+          script: 'rm -rf ./src/**/node_modules'
       - task: 'Npm@1'
         displayName: 'Install subproject prod dependencies'
         inputs:
