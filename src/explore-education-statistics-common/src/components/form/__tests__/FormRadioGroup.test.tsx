@@ -159,11 +159,13 @@ describe('FormRadioGroup', () => {
       />,
     );
 
-    expect(getByText('Conditional 1').parentElement).toHaveAttribute('hidden');
-    expect(getByText('Conditional 2').parentElement).not.toHaveAttribute(
-      'hidden',
+    const hiddenClass = 'govuk-radios__conditional--hidden';
+
+    expect(getByText('Conditional 1').parentElement).toHaveClass(hiddenClass);
+    expect(getByText('Conditional 2').parentElement).not.toHaveClass(
+      hiddenClass,
     );
-    expect(getByText('Conditional 3').parentElement).toHaveAttribute('hidden');
+    expect(getByText('Conditional 3').parentElement).toHaveClass(hiddenClass);
     expect(container.innerHTML).toMatchSnapshot();
   });
 });

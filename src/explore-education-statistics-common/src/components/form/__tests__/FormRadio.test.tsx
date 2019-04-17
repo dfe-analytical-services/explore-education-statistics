@@ -47,9 +47,9 @@ describe('FormRadio', () => {
       />,
     );
 
-    expect(
-      getByText('The conditional content').parentElement,
-    ).not.toHaveAttribute('hidden');
+    expect(getByText('The conditional content').parentElement).not.toHaveClass(
+      'govuk-radios__conditional--hidden',
+    );
     expect(container.innerHTML).toMatchSnapshot();
   });
 
@@ -64,8 +64,8 @@ describe('FormRadio', () => {
       />,
     );
 
-    expect(getByText('The conditional content').parentElement).toHaveAttribute(
-      'hidden',
+    expect(getByText('The conditional content').parentElement).toHaveClass(
+      'govuk-radios__conditional--hidden',
     );
     expect(container.innerHTML).toMatchSnapshot();
   });
