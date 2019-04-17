@@ -405,3 +405,32 @@ export const ks4StateFundedSchoolsPerformance = createDataBlockWithChart(
     ],
   ],
 );
+
+export const testChartsVerticalWithReferenceLine = createDataBlockWithChart(
+  'GDHI per head (£) England, 2011',
+  ['la_name', 'cost'],
+  ['Region', 'Cost'],
+
+  SchoolType.Total,
+  201112,
+  [
+    ['London', '21'],
+    ['South East', '18'],
+    ['East', '17'],
+    ['South West', '15'],
+    ['East Midlands', '13'],
+    ['North West', '13'],
+    ['West Midlands', '12'],
+    ['Yorkshire', '11'],
+    ['North East', '10'],
+  ],
+  [
+    createBasicChart(
+      'horizontalbar',
+      ['cost'],
+      { title: '' },
+      { title: '', key: 'la_name' },
+    ),
+  ],
+  //['London', 'Yorkshire', 'East', 'South East', 'South West', 'West Midlands', 'East Midlands', 'North West', 'North East' ]
+);

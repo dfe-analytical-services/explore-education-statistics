@@ -42,32 +42,34 @@ class Accordion extends Component<AccordionProps, State> {
 
   private goToHash = () => {
     if (this.ref.current && location.hash) {
-      const locationHashEl = this.ref.current.querySelector(location.hash);
+      try {
+        const locationHashEl = this.ref.current.querySelector(location.hash);
 
-      if (locationHashEl) {
-        const sectionEl = locationHashEl.closest(`.${classes.section}`);
+        if (locationHashEl) {
+          const sectionEl = locationHashEl.closest(`.${classes.section}`);
 
-        if (sectionEl) {
-          const contentEl = sectionEl.querySelector(
-            `.${classes.sectionContent}`,
-          );
-
-          if (contentEl) {
-            if (window.sessionStorage.getItem(contentEl.id) === 'false') {
-              window.sessionStorage.removeItem(contentEl.id);
-            }
-
-            this.setState(
-              {
-                openSectionId: contentEl.id,
-              },
-              () => {
-                locationHashEl.scrollIntoView({ block: 'start' });
-              },
+          if (sectionEl) {
+            const contentEl = sectionEl.querySelector(
+              `.${classes.sectionContent}`,
             );
+
+            if (contentEl) {
+              if (window.sessionStorage.getItem(contentEl.id) === 'false') {
+                window.sessionStorage.removeItem(contentEl.id);
+              }
+
+              this.setState(
+                {
+                  openSectionId: contentEl.id,
+                },
+                () => {
+                  locationHashEl.scrollIntoView({ block: 'start' });
+                },
+              );
+            }
           }
         }
-      }
+      } catch (e) {}
     }
   };
 

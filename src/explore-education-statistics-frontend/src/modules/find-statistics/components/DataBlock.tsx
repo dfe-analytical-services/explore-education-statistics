@@ -28,6 +28,7 @@ export interface DataBlockProps {
   data?: CharacteristicsData;
   meta?: PublicationMeta;
   height?: number;
+  showTables?: boolean;
 }
 
 interface DataBlockState {
@@ -134,7 +135,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
             </TabsSection>
           )}
 
-          {this.state.tables && (
+          {this.state.tables && this.props.showTables !== false && (
             <TabsSection id={`${id}0`} title="Data tables">
               <h3>{this.props.heading}</h3>
               {this.state.tables.map((table, idx) => (
@@ -151,7 +152,11 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
           )}
 
           {this.state.charts && (
-            <TabsSection id={`${id}1`} title="Charts" lazy={true}>
+            <TabsSection
+              id={`${id}1`}
+              title="Charts"
+              lazy={this.props.showTables !== false}
+            >
               <h3>{this.props.heading}</h3>
               {this.state.charts.map((chart, idx) => (
                 <ChartRenderer
