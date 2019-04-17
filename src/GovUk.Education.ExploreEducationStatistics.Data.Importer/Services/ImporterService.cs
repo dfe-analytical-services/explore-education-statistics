@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         private static GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
         {
-            return GeographicLevels.EnumFromStringForImport(line[headers.FindIndex(h => h.Equals("geographic_level"))]);
+            return GeographicLevels.EnumFromStringForImport(CsvUtil.Value(line, headers, "geographic_level"));
         }
 
         private Location GetLocation(IReadOnlyList<string> line, List<string> headers)

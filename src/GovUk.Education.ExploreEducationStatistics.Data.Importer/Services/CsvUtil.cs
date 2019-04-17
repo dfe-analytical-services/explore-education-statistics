@@ -12,15 +12,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             var values = Values(line, headers, columns);
             return values.All(value => value == null) ? default(T) : func(values);
         }
-        
+
         private static string[] Values(IReadOnlyList<string> line, List<string> headers, IEnumerable<string> columns)
         {
             return columns.Select(c => Value(line, headers, c)).ToArray();
         }
-        
-        public static string Value(IReadOnlyList<string> line, List<string> headers, string c)
+
+        public static string Value(IReadOnlyList<string> line, List<string> headers, string column)
         {
-            return headers.Contains(c) ? line[headers.FindIndex(h => h.Equals(c))].NullIfWhiteSpace() : null;
+            return headers.Contains(column) ? 
+                line[headers.FindIndex(h => h.Equals(column))].NullIfWhiteSpace() : null;
         }
     }
 }
