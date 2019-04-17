@@ -8,6 +8,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
+    [Obsolete]
     public class ImporterSchoolService
     {
         private readonly IMemoryCache _cache;

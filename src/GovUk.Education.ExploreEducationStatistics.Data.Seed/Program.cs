@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                 .AddTransient<ISeedService, SeedService>()
                 .AddTransient<IImporterService, ImporterService>()
                 .AddTransient<ImporterLocationService>()
-                .AddTransient<ImporterSchoolService>()
+                .AddTransient<ImporterMetaService>()
                 .BuildServiceProvider();
         }
     }

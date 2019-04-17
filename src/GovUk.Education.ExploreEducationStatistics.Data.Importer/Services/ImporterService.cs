@@ -13,29 +13,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
     public class ImporterService : IImporterService
     {
         private readonly ImporterLocationService _importerLocationService;
-        private readonly ImporterSchoolService _importerSchoolService;
+        private readonly ImporterMetaService _importerMetaService;
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
 
-        public ImporterService(ImporterLocationService importerLocationService,
-            ImporterSchoolService importerSchoolService,
+        private static readonly Dictionary<string, TimeIdentifier> _timeIdentifiers =
+            new Dictionary<string, TimeIdentifier>
+            {
+                {"Academic year", TimeIdentifier.AY},
+                {"Calendar year", TimeIdentifier.CY},
+                {"Up until 31st March", TimeIdentifier.EOM},
+                {"Financial year", TimeIdentifier.FY},
+                {"January", TimeIdentifier.M1},
+                {"February", TimeIdentifier.M2},
+                {"March", TimeIdentifier.M3},
+                {"April", TimeIdentifier.M4},
+                {"May", TimeIdentifier.M5},
+                {"June", TimeIdentifier.M6},
+                {"July", TimeIdentifier.M7},
+                {"August", TimeIdentifier.M8},
+                {"September", TimeIdentifier.M9},
+                {"October", TimeIdentifier.M10},
+                {"November", TimeIdentifier.M11},
+                {"December", TimeIdentifier.M12},
+                {"Q1", TimeIdentifier.Q1},
+                {"Q1-Q2", TimeIdentifier.Q1Q2},
+                {"Q1-Q3", TimeIdentifier.Q1Q3},
+                {"Q2", TimeIdentifier.Q2},
+                {"Q3", TimeIdentifier.Q3},
+                {"Q4", TimeIdentifier.Q4},
+                {"Autumn term", TimeIdentifier.T1},
+                {"Autumn and spring term", TimeIdentifier.T1T2},
+                {"Spring term", TimeIdentifier.T2},
+                {"Summer term", TimeIdentifier.T3}
+            };
+
+        public ImporterService(
+            ImporterLocationService importerLocationService,
+            ImporterMetaService importerMetaService,
             ApplicationDbContext context,
             ILogger<ImporterService> logger)
         {
             _importerLocationService = importerLocationService;
-            _importerSchoolService = importerSchoolService;
+            _importerMetaService = importerMetaService;
             _context = context;
             _logger = logger;
         }
 
-        public void Import(IEnumerable<string> lines, Subject subject)
+        public void Import(IEnumerable<string> lines, IEnumerable<string> metaLines, Subject subject)
         {
             _logger.LogInformation("Importing {count} lines", lines.Count());
 
-            var data = Data(lines, subject);
+            var subjectMeta = _importerMetaService.Import(metaLines);
+            var observations = GetObservations(lines, subject, subjectMeta);
 
             var index = 1;
-            var batches = data.Batch(10000);
+            var batches = observations.Batch(10000);
             var stopWatch = new Stopwatch();
 
             stopWatch.Start();
@@ -45,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     "Importing batch {Index} of {TotalCount} for Publication {Publication}, {Subject}", index,
                     batches.Count(), subject.Release.PublicationId, subject.Name);
 
-                _context.Set<Observation>().AddRange(batch);
+                _context.Observation.AddRange(batch);
                 _context.SaveChanges();
                 index++;
 
@@ -58,60 +91,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             stopWatch.Stop();
         }
 
-        private IEnumerable<Observation> Data(IEnumerable<string> lines, Subject subject)
+        private IEnumerable<Observation> GetObservations(IEnumerable<string> lines,
+            Subject subject,
+            SubjectMeta subjectMeta)
         {
             var headers = lines.First().Split(',').ToList();
             return lines
                 .Skip(1)
-                .Select(csvLine => ObservationsFromCsv(csvLine, headers, subject)).ToList();
+                .Select(line => ObservationsFromCsv(line, headers, subject, subjectMeta)).ToList();
         }
 
-        private Observation ObservationsFromCsv(string raw, List<string> headers, Subject subject)
+        private Observation ObservationsFromCsv(string raw,
+            List<string> headers,
+            Subject subject,
+            SubjectMeta subjectMeta)
         {
             var line = raw.Split(',');
             return new Observation
             {
                 Subject = subject,
-                Level = GetLevel(line, headers),
+                GeographicLevel = GetGeographicLevel(line, headers),
                 Location = GetLocation(line, headers),
                 School = GetSchool(line, headers),
-                Year = GetYear(),
-                TimePeriod = GetTimePeriod()
+                Year = GetYear(line, headers),
+                TimeIdentifier = GetTimeIdentifier(line, headers)
             };
         }
 
-//        private Dictionary<string, string> GetIndicators(IReadOnlyList<string> line, List<string> headers,
-//            string[] headerValues)
-//        {
-//            var indicators = new Dictionary<string, string>();
-//            for (var i = 0; i < line.Count; i++)
-//            {
-//                if (!headerValues.Contains(headers[i]))
-//                {
-//                    indicators.Add(headers[i], line[i]);
-//                }
-//            }
-//
-//            return indicators;
-//        }
-
-        private static int GetYear()
+        private static TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)
         {
-            // TODO
-            // int.Parse(values[headers.FindIndex(h => h.Equals("time_period"))]),
-            return 2015;
+            if (_timeIdentifiers.TryGetValue(CsvUtil.Value(line, headers, "time_identifier"), out var timeIdentifier))
+            {
+                return timeIdentifier;
+            }
+
+            throw new ArgumentException("Unexpected value: " + timeIdentifier);
         }
 
-        private static TimePeriod GetTimePeriod()
+        private static int GetYear(IReadOnlyList<string> line, List<string> headers)
         {
-            // TODO
-            // TODO Six half terms vs five half terms??
-            return TimePeriod.AY;
+            return int.Parse(CsvUtil.Value(line, headers, "time_period").Substring(0, 4));
         }
 
-        private static Level GetLevel(IReadOnlyList<string> line, List<string> headers)
+        private static GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
         {
-            return Levels.EnumFromStringForImport(line[headers.FindIndex(h => h.Equals("level"))]);
+            return GeographicLevels.EnumFromStringForImport(line[headers.FindIndex(h => h.Equals("geographic_level"))]);
         }
 
         private Location GetLocation(IReadOnlyList<string> line, List<string> headers)
@@ -126,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private School GetSchool(IReadOnlyList<string> line, List<string> headers)
         {
             var columns = new[] {"estab", "laestab", "academy_open_date", "academy_type", "urn"};
-            var school = BuildType(line, headers, columns, values => new School
+            var school = CsvUtil.BuildType(line, headers, columns, values => new School
             {
                 Estab = values[0],
                 LaEstab = values[1],
@@ -134,64 +158,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 AcademyType = values[3],
                 Urn = values[4]
             });
-
-            return _importerSchoolService.Find(school);
+            return school;
         }
 
         private static Country GetCountry(IReadOnlyList<string> line, List<string> headers)
         {
             var columns = new[] {"country_code", "country_name"};
-            return BuildType(line, headers, columns, values => new Country
-            {
-                Code = values[0],
-                Name = values[1]
-            });
+            return CsvUtil.BuildType(line, headers, columns, values =>
+                new Country(values[0], values[1]));
         }
 
         private static Region GetRegion(IReadOnlyList<string> line, List<string> headers)
         {
             var columns = new[] {"region_code", "region_name"};
-            return BuildType(line, headers, columns, values => new Region
-            {
-                Code = values[0],
-                Name = values[1]
-            });
+            return CsvUtil.BuildType(line, headers, columns, values =>
+                new Region(values[0], values[1]));
         }
 
         private static LocalAuthority GetLocalAuthority(IReadOnlyList<string> line, List<string> headers)
         {
             var columns = new[] {"old_la_code", "new_la_code", "la_name"};
-            return BuildType(line, headers, columns, values => new LocalAuthority
-            {
-                Old_Code = columns[0],
-                Code = values[1],
-                Name = values[2]
-            });
+            return CsvUtil.BuildType(line, headers, columns, values =>
+                new LocalAuthority(values[0], values[1], values[2]));
         }
 
         private static LocalAuthorityDistrict GetLocalAuthorityDistrict(IReadOnlyList<string> line,
             List<string> headers)
         {
             var columns = new[] {"sch_lad_code", "sch_lad_name"};
-            return BuildType(line, headers, columns, values => new LocalAuthorityDistrict
-            {
-                Code = values[0],
-                Name = values[1]
-            });
-        }
-
-        private static T BuildType<T>(IReadOnlyList<string> line, List<string> headers, IEnumerable<string> columns,
-            Func<string[], T> func)
-        {
-            var values = Values(line, headers, columns);
-            return values.All(value => value == null) ? default(T) : func(values);
-        }
-
-        private static string[] Values(IReadOnlyList<string> values, List<string> headers, IEnumerable<string> columns)
-        {
-            return columns
-                .Select(c => headers.Contains(c) ? values[headers.FindIndex(h => h.Equals(c))] : null)
-                .ToArray();
+            return CsvUtil.BuildType(line, headers, columns, values =>
+                new LocalAuthorityDistrict(values[0], values[1]));
         }
     }
 }
