@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190415131637_InitialCreate")]
+    [Migration("20190417143356_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,24 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<long>("FilterGroupId");
-
                     b.Property<string>("Hint");
-
-                    b.Property<string>("Label");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FilterGroupId");
-
-                    b.ToTable("Filter");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroup", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Label");
 
@@ -54,10 +37,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("FilterGroup");
+                    b.ToTable("Filter");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItem", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroup", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -70,6 +53,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FilterId");
+
+                    b.ToTable("FilterGroup");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItem", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("FilterGroupId");
+
+                    b.Property<string>("Label");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FilterGroupId");
 
                     b.ToTable("FilterItem");
                 });
@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Level")
+                    b.Property<string>("GeographicLevel")
                         .IsRequired();
 
                     b.Property<long>("LocationId");
@@ -139,7 +139,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                     b.Property<long>("SubjectId");
 
-                    b.Property<int>("TimePeriod");
+                    b.Property<string>("TimeIdentifier")
+                        .IsRequired();
 
                     b.Property<int>("Year");
 
@@ -151,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.HasIndex("TimePeriod");
+                    b.HasIndex("TimeIdentifier");
 
                     b.HasIndex("Year");
 
@@ -225,25 +226,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Filter", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroup", "FilterGroup")
-                        .WithMany("Filters")
-                        .HasForeignKey("FilterGroupId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroup", b =>
-                {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItem", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroup", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Filter", "Filter")
-                        .WithMany()
+                        .WithMany("FilterGroups")
                         .HasForeignKey("FilterId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItem", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroup", "FilterGroup")
+                        .WithMany("FilterItems")
+                        .HasForeignKey("FilterGroupId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
         where TData : Observation
         where TResult : ITableBuilderData
     {
-        TResult BuildResult(TData observation, ICollection<string> indicators);
+        TResult BuildResult(TData observation, ICollection<long> indicators);
     }
 }

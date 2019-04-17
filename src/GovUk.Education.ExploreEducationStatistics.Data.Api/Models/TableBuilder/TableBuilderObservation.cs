@@ -10,10 +10,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilde
     {
         public LocationViewModel Location { get; set; }
 
-        public Dictionary<string, string> Measures { get; set; }
+        public Dictionary<long, string> Measures { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public TimePeriod TimePeriod { get; set; }
+        public TimeIdentifier TimeIdentifier { get; set; }
 
         public int Year { get; set; }
     }

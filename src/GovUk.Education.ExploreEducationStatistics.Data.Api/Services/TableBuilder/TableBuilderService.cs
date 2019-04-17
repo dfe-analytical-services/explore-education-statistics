@@ -33,14 +33,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             {
                 return new TableBuilderResult();
             }
-            
+
             var first = observations.FirstOrDefault();
             return new TableBuilderResult
             {
                 PublicationId = first.Subject.Release.PublicationId,
                 ReleaseId = first.SubjectId,
                 ReleaseDate = first.Subject.Release.ReleaseDate,
-                Level = first.Level,
+                GeographicLevel = first.GeographicLevel,
                 Result = observations.Select(observation =>
                     _resultBuilder.BuildResult(observation, queryContext.Indicators))
             };
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             var releaseId = _releaseService.GetLatestRelease(queryContext.PublicationId);
             return _observationService.FindMany(queryContext.FindExpression(releaseId),
                 new List<Expression<Func<Observation, object>>>
-                    {data => data.Level, data => data.Subject, data => data.Subject.Release}
+                    {data => data.Subject, data => data.Subject.Release}
             );
         }
     }

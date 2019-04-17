@@ -7,8 +7,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilde
     public interface ITableBuilderData
     {
         LocationViewModel Location { get; set; }
-        Dictionary<string, string> Measures { get; set; }
-        TimePeriod TimePeriod { get; set; }
+        Dictionary<long, string> Measures { get; set; }
+        TimeIdentifier TimeIdentifier { get; set; }
         int Year { get; set; }
     }
 }

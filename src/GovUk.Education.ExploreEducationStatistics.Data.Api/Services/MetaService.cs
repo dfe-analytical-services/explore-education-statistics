@@ -357,37 +357,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         {
                             new TimePeriodMetaViewModel
                             {
-                                Code = TimePeriod.AY,
+                                Code = TimeIdentifier.AY,
                                 Label = "2011/12",
                                 Year = 2011
                             },
                             new TimePeriodMetaViewModel
                             {
-                                Code = TimePeriod.AY,
+                                Code = TimeIdentifier.AY,
                                 Label = "2012/13",
                                 Year = 2012
                             },
                             new TimePeriodMetaViewModel
                             {
-                                Code = TimePeriod.AY,
+                                Code = TimeIdentifier.AY,
                                 Label = "2013/14",
                                 Year = 2013
                             },
                             new TimePeriodMetaViewModel
                             {
-                                Code = TimePeriod.AY,
+                                Code = TimeIdentifier.AY,
                                 Label = "2014/15",
                                 Year = 2014
                             },
                             new TimePeriodMetaViewModel
                             {
-                                Code = TimePeriod.AY,
+                                Code = TimeIdentifier.AY,
                                 Label = "2015/16",
                                 Year = 2015
                             },
                             new TimePeriodMetaViewModel
                             {
-                                Code = TimePeriod.AY,
+                                Code = TimeIdentifier.AY,
                                 Label = "2016/17",
                                 Year = 2016
                             }

@@ -6,8 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
     {
         public long Id { get; set; }
         public string Label { get; set; }
-        public Filter Filter { get; set; }
-        public long FilterId { get; set; }
+        public FilterGroup FilterGroup { get; set; }
+        public long FilterGroupId { get; set; }
         public IEnumerable<ObservationFilterItem> Observations { get; set; }
     }
 }

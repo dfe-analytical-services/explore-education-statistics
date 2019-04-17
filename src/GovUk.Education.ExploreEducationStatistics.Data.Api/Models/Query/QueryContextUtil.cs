@@ -14,10 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
             return x => x.Subject.ReleaseId == releaseId;
         }
 
-        public static Expression<Func<T, bool>> LevelExpression<T>(Level level)
+        public static Expression<Func<T, bool>> GeographicLevelExpression<T>(GeographicLevel geographicLevel)
             where T : Observation
         {
-            return x => x.Level == level;
+            return x => x.GeographicLevel == geographicLevel;
         }
 
         public static Expression<Func<T, bool>> RegionsExpression<T>(IEnumerable<string> regions)

@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    public enum Level
+    public enum GeographicLevel
     {
         National,
         Regional,

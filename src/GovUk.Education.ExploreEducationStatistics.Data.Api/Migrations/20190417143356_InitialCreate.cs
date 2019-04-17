@@ -79,19 +79,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FilterGroup",
+                name: "Filter",
                 columns: table => new
                 {
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Label = table.Column<string>(nullable: true),
+                    Hint = table.Column<string>(nullable: true),
                     SubjectId = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FilterGroup", x => x.Id);
+                    table.PrimaryKey("PK_Filter", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FilterGroup_Subject_SubjectId",
+                        name: "FK_Filter_Subject_SubjectId",
                         column: x => x.SubjectId,
                         principalTable: "Subject",
                         principalColumn: "Id",
@@ -125,11 +126,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     SubjectId = table.Column<long>(nullable: false),
-                    Level = table.Column<string>(nullable: false),
+                    GeographicLevel = table.Column<string>(nullable: false),
                     LocationId = table.Column<long>(nullable: false),
                     SchoolLaEstab = table.Column<string>(nullable: true),
                     Year = table.Column<int>(nullable: false),
-                    TimePeriod = table.Column<int>(nullable: false),
+                    TimeIdentifier = table.Column<string>(nullable: false),
                     Measures = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -156,22 +157,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Filter",
+                name: "FilterGroup",
                 columns: table => new
                 {
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Label = table.Column<string>(nullable: true),
-                    Hint = table.Column<string>(nullable: true),
-                    FilterGroupId = table.Column<long>(nullable: false)
+                    FilterId = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Filter", x => x.Id);
+                    table.PrimaryKey("PK_FilterGroup", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Filter_FilterGroup_FilterGroupId",
-                        column: x => x.FilterGroupId,
-                        principalTable: "FilterGroup",
+                        name: "FK_FilterGroup_Filter_FilterId",
+                        column: x => x.FilterId,
+                        principalTable: "Filter",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -204,15 +204,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Label = table.Column<string>(nullable: true),
-                    FilterId = table.Column<long>(nullable: false)
+                    FilterGroupId = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_FilterItem", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FilterItem_Filter_FilterId",
-                        column: x => x.FilterId,
-                        principalTable: "Filter",
+                        name: "FK_FilterItem_FilterGroup_FilterGroupId",
+                        column: x => x.FilterGroupId,
+                        principalTable: "FilterGroup",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -242,19 +242,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Filter_FilterGroupId",
+                name: "IX_Filter_SubjectId",
                 table: "Filter",
-                column: "FilterGroupId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FilterGroup_SubjectId",
-                table: "FilterGroup",
                 column: "SubjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FilterItem_FilterId",
-                table: "FilterItem",
+                name: "IX_FilterGroup_FilterId",
+                table: "FilterGroup",
                 column: "FilterId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FilterItem_FilterGroupId",
+                table: "FilterItem",
+                column: "FilterGroupId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Indicator_IndicatorGroupId",
@@ -302,9 +302,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 column: "SubjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Observation_TimePeriod",
+                name: "IX_Observation_TimeIdentifier",
                 table: "Observation",
-                column: "TimePeriod");
+                column: "TimeIdentifier");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Observation_Year",
@@ -345,7 +345,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 name: "Observation");
 
             migrationBuilder.DropTable(
-                name: "Filter");
+                name: "FilterGroup");
 
             migrationBuilder.DropTable(
                 name: "Location");
@@ -354,7 +354,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 name: "School");
 
             migrationBuilder.DropTable(
-                name: "FilterGroup");
+                name: "Filter");
 
             migrationBuilder.DropTable(
                 name: "Subject");

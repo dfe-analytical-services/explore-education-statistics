@@ -30,8 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureUnit(modelBuilder);
             ConfigurePublication(modelBuilder);
             ConfigureMeasures(modelBuilder);
-            ConfigureTime(modelBuilder);
-            ConfigureLevel(modelBuilder);
+            ConfigureTimePeriod(modelBuilder);
+            ConfigureGeographicLevel(modelBuilder);
             ConfigureCountry(modelBuilder);
             ConfigureLocalAuthority(modelBuilder);
             ConfigureLocalAuthorityDistrict(modelBuilder);
@@ -76,25 +76,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .Property(data => data.Measures)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<Dictionary<string, string>>(v));
+                    v => JsonConvert.DeserializeObject<Dictionary<long, string>>(v));
         }
-        
-        private static void ConfigureTime(ModelBuilder modelBuilder)
+
+        private static void ConfigureTimePeriod(ModelBuilder modelBuilder)
         {
+            var timeIdentifierConverter = new EnumToStringConverter<TimeIdentifier>();
+
+            modelBuilder.Entity<Observation>()
+                .Property(observation => observation.TimeIdentifier)
+                .HasConversion(timeIdentifierConverter);
+
             modelBuilder.Entity<Observation>()
                 .HasIndex(observation => observation.Year);
 
             modelBuilder.Entity<Observation>()
-                .HasIndex(observation => observation.TimePeriod);
+                .HasIndex(observation => observation.TimeIdentifier);
         }
 
-        private static void ConfigureLevel(ModelBuilder modelBuilder)
+        private static void ConfigureGeographicLevel(ModelBuilder modelBuilder)
         {
-            var levelConverter = new EnumToStringConverter<Level>();
+            var geographicLevelConverter = new EnumToStringConverter<GeographicLevel>();
 
             modelBuilder.Entity<Observation>()
-                .Property(observation => observation.Level)
-                .HasConversion(levelConverter);
+                .Property(observation => observation.GeographicLevel)
+                .HasConversion(geographicLevelConverter);
         }
 
         private static void ConfigureCountry(ModelBuilder modelBuilder)

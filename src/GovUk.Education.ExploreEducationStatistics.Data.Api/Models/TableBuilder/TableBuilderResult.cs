@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilde
         public DateTime ReleaseDate { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public Level Level { get; set; }
+        public GeographicLevel GeographicLevel { get; set; }
 
         public IEnumerable<ITableBuilderData> Result { get; set; }
 

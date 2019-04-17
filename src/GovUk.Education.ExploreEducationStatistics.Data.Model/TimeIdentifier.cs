@@ -1,9 +1,10 @@
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    public enum TimePeriod
+    public enum TimeIdentifier
     {
         AY,
         CY,
+        EOM,
         FY,
         M1,
         M2,
@@ -18,10 +19,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         M11,
         M12,
         Q1,
+        Q1Q2,
+        Q1Q3,
         Q2,
         Q3,
         Q4,
         T1,
+        T1T2,
         T2,
         T3
     }

@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             _mapper = mapper;
         }
 
-        public TableBuilderObservation BuildResult(Observation observation, ICollection<string> indicators)
+        public TableBuilderObservation BuildResult(Observation observation, ICollection<long> indicators)
         {
             return new TableBuilderObservation
             {
@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
                 Measures = indicators.Count > 0
                     ? QueryUtil.FilterMeasures(observation.Measures, indicators)
                     : observation.Measures,
-                TimePeriod = observation.TimePeriod,
+                TimeIdentifier = observation.TimeIdentifier,
                 Year = observation.Year
             };
         }

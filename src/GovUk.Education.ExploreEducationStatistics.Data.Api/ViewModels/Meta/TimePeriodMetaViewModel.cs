@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
     public class TimePeriodMetaViewModel
     {
         [JsonConverter(typeof(StringEnumConverter))]
-        public TimePeriod Code { get; set; }
+        public TimeIdentifier Code { get; set; }
 
         public string Label { get; set; }
         public int Year { get; set; }
