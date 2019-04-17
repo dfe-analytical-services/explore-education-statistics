@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'react-testing-library';
-import FormTextSearchInput from '../FormTextInput';
+import FormTextSearchInput from '../FormTextSearchInput';
 
 describe('FormTextSearchInput', () => {
   test('renders correctly with required props', () => {
@@ -112,5 +112,20 @@ describe('FormTextSearchInput', () => {
 
     expect(container.querySelector('.govuk-input--width-20')).not.toBeNull();
     expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('setting `labelHidden` visually hides the label', () => {
+    const { getByText } = render(
+      <FormTextSearchInput
+        id="test-input"
+        label="Test input"
+        labelHidden
+        name="testInput"
+        hint="Fill me in"
+        width={20}
+      />,
+    );
+
+    expect(getByText('Test input')).toHaveClass('govuk-visually-hidden');
   });
 });

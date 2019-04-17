@@ -1,26 +1,48 @@
 import { FormTextInputProps } from '@common/components/form/FormTextInput';
 import classNames from 'classnames';
-import React from 'react';
+import debounce from 'lodash/debounce';
+import React, { ChangeEvent } from 'react';
 import ErrorMessage from '../ErrorMessage';
 import styles from './FormTextSearchInput.module.scss';
 import createDescribedBy from './util/createDescribedBy';
 
-type Props = FormTextInputProps;
+interface Props extends FormTextInputProps {
+  debounce?: number;
+  labelHidden?: boolean;
+}
 
 const FormTextSearchInput = ({
+  debounce: debounceTime = 200,
   error,
   hint,
   id,
   label,
+  labelHidden,
   name,
   onChange,
   width,
 }: Props) => {
+  const handleChange = debounce((event: ChangeEvent<HTMLInputElement>) => {
+    if (onChange) {
+      onChange(event);
+    }
+  }, debounceTime);
+
   return (
     <>
-      <label className="govuk-label govuk-visually-hidden" htmlFor={id}>
+      <label
+        className={classNames('govuk-label', {
+          'govuk-visually-hidden': labelHidden,
+        })}
+        htmlFor={id}
+      >
         {label}
       </label>
+      {hint && (
+        <span id={`${id}-hint`} className="govuk-hint">
+          {hint}
+        </span>
+      )}
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
       <input
         aria-describedby={createDescribedBy({
@@ -34,7 +56,10 @@ const FormTextSearchInput = ({
         })}
         id={id}
         name={name}
-        onChange={onChange}
+        onChange={event => {
+          event.persist();
+          handleChange(event);
+        }}
       />
     </>
   );
