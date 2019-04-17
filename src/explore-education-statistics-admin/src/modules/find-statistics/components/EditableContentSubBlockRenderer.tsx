@@ -1,8 +1,8 @@
+import { PrototypeEditableContent } from '@admin/pages/prototypes/components/PrototypeEditableContent';
 import { ContentBlock } from '@common/services/publicationService';
 import marked from 'marked';
 import React, { Component } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
-import { PrototypeEditableContent } from 'src/pages/prototypes/components/PrototypeEditableContent';
 import { DataBlock } from './DataBlock';
 
 interface Props {

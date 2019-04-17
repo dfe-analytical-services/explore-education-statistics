@@ -1,12 +1,12 @@
 import { FormGroup } from '@common/components/form';
 import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
+import MenuDetails from '@frontend/modules/table-tool/components/MenuDetails';
+import { GroupedFilterOptions } from '@frontend/prototypes/table-tool/components/meta/initialSpec';
+import SearchTextInput from '@frontend/prototypes/table-tool/components/SearchTextInput';
 import classNames from 'classnames';
 import camelCase from 'lodash/camelCase';
 import sortBy from 'lodash/sortBy';
 import React, { PureComponent } from 'react';
-import MenuDetails from 'src/modules/table-tool/components/MenuDetails';
-import { GroupedFilterOptions } from 'src/prototypes/table-tool/components/meta/initialSpec';
-import SearchTextInput from 'src/prototypes/table-tool/components/SearchTextInput';
 import styles from './SearchableGroupedFilterMenus.module.scss';
 
 interface Props<FormValues> {

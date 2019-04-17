@@ -4,12 +4,12 @@ import {
   FormFieldset,
 } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
-import { FormikState } from 'formik';
-import React from 'react';
 import {
   LocationLevel,
   MetaSpecification,
-} from 'src/prototypes/table-tool/components/meta/initialSpec';
+} from '@frontend/prototypes/table-tool/components/meta/initialSpec';
+import { FormikState } from 'formik';
+import React from 'react';
 import { FormValues } from './FiltersForm';
 
 interface Props {

@@ -1,3 +1,4 @@
+import { logPageView } from '@frontend/services/googleAnalyticsService';
 import 'core-js/fn/array/virtual/flat-map';
 import 'core-js/fn/array/virtual/includes';
 import 'cross-fetch/polyfill';
@@ -6,7 +7,6 @@ import { Container, default as BaseApp, NextAppContext } from 'next/app';
 import Router from 'next/router';
 import React from 'react';
 import Helmet from 'react-helmet';
-import { logPageView } from 'src/services/googleAnalyticsService';
 import './_app.scss';
 
 class App extends BaseApp {
@@ -29,7 +29,7 @@ class App extends BaseApp {
 
     document.body.classList.add('js-enabled');
 
-    import('src/polyfill');
+    import('@frontend/polyfill');
   }
 
   public render() {

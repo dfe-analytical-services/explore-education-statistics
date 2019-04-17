@@ -1,14 +1,14 @@
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import TimePeriod from '@common/services/types/TimePeriod';
-import { Form, Formik } from 'formik';
-import React, { Component } from 'react';
-import FormFieldSortableList from 'src/prototypes/table-tool/components/FormFieldSortableList';
-import { SortableOption } from 'src/prototypes/table-tool/components/FormSortableList';
+import FormFieldSortableList from '@frontend/prototypes/table-tool/components/FormFieldSortableList';
+import { SortableOption } from '@frontend/prototypes/table-tool/components/FormSortableList';
 import {
   FilterOption,
   IndicatorOption,
-} from 'src/prototypes/table-tool/components/meta/initialSpec';
+} from '@frontend/prototypes/table-tool/components/meta/initialSpec';
+import { Form, Formik } from 'formik';
+import React, { Component } from 'react';
 
 interface Props {
   filters: {

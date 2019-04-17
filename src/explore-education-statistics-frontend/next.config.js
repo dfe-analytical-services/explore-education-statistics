@@ -148,13 +148,13 @@ const config = {
 
     config.resolve.alias = {
       ...config.resolve.alias,
-      src: path.resolve(__dirname, 'src'),
-      react: path.resolve(__dirname, 'node_modules/react'),
-      formik: path.resolve(__dirname, 'node_modules/formik'),
+      '@frontend': path.resolve(__dirname, 'src'),
       '@common': path.resolve(
         __dirname,
         '../explore-education-statistics-common/src',
       ),
+      react: path.resolve(__dirname, 'node_modules/react'),
+      formik: path.resolve(__dirname, 'node_modules/formik'),
     };
 
     config.module.rules

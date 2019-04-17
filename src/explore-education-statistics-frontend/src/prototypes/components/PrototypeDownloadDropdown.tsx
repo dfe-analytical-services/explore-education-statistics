@@ -1,5 +1,5 @@
+import Link from '@frontend/components/Link';
 import React from 'react';
-import Link from 'src/components/Link';
 
 interface Props {
   viewType?: string;

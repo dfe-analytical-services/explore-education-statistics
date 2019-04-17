@@ -1,8 +1,8 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import Link from '@frontend/components/Link';
+import PrototypePage from '@frontend/prototypes/components/PrototypePage';
 import React from 'react';
-import Link from 'src/components/Link';
-import PrototypePage from 'src/prototypes/components/PrototypePage';
 
 const BrowseReleasesPage = () => {
   return (

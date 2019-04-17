@@ -6,10 +6,10 @@ import tableBuilderService, {
   PublicationMeta,
 } from '@common/services/tableBuilderService';
 import SchoolType from '@common/services/types/SchoolType';
+import Page from '@frontend/components/Page';
+import PageTitle from '@frontend/components/PageTitle';
 import range from 'lodash/range';
 import React, { Component, createRef } from 'react';
-import Page from 'src/components/Page';
-import PageTitle from 'src/components/PageTitle';
 import CharacteristicsFilterForm, {
   CharacteristicsFilterFormSubmitHandler,
 } from './components/CharacteristicsFilterForm';

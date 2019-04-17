@@ -3,25 +3,25 @@ import tableBuilderService, {
   DataTableResult,
 } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
-import mapValues from 'lodash/mapValues';
-import React, { Component, createRef } from 'react';
-import PageTitle from 'src/components/PageTitle';
+import PageTitle from '@frontend/components/PageTitle';
 import PublicationMenu, {
   MenuChangeEventHandler,
-} from 'src/modules/table-tool/components/PublicationMenu';
-import PublicationSubjectMenu from 'src/modules/table-tool/components/PublicationSubjectMenu';
-import PrototypePage from 'src/prototypes/components/PrototypePage';
+} from '@frontend/modules/table-tool/components/PublicationMenu';
+import PublicationSubjectMenu from '@frontend/modules/table-tool/components/PublicationSubjectMenu';
+import PrototypePage from '@frontend/prototypes/components/PrototypePage';
 import FiltersForm, {
   FilterFormSubmitHandler,
-} from 'src/prototypes/table-tool/components/FiltersForm';
+} from '@frontend/prototypes/table-tool/components/FiltersForm';
 import initialMetaSpecification, {
   FilterOption,
   IndicatorOption,
   MetaSpecification,
-} from 'src/prototypes/table-tool/components/meta/initialSpec';
-import publicationSubjectSpec from 'src/prototypes/table-tool/components/meta/publicationSubjectSpec';
-import TimePeriodDataTable from 'src/prototypes/table-tool/components/TimePeriodDataTable';
-import mapOptionValues from 'src/prototypes/table-tool/components/utils/mapOptionValues';
+} from '@frontend/prototypes/table-tool/components/meta/initialSpec';
+import publicationSubjectSpec from '@frontend/prototypes/table-tool/components/meta/publicationSubjectSpec';
+import TimePeriodDataTable from '@frontend/prototypes/table-tool/components/TimePeriodDataTable';
+import mapOptionValues from '@frontend/prototypes/table-tool/components/utils/mapOptionValues';
+import mapValues from 'lodash/mapValues';
+import React, { Component, createRef } from 'react';
 
 const defaultPublicationOptions = [
   {

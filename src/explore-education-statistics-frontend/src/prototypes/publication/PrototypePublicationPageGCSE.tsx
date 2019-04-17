@@ -1,12 +1,11 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
-import React from 'react';
-import Link from 'src/components/Link';
-import { DataBlock } from 'src/modules/find-statistics/components/DataBlock';
-import PrototypePage from 'src/prototypes/components/PrototypePage';
-import PrototypeSearchForm from 'src/prototypes/components/PrototypeSearchForm';
-import PrototypeDataSampleGCSE from 'src/prototypes/publication/components/PrototypeDataSampleGCSE';
+import Link from '@frontend/components/Link';
+import { DataBlock } from '@frontend/modules/find-statistics/components/DataBlock';
+import PrototypePage from '@frontend/prototypes/components/PrototypePage';
+import PrototypeSearchForm from '@frontend/prototypes/components/PrototypeSearchForm';
+import PrototypeDataSampleGCSE from '@frontend/prototypes/publication/components/PrototypeDataSampleGCSE';
 import {
   ks4AverageAttainment8ScorePerPupilByLocalAuthority,
   ks4AverageHeadlineScoresByPupilEthnicity,
@@ -17,7 +16,8 @@ import {
   ks4SchoolRevisedAttainmentChart,
   ks4StateFundedSchoolsPerformance,
   ks4TrendInDisavdantagePuilsAttainmentGapIndex,
-} from 'src/prototypes/publication/data/PrototypeDataFactory';
+} from '@frontend/prototypes/publication/data/PrototypeDataFactory';
+import React from 'react';
 
 import styles from './prototype.module.scss';
 

@@ -1,5 +1,6 @@
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
 import {
   SummaryRenderer,
   SummaryRendererProps,
@@ -11,12 +12,11 @@ import {
 import { baseUrl } from '@common/services/api';
 import { Chart, DataQuery, Summary } from '@common/services/publicationService';
 import {
-  PublicationMeta,
   CharacteristicsData,
+  PublicationMeta,
 } from '@common/services/tableBuilderService';
 import React, { Component } from 'react';
 import { ChartRenderer, ChartRendererProps } from './ChartRenderer';
-import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
 
 export interface DataBlockProps {
   type: string;

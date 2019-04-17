@@ -1,6 +1,6 @@
+import PageFooter from '@admin/components/PageFooter';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
-import PageFooter from 'src/components/PageFooter';
 import PrototypeBreadcrumbs, { Breadcrumb } from './PrototypeBreadcrumbs';
 import PrototypePageBanner from './PrototypePageBanner';
 import PrototypePageHeader from './PrototypePageHeader';

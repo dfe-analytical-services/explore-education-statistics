@@ -1,3 +1,3 @@
-import Page from 'src/prototypes/table-tool/PrototypeTableToolPage';
+import Page from '@frontend/prototypes/table-tool/PrototypeTableToolPage';
 
 export default Page;

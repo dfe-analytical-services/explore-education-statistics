@@ -1,11 +1,11 @@
+import Link from '@admin/components/Link';
+import PrototypeAbsenceData from '@admin/pages/prototypes/publication/components/PrototypeAbsenceData';
+import PrototypeDataSample from '@admin/pages/prototypes/publication/components/PrototypeDataSample';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import PrototypeMap from '@common/prototypes/publication/components/PrototypeMap';
 import React from 'react';
-import Link from 'src/components/Link';
-import PrototypeAbsenceData from 'src/pages/prototypes/publication/components/PrototypeAbsenceData';
-import PrototypeDataSample from 'src/pages/prototypes/publication/components/PrototypeDataSample';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import { PrototypeEditableContent } from './components/PrototypeEditableContent';
 import PrototypePage from './components/PrototypePage';

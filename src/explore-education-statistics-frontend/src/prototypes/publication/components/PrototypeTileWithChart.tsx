@@ -1,7 +1,7 @@
 import Details from '@common/components/Details';
+import Link from '@frontend/components/Link';
 import React from 'react';
 import { Area, AreaChart } from 'recharts';
-import Link from 'src/components/Link';
 
 const chartData = [
   { name: '2012/13', overall: Math.random() * 2 + 4 },

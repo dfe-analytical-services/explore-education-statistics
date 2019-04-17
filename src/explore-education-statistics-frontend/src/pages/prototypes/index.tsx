@@ -1,5 +1,5 @@
+import Link from '@frontend/components/Link';
 import React, { Component } from 'react';
-import Link from 'src/components/Link';
 import PrototypePage from '../../prototypes/components/PrototypePage';
 
 class PrototypesIndexPage extends Component {
