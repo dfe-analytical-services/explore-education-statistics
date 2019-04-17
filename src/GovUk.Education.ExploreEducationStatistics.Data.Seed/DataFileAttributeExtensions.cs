@@ -1,16 +1,14 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using GovUk.Education.ExploreEducationStatistics.Data.Seed.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
 {
     public static class DataFileAttributeExtensions
     {
-        public static DataCsvMetaFilename GetMetaFilenameFromDataFileAttributeOfEnumType(this Enum enumValue,
-            Type enumType)
+        public static DataCsvMetaFilename GetMetaFilename(this Enum enumValue)
         {
-            return enumType.GetMember(enumValue.ToString())
+            return typeof(DataCsvFilename).GetMember(enumValue.ToString())
                 .First()
                 .GetCustomAttribute<DataFileAttribute>().MetaFilename;
         }

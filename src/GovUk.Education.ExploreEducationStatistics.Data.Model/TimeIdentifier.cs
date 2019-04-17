@@ -6,6 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         CY,
         EOM,
         FY,
+        HT5,
+        HT6,
         M1,
         M2,
         M3,

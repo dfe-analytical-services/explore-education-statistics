@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Models
 
         public DataCsvMetaFilename GetMetaFilename()
         {
-            return Filename.GetMetaFilenameFromDataFileAttributeOfEnumType(typeof(DataCsvMetaFilename));
+            return Filename.GetMetaFilename();
         }
     }
 }

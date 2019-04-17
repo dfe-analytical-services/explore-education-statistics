@@ -24,6 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 {"Calendar year", TimeIdentifier.CY},
                 {"Up until 31st March", TimeIdentifier.EOM},
                 {"Financial year", TimeIdentifier.FY},
+                {"five half terms", TimeIdentifier.HT5},
+                {"six half terms", TimeIdentifier.HT6},
                 {"January", TimeIdentifier.M1},
                 {"February", TimeIdentifier.M2},
                 {"March", TimeIdentifier.M3},
@@ -120,11 +122,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         private static TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)
         {
-            if (_timeIdentifiers.TryGetValue(CsvUtil.Value(line, headers, "time_identifier"), out var timeIdentifier))
+            var timeIdentifier = CsvUtil.Value(line, headers, "time_identifier");
+            if (_timeIdentifiers.TryGetValue(timeIdentifier, out var code))
             {
-                return timeIdentifier;
+                return code;
             }
-
             throw new ArgumentException("Unexpected value: " + timeIdentifier);
         }
 
@@ -147,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 GetLocalAuthorityDistrict(line, headers));
         }
 
-        private School GetSchool(IReadOnlyList<string> line, List<string> headers)
+        private static School GetSchool(IReadOnlyList<string> line, List<string> headers)
         {
             var columns = new[] {"estab", "laestab", "academy_open_date", "academy_type", "urn"};
             var school = CsvUtil.BuildType(line, headers, columns, values => new School
