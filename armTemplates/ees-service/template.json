@@ -93,7 +93,7 @@
 
     "notificationsAppName": "[concat(parameters('environment'), '-fa-ees-notify')]",
     "notificationsPlanName": "[concat(parameters('environment'), '-asp-ees-notify')]",
-    "notificationsAppInsights": "[concat(variables('notificationsAppName'), '-ai-ees-notify')]",
+    "notificationsAppInsights": "[concat(parameters('environment'), '-ai-ees-notify')]",
 
     "notificationsstorageAccountName": "[concat(parameters('environment'), 'storageeesnotify')]",
     "notificationsstorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]"
