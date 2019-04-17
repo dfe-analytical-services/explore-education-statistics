@@ -4,12 +4,17 @@
   "parameters": {
 
     "environment": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "descritpion": "Data Hub Environment Name e.g. s101d01. Used as a prefix for created resources"
+      }
     },
 
     "appInsightsLocation": {
-      "type": "string"
+      "type": "string", 
+      "defaultValue": "West Europe"
     },
+
     "sku": {
       "type": "string",
       "defaultValue": "Standard S1"
@@ -32,20 +37,32 @@
       "type": "string"
     },
     "publicAppBasicAuthPassword": {
-      "type": "securestring"
+      "type": "securestring",
+      "metadata": {
+        "descritpion": "Password protecting the public app, no requirement to be seceret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
+      }
     },
    
     "verificationEmailTemplateId": {
       "type": "securestring",
-      "defaultValue": ""
+      "defaultValue": "",
+      "metadata": {
+        "description": "Gov UK Notify service template Id for verifing subscription"
+      }
     },
     "publicationNotificationEmailTemplateId": {
       "type": "securestring",
-      "defaultValue": ""
+      "defaultValue": "",
+      "metadata": {
+        "description": "Gov UK Notify service template Id for new release notification"
+      }
     },
     "notifyApiKey": {
       "type": "securestring",
-      "defaultValue": ""
+      "defaultValue": "",
+      "metadata": {
+        "description": "Gov UK Notify service API key"
+      }
     },
     "notifyTokenSecretKey": {
       "type": "securestring",
