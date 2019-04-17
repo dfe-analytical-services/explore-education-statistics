@@ -1,16 +1,16 @@
 import { DataTableResult } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
-import isEqual from 'lodash/isEqual';
-import React, { useState } from 'react';
 import FixedHeaderGroupedDataTable, {
   HeaderGroup,
   RowGroup,
-} from 'src/prototypes/table-tool/components/FixedHeaderGroupedDataTable';
+} from '@frontend/prototypes/table-tool/components/FixedHeaderGroupedDataTable';
 import {
   FilterOption,
   IndicatorOption,
-} from 'src/prototypes/table-tool/components/meta/initialSpec';
-import TableHeadersForm from 'src/prototypes/table-tool/components/TableHeadersForm';
+} from '@frontend/prototypes/table-tool/components/meta/initialSpec';
+import TableHeadersForm from '@frontend/prototypes/table-tool/components/TableHeadersForm';
+import isEqual from 'lodash/isEqual';
+import React, { useState } from 'react';
 
 interface Props {
   filters: {

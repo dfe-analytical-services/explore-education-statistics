@@ -1,3 +1,3 @@
-import Page from 'src/prototypes/PrototypeBrowseReleases';
+import Page from '@frontend/prototypes/PrototypeBrowseReleases';
 
 export default Page;

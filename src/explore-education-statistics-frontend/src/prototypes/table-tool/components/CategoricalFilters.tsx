@@ -1,10 +1,10 @@
 import { FormFieldCheckboxGroup, FormFieldset } from '@common/components/form';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
+import { FormValues } from '@frontend/prototypes/table-tool/components/FiltersForm';
+import { MetaSpecification } from '@frontend/prototypes/table-tool/components/meta/initialSpec';
+import SearchableGroupedFilterMenus from '@frontend/prototypes/table-tool/components/SearchableGroupedFilterMenus';
 import { FormikState } from 'formik';
 import React from 'react';
-import { FormValues } from 'src/prototypes/table-tool/components/FiltersForm';
-import { MetaSpecification } from 'src/prototypes/table-tool/components/meta/initialSpec';
-import SearchableGroupedFilterMenus from 'src/prototypes/table-tool/components/SearchableGroupedFilterMenus';
 import styles from './CategoricalFilters.module.scss';
 
 interface Props {

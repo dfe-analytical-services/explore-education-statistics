@@ -145,10 +145,9 @@
     ],
     "moduleNameMapper": {
       "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
+      "^@admin/(.*)$": "<rootDir>/src/$1",
       "^@common/(.*)$": "<rootDir>/../explore-education-statistics-common/src/$1",
       "^@common-test/(.*)$": "<rootDir>/../explore-education-statistics-common/test/$1",
-      "^src/(.*)$": "<rootDir>/src/$1",
-      "^test/(.*)$": "<rootDir>/test/$1",
       "^react$": "<rootDir>/node_modules/react",
       "^formik$": "<rootDir>/node_modules/formik"
     },

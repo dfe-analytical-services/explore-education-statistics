@@ -7,12 +7,12 @@ import { baseUrl } from '@common/services/api';
 import publicationService, {
   Release,
 } from '@common/services/publicationService';
+import Link from '@frontend/components/Link';
+import Page from '@frontend/components/Page';
+import PageTitle from '@frontend/components/PageTitle';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
-import Link from 'src/components/Link';
-import Page from 'src/components/Page';
-import PageTitle from 'src/components/PageTitle';
 import ContentBlock from './components/ContentBlock';
 import { DataBlock } from './components/DataBlock';
 

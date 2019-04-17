@@ -6,7 +6,7 @@ import {
   PublicationMeta,
 } from '@common/services/tableBuilderService';
 import SchoolType from '@common/services/types/SchoolType';
-import { DataBlockProps } from 'src/modules/find-statistics/components/DataBlock';
+import { DataBlockProps } from '@frontend/modules/find-statistics/components/DataBlock';
 
 function createDataValues(
   indicators: string[],

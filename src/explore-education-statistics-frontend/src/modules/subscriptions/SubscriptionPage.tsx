@@ -1,11 +1,11 @@
 import publicationService, {
   Release,
 } from '@common/services/publicationService';
+import Page from '@frontend/components/Page';
+import PageTitle from '@frontend/components/PageTitle';
+import functionsService from '@frontend/services/functionsService';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
-import Page from 'src/components/Page';
-import PageTitle from 'src/components/PageTitle';
-import functionsService from 'src/services/functionsService';
 import SubscriptionForm, {
   SubscriptionFormSubmitHandler,
 } from './components/SubscriptionForm';

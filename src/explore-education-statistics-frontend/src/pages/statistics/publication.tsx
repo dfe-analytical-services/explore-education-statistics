@@ -1,3 +1,3 @@
-import PublicationReleasePage from 'src/modules/find-statistics/PublicationReleasePage';
+import PublicationReleasePage from '@frontend/modules/find-statistics/PublicationReleasePage';
 
 export default PublicationReleasePage;

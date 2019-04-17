@@ -1,3 +1,4 @@
+import PrototypeDataSample from '@admin/pages/prototypes/publication/components/PrototypeDataSample';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
@@ -12,7 +13,6 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
-import PrototypeDataSample from 'src/pages/prototypes/publication/components/PrototypeDataSample';
 import EditableAccordion from '../../components/EditableAccordion';
 import EditableAccordionSection from '../../components/EditableAccordionSection';
 import Link from '../../components/Link';

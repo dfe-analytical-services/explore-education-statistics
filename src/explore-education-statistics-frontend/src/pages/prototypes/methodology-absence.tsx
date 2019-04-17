@@ -1,3 +1,3 @@
-import Page from 'src/prototypes/methodology/PrototypeMethodologyPageAbsence';
+import Page from '@frontend/prototypes/methodology/PrototypeMethodologyPageAbsence';
 
 export default Page;

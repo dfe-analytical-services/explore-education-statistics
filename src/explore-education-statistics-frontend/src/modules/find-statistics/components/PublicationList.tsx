@@ -1,5 +1,5 @@
+import Link from '@frontend/components/Link';
 import React, { Component } from 'react';
-import Link from 'src/components/Link';
 
 export interface Publication {
   id: string;

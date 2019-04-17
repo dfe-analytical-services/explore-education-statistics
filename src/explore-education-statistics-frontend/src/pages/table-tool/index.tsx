@@ -1,3 +1,3 @@
-import Page from 'src/modules/table-tool/TableToolPage';
+import Page from '@frontend/modules/table-tool/TableToolPage';
 
 export default Page;

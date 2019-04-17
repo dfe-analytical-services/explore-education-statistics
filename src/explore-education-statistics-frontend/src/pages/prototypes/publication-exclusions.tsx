@@ -1,3 +1,3 @@
-import Page from 'src/prototypes/publication/PrototypePublicationPageExclusions';
+import Page from '@frontend/prototypes/publication/PrototypePublicationPageExclusions';
 
 export default Page;
