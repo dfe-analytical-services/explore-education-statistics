@@ -229,4 +229,34 @@ describe('FormCheckboxGroup', () => {
     expect(getByText('Conditional 3').parentElement).toHaveClass(hiddenClass);
     expect(container.innerHTML).toMatchSnapshot();
   });
+
+  test('generates option IDs from id and value if none specified', () => {
+    const { container, getByLabelText } = render(
+      <FormCheckboxGroup
+        id="test-checkboxes"
+        name="test-checkboxes"
+        legend="Test checkboxes"
+        options={[
+          { label: 'Test checkbox 1', value: 'opt1' },
+          { label: 'Test checkbox 2', value: 'opt-2' },
+          { label: 'Test checkbox 3', value: 'opt.3' },
+        ]}
+      />,
+    );
+
+    expect(getByLabelText('Test checkbox 1')).toHaveAttribute(
+      'id',
+      'test-checkboxes-opt-1',
+    );
+    expect(getByLabelText('Test checkbox 2')).toHaveAttribute(
+      'id',
+      'test-checkboxes-opt-2',
+    );
+    expect(getByLabelText('Test checkbox 3')).toHaveAttribute(
+      'id',
+      'test-checkboxes-opt-3',
+    );
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
 });

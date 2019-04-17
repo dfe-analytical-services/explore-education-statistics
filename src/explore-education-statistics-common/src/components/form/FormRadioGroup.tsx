@@ -1,5 +1,6 @@
-import { Omit } from '@common/types/util';
+import { Omit, PartialBy } from '@common/types/util';
 import classNames from 'classnames';
+import kebabCase from 'lodash/kebabCase';
 import React, { Component, createRef } from 'react';
 import FormFieldset, { FieldSetProps } from './FormFieldset';
 import FormRadio, {
@@ -7,7 +8,10 @@ import FormRadio, {
   RadioChangeEventHandler,
 } from './FormRadio';
 
-type RadioOption = Omit<FormRadioProps, 'checked' | 'name' | 'onChange'>;
+type RadioOption = PartialBy<
+  Omit<FormRadioProps, 'checked' | 'name' | 'onChange'>,
+  'id'
+>;
 
 export type FormRadioGroupProps = {
   inline?: boolean;
@@ -37,7 +41,7 @@ class FormRadioGroup extends Component<FormRadioGroupProps> {
   }
 
   public render() {
-    const { inline, name, onChange, options, value } = this.props;
+    const { id, inline, name, onChange, options, value } = this.props;
 
     return (
       <FormFieldset {...this.props}>
@@ -50,8 +54,9 @@ class FormRadioGroup extends Component<FormRadioGroupProps> {
           {options.map(option => (
             <FormRadio
               {...option}
+              id={option.id ? option.id : `${id}-${kebabCase(option.value)}`}
               checked={value === option.value}
-              key={option.id}
+              key={option.value}
               name={name}
               onChange={event => {
                 if (onChange) {

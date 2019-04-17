@@ -1,5 +1,60 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`FormCheckboxGroup generates option IDs from id and value if none specified 1`] = `
+
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset"
+            id="test-checkboxes"
+  >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+      Test checkboxes
+    </legend>
+    <div class="govuk-checkboxes">
+      <div class="govuk-checkboxes__item">
+        <input class="govuk-checkboxes__input"
+               id="test-checkboxes-opt-1"
+               name="test-checkboxes"
+               type="checkbox"
+               value="opt1"
+        >
+        <label class="govuk-label govuk-checkboxes__label"
+               for="test-checkboxes-opt-1"
+        >
+          Test checkbox 1
+        </label>
+      </div>
+      <div class="govuk-checkboxes__item">
+        <input class="govuk-checkboxes__input"
+               id="test-checkboxes-opt-2"
+               name="test-checkboxes"
+               type="checkbox"
+               value="opt-2"
+        >
+        <label class="govuk-label govuk-checkboxes__label"
+               for="test-checkboxes-opt-2"
+        >
+          Test checkbox 2
+        </label>
+      </div>
+      <div class="govuk-checkboxes__item">
+        <input class="govuk-checkboxes__input"
+               id="test-checkboxes-opt-3"
+               name="test-checkboxes"
+               type="checkbox"
+               value="opt.3"
+        >
+        <label class="govuk-label govuk-checkboxes__label"
+               for="test-checkboxes-opt-3"
+        >
+          Test checkbox 3
+        </label>
+      </div>
+    </div>
+  </fieldset>
+</div>
+
+`;
+
 exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
 
 <div class="govuk-form-group">

@@ -1,5 +1,63 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`FormRadioGroup generates option IDs from id and value if none specified 1`] = `
+
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset"
+            id="test-radios"
+  >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+      Test radios
+    </legend>
+    <div class="govuk-radios">
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input"
+               id="test-radios-opt-1"
+               name="test-radios"
+               type="radio"
+               data-testid="Test radio 1"
+               value="opt1"
+        >
+        <label class="govuk-label govuk-radios__label"
+               for="test-radios-opt-1"
+        >
+          Test radio 1
+        </label>
+      </div>
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input"
+               id="test-radios-opt-2"
+               name="test-radios"
+               type="radio"
+               data-testid="Test radio 2"
+               value="opt-2"
+        >
+        <label class="govuk-label govuk-radios__label"
+               for="test-radios-opt-2"
+        >
+          Test radio 2
+        </label>
+      </div>
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input"
+               id="test-radios-opt-3"
+               name="test-radios"
+               type="radio"
+               data-testid="Test radio 3"
+               value="opt.3"
+        >
+        <label class="govuk-label govuk-radios__label"
+               for="test-radios-opt-3"
+        >
+          Test radio 3
+        </label>
+      </div>
+    </div>
+  </fieldset>
+</div>
+
+`;
+
 exports[`FormRadioGroup renders correctly with legend 1`] = `
 
 <div class="govuk-form-group">

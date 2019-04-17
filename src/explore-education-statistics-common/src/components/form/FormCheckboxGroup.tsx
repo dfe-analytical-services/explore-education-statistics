@@ -1,5 +1,6 @@
-import { Omit } from '@common/types/util';
+import { Omit, PartialBy } from '@common/types/util';
 import classNames from 'classnames';
+import kebabCase from 'lodash/kebabCase';
 import React, { Component, createRef } from 'react';
 import FormCheckbox, {
   CheckboxChangeEventHandler,
@@ -7,9 +8,9 @@ import FormCheckbox, {
 } from './FormCheckbox';
 import FormFieldset, { FieldSetProps } from './FormFieldset';
 
-export type CheckboxOption = Omit<
-  FormCheckboxProps,
-  'name' | 'checked' | 'onChange'
+export type CheckboxOption = PartialBy<
+  Omit<FormCheckboxProps, 'name' | 'checked' | 'onChange'>,
+  'id'
 >;
 
 export type FormCheckboxGroupProps = {
@@ -91,8 +92,9 @@ class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
           {options.map(option => (
             <FormCheckbox
               {...option}
+              id={option.id ? option.id : `${id}-${kebabCase(option.value)}`}
               name={name}
-              key={option.id}
+              key={option.value}
               checked={value.indexOf(option.value) > -1}
               onChange={event => {
                 if (onChange) {

@@ -172,4 +172,34 @@ describe('FormRadioGroup', () => {
     expect(getByText('Conditional 3').parentElement).toHaveClass(hiddenClass);
     expect(container.innerHTML).toMatchSnapshot();
   });
+
+  test('generates option IDs from id and value if none specified', () => {
+    const { container, getByLabelText } = render(
+      <FormRadioGroup
+        id="test-radios"
+        name="test-radios"
+        legend="Test radios"
+        options={[
+          { label: 'Test radio 1', value: 'opt1' },
+          { label: 'Test radio 2', value: 'opt-2' },
+          { label: 'Test radio 3', value: 'opt.3' },
+        ]}
+      />,
+    );
+
+    expect(getByLabelText('Test radio 1')).toHaveAttribute(
+      'id',
+      'test-radios-opt-1',
+    );
+    expect(getByLabelText('Test radio 2')).toHaveAttribute(
+      'id',
+      'test-radios-opt-2',
+    );
+    expect(getByLabelText('Test radio 3')).toHaveAttribute(
+      'id',
+      'test-radios-opt-3',
+    );
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
 });
