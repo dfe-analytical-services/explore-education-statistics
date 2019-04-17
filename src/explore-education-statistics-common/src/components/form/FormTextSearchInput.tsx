@@ -12,7 +12,7 @@ interface Props extends FormTextInputProps {
 }
 
 const FormTextSearchInput = ({
-  debounce: debounceTime = 200,
+  debounce: debounceTime = 300,
   error,
   hint,
   id,
