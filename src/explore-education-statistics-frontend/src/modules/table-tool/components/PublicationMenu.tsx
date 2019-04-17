@@ -33,6 +33,8 @@ const PublicationMenu = ({ options, onChange, value }: Props) => {
             <MenuDetails summary={topic.name} key={topic.id}>
               <FormRadioGroup
                 value={value}
+                legend="Choose publication"
+                legendHidden
                 name="publicationId"
                 id={topic.id}
                 onChange={event => {

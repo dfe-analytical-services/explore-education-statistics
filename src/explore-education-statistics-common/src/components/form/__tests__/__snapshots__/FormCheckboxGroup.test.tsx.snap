@@ -6,6 +6,9 @@ exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
   >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+      Test checkboxes
+    </legend>
     <div class="govuk-checkboxes">
       <div class="govuk-checkboxes__item">
         <input class="govuk-checkboxes__input"
@@ -117,6 +120,11 @@ exports[`FormCheckboxGroup renders correctly with small size variants 1`] = `
       class="govuk-fieldset"
       id="test-checkboxes"
     >
+      <legend
+        class="govuk-fieldset__legend govuk-fieldset__legend--m"
+      >
+        Test checkboxes
+      </legend>
       <div
         class="govuk-checkboxes govuk-checkboxes--small"
       >
@@ -183,6 +191,9 @@ exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
   >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+      Test checkboxes
+    </legend>
     <div class="govuk-checkboxes">
       <div class="govuk-checkboxes__item">
         <input class="govuk-checkboxes__input"
@@ -235,6 +246,9 @@ exports[`FormCheckboxGroup renders option with conditional contents 1`] = `
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
   >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+      Test checkboxes
+    </legend>
     <div class="govuk-checkboxes">
       <div class="govuk-checkboxes__item">
         <input class="govuk-checkboxes__input"
@@ -303,6 +317,9 @@ exports[`FormCheckboxGroup renders unchecked \`Select all\` option when \`select
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
   >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+      Test checkboxes
+    </legend>
     <div class="govuk-checkboxes">
       <div class="govuk-checkboxes__item">
         <input class="govuk-checkboxes__input"

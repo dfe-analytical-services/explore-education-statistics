@@ -11,6 +11,7 @@ describe('FormRadioGroup', () => {
         value={null}
         id="test-radios"
         name="test-radios"
+        legend="Test radios"
         options={[
           { id: 'radio-1', label: 'Test radio 1', value: '1' },
           { id: 'radio-2', label: 'Test radio 2', value: '2' },
@@ -49,6 +50,7 @@ describe('FormRadioGroup', () => {
             onChange={this.handleChange}
             id="test-radios"
             name="test-radios"
+            legend="Test radios"
             options={[{ id: 'radio-1', label: 'Test radio', value: '1' }]}
           />
         );
@@ -86,6 +88,7 @@ describe('FormRadioGroup', () => {
             onChange={this.handleChange}
             id="test-radios"
             name="test-radios"
+            legend="Test radios"
             options={[
               { id: 'radio-1', label: 'Test radio 1', value: '1' },
               { id: 'radio-2', label: 'Test radio 2', value: '2' },
@@ -136,6 +139,7 @@ describe('FormRadioGroup', () => {
         value="2"
         id="test-radios"
         name="test-radios"
+        legend="Test radios"
         options={[
           {
             id: 'radio-1',

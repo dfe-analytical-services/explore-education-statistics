@@ -88,6 +88,8 @@ class SearchableFilterMenus<
             }}
           >
             <FormFieldCheckboxGroup
+              legend="Choose option"
+              legendHidden
               name={name as string}
               options={options}
               id={compositeKey}

@@ -20,6 +20,7 @@ describe('FormFieldCheckboxGroup', () => {
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
+            legend="Test checkboxes"
             options={[
               { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
               { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
@@ -52,6 +53,7 @@ describe('FormFieldCheckboxGroup', () => {
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
+            legend="Test checkboxes"
             options={[
               { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
               { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
@@ -84,6 +86,7 @@ describe('FormFieldCheckboxGroup', () => {
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
+            legend="Test checkboxes"
             options={[
               { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
               { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
@@ -119,6 +122,7 @@ describe('FormFieldCheckboxGroup', () => {
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
+            legend="Test checkboxes"
             selectAll
             options={[
               { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
@@ -156,6 +160,7 @@ describe('FormFieldCheckboxGroup', () => {
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
+            legend="Test checkboxes"
             selectAll
             options={[
               { id: 'checkbox-1', label: 'Checkbox 1', value: '1' },
@@ -198,6 +203,7 @@ describe('FormFieldCheckboxGroup', () => {
           <FormFieldCheckboxGroup<FormValues>
             name="test"
             id="checkboxes"
+            legend="Test checkboxes"
             selectAll
             options={[
               { id: 'checkbox-1', label: 'Checkbox 1', value: '1' },
@@ -238,6 +244,7 @@ describe('FormFieldCheckboxGroup', () => {
             <FormFieldCheckboxGroup<FormValues>
               name="test"
               id="checkboxes"
+              legend="Test checkboxes"
               options={[
                 { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
                 { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
@@ -265,6 +272,7 @@ describe('FormFieldCheckboxGroup', () => {
             <FormFieldCheckboxGroup<FormValues>
               name="test"
               id="checkboxes"
+              legend="Test checkboxes"
               options={[
                 { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
                 { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
@@ -299,6 +307,7 @@ describe('FormFieldCheckboxGroup', () => {
             <FormFieldCheckboxGroup<FormValues>
               name="test"
               id="checkboxes"
+              legend="Test checkboxes"
               error="Invalid checkbox selection"
               options={[
                 { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
@@ -327,6 +336,7 @@ describe('FormFieldCheckboxGroup', () => {
             <FormFieldCheckboxGroup<FormValues>
               name="test"
               id="checkboxes"
+              legend="Test checkboxes"
               showError={false}
               options={[
                 { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },

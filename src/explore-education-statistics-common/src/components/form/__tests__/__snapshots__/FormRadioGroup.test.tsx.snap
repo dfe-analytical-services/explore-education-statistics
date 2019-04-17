@@ -64,6 +64,9 @@ exports[`FormRadioGroup renders list of radios in correct order 1`] = `
   <fieldset class="govuk-fieldset"
             id="test-radios"
   >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+      Test radios
+    </legend>
     <div class="govuk-radios">
       <div class="govuk-radios__item">
         <input class="govuk-radios__input"
@@ -119,6 +122,9 @@ exports[`FormRadioGroup renders option with conditional contents 1`] = `
   <fieldset class="govuk-fieldset"
             id="test-radios"
   >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+      Test radios
+    </legend>
     <div class="govuk-radios">
       <div class="govuk-radios__item">
         <input class="govuk-radios__input"

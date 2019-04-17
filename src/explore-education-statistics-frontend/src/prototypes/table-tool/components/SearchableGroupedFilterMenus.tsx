@@ -112,6 +112,8 @@ class SearchableGroupedFilterMenus<
           >
             <FormFieldCheckboxGroup
               name={name as string}
+              legend="Choose an option"
+              legendHidden
               options={options}
               id={compositeKey}
               selectAll

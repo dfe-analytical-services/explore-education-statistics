@@ -8,6 +8,7 @@ describe('FormCheckboxGroup', () => {
       <FormCheckboxGroup
         id="test-checkboxes"
         name="test-checkboxes"
+        legend="Test checkboxes"
         options={[
           { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
           { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
@@ -31,6 +32,7 @@ describe('FormCheckboxGroup', () => {
       <FormCheckboxGroup
         id="test-checkboxes"
         name="test-checkboxes"
+        legend="Test checkboxes"
         options={[
           { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
           { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
@@ -73,6 +75,7 @@ describe('FormCheckboxGroup', () => {
       <FormCheckboxGroup
         id="test-checkboxes"
         name="test-checkboxes"
+        legend="Test checkboxes"
         small
         options={[
           { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
@@ -92,6 +95,7 @@ describe('FormCheckboxGroup', () => {
         value={[]}
         id="test-checkboxes"
         name="test-checkboxes"
+        legend="Test checkboxes"
         selectAll
         options={[
           { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
@@ -114,6 +118,7 @@ describe('FormCheckboxGroup', () => {
         value={['1', '2', '3']}
         id="test-checkboxes"
         name="test-checkboxes"
+        legend="Test checkboxes"
         selectAll
         options={[
           { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
@@ -134,6 +139,7 @@ describe('FormCheckboxGroup', () => {
         value={[]}
         id="test-checkboxes"
         name="test-checkboxes"
+        legend="Test checkboxes"
         selectAll
         small
         options={[
@@ -153,6 +159,7 @@ describe('FormCheckboxGroup', () => {
         value={['4', '5', '6']}
         id="test-checkboxes"
         name="test-checkboxes"
+        legend="Test checkboxes"
         selectAll
         options={[
           { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
@@ -173,6 +180,7 @@ describe('FormCheckboxGroup', () => {
         value={[]}
         id="test-checkboxes"
         name="test-checkboxes"
+        legend="Test checkboxes"
         selectAll
         options={[{ id: 'checkbox-1', label: 'Test checkbox 1', value: '1' }]}
       />,
@@ -188,6 +196,7 @@ describe('FormCheckboxGroup', () => {
         value={['2']}
         id="test-checkboxes"
         name="test-checkboxes"
+        legend="Test checkboxes"
         options={[
           {
             id: 'checkbox-1',

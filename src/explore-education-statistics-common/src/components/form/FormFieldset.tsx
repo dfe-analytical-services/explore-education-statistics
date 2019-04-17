@@ -9,8 +9,9 @@ export interface FieldSetProps {
   error?: string;
   hint?: string;
   id: string;
-  legend?: ReactNode | string;
+  legend: ReactNode | string;
   legendSize?: 'xl' | 'l' | 'm' | 's';
+  legendHidden?: boolean;
 }
 
 const FormFieldset = ({
@@ -20,6 +21,7 @@ const FormFieldset = ({
   id,
   legend,
   legendSize = 'm',
+  legendHidden = false,
 }: FieldSetProps) => {
   return (
     <FormGroup hasError={!!error}>
@@ -32,16 +34,17 @@ const FormFieldset = ({
           hint: !!hint,
         })}
       >
-        {legend && (
-          <legend
-            className={classNames(
-              'govuk-fieldset__legend',
-              `govuk-fieldset__legend--${legendSize}`,
-            )}
-          >
-            {legend}
-          </legend>
-        )}
+        <legend
+          className={classNames(
+            'govuk-fieldset__legend',
+            `govuk-fieldset__legend--${legendSize}`,
+            {
+              'govuk-visually-hidden': legendHidden,
+            },
+          )}
+        >
+          {legend}
+        </legend>
 
         {hint && (
           <span className="govuk-hint" id={`${id}-hint`}>
