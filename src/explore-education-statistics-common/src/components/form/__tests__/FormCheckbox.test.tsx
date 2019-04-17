@@ -38,4 +38,40 @@ describe('FormCheckbox', () => {
 
     expect(container.innerHTML).toMatchSnapshot();
   });
+
+  test('renders conditional content when checked', () => {
+    const { container, getByText } = render(
+      <FormCheckbox
+        name="test"
+        id="test-checkbox"
+        label="Test checkbox"
+        value="true"
+        checked
+        onChange={() => {}}
+        conditional={<p>The conditional content</p>}
+      />,
+    );
+
+    expect(getByText('The conditional content').parentElement).not.toHaveClass(
+      'govuk-checkboxes__conditional--hidden',
+    );
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('does not render conditional content when not checked', () => {
+    const { container, getByText } = render(
+      <FormCheckbox
+        name="test"
+        id="test-checkbox"
+        label="Test checkbox"
+        value="true"
+        conditional={<p>The conditional content</p>}
+      />,
+    );
+
+    expect(getByText('The conditional content').parentElement).toHaveClass(
+      'govuk-checkboxes__conditional--hidden',
+    );
+    expect(container.innerHTML).toMatchSnapshot();
+  });
 });

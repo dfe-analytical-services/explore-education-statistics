@@ -229,6 +229,74 @@ exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
 
 `;
 
+exports[`FormCheckboxGroup renders option with conditional contents 1`] = `
+
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset"
+            id="test-checkboxes"
+  >
+    <div class="govuk-checkboxes">
+      <div class="govuk-checkboxes__item">
+        <input class="govuk-checkboxes__input"
+               id="checkbox-1"
+               name="test-checkboxes"
+               type="checkbox"
+               value="1"
+        >
+        <label class="govuk-label govuk-checkboxes__label"
+               for="checkbox-1"
+        >
+          Test checkbox 1
+        </label>
+      </div>
+      <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden">
+        <p>
+          Conditional 1
+        </p>
+      </div>
+      <div class="govuk-checkboxes__item">
+        <input class="govuk-checkboxes__input"
+               id="checkbox-2"
+               name="test-checkboxes"
+               type="checkbox"
+               value="2"
+               checked
+        >
+        <label class="govuk-label govuk-checkboxes__label"
+               for="checkbox-2"
+        >
+          Test checkbox 2
+        </label>
+      </div>
+      <div class="govuk-checkboxes__conditional">
+        <p>
+          Conditional 2
+        </p>
+      </div>
+      <div class="govuk-checkboxes__item">
+        <input class="govuk-checkboxes__input"
+               id="checkbox-3"
+               name="test-checkboxes"
+               type="checkbox"
+               value="3"
+        >
+        <label class="govuk-label govuk-checkboxes__label"
+               for="checkbox-3"
+        >
+          Test checkbox 3
+        </label>
+      </div>
+      <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden">
+        <p>
+          Conditional 3
+        </p>
+      </div>
+    </div>
+  </fieldset>
+</div>
+
+`;
+
 exports[`FormCheckboxGroup renders unchecked \`Select all\` option when \`selectAll\` is true 1`] = `
 
 <div class="govuk-form-group">

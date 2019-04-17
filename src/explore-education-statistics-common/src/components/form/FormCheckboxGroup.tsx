@@ -1,14 +1,16 @@
+import { Omit } from '@common/types/util';
 import classNames from 'classnames';
 import React, { Component, createRef } from 'react';
-import FormCheckbox, { CheckboxChangeEventHandler } from './FormCheckbox';
+import FormCheckbox, {
+  CheckboxChangeEventHandler,
+  FormCheckboxProps,
+} from './FormCheckbox';
 import FormFieldset, { FieldSetProps } from './FormFieldset';
 
-export interface CheckboxOption {
-  hint?: string;
-  id: string;
-  label: string;
-  value: string;
-}
+export type CheckboxOption = Omit<
+  FormCheckboxProps,
+  'name' | 'checked' | 'onChange'
+>;
 
 export type FormCheckboxGroupProps = {
   name: string;

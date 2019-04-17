@@ -181,4 +181,43 @@ describe('FormCheckboxGroup', () => {
     expect(queryByLabelText('Select all')).toBeNull();
     expect(queryByLabelText('Test checkbox 1')).not.toBeNull();
   });
+
+  test('renders option with conditional contents', () => {
+    const { container, getByText } = render(
+      <FormCheckboxGroup
+        value={['2']}
+        id="test-checkboxes"
+        name="test-checkboxes"
+        options={[
+          {
+            id: 'checkbox-1',
+            label: 'Test checkbox 1',
+            value: '1',
+            conditional: <p>Conditional 1</p>,
+          },
+          {
+            id: 'checkbox-2',
+            label: 'Test checkbox 2',
+            value: '2',
+            conditional: <p>Conditional 2</p>,
+          },
+          {
+            id: 'checkbox-3',
+            label: 'Test checkbox 3',
+            value: '3',
+            conditional: <p>Conditional 3</p>,
+          },
+        ]}
+      />,
+    );
+
+    const hiddenClass = 'govuk-checkboxes__conditional--hidden';
+
+    expect(getByText('Conditional 1').parentElement).toHaveClass(hiddenClass);
+    expect(getByText('Conditional 2').parentElement).not.toHaveClass(
+      hiddenClass,
+    );
+    expect(getByText('Conditional 3').parentElement).toHaveClass(hiddenClass);
+    expect(container.innerHTML).toMatchSnapshot();
+  });
 });
