@@ -6,8 +6,6 @@ import {
   Legend,
   ResponsiveContainer,
   Tooltip,
-  XAxis,
-  YAxis,
 } from 'recharts';
 
 import { colours } from './Charts';
@@ -29,15 +27,21 @@ export class HorizontalBarBlock extends AbstractChart<
     });
 
     return (
-      <ResponsiveContainer width={900} height={this.props.height || 600}>
+      <ResponsiveContainer width={'100%'} height={this.props.height || 600}>
         <BarChart
           data={chartData}
           layout="vertical"
           margin={this.calculateMargins()}
         >
-          <YAxis type="category" dataKey={this.props.yAxis.key || 'name'} />
+          {this.calculateYAxis({
+            type: 'category',
+            dataKey: this.props.yAxis.key || 'name',
+          })}
+
           <CartesianGrid />
-          <XAxis type="number" />
+
+          {this.calculateXAxis({ type: 'number' })}
+
           <Tooltip cursor={false} />
           <Legend />
 

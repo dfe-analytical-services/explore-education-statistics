@@ -1,8 +1,14 @@
 import { CharacteristicsData } from '@common/services/tableBuilderService';
 import { Axis, ReferenceLine } from '@common/services/publicationService';
-import { Component } from 'react';
+import { Component, ReactNode } from 'react';
 import React from 'react';
 import * as Recharts from 'recharts';
+import { PositionType } from 'recharts';
+import { Label } from 'recharts';
+import { XAxisProps } from 'recharts';
+import { XAxis } from 'recharts';
+import { YAxisProps } from 'recharts';
+import { YAxis } from 'recharts';
 
 export interface ChartProps {
   characteristicsData: CharacteristicsData;
@@ -33,7 +39,60 @@ export class AbstractChart<P extends ChartProps, S = {}> extends Component<
       });
     }
 
+    if (this.props.xAxis.title) {
+      //margin.bottom +=25;
+    }
+
+    console.log(margin);
+
     return margin;
+  }
+
+  private calculateAxis(
+    axis: Axis,
+    position: PositionType,
+    angle: number = 0,
+    titleSize: number = 25,
+  ) {
+    let size = 25;
+    let title: ReactNode | '';
+
+    if (axis.title) {
+      size += titleSize;
+      title = (
+        <Label position={position} angle={angle}>
+          {axis.title}
+        </Label>
+      );
+    }
+
+    return { size, title };
+  }
+
+  protected calculateXAxis(props: XAxisProps): ReactNode {
+    const { size: height, title } = this.calculateAxis(
+      this.props.xAxis,
+      'insideBottom',
+    );
+    return (
+      <XAxis {...props} height={height}>
+        {title}
+      </XAxis>
+    );
+  }
+
+  protected calculateYAxis(props: YAxisProps): ReactNode {
+    const { size: width, title } = this.calculateAxis(
+      this.props.yAxis,
+      'left',
+      270,
+      90,
+    );
+    return (
+      <YAxis {...props} width={width}>
+        {title}
+      </YAxis>
+    );
   }
 
   protected generateReferenceLines() {
@@ -41,6 +100,9 @@ export class AbstractChart<P extends ChartProps, S = {}> extends Component<
       const referenceLineProps = {
         key: `ref_${idx}`,
         ...line,
+        stroke: 'black',
+        strokeWidth: '2px',
+
         label: {
           position: 'top',
           value: line.label,

@@ -440,5 +440,34 @@ export const testChartsVerticalWithReferenceLine = createDataBlockWithChart(
       [{ x: 17, label: 'England' }],
     ),
   ],
-  //['London', 'Yorkshire', 'East', 'South East', 'South West', 'West Midlands', 'East Midlands', 'North West', 'North East' ]
+);
+
+export const testChartsVerticalWithReferenceLineAndAxisTitles = createDataBlockWithChart(
+  'GDHI per head (£) England, 2011',
+  ['la_name', 'cost'],
+  ['Region', 'Cost'],
+
+  SchoolType.Total,
+  201112,
+  [
+    ['London', '21'],
+    ['South East', '18'],
+    ['East', '17'],
+    ['South West', '15'],
+    ['East Midlands', '13'],
+    ['North West', '13'],
+    ['West Midlands', '12'],
+    ['Yorkshire', '11'],
+    ['North East', '10'],
+  ],
+  [
+    createBasicChart(
+      'horizontalbar',
+      ['cost'],
+      { title: 'Cost' },
+      { title: 'Local Authority', key: 'la_name' },
+      false,
+      [{ x: 17, label: 'England' }],
+    ),
+  ],
 );

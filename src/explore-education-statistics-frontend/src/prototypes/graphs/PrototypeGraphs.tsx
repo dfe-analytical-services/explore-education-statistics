@@ -10,6 +10,7 @@ import {
   ks4SchoolRevisedAttainmentChart,
   ks4TrendInDisavdantagePuilsAttainmentGapIndex,
   testChartsVerticalWithReferenceLine,
+  testChartsVerticalWithReferenceLineAndAxisTitles,
 } from '@frontend/prototypes/publication/data/PrototypeDataFactory';
 import { DataBlock } from '@frontend/modules/find-statistics/components/DataBlock';
 
@@ -31,6 +32,12 @@ const GraphsPage = () => {
           />
           <DataBlock
             {...testChartsVerticalWithReferenceLine}
+            showTables={false}
+          />
+
+          <h3>Reference line with Axis titles</h3>
+          <DataBlock
+            {...testChartsVerticalWithReferenceLineAndAxisTitles}
             showTables={false}
           />
           <h3>Vertical Bars</h3>
