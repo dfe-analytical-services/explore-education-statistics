@@ -1,12 +1,6 @@
-import useMounted from '@common/hooks/useMounted';
+import { useDesktopMedia } from '@common/hooks/useMedia';
 import classNames from 'classnames';
-import React, {
-  forwardRef,
-  FunctionComponent,
-  HTMLAttributes,
-  ReactNode,
-  Ref,
-} from 'react';
+import React, { forwardRef, HTMLAttributes, ReactNode } from 'react';
 import styles from './TabsSection.module.scss';
 
 export interface TabsSectionProps {
@@ -20,9 +14,9 @@ export interface TabsSectionProps {
   title: string;
 }
 
-const TabsSection: FunctionComponent<TabsSectionProps> = forwardRef(
-  ({ children, id, ...restProps }: TabsSectionProps, ref: Ref<HTMLElement>) => {
-    const { onMounted } = useMounted();
+const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
+  ({ children, id, ...restProps }, ref) => {
+    const { onMedia } = useDesktopMedia();
 
     // Hide additional props from the component's public API to
     // avoid any confusion over this component's usage as
@@ -31,15 +25,14 @@ const TabsSection: FunctionComponent<TabsSectionProps> = forwardRef(
 
     return (
       <section
-        aria-labelledby={onMounted(tabProps['aria-labelledby'])}
+        aria-labelledby={onMedia(tabProps['aria-labelledby'])}
         className={classNames('govuk-tabs__panel', styles.panel, {
           'govuk-tabs__panel--hidden': tabProps.hidden,
         })}
         id={id}
-        hidden={tabProps.hidden}
         ref={ref}
-        role={onMounted('tabpanel')}
-        tabIndex={onMounted(-1)}
+        role={onMedia('tabpanel')}
+        tabIndex={onMedia(-1)}
         data-testid={tabProps.title}
       >
         {children}

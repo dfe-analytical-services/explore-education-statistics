@@ -3,6 +3,8 @@ import { fireEvent, render } from 'react-testing-library';
 import Tabs from '../Tabs';
 import TabsSection from '../TabsSection';
 
+const hiddenSectionClass = 'govuk-tabs__panel--hidden';
+
 describe('Tabs', () => {
   test('renders single tab correctly', () => {
     const { container } = render(
@@ -78,13 +80,32 @@ describe('Tabs', () => {
     const tabSection1 = container.querySelector('#section-1') as HTMLElement;
     const tabSection2 = container.querySelector('#section-2') as HTMLElement;
 
-    expect(tabSection1.hidden).toBe(false);
-    expect(tabSection2.hidden).toBe(true);
+    expect(tabSection1).not.toHaveClass(hiddenSectionClass);
+    expect(tabSection2).toHaveClass(hiddenSectionClass);
 
     fireEvent.click(getByText('Tab 2'));
 
-    expect(tabSection1.hidden).toBe(true);
-    expect(tabSection2.hidden).toBe(false);
+    expect(tabSection1).toHaveClass(hiddenSectionClass);
+    expect(tabSection2).not.toHaveClass(hiddenSectionClass);
+  });
+
+  test('clicking tab changes location hash', () => {
+    const { getByText } = render(
+      <Tabs>
+        <TabsSection id="section-1" title="Tab 1">
+          <p>Test section 1 content</p>
+        </TabsSection>
+        <TabsSection id="section-2" title="Tab 2">
+          <p>Test section 2 content</p>
+        </TabsSection>
+      </Tabs>,
+    );
+
+    expect(location.hash).toBe('');
+
+    fireEvent.click(getByText('Tab 2'));
+
+    expect(location.hash).toBe('#section-2');
   });
 
   test('clicking tab renders lazy section', () => {
@@ -143,8 +164,11 @@ describe('Tabs', () => {
 
       expect(tab1).toHaveAttribute('aria-selected', 'false');
       expect(tab2).toHaveAttribute('aria-selected', 'true');
-      expect(tabSection1.hidden).toBe(true);
-      expect(tabSection2.hidden).toBe(false);
+
+      expect(tabSection1).toHaveClass(hiddenSectionClass);
+      expect(tabSection2).not.toHaveClass(hiddenSectionClass);
+
+      expect(location.hash).toBe('#section-2');
 
       fireEvent.keyDown(tab2, { key: 'ArrowLeft' });
 
@@ -152,15 +176,22 @@ describe('Tabs', () => {
       expect(tab1).toHaveFocus();
       expect(tab2).toHaveAttribute('aria-selected', 'false');
 
-      expect(tabSection1.hidden).toBe(false);
-      expect(tabSection2.hidden).toBe(true);
+      expect(tabSection1).not.toHaveClass(hiddenSectionClass);
+      expect(tabSection2).toHaveClass(hiddenSectionClass);
+
+      expect(location.hash).toBe('#section-1');
     });
 
     test('pressing left arrow key cycles to end of tabs', () => {
+      fireEvent.click(tab1);
+
       expect(tab1).toHaveAttribute('aria-selected', 'true');
       expect(tab3).toHaveAttribute('aria-selected', 'false');
-      expect(tabSection1.hidden).toBe(false);
-      expect(tabSection3.hidden).toBe(true);
+
+      expect(tabSection1).not.toHaveClass(hiddenSectionClass);
+      expect(tabSection3).toHaveClass(hiddenSectionClass);
+
+      expect(location.hash).toBe('#section-1');
 
       fireEvent.keyDown(tab1, { key: 'ArrowLeft' });
 
@@ -168,8 +199,10 @@ describe('Tabs', () => {
       expect(tab3).toHaveAttribute('aria-selected', 'true');
       expect(tab3).toHaveFocus();
 
-      expect(tabSection1.hidden).toBe(true);
-      expect(tabSection3.hidden).toBe(false);
+      expect(tabSection1).toHaveClass(hiddenSectionClass);
+      expect(tabSection3).not.toHaveClass(hiddenSectionClass);
+
+      expect(location.hash).toBe('#section-3');
     });
 
     test('pressing right arrow key moves to next tab', () => {
@@ -177,8 +210,11 @@ describe('Tabs', () => {
 
       expect(tab2).toHaveAttribute('aria-selected', 'true');
       expect(tab3).toHaveAttribute('aria-selected', 'false');
-      expect(tabSection2.hidden).toBe(false);
-      expect(tabSection3.hidden).toBe(true);
+
+      expect(tabSection2).not.toHaveClass(hiddenSectionClass);
+      expect(tabSection3).toHaveClass(hiddenSectionClass);
+
+      expect(location.hash).toBe('#section-2');
 
       fireEvent.keyDown(tab2, { key: 'ArrowRight' });
 
@@ -186,8 +222,10 @@ describe('Tabs', () => {
       expect(tab3).toHaveAttribute('aria-selected', 'true');
       expect(tab3).toHaveFocus();
 
-      expect(tabSection2.hidden).toBe(true);
-      expect(tabSection3.hidden).toBe(false);
+      expect(tabSection2).toHaveClass(hiddenSectionClass);
+      expect(tabSection3).not.toHaveClass(hiddenSectionClass);
+
+      expect(location.hash).toBe('#section-3');
     });
 
     test('pressing right arrow key cycles to beginning of tabs', () => {
@@ -195,16 +233,22 @@ describe('Tabs', () => {
 
       expect(tab1).toHaveAttribute('aria-selected', 'false');
       expect(tab3).toHaveAttribute('aria-selected', 'true');
-      expect(tabSection1.hidden).toBe(true);
-      expect(tabSection3.hidden).toBe(false);
+
+      expect(tabSection1).toHaveClass(hiddenSectionClass);
+      expect(tabSection3).not.toHaveClass(hiddenSectionClass);
+
+      expect(location.hash).toBe('#section-3');
 
       fireEvent.keyDown(tab3, { key: 'ArrowRight' });
 
       expect(tab1).toHaveAttribute('aria-selected', 'true');
       expect(tab1).toHaveFocus();
       expect(tab3).toHaveAttribute('aria-selected', 'false');
-      expect(tabSection1.hidden).toBe(false);
-      expect(tabSection3.hidden).toBe(true);
+
+      expect(tabSection1).not.toHaveClass(hiddenSectionClass);
+      expect(tabSection3).toHaveClass(hiddenSectionClass);
+
+      expect(location.hash).toBe('#section-1');
     });
 
     test('pressing down arrow key focuses the tab section', async () => {
