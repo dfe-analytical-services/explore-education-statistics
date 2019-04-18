@@ -5,7 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Debug
         public int FilterCount { get; set; }
         public int IndicatorCount { get; set; }
         public int LocationCount { get; set; }
-        public int MeasureCount { get; set; }
         public int ObservationCount { get; set; }
         public int ReleaseCount { get; set; }
         public int SchoolCount { get; set; }

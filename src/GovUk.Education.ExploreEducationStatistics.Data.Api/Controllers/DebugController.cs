@@ -59,11 +59,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 FilterCount = counts[0],
                 IndicatorCount = counts[1],
                 LocationCount = counts[2],
-                MeasureCount = counts[3],
-                ObservationCount = counts[4],
-                ReleaseCount = counts[5],
-                SchoolCount = counts[6],
-                SubjectCount = counts[7]
+                ObservationCount = counts[3],
+                ReleaseCount = counts[4],
+                SchoolCount = counts[5],
+                SubjectCount = counts[6]
             };
         }
     }
