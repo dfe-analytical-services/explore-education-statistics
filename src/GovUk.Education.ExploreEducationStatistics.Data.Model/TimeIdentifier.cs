@@ -29,7 +29,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         T1,
         T1T2,
         T2,
-        T3,
-        ZZZ
+        T3
     }
 }

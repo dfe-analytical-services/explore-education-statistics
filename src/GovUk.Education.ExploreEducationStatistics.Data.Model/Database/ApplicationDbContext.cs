@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         private static void ConfigureGeographicLevel(ModelBuilder modelBuilder)
         {
-            var geographicLevelConverter = new EnumToStringConverter<GeographicLevel>();
+            var geographicLevelConverter = new EnumToLabelConverter<GeographicLevel>();
 
             modelBuilder.Entity<Observation>()
                 .Property(observation => observation.GeographicLevel)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -64,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         public void Import(IEnumerable<string> lines, IEnumerable<string> metaLines, Subject subject)
         {
             _logger.LogInformation("Importing {count} lines", lines.Count());
-            
+
             var subjectMeta = ImportMeta(metaLines, subject);
             ImportObservations(lines, metaLines, subject, subjectMeta);
         }
@@ -73,11 +74,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             return _importerMetaService.Import(metaLines, subject);
         }
-        
-        private void ImportObservations(IEnumerable<string> lines, IEnumerable<string> metaLines, Subject subject, SubjectMeta subjectMeta)
+
+        private void ImportObservations(IEnumerable<string> lines, IEnumerable<string> metaLines, Subject subject,
+            SubjectMeta subjectMeta)
         {
             var observations = GetObservations(lines, subject, subjectMeta);
-            
+
             var index = 1;
             var batches = observations.Batch(10000);
             var stopWatch = new Stopwatch();
@@ -136,11 +138,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 return code;
             }
-            
-            //throw new ArgumentException("Unexpected value: " + timeIdentifier);
-            
-            _logger.LogWarning("Unexpected time identifier: " + timeIdentifier);
-            return TimeIdentifier.ZZZ;
+
+            throw new ArgumentException("Unexpected value: " + timeIdentifier);
         }
 
         private static int GetYear(IReadOnlyList<string> line, List<string> headers)
