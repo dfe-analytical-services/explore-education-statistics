@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Meta
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.ViewModels
 {
     public class LocationMeta
     {

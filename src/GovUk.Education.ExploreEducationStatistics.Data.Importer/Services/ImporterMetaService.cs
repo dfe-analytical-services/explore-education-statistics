@@ -3,37 +3,47 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
     public class ImporterMetaService
     {
-        public SubjectMeta Import(IEnumerable<string> metaLines)
+        private readonly ApplicationDbContext _context;
+
+        public ImporterMetaService(ApplicationDbContext context)
         {
-            var headers = metaLines.First().Split(',').ToList();
-            var lines = metaLines
+            _context = context;
+        }
+
+        public SubjectMeta Import(IEnumerable<string> lines, Subject subject)
+        {
+            var headers = lines.First().Split(',').ToList();
+            var metaRows = lines
                 .Skip(1)
                 .Select(line => GetMetaRow(line, headers));
 
             return new SubjectMeta
             {
-                Filters = GetFilters(lines),
-                IndicatorGroups = GetIndicatorGroups(lines)
+                Filters = ImportFilters(metaRows, subject),
+                IndicatorGroups = ImportIndicatorGroups(metaRows, subject)
             };
         }
 
-        private static MetaRow GetMetaRow(string raw, List<string> headers)
+        private static MetaRow GetMetaRow(string line, List<string> headers)
         {
-            var line = raw.Split(',');
-
             var columns = new[]
             {
-                "col_name", "col_type", "label", "filter_grouping_column", "filter_hint", "indicator_grouping",
+                "col_name",
+                "col_type",
+                "label",
+                "filter_grouping_column",
+                "filter_hint",
+                "indicator_grouping",
                 "indicator_unit"
             };
 
-            return CsvUtil.BuildType(line, headers, columns, values => new MetaRow
+            return CsvUtil.BuildType(line.Split(','), headers, columns, values => new MetaRow
             {
                 ColumnName = values[0],
                 ColumnType = (ColumnType) Enum.Parse(typeof(ColumnType), values[1]),
@@ -45,20 +55,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             });
         }
 
-        private static IEnumerable<Filter> GetFilters(IEnumerable<MetaRow> lines)
+        private IEnumerable<(Filter Filter, string FilterGroupingColumn)> ImportFilters(
+            IEnumerable<MetaRow> metaRows, Subject subject)
         {
-            return lines
-                .Where(row => row.ColumnType == ColumnType.Filter)
-                .Select(filter => new Filter
-                {
-                    Label = filter.Label,
-                    Hint = filter.FilterHint
-                });
+            var filters = GetFilters(metaRows, subject);
+            _context.Filter.AddRange(filters.Select(tuple => tuple.Filter));
+            _context.SaveChanges();
+            return filters;
         }
 
-        private static IEnumerable<IndicatorGroup> GetIndicatorGroups(IEnumerable<MetaRow> lines)
+        private IEnumerable<IndicatorGroup> ImportIndicatorGroups(IEnumerable<MetaRow> metaRows, Subject subject)
         {
-            return lines
+            var indicatorGroups = GetIndicatorGroups(metaRows, subject);
+            _context.IndicatorGroup.AddRange(indicatorGroups);
+            _context.SaveChanges();
+            return indicatorGroups;
+        }
+
+        private static IEnumerable<(Filter Filter, string FilterGroupingColumn)> GetFilters(
+            IEnumerable<MetaRow> metaRows, Subject subject)
+        {
+            return metaRows
+                .Where(row => row.ColumnType == ColumnType.Filter)
+                .Select(filter => (filter: new Filter
+                {
+                    Hint = filter.FilterHint,
+                    Label = filter.Label,
+                    Subject = subject
+                }, filterGroupingColumn: filter.FilterGroupingColumn));
+        }
+
+        private static IEnumerable<IndicatorGroup> GetIndicatorGroups(IEnumerable<MetaRow> metaRows, Subject subject)
+        {
+            var indicatorGroups = metaRows
                 .Where(row => row.ColumnType == ColumnType.Indicator)
                 .GroupBy(row => row.IndicatorGrouping)
                 .Select(group => new IndicatorGroup
@@ -67,9 +96,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     {
                         Label = row.Label,
                         Unit = row.IndicatorUnit
-                    }),
-                    Label = group.Key
-                });
+                    }).ToList(),
+                    Label = group.Key,
+                    Subject = subject
+                }).ToList();
+
+            indicatorGroups.ForEach(group =>
+            {
+                foreach (var indicator in group.Indicators)
+                {
+                    indicator.IndicatorGroup = group;
+                }
+            });
+
+            return indicatorGroups;
         }
     }
 }

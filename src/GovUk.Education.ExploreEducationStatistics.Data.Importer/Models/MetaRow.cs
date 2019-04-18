@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Models
 {

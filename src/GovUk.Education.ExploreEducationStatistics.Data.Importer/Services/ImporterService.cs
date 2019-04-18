@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -20,34 +19,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private static readonly Dictionary<string, TimeIdentifier> _timeIdentifiers =
             new Dictionary<string, TimeIdentifier>
             {
-                {"Academic year", TimeIdentifier.AY},
-                {"Calendar year", TimeIdentifier.CY},
-                {"Up until 31st March", TimeIdentifier.EOM},
-                {"Financial year", TimeIdentifier.FY},
+                {"academic year", TimeIdentifier.AY},
+                {"calendar year", TimeIdentifier.CY},
+                {"up until 31st march", TimeIdentifier.EOM},
+                {"financial year", TimeIdentifier.FY},
                 {"five half terms", TimeIdentifier.HT5},
                 {"six half terms", TimeIdentifier.HT6},
-                {"January", TimeIdentifier.M1},
-                {"February", TimeIdentifier.M2},
-                {"March", TimeIdentifier.M3},
-                {"April", TimeIdentifier.M4},
-                {"May", TimeIdentifier.M5},
-                {"June", TimeIdentifier.M6},
-                {"July", TimeIdentifier.M7},
-                {"August", TimeIdentifier.M8},
-                {"September", TimeIdentifier.M9},
-                {"October", TimeIdentifier.M10},
-                {"November", TimeIdentifier.M11},
-                {"December", TimeIdentifier.M12},
-                {"Q1", TimeIdentifier.Q1},
-                {"Q1-Q2", TimeIdentifier.Q1Q2},
-                {"Q1-Q3", TimeIdentifier.Q1Q3},
-                {"Q2", TimeIdentifier.Q2},
-                {"Q3", TimeIdentifier.Q3},
-                {"Q4", TimeIdentifier.Q4},
-                {"Autumn term", TimeIdentifier.T1},
-                {"Autumn and spring term", TimeIdentifier.T1T2},
-                {"Spring term", TimeIdentifier.T2},
-                {"Summer term", TimeIdentifier.T3}
+                {"january", TimeIdentifier.M1},
+                {"february", TimeIdentifier.M2},
+                {"march", TimeIdentifier.M3},
+                {"april", TimeIdentifier.M4},
+                {"may", TimeIdentifier.M5},
+                {"june", TimeIdentifier.M6},
+                {"july", TimeIdentifier.M7},
+                {"august", TimeIdentifier.M8},
+                {"september", TimeIdentifier.M9},
+                {"october", TimeIdentifier.M10},
+                {"november", TimeIdentifier.M11},
+                {"december", TimeIdentifier.M12},
+                {"q1", TimeIdentifier.Q1},
+                {"q1-q2", TimeIdentifier.Q1Q2},
+                {"q1-q3", TimeIdentifier.Q1Q3},
+                {"q2", TimeIdentifier.Q2},
+                {"q3", TimeIdentifier.Q3},
+                {"q4", TimeIdentifier.Q4},
+                {"autumn term", TimeIdentifier.T1},
+                {"autumn and spring term", TimeIdentifier.T1T2},
+                {"spring term", TimeIdentifier.T2},
+                {"summer term", TimeIdentifier.T3}
             };
 
         public ImporterService(
@@ -65,10 +64,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         public void Import(IEnumerable<string> lines, IEnumerable<string> metaLines, Subject subject)
         {
             _logger.LogInformation("Importing {count} lines", lines.Count());
+            
+            var subjectMeta = ImportMeta(metaLines, subject);
+            ImportObservations(lines, metaLines, subject, subjectMeta);
+        }
 
-            var subjectMeta = _importerMetaService.Import(metaLines);
+        private SubjectMeta ImportMeta(IEnumerable<string> metaLines, Subject subject)
+        {
+            return _importerMetaService.Import(metaLines, subject);
+        }
+        
+        private void ImportObservations(IEnumerable<string> lines, IEnumerable<string> metaLines, Subject subject, SubjectMeta subjectMeta)
+        {
             var observations = GetObservations(lines, subject, subjectMeta);
-
+            
             var index = 1;
             var batches = observations.Batch(10000);
             var stopWatch = new Stopwatch();
@@ -120,14 +129,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             };
         }
 
-        private static TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)
+        private TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)
         {
-            var timeIdentifier = CsvUtil.Value(line, headers, "time_identifier");
+            var timeIdentifier = CsvUtil.Value(line, headers, "time_identifier").ToLower();
             if (_timeIdentifiers.TryGetValue(timeIdentifier, out var code))
             {
                 return code;
             }
-            throw new ArgumentException("Unexpected value: " + timeIdentifier);
+            
+            //throw new ArgumentException("Unexpected value: " + timeIdentifier);
+            
+            _logger.LogWarning("Unexpected time identifier: " + timeIdentifier);
+            return TimeIdentifier.ZZZ;
         }
 
         private static int GetYear(IReadOnlyList<string> line, List<string> headers)

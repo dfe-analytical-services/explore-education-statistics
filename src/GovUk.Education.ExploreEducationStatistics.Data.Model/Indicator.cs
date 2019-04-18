@@ -1,5 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Meta;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class Indicator

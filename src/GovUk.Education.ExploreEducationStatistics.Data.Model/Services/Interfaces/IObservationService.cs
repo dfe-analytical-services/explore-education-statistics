@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces
 {

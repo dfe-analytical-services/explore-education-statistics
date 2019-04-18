@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Models
 {
     public class SubjectMeta
     {
-        public IEnumerable<Filter> Filters { get; set; }
+        public IEnumerable<(Filter Filter, string FilterGroupingColumn)> Filters { get; set; }
         public IEnumerable<IndicatorGroup> IndicatorGroups { get; set; }
     }
 }

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Meta;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
@@ -57,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         private static void ConfigureUnit(ModelBuilder modelBuilder)
         {
-            var unitConverter = new EnumToStringConverter<Unit>();
+            var unitConverter = new EnumToLabelConverter<Unit>();
 
             modelBuilder.Entity<Indicator>()
                 .Property(indicator => indicator.Unit)
