@@ -1,3 +1,3 @@
-import FindStatisticsPage from 'src/modules/find-statistics/FindStatisticsPage';
+import FindStatisticsPage from '@frontend/modules/find-statistics/FindStatisticsPage';
 
 export default FindStatisticsPage;

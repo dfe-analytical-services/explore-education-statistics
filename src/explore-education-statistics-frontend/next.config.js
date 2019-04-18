@@ -1,12 +1,9 @@
 const withCss = require('@zeit/next-css');
 const cssLoaderConfig = require('@zeit/next-css/css-loader-config');
 const withTypescript = require('@zeit/next-typescript');
-const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const DotEnvPlugin = require('dotenv-webpack');
-const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin');
 const compose = require('lodash/fp/compose');
 const withImages = require('next-images');
-const StylelintPlugin = require('stylelint-webpack-plugin');
 const path = require('path');
 
 const createPlugin = plugin => {
@@ -91,21 +88,52 @@ const withSassModules = createPlugin((config, options) => {
   return config;
 });
 
+const withESLint = createPlugin((config, options) => {
+  const { dev } = options;
+
+  if (dev) {
+    config.module.rules.push({
+      enforce: 'pre',
+      test: /\.(ts|tsx|js|jsx)$/,
+      exclude: /node_modules/,
+      use: {
+        loader: 'eslint-loader',
+        options: {
+          failOnError: true,
+        },
+      },
+    });
+  }
+
+  return config;
+});
+
 const config = {
   webpack(config, options) {
     const { dev, isServer } = options;
 
     if (isServer) {
+      const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin');
+
       config.plugins.push(
         new ForkTsCheckerPlugin({
           tsconfig: path.resolve(__dirname, 'tsconfig.json'),
-          tslint: path.resolve(__dirname, 'tslint.json'),
         }),
       );
     }
 
     if (dev) {
-      config.plugins.push(new CaseSensitivePathsPlugin());
+      const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
+      const StylelintPlugin = require('stylelint-webpack-plugin');
+
+      config.plugins.push(
+        new CaseSensitivePathsPlugin(),
+        new StylelintPlugin({
+          // Next doesn't play nicely with emitted errors
+          // so we'll just display warnings instead
+          emitErrors: !dev,
+        }),
+      );
     }
 
     config.plugins.push(
@@ -116,25 +144,29 @@ const config = {
         ),
         safe: true,
       }),
-      new StylelintPlugin({
-        // Next doesn't play nicely with emitted errors
-        // so we'll just display warnings instead
-        emitErrors: !dev,
-      }),
     );
 
-    config.module.rules.push({
-      test: /\.jsx?$/,
-      enforce: 'pre',
-      exclude: /node_modules/,
-      loader: 'eslint-loader',
-      options: {
-        emitError: !dev,
-        emitWarning: dev,
-      },
-    });
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@frontend': path.resolve(__dirname, 'src'),
+      '@common': path.resolve(
+        __dirname,
+        '../explore-education-statistics-common/src',
+      ),
+      react: path.resolve(__dirname, 'node_modules/react'),
+      formik: path.resolve(__dirname, 'node_modules/formik'),
+    };
 
-    config.resolve.alias.src = path.resolve(__dirname, 'src');
+    config.module.rules
+      .filter(rule => rule.test.test('test.tsx'))
+      .forEach(rule => {
+        rule.include = undefined;
+      });
+
+    options.defaultLoaders.babel.options.configFile = path.resolve(
+      __dirname,
+      'babel.config.js',
+    );
 
     return config;
   },
@@ -146,4 +178,5 @@ module.exports = compose(
   withCss,
   withSassModules,
   withTypescript,
+  withESLint,
 )(config);

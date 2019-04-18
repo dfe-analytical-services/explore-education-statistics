@@ -1,16 +1,16 @@
-import isEqual from 'lodash/isEqual';
-import React, { useState } from 'react';
+import { DataTableResult } from '@common/services/tableBuilderService';
+import TimePeriod from '@common/services/types/TimePeriod';
 import FixedHeaderGroupedDataTable, {
   HeaderGroup,
   RowGroup,
-} from 'src/prototypes/table-tool/components/FixedHeaderGroupedDataTable';
+} from '@frontend/prototypes/table-tool/components/FixedHeaderGroupedDataTable';
 import {
   FilterOption,
   IndicatorOption,
-} from 'src/prototypes/table-tool/components/meta/initialSpec';
-import TableHeadersForm from 'src/prototypes/table-tool/components/TableHeadersForm';
-import { DataTableResult } from 'src/services/tableBuilderService';
-import TimePeriod from 'src/services/types/TimePeriod';
+} from '@frontend/prototypes/table-tool/components/meta/initialSpec';
+import TableHeadersForm from '@frontend/prototypes/table-tool/components/TableHeadersForm';
+import isEqual from 'lodash/isEqual';
+import React, { useState } from 'react';
 
 interface Props {
   filters: {
@@ -85,8 +85,7 @@ const TimePeriodDataTable = (props: Props) => {
               result.indicators[row.value] !== undefined &&
                 result.characteristic &&
                 result.characteristic.name === rowGroup.value &&
-                result.timePeriod ===
-                  formatToAcademicYear((column as any).year) &&
+                result.timePeriod === formatToAcademicYear(column.year) &&
                 result.schoolType === colGroup.value,
             );
           });
@@ -122,7 +121,7 @@ const TimePeriodDataTable = (props: Props) => {
       <TableHeadersForm
         filters={filters}
         onSubmit={value => {
-          setTableHeaders(value as any);
+          setTableHeaders(value as TableHeaders);
         }}
       />
 

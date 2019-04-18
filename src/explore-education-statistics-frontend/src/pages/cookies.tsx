@@ -1,6 +1,6 @@
+import Page from '@frontend/components/Page';
+import PageTitle from '@frontend/components/PageTitle';
 import React, { Component } from 'react';
-import Page from 'src/components/Page';
-import PageTitle from 'src/components/PageTitle';
 
 class CookiesPage extends Component {
   public render() {

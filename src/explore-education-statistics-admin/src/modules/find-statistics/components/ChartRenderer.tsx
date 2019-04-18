@@ -1,28 +1,28 @@
-import React, { Component } from 'react';
-import { Axis } from '../../../services/publicationService';
+import { HorizontalBarBlock } from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
+import { LineChartBlock } from '@common/modules/find-statistics/components/charts/LineChartBlock';
+
+import DynamicMapBlock, {
+  MapFeature,
+} from '@common/modules/find-statistics/components/charts/MapBlock';
+import { VerticalBarBlock } from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
+import { Axis } from '@common/services/publicationService';
 import {
   CharacteristicsData,
   IndicatorsMetaItem,
   PublicationMeta,
-} from '../../../services/tableBuilderService';
-import { HorizontalBarBlock } from './Charts/HorizontalBarBlock';
-import { LineChartBlock } from './Charts/LineChartBlock';
-import { VerticalBarBlock } from './Charts/VerticalBarBlock';
+} from '@common/services/tableBuilderService';
+import React, { Component } from 'react';
 
-import  DynamicMapBlock from './Charts/MapBlock';
-
-interface ChartRendererProps {
+export interface ChartRendererProps {
   type: string;
   indicators: string[];
-
-  data: any;
+  data: CharacteristicsData;
   meta: PublicationMeta;
-
   xAxis?: Axis;
   yAxis?: Axis;
-
   height?: number;
-  [property: string]: any;
+  stacked?: boolean;
+  geometry?: MapFeature;
 }
 
 export class ChartRenderer extends Component<ChartRendererProps> {
@@ -37,9 +37,11 @@ export class ChartRenderer extends Component<ChartRendererProps> {
       )
       .filter(_ => _ !== undefined) as IndicatorsMetaItem[]; // just in case
 
-    const labels = usedIndicatorLabels.reduce((obj: any, next) => {
-      obj[next.name] = next.label;
-      return obj;
+    const labels = usedIndicatorLabels.reduce((obj, next) => {
+      return {
+        ...obj,
+        [next.name]: next.label,
+      };
     }, {});
 
     const characteristicsData: CharacteristicsData = this.props.data;
@@ -53,10 +55,8 @@ export class ChartRenderer extends Component<ChartRendererProps> {
         : 0;
     });
 
-    // @ts-ignore
-    const xAxis: Axis = this.props.xAxis;
-    // @ts-ignore
-    const yAxis: Axis = this.props.yAxis;
+    const xAxis = this.props.xAxis || { title: '' };
+    const yAxis = this.props.yAxis || { title: '' };
 
     switch (this.props.type.toLowerCase()) {
       case 'line':

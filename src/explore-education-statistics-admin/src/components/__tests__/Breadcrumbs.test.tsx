@@ -1,92 +1,107 @@
 import React from 'react';
+import { MemoryRouter } from 'react-router';
 import { render } from 'react-testing-library';
 import Breadcrumbs from '../Breadcrumbs';
 
 describe('Breadcrumbs', () => {
   test('renders correctly with just home breadcrumb', () => {
-    const { container } = render(<Breadcrumbs breadcrumbs={[]} />);
+    const { container } = render(
+      <MemoryRouter initialEntries={['/']}>
+        <Breadcrumbs breadcrumbs={[]} />
+      </MemoryRouter>,
+    );
 
     const breadcrumbs = container.querySelectorAll('li');
 
     expect(breadcrumbs).toHaveLength(1);
-    expect(breadcrumbs[0]!.textContent).toBe('Home');
-    expect(breadcrumbs[0]!.querySelector('a')).toHaveAttribute('href', '/');
+    expect(breadcrumbs[0].textContent).toBe('Home');
+    expect(breadcrumbs[0].querySelector('a')).toHaveAttribute('href', '/');
 
     expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('renders correctly with multiple breadcrumbs', () => {
     const { container } = render(
-      <Breadcrumbs
-        breadcrumbs={[
-          {
-            link: '/publications',
-            name: 'Publications',
-          },
-          {
-            link: '/test-publication',
-            name: 'Test publication',
-          },
-        ]}
-      />,
+      <MemoryRouter initialEntries={['/publications', '/test-publication']}>
+        <Breadcrumbs
+          breadcrumbs={[
+            {
+              link: '/publications',
+              name: 'Publications',
+            },
+            {
+              link: '/test-publication',
+              name: 'Test publication',
+            },
+          ]}
+        />
+      </MemoryRouter>,
     );
 
     const breadcrumbs = container.querySelectorAll('li');
 
     expect(breadcrumbs).toHaveLength(3);
-    expect(breadcrumbs[0]!.textContent).toBe('Home');
-    expect(breadcrumbs[0]!.querySelector('a')).toHaveAttribute('href', '/');
-    expect(breadcrumbs[1]!.textContent).toBe('Publications');
-    expect(breadcrumbs[1]!.querySelector('a')).toHaveAttribute(
+    expect(breadcrumbs[0].textContent).toBe('Home');
+    expect(breadcrumbs[0].querySelector('a')).toHaveAttribute('href', '/');
+    expect(breadcrumbs[1].textContent).toBe('Publications');
+    expect(breadcrumbs[1].querySelector('a')).toHaveAttribute(
       'href',
       '/publications',
     );
-    expect(breadcrumbs[2]!.textContent).toBe('Test publication');
+    expect(breadcrumbs[2].textContent).toBe('Test publication');
 
     expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('does not render a link if breadcrumb is missing a link', () => {
     const { container } = render(
-      <Breadcrumbs
-        breadcrumbs={[
-          {
-            name: 'Publications',
-          },
-          {
-            link: '/test-publication',
-            name: 'Test publication',
-          },
-        ]}
-      />,
+      <MemoryRouter>
+        <Breadcrumbs
+          breadcrumbs={[
+            {
+              name: 'Publications',
+            },
+            {
+              link: '/test-publication',
+              name: 'Test publication',
+            },
+          ]}
+        />
+        ,
+      </MemoryRouter>,
     );
 
     const breadcrumbs = container.querySelectorAll('li');
 
     expect(breadcrumbs).toHaveLength(3);
-    expect(breadcrumbs[1]!.textContent).toBe('Publications');
-    expect(breadcrumbs[1]!.querySelector('a')).toBe(null);
+    expect(breadcrumbs[1].textContent).toBe('Publications');
+    expect(breadcrumbs[1].querySelector('a')).toBe(null);
   });
 
   test('does not render last breadcrumb as a link', () => {
     const { container } = render(
-      <Breadcrumbs
-        breadcrumbs={[
-          {
-            link: '/publications',
-            name: 'Publications',
-          },
-          {
-            link: '/test-publication',
-            name: 'Test publication',
-          },
-        ]}
-      />,
+      <MemoryRouter>
+        <Breadcrumbs
+          breadcrumbs={[
+            {
+              link: '/publications',
+              name: 'Publications',
+            },
+            {
+              link: '/test-publication',
+              name: 'Test publication',
+            },
+          ]}
+        />
+        ,
+      </MemoryRouter>,
     );
 
-    const lastBreadcrumb = container.querySelector('li:last-child');
+    const lastBreadcrumb = container.querySelector(
+      'li:last-child',
+    ) as HTMLElement;
 
     expect(lastBreadcrumb).toBeDefined();
-    expect(lastBreadcrumb!.querySelector('a')).toBeNull();
+    expect(lastBreadcrumb.querySelector('a')).toBeNull();
   });
 });

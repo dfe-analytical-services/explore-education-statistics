@@ -1,15 +1,39 @@
+## IDEs
+.idea
+.vs
+.vscode
+
+*.iml
+*.ipr
+*.iws
+
+## Application
 bin
 obj
-*.tmp
-.vs
-.idea
-.vscode
+/data/
 dfe-meta.db
+
+## CSharp
+
+*.sln.DotSettings.user
+
+## Javascript
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+## Tests
+
+junit.xml
+**/test-results/
+/tests/robot-tests/webdriver
+/tests/robot-tests/.env
+
+## Misc
+
 *.~lock*
 tags
 *.pyc
-*.sln.DotSettings.user
-**/test-results/
-tests/robot-tests/webdriver
-tests/robot-tests/.env
-data/
+*.tmp

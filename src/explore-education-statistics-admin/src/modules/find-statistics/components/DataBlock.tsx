@@ -1,16 +1,22 @@
-import React, { Component } from 'react';
-import Tabs from '../../../components/Tabs';
-import TabsSection from '../../../components/TabsSection';
-import { baseUrl } from '../../../services/api';
+import Tabs from '@common/components/Tabs';
+import TabsSection from '@common/components/TabsSection';
+import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
 import {
-  Chart,
-  DataQuery,
-  Summary,
-} from '../../../services/publicationService';
-import { PublicationMeta } from '../../../services/tableBuilderService';
-import { ChartRenderer } from './ChartRenderer';
-import { SummaryRenderer } from './SummaryRenderer';
-import { TableRenderer } from './TableRenderer';
+  SummaryRenderer,
+  SummaryRendererProps,
+} from '@common/modules/find-statistics/components/SummaryRenderer';
+import {
+  TableRenderer,
+  TableRendererProps,
+} from '@common/modules/find-statistics/components/TableRenderer';
+import { baseUrl } from '@common/services/api';
+import { Chart, DataQuery, Summary } from '@common/services/publicationService';
+import {
+  CharacteristicsData,
+  PublicationMeta,
+} from '@common/services/tableBuilderService';
+import React, { Component } from 'react';
+import { ChartRenderer, ChartRendererProps } from './ChartRenderer';
 
 export interface DataBlockProps {
   type: string;
@@ -18,25 +24,20 @@ export interface DataBlockProps {
   dataQuery?: DataQuery;
   charts?: Chart[];
   summary?: Summary;
-  data?: any;
+  data?: CharacteristicsData;
   meta?: PublicationMeta;
   height?: number;
 }
 
 interface DataBlockState {
-  charts?: any[];
-  downloads?: any[];
-  tables?: any[];
-  summary?: any;
+  charts?: ChartRendererProps[];
+  // downloads?: any[];
+  tables?: TableRendererProps[];
+  summary?: SummaryRendererProps;
 }
 
 export class DataBlock extends Component<DataBlockProps, DataBlockState> {
-  public state: DataBlockState = {
-    charts: undefined,
-    downloads: undefined,
-    summary: undefined,
-    tables: undefined,
-  };
+  public state: DataBlockState = {};
 
   private currentDataQuery?: DataQuery = undefined;
 
@@ -67,7 +68,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
       method: dataQuery.method,
     });
 
-    const json = await response.json();
+    const json: CharacteristicsData = await response.json();
 
     const publicationId = json.publicationId;
 
@@ -84,8 +85,11 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
     }
   }
 
-  private parseDataResponse(json?: any, jsonMeta?: PublicationMeta): void {
-    const newState: any = {};
+  private parseDataResponse(
+    json?: CharacteristicsData,
+    jsonMeta?: PublicationMeta,
+  ): void {
+    const newState: DataBlockState = {};
 
     if (json && jsonMeta) {
       if (json.result.length > 0) {
@@ -93,20 +97,21 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
       }
 
       if (this.props.charts) {
-        newState.charts = this.props.charts.map(chart => ({
+        newState.charts = this.props.charts.map((chart: Chart) => ({
           ...chart,
+          geometry: chart.geometry as MapFeature,
           data: json,
           meta: jsonMeta,
         }));
       }
-    }
 
-    if (this.props.summary) {
-      newState.summary = {
-        ...this.props.summary,
-        data: json,
-        meta: jsonMeta,
-      };
+      if (this.props.summary) {
+        newState.summary = {
+          ...this.props.summary,
+          data: json,
+          meta: jsonMeta,
+        };
+      }
     }
 
     this.setState(newState);
@@ -128,7 +133,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
           {this.state.tables && (
             <TabsSection id={`${id}0`} title="Data tables">
               <h3>{this.props.heading}</h3>
-              {this.state.tables.map((table: any, idx) => (
+              {this.state.tables.map((table, idx) => (
                 <TableRenderer key={`${id}0_table_${idx}`} {...table} />
               ))}
             </TabsSection>
@@ -137,7 +142,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
           {this.state.charts && (
             <TabsSection id={`${id}1`} title="Charts" lazy={false}>
               <h3>{this.props.heading}</h3>
-              {this.state.charts.map((chart: any, idx) => (
+              {this.state.charts.map((chart, idx) => (
                 <ChartRenderer
                   key={`${id}_chart_${idx}`}
                   {...chart}

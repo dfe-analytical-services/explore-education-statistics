@@ -1,6 +1,6 @@
+import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
 import sortBy from 'lodash/sortBy';
 import React, { PureComponent } from 'react';
-import FormFieldCheckboxGroup from 'src/components/form/FormFieldCheckboxGroup';
 import MenuDetails from './MenuDetails';
 
 interface Props<FormValues> {

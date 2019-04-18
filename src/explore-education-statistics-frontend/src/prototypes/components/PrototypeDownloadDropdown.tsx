@@ -1,6 +1,5 @@
+import Link from '@frontend/components/Link';
 import React from 'react';
-import Details from '../../components/Details';
-import Link from '../../components/Link';
 
 interface Props {
   viewType?: string;
@@ -8,7 +7,7 @@ interface Props {
   link?: string;
 }
 
-const PrototypeDownloadDropdown = ({ viewType, topic, link }: Props) => {
+const PrototypeDownloadDropdown = ({ link }: Props) => {
   return (
     <>
       <div className="govuk-grid-row">

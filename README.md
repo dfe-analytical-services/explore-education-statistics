@@ -4,6 +4,7 @@
 ## Getting started
 
 ### Requirements
+
 To run the application you require:
 - Docker / Docker compose 
 
@@ -12,6 +13,7 @@ To develop the application you will require:
 - Version 2.2 of the dotnet SDK installed
 
 ### Running the service locally
+
 Create the frontend .env file, copy `src/explore-education-statistics-frontend/.env.example` to `src/explore-education-statistics-frontend/.env`.
 
 Run the application
@@ -22,7 +24,6 @@ docker-compose up
 To access the public site browse to `http://localhost:3000`
 
 ### Developing the application
-
 
 ## Contributing
 

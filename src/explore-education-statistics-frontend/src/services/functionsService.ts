@@ -1,4 +1,4 @@
-import { functionApi } from './api';
+import { functionApi } from '@common/services/api';
 
 export interface SubscriptionData {
   email: string;
@@ -9,6 +9,7 @@ export interface SubscriptionData {
 export default {
   subscribeToPublication(query: {
     email: string;
+    id: string;
     slug: string;
     title: string;
   }): Promise<SubscriptionData> {

@@ -1,3 +1,3 @@
-import Page from 'src/prototypes/PrototypePublicationPageGCSE';
+import Page from '@frontend/prototypes/publication/PrototypePublicationPageGCSE';
 
 export default Page;

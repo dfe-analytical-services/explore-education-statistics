@@ -1,3 +1,3 @@
-import Page from 'src/prototypes/PrototypeHomePageV2';
+import Page from '@frontend/prototypes/PrototypeHomePageV2';
 
 export default Page;

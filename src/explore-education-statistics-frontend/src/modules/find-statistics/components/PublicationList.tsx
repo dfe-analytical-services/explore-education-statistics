@@ -1,6 +1,5 @@
+import Link from '@frontend/components/Link';
 import React, { Component } from 'react';
-import Link from 'src/components/Link';
-import { contentApi } from 'src/services/api';
 
 export interface Publication {
   id: string;
@@ -10,13 +9,12 @@ export interface Publication {
 }
 
 interface Props {
-  topic: string;
   publications: Publication[];
 }
 
 class PublicationList extends Component<Props> {
   public render() {
-    const { topic, publications } = this.props;
+    const { publications } = this.props;
 
     return (
       <>

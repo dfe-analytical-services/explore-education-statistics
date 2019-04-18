@@ -1,0 +1,36 @@
+@import '~explore-education-statistics-common/src/styles/govuk-base';
+
+.keyStatsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.keyStatTile {
+  background: govuk-colour('grey-4');
+  flex: 1 0 32%;
+  margin: 0.5%;
+  max-width: 32%;
+  padding: 1rem;
+
+  @include govuk-media-query($until: tablet) {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  details {
+    font-size: 1rem;
+    margin: 0.25rem 0 0;
+  }
+}
+
+.keyStatHeading {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.keyStatLarge {
+  font-size: 2.4rem;
+  font-weight: bold;
+  margin: 0;
+}

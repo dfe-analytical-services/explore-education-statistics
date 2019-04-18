@@ -1,4 +1,4 @@
-@import '../../styles/govuk-base';
+@import '~explore-education-statistics-common/src/styles/govuk-base';
 
 .container {
   margin-bottom: govuk-spacing(0);
@@ -29,4 +29,49 @@
     border: 2px solid $govuk-focus-colour;
     outline: 0;
   }
+}
+
+.results {
+  background-color: #fff;
+  border: 2px solid $govuk-border-colour;
+  border-top: 0;
+  list-style: none;
+  margin-top: 0;
+  max-height: 50vh;
+  overflow: auto;
+  padding-left: 0;
+  padding-top: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 2000;
+}
+
+.results li {
+  margin: 0;
+  padding: 5px;
+
+  &:focus,
+  &:hover {
+    background-color: $govuk-brand-colour;
+    color: govuk-colour('white');
+    cursor: pointer;
+  }
+
+  &:not(:first-child) {
+    border-top: 1px solid $govuk-border-colour;
+  }
+}
+
+.highlighted {
+  background-color: $govuk-brand-colour;
+  color: govuk-colour('white');
+}
+
+.resultHeader {
+  display: block;
+  width: 100%;
+}
+
+.resultLocation {
+  font-size: 0.9rem;
 }

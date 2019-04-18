@@ -1,6 +1,4 @@
 import React from 'react';
-// import Details from '../components/Details';
-// import PrototypeDataSample from './components/PrototypeDataSample';
 import Link from '../components/Link';
 import PrototypePage from './components/PrototypePage';
 

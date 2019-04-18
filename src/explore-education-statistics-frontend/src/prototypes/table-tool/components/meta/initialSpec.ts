@@ -23,7 +23,7 @@ export interface GroupedFilterOptions {
 export enum LocationLevel {
   National = 'national',
   Region = 'region',
-  Local_Authority = 'localAuthority',
+  LocalAuthority = 'localAuthority',
   School = 'school',
 }
 

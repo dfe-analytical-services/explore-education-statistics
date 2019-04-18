@@ -1,15 +1,21 @@
+import Button from '@common/components/Button';
+import ErrorSummary, {
+  ErrorSummaryMessage,
+} from '@common/components/ErrorSummary';
+import {
+  FormFieldset,
+  FormGroup,
+  FormTextInput,
+} from '@common/components/form';
+import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
+import createErrorHelper from '@common/lib/validation/createErrorHelper';
+import Yup from '@common/lib/validation/yup';
+import { PublicationMeta } from '@common/services/tableBuilderService';
+import SchoolType from '@common/services/types/SchoolType';
 import { Form, Formik, FormikErrors, FormikProps, FormikTouched } from 'formik';
 import debounce from 'lodash/debounce';
 import React, { ChangeEvent, Component, createRef } from 'react';
-import Button from 'src/components/Button';
-import ErrorSummary, { ErrorSummaryMessage } from 'src/components/ErrorSummary';
-import { FormFieldset, FormGroup, FormTextInput } from 'src/components/form';
-import FormFieldCheckboxGroup from 'src/components/form/FormFieldCheckboxGroup';
-import FormFieldSelect from 'src/components/form/FormFieldSelect';
-import createErrorHelper from 'src/lib/validation/createErrorHelper';
-import Yup from 'src/lib/validation/yup';
-import { PublicationMeta } from 'src/services/tableBuilderService';
-import SchoolType from 'src/services/types/SchoolType';
 import SearchableFilterMenus from './SearchableFilterMenus';
 
 interface FormValues {
@@ -66,12 +72,12 @@ class CharacteristicsFilterForm extends Component<Props, State> {
     {
       id: 'filter-schoolTypes-primary',
       label: 'Primary',
-      value: SchoolType.State_Funded_Primary,
+      value: SchoolType.StateFundedPrimary,
     },
     {
       id: 'filter-schoolTypes-secondary',
       label: 'Secondary',
-      value: SchoolType.State_Funded_Secondary,
+      value: SchoolType.StateFundedSecondary,
     },
     {
       id: 'filter-schoolTypes-special',

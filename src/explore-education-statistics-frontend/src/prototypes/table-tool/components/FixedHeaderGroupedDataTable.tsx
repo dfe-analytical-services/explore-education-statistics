@@ -1,7 +1,7 @@
+import styles from '@frontend/prototypes/table-tool/components/FixedHeaderGroupedDataTable.module.scss';
 import classNames from 'classnames';
 import throttle from 'lodash/throttle';
 import React, { Component, createRef, forwardRef } from 'react';
-import styles from 'src/prototypes/table-tool/components/FixedHeaderGroupedDataTable.module.scss';
 
 const dataTableCaption = 'dataTableCaption';
 
@@ -159,6 +159,8 @@ const GroupedDataTable = forwardRef<HTMLTableElement, InnerTableProps>(
   },
 );
 
+GroupedDataTable.displayName = 'GroupedDataTable';
+
 class FixedHeaderGroupedDataTable extends Component<Props> {
   private containerRef = createRef<HTMLDivElement>();
   private mainTableRef = createRef<HTMLTableElement>();
@@ -242,7 +244,7 @@ class FixedHeaderGroupedDataTable extends Component<Props> {
           className={styles.container}
           ref={this.containerRef}
           role="region"
-          tabIndex={0}
+          tabIndex={-1}
           onScroll={event => {
             const { scrollLeft, scrollTop } = event.currentTarget;
 

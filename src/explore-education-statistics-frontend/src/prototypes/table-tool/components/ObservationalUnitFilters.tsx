@@ -1,15 +1,15 @@
-import { FormikState } from 'formik';
-import React from 'react';
 import {
   FormFieldRadioGroup,
   FormFieldSelect,
   FormFieldset,
-} from 'src/components/form';
-import { SelectOption } from 'src/components/form/FormSelect';
+} from '@common/components/form';
+import { SelectOption } from '@common/components/form/FormSelect';
 import {
   LocationLevel,
   MetaSpecification,
-} from 'src/prototypes/table-tool/components/meta/initialSpec';
+} from '@frontend/prototypes/table-tool/components/meta/initialSpec';
+import { FormikState } from 'formik';
+import React from 'react';
 import { FormValues } from './FiltersForm';
 
 interface Props {
@@ -76,7 +76,7 @@ const ObservationalUnitFilters = ({ form, specification }: Props) => {
             />
           )}
 
-          {form.values.location.level === LocationLevel.Local_Authority && (
+          {form.values.location.level === LocationLevel.LocalAuthority && (
             <FormFieldSelect
               name="location.localAuthority"
               id="filter-localAuthority"

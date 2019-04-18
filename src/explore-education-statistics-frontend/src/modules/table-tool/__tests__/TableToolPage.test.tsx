@@ -1,15 +1,15 @@
-import React from 'react';
-import { fireEvent, render, wait, within } from 'react-testing-library';
 import _tableBuilderService, {
   PublicationMeta,
-} from 'src/services/tableBuilderService';
+} from '@common/services/tableBuilderService';
+import React from 'react';
+import { fireEvent, render, wait, within } from 'react-testing-library';
 import TableToolPage from '../TableToolPage';
 
-jest.mock('src/services/tableBuilderService');
+jest.mock('@common/services/tableBuilderService');
 
-const tableBuilderService: jest.Mocked<
+const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService
-> = _tableBuilderService as any;
+>;
 
 describe('TableToolPage', () => {
   test('renders list of publication options correctly', () => {

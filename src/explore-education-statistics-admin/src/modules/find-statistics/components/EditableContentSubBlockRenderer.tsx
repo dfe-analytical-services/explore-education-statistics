@@ -1,11 +1,9 @@
-import React, {Component} from 'react';
-import ReactMarkdown from 'react-markdown';
+import { PrototypeEditableContent } from '@admin/pages/prototypes/components/PrototypeEditableContent';
+import { ContentBlock } from '@common/services/publicationService';
 import marked from 'marked';
-
+import React, { Component } from 'react';
+import { Draggable } from 'react-beautiful-dnd';
 import { DataBlock } from './DataBlock';
-import {ContentBlock} from "../../../services/publicationService";
-import {PrototypeEditableContent} from "../../../prototypes/components/PrototypeEditableContent";
-import {Draggable} from "react-beautiful-dnd";
 
 interface Props {
   block: ContentBlock;
@@ -14,21 +12,30 @@ interface Props {
 }
 
 class EditableContentSubBlockRenderer extends Component<Props> {
-
-  getBlockHTML(block : ContentBlock) {
+  public getBlockHTML(block: ContentBlock) {
     switch (block.type) {
       case 'MarkDownBlock':
-        return <PrototypeEditableContent content={`
-         <p className="govuk-body">${ marked(block.body) } </p>
-      `}/>;
+        return (
+          <PrototypeEditableContent
+            content={`
+         <p className="govuk-body">${marked(block.body)} </p>
+      `}
+          />
+        );
       case 'InsetTextBlock':
         return (
           <div className="govuk-inset-text">
-            <PrototypeEditableContent content={`
-            ${block.heading ? ('<h3 className="govuk-heading-s">'+block.heading+'</h3>') : "" }
+            <PrototypeEditableContent
+              content={`
+            ${
+              block.heading
+                ? '<h3 className="govuk-heading-s">' + block.heading + '</h3>'
+                : ''
+            }
 
-            <p className="govuk-body">${ marked(block.body) } </p>
-          `}/>
+            <p className="govuk-body">${marked(block.body)} </p>
+          `}
+            />
           </div>
         );
       case 'DataBlock':
@@ -42,39 +49,24 @@ class EditableContentSubBlockRenderer extends Component<Props> {
     }
   }
 
-  render() {
-
-    let {
-      block,
-      id,
-      index
-    } = this.props;
+  public render() {
+    const { block, id, index } = this.props;
 
     return this.getBlockHTML(block);
 
     return (
       <Draggable draggableId={`draggable_block_${id}_${index}`} index={index}>
+        {provided => (
+          <div ref={provided.innerRef} {...provided.draggableProps}>
+            <div className="drag-handle small" {...provided.dragHandleProps} />
 
-        {(provided, snapshot) => (
-
-          <div
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-
-          >
-            <div className='drag-handle small' {...provided.dragHandleProps} />
-
-            { this.getBlockHTML(block) }
+            {this.getBlockHTML(block)}
 
             {provided.placeholder}
           </div>
         )}
-
       </Draggable>
     );
-
-
-
   }
 }
 

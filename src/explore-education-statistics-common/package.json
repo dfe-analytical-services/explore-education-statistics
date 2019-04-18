@@ -1,0 +1,122 @@
+{
+  "name": "explore-education-statistics-common",
+  "version": "0.1.0",
+  "description": "",
+  "devDependencies": {
+    "@types/react-leaflet": "^2.2.1",
+    "@types/recharts": "^1.1.16",
+    "@types/classnames": "^2.2.7",
+    "@types/jest": "^24.0.9",
+    "@types/lodash": "^4.14.121",
+    "@types/lodash-es": "^4.17.2",
+    "@types/next": "^8.0.1",
+    "@types/node": "^11.10.4",
+    "@types/react": "^16.8.6",
+    "@types/react-dom": "^16.8.4",
+    "@types/react-helmet": "^5.0.8",
+    "@types/yup": "^0.26.11",
+    "@typescript-eslint/eslint-plugin": "^1.6.0",
+    "@typescript-eslint/parser": "^1.6.0",
+    "@zeit/next-typescript": "^1.1.1",
+    "axios": "^0.18.0",
+    "babel-jest": "^24.7.1",
+    "babel-preset-react-app": "^7.0.2",
+    "classnames": "^2.2.6",
+    "core-js": "^2.6.5",
+    "date-fns": "^2.0.0-alpha.27",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.1.0",
+    "eslint-plugin-import": "^2.17.1",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-react": "^7.12.4",
+    "formik": "^1.5.2",
+    "govuk-frontend": "^2.10.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^24.7.1",
+    "jest-dom": "^3.1.2",
+    "jest-junit": "^6.3.0",
+    "jest-resolve": "^24.7.1",
+    "jest-serializer-html": "^6.0.0",
+    "jest-watch-typeahead": "^0.3.0",
+    "leaflet": "^1.4.0",
+    "next": "^8.0.4",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-helmet": "^5.2.0",
+    "react-leaflet": "^2.2.1",
+    "react-markdown": "^4.0.7",
+    "react-testing-library": "^6.1.2",
+    "recharts": "^1.5.0",
+    "stylelint": "^10.0.0",
+    "typescript": "^3.4.3",
+    "whatwg-fetch": "^3.0.0",
+    "yup": "^0.27.0"
+  },
+  "scripts": {
+    "lint": "npm run lint:js && npm run lint:style",
+    "lint:js": "eslint --ext .ts,.tsx,.js,.jsx .",
+    "lint:style": "stylelint src/**/*.{scss,css}",
+    "tsc": "tsc --noEmit",
+    "test": "jest",
+    "test:ci": "jest --ci --reporters=default --reporters=jest-junit",
+    "test:watch": "jest --watch",
+    "test:snapshot": "jest --updateSnapshot"
+  },
+  "author": "",
+  "license": "MIT",
+  "private": true,
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie < 11",
+    "not op_mini all"
+  ],
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!src/**/*.d.ts"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/setupTests.js"
+    ],
+    "testMatch": [
+      "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
+      "<rootDir>/src/**/?(*.)(spec|test).{js,jsx,ts,tsx}"
+    ],
+    "testEnvironment": "jsdom",
+    "testURL": "http://localhost",
+    "transform": {
+      "^.+\\.(js|jsx|ts|tsx)$": "<rootDir>/node_modules/babel-jest",
+      "^.+\\.css$": "<rootDir>/test/cssTransform.js",
+      "^(?!.*\\.(js|jsx|ts|tsx|css|json)$)": "<rootDir>/test/fileTransform.js"
+    },
+    "transformIgnorePatterns": [
+      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$",
+      "^.+\\.module\\.(css|sass|scss)$"
+    ],
+    "moduleNameMapper": {
+      "^@common/(.*)$": "<rootDir>/src/$1",
+      "^@common-test/(.*)$": "<rootDir>/test/$1",
+      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
+    },
+    "moduleFileExtensions": [
+      "web.js",
+      "js",
+      "web.ts",
+      "ts",
+      "web.tsx",
+      "tsx",
+      "json",
+      "web.jsx",
+      "jsx",
+      "node"
+    ],
+    "resetMocks": true,
+    "snapshotSerializers": [
+      "jest-serializer-html"
+    ]
+  },
+  "jest-junit": {
+    "ancestorSeparator": " › "
+  }
+}

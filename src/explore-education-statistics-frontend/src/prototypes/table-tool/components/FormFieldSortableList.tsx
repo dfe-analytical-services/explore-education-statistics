@@ -1,9 +1,9 @@
-import { Field, FieldProps } from 'formik';
-import React from 'react';
+import { Omit } from '@common/types/util';
 import FormSortableList, {
   FormSortableListProps,
-} from 'src/prototypes/table-tool/components/FormSortableList';
-import { Omit } from 'src/types/util';
+} from '@frontend/prototypes/table-tool/components/FormSortableList';
+import { Field, FieldProps } from 'formik';
+import React from 'react';
 
 type Props<FormValues> = {
   name: keyof FormValues | string;
