@@ -1,0 +1,72 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormCheckboxSearchGroup renders list of checkboxes in correct order 1`] = `
+
+<div>
+  <div class="inputContainer">
+    <label class="govuk-label"
+           for="test-checkboxes-search"
+    >
+      Search options
+    </label>
+    <input type="text"
+           class="govuk-input searchInput govuk-input--width-20"
+           id="test-checkboxes-search"
+           name="testCheckboxes-search"
+    >
+  </div>
+  <div class="optionsContainer">
+    <div class="govuk-form-group">
+      <fieldset class="govuk-fieldset"
+                id="test-checkboxes"
+      >
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+          Choose options
+        </legend>
+        <div class="govuk-checkboxes govuk-checkboxes--small">
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input"
+                   id="test-checkboxes-1"
+                   name="testCheckboxes"
+                   type="checkbox"
+                   value="1"
+            >
+            <label class="govuk-label govuk-checkboxes__label"
+                   for="test-checkboxes-1"
+            >
+              Test checkbox 1
+            </label>
+          </div>
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input"
+                   id="test-checkboxes-2"
+                   name="testCheckboxes"
+                   type="checkbox"
+                   value="2"
+            >
+            <label class="govuk-label govuk-checkboxes__label"
+                   for="test-checkboxes-2"
+            >
+              Test checkbox 2
+            </label>
+          </div>
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input"
+                   id="test-checkboxes-3"
+                   name="testCheckboxes"
+                   type="checkbox"
+                   value="3"
+            >
+            <label class="govuk-label govuk-checkboxes__label"
+                   for="test-checkboxes-3"
+            >
+              Test checkbox 3
+            </label>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+</div>
+
+`;

@@ -45,7 +45,9 @@ class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
     if (this.ref.current) {
       import('govuk-frontend/components/checkboxes/checkboxes').then(
         ({ default: GovUkCheckboxes }) => {
-          new GovUkCheckboxes(this.ref.current).init();
+          if (this.ref.current) {
+            new GovUkCheckboxes(this.ref.current).init();
+          }
         },
       );
     }
