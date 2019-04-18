@@ -1,0 +1,176 @@
+variables:
+  BuildConfiguration: 'Release'
+  CI: true
+
+trigger: [ 'master' ]
+pr: [ 'master' ]
+
+jobs:
+  - job: 'Backend'
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Restore'
+        inputs:
+          command: 'restore'
+          projects: '**/GovUk.*/*csproj'
+          feedsToUse: config
+          nugetConfigPath: src/nuget.config
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Build'
+        inputs:
+          projects: '**/GovUk.*/*csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Test'
+        inputs:
+          command: 'test'
+          projects: '**/GovUk.*[Tt]ests/*.csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.*/*.csproj'
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+          zipAfterPublish: True
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Pipeline Artifact'
+        inputs:
+          artifactName: 'backend'
+          targetPath: '$(Build.ArtifactStagingDirectory)'
+
+  - job: 'Frontend'
+    pool:
+      vmImage: 'ubuntu-16.04'
+      demands: 'npm'
+    steps:
+      - task: 'Npm@1'
+        displayName: 'npm run ci'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'ci'
+      - task: 'Npm@1'
+        displayName: 'npm run bootstrap'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run bootstrap'
+      - script: 'npm audit --json >> audit.json'
+        workingDirectory: 'src/explore-education-statistics-frontend'
+        displayName: 'Run npm audit'
+        continueOnError: true
+        enabled: false
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish Pipeline Artifact audit_results'
+        inputs:
+          artifactName: 'audit_results'
+          targetPath: 'src/explore-education-statistics-frontend/audit.json'
+        continueOnError: true
+        enabled: false
+      - task: 'Npm@1'
+        displayName: 'npm run lint'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run lint'
+      - task: 'Npm@1'
+        displayName: 'npm run format:check'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run format:check'
+      - task: 'Npm@1'
+        displayName: 'npm run test:ci'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run test:ci'
+      - task: 'PublishTestResults@2'
+        displayName: 'Publish frontend test results'
+        inputs:
+          testResultsFormat: 'JUnit'
+          testResultsFiles: '**/junit.xml'
+          searchFolder: './src'
+          testRunTitle: 'Frontend Jest tests'
+
+  - job: 'Frontend - Development'
+    dependsOn: 'Frontend'
+    pool:
+      vmImage: 'ubuntu-16.04'
+      demands: 'npm'
+    steps:
+      - task: 'Npm@1'
+        displayName: 'Install root dependencies'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'ci'
+      - task: 'Npm@1'
+        displayName: 'Install subproject dev dependencies'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run bootstrap'
+      - task: 'Npm@1'
+        displayName: 'Build frontend'
+        inputs:
+          command: 'custom'
+          workingDir: './src/explore-education-statistics-frontend'
+          verbose: false
+          customCommand: 'run build:development'
+      - task: 'Bash@3'
+        displayName: 'Remove dev dependencies'
+        inputs:
+          targetType: 'inline'
+          script: 'rm -rf ./src/**/node_modules'
+      - task: 'Npm@1'
+        displayName: 'Install prod dependencies'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run bootstrap:prod'
+      - task: 'ArchiveFiles@2'
+        displayName: 'Archive frontend'
+        inputs:
+          rootFolderOrFile: './src/explore-education-statistics-frontend'
+          includeRootFolder: false
+          archiveFile: '$(Build.ArtifactStagingDirectory)/frontend-development.zip'
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Pipeline Artifact'
+        inputs:
+          artifactName: 'frontend-development'
+          targetPath: '$(Build.ArtifactStagingDirectory)'
+
+
+  - job: 'MiscellaneousArtifacts'
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish Pipeline Artifact'
+        inputs:
+          artifactName: 'robot-tests'
+          targetPath: 'tests/robot-tests'
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish Pipeline Artifact'
+        inputs:
+          artifactName: 'newman-tests'
+          targetPath: 'tests/newman'
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish ARM templates'
+        inputs:
+          artifactName: 'arm-templates'
+          targetPath: 'armTemplates'
