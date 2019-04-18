@@ -129,7 +129,7 @@ jobs:
           command: 'custom'
           workingDir: './src/explore-education-statistics-frontend'
           verbose: false
-          customCommand: 'run build:test'
+          customCommand: 'run build:development'
       - task: 'Bash@3'
         displayName: 'Remove dev dependencies'
         inputs:
@@ -147,7 +147,7 @@ jobs:
         inputs:
           rootFolderOrFile: './src/explore-education-statistics-frontend'
           includeRootFolder: false
-          archiveFile: '$(Build.ArtifactStagingDirectory)/frontend-test.zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/frontend-development.zip'
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
         inputs:
