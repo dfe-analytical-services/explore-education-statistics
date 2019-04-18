@@ -1,4 +1,4 @@
-import useRendered from '@common/hooks/useRendered';
+import useMounted from '@common/hooks/useMounted';
 import classNames from 'classnames';
 import React, {
   forwardRef,
@@ -22,7 +22,7 @@ export interface TabsSectionProps {
 
 const TabsSection: FunctionComponent<TabsSectionProps> = forwardRef(
   ({ children, id, ...restProps }: TabsSectionProps, ref: Ref<HTMLElement>) => {
-    const { onRendered } = useRendered();
+    const { onMounted } = useMounted();
 
     // Hide additional props from the component's public API to
     // avoid any confusion over this component's usage as
@@ -31,15 +31,15 @@ const TabsSection: FunctionComponent<TabsSectionProps> = forwardRef(
 
     return (
       <section
-        aria-labelledby={onRendered(tabProps['aria-labelledby'])}
+        aria-labelledby={onMounted(tabProps['aria-labelledby'])}
         className={classNames('govuk-tabs__panel', styles.panel, {
           'govuk-tabs__panel--hidden': tabProps.hidden,
         })}
         id={id}
         hidden={tabProps.hidden}
         ref={ref}
-        role={onRendered('tabpanel')}
-        tabIndex={onRendered(-1)}
+        role={onMounted('tabpanel')}
+        tabIndex={onMounted(-1)}
         data-testid={tabProps.title}
       >
         {children}
