@@ -10,7 +10,8 @@ import {
   YAxis,
 } from 'recharts';
 
-import { ChartProps, colours } from './Charts';
+import { colours } from './Charts';
+import { ChartProps } from '@common/modules/find-statistics/components/charts/AbstractChart';
 
 export class VerticalBarBlock extends Component<ChartProps> {
   public render() {

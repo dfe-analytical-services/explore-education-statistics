@@ -15,18 +15,8 @@ import { DataBlock } from '@frontend/modules/find-statistics/components/DataBloc
 
 const GraphsPage = () => {
   return (
-    <PrototypePage
-      breadcrumbs={[
-        {
-          link: '/prototypes/browse-releases-find',
-          text: 'Find statistics and download data',
-        },
-        { text: 'GCSE and equivalent results in England', link: '#' },
-      ]}
-    >
-      <h1 className="govuk-heading-xl">
-        GCSE and equivalent results in England, 2016 to 2017
-      </h1>
+    <PrototypePage breadcrumbs={[{ text: 'Example graphs', link: '#' }]}>
+      <h1 className="govuk-heading-xl">Example graphs</h1>
 
       <Accordion id="graphs">
         <AccordionSection heading="Bar Charts">
