@@ -42,7 +42,13 @@ class Accordion extends Component<AccordionProps, State> {
 
   private goToHash = () => {
     if (this.ref.current && location.hash) {
-      const locationHashEl = this.ref.current.querySelector(location.hash);
+      let locationHashEl: HTMLElement | null = null;
+
+      try {
+        locationHashEl = this.ref.current.querySelector(location.hash);
+      } catch (_) {
+        return;
+      }
 
       if (locationHashEl) {
         const sectionEl = locationHashEl.closest(`.${classes.section}`);
@@ -62,7 +68,9 @@ class Accordion extends Component<AccordionProps, State> {
                 openSectionId: contentEl.id,
               },
               () => {
-                locationHashEl.scrollIntoView({ block: 'start' });
+                (locationHashEl as HTMLElement).scrollIntoView({
+                  block: 'start',
+                });
               },
             );
           }
