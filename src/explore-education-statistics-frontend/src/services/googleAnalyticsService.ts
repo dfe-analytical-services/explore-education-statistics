@@ -9,7 +9,7 @@ if (
   ReactGA.initialize(process.env.GA_TRACKING_ID);
   initialised = true;
 
-  // tslint:disable-next-line:no-console
+  // eslint-disable-next-line no-console
   console.log('GA initialised');
 }
 
