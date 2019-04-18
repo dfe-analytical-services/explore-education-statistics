@@ -29,7 +29,10 @@ yarn-error.log*
 junit.xml
 **/test-results/
 /tests/robot-tests/webdriver
-/tests/robot-tests/.env
+/tests/robot-tests/.env.test
+/tests/robot-tests/.env.stage
+/tests/robot-tests/.env.prod
+/tests/robot-tests/.env.dfedev
 
 ## Misc
 
