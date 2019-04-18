@@ -4,6 +4,7 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
+  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
@@ -18,31 +19,31 @@ export class VerticalBarBlock extends Component<ChartProps> {
     });
 
     return (
-      <BarChart
-        width={900}
-        height={this.props.height || 300}
-        data={chartData}
-        margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
-      >
-        <XAxis
-          dataKey={this.props.xAxis.key || 'name'}
-          interval={0}
-          tick={{ fontSize: 12 }}
-        />
-        <CartesianGrid />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-
-        {this.props.chartDataKeys.map((key, index) => (
-          <Bar
-            key={index}
-            dataKey={key}
-            fill={colours[index]}
-            name={this.props.labels[key]}
+      <ResponsiveContainer width={900} height={this.props.height || 300}>
+        <BarChart
+          data={chartData}
+          margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
+        >
+          <XAxis
+            dataKey={this.props.xAxis.key || 'name'}
+            interval={0}
+            tick={{ fontSize: 12 }}
           />
-        ))}
-      </BarChart>
+          <CartesianGrid />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+
+          {this.props.chartDataKeys.map((key, index) => (
+            <Bar
+              key={index}
+              dataKey={key}
+              fill={colours[index]}
+              name={this.props.labels[key]}
+            />
+          ))}
+        </BarChart>
+      </ResponsiveContainer>
     );
   }
 }
