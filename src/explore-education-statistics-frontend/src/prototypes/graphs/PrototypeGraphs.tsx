@@ -9,7 +9,8 @@ import {
   kS4SchoolPerformanceDataBlock,
   ks4SchoolRevisedAttainmentChart,
   ks4TrendInDisavdantagePuilsAttainmentGapIndex,
-  testChartsVerticalWithReferenceLine,
+  testChartsVerticalOffset,
+  testChartsVertical,
   testChartsVerticalWithReferenceLineAndAxisTitles,
 } from '@frontend/prototypes/publication/data/PrototypeDataFactory';
 import { DataBlock } from '@frontend/modules/find-statistics/components/DataBlock';
@@ -26,20 +27,21 @@ const GraphsPage = () => {
             {...ks4SchoolAverageHeadlineScoresByPupilCharacteristics}
             showTables={false}
           />
+          <h3>Ranking</h3>
+          <DataBlock {...testChartsVertical} showTables={false} />
+
+          <h3>Part-to-Whole – to show ratio/percentage/proportion</h3>
           <DataBlock
             {...ks4PerformanceInMatsComparedToNationalAverage}
             showTables={false}
           />
-          <DataBlock
-            {...testChartsVerticalWithReferenceLine}
-            showTables={false}
-          />
-
-          <h3>Reference line with Axis titles</h3>
+          <h3>Deviation where the value of data is most important</h3>
           <DataBlock
             {...testChartsVerticalWithReferenceLineAndAxisTitles}
             showTables={false}
           />
+          <h3>Deviation where the amount of change is most important</h3>
+          <DataBlock {...testChartsVerticalOffset} showTables={false} />
           <h3>Vertical Bars</h3>
           <DataBlock {...ks4SchoolRevisedAttainmentChart} showTables={false} />
           <DataBlock

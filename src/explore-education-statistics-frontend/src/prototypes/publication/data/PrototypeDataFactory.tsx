@@ -412,7 +412,7 @@ export const ks4StateFundedSchoolsPerformance = createDataBlockWithChart(
   ],
 );
 
-export const testChartsVerticalWithReferenceLine = createDataBlockWithChart(
+export const testChartsVertical = createDataBlockWithChart(
   'GDHI per head (£) England, 2011',
   ['la_name', 'cost'],
   ['Region', 'Cost'],
@@ -437,7 +437,6 @@ export const testChartsVerticalWithReferenceLine = createDataBlockWithChart(
       { title: '' },
       { title: '', key: 'la_name' },
       false,
-      [{ x: 17, label: 'England' }],
     ),
   ],
 );
@@ -468,6 +467,36 @@ export const testChartsVerticalWithReferenceLineAndAxisTitles = createDataBlockW
       { title: 'Local Authority', key: 'la_name' },
       false,
       [{ x: 17, label: 'England' }],
+    ),
+  ],
+);
+
+export const testChartsVerticalOffset = createDataBlockWithChart(
+  'GDHI per head index comparison with average (£) England, 2011',
+  ['la_name', 'cost'],
+  ['Region', '£(thousands)'],
+
+  SchoolType.Total,
+  201112,
+  [
+    ['London', '5'],
+    ['South East', '2'],
+    ['East', '0.5'],
+    ['South West', '-0.1'],
+    ['East Midlands', '-1.8'],
+    ['North West', '-1.9'],
+    ['West Midlands', '-2'],
+    ['Yorkshire', '-2.1'],
+    ['North East', '-2.2'],
+  ],
+  [
+    createBasicChart(
+      'horizontalbar',
+      ['cost'],
+      { title: '' },
+      { title: '', key: 'la_name' },
+      false,
+      // [{ x: 17, label: 'England' }],
     ),
   ],
 );
