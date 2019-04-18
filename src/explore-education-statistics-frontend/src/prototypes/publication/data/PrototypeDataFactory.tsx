@@ -500,3 +500,75 @@ export const testChartsVerticalOffset = createDataBlockWithChart(
     ),
   ],
 );
+
+export const testTimeSeries = createDataBlockWithChart(
+  'Time Series',
+  ['year', 'percent'],
+  ['year', 'Percent'],
+
+  SchoolType.Total,
+  200102,
+  [
+    ['1991', 50],
+    ['1992', 70],
+    ['1993', 40],
+    ['1994', 90],
+    ['1995', 10],
+    ['1996', 30],
+    ['1997', 70],
+    ['1998', 80],
+    ['1999', 50],
+    ['2000', 85],
+    ['2001', 50],
+    ['2002', 70],
+    ['2003', 40],
+    ['2004', 90],
+    ['2005', 10],
+    ['2006', 30],
+    ['2007', 70],
+    ['2008', 80],
+    ['2009', 50],
+    ['2010', 85],
+  ],
+  [
+    createBasicChart(
+      'verticalbar',
+      ['percent'],
+      { title: '', key: 'year' },
+      { title: '' },
+      false,
+    ),
+  ],
+);
+
+export const testTimeSeriesWithLine = {
+  ...testTimeSeries,
+  charts: [
+    createBasicChart(
+      'line',
+      ['percent'],
+      { title: '', key: 'year' },
+      { title: '' },
+      false,
+    ),
+  ],
+};
+
+export const testDistribution = createDataBlockWithChart(
+  'Distribution',
+  ['year', 'percent'],
+  ['year', 'Percent'],
+
+  SchoolType.Total,
+  200102,
+  [...Array(100)].map((item, idx) => [1900 + idx, Math.random() * 100]),
+  [
+    createBasicChart(
+      'verticalbar',
+      ['percent'],
+      { title: '', key: 'year' },
+      { title: '' },
+      false,
+    ),
+  ],
+);

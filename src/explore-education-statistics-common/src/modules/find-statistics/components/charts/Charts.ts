@@ -1,6 +1,6 @@
 export const colours: string[] = [
-  '#b10e1e',
-  '#006435',
+  '#4763a5',
+  '#f5a450',
   '#005ea5',
   '#800080',
   '#C0C0C0',

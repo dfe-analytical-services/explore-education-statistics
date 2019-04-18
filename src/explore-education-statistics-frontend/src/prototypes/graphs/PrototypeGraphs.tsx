@@ -12,6 +12,9 @@ import {
   testChartsVerticalOffset,
   testChartsVertical,
   testChartsVerticalWithReferenceLineAndAxisTitles,
+  testTimeSeries,
+  testTimeSeriesWithLine,
+  testDistribution,
 } from '@frontend/prototypes/publication/data/PrototypeDataFactory';
 import { DataBlock } from '@frontend/modules/find-statistics/components/DataBlock';
 
@@ -21,20 +24,25 @@ const GraphsPage = () => {
       <h1 className="govuk-heading-xl">Example graphs</h1>
 
       <Accordion id="graphs">
-        <AccordionSection heading="Bar Charts">
-          <h3>Horizontal Bars</h3>
-          <DataBlock
-            {...ks4SchoolAverageHeadlineScoresByPupilCharacteristics}
-            showTables={false}
-          />
-          <h3>Ranking</h3>
+        <AccordionSection heading="Comparison of Magnitude">
+          <DataBlock {...ks4SchoolRevisedAttainmentChart} showTables={false} />
+        </AccordionSection>
+        <AccordionSection heading="Time Series">
+          <DataBlock {...testTimeSeries} showTables={false} />
+          <DataBlock {...testTimeSeriesWithLine} showTables={false} />
+        </AccordionSection>
+        <AccordionSection heading="Ranking">
           <DataBlock {...testChartsVertical} showTables={false} />
+        </AccordionSection>
 
-          <h3>Part-to-Whole – to show ratio/percentage/proportion</h3>
+        <AccordionSection heading="Part-to-Whole">
           <DataBlock
             {...ks4PerformanceInMatsComparedToNationalAverage}
             showTables={false}
           />
+        </AccordionSection>
+
+        <AccordionSection heading="Deviation">
           <h3>Deviation where the value of data is most important</h3>
           <DataBlock
             {...testChartsVerticalWithReferenceLineAndAxisTitles}
@@ -42,8 +50,24 @@ const GraphsPage = () => {
           />
           <h3>Deviation where the amount of change is most important</h3>
           <DataBlock {...testChartsVerticalOffset} showTables={false} />
-          <h3>Vertical Bars</h3>
+        </AccordionSection>
+
+        <AccordionSection heading="Distribution">
+          <DataBlock {...testDistribution} showTables={false} />
+        </AccordionSection>
+
+        <AccordionSection heading="Bar Charts">
           <DataBlock {...ks4SchoolRevisedAttainmentChart} showTables={false} />
+
+          <h3>Horizontal Bars</h3>
+          <DataBlock
+            {...ks4SchoolAverageHeadlineScoresByPupilCharacteristics}
+            showTables={false}
+          />
+          <h3>Ranking</h3>
+
+          <h3>Part-to-Whole – to show ratio/percentage/proportion</h3>
+          <h3>Vertical Bars</h3>
           <DataBlock
             {...ks4AverageHeadlineScoresByPupilEthnicity}
             showTables={false}
