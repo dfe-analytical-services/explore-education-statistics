@@ -43,8 +43,6 @@ export class AbstractChart<P extends ChartProps, S = {}> extends Component<
       //margin.bottom +=25;
     }
 
-    console.log(margin);
-
     return margin;
   }
 
