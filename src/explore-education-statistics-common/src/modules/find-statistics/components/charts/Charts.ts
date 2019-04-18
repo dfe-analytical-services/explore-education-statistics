@@ -1,4 +1,4 @@
-import { Axis } from '@common/services/publicationService';
+import { Axis, ReferenceLine } from '@common/services/publicationService';
 import { CharacteristicsData } from '@common/services/tableBuilderService';
 
 export const colours: string[] = [
@@ -30,4 +30,5 @@ export interface ChartProps {
   xAxis: Axis;
   yAxis: Axis;
   height?: number;
+  referenceLines?: ReferenceLine[];
 }

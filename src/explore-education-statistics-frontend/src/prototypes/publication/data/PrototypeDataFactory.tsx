@@ -1,5 +1,9 @@
 import { data as OriginalData } from '@common/prototypes/publication/components/PrototypeMapBoundaries';
-import { Axis, Chart } from '@common/services/publicationService';
+import {
+  Axis,
+  Chart,
+  ReferenceLine,
+} from '@common/services/publicationService';
 import {
   CharacteristicsData,
   DataTableResult,
@@ -90,6 +94,7 @@ function createBasicChart(
   xAxis: Axis,
   yAxis: Axis,
   stacked: boolean = false,
+  referenceLines: ReferenceLine[] = [],
 ): Chart {
   return {
     indicators,
@@ -97,6 +102,7 @@ function createBasicChart(
     type,
     xAxis,
     yAxis,
+    referenceLines,
   };
 }
 
@@ -430,6 +436,8 @@ export const testChartsVerticalWithReferenceLine = createDataBlockWithChart(
       ['cost'],
       { title: '' },
       { title: '', key: 'la_name' },
+      false,
+      [{ x: 17, label: 'England' }],
     ),
   ],
   //['London', 'Yorkshire', 'East', 'South East', 'South West', 'West Midlands', 'East Midlands', 'North West', 'North East' ]

@@ -4,6 +4,7 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
+  ReferenceLine,
   Tooltip,
   XAxis,
   YAxis,
@@ -34,6 +35,12 @@ export class HorizontalBarBlock extends Component<StackedBarHorizontalProps> {
         <XAxis type="number" />
         <Tooltip cursor={false} />
         <Legend />
+
+        {this.props.referenceLines &&
+          this.props.referenceLines.length > 0 &&
+          this.props.referenceLines.map((line, idx) => (
+            <ReferenceLine key={`ref_${idx}`} {...line} />
+          ))}
 
         {this.props.chartDataKeys.map((key, index) => (
           <Bar
