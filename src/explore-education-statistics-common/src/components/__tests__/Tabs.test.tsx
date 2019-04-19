@@ -33,6 +33,25 @@ describe('Tabs', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
+  test('setting `headingTag` changes section heading size', () => {
+    const { container } = render(
+      <Tabs>
+        <TabsSection id="section-1" title="Tab 1">
+          <p>Test section 1 content</p>
+        </TabsSection>
+        <TabsSection id="section-2" title="Tab 2" headingTag="h2">
+          <p>Test section 2 content</p>
+        </TabsSection>
+      </Tabs>,
+    );
+
+    const heading1 = container.querySelector('h3') as HTMLHeadingElement;
+    const heading2 = container.querySelector('h2') as HTMLHeadingElement;
+
+    expect(heading1).toHaveTextContent('Tab 1');
+    expect(heading2).toHaveTextContent('Tab 2');
+  });
+
   test('does not immediately render lazy tab section', () => {
     const { queryByText } = render(
       <Tabs>

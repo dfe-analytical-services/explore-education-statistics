@@ -1,6 +1,11 @@
 import { useDesktopMedia } from '@common/hooks/useMedia';
 import classNames from 'classnames';
-import React, { forwardRef, HTMLAttributes, ReactNode } from 'react';
+import React, {
+  createElement,
+  forwardRef,
+  HTMLAttributes,
+  ReactNode,
+} from 'react';
 import styles from './TabsSection.module.scss';
 
 export interface TabsSectionProps {
@@ -12,10 +17,14 @@ export interface TabsSectionProps {
    */
   lazy?: boolean;
   title: string;
+  headingTag?: 'h2' | 'h3' | 'h4';
 }
 
 const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
-  ({ children, id, ...restProps }, ref) => {
+  (
+    { children, id, title, headingTag = 'h3', ...restProps }: TabsSectionProps,
+    ref,
+  ) => {
     const { onMedia } = useDesktopMedia();
 
     // Hide additional props from the component's public API to
@@ -33,8 +42,9 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
         ref={ref}
         role={onMedia('tabpanel')}
         tabIndex={onMedia(-1)}
-        data-testid={tabProps.title}
+        data-testid={title}
       >
+        {createElement(headingTag, { children: title })}
         {children}
       </section>
     );

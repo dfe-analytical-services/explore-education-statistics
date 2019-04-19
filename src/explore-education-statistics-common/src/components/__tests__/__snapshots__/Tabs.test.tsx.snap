@@ -41,6 +41,9 @@ exports[`Tabs renders multiple tabs correctly 1`] = `
            role="tabpanel"
            tabindex="-1"
   >
+    <h3>
+      Tab 1
+    </h3>
     <p>
       Test section 1 content
     </p>
@@ -52,6 +55,9 @@ exports[`Tabs renders multiple tabs correctly 1`] = `
            role="tabpanel"
            tabindex="-1"
   >
+    <h3>
+      Tab 2
+    </h3>
     <p>
       Test section 2 content
     </p>
@@ -87,6 +93,9 @@ exports[`Tabs renders single tab correctly 1`] = `
            role="tabpanel"
            tabindex="-1"
   >
+    <h3>
+      Tab 1
+    </h3>
     <p>
       Test section 1 content
     </p>
