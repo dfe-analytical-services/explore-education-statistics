@@ -1,5 +1,5 @@
 import { Release } from '@common/services/publicationService';
-import React, { Component } from 'react';
+import React from 'react';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
 
 interface Props {
@@ -7,25 +7,25 @@ interface Props {
   id?: string;
 }
 
-class EditableContentBlock extends Component<Props> {
-  public render() {
-    const { content, id = '' } = this.props;
+function EditableContentBlock({ content, id = '' }: Props) {
+  return content.length > 0 ? (
+    content.map((block, index) => {
+      const key = `${index}_${block.heading}_${block.type}`;
 
-    return content.length > 0 ? (
-      content.map((block, index) => (
+      return (
         <EditableContentSubBlockRenderer
           block={block}
-          key={`${index}-${block.heading}-${block.type}`}
+          key={key}
           id={id}
           index={index}
         />
-      ))
-    ) : (
-      <div className="govuk-inset-text">
-        There is no content for this section.
-      </div>
-    );
-  }
+      );
+    })
+  ) : (
+    <div className="govuk-inset-text">
+      There is no content for this section.
+    </div>
+  );
 }
 
 export default EditableContentBlock;

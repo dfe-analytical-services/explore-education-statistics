@@ -10,15 +10,7 @@ export interface EditableAccordionProps {
   index: number;
 }
 
-interface State {
-  hash: string;
-}
-
-class EditableAccordion extends Component<EditableAccordionProps, State> {
-  public state = {
-    hash: '',
-  };
-
+class EditableAccordion extends Component<EditableAccordionProps> {
   private ref = createRef<HTMLDivElement>();
 
   public componentDidMount(): void {
@@ -29,28 +21,7 @@ class EditableAccordion extends Component<EditableAccordionProps, State> {
         }
       },
     );
-
-    this.goToHash();
-    window.addEventListener('hashchange', this.goToHash);
   }
-
-  public componentWillUnmount(): void {
-    window.removeEventListener('hashchange', this.goToHash);
-  }
-
-  private goToHash = () => {
-    this.setState({ hash: location.hash });
-
-    if (this.ref.current && location.hash) {
-      const anchor = this.ref.current.querySelector(
-        location.hash,
-      ) as HTMLButtonElement;
-
-      if (anchor) {
-        anchor.scrollIntoView();
-      }
-    }
-  };
 
   public render() {
     const { children, id, index } = this.props;

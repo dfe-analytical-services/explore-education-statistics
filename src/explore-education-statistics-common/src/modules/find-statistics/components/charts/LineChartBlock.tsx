@@ -1,3 +1,4 @@
+import { ChartProps } from '@common/modules/find-statistics/components/charts/AbstractChart';
 import React, { Component } from 'react';
 import {
   AxisDomain,
@@ -13,12 +14,9 @@ import {
   YAxis,
 } from 'recharts';
 import { colours, parseCondensedTimePeriodRange, symbols } from './Charts';
-import { ChartProps } from '@common/modules/find-statistics/components/charts/AbstractChart';
 
-const CustomToolTip = (props: TooltipProps) => {
-  if (props.active) {
-    const { payload, label } = props;
-
+const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
+  if (active) {
     return (
       <div className="graph-tooltip">
         <p>{label}</p>
@@ -31,21 +29,27 @@ const CustomToolTip = (props: TooltipProps) => {
 
               return 0;
             })
-            .map((_, index) => (
-              <p key={index}>
-                {`${payload[index].name} : ${payload[index].value}`}
-              </p>
-            ))}
+            .map((_, index) => {
+              return (
+                // eslint-disable-next-line react/no-array-index-key
+                <p key={index}>
+                  {`${payload[index].name} : ${payload[index].value}`}
+                </p>
+              );
+            })}
       </div>
     );
   }
+
+  return null;
 };
 
-export class LineChartBlock extends Component<ChartProps> {
+export default class LineChartBlock extends Component<ChartProps> {
   public render() {
     const {
       characteristicsData,
       chartDataKeys,
+      height,
       xAxis,
       yAxis,
       labels,
@@ -70,7 +74,7 @@ export class LineChartBlock extends Component<ChartProps> {
     }
 
     return (
-      <ResponsiveContainer width={900} height={this.props.height || 300}>
+      <ResponsiveContainer width={900} height={height || 300}>
         <LineChart
           data={chartData}
           margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
@@ -103,21 +107,25 @@ export class LineChartBlock extends Component<ChartProps> {
             unit="%"
             domain={yAxisDomain}
           />
-          {chartDataKeys.map((dataKey, index) => (
-            <Line
-              key={index}
-              name={labels[dataKey]}
-              type="linear"
-              dataKey={dataKey}
-              stroke={colours[index]}
-              fill={colours[index]}
-              strokeWidth="5"
-              unit="%"
-              legendType={symbols[index]}
-              activeDot={{ r: 3 }}
-              dot={props => <Symbols {...props} type={symbols[index]} />}
-            />
-          ))}
+          {chartDataKeys.map((dataKey, index) => {
+            const key = index;
+
+            return (
+              <Line
+                key={key}
+                name={labels[dataKey]}
+                type="linear"
+                dataKey={dataKey}
+                stroke={colours[index]}
+                fill={colours[index]}
+                strokeWidth="5"
+                unit="%"
+                legendType={symbols[index]}
+                activeDot={{ r: 3 }}
+                dot={props => <Symbols {...props} type={symbols[index]} />}
+              />
+            );
+          })}
         </LineChart>
       </ResponsiveContainer>
     );

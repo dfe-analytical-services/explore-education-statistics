@@ -1,3 +1,7 @@
+import {
+  AbstractChart,
+  ChartProps,
+} from '@common/modules/find-statistics/components/charts/AbstractChart';
 import React from 'react';
 import {
   Bar,
@@ -9,16 +13,12 @@ import {
 } from 'recharts';
 
 import { colours } from './Charts';
-import {
-  AbstractChart,
-  ChartProps,
-} from '@common/modules/find-statistics/components/charts/AbstractChart';
 
 interface StackedBarHorizontalProps extends ChartProps {
   stacked?: boolean;
 }
 
-export class HorizontalBarBlock extends AbstractChart<
+export default class HorizontalBarBlock extends AbstractChart<
   StackedBarHorizontalProps
 > {
   public render() {
@@ -27,7 +27,7 @@ export class HorizontalBarBlock extends AbstractChart<
     });
 
     return (
-      <ResponsiveContainer width={'100%'} height={this.props.height || 600}>
+      <ResponsiveContainer width="100%" height={this.props.height || 600}>
         <BarChart
           data={chartData}
           layout="vertical"
@@ -45,15 +45,18 @@ export class HorizontalBarBlock extends AbstractChart<
           <Tooltip cursor={false} />
           <Legend />
 
-          {this.props.chartDataKeys.map((key, index) => (
-            <Bar
-              key={index}
-              dataKey={key}
-              name={this.props.labels[key]}
-              fill={colours[index]}
-              stackId={this.props.stacked ? 'a' : undefined}
-            />
-          ))}
+          {this.props.chartDataKeys.map((dataKey, index) => {
+            const key = index;
+            return (
+              <Bar
+                key={key}
+                dataKey={dataKey}
+                name={this.props.labels[dataKey]}
+                fill={colours[index]}
+                stackId={this.props.stacked ? 'a' : undefined}
+              />
+            )
+          })}
 
           {this.generateReferenceLines()}
         </BarChart>

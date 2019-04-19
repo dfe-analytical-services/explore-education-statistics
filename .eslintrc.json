@@ -26,6 +26,7 @@
       "error",
       { "argsIgnorePattern": "^_$" }
     ],
+    "import/no-cycle": "off",
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
     "react/no-unescaped-entities": [
       "error",
@@ -49,11 +50,16 @@
       }
     ],
     "react/jsx-one-expression-per-line": "off",
+    "react/jsx-wrap-multilines": ["error", { "prop": "ignore"}],
     "react/prop-types": "off",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "jsx-a11y/anchor-is-valid": "off",
+    "jsx-a11y/label-has-associated-control": ["error", {
+      "assert": "htmlFor"
+    }],
     "no-console": "warn",
+    "no-use-before-define": "off",
     "no-useless-constructor": "off",
     "spaced-comment": ["warn", "always", { "markers": ["/"] }]
   },
@@ -63,6 +69,7 @@
       "rules": {
         "@typescript-eslint/no-var-requires": "off",
         "global-require": "off",
+        "import/no-dynamic-require": "off",
         "no-console": "off"
       }
     },

@@ -41,7 +41,7 @@ class Accordion extends Component<AccordionProps, State> {
   }
 
   private goToHash = () => {
-    if (this.ref.current && location.hash) {
+    if (this.ref.current && window.location.hash) {
       let locationHashEl: HTMLElement | null = null;
 
       try {

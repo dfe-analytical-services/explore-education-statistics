@@ -26,5 +26,5 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  location.hash = '';
+  window.location.hash = '';
 });

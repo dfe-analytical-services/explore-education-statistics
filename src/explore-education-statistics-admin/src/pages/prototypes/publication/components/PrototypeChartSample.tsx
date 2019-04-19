@@ -35,6 +35,8 @@ const symbols: ('circle' | 'square' | 'triangle' | 'cross' | 'star')[] = [
   'star',
 ];
 
+/* eslint-disable react/no-array-index-key */
+
 const CustomToolTip = (props: TooltipProps) => {
   const { active, payload, label } = props;
 
@@ -54,6 +56,8 @@ const CustomToolTip = (props: TooltipProps) => {
       </div>
     );
   }
+
+  return null;
 };
 
 const PrototypeChartSample = ({

@@ -21,7 +21,10 @@ const Breadcrumbs = ({ breadcrumbs = [] }: BreadcrumbsProps) => {
         </li>
         {breadcrumbs.map((breadcrumb, index) => {
           return (
-            <li key={index} className="govuk-breadcrumbs__list-item">
+            <li
+              key={`${breadcrumb.name}_${breadcrumb.link}`}
+              className="govuk-breadcrumbs__list-item"
+            >
               {index < currentBreadcrumbIndex && breadcrumb.link ? (
                 <Link className="govuk-breadcrumbs__link" to={breadcrumb.link}>
                   {breadcrumb.name}

@@ -1,15 +1,13 @@
 import Link from '@admin/components/Link';
-import PrototypeAbsenceData
-  from '@admin/pages/prototypes/publication/components/PrototypeAbsenceData';
-import PrototypeDataSample
-  from '@admin/pages/prototypes/publication/components/PrototypeDataSample';
+import PrototypeAbsenceData from '@admin/pages/prototypes/publication/components/PrototypeAbsenceData';
+import PrototypeDataSample from '@admin/pages/prototypes/publication/components/PrototypeDataSample';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import PrototypeMap from '@common/prototypes/publication/components/PrototypeMap';
 import React from 'react';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
-import { PrototypeEditableContent } from './components/PrototypeEditableContent';
+import PrototypeEditableContent from './components/PrototypeEditableContent';
 import PrototypePage from './components/PrototypePage';
 
 const PublicationPage = () => {
@@ -582,7 +580,14 @@ const PublicationPage = () => {
           heading="Pupil absence by local authority"
           onToggle={() => mapRef && mapRef.refresh()}
         >
-          <PrototypeAbsenceData ref={el => el && (mapRef = el.mapRef)} />
+          <PrototypeAbsenceData
+            ref={el => {
+              if (el) {
+                // eslint-disable-next-line prefer-destructuring
+                mapRef = el.mapRef;
+              }
+            }}
+          />
 
           <PrototypeEditableContent
             content={`

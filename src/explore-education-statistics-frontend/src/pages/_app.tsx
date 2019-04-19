@@ -1,5 +1,5 @@
 import { logPageView } from '@frontend/services/googleAnalyticsService';
-import { Container, default as BaseApp, NextAppContext } from 'next/app';
+import BaseApp, { Container, NextAppContext } from 'next/app';
 import Router from 'next/router';
 import React from 'react';
 import Helmet from 'react-helmet';

@@ -108,7 +108,9 @@ class CharacteristicsFilterForm extends Component<Props, State> {
         message: typeof message === 'string' ? message : '',
       }));
 
-    if (this.state.submitError) {
+    const { submitError } = this.state;
+
+    if (submitError) {
       summaryErrors.push({
         id: 'submit-button',
         message: 'Could not submit filters. Please try again later.',
@@ -119,6 +121,9 @@ class CharacteristicsFilterForm extends Component<Props, State> {
   }
 
   public render() {
+    const { onSubmit, publicationMeta } = this.props;
+    const { searchTerm } = this.state;
+
     return (
       <Formik
         initialValues={{
@@ -149,7 +154,7 @@ class CharacteristicsFilterForm extends Component<Props, State> {
         })}
         onSubmit={async (form, actions) => {
           try {
-            await this.props.onSubmit(form);
+            await onSubmit(form);
           } catch (error) {
             this.setState({
               submitError: error.message,
@@ -213,9 +218,9 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                       error={getError('indicators')}
                     >
                       <SearchableFilterMenus<FormValues>
-                        menuOptions={this.props.publicationMeta.indicators}
+                        menuOptions={publicationMeta.indicators}
                         name="indicators"
-                        searchTerm={this.state.searchTerm}
+                        searchTerm={searchTerm}
                         values={values.indicators}
                       />
                     </FormFieldset>
@@ -228,9 +233,9 @@ class CharacteristicsFilterForm extends Component<Props, State> {
                       error={getError('characteristics')}
                     >
                       <SearchableFilterMenus<FormValues>
-                        menuOptions={this.props.publicationMeta.characteristics}
+                        menuOptions={publicationMeta.characteristics}
                         name="characteristics"
-                        searchTerm={this.state.searchTerm}
+                        searchTerm={searchTerm}
                         values={values.characteristics}
                       />
                     </FormFieldset>

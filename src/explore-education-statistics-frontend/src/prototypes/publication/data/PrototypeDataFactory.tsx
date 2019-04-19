@@ -6,7 +6,6 @@ import {
 } from '@common/services/publicationService';
 import {
   CharacteristicsData,
-  DataTableResult,
   PublicationMeta,
 } from '@common/services/tableBuilderService';
 import SchoolType from '@common/services/types/SchoolType';
@@ -38,13 +37,18 @@ function createDataValues(
         timePeriod: year !== undefined ? year + rowIndex * 101 : 0,
       };
 
-      return row.reduce(
-        (result: DataTableResult, next: string | number | undefined, index) => {
-          if (next) result.indicators[indicators[index]] = `${next}`;
-          return result;
-        },
-        initialData,
-      );
+      return row.reduce((result, next, index) => {
+        if (next) {
+          const newIndicators = [...indicators];
+          newIndicators[index] = `${next}`;
+
+          return {
+            ...result,
+            indicators: newIndicators,
+          };
+        }
+        return result;
+      }, initialData);
     }),
   };
 

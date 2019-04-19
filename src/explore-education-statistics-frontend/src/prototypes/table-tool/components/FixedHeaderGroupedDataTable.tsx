@@ -1,8 +1,7 @@
-import styles
-  from '@frontend/prototypes/table-tool/components/FixedHeaderGroupedDataTable.module.scss';
 import classNames from 'classnames';
 import throttle from 'lodash/throttle';
 import React, { Component, createRef, forwardRef } from 'react';
+import styles from './FixedHeaderGroupedDataTable.module.scss';
 
 const dataTableCaption = 'dataTableCaption';
 
@@ -61,19 +60,23 @@ const GroupedDataTable = forwardRef<HTMLTableElement, InnerTableProps>(
               )}
             />
             {!isStickyColumn &&
-              headers.map((group, groupIndex) => (
-                <th
-                  className={classNames(
-                    'govuk-table__header--center',
-                    styles.borderLeft,
-                  )}
-                  colSpan={group.columns.length || 1}
-                  scope="colgroup"
-                  key={`${group.label}-${groupIndex}`}
-                >
-                  {group.label}
-                </th>
-              ))}
+              headers.map((group, groupIndex) => {
+                const key = `${group.label}-${groupIndex}`;
+
+                return (
+                  <th
+                    className={classNames(
+                      'govuk-table__header--center',
+                      styles.borderLeft,
+                    )}
+                    colSpan={group.columns.length || 1}
+                    scope="colgroup"
+                    key={key}
+                  >
+                    {group.label}
+                  </th>
+                );
+              })}
           </tr>
           <tr>
             <th
@@ -82,21 +85,25 @@ const GroupedDataTable = forwardRef<HTMLTableElement, InnerTableProps>(
             />
             {!isStickyColumn &&
               headers.flatMap(group =>
-                group.columns.map((column, columnIndex) => (
-                  <th
-                    className={classNames(
-                      'govuk-table__header--numeric',
-                      styles.borderBottom,
-                      {
-                        [styles.borderLeft]: columnIndex === 0,
-                      },
-                    )}
-                    scope="col"
-                    key={`${group.label}-${column}-${columnIndex}`}
-                  >
-                    {column}
-                  </th>
-                )),
+                group.columns.map((column, columnIndex) => {
+                  const key = `${group.label}_${column}_${columnIndex}`;
+
+                  return (
+                    <th
+                      className={classNames(
+                        'govuk-table__header--numeric',
+                        styles.borderBottom,
+                        {
+                          [styles.borderLeft]: columnIndex === 0,
+                        },
+                      )}
+                      scope="col"
+                      key={key}
+                    >
+                      {column}
+                    </th>
+                  );
+                }),
               )}
           </tr>
         </thead>
@@ -107,7 +114,7 @@ const GroupedDataTable = forwardRef<HTMLTableElement, InnerTableProps>(
             !isStickyHeader && (
               <tbody key={groupKey} className={styles.borderBottom}>
                 {group.rows.map((row, rowIndex) => {
-                  const rowKey = `${groupKey}-${row.label}-${rowIndex}`;
+                  const rowKey = `${groupKey}_${row.label}_${rowIndex}`;
 
                   return (
                     <tr key={rowKey}>
@@ -132,6 +139,8 @@ const GroupedDataTable = forwardRef<HTMLTableElement, InnerTableProps>(
                       {!isStickyColumn &&
                         row.columnGroups.flatMap((colGroup, colGroupIndex) =>
                           colGroup.map((column, columnIndex) => {
+                            const cellKey = `${rowKey}_${colGroupIndex}_${column}_${columnIndex}`;
+
                             return (
                               <td
                                 className={classNames(
@@ -141,7 +150,7 @@ const GroupedDataTable = forwardRef<HTMLTableElement, InnerTableProps>(
                                       columnIndex === 0 && colGroupIndex > 0,
                                   },
                                 )}
-                                key={`${rowKey}-${colGroupIndex}-${column}-${columnIndex}`}
+                                key={cellKey}
                               >
                                 {column}
                               </td>
@@ -162,6 +171,7 @@ const GroupedDataTable = forwardRef<HTMLTableElement, InnerTableProps>(
 
 GroupedDataTable.displayName = 'GroupedDataTable';
 
+// eslint-disable-next-line react/no-multi-comp
 class FixedHeaderGroupedDataTable extends Component<Props> {
   private containerRef = createRef<HTMLDivElement>();
 

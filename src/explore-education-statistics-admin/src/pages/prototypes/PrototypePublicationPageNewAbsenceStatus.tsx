@@ -17,7 +17,7 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
       ]}
     >
       <PrototypeAdminNavigation sectionId="status" />
-      {location.search == '?status=readyApproval' && (
+      {location.search === '?status=readyApproval' && (
         <>
           <div className="govuk-panel govuk-panel--confirmation">
             <h1 className="govuk-panel__title">Release ready for approval</h1>
@@ -36,7 +36,7 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
           </Link>
         </>
       )}
-      {location.search != '?status=readyApproval' && (
+      {location.search !== '?status=readyApproval' && (
         <form action="/prototypes/publication-create-new-absence-status">
           <div className="govuk-form-group">
             <fieldset className="govuk-fieldset">
@@ -107,7 +107,7 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
                 className="govuk-textarea govuk-!-width-one-half"
               />
             </div>
-            <button className="govuk-button govuk-!-margin-top-3">
+            <button className="govuk-button govuk-!-margin-top-3" type="submit">
               Update page status
             </button>
           </div>

@@ -752,8 +752,7 @@ const DocumentationGlossary = () => {
               <p>Similarly, use “WebOps”.</p>
               <h3 id="diploma">diploma</h3>
               <p>
-                Lower case unless part of a title like Edexcel L2 Diploma in
-                IT.​
+                Lower case unless part of a title like Edexcel L2 Diploma in IT.
               </p>
               <h3 id="direct-debit">Direct Debit</h3>
               <p>Upper case.</p>

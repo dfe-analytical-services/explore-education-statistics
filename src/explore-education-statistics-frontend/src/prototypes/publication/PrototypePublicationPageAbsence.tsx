@@ -643,7 +643,14 @@ const PublicationPage = () => {
           heading="Pupil absence by local authority"
           onToggle={() => mapRef && mapRef.refresh()}
         >
-          <PrototypeAbsenceData ref={el => el && (mapRef = el.mapRef)} />
+          <PrototypeAbsenceData
+            ref={el => {
+              if (el) {
+                // eslint-disable-next-line prefer-destructuring
+                mapRef = el.mapRef;
+              }
+            }}
+          />
 
           <p>
             There is variation in overall and persistent absence rates across

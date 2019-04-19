@@ -1,6 +1,9 @@
 import Details from '@common/components/Details';
-import { CharacteristicsData, PublicationMeta } from '@common/services/tableBuilderService';
-import React, { Component } from 'react';
+import {
+  CharacteristicsData,
+  PublicationMeta,
+} from '@common/services/tableBuilderService';
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
 export interface SummaryRendererProps {
@@ -10,38 +13,52 @@ export interface SummaryRendererProps {
   description: { type: string; body: string };
 }
 
-export class SummaryRenderer extends Component<SummaryRendererProps> {
-  public render() {
-    let indicators: { [key: string]: string } = {};
-    let indicatorMeta: { [key: string]: { label: string; unit: string } } = {};
-    const { dataKeys } = this.props;
+export default function SummaryRenderer({
+  meta,
+  description,
+  data,
+  dataKeys,
+}: SummaryRendererProps) {
+  let indicators: { [key: string]: string } = {};
+  let indicatorMeta: { [key: string]: { label: string; unit: string } } = {};
 
-    if (this.props.data) {
-      const characteristicsData = this.props.data;
+  if (data) {
+    const result = [...data.result];
 
-      const result = [...characteristicsData.result];
+    result.sort((a, b) => {
+      if (a.timePeriod < b.timePeriod) {
+        return -1;
+      }
 
-      result.sort((a, b) =>
-        a.timePeriod < b.timePeriod ? -1 : a.timePeriod > b.timePeriod ? 1 : 0,
-      );
+      if (a.timePeriod > b.timePeriod) {
+        return 1;
+      }
 
-      const latest = result[result.length - 1];
-      indicators = latest.indicators;
-      indicatorMeta = Array.prototype
-        .concat(...Object.values(this.props.meta.indicators))
-        .reduce((allMeta, next) => ({ ...allMeta, [next.name]: next }), {});
-    } else {
-      dataKeys.forEach(key => {
-        indicators[key] = '';
-        indicatorMeta[key] = { label: key, unit: '' };
-      });
-    }
+      return 0;
+    });
 
-    return (
-      <div>
-        <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">
-          {dataKeys.map((key, index) => (
-            <div className="dfe-dash-tiles__tile" key={`${key}_${index}`}>
+    const latest = result[result.length - 1];
+
+    // eslint-disable-next-line prefer-destructuring
+    indicators = latest.indicators;
+    indicatorMeta = Array.prototype
+      .concat(...Object.values(meta.indicators))
+      .reduce((allMeta, next) => ({ ...allMeta, [next.name]: next }), {});
+  } else {
+    dataKeys.forEach(key => {
+      indicators[key] = '';
+      indicatorMeta[key] = { label: key, unit: '' };
+    });
+  }
+
+  return (
+    <div>
+      <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">
+        {dataKeys.map((key, index) => {
+          const indicatorKey = `${key}_${index}`;
+
+          return (
+            <div className="dfe-dash-tiles__tile" key={indicatorKey}>
               <h3 className="govuk-heading-m dfe-dash-tiles__heading">
                 {indicatorMeta[key].label}
               </h3>
@@ -57,14 +74,14 @@ export class SummaryRenderer extends Component<SummaryRendererProps> {
                 voluptas quidem fugiat enim ipsa reprehenderit nulla.
               </Details>
             </div>
-          ))}
-        </div>
-        {this.props.description.body !== '' ? (
-          <ReactMarkdown source={this.props.description.body} />
-        ) : (
-          ''
-        )}
+          );
+        })}
       </div>
-    );
-  }
+      {description.body !== '' ? (
+        <ReactMarkdown source={description.body} />
+      ) : (
+        ''
+      )}
+    </div>
+  );
 }

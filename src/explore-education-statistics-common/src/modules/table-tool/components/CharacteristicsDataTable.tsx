@@ -31,7 +31,7 @@ interface Props {
 }
 
 class CharacteristicsDataTable extends Component<Props> {
-  private parseYear(year?: number): string {
+  private static parseYear(year?: number): string {
     if (!year) {
       return '';
     }
@@ -45,7 +45,7 @@ class CharacteristicsDataTable extends Component<Props> {
     return `${year}/${Number(yearString.substring(2, 4)) + 1}`;
   }
 
-  private groupByName(groupedValues: {
+  private static groupByName(groupedValues: {
     [group: string]: {
       name: string;
     }[];
@@ -77,11 +77,15 @@ class CharacteristicsDataTable extends Component<Props> {
       schoolTypes,
       years,
     } = this.props;
-    const firstYear = this.parseYear(min(years));
-    const lastYear = this.parseYear(max(years));
+    const firstYear = CharacteristicsDataTable.parseYear(min(years));
+    const lastYear = CharacteristicsDataTable.parseYear(max(years));
 
-    const characteristicsByName = this.groupByName(characteristicsMeta);
-    const indicatorsByName = this.groupByName(indicatorsMeta);
+    const characteristicsByName = CharacteristicsDataTable.groupByName(
+      characteristicsMeta,
+    );
+    const indicatorsByName = CharacteristicsDataTable.groupByName(
+      indicatorsMeta,
+    );
 
     const dataBySchool = groupBy(results, 'schoolType');
 
@@ -157,7 +161,7 @@ class CharacteristicsDataTable extends Component<Props> {
             <GroupedDataTable
               key={schoolGroup.name}
               caption={schoolGroup.name}
-              header={years.map(this.parseYear)}
+              header={years.map(CharacteristicsDataTable.parseYear)}
               groups={schoolGroup.data}
             />
           );

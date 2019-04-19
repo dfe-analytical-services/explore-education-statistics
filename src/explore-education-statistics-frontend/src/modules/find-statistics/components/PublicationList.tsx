@@ -70,18 +70,17 @@ class PublicationList extends Component<Props> {
                       </ul>
                     </Details>
                   </div>
-                </div>
               </div>
-            </li>
-          ))
-        ) : (
-          <div className="govuk-inset-text">
-            No publications currently released.
-          </div>
-        )}
-      </>
-    );
-  }
+            </div>
+          </li>
+        ))
+      ) : (
+        <div className="govuk-inset-text">
+          No publications currently released.
+        </div>
+      )}
+    </>
+  );
 }
 
 export default PublicationList;

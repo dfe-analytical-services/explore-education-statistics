@@ -1,10 +1,14 @@
-import publicationService, { Release } from '@common/services/publicationService';
+import publicationService, {
+  Release,
+} from '@common/services/publicationService';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
 import functionsService from '@frontend/services/functionsService';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
-import SubscriptionForm, { SubscriptionFormSubmitHandler } from './components/SubscriptionForm';
+import SubscriptionForm, {
+  SubscriptionFormSubmitHandler,
+} from './components/SubscriptionForm';
 
 interface Props {
   slug: string;
@@ -14,9 +18,6 @@ interface Props {
 }
 
 interface State {
-  id: string;
-  slug: string;
-  title: string;
   subscribed: boolean;
 }
 
@@ -43,19 +44,17 @@ class SubscriptionPage extends Component<Props> {
   }
 
   public state: State = {
-    id: this.props.data.id,
-    slug: this.props.slug,
     subscribed: false,
-    title: this.props.data.title,
   };
 
   private handleFormSubmit: SubscriptionFormSubmitHandler = async ({
     email,
   }) => {
     if (email !== '') {
-      const { slug } = this.state;
-      const { title } = this.state;
-      const { id } = this.state;
+      const {
+        data: { id, title },
+        slug,
+      } = this.props;
 
       await functionsService.subscribeToPublication({
         email,
@@ -70,14 +69,16 @@ class SubscriptionPage extends Component<Props> {
   };
 
   public render() {
+    const { subscribed } = this.state;
     const { data, slug, unsubscribed, verified } = this.props;
+
     let message;
 
     if (unsubscribed) {
       message = 'You have successfully unsubscribed from this publication.';
     } else if (verified) {
       message = 'You have successfully subscribed to this publication.';
-    } else if (this.state.subscribed) {
+    } else if (subscribed) {
       message =
         'Thank you. Please check your email to verify the subscription.';
     }
