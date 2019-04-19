@@ -1,6 +1,7 @@
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import CharacteristicsDataTable from '@common/modules/table-tool/components/CharacteristicsDataTable';
+import CharacteristicsDataTable
+  from '@common/modules/table-tool/components/CharacteristicsDataTable';
 import tableBuilderService, {
   DataTableResult,
   PublicationMeta,
@@ -10,12 +11,8 @@ import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
 import range from 'lodash/range';
 import React, { Component, createRef } from 'react';
-import CharacteristicsFilterForm, {
-  CharacteristicsFilterFormSubmitHandler,
-} from './components/CharacteristicsFilterForm';
-import PublicationMenu, {
-  MenuChangeEventHandler,
-} from './components/PublicationMenu';
+import CharacteristicsFilterForm, { CharacteristicsFilterFormSubmitHandler } from './components/CharacteristicsFilterForm';
+import PublicationMenu, { MenuChangeEventHandler } from './components/PublicationMenu';
 
 const defaultPublicationOptions = [
   {
@@ -85,6 +82,7 @@ class TableToolPage extends Component<{}, State> {
   };
 
   private filtersRef = createRef<HTMLDivElement>();
+
   private dataTableRef = createRef<HTMLElement>();
 
   private handleMenuChange: MenuChangeEventHandler = async ({

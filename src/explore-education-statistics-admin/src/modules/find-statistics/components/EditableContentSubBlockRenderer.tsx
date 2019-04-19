@@ -29,7 +29,7 @@ class EditableContentSubBlockRenderer extends Component<Props> {
               content={`
             ${
               block.heading
-                ? '<h3 className="govuk-heading-s">' + block.heading + '</h3>'
+                ? `<h3 className="govuk-heading-s">${block.heading}</h3>`
                 : ''
             }
 

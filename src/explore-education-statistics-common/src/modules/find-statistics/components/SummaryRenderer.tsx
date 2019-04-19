@@ -1,8 +1,5 @@
 import Details from '@common/components/Details';
-import {
-  CharacteristicsData,
-  PublicationMeta,
-} from '@common/services/tableBuilderService';
+import { CharacteristicsData, PublicationMeta } from '@common/services/tableBuilderService';
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
 
@@ -17,7 +14,7 @@ export class SummaryRenderer extends Component<SummaryRendererProps> {
   public render() {
     let indicators: { [key: string]: string } = {};
     let indicatorMeta: { [key: string]: { label: string; unit: string } } = {};
-    const dataKeys = this.props.dataKeys;
+    const { dataKeys } = this.props;
 
     if (this.props.data) {
       const characteristicsData = this.props.data;

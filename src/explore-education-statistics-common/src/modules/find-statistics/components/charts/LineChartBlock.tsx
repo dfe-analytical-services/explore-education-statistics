@@ -32,9 +32,9 @@ const CustomToolTip = (props: TooltipProps) => {
               return 0;
             })
             .map((_, index) => (
-              <p key={index}>{`${payload[index].name} : ${
-                payload[index].value
-              }`}</p>
+              <p key={index}>
+                {`${payload[index].name} : ${payload[index].value}`}
+              </p>
             ))}
       </div>
     );

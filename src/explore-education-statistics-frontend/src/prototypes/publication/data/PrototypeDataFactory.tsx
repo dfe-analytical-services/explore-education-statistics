@@ -186,7 +186,7 @@ export const ks4SchoolRevisedAttainmentChart = createDataBlockWithChart(
       { title: '' },
     ),
   ],
-  //['London', 'Yorkshire', 'East', 'South East', 'South West', 'West Midlands', 'East Midlands', 'North West', 'North East' ]
+  // ['London', 'Yorkshire', 'East', 'South East', 'South West', 'West Midlands', 'East Midlands', 'North West', 'North East' ]
 );
 
 export const ks4SchoolAverageHeadlineScoresByPupilCharacteristics = createDataBlockWithChart(

@@ -1,7 +1,8 @@
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import TimePeriod from '@common/services/types/TimePeriod';
-import FormFieldSortableList from '@frontend/prototypes/table-tool/components/FormFieldSortableList';
+import FormFieldSortableList
+  from '@frontend/prototypes/table-tool/components/FormFieldSortableList';
 import { SortableOption } from '@frontend/prototypes/table-tool/components/FormSortableList';
 import {
   FilterOption,
@@ -40,7 +41,7 @@ class TableHeadersForm extends Component<Props> {
         </p>
 
         <Formik<FormValues>
-          enableReinitialize={true}
+          enableReinitialize
           initialValues={{
             columnGroups: categorical.schoolTypes,
             columns: timePeriods,

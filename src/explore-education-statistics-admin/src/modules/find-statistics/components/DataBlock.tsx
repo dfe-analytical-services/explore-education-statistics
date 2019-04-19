@@ -11,10 +11,7 @@ import {
 } from '@common/modules/find-statistics/components/TableRenderer';
 import { baseUrl } from '@common/services/api';
 import { Chart, DataQuery, Summary } from '@common/services/publicationService';
-import {
-  CharacteristicsData,
-  PublicationMeta,
-} from '@common/services/tableBuilderService';
+import { CharacteristicsData, PublicationMeta } from '@common/services/tableBuilderService';
 import React, { Component } from 'react';
 import { ChartRenderer, ChartRendererProps } from './ChartRenderer';
 
@@ -70,7 +67,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
     const json: CharacteristicsData = await response.json();
 
-    const publicationId = json.publicationId;
+    const { publicationId } = json;
 
     const metaResponse = await fetch(
       `${

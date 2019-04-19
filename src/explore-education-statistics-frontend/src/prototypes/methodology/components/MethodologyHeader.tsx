@@ -8,6 +8,7 @@ export interface MethodologyHeaderProps {
 
 export class MethodologyHeader extends React.Component<MethodologyHeaderProps> {
   private element: HTMLElement | null;
+
   private staticRef: HTMLElement | null;
 
   public constructor(props: MethodologyHeaderProps) {

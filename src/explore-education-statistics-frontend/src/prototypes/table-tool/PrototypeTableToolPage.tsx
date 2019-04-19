@@ -1,23 +1,18 @@
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
-import tableBuilderService, {
-  DataTableResult,
-} from '@common/services/tableBuilderService';
+import tableBuilderService, { DataTableResult } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import PageTitle from '@frontend/components/PageTitle';
-import PublicationMenu, {
-  MenuChangeEventHandler,
-} from '@frontend/modules/table-tool/components/PublicationMenu';
+import PublicationMenu, { MenuChangeEventHandler } from '@frontend/modules/table-tool/components/PublicationMenu';
 import PublicationSubjectMenu from '@frontend/modules/table-tool/components/PublicationSubjectMenu';
 import PrototypePage from '@frontend/prototypes/components/PrototypePage';
-import FiltersForm, {
-  FilterFormSubmitHandler,
-} from '@frontend/prototypes/table-tool/components/FiltersForm';
+import FiltersForm, { FilterFormSubmitHandler } from '@frontend/prototypes/table-tool/components/FiltersForm';
 import initialMetaSpecification, {
   FilterOption,
   IndicatorOption,
   MetaSpecification,
 } from '@frontend/prototypes/table-tool/components/meta/initialSpec';
-import publicationSubjectSpec from '@frontend/prototypes/table-tool/components/meta/publicationSubjectSpec';
+import publicationSubjectSpec
+  from '@frontend/prototypes/table-tool/components/meta/publicationSubjectSpec';
 import TimePeriodDataTable from '@frontend/prototypes/table-tool/components/TimePeriodDataTable';
 import mapOptionValues from '@frontend/prototypes/table-tool/components/utils/mapOptionValues';
 import mapValues from 'lodash/mapValues';
@@ -93,6 +88,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
   };
 
   private filtersRef = createRef<HTMLElement>();
+
   private dataTableRef = createRef<HTMLElement>();
 
   private handleMenuChange: MenuChangeEventHandler = async ({

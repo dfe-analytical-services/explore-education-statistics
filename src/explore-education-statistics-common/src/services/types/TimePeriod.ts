@@ -6,6 +6,7 @@ const allowedTimePeriodCodes: TimePeriodCode[] = ['AY'];
 
 class TimePeriod {
   public readonly year: number;
+
   public readonly code: TimePeriodCode;
 
   public constructor(year: number, code: TimePeriodCode) {

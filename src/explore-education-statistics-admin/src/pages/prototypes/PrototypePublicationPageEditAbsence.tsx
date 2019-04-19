@@ -1,10 +1,9 @@
-import PrototypeDataSample from '@admin/pages/prototypes/publication/components/PrototypeDataSample';
+import PrototypeDataSample
+  from '@admin/pages/prototypes/publication/components/PrototypeDataSample';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
-import publicationService, {
-  Release,
-} from '@common/services/publicationService';
+import publicationService, { Release } from '@common/services/publicationService';
 import React, { Component, Fragment } from 'react';
 import {
   DragDropContext,
@@ -39,7 +38,7 @@ function getAccordionIndex(id: string | null | undefined) {
 class PublicationPage extends Component<{}, State> {
   public onDragEnd = (result: DropResult) => {
     if (result.destination) {
-      const source = result.source;
+      const { source } = result;
       const target: DraggableLocation = result.destination;
 
       if (result.type === 'accordion') {
@@ -392,7 +391,7 @@ class PublicationPage extends Component<{}, State> {
 
                 <div className="govuk-accordion__controls">&nbsp;</div>
 
-                <Droppable droppableId={`accordion(0)`} type="accordion">
+                <Droppable droppableId="accordion(0)" type="accordion">
                   {droppableProvided => (
                     <div
                       {...droppableProvided.droppableProps}

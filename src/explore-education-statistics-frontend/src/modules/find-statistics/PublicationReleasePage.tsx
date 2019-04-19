@@ -4,9 +4,7 @@ import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import GoToTopLink from '@common/components/GoToTopLink';
 import { baseUrl } from '@common/services/api';
-import publicationService, {
-  Release,
-} from '@common/services/publicationService';
+import publicationService, { Release } from '@common/services/publicationService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
@@ -115,7 +113,7 @@ class PublicationReleasePage extends Component<Props> {
 
               <p>Use our table tool to add and remove data for this table.</p>
 
-              <Link to={`/table-tool/`} className="govuk-button">
+              <Link to="/table-tool/" className="govuk-button">
                 Explore data
               </Link>
             </Details>

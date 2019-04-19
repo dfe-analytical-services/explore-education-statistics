@@ -11,10 +11,7 @@ import {
 } from '@common/modules/find-statistics/components/TableRenderer';
 import { baseUrl } from '@common/services/api';
 import { Chart, DataQuery, Summary } from '@common/services/publicationService';
-import {
-  CharacteristicsData,
-  PublicationMeta,
-} from '@common/services/tableBuilderService';
+import { CharacteristicsData, PublicationMeta } from '@common/services/tableBuilderService';
 import Link from '@frontend/components/Link';
 import React, { Component } from 'react';
 import { ChartRenderer, ChartRendererProps } from './ChartRenderer';
@@ -76,7 +73,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
     const json: CharacteristicsData = await response.json();
 
-    const publicationId = json.publicationId;
+    const { publicationId } = json;
 
     const metaResponse = await fetch(
       `${
@@ -149,7 +146,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
                 Explore and edit this data online
               </h2>
               <p>Use our table tool to add and remove data for this table.</p>
-              <Link to={`/table-tool/`} className="govuk-button">
+              <Link to="/table-tool/" className="govuk-button">
                 Explore data
               </Link>
             </TabsSection>
@@ -173,7 +170,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
                 Explore and edit this data online
               </h2>
               <p>Use our table tool to add and remove data for this chart.</p>
-              <Link to={`/table-tool/`} className="govuk-button">
+              <Link to="/table-tool/" className="govuk-button">
                 Explore chart data
               </Link>
             </TabsSection>
@@ -191,7 +188,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
               Explore and edit this data online
             </h2>
             <p>Use our table tool to explore this data.</p>
-            <Link to={`/table-tool/`} className="govuk-button">
+            <Link to="/table-tool/" className="govuk-button">
               Explore data
             </Link>
           </TabsSection>

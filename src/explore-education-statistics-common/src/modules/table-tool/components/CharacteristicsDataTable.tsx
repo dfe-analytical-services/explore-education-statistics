@@ -120,7 +120,7 @@ class CharacteristicsDataTable extends Component<Props> {
 
                   if (dataByTimePeriod[year].length > 0) {
                     if (dataByTimePeriod[year][0].indicators[indicator]) {
-                      const unit = indicatorsByName[indicator].unit;
+                      const { unit } = indicatorsByName[indicator];
 
                       return `${
                         dataByTimePeriod[year][0].indicators[indicator]

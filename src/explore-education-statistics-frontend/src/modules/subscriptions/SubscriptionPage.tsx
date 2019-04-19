@@ -1,14 +1,10 @@
-import publicationService, {
-  Release,
-} from '@common/services/publicationService';
+import publicationService, { Release } from '@common/services/publicationService';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
 import functionsService from '@frontend/services/functionsService';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
-import SubscriptionForm, {
-  SubscriptionFormSubmitHandler,
-} from './components/SubscriptionForm';
+import SubscriptionForm, { SubscriptionFormSubmitHandler } from './components/SubscriptionForm';
 
 interface Props {
   slug: string;
@@ -57,9 +53,9 @@ class SubscriptionPage extends Component<Props> {
     email,
   }) => {
     if (email !== '') {
-      const slug = this.state.slug;
-      const title = this.state.title;
-      const id = this.state.id;
+      const { slug } = this.state;
+      const { title } = this.state;
+      const { id } = this.state;
 
       await functionsService.subscribeToPublication({
         email,
@@ -94,7 +90,7 @@ class SubscriptionPage extends Component<Props> {
           { name: 'subscribe' },
         ]}
       >
-        <PageTitle title={`${data.title}`} caption={'Subscription'} />
+        <PageTitle title={`${data.title}`} caption="Subscription" />
 
         {message ? (
           <p>{message}</p>

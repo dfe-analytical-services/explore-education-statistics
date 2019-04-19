@@ -21,6 +21,7 @@ class PrototypeSearchForm extends Component<{}, State> {
     searchResults: [],
     searchValue: '',
   };
+
   private readonly boundPerformSearch: () => void;
 
   private findElementsWithText(text: string) {
@@ -34,7 +35,7 @@ class PrototypeSearchForm extends Component<{}, State> {
     element: Element,
     ...className: string[]
   ) {
-    let parentElement = element.parentElement;
+    let { parentElement } = element;
     while (
       parentElement &&
       parentElement !== document.documentElement &&
@@ -264,18 +265,15 @@ class PrototypeSearchForm extends Component<{}, State> {
 
       const len = this.state.searchResults.length;
 
-      let currentlyHighlighted: number | undefined = this.state
-        .currentlyHighlighted;
+      let { currentlyHighlighted } = this.state;
 
       if (currentlyHighlighted !== undefined) {
         currentlyHighlighted =
           ((this.state.currentlyHighlighted || 0) + direction + len) % len;
+      } else if (direction === -1) {
+        currentlyHighlighted = len - 1;
       } else {
-        if (direction === -1) {
-          currentlyHighlighted = len - 1;
-        } else {
-          currentlyHighlighted = 0;
-        }
+        currentlyHighlighted = 0;
       }
 
       this.setState({ currentlyHighlighted });

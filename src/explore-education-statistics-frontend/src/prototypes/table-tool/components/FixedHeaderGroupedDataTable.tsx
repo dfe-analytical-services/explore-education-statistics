@@ -1,4 +1,5 @@
-import styles from '@frontend/prototypes/table-tool/components/FixedHeaderGroupedDataTable.module.scss';
+import styles
+  from '@frontend/prototypes/table-tool/components/FixedHeaderGroupedDataTable.module.scss';
 import classNames from 'classnames';
 import throttle from 'lodash/throttle';
 import React, { Component, createRef, forwardRef } from 'react';
@@ -163,9 +164,13 @@ GroupedDataTable.displayName = 'GroupedDataTable';
 
 class FixedHeaderGroupedDataTable extends Component<Props> {
   private containerRef = createRef<HTMLDivElement>();
+
   private mainTableRef = createRef<HTMLTableElement>();
+
   private headerTableRef = createRef<HTMLTableElement>();
+
   private columnTableRef = createRef<HTMLTableElement>();
+
   private intersectionTableRef = createRef<HTMLTableElement>();
 
   public componentDidMount() {
