@@ -54,7 +54,8 @@
     "react-hooks/exhaustive-deps": "warn",
     "jsx-a11y/anchor-is-valid": "off",
     "no-console": "warn",
-    "no-useless-constructor": "off"
+    "no-useless-constructor": "off",
+    "spaced-comment": ["warn", "always", { "markers": ["/"] }]
   },
   "overrides": [
     {
