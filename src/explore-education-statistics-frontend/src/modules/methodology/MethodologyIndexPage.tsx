@@ -24,9 +24,10 @@ class MethodologyIndexPage extends Component {
               <nav role="navigation" aria-labelledby="subsection-title">
                 <ul className="govuk-list">
                   <li>
-                    <Link to="/statistics">
-                      Find statistics and data
-                    </Link>
+                    <Link to="/statistics">Find statistics and data</Link>
+                  </li>
+                  <li>
+                    <Link to="/glossary">Glossary</Link>
                   </li>
                 </ul>
               </nav>
