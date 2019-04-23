@@ -1,6 +1,6 @@
+import loadPolyfill from '@common/polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import loadPolyfill from './polyfill';
 
 import * as serviceWorker from './serviceWorker';
 
