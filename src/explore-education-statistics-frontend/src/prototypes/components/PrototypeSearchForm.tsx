@@ -1,6 +1,7 @@
 import debounce from 'lodash/debounce';
 import React, { Component, FormEvent, KeyboardEvent } from 'react';
 import styles from './PrototypeSearchForm.module.scss';
+import _ from 'lodash';
 
 interface SearchResult {
   element: Element;
@@ -29,12 +30,15 @@ class PrototypeSearchForm extends Component<{}, State> {
     );
   }
 
-  private static parentUntilClassname(element: Element, className: string) {
+  private static parentUntilClassname(
+    element: Element,
+    ...className: string[]
+  ) {
     let parentElement = element.parentElement;
     while (
       parentElement &&
       parentElement !== document.documentElement &&
-      !parentElement.classList.contains(className)
+      _.intersection(className, parentElement.classList).length === 0
     ) {
       parentElement = parentElement.parentElement;
     }
@@ -82,23 +86,37 @@ class PrototypeSearchForm extends Component<{}, State> {
     const searchResults: SearchResult[] = elements.map(element => {
       let scrollIntoView: () => void;
 
-      const potentialAccordion = PrototypeSearchForm.parentUntilClassname(
+      const collapsedContainer = PrototypeSearchForm.parentUntilClassname(
         element,
         'govuk-accordion__section',
+        'govuk-details',
       );
 
-      const insideAccordion = potentialAccordion.classList.contains(
-        'govuk-accordion__section',
-      );
       const location = PrototypeSearchForm.calculateLocationOfElement(
         element,
-        insideAccordion,
-        potentialAccordion,
+        collapsedContainer,
       );
 
-      if (insideAccordion) {
+      if (collapsedContainer.classList.contains('govuk-accordion__section')) {
         scrollIntoView = () => {
-          PrototypeSearchForm.openAccordion(potentialAccordion);
+          PrototypeSearchForm.openAccordion(collapsedContainer);
+          this.resetSearch();
+          element.scrollIntoView();
+        };
+      } else if (collapsedContainer.classList.contains('govuk-details')) {
+        scrollIntoView = () => {
+          collapsedContainer.setAttribute('open', '');
+          const textEl = collapsedContainer.querySelector(
+            '.govuk-details__text',
+          );
+          if (textEl) {
+            textEl.setAttribute('aria-hidden', 'false');
+            textEl.setAttribute('style', '');
+          }
+          const summary = collapsedContainer.querySelector('summary');
+          if (summary) {
+            summary.setAttribute('aria-expanded', 'true');
+          }
           this.resetSearch();
           element.scrollIntoView();
         };
@@ -134,8 +152,7 @@ class PrototypeSearchForm extends Component<{}, State> {
 
   private static calculateLocationOfElement(
     element: HTMLElement,
-    insideAccordion: boolean,
-    potentialAccordion: HTMLElement,
+    collapsedContainer: HTMLElement,
   ) {
     const location: string[] = [];
 
@@ -155,8 +172,8 @@ class PrototypeSearchForm extends Component<{}, State> {
       );
     }
 
-    if (insideAccordion) {
-      const accordionHeader = potentialAccordion.querySelector(
+    if (collapsedContainer.classList.contains('govuk-accordion__section')) {
+      const accordionHeader = collapsedContainer.querySelector(
         '.govuk-accordion__section-heading button',
       );
       if (accordionHeader) {
@@ -236,6 +253,7 @@ class PrototypeSearchForm extends Component<{}, State> {
             value={this.state.searchValue}
             onKeyDown={this.onKeyDown}
             onInput={this.onChange}
+            onChange={this.onChange}
           />
           <input
             type="submit"
