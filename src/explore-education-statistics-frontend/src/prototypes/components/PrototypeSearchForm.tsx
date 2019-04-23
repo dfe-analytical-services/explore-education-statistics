@@ -112,7 +112,7 @@ class PrototypeSearchForm extends Component<{}, State> {
         }
 
         if (detailsContainer.classList.contains('govuk-details')) {
-          PrototypeSearchForm.openDetails(accordionContainer);
+          PrototypeSearchForm.openDetails(detailsContainer);
         }
 
         if (tabContainer.classList.contains('govuk-tabs')) {
