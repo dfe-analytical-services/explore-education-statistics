@@ -24,7 +24,7 @@ Then in the robot-tests directory run
 pipenv install
 ```
 
-You will also need to create a .env file which contains the basic auth username and password. You can copy the .env.example file in the robot-tests directory, replacing `user` and `pass` with the actual username and password.
+If you intend to run the tests from your local machine, you will also need to create .env files for the relevant environments: ".env.test", ".env.stage", ".env.prod", and ".env.dfedev". Each .env file contains the URLs for that environment's public app and admin app. You can copy and rename the .env.example file in the robot-tests directory, replacing `publicAppUrl` and `adminAppUrl` with the actual URLs for that environment.
 
 # How do I run the tests?
 

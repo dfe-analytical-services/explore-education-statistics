@@ -131,8 +131,6 @@ class PrototypeAbsenceData extends Component<
   public render() {
     const { data, legend } = this.state;
 
-    console.log(this.state.absenceData);
-
     const localAuthorityOptions = data ? data.features : [];
 
     return (
