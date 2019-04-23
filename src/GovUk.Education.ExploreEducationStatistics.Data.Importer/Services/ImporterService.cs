@@ -127,7 +127,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 Location = GetLocation(line, headers),
                 School = GetSchool(line, headers),
                 Year = GetYear(line, headers),
-                TimeIdentifier = GetTimeIdentifier(line, headers)
+                TimeIdentifier = GetTimeIdentifier(line, headers),
+                //Measures = GetMeasures(line, headers, subjectMeta.Indicators)
             };
         }
 
@@ -175,6 +176,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return school;
         }
 
+        private static Dictionary<long, string> GetMeasures(IReadOnlyList<string> line,
+            List<string> headers, IEnumerable<(Indicator Indicator, string Column)> indicators)
+        {
+            var columns = indicators.Select(tuple => tuple.Column);
+            var values = CsvUtil.Values(line, headers, columns);
+
+            return indicators.Zip(values, (tuple, value) => new { tuple, value })
+                .ToDictionary(item => item.tuple.Indicator.Id, item => item.value);
+        }
+        
         private static Country GetCountry(IReadOnlyList<string> line, List<string> headers)
         {
             var columns = new[] {"country_code", "country_name"};

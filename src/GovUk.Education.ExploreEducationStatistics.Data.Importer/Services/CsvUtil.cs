@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
-    public class CsvUtil
+    public static class CsvUtil
     {
         public static T BuildType<T>(IReadOnlyList<string> line, List<string> headers, IEnumerable<string> columns,
             Func<string[], T> func)
@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return values.All(value => value == null) ? default(T) : func(values);
         }
 
-        private static string[] Values(IReadOnlyList<string> line, List<string> headers, IEnumerable<string> columns)
+        public static string[] Values(IReadOnlyList<string> line, List<string> headers, IEnumerable<string> columns)
         {
             return columns.Select(c => Value(line, headers, c)).ToArray();
         }

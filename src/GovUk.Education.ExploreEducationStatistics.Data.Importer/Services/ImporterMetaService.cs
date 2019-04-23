@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return new SubjectMeta
             {
                 Filters = ImportFilters(metaRows, subject),
-                IndicatorGroups = ImportIndicatorGroups(metaRows, subject)
+                Indicators = ImportIndicators(metaRows, subject)
             };
         }
 
@@ -55,61 +55,67 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             });
         }
 
-        private IEnumerable<(Filter Filter, string FilterGroupingColumn)> ImportFilters(
+        private IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> ImportFilters(
             IEnumerable<MetaRow> metaRows, Subject subject)
         {
             var filters = GetFilters(metaRows, subject);
-            _context.Filter.AddRange(filters.Select(tuple => tuple.Filter));
+            _context.Filter.AddRange(filters.Select(triple => triple.Filter));
             _context.SaveChanges();
             return filters;
         }
 
-        private IEnumerable<IndicatorGroup> ImportIndicatorGroups(IEnumerable<MetaRow> metaRows, Subject subject)
+        private IEnumerable<(Indicator Indicator, string Column)> ImportIndicators(IEnumerable<MetaRow> metaRows,
+            Subject subject)
         {
-            var indicatorGroups = GetIndicatorGroups(metaRows, subject);
-            _context.IndicatorGroup.AddRange(indicatorGroups);
+            var indicators = GetIndicators(metaRows, subject);
+            _context.Indicator.AddRange(indicators.Select(tuple => tuple.Indicator));
             _context.SaveChanges();
-            return indicatorGroups;
+            return indicators;
         }
 
-        private static IEnumerable<(Filter Filter, string FilterGroupingColumn)> GetFilters(
+        private static IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> GetFilters(
             IEnumerable<MetaRow> metaRows, Subject subject)
         {
             return metaRows
                 .Where(row => row.ColumnType == ColumnType.Filter)
-                .Select(filter => (filter: new Filter
-                {
-                    Hint = filter.FilterHint,
-                    Label = filter.Label,
-                    Subject = subject
-                }, filterGroupingColumn: filter.FilterGroupingColumn));
+                .Select(filter => (
+                    filter: new Filter
+                    {
+                        Hint = filter.FilterHint,
+                        Label = filter.Label,
+                        Subject = subject
+                    },
+                    column: filter.ColumnName,
+                    filterGroupingColumn: filter.FilterGroupingColumn));
         }
 
-        private static IEnumerable<IndicatorGroup> GetIndicatorGroups(IEnumerable<MetaRow> metaRows, Subject subject)
+        private static IEnumerable<(Indicator Indicator, string Column)> GetIndicators(IEnumerable<MetaRow> metaRows,
+            Subject subject)
         {
-            var indicatorGroups = metaRows
-                .Where(row => row.ColumnType == ColumnType.Indicator)
+            var indicatorRows = metaRows.Where(row => row.ColumnType == ColumnType.Indicator);
+
+            var indicatorGroups = indicatorRows
                 .GroupBy(row => row.IndicatorGrouping)
-                .Select(group => new IndicatorGroup
+                .ToDictionary(rows => rows.Key, rows => new IndicatorGroup
                 {
-                    Indicators = group.ToList().Select(row => new Indicator
-                    {
-                        Label = row.Label,
-                        Unit = row.IndicatorUnit
-                    }).ToList(),
-                    Label = group.Key,
+                    Label = rows.Key,
                     Subject = subject
-                }).ToList();
+                });
 
-            indicatorGroups.ForEach(group =>
-            {
-                foreach (var indicator in group.Indicators)
+            return indicatorRows
+                .Select(row =>
                 {
-                    indicator.IndicatorGroup = group;
-                }
-            });
-
-            return indicatorGroups;
+                    indicatorGroups.TryGetValue(row.IndicatorGrouping, out var indicatorGroup);
+                    return (
+                        indicator: new Indicator
+                        {
+                            IndicatorGroup = indicatorGroup,
+                            Label = row.Label,
+                            Unit = row.IndicatorUnit
+                        },
+                        column: row.ColumnName
+                    );
+                });
         }
     }
 }
