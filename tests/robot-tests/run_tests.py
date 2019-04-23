@@ -9,7 +9,7 @@ Options:
 -e|--env : Run against specific environment, "local", "test", "stage", "prod".
 Usage: "pipenv run python run_tests.py -e test"
 
--h|--happypath: Run happypath tests only. Usage: "pipenv run python run_tests.py -h"
+-t|--tag: Run specified tests with tag. Usage: "pipenv run python run_tests.py -t HappyPath"
 
 -b BROWSER|--browser BROWSER : Run a different browser to the default, chrome.
 Usage: "pipenv run python run_tests.py -b firefox". You will need to install the webdriver for that browser (e.g. geckodriver for firefox)
@@ -40,36 +40,17 @@ from dotenv import load_dotenv
 
 arguments = []
 headless = True
-happypath = False
+tag = None
 profile = False
 ci = False
 tests = "tests/"
 browser = "chrome"
 interp = "pabot"
 
-# Get .env basicAuth credentials
-basicAuthUser = "user"
-basicAuthPass = "pass"
-load_dotenv()
-if os.getenv('publicAppBasicAuthUsername') and os.getenv('publicAppBasicAuthPassword'):
-    basicAuthUser = os.getenv('publicAppBasicAuthUsername')
-    basicAuthPass = os.getenv('publicAppBasicAuthPassword')
-else:
-    print("No basic auth credentials detected!")
-
-env = "test"  # by default, run tests against test environment
-url = "about:blank"
-localUrl = "http://localhost:3000"
-localAdminUrl = ""
-testUrl = "https://%s:%s@public-explore-education-statistics-test.azurewebsites.net" % (basicAuthUser, basicAuthPass)
-testAdminUrl = "https://eesadminprototype.z33.web.core.windows.net/prototypes/admin-dashboard"
-stageUrl = "https://%s:%s@public-explore-education-statistics-stage.azurewebsites.net" % (basicAuthUser, basicAuthPass)
-stageAdminUrl = "https://eesadminprototype.z33.web.core.windows.net/prototypes/admin-dashboard"
-prodUrl = ""
-prodAdminUrl = ""
-
 timeout = 10
 implicit_wait = 10
+
+env = "test"  # by default, run tests against test environment
 
 # Process arguments
 for i in range(1, len(sys.argv)):
@@ -93,8 +74,8 @@ for i in range(1, len(sys.argv)):
 arguments += ["--outputdir", "test-results/", "--exclude", "Failing",
               "--exclude", "UnderConstruction"]
 
-if happypath:
-    arguments += ["--include", "HappyPath"]
+if tag:
+    arguments += ["--include", tag]
 
 if ci:
   arguments += ["--xunit", "xunit", "-v", "timeout:" + str(timeout), "-v", "implicit_wait:" + str(implicit_wait)]
@@ -104,18 +85,27 @@ if headless:
 else:
     arguments += ["-v", "headless:0"]
 
+url = "about:blank"
+urlAdmin = "about:blank"
 if env == 'local':
-    url = localUrl
-    urlAdmin = localAdminUrl
+    url = "http://localhost:3000"
+    urlAdmin = "about:blank"
 elif env == 'test':
-    url = testUrl
-    urlAdmin = testAdminUrl
-elif env == 'stage' or env == "staging":
-    url = stageUrl
-    urlAdmin = stageAdminUrl
-elif env == "prod" or env == "live":
-    url = prodUrl
-    urlAdmin = prodAdminUrl
+    load_dotenv(os.path.join(os.path.dirname(__file__), '.env.test'))
+    url = os.getenv('publicAppUrl')
+    urlAdmin = os.getenv('adminAppUrl')
+elif env in ['stage', 'staging']:
+    load_dotenv(os.path.join(os.path.dirname(__file__), '.env.stage'))
+    url = os.getenv('publicAppUrl')
+    urlAdmin = os.getenv('adminAppUrl')
+elif env in ['prod', 'live']:
+    load_dotenv(os.path.join(os.path.dirname(__file__), '.env.prod'))
+    url = os.getenv('publicAppUrl')
+    urlAdmin = os.getenv('adminAppUrl')
+elif env == 'dfedev':
+    load_dotenv(os.path.join(os.path.dirname(__file__), '.env.dfedev'))
+    url = os.getenv('publicAppUrl')
+    urlAdmin = os.getenv('adminAppUrl')
 else:
     raise Exception('Invalid environment \"' + env + '\"! Must be \"local\", \"test\", \"stage\", or \"prod\"!')
 
@@ -128,9 +118,6 @@ arguments += [tests]
 # Install Chromedriver and add it to PATH
 path = cdi.install(file_directory='./webdriver/', verbose=False, chmod=True, overwrite=False, version=None)
 os.environ["PATH"] += os.pathsep + os.getcwd() + os.sep + 'webdriver'
-
-# Wait until environment is warmed up
-# warm_up_servers.wait_for_server(url)
 
 # Run tests
 if interp == "robot":

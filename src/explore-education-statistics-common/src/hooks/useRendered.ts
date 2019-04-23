@@ -13,7 +13,7 @@ function useRendered() {
 
   useEffect(() => {
     setRendered(true);
-  });
+  }, []);
 
   return {
     isRendered,

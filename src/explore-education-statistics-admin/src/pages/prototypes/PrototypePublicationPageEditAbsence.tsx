@@ -42,8 +42,6 @@ class PublicationPage extends Component<{}, State> {
       const source = result.source;
       const target: DraggableLocation = result.destination;
 
-      console.log(result);
-
       if (result.type === 'accordion') {
         const sourceAccordion = getAccordionIndex(source.droppableId);
         const targetAccordion = getAccordionIndex(target.droppableId);
