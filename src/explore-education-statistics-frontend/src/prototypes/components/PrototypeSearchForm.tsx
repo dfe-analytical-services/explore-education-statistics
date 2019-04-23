@@ -105,7 +105,18 @@ class PrototypeSearchForm extends Component<{}, State> {
         };
       } else if (collapsedContainer.classList.contains('govuk-details')) {
         scrollIntoView = () => {
-          collapsedContainer.setAttribute('open', 'open');
+          collapsedContainer.setAttribute('open', '');
+          const textEl = collapsedContainer.querySelector(
+            '.govuk-details__text',
+          );
+          if (textEl) {
+            textEl.setAttribute('aria-hidden', 'false');
+            textEl.setAttribute('style', '');
+          }
+          const summary = collapsedContainer.querySelector('summary');
+          if (summary) {
+            summary.setAttribute('aria-expanded', 'true');
+          }
           this.resetSearch();
           element.scrollIntoView();
         };
@@ -242,6 +253,7 @@ class PrototypeSearchForm extends Component<{}, State> {
             value={this.state.searchValue}
             onKeyDown={this.onKeyDown}
             onInput={this.onChange}
+            onChange={this.onChange}
           />
           <input
             type="submit"
