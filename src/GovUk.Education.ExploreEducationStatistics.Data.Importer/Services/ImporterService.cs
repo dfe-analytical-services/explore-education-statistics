@@ -13,6 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
     public class ImporterService : IImporterService
     {
         private readonly ImporterLocationService _importerLocationService;
+        private readonly ImporterFilterService _importerFilterService;
         private readonly ImporterMetaService _importerMetaService;
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
@@ -51,11 +52,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             };
 
         public ImporterService(
+            ImporterFilterService importerFilterService,
             ImporterLocationService importerLocationService,
             ImporterMetaService importerMetaService,
             ApplicationDbContext context,
             ILogger<ImporterService> logger)
         {
+            _importerFilterService = importerFilterService;
             _importerLocationService = importerLocationService;
             _importerMetaService = importerMetaService;
             _context = context;
@@ -122,14 +125,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             var line = raw.Split(',');
             return new Observation
             {
-                Subject = subject,
+                FilterItems = GetFilterItems(line, headers, subjectMeta.Filters),
                 GeographicLevel = GetGeographicLevel(line, headers),
                 Location = GetLocation(line, headers),
+                Measures = GetMeasures(line, headers, subjectMeta.Indicators),
                 School = GetSchool(line, headers),
-                Year = GetYear(line, headers),
+                Subject = subject,
                 TimeIdentifier = GetTimeIdentifier(line, headers),
-                Measures = GetMeasures(line, headers, subjectMeta.Indicators)
+                Year = GetYear(line, headers)
             };
+        }
+
+        private IEnumerable<ObservationFilterItem> GetFilterItems(IReadOnlyList<string> line,
+            List<string> headers,
+            IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
+        {
+            return filtersMeta.Select(filterMeta =>
+            {
+                var filterItemLabel = CsvUtil.Value(line, headers, filterMeta.Column);
+                var filterGroupLabel = CsvUtil.Value(line, headers, filterMeta.FilterGroupingColumn);
+                var filterItem = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter);
+                return new ObservationFilterItem
+                {
+                    FilterItem = filterItem
+                };
+            });
         }
 
         private static TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)
@@ -165,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private static School GetSchool(IReadOnlyList<string> line, List<string> headers)
         {
             var columns = new[] {"estab", "laestab", "academy_open_date", "academy_type", "urn"};
-            var school = CsvUtil.BuildType(line, headers, columns, values => new School
+            return CsvUtil.BuildType(line, headers, columns, values => new School
             {
                 Estab = values[0],
                 LaEstab = values[1],
@@ -173,7 +193,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 AcademyType = values[3],
                 Urn = values[4]
             });
-            return school;
         }
 
         private static Dictionary<long, string> GetMeasures(IReadOnlyList<string> line,
@@ -182,12 +201,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             var columns = indicators.Select(tuple => tuple.Column);
             var values = CsvUtil.Values(line, headers, columns);
 
-            var result = indicators.Zip(values, (tuple, value) => new {tuple, value})
+            return indicators.Zip(values, (tuple, value) => new {tuple, value})
                 .ToDictionary(item => item.tuple.Indicator.Id, item => item.value);
-
-            return result;
         }
-        
+
         private static Country GetCountry(IReadOnlyList<string> line, List<string> headers)
         {
             var columns = new[] {"country_code", "country_name"};
