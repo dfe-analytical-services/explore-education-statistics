@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private IEnumerable<(Indicator Indicator, string Column)> ImportIndicators(IEnumerable<MetaRow> metaRows,
             Subject subject)
         {
-            var indicators = GetIndicators(metaRows, subject);
+            var indicators = GetIndicators(metaRows, subject).ToList();
             _context.Indicator.AddRange(indicators.Select(tuple => tuple.Indicator));
             _context.SaveChanges();
             return indicators;
