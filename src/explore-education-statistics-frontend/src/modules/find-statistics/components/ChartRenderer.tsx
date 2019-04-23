@@ -2,7 +2,7 @@ import { HorizontalBarBlock } from '@common/modules/find-statistics/components/c
 import { LineChartBlock } from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
 import { VerticalBarBlock } from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
-import { Axis } from '@common/services/publicationService';
+import { Axis, ReferenceLine } from '@common/services/publicationService';
 import {
   CharacteristicsData,
   IndicatorsMetaItem,
@@ -28,6 +28,7 @@ export interface ChartRendererProps {
   height?: number;
   stacked?: boolean;
   geometry?: MapFeature;
+  referenceLines?: ReferenceLine[];
 }
 
 export class ChartRenderer extends Component<ChartRendererProps> {
@@ -63,6 +64,8 @@ export class ChartRenderer extends Component<ChartRendererProps> {
     const xAxis: Axis = this.props.xAxis || { title: '' };
     const yAxis: Axis = this.props.yAxis || { title: '' };
 
+    const referenceLines = this.props.referenceLines;
+
     switch (this.props.type.toLowerCase()) {
       case 'line':
         return (
@@ -73,6 +76,7 @@ export class ChartRenderer extends Component<ChartRendererProps> {
             xAxis={xAxis}
             yAxis={yAxis}
             height={this.props.height}
+            referenceLines={referenceLines}
           />
         );
       case 'verticalbar':
@@ -84,6 +88,7 @@ export class ChartRenderer extends Component<ChartRendererProps> {
             xAxis={xAxis}
             yAxis={yAxis}
             height={this.props.height}
+            referenceLines={referenceLines}
           />
         );
       case 'horizontalbar':
@@ -96,6 +101,7 @@ export class ChartRenderer extends Component<ChartRendererProps> {
             yAxis={yAxis}
             height={this.props.height}
             stacked={this.props.stacked}
+            referenceLines={referenceLines}
           />
         );
       case 'map':

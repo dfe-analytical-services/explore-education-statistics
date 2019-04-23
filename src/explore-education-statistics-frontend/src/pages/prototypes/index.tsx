@@ -61,6 +61,12 @@ class PrototypesIndexPage extends Component {
             </a>
           </li>
         </ul>
+
+        <ul>
+          <li>
+            <Link to="/prototypes/graphs">Example graphs page</Link>
+          </li>
+        </ul>
       </PrototypePage>
     );
   }

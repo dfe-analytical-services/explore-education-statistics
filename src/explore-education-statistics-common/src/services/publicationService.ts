@@ -28,6 +28,12 @@ export interface DataQuery {
   body: string;
 }
 
+export interface ReferenceLine {
+  label: string;
+  x?: number | string;
+  y?: number | string;
+}
+
 export interface Axis {
   title: string;
   key?: string;
@@ -42,6 +48,7 @@ export interface Chart {
   yAxis?: Axis;
   stacked?: boolean;
   geometry?: MapFeature | FeatureCollection;
+  referenceLines?: ReferenceLine[];
 }
 
 export interface Summary {
