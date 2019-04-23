@@ -50,14 +50,58 @@
       }
     ],
     "react/jsx-one-expression-per-line": "off",
-    "react/jsx-wrap-multilines": ["error", { "prop": "ignore"}],
+    "react/jsx-wrap-multilines": ["error", { "prop": "ignore" }],
+    "react/sort-comp": [
+      "error",
+      {
+        "order": [
+          "instance-variables",
+          "lifecycle",
+          "static-methods",
+          "getters",
+          "setters",
+          "/^(get|set)(?!(InitialState$|DefaultProps$|ChildContext$)).+$/",
+          "instance-methods",
+          "everything-else",
+          "/^on.+$/",
+          "rendering"
+        ],
+        "groups": {
+          "lifecycle": [
+            "displayName",
+            "propTypes",
+            "contextTypes",
+            "childContextTypes",
+            "mixins",
+            "statics",
+            "defaultProps",
+            "state",
+            "constructor",
+            "getDefaultProps",
+            "getInitialState",
+            "getChildContext",
+            "componentWillMount",
+            "componentDidMount",
+            "componentWillReceiveProps",
+            "shouldComponentUpdate",
+            "componentWillUpdate",
+            "componentDidUpdate",
+            "componentWillUnmount"
+          ],
+          "rendering": ["/^render.+$/", "render"]
+        }
+      }
+    ],
     "react/prop-types": "off",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "jsx-a11y/anchor-is-valid": "off",
-    "jsx-a11y/label-has-associated-control": ["error", {
-      "assert": "htmlFor"
-    }],
+    "jsx-a11y/label-has-associated-control": [
+      "error",
+      {
+        "assert": "htmlFor"
+      }
+    ],
     "no-console": "warn",
     "no-use-before-define": "off",
     "no-useless-constructor": "off",

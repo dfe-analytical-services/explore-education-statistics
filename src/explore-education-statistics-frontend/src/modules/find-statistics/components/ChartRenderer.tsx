@@ -39,6 +39,7 @@ export class ChartRenderer extends Component<ChartRendererProps> {
       height,
       meta,
       indicators,
+      referenceLines,
       stacked,
       type,
       xAxis = { title: '' },
@@ -76,8 +77,6 @@ export class ChartRenderer extends Component<ChartRendererProps> {
 
       return 0;
     });
-
-    const referenceLines = this.props.referenceLines;
 
     switch (type.toLowerCase()) {
       case 'line':

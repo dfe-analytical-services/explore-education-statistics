@@ -158,11 +158,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
           )}
 
           {charts && (
-            <TabsSection
-              id={`${id}1`}
-              title="Charts"
-              lazy={this.props.showTables}
-            >
+            <TabsSection id={`${id}1`} title="Charts" lazy={showTables}>
               <h3>{heading}</h3>
               {charts.map((chart, idx) => {
                 const key = `${id}_chart_${idx}`;
