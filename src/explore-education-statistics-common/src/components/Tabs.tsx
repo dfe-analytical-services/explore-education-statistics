@@ -1,4 +1,4 @@
-import useRendered from '@common/hooks/useRendered';
+import { useDesktopMedia } from '@common/hooks/useMedia';
 import isComponentType from '@common/lib/type-guards/components/isComponentType';
 import classNames from 'classnames';
 import React, {
@@ -33,12 +33,14 @@ const Tabs = ({ children }: Props) => {
   const [loadedSections, setLoadedSections] = useState(new Set<number>());
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
-  const { onRendered } = useRendered();
+  const { onMedia } = useDesktopMedia();
 
   const tabElements: HTMLAnchorElement[] = [];
   const sectionElements: HTMLElement[] = [];
 
   const setSelectedTab = (index: number) => {
+    window.location.hash = sectionElements[index].id;
+
     setLoadedSections(loadedSections.add(index));
     setSelectedTabIndex(index);
   };
@@ -55,16 +57,20 @@ const Tabs = ({ children }: Props) => {
             role="presentation"
           >
             <a
-              aria-controls={onRendered(props.id)}
-              aria-selected={onRendered(selectedTabIndex === index)}
+              aria-controls={onMedia(props.id)}
+              aria-selected={onMedia(selectedTabIndex === index)}
+              role={onMedia('tab')}
               className={classNames('govuk-tabs__tab', {
                 'govuk-tabs__tab--selected': selectedTabIndex === index,
               })}
               href={`#${props.id}`}
               id={`${props.id}-tab`}
               ref={(element: HTMLAnchorElement) => tabElements.push(element)}
-              role={onRendered('tab')}
-              onClick={() => setSelectedTab(index)}
+              tabIndex={selectedTabIndex !== index ? -1 : undefined}
+              onClick={event => {
+                event.preventDefault();
+                setSelectedTab(index);
+              }}
               onKeyDown={event => {
                 switch (event.key) {
                   case 'ArrowLeft': {
@@ -94,7 +100,6 @@ const Tabs = ({ children }: Props) => {
                     break;
                 }
               }}
-              tabIndex={selectedTabIndex !== index ? -1 : undefined}
             >
               {props.title}
             </a>
