@@ -1,7 +1,7 @@
 import debounce from 'lodash/debounce';
 import React, { Component, FormEvent, KeyboardEvent } from 'react';
 import styles from './PrototypeSearchForm.module.scss';
-import _ from 'lodash';
+import intersection from 'lodash/intersection';
 
 interface SearchResult {
   element: Element;
@@ -38,7 +38,7 @@ class PrototypeSearchForm extends Component<{}, State> {
     while (
       parentElement &&
       parentElement !== document.documentElement &&
-      _.intersection(className, parentElement.classList).length === 0
+      intersection(className, parentElement.classList).length === 0
     ) {
       parentElement = parentElement.parentElement;
     }
@@ -161,10 +161,10 @@ class PrototypeSearchForm extends Component<{}, State> {
           .querySelectorAll(
             'ul.govuk-tabs__list > li.govuk-tabs__list-item a.govuk-tabs__tab--selected',
           )
-          .forEach(_ => {
-            _.classList.remove('govuk-tabs__tab--selected');
-            _.setAttribute('aria-selected', 'false');
-            _.setAttribute('tabIndex', '-1');
+          .forEach(selectedElement => {
+            selectedElement.classList.remove('govuk-tabs__tab--selected');
+            selectedElement.setAttribute('aria-selected', 'false');
+            selectedElement.setAttribute('tabIndex', '-1');
           });
 
         // make the selected tab selected
@@ -177,7 +177,9 @@ class PrototypeSearchForm extends Component<{}, State> {
           container.querySelectorAll(
             '.govuk-tabs__panel:not(.govuk-tabs__panel--hidden)',
           ),
-        ).forEach(_ => _.classList.add('govuk-tabs__panel--hidden'));
+        ).forEach(hiddenElement =>
+          hiddenElement.classList.add('govuk-tabs__panel--hidden'),
+        );
 
         // show the selected panel
         panel.classList.remove('govuk-tabs__panel--hidden');
