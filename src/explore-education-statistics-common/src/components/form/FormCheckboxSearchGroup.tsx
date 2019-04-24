@@ -1,5 +1,5 @@
 import FormTextSearchInput from '@common/components/form/FormTextSearchInput';
-import useRendered from '@common/hooks/useRendered';
+import useMounted from '@common/hooks/useMounted';
 import React, { useState } from 'react';
 import FormCheckboxGroup, { FormCheckboxGroupProps } from './FormCheckboxGroup';
 import styles from './FormCheckboxSearchGroup.module.scss';
@@ -15,7 +15,7 @@ const FormCheckboxSearchGroup = ({
   const { id, name, options, value } = props;
 
   const [searchTerm, setSearchTerm] = useState('');
-  const { isRendered } = useRendered();
+  const { isMounted } = useMounted();
 
   let filteredOptions = options;
 
@@ -34,7 +34,7 @@ const FormCheckboxSearchGroup = ({
 
   return (
     <>
-      {isRendered ? (
+      {isMounted ? (
         <div>
           <div className={styles.inputContainer}>
             <FormTextSearchInput

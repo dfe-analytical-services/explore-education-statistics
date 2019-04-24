@@ -3,15 +3,17 @@ import { Omit } from '@common/types/util';
 import { FieldArray } from 'formik';
 import get from 'lodash/get';
 import React from 'react';
-import FormCheckboxGroup, { FormCheckboxGroupProps } from './FormCheckboxGroup';
+import FormCheckboxSearchGroup, {
+  FormCheckboxSearchGroupProps,
+} from './FormCheckboxSearchGroup';
 import { onAllChange, onChange } from './util/checkboxGroupFieldHelpers';
 
 type Props<FormValues> = {
   name: keyof FormValues | string;
   showError?: boolean;
-} & Omit<FormCheckboxGroupProps, 'value'>;
+} & Omit<FormCheckboxSearchGroupProps, 'value'>;
 
-const FormFieldCheckboxGroup = <T extends {}>(props: Props<T>) => {
+const FormFieldCheckboxSearchGroup = <T extends {}>(props: Props<T>) => {
   const { error, name, options, showError = true } = props;
 
   return (
@@ -20,14 +22,14 @@ const FormFieldCheckboxGroup = <T extends {}>(props: Props<T>) => {
         const { form } = fieldArrayProps;
         const { getError } = createErrorHelper(form);
 
-        let errorMessage = error || getError(name);
+        let errorMessage = error ? error : getError(name);
 
         if (!showError) {
           errorMessage = '';
         }
 
         return (
-          <FormCheckboxGroup
+          <FormCheckboxSearchGroup
             {...props}
             error={errorMessage}
             options={options}
@@ -41,4 +43,4 @@ const FormFieldCheckboxGroup = <T extends {}>(props: Props<T>) => {
   );
 };
 
-export default FormFieldCheckboxGroup;
+export default FormFieldCheckboxSearchGroup;
