@@ -39,6 +39,7 @@ export interface Axis {
   key?: string;
   min?: number;
   max?: number;
+  size?: number;
 }
 
 export interface Chart {

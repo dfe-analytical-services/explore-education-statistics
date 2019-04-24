@@ -52,7 +52,7 @@ export class AbstractChart<P extends ChartProps, S = {}> extends Component<
     angle: number = 0,
     titleSize: number = 25,
   ) {
-    let size = 25;
+    let size = axis.size || 25;
     let title: ReactNode | '';
 
     if (axis.title) {

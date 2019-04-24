@@ -210,7 +210,7 @@ export const ks4SchoolAverageHeadlineScoresByPupilCharacteristics = createDataBl
       'horizontalbar',
       ['ebacc_entry', 'eng', 'attainment'],
       { title: '' },
-      { title: '', key: 'name' },
+      { title: '', key: 'name', size: 60 },
     ),
   ],
 );
@@ -280,7 +280,7 @@ export const ks4PerformanceInMatsComparedToNationalAverage = createDataBlockWith
       'horizontalbar',
       ['below_Average', 'average', 'above_average'],
       { title: '', key: 'name' },
-      { title: '' },
+      { title: '', size: 40 },
       true,
     ),
   ],
@@ -561,7 +561,10 @@ export const testDistribution = createDataBlockWithChart(
 
   SchoolType.Total,
   200102,
-  [...Array(100)].map((item, idx) => [1900 + idx, Math.random() * 100]),
+  [...Array(101)].map((item, idx) => [
+    idx % 10 === 0 ? 1900 + idx : '',
+    Math.random() * 100,
+  ]),
   [
     createBasicChart(
       'verticalbar',
