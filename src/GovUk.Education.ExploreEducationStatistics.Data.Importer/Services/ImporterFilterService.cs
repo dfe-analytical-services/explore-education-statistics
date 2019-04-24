@@ -24,11 +24,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         private FilterItem LookupOrCreateFilterItem(FilterGroup filterGroup, string filterItemLabel)
         {
-            var cacheKey = filterGroup.Id + "_" + filterItemLabel;
+            if (string.IsNullOrWhiteSpace(filterItemLabel))
+            {
+                filterItemLabel = "Not specified";
+            }
+
+            var cacheKey = filterGroup.Id + "_" + filterItemLabel.ToLower();
             if (_cache.TryGetValue(cacheKey, out FilterItem filterItem))
             {
                 return filterItem;
             }
+            
+            // TODO change expiry or introduce lookup
 
             filterItem = CreateFilterItem(filterGroup, filterItemLabel);
             _cache.Set(cacheKey, filterItem,
@@ -50,15 +57,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             if (label == null)
             {
-                label = "All";
+                label = "Default";
             }
 
-            var cacheKey = filter.Id + "_" + label;
+            var cacheKey = filter.Id + "_" + label.ToLower();
             if (_cache.TryGetValue(cacheKey, out FilterGroup filterGroup))
             {
                 return filterGroup;
             }
 
+            // TODO change expiry or introduce lookup
+            
             filterGroup = CreateFilterGroup(filter, label);
             _cache.Set(cacheKey, filterGroup,
                 new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
@@ -68,11 +77,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         private FilterGroup CreateFilterGroup(Filter filter, string label)
         {
-            return _context.FilterGroup.Add(new FilterGroup
+            var filterGroup = _context.FilterGroup.Add(new FilterGroup
             {
                 Filter = filter,
                 Label = label
             }).Entity;
+            _context.SaveChanges();
+            return filterGroup;
         }
     }
 }

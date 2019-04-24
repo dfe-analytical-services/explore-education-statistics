@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> ImportFilters(
             IEnumerable<MetaRow> metaRows, Subject subject)
         {
-            var filters = GetFilters(metaRows, subject);
+            var filters = GetFilters(metaRows, subject).ToList();
             _context.Filter.AddRange(filters.Select(triple => triple.Filter));
             _context.SaveChanges();
             return filters;

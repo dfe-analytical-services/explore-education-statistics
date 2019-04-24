@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             SubjectMeta subjectMeta)
         {
             var line = raw.Split(',');
-            return new Observation
+            var observation = new Observation
             {
                 FilterItems = GetFilterItems(line, headers, subjectMeta.Filters),
                 GeographicLevel = GetGeographicLevel(line, headers),
@@ -134,9 +134,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 TimeIdentifier = GetTimeIdentifier(line, headers),
                 Year = GetYear(line, headers)
             };
+            return observation;
         }
 
-        private IEnumerable<ObservationFilterItem> GetFilterItems(IReadOnlyList<string> line,
+        private ICollection<ObservationFilterItem> GetFilterItems(IReadOnlyList<string> line,
             List<string> headers,
             IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
         {
@@ -149,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 {
                     FilterItem = filterItem
                 };
-            });
+            }).ToList();
         }
 
         private static TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)
