@@ -1,7 +1,7 @@
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.TableBuilder;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpPost("geographic")]
-        public ActionResult<TableBuilderResult> Query([FromBody] ObservationQueryContext query)
+        public ActionResult<TableBuilderResultViewModel> Query([FromBody] ObservationQueryContext query)
         {
             var result = _tableBuilderService.Query(query);
             if (result.Result.Any())

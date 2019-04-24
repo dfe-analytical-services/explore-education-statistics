@@ -12,18 +12,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         [EnumLabel("LEP")] Local_Enterprise_Partnerships,
 
+        [EnumLabel("MATS")] MAT_Or_Sponsor,
+        
         [EnumLabel("MCA")] Mayoral_Combined_Authorities,
-
+        
         [EnumLabel("NAT")] National,
 
         [EnumLabel("OA")] Opportunity_Areas,
 
         [EnumLabel("PC")] Parliamentary_Constituency,
+        
+        [EnumLabel("PRO")] Provider,
 
         [EnumLabel("REG")] Regional,
 
         [EnumLabel("RSCR")] RSC_Region,
 
-        [EnumLabel("SCH")] School
+        [EnumLabel("SCH")] School,
+        
+        [EnumLabel("WAR")] Ward
     }
 }

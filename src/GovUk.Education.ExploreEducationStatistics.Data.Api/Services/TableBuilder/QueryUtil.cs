@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
     {
         public static Dictionary<long, string> FilterMeasures(
             Dictionary<long, string> measures,
-            ICollection<long> indicators)
+            IEnumerable<long> indicators)
         {
             return (
                 from kvp in measures
@@ -17,9 +17,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             ).ToDictionary(pair => pair.Key, pair => pair.Value);
         }
 
-        public static IEnumerable<int> YearsQuery(ICollection<int> specificYears, int start, int end)
+        public static IEnumerable<int> YearsQuery(IEnumerable<int> specificYears, int start, int end)
         {
-            if (specificYears != null && specificYears.Count > 0)
+            if (specificYears != null && specificYears.Any())
             {
                 // Years have been specified. Ignore any StartYear and EndYear
                 return specificYears;

@@ -2,5 +2,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 {
     public interface ISubjectService : IDataService<Subject, long>
     {
+        bool IsSubjectForLatestRelease(long subjectId);
     }
 }

@@ -8,22 +8,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 {
     public static class QueryContextUtil
     {
-        public static Expression<Func<T, bool>> ReleaseExpression<T>(long releaseId)
-            where T : Observation
-        {
-            return x => x.Subject.ReleaseId == releaseId;
-        }
-
         public static Expression<Func<T, bool>> GeographicLevelExpression<T>(GeographicLevel geographicLevel)
             where T : Observation
         {
             return x => x.GeographicLevel == geographicLevel;
-        }
-
-        public static Expression<Func<T, bool>> RegionsExpression<T>(IEnumerable<string> regions)
-            where T : Observation
-        {
-            return x => regions == null || !regions.Any() || regions.Contains(x.Location.Region.Code);
         }
 
         public static Expression<Func<T, bool>> LocalAuthoritiesExpression<T>(IEnumerable<string> localAuthorities)
@@ -40,7 +28,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
             return x => localAuthorityDistricts == null || !localAuthorityDistricts.Any() ||
                         localAuthorityDistricts.Contains(x.Location.LocalAuthorityDistrict.Code);
         }
-        
+
+        public static Expression<Func<T, bool>> RegionsExpression<T>(IEnumerable<string> regions)
+            where T : Observation
+        {
+            return x => regions == null || !regions.Any() || regions.Contains(x.Location.Region.Code);
+        }
+
+        public static Expression<Func<T, bool>> SubjectExpression<T>(long subjectId)
+            where T : Observation
+        {
+            return x => x.SubjectId == subjectId;
+        }
+
         public static Expression<Func<T, bool>> TimePeriodExpression<T>(IEnumerable<int> timePeriods)
             where T : Observation
         {

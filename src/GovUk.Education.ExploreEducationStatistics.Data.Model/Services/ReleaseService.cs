@@ -7,7 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class ReleaseService : AbstractDataService<Release, long>, IReleaseService
     {
-
         public ReleaseService(ApplicationDbContext context, ILogger<ReleaseService> logger) :
             base(context, logger)
         {

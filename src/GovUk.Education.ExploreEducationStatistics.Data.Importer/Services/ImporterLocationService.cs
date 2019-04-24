@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 return location;
             }
 
-            location = LookupOrCreate(country, region, localAuthority);
+            location = LookupOrCreate(country, region, localAuthority, localAuthorityDistrict);
             _cache.Set(cacheKey, location,
                 new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
 

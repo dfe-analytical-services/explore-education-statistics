@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             var enumType = typeof(TEnum);
             foreach (TEnum val in Enum.GetValues(enumType))
             {
-                var enumTypeMemberInfo = enumType.GetMember(value);
+                var enumTypeMemberInfo = enumType.GetMember(val.ToString());
                 var enumLabelAttribute = (EnumLabelAttribute) enumTypeMemberInfo[0]
                     .GetCustomAttributes(typeof(EnumLabelAttribute), false)
                     .FirstOrDefault();

@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ModelBinding;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
@@ -54,11 +54,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Data API", Version = "v1"});
             });
 
-            services.AddTransient<IResultBuilder<Observation, TableBuilderObservation>, ResultBuilder>();
+            services.AddTransient<IResultBuilder<Observation, TableBuilderObservationViewModel>, ResultBuilder>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
             services.AddTransient<IMetaService, MetaService>();
 
             services.AddTransient<IFilterService, FilterService>();
+            services.AddTransient<IIndicatorGroupService, IndicatorGroupService>();
             services.AddTransient<IIndicatorService, IndicatorService>();
             services.AddTransient<ILocationService, LocationService>();
             services.AddTransient<IObservationService, ObservationService>();

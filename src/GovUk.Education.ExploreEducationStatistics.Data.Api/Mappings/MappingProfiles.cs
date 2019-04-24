@@ -23,6 +23,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
                 .ForMember(dest => dest.Label, opts => { opts.MapFrom(localAuthority => localAuthority.Name); })
                 .ForMember(dest => dest.Value, opts => { opts.MapFrom(localAuthority => localAuthority.Code); });
 
+            CreateMap<LocalAuthorityDistrict, LabelValueViewModel>()
+                .ForMember(dest => dest.Label,
+                    opts => { opts.MapFrom(localAuthorityDistrict => localAuthorityDistrict.Name); })
+                .ForMember(dest => dest.Value,
+                    opts => { opts.MapFrom(localAuthorityDistrict => localAuthorityDistrict.Code); });
+
             CreateMap<Region, LabelValueViewModel>()
                 .ForMember(dest => dest.Label, opts => { opts.MapFrom(region => region.Name); })
                 .ForMember(dest => dest.Value, opts => { opts.MapFrom(region => region.Code); });

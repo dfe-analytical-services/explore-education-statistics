@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
@@ -12,33 +12,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 {
     public class TableBuilderService : ITableBuilderService
     {
-        private readonly IReleaseService _releaseService;
         private readonly IObservationService _observationService;
-        private readonly IResultBuilder<Observation, TableBuilderObservation> _resultBuilder;
+        private readonly ISubjectService _subjectService;
+
+        private readonly IResultBuilder<Observation, TableBuilderObservationViewModel> _resultBuilder;
 
         public TableBuilderService(
-            IReleaseService releaseService,
             IObservationService observationService,
-            IResultBuilder<Observation, TableBuilderObservation> resultBuilder)
+            ISubjectService subjectService,
+            IResultBuilder<Observation, TableBuilderObservationViewModel> resultBuilder)
         {
-            _releaseService = releaseService;
             _observationService = observationService;
+            _subjectService = subjectService;
             _resultBuilder = resultBuilder;
         }
 
-        public TableBuilderResult Query(IQueryContext<Observation> queryContext)
+        public TableBuilderResultViewModel Query(IQueryContext<Observation> queryContext)
         {
             var observations = GetObservations(queryContext);
             if (!observations.Any())
             {
-                return new TableBuilderResult();
+                return new TableBuilderResultViewModel();
             }
 
             var first = observations.FirstOrDefault();
-            return new TableBuilderResult
+            return new TableBuilderResultViewModel
             {
                 PublicationId = first.Subject.Release.PublicationId,
-                ReleaseId = first.SubjectId,
+                ReleaseId = first.Subject.Release.Id,
+                SubjectId = first.Subject.Id,
                 ReleaseDate = first.Subject.Release.ReleaseDate,
                 GeographicLevel = first.GeographicLevel,
                 Result = observations.Select(observation =>
@@ -48,8 +50,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 
         private IEnumerable<Observation> GetObservations(IQueryContext<Observation> queryContext)
         {
-            var releaseId = _releaseService.GetLatestRelease(queryContext.PublicationId);
-            return _observationService.FindMany(queryContext.FindExpression(releaseId),
+            if (!_subjectService.IsSubjectForLatestRelease(queryContext.SubjectId))
+            {
+                // TODO throw exception?
+                return new List<Observation>();
+            }
+
+            return _observationService.FindMany(queryContext.FindExpression(),
                 new List<Expression<Func<Observation, object>>>
                     {data => data.Subject, data => data.Subject.Release}
             );

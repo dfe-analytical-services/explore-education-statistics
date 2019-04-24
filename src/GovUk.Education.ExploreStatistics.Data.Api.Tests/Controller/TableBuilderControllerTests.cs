@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.TableBuilder;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -20,17 +20,17 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
             var tableBuilderService = new Mock<ITableBuilderService>();
 
             tableBuilderService.Setup(s => s.Query(It.IsNotIn(_query))).Returns(
-                new TableBuilderResult
+                new TableBuilderResultViewModel
                 {
-                    Result = new List<ITableBuilderData>()
+                    Result = new List<TableBuilderObservationViewModel>()
                 });
 
             tableBuilderService.Setup(s => s.Query(_query)).Returns(
-                new TableBuilderResult
+                new TableBuilderResultViewModel
                 {
-                    Result = new List<ITableBuilderData>
+                    Result = new List<TableBuilderObservationViewModel>
                     {
-                        new TableBuilderObservation()
+                        new TableBuilderObservationViewModel()
                     }
                 });
 
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
         public void Query_Post()
         {
             var result = _controller.Query(_query);
-            Assert.IsAssignableFrom<TableBuilderResult>(result.Value);
+            Assert.IsAssignableFrom<TableBuilderResultViewModel>(result.Value);
         }
 
         [Fact]
