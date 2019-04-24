@@ -121,16 +121,27 @@ describe('FormRadioGroup', () => {
         legend="Choose a radio"
         id="test-radios"
         name="test-radios"
-        options={[
-          { id: 'radio-1', label: 'Test radio 1', value: '1' },
-          { id: 'radio-2', label: 'Test radio 2', value: '2' },
-          { id: 'radio-3', label: 'Test radio 3', value: '3' },
-        ]}
+        options={[{ id: 'radio-1', label: 'Test radio 1', value: '1' }]}
       />,
     );
 
     expect(getByText('Choose a radio')).toBeDefined();
     expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders correctly with small size variants', () => {
+    const { container } = render(
+      <FormRadioGroup
+        id="test-radios"
+        name="test-radios"
+        legend="Choose a radio"
+        small
+        options={[{ id: 'radio-1', label: 'Test radio 1', value: '1' }]}
+      />,
+    );
+
+    expect(container.querySelector('.govuk-radios--small')).not.toBeNull();
+    expect(container).toMatchSnapshot();
   });
 
   test('renders option with conditional contents', () => {

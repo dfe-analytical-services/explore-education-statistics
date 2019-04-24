@@ -18,6 +18,7 @@ export type FormRadioGroupProps = {
   name: string;
   onChange?: RadioChangeEventHandler;
   options: RadioOption[];
+  small?: boolean;
   value: string | null;
 } & FieldSetProps;
 
@@ -25,6 +26,7 @@ class FormRadioGroup extends Component<FormRadioGroupProps> {
   public static defaultProps = {
     inline: false,
     legendSize: 'm',
+    small: false,
     value: '',
   };
 
@@ -41,13 +43,14 @@ class FormRadioGroup extends Component<FormRadioGroupProps> {
   }
 
   public render() {
-    const { id, inline, name, onChange, options, value } = this.props;
+    const { id, inline, name, onChange, options, small, value } = this.props;
 
     return (
       <FormFieldset {...this.props}>
         <div
           className={classNames('govuk-radios', {
             'govuk-radios--inline': inline,
+            'govuk-radios--small': small,
           })}
           ref={this.ref}
         >

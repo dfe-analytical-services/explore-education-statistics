@@ -134,32 +134,6 @@ exports[`FormCheckboxGroup renders correctly with legend 1`] = `
           Test checkbox 1
         </label>
       </div>
-      <div class="govuk-checkboxes__item">
-        <input class="govuk-checkboxes__input"
-               id="checkbox-2"
-               name="test-checkboxes"
-               type="checkbox"
-               value="2"
-        >
-        <label class="govuk-label govuk-checkboxes__label"
-               for="checkbox-2"
-        >
-          Test checkbox 2
-        </label>
-      </div>
-      <div class="govuk-checkboxes__item">
-        <input class="govuk-checkboxes__input"
-               id="checkbox-3"
-               name="test-checkboxes"
-               type="checkbox"
-               value="3"
-        >
-        <label class="govuk-label govuk-checkboxes__label"
-               for="checkbox-3"
-        >
-          Test checkbox 3
-        </label>
-      </div>
     </div>
   </fieldset>
 </div>
@@ -198,40 +172,6 @@ exports[`FormCheckboxGroup renders correctly with small size variants 1`] = `
             for="checkbox-1"
           >
             Test checkbox 1
-          </label>
-        </div>
-        <div
-          class="govuk-checkboxes__item"
-        >
-          <input
-            class="govuk-checkboxes__input"
-            id="checkbox-2"
-            name="test-checkboxes"
-            type="checkbox"
-            value="2"
-          />
-          <label
-            class="govuk-label govuk-checkboxes__label"
-            for="checkbox-2"
-          >
-            Test checkbox 2
-          </label>
-        </div>
-        <div
-          class="govuk-checkboxes__item"
-        >
-          <input
-            class="govuk-checkboxes__input"
-            id="checkbox-3"
-            name="test-checkboxes"
-            type="checkbox"
-            value="3"
-          />
-          <label
-            class="govuk-label govuk-checkboxes__label"
-            for="checkbox-3"
-          >
-            Test checkbox 3
           </label>
         </div>
       </div>
