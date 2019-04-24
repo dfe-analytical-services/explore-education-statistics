@@ -52,7 +52,7 @@ export class AbstractChart<P extends ChartProps, S = {}> extends Component<
     angle: number = 0,
     titleSize: number = 25,
   ) {
-    let size = 25;
+    let size = axis.size || 25;
     let title: ReactNode | '';
 
     if (axis.title) {
@@ -73,7 +73,7 @@ export class AbstractChart<P extends ChartProps, S = {}> extends Component<
       'insideBottom',
     );
     return (
-      <XAxis {...props} height={height}>
+      <XAxis {...props} height={height} minTickGap={10}>
         {title}
       </XAxis>
     );
