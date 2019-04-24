@@ -103,7 +103,57 @@ jobs:
           searchFolder: './src'
           testRunTitle: 'Frontend Jest tests'
 
-  - job: 'FrontendDev02'
+  - job: 'FrontendArtifactDev01'
+    dependsOn: 'Frontend'
+    pool:
+      vmImage: 'ubuntu-16.04'
+      demands: 'npm'
+    steps:
+      - task: 'Npm@1'
+        displayName: 'Install root dependencies'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'ci'
+      - task: 'Npm@1'
+        displayName: 'Install subproject dev dependencies'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run bootstrap'
+      - task: 'Npm@1'
+        displayName: 'Build frontend'
+        inputs:
+          command: 'custom'
+          workingDir: './src/explore-education-statistics-frontend'
+          verbose: false
+          customCommand: 'run build:dev01'
+      - task: 'Bash@3'
+        displayName: 'Remove dev dependencies'
+        inputs:
+          targetType: 'inline'
+          script: 'rm -rf ./src/**/node_modules'
+      - task: 'Npm@1'
+        displayName: 'Install prod dependencies'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run bootstrap:prod'
+      - task: 'ArchiveFiles@2'
+        displayName: 'Archive frontend'
+        inputs:
+          rootFolderOrFile: './src/explore-education-statistics-frontend'
+          includeRootFolder: false
+          archiveFile: '$(Build.ArtifactStagingDirectory)/frontend-development.zip'
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Pipeline Artifact'
+        inputs:
+          artifactName: 'frontend-dev01'
+          targetPath: '$(Build.ArtifactStagingDirectory)'
+  - job: 'FrontendArtifactDev02'
     dependsOn: 'Frontend'
     pool:
       vmImage: 'ubuntu-16.04'
@@ -152,8 +202,8 @@ jobs:
         displayName: 'Publish Pipeline Artifact'
         inputs:
           artifactName: 'frontend-dev02'
-          targetPath: '$(Build.ArtifactStagingDirectory)'
-  - job: 'FrontendDev03'
+          targetPath: '$(Build.ArtifactStagingDirectory)'          
+  - job: 'FrontendArtifactDev03'
     dependsOn: 'Frontend'
     pool:
       vmImage: 'ubuntu-16.04'
@@ -202,56 +252,6 @@ jobs:
         displayName: 'Publish Pipeline Artifact'
         inputs:
           artifactName: 'frontend-dev03'
-          targetPath: '$(Build.ArtifactStagingDirectory)'          
-- job: 'FrontendDevelopment'
-    dependsOn: 'Frontend'
-    pool:
-      vmImage: 'ubuntu-16.04'
-      demands: 'npm'
-    steps:
-      - task: 'Npm@1'
-        displayName: 'Install root dependencies'
-        inputs:
-          command: 'custom'
-          workingDir: '.'
-          verbose: false
-          customCommand: 'ci'
-      - task: 'Npm@1'
-        displayName: 'Install subproject dev dependencies'
-        inputs:
-          command: 'custom'
-          workingDir: '.'
-          verbose: false
-          customCommand: 'run bootstrap'
-      - task: 'Npm@1'
-        displayName: 'Build frontend'
-        inputs:
-          command: 'custom'
-          workingDir: './src/explore-education-statistics-frontend'
-          verbose: false
-          customCommand: 'run build:development'
-      - task: 'Bash@3'
-        displayName: 'Remove dev dependencies'
-        inputs:
-          targetType: 'inline'
-          script: 'rm -rf ./src/**/node_modules'
-      - task: 'Npm@1'
-        displayName: 'Install prod dependencies'
-        inputs:
-          command: 'custom'
-          workingDir: '.'
-          verbose: false
-          customCommand: 'run bootstrap:prod'
-      - task: 'ArchiveFiles@2'
-        displayName: 'Archive frontend'
-        inputs:
-          rootFolderOrFile: './src/explore-education-statistics-frontend'
-          includeRootFolder: false
-          archiveFile: '$(Build.ArtifactStagingDirectory)/frontend-development.zip'
-      - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Pipeline Artifact'
-        inputs:
-          artifactName: 'frontend-development'
           targetPath: '$(Build.ArtifactStagingDirectory)'
 
   - job: 'MiscellaneousArtifacts'

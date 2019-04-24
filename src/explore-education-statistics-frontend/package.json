@@ -95,7 +95,7 @@
     "start": "node server.js",
     "start:prod": "cross-env NODE_ENV=production node server.js",
     "build": "next build ./src",
-    "build:development": "cross-env BUILD_ENV=development next build ./src",
+    "build:dev01": "cross-env BUILD_ENV=dev01 next build ./src",
     "build:dev02": "cross-env BUILD_ENV=dev02 next build ./src",
     "build:dev03": "cross-env BUILD_ENV=dev03 next build ./src",
     "build:test": "cross-env BUILD_ENV=test next build ./src",
