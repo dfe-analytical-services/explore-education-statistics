@@ -22,6 +22,10 @@ interface State {
 }
 
 class SubscriptionPage extends Component<Props> {
+  public state: State = {
+    subscribed: false,
+  };
+
   public static async getInitialProps({
     query,
   }: NextContext<{
@@ -42,10 +46,6 @@ class SubscriptionPage extends Component<Props> {
       verified,
     };
   }
-
-  public state: State = {
-    subscribed: false,
-  };
 
   private handleFormSubmit: SubscriptionFormSubmitHandler = async ({
     email,

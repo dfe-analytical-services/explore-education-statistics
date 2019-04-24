@@ -29,6 +29,7 @@ class PrototypeMap extends Component<PrototypeMapProps, State> {
     selectedAuthority: '',
   };
 
+  // eslint-disable-next-line react/sort-comp
   private static DEFAULT_BOUNDS = new LatLngBounds(
     { lat: 48, lng: -6.5 },
     { lat: 60, lng: 2 },

@@ -55,6 +55,14 @@
       "error",
       {
         "order": [
+          "displayName",
+          "propTypes",
+          "contextTypes",
+          "childContextTypes",
+          "mixins",
+          "defaultProps",
+          "statics",
+          "state",
           "instance-variables",
           "lifecycle",
           "static-methods",
@@ -68,14 +76,6 @@
         ],
         "groups": {
           "lifecycle": [
-            "displayName",
-            "propTypes",
-            "contextTypes",
-            "childContextTypes",
-            "mixins",
-            "statics",
-            "defaultProps",
-            "state",
             "constructor",
             "getDefaultProps",
             "getInitialState",
