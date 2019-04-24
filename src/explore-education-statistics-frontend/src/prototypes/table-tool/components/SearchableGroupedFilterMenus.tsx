@@ -1,6 +1,6 @@
+import DetailsMenu from '@common/components/DetailsMenu';
 import { FormGroup } from '@common/components/form';
 import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
-import MenuDetails from '@frontend/modules/table-tool/components/MenuDetails';
 import { GroupedFilterOptions } from '@frontend/prototypes/table-tool/components/meta/initialSpec';
 import SearchTextInput from '@frontend/prototypes/table-tool/components/SearchTextInput';
 import classNames from 'classnames';
@@ -86,7 +86,7 @@ class SearchableGroupedFilterMenus<
         );
 
         return (
-          <MenuDetails
+          <DetailsMenu
             summary={
               <>
                 {groupKey}
@@ -120,7 +120,7 @@ class SearchableGroupedFilterMenus<
               small
               showError={false}
             />
-          </MenuDetails>
+          </DetailsMenu>
         );
       });
 
