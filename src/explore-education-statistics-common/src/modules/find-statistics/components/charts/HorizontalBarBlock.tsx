@@ -1,50 +1,63 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {
   Bar,
   BarChart,
   CartesianGrid,
   Legend,
+  ResponsiveContainer,
   Tooltip,
-  XAxis,
-  YAxis,
 } from 'recharts';
 
-import { ChartProps, colours } from './Charts';
+import { colours } from './Charts';
+import {
+  AbstractChart,
+  ChartProps,
+} from '@common/modules/find-statistics/components/charts/AbstractChart';
 
 interface StackedBarHorizontalProps extends ChartProps {
   stacked?: boolean;
 }
 
-export class HorizontalBarBlock extends Component<StackedBarHorizontalProps> {
+export class HorizontalBarBlock extends AbstractChart<
+  StackedBarHorizontalProps
+> {
   public render() {
     const chartData = this.props.characteristicsData.result.map(data => {
       return data.indicators;
     });
 
     return (
-      <BarChart
-        width={900}
-        height={this.props.height || 600}
-        data={chartData}
-        layout="vertical"
-        margin={{ top: 5, right: 30, left: 60, bottom: 25 }}
-      >
-        <YAxis type="category" dataKey={this.props.yAxis.key || 'name'} />
-        <CartesianGrid />
-        <XAxis type="number" />
-        <Tooltip cursor={false} />
-        <Legend />
+      <ResponsiveContainer width={'100%'} height={this.props.height || 600}>
+        <BarChart
+          data={chartData}
+          layout="vertical"
+          margin={this.calculateMargins()}
+        >
+          {this.calculateYAxis({
+            type: 'category',
+            dataKey: this.props.yAxis.key || 'name',
+          })}
 
-        {this.props.chartDataKeys.map((key, index) => (
-          <Bar
-            key={index}
-            dataKey={key}
-            name={this.props.labels[key]}
-            fill={colours[index]}
-            stackId={this.props.stacked ? 'a' : undefined}
-          />
-        ))}
-      </BarChart>
+          <CartesianGrid />
+
+          {this.calculateXAxis({ type: 'number' })}
+
+          <Tooltip cursor={false} />
+          <Legend />
+
+          {this.props.chartDataKeys.map((key, index) => (
+            <Bar
+              key={index}
+              dataKey={key}
+              name={this.props.labels[key]}
+              fill={colours[index]}
+              stackId={this.props.stacked ? 'a' : undefined}
+            />
+          ))}
+
+          {this.generateReferenceLines()}
+        </BarChart>
+      </ResponsiveContainer>
     );
   }
 }

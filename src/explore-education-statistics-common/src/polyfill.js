@@ -1,5 +1,3 @@
-console.log(typeof Promise === 'undefined');
-
 if (typeof Promise === 'undefined') {
   // eslint-disable-next-line global-require
   window.Promise = require('core-js/fn/promise');
@@ -24,6 +22,17 @@ const loadPolyfill = () => {
     // NodeList.forEach
     if (window.NodeList && !NodeList.prototype.forEach) {
       NodeList.prototype.forEach = Array.prototype.forEach;
+    }
+
+    // Alias addListener/removeListener (as these are deprecated)
+    if (
+      typeof MediaQueryList.prototype.addEventListener === 'undefined' ||
+      typeof MediaQueryList.prototype.removeEventListener === 'undefined'
+    ) {
+      MediaQueryList.prototype.addEventListener =
+        MediaQueryList.prototype.addListener;
+      MediaQueryList.prototype.removeEventListener =
+        MediaQueryList.prototype.removeListener;
     }
   };
 

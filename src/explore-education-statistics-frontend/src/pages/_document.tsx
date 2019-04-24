@@ -19,6 +19,14 @@ class Document extends BaseDocument {
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+          {process.env.NODE_ENV === 'development' && (
+            <>
+              {/* Force browser to not cache any assets */}
+              <meta httpEquiv="pragma" content="no-cache" />
+              <meta httpEquiv="cache-control" content="no-cache" />
+            </>
+          )}
+
           <link
             rel="shortcut icon"
             sizes="16x16 32x32 48x48"
