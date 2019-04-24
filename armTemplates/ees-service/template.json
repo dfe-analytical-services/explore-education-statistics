@@ -3,10 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
 
+    "subscription": {
+      "type": "string",
+      "metadata": {
+        "descritpion": "Data Hub Subscription Name e.g. s101d01. Used as a prefix for created resources"
+      }
+    },
     "environment": {
       "type": "string",
       "metadata": {
-        "descritpion": "Data Hub Environment Name e.g. s101d01. Used as a prefix for created resources"
+        "descritpion": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
       }
     },
 
@@ -70,32 +76,32 @@
     }
   },
   "variables": {
-    "dataAppName": "[concat(parameters('environment'), '-as-ees-data')]",
-    "dataPlanName": "[concat(parameters('environment'), '-asp-ees-data')]",
-    "dataAppInsights": "[concat(parameters('environment'), '-ai-ees-data')]",
+    "dataAppName": "[concat(parameters('subscription'), '-as-', parameters('subscription'), '-data')]",
+    "dataPlanName": "[concat(parameters('subscription'), '-asp', parameters('subscription'), '-data')]",
+    "dataAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('subscription'), '-data')]",
 
-    "contentAppName": "[concat(parameters('environment'), '-as-ees-content')]",
-    "contentPlanName": "[concat(parameters('environment'), '-asp-ees-content')]",
-    "contentAppInsights": "[concat(parameters('environment'), '-ai-ees-content')]",
+    "contentAppName": "[concat(parameters('subscription'), '-as-', parameters('subscription'), '-content')]",
+    "contentPlanName": "[concat(parameters('subscription'), '-asp-', parameters('subscription'), '-content')]",
+    "contentAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('subscription'), '-content')]",
 
-    "adminAppName": "[concat(parameters('environment'), '-as-ees-admin')]",
-    "adminPlanName": "[concat(parameters('environment'), '-asp-ees-admin')]",
-    "adminAppInsights": "[concat(parameters('environment'), '-ai-ees-admin')]",
+    "adminAppName": "[concat(parameters('subscription'), '-as-', parameters('subscription'), '-admin')]",
+    "adminPlanName": "[concat(parameters('subscription'), '-asp-', parameters('subscription'), '-admin')]",
+    "adminAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('subscription'), '-admin')]",
 
-    "publicAppName": "[concat(parameters('environment'), '-as-ees-public')]",
-    "publicPlanName": "[concat(parameters('environment'), '-asp-ees-public')]",
-    "publicAppInsights": "[concat(parameters('environment'), '-ai-ees-public')]",
+    "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('subscription'), '-public')]",
+    "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('subscription'), '-public')]",
+    "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('subscription'), '-public')]",
 
-    "coreStorageAccountName": "[concat(parameters('environment'), 'storageeescore')]",
+    "coreStorageAccountName": "[concat(parameters('subscription'), 'storage', parameters('subscription'), 'core')]",
     "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]",
 
-    "sqlserverName": "[concat(parameters('environment'), '-sqlsvr-ees-01')]",
+    "sqlserverName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('subscription'), '-01')]",
 
-    "notificationsAppName": "[concat(parameters('environment'), '-fa-ees-notify')]",
-    "notificationsPlanName": "[concat(parameters('environment'), '-asp-ees-notify')]",
-    "notificationsAppInsights": "[concat(parameters('environment'), '-ai-ees-notify')]",
+    "notificationsAppName": "[concat(parameters('subscription'), '-fa-', parameters('subscription'), '-notify')]",
+    "notificationsPlanName": "[concat(parameters('subscription'), '-asp-', parameters('subscription'), '-notify')]",
+    "notificationsAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('subscription'), '-notify')]",
 
-    "notificationsstorageAccountName": "[concat(parameters('environment'), 'storageeesnotify')]",
+    "notificationsstorageAccountName": "[concat(parameters('subscription'), 'storage', parameters('subscription'), 'notify')]",
     "notificationsstorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]"
   },
   "resources": [
