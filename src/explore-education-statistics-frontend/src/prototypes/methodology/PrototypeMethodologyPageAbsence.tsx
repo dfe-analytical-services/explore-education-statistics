@@ -33,7 +33,7 @@ const PublicationPage = () => {
       ]}
     >
       <h1 className="govuk-heading-xl">
-        Pupil absence statistics: guidance and methodology
+        Pupil absence statistics: methodology
       </h1>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
@@ -53,8 +53,8 @@ const PublicationPage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">
-            Find out about the methodology behind pupil absence statistics and
-            data and how and why they're collected and published.
+            Find out more about pupil absence statistics and data and how and
+            why they're collected and published.
           </p>
         </div>
 
@@ -75,7 +75,7 @@ const PublicationPage = () => {
       </div>
 
       <Accordion id="contents-sections">
-        <AccordionSection heading="1. Introduction">
+        <AccordionSection heading="1. Overview of absence statistics">
           <MethodologySection>
             <MethodologyHeader>
               <h3 className="govuk-heading-s">In this section</h3>
@@ -99,7 +99,7 @@ const PublicationPage = () => {
           </MethodologySection>
         </AccordionSection>
 
-        <AccordionSection heading="2. Background">
+        <AccordionSection heading="2. National Statistics badging">
           <MethodologySection>
             <MethodologyHeader>
               <h3 className="govuk-heading-s">In this section</h3>
@@ -233,7 +233,7 @@ const PublicationPage = () => {
           </MethodologySection>
         </AccordionSection>
 
-        <AccordionSection heading="6. Contacts">
+        <AccordionSection heading="7. Contacts">
           <PrototypeSection7 />
         </AccordionSection>
       </Accordion>

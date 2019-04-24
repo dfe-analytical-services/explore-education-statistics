@@ -19,8 +19,8 @@ const HomePage = () => {
             <Link to="/prototypes/methodology-specific">Methodology</Link>
           </h2>
           <p className="govuk-body">
-            Browse to find out about the methodology behind specific education
-            statistics and data and how and why they're collected and published.
+            Browse education statistics and data topics to find out more about
+            them and how and why they're collected and published.
           </p>
 
           <h2 className="govuk-heading-m govuk-!-margin-bottom-1">
