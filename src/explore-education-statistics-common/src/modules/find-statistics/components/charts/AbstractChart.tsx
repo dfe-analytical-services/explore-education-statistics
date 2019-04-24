@@ -73,7 +73,7 @@ export class AbstractChart<P extends ChartProps, S = {}> extends Component<
       'insideBottom',
     );
     return (
-      <XAxis {...props} height={height} minTickGap={10}>
+      <XAxis {...props} height={height}>
         {title}
       </XAxis>
     );
