@@ -74,6 +74,10 @@
     "notifyTokenSecretKey": {
       "type": "securestring",
       "defaultValue": ""
+    },
+    "envNumber": {
+      "type": "string",
+      "defaultValue": ""
     }
   },
   "variables": {
@@ -93,7 +97,9 @@
     "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-public')]",
     "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public')]",
 
-    "coreStorageAccountName": "[concat(parameters('subscription'), 'storage', parameters('environment'), 'core')]",
+    "storageEnv": "[concat('ees', parameters('envNumber'))]",
+
+    "coreStorageAccountName": "[concat(parameters('subscription'), 'storage', variables('storageEnv'), 'core')]",
     "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]",
 
     "sqlserverName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
@@ -102,7 +108,7 @@
     "notificationsPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-notify')]",
     "notificationsAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-notify')]",
 
-    "notificationsstorageAccountName": "[concat(parameters('subscription'), 'storage', parameters('environment'), 'notify')]",
+    "notificationsstorageAccountName": "[concat(parameters('subscription'), 'storage', variables('storageEnv'), 'notify')]",
     "notificationsstorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]"
   },
   "resources": [
