@@ -98,4 +98,43 @@ describe('FormCheckboxSearchGroup', () => {
     expect(checkboxes[0]).toHaveAttribute('value', '1');
     expect(checkboxes[1]).toHaveAttribute('value', '2');
   });
+
+  test('selecting options increments the selection count', async () => {
+    const { queryByText } = render(
+      <FormCheckboxSearchGroup
+        name="testCheckboxes"
+        id="test-checkboxes"
+        legend="Choose options"
+        searchLabel="Search options"
+        value={['1']}
+        options={[
+          { label: 'Test checkbox 1', value: '1' },
+          { label: 'Test checkbox 2', value: '2' },
+          { label: 'Test checkbox 3', value: '3' },
+        ]}
+      />,
+    );
+
+    expect(queryByText('1 selected')).not.toBeNull();
+  });
+
+  test('setting `hideCount` prop to true hides the selection count', () => {
+    const { queryByText } = render(
+      <FormCheckboxSearchGroup
+        name="testCheckboxes"
+        id="test-checkboxes"
+        legend="Choose options"
+        searchLabel="Search options"
+        hideCount
+        value={['1']}
+        options={[
+          { label: 'Test checkbox 1', value: '1' },
+          { label: 'Test checkbox 2', value: '2' },
+          { label: 'Test checkbox 3', value: '3' },
+        ]}
+      />,
+    );
+
+    expect(queryByText('1 selected')).toBeNull();
+  });
 });

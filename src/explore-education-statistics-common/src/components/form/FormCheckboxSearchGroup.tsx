@@ -5,14 +5,16 @@ import FormCheckboxGroup, { FormCheckboxGroupProps } from './FormCheckboxGroup';
 import styles from './FormCheckboxSearchGroup.module.scss';
 
 export interface FormCheckboxSearchGroupProps extends FormCheckboxGroupProps {
+  hideCount?: boolean;
   searchLabel?: string;
 }
 
 const FormCheckboxSearchGroup = ({
+  hideCount = false,
   searchLabel = 'Search options',
   ...props
 }: FormCheckboxSearchGroupProps) => {
-  const { id, name, options, value } = props;
+  const { id, name, options, value = [] } = props;
 
   const [searchTerm, setSearchTerm] = useState('');
   const { isMounted } = useMounted();
@@ -45,7 +47,7 @@ const FormCheckboxSearchGroup = ({
               width={20}
             />
 
-            {selectedCount > 0 && (
+            {selectedCount > 0 && !hideCount && (
               <div className="govuk-!-margin-top-2">
                 <span className="govuk-tag">{`${selectedCount} selected`}</span>
               </div>

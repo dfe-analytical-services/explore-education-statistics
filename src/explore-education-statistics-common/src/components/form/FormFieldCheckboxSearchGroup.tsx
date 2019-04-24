@@ -8,12 +8,14 @@ import FormCheckboxSearchGroup, {
 } from './FormCheckboxSearchGroup';
 import { onAllChange, onChange } from './util/checkboxGroupFieldHelpers';
 
-type Props<FormValues> = {
+export type FormFieldCheckboxSearchGroupProps<FormValues> = {
   name: keyof FormValues | string;
   showError?: boolean;
-} & Omit<FormCheckboxSearchGroupProps, 'value'>;
+} & Omit<FormCheckboxSearchGroupProps, 'onChange' | 'onAllChange' | 'value'>;
 
-const FormFieldCheckboxSearchGroup = <T extends {}>(props: Props<T>) => {
+const FormFieldCheckboxSearchGroup = <T extends {}>(
+  props: FormFieldCheckboxSearchGroupProps<T>,
+) => {
   const { error, name, options, showError = true } = props;
 
   return (
