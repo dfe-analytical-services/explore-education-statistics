@@ -42,9 +42,10 @@ const BrowseReleasesPage = () => {
             <nav role="navigation" aria-labelledby="subsection-title">
               <ul className="govuk-list">
                 <li>
-                  <Link to="/prototypes/methodology-home">
-                    Methodology and guidance
-                  </Link>
+                  <Link to="/prototypes/methodology-home">Methodology</Link>
+                </li>
+                <li>
+                  <Link to="/prototypes/glossary">Glossary</Link>
                 </li>
               </ul>
             </nav>
