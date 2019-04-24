@@ -33,6 +33,8 @@
     "lint": "npm run lint:js && npm run lint:style",
     "lint:js": "eslint --ext .ts,.tsx,.js,.jsx src",
     "lint:style": "stylelint src/**/*.{scss,css}",
+    "start:admin": "cd src/explore-education-statistics-admin && npm start",
+    "start:frontend": "cd src/explore-education-statistics-frontend && npm start",
     "test": "lerna run test",
     "test:ci": "lerna run test:ci",
     "tsc": "lerna run tsc"
