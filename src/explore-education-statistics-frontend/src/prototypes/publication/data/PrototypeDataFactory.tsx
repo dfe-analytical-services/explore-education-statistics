@@ -210,7 +210,7 @@ export const ks4SchoolAverageHeadlineScoresByPupilCharacteristics = createDataBl
       'horizontalbar',
       ['ebacc_entry', 'eng', 'attainment'],
       { title: '' },
-      { title: '', key: 'name' },
+      { title: '', key: 'name', size: 60 },
     ),
   ],
 );
