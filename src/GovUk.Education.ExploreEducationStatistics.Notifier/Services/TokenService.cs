@@ -3,14 +3,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
 {
     public class TokenService : ITokenService
     {
-        public string GenerateToken(string secretKey, string email, ILogger log)
+        public string GenerateToken(string secretKey, string email, ILogger log, DateTime expiryDateTime)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
                 {
                     new Claim(JwtRegisteredClaimNames.Email, email)
                 },
-                expires: DateTime.UtcNow.AddDays(1));
+                expires: expiryDateTime);
 
             var handler = new JwtSecurityTokenHandler();
             return handler.WriteToken(secToken);
@@ -45,6 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
             }
             catch (Exception e)
             {
+                log.LogInformation($"error validating token : {e.Message}");
             }
 
             return email;
@@ -54,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
         {
             return new TokenValidationParameters()
             {
-                ValidateLifetime = false, // Because there is no expiration in the generated token
+                ValidateLifetime = true, // Because there is no expiration in the generated token
                 ValidateAudience = false, // Because there is no audience in the generated token
                 ValidateIssuer = false,   // Because there is no issuer in the generated token
                 ValidIssuer = "Sample",
