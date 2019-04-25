@@ -50,9 +50,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             // TODO check subject exists
             var subject = _subjectService.Find(subjectId);
 
-            var filters = GetFilters();
-            var indicators = GetIndicators(subject);
+            var filters = GetFilters(subject.Id);
+            var indicators = GetIndicators(subject.Id);
             var locationMeta = _observationService.GetLocationMeta(subject.Id);
+            var timePeriods = GetTimePeriods(subject.Id);
 
             var national = locationMeta.Country.Distinct().Select(MapCountry);
 
@@ -102,58 +103,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                             }
                         }
                     },
-                    TimePeriod = new LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>>
-                    {
-                        Hint = "Filter statistics by a given start and end date",
-                        Legend = "Academic Year",
-                        Options = new List<TimePeriodMetaViewModel>
-                        {
-                            new TimePeriodMetaViewModel
-                            {
-                                Code = TimeIdentifier.AY,
-                                Label = "2011/12",
-                                Year = 2011
-                            },
-                            new TimePeriodMetaViewModel
-                            {
-                                Code = TimeIdentifier.AY,
-                                Label = "2012/13",
-                                Year = 2012
-                            },
-                            new TimePeriodMetaViewModel
-                            {
-                                Code = TimeIdentifier.AY,
-                                Label = "2013/14",
-                                Year = 2013
-                            },
-                            new TimePeriodMetaViewModel
-                            {
-                                Code = TimeIdentifier.AY,
-                                Label = "2014/15",
-                                Year = 2014
-                            },
-                            new TimePeriodMetaViewModel
-                            {
-                                Code = TimeIdentifier.AY,
-                                Label = "2015/16",
-                                Year = 2015
-                            },
-                            new TimePeriodMetaViewModel
-                            {
-                                Code = TimeIdentifier.AY,
-                                Label = "2016/17",
-                                Year = 2016
-                            }
-                        }
-                    }
+                    TimePeriod = timePeriods
                 }
             };
         }
 
-        private Dictionary<string, LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>> GetIndicators(
-            Subject subject)
+        private LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>> GetTimePeriods(long subjectId)
         {
-            return _indicatorGroupService.GetGroupedIndicatorsBySubjectId(subject.Id).ToDictionary(
+            var timePeriodsMeta = _observationService.GetTimePeriodsMeta(subjectId);
+            return new LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>>
+            {
+                Hint = "Filter statistics by a given start and end date",
+                Legend = "Academic Year",
+                Options = timePeriodsMeta.Select(tuple => new TimePeriodMetaViewModel
+                {
+                    Code = tuple.TimePeriod,
+                    // TODO generate a label from code and year
+                    Label = tuple.Year.ToString(),
+                    Year = tuple.Year
+                })
+            };
+        }
+
+        private Dictionary<string, LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>> GetIndicators(
+            long subjectId)
+        {
+            return _indicatorGroupService.GetGroupedIndicatorsBySubjectId(subjectId).ToDictionary(
                 pair => pair.Key.Id.ToString(),
                 pair => new LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>
                 {
@@ -164,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         private Dictionary<string, LegendOptionsMetaValueModel<Dictionary<string,
-            LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>> GetFilters()
+            LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>> GetFilters(long subjectId)
         {
             return new Dictionary<string,
                 LegendOptionsMetaValueModel<Dictionary<string,

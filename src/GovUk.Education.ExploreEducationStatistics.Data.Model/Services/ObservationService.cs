@@ -19,6 +19,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             _locationService = locationService;
         }
 
+        public IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(long subjectId)
+        {
+            var timePeriods = (from o in DbSet().Where(data => data.SubjectId == subjectId)
+                select new {o.TimeIdentifier, o.Year }).Distinct();
+            
+            return from timePeriod in timePeriods.AsEnumerable()
+                select (timePeriod.TimeIdentifier, timePeriod.Year);
+        }
+
         public LocationMeta GetLocationMeta(long subjectId)
         {
             var locations = GetLocations(subjectId);
