@@ -3,7 +3,7 @@ import 'jest-dom/extend-expect';
 
 if (typeof window !== 'undefined') {
   // fetch polyfill for making API calls.
-  require('whatwg-fetch');
+  require('cross-fetch');
 }
 
 const localStorageMock = {
