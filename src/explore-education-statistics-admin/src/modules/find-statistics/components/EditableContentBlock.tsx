@@ -5,6 +5,7 @@ import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
 interface Props {
   content: Release['content'][0]['content'];
   id?: string;
+  editable?: boolean;
 }
 
 class EditableContentBlock extends Component<Props> {
@@ -14,6 +15,7 @@ class EditableContentBlock extends Component<Props> {
     return content.length > 0 ? (
       content.map((block, index) => (
         <EditableContentSubBlockRenderer
+          editable={this.props.editable}
           block={block}
           key={`${index}-${block.heading}-${block.type}`}
           id={id}

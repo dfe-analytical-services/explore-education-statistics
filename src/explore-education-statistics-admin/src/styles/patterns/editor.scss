@@ -3,42 +3,62 @@ div.ck.ck-editor__editable_inline {
   background-color: #eee;
 }
 
-.editable-content {
+.page-editing .editable-content {
   cursor: pointer;
   margin: 0;
   padding: 0;
   position: relative;
 
-  &:hover {
-    background-color: #f8f8f8;
-
-    // stylelint-disable-next-line max-nesting-depth
-    .editable-button {
-      display: none;
-    }
+  /*
+  &::before {
+    background-color: #eee;
+    border-right: 6px solid #005ea5;
+    content: 'editable';
+    height: 100%;
+    left: -90px;
+    padding: 0 5px;
+    position: absolute;
   }
+  */
 
   .editable-button {
-    background-color: #8f8;
-    border: solid 1px #808080;
+    background-color: rgba(240, 240, 240, 0.75);
     display: block;
+    height: 100%;
     padding: 0 4px;
     position: absolute;
-    right: 0;
-    top: -20px;
+    width: 100%;
   }
 
-  .unsaved {
-    background-color: #f88;
+  .editable-button::after {
+    content: 'Click to edit this section';
+    font-weight: bold;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+  }
+
+  &.unsaved .editable-button::after {
+    content: 'Click to edit this section\00000amodified';
+    text-align: center;
+    white-space: pre;
   }
 }
 
-.editable-content-editing {
+.page-editing .editable-content-editing {
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  position: relative;
+
   .editable-button {
     border: 0;
     display: inline !important;
     margin: 6px;
     padding: 0;
+    position: absolute;
+    right: 0;
     top: 0;
     z-index: 1000;
   }
@@ -58,28 +78,6 @@ div.ck.ck-editor__editable_inline {
     width: 100%;
   }
 }
-
-/*
-.govuk-accordion__drag-icon:after,
-.govuk-accordion__drag-icon:before {
-
-  box-sizing: border-box;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  width: 25%;
-  height: 25%;
-  margin: auto;
-  border: 2px solid transparent;
-  background-color: govuk-colour("black");
-}
-
-
-.govuk-accordion__drag-icon:after {
-  height: 100%;
-}*/
 
 .drag-handle {
   height: 0;
@@ -109,10 +107,15 @@ div.ck.ck-editor__editable_inline {
   right: 0;
 }
 
-.reorderable-relative {
-  position: relative;
-}
-
 .reorderable-absolute {
   position: absolute;
+}
+
+.reorderable-relative {
+  display: none;
+}
+
+.page-editing .reorderable-relative {
+  display: block;
+  position: relative;
 }

@@ -9,6 +9,7 @@ interface Props {
   block: ContentBlock;
   id: string;
   index: number;
+  editable?: boolean;
 }
 
 class EditableContentSubBlockRenderer extends Component<Props> {
@@ -17,6 +18,7 @@ class EditableContentSubBlockRenderer extends Component<Props> {
       case 'MarkDownBlock':
         return (
           <PrototypeEditableContent
+            editable={this.props.editable}
             content={`
          <p className="govuk-body">${marked(block.body)} </p>
       `}
@@ -26,6 +28,7 @@ class EditableContentSubBlockRenderer extends Component<Props> {
         return (
           <div className="govuk-inset-text">
             <PrototypeEditableContent
+              editable={this.props.editable}
               content={`
             ${
               block.heading

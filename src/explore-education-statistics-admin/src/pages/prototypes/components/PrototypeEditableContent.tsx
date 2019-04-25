@@ -7,6 +7,7 @@ import React, { ChangeEvent, Fragment } from 'react';
 // import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 interface Props {
+  editable?: boolean;
   content: string;
 }
 
@@ -20,6 +21,10 @@ export class PrototypeEditableContent extends React.Component<Props, State> {
   private ref: HTMLElement | null = null;
 
   private temporaryContent: string = '';
+
+  public static defaultProps = {
+    editable: true,
+  };
 
   public state: State = {
     content: '',
@@ -48,7 +53,7 @@ export class PrototypeEditableContent extends React.Component<Props, State> {
   }
 
   public setEditing = () => {
-    if (!this.state.editing) {
+    if (this.props.editable && !this.state.editing) {
       this.setState({ editing: true });
     }
   };
@@ -65,7 +70,7 @@ export class PrototypeEditableContent extends React.Component<Props, State> {
     return (
       <Fragment>
         {this.state.editing ? (
-          <div className="editable-content editable-content-editing">
+          <div className="editable-content-editing">
             <div className="editable-button">
               <button onClick={this.save}>Save</button>
             </div>
@@ -82,12 +87,13 @@ export class PrototypeEditableContent extends React.Component<Props, State> {
           </div>
         ) : (
           // eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events
-          <div className="editable-content" onClick={this.setEditing}>
-            {this.state.unsaved ? (
-              <div className="editable-button unsaved">Click to edit</div>
-            ) : (
-              <div className="editable-button">Click to edit</div>
-            )}
+          <div
+            className={`editable-content ${
+              this.state.unsaved ? 'unsaved' : ''
+            }`}
+            onClick={this.setEditing}
+          >
+            <div className="editable-button" />
             <div ref={ref => (this.ref = ref)} />
           </div>
         )}
