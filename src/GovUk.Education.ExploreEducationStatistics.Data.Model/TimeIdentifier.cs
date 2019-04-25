@@ -1,0 +1,34 @@
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model
+{
+    public enum TimeIdentifier
+    {
+        AY,
+        CY,
+        EOM,
+        FY,
+        HT5,
+        HT6,
+        M1,
+        M2,
+        M3,
+        M4,
+        M5,
+        M6,
+        M7,
+        M8,
+        M9,
+        M10,
+        M11,
+        M12,
+        Q1,
+        Q1Q2,
+        Q1Q3,
+        Q2,
+        Q3,
+        Q4,
+        T1,
+        T1T2,
+        T2,
+        T3
+    }
+}

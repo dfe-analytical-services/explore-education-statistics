@@ -6,11 +6,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
     [AttributeUsage(AttributeTargets.Field)]
     public class DataFileAttribute : Attribute
     {
-        public ImportFileType ImportFileType { get; }
+        public DataCsvMetaFilename MetaFilename { get; }
 
-        public DataFileAttribute(ImportFileType importFileType)
+        public DataFileAttribute(DataCsvMetaFilename metaFilename)
         {
-            ImportFileType = importFileType;
+            MetaFilename = metaFilename;
         }
     }
 }

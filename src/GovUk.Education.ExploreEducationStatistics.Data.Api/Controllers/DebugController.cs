@@ -9,30 +9,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     [ApiController]
     public class DebugController : ControllerBase
     {
-        private readonly IGeographicDataService _geographicDataService;
-        private readonly ICharacteristicDataService _characteristicDataService;
+        private readonly IFilterService _filterService;
+        private readonly IIndicatorService _indicatorService;
+        private readonly ILocationService _locationService;
+        private readonly IObservationService _observationService;
+        private readonly IReleaseService _releaseService;
+        private readonly ISchoolService _schoolService;
+        private readonly ISubjectService _subjectService;
 
-        public DebugController(IGeographicDataService geographicDataService,
-            ICharacteristicDataService characteristicDataService)
+        public DebugController(IFilterService filterService,
+            IIndicatorService indicatorService,
+            ILocationService locationService,
+            IObservationService observationService,
+            IReleaseService releaseService,
+            ISchoolService schoolService,
+            ISubjectService subjectService)
         {
-            _geographicDataService = geographicDataService;
-            _characteristicDataService = characteristicDataService;
+            _filterService = filterService;
+            _indicatorService = indicatorService;
+            _locationService = locationService;
+            _observationService = observationService;
+            _releaseService = releaseService;
+            _schoolService = schoolService;
+            _subjectService = subjectService;
         }
 
         [HttpGet("report")]
         public async Task<ActionResult<DebugReport>> GetReport()
         {
-            var geographicCount = _geographicDataService.Count();
-            var characteristicCount = _characteristicDataService.Count();
+            var filterCount = _filterService.Count();
+            var indicatorCount = _indicatorService.Count();
+            var locationCount = _locationService.Count();
+            var observationCount = _observationService.Count();
+            var releaseCount = _releaseService.Count();
+            var schoolCount = _schoolService.Count();
+            var subjectCount = _subjectService.Count();
 
             var counts = await Task.WhenAll(
-                geographicCount, characteristicCount
-            );
+                filterCount,
+                indicatorCount,
+                locationCount,
+                observationCount,
+                releaseCount,
+                schoolCount,
+                subjectCount);
 
             return new DebugReport
             {
-                geographicCount = counts[0],
-                characteristicCount = counts[1]
+                FilterCount = counts[0],
+                IndicatorCount = counts[1],
+                LocationCount = counts[2],
+                ObservationCount = counts[3],
+                ReleaseCount = counts[4],
+                SchoolCount = counts[5],
+                SubjectCount = counts[6]
             };
         }
     }

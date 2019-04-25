@@ -13,6 +13,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         [JsonProperty(PropertyName = "la_name")]
         public string Name { get; set; }
 
+        public LocalAuthority()
+        {
+        }
+
+        public LocalAuthority(string code, string oldCode, string name)
+        {
+            Code = code;
+            Old_Code = oldCode;
+            Name = name;
+        }
+
+        public static LocalAuthority Empty()
+        {
+            return new LocalAuthority(null, null, null);
+        }
+
         protected bool Equals(LocalAuthority other)
         {
             return string.Equals(Code, other.Code);
