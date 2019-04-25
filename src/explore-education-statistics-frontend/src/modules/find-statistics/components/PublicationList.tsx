@@ -27,7 +27,7 @@ class PublicationList extends Component<Props> {
               <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
                 {summary}
               </p>
-              <div className="govuk-!-margin-top-0 govuk-!-margin-bottom-9">
+              <div className="govuk-!-margin-top-0 govuk-!-margin-bottom-5">
                 <div className="govuk-grid-row">
                   <div className="govuk-grid-column-one-third">
                     <Link
@@ -47,6 +47,34 @@ class PublicationList extends Component<Props> {
                     >
                       Create charts and tables
                     </Link>
+                  </div>
+                  <div className="govuk-grid-column-one-third">
+                    <details className="govuk-details govuk-!-display-inline-block">
+                      <summary className="govuk-details__summary">
+                        <span className="govuk-details__summary-text">
+                          Download underlying data files
+                        </span>
+                      </summary>
+                      <div className="govuk-details__text">
+                        <ul className="govuk-list-bullet">
+                          <li>
+                            <a href="#" className="govuk-link">
+                              Download Excel files
+                            </a>
+                          </li>
+                          <li>
+                            <a href="#" className="govuk-link">
+                              Download .csv files
+                            </a>
+                          </li>
+                          <li>
+                            <a href="#" className="govuk-link">
+                              Access API
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+                    </details>
                   </div>
                 </div>
               </div>
