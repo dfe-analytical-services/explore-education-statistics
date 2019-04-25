@@ -1,5 +1,6 @@
 import Link from '@frontend/components/Link';
 import React, { Component } from 'react';
+import Details from '@common/components/Details';
 
 export interface Publication {
   id: string;
@@ -27,7 +28,7 @@ class PublicationList extends Component<Props> {
               <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
                 {summary}
               </p>
-              <div className="govuk-!-margin-top-0 govuk-!-margin-bottom-9">
+              <div className="govuk-!-margin-top-0 govuk-!-margin-bottom-5">
                 <div className="govuk-grid-row">
                   <div className="govuk-grid-column-one-third">
                     <Link
@@ -47,6 +48,27 @@ class PublicationList extends Component<Props> {
                     >
                       Create charts and tables
                     </Link>
+                  </div>
+                  <div className="govuk-grid-column-one-third">
+                    <Details summary="Download underlying data files">
+                      <ul className="govuk-list-bullet">
+                        <li>
+                          <a href="#" className="govuk-link">
+                            Download Excel files
+                          </a>
+                        </li>
+                        <li>
+                          <a href="#" className="govuk-link">
+                            Download .csv files
+                          </a>
+                        </li>
+                        <li>
+                          <a href="#" className="govuk-link">
+                            Access API
+                          </a>
+                        </li>
+                      </ul>
+                    </Details>
                   </div>
                 </div>
               </div>
