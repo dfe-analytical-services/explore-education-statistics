@@ -20,7 +20,13 @@ class App extends BaseApp {
     return { pageProps };
   }
 
-  public async componentDidMount() {
+  public async componentWillMount() {
+    if (process.browser) {
+      await loadPolyfill();
+    }
+  }
+
+  public componentDidMount() {
     logPageView();
 
     if (Router.router !== null) {
@@ -28,8 +34,6 @@ class App extends BaseApp {
     }
 
     document.body.classList.add('js-enabled');
-
-    await loadPolyfill();
   }
 
   public render() {
