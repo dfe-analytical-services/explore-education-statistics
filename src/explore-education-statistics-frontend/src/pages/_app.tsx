@@ -1,8 +1,8 @@
+import loadPolyfill from '@common/polyfill';
 import { logPageView } from '@frontend/services/googleAnalyticsService';
 import 'core-js/fn/array/virtual/flat-map';
 import 'core-js/fn/array/virtual/includes';
 import 'cross-fetch/polyfill';
-
 import { Container, default as BaseApp, NextAppContext } from 'next/app';
 import Router from 'next/router';
 import React from 'react';
@@ -20,7 +20,13 @@ class App extends BaseApp {
     return { pageProps };
   }
 
-  public componentDidMount(): void {
+  public async componentWillMount() {
+    if (process.browser) {
+      await loadPolyfill();
+    }
+  }
+
+  public componentDidMount() {
     logPageView();
 
     if (Router.router !== null) {
@@ -28,8 +34,6 @@ class App extends BaseApp {
     }
 
     document.body.classList.add('js-enabled');
-
-    import('@frontend/polyfill');
   }
 
   public render() {

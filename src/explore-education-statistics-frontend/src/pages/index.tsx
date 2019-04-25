@@ -52,7 +52,33 @@ class HomePage extends Component {
         </div>
 
         <hr />
-        <h3 className="govuk-heading-m govuk-!-margin-top-9">
+        <h3 className="govuk-heading-l govuk-!-margin-top-9">
+          Help and support
+        </h3>
+        <div className="govuk-grid-row">
+          <div className="govuk-grid-column-one-half">
+            <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
+              <Link to="/methodology">Methodology</Link>
+            </h2>
+            <p className="govuk-caption-m govuk-!-margin-top-2">
+              Browse to find out about the methodology behind specific education
+              statistics and data and how and why they're collected and
+              published.
+            </p>
+          </div>
+          <div className="govuk-grid-column-one-half">
+            <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
+              <Link to="/glossary">Glossary</Link>
+            </h2>
+            <p className="govuk-caption-m govuk-!-margin-top-2">
+              Browse our A to Z list of definitions for terms used across
+              education statistics and data.
+            </p>
+          </div>
+        </div>
+
+        <hr />
+        <h3 className="govuk-heading-l govuk-!-margin-top-9">
           Related services
         </h3>
         <p className="govuk-body">

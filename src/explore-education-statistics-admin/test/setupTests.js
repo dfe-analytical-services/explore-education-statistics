@@ -15,6 +15,16 @@ global.localStorage = localStorageMock;
 
 Element.prototype.scrollIntoView = jest.fn();
 
+beforeEach(() => {
+  window.matchMedia = jest.fn(() => {
+    return {
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      matches: true,
+    };
+  });
+});
+
 afterEach(() => {
   location.hash = '';
 });

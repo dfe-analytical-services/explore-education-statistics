@@ -4,6 +4,7 @@ const withTypescript = require('@zeit/next-typescript');
 const DotEnvPlugin = require('dotenv-webpack');
 const compose = require('lodash/fp/compose');
 const withImages = require('next-images');
+const withTranspileModules = require('next-transpile-modules');
 const path = require('path');
 
 const createPlugin = plugin => {
@@ -109,6 +110,7 @@ const withESLint = createPlugin((config, options) => {
 });
 
 const config = {
+  transpileModules: ['explore-education-statistics-common', '@common'],
   webpack(config, options) {
     const { dev, isServer } = options;
 
@@ -157,12 +159,6 @@ const config = {
       formik: path.resolve(__dirname, 'node_modules/formik'),
     };
 
-    config.module.rules
-      .filter(rule => rule.test.test('test.tsx'))
-      .forEach(rule => {
-        rule.include = undefined;
-      });
-
     options.defaultLoaders.babel.options.configFile = path.resolve(
       __dirname,
       'babel.config.js',
@@ -173,6 +169,7 @@ const config = {
 };
 
 module.exports = compose(
+  withTranspileModules,
   withFonts,
   withImages,
   withCss,

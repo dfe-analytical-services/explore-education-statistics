@@ -19,19 +19,19 @@ services:
     ports:
     - "5010:5000"
     - "5011:5011"
-  frontend:
-    container_name: ees-frontend
-    build: explore-education-statistics-frontend
-    volumes:
-      - './explore-education-statistics-frontend:/usr/src/app'
-      - '/usr/src/app/node_modules'
-    ports:
-      - '3000:3000'
-    environment:
-      - NODE_ENV=development
-    depends_on:
-      - data-api
-      - content-api
+#  frontend:
+#    container_name: ees-frontend
+#    build: explore-education-statistics-frontend
+#    volumes:
+#      - './explore-education-statistics-frontend:/usr/src/app'
+#      - '/usr/src/app/node_modules'
+#    ports:
+#      - '3000:3000'
+#    environment:
+#      - NODE_ENV=development
+#    depends_on:
+#      - data-api
+#      - content-api
 #  data-storage:
 #    container_name: ees-storage
 #    image: arafato/azurite
@@ -43,7 +43,7 @@ services:
 #    container_name: ees-import
 #    build: explore-education-statistics-data-import
 #    ports:
-#      - "8080:80" 
+#      - "8080:80"
 #    depends_on:
 #      - mongo
   db:
@@ -52,7 +52,7 @@ services:
     ports:
       - "1433:1433"
     volumes:
-      - ../data/ees-mssql:/var/opt/mssql/data      
+      - ../data/ees-mssql:/var/opt/mssql/data
     environment:
       SA_PASSWORD: "Your_Password123"
       ACCEPT_EULA: "Y"

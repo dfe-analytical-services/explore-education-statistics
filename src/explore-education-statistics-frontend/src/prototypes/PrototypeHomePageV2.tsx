@@ -40,10 +40,33 @@ const HomePage = () => {
             Browse to find and download the data files behind our range of
             national and regional statistics for your own analysis.
           </p>
+          <hr />
+        </div>
+      </div>
+      <h3 className="govuk-heading-l govuk-!-margin-top-9">Help and support</h3>
+
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-one-half">
+          <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
+            <Link to="/prototypes/methodology-specific">Methodology</Link>
+          </h2>
+          <p className="govuk-caption-m govuk-!-margin-top-2">
+            Find out more about education statistics and data topics and how and
+            why they're collected and published.
+          </p>
+        </div>
+        <div className="govuk-grid-column-one-half">
+          <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
+            <Link to="#">Glossary</Link>
+          </h2>
+          <p className="govuk-caption-m govuk-!-margin-top-2">
+            Browse our A to Z list of definitions for terms used across
+            education statistics and data.
+          </p>
         </div>
       </div>
       <hr />
-      <h3 className="govuk-heading-m govuk-!-margin-top-9">Related services</h3>
+      <h3 className="govuk-heading-l govuk-!-margin-top-9">Related services</h3>
       <p className="govuk-body">
         Use these services to find and compare and contrast performance and
         other information about schools and colleges in England:

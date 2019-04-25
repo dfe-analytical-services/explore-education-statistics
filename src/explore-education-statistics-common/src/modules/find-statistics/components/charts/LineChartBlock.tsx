@@ -5,18 +5,15 @@ import {
   Legend,
   Line,
   LineChart,
+  ResponsiveContainer,
   Symbols,
   Tooltip,
   TooltipProps,
   XAxis,
   YAxis,
 } from 'recharts';
-import {
-  ChartProps,
-  colours,
-  parseCondensedTimePeriodRange,
-  symbols,
-} from './Charts';
+import { colours, parseCondensedTimePeriodRange, symbols } from './Charts';
+import { ChartProps } from '@common/modules/find-statistics/components/charts/AbstractChart';
 
 const CustomToolTip = (props: TooltipProps) => {
   if (props.active) {
@@ -73,56 +70,56 @@ export class LineChartBlock extends Component<ChartProps> {
     }
 
     return (
-      <LineChart
-        width={900}
-        height={this.props.height || 300}
-        data={chartData}
-        margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
-      >
-        <Tooltip content={CustomToolTip} />
-        {chartDataKeys.length > 1 ? (
-          <Legend verticalAlign="top" height={36} />
-        ) : (
-          ''
-        )}
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey="name"
-          label={{
-            offset: 5,
-            position: 'bottom',
-            value: xAxis.title,
-          }}
-          padding={{ left: 20, right: 20 }}
-          tickMargin={10}
-        />
-        <YAxis
-          label={{
-            angle: -90,
-            offset: 0,
-            position: 'left',
-            value: yAxis.title,
-          }}
-          scale="auto"
-          unit="%"
-          domain={yAxisDomain}
-        />
-        {chartDataKeys.map((dataKey, index) => (
-          <Line
-            key={index}
-            name={labels[dataKey]}
-            type="linear"
-            dataKey={dataKey}
-            stroke={colours[index]}
-            fill={colours[index]}
-            strokeWidth="5"
-            unit="%"
-            legendType={symbols[index]}
-            activeDot={{ r: 3 }}
-            dot={props => <Symbols {...props} type={symbols[index]} />}
+      <ResponsiveContainer width={900} height={this.props.height || 300}>
+        <LineChart
+          data={chartData}
+          margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
+        >
+          <Tooltip content={CustomToolTip} />
+          {chartDataKeys.length > 1 ? (
+            <Legend verticalAlign="top" height={36} />
+          ) : (
+            ''
+          )}
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis
+            dataKey="name"
+            label={{
+              offset: 5,
+              position: 'bottom',
+              value: xAxis.title,
+            }}
+            padding={{ left: 20, right: 20 }}
+            tickMargin={10}
           />
-        ))}
-      </LineChart>
+          <YAxis
+            label={{
+              angle: -90,
+              offset: 0,
+              position: 'left',
+              value: yAxis.title,
+            }}
+            scale="auto"
+            unit="%"
+            domain={yAxisDomain}
+          />
+          {chartDataKeys.map((dataKey, index) => (
+            <Line
+              key={index}
+              name={labels[dataKey]}
+              type="linear"
+              dataKey={dataKey}
+              stroke={colours[index]}
+              fill={colours[index]}
+              strokeWidth="5"
+              unit="%"
+              legendType={symbols[index]}
+              activeDot={{ r: 3 }}
+              dot={props => <Symbols {...props} type={symbols[index]} />}
+            />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
     );
   }
 }

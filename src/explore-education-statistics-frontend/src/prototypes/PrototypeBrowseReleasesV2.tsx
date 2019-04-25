@@ -13,7 +13,7 @@ const BrowseReleasesPage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <h1 className="govuk-heading-xl">
-            Find statistics and download data
+            Find statistics and download data TEST
           </h1>
           <p className="govuk-body-l">
             Browse to find the statistics and data you’re looking for and open
@@ -42,10 +42,9 @@ const BrowseReleasesPage = () => {
             <nav role="navigation" aria-labelledby="subsection-title">
               <ul className="govuk-list">
                 <li>
-                  <Link to="/prototypes/methodology-home">Methodology</Link>
-                </li>
-                <li>
-                  <Link to="/prototypes/glossary">Glossary</Link>
+                  <Link to="/prototypes/methodology-home">
+                    Methodology and guidance
+                  </Link>
                 </li>
               </ul>
             </nav>

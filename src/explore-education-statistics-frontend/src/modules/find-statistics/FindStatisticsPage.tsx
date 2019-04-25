@@ -1,4 +1,5 @@
 import { contentApi } from '@common/services/api';
+import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
 import React, { Component } from 'react';
@@ -33,25 +34,46 @@ class FindStatisticsPage extends Component<Props> {
       <Page breadcrumbs={[{ name: 'Find statistics and data' }]}>
         <PageTitle title="Find statistics and data" />
 
-        <p className="govuk-body-l">
-          Browse to find the statistics and data you’re looking for and open the
-          section to get links to:
-        </p>
+        <div className="govuk-grid-row">
+          <div className="govuk-grid-column-two-thirds">
+            <p className="govuk-body-l">
+              Browse to find the statistics and data you’re looking for and open
+              the section to get links to:
+            </p>
 
-        <ul className="govuk-!-margin-bottom-9">
-          <li>
-            up-to-date national statistical headlines, breakdowns and
-            explanations
-          </li>
-          <li>
-            charts and tables to help you compare, contrast and view national
-            and regional statistical data and trends
-          </li>
-          <li>
-            links to underlying data so you can download files and carry out
-            your own statistical analysis
-          </li>
-        </ul>
+            <ul className="govuk-!-margin-bottom-9">
+              <li>
+                up-to-date national statistical headlines, breakdowns and
+                explanations
+              </li>
+              <li>
+                charts and tables to help you compare, contrast and view
+                national and regional statistical data and trends
+              </li>
+              <li>
+                links to underlying data so you can download files and carry out
+                your own statistical analysis
+              </li>
+            </ul>
+          </div>
+          <div className="govuk-grid-column-one-third">
+            <aside className="app-related-items">
+              <h2 className="govuk-heading-m" id="releated-content">
+                Related content
+              </h2>
+              <nav role="navigation" aria-labelledby="subsection-title">
+                <ul className="govuk-list">
+                  <li>
+                    <Link to="/methodology">Methodology</Link>
+                  </li>
+                  <li>
+                    <Link to="/glossary">Glossary</Link>
+                  </li>
+                </ul>
+              </nav>
+            </aside>
+          </div>
+        </div>
 
         {themes.length > 0 ? (
           <>

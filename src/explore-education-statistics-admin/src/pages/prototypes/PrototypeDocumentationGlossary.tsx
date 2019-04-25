@@ -9,14 +9,14 @@ const DocumentationGlossary = () => {
       wide
       breadcrumbs={[
         { text: 'Documentation', link: '/prototypes/documentation' },
-        { text: 'Glossary' },
+        { text: 'Style guide' },
       ]}
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <div className="app-content__header">
             <span className="govuk-caption-xl">Style Guide</span>
-            <h1 className="govuk-heading-xl">Glossary</h1>
+            <h1 className="govuk-heading-xl">Style guide</h1>
           </div>
           <p>
             The Government Digital Service style guide covers style, spelling

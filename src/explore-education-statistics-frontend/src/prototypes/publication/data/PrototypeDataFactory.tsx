@@ -1,5 +1,9 @@
 import { data as OriginalData } from '@common/prototypes/publication/components/PrototypeMapBoundaries';
-import { Axis, Chart } from '@common/services/publicationService';
+import {
+  Axis,
+  Chart,
+  ReferenceLine,
+} from '@common/services/publicationService';
 import {
   CharacteristicsData,
   DataTableResult,
@@ -90,6 +94,7 @@ function createBasicChart(
   xAxis: Axis,
   yAxis: Axis,
   stacked: boolean = false,
+  referenceLines: ReferenceLine[] = [],
 ): Chart {
   return {
     indicators,
@@ -97,6 +102,7 @@ function createBasicChart(
     type,
     xAxis,
     yAxis,
+    referenceLines,
   };
 }
 
@@ -204,7 +210,7 @@ export const ks4SchoolAverageHeadlineScoresByPupilCharacteristics = createDataBl
       'horizontalbar',
       ['ebacc_entry', 'eng', 'attainment'],
       { title: '' },
-      { title: '', key: 'name' },
+      { title: '', key: 'name', size: 60 },
     ),
   ],
 );
@@ -274,7 +280,7 @@ export const ks4PerformanceInMatsComparedToNationalAverage = createDataBlockWith
       'horizontalbar',
       ['below_Average', 'average', 'above_average'],
       { title: '', key: 'name' },
-      { title: '' },
+      { title: '', size: 40 },
       true,
     ),
   ],
@@ -403,5 +409,169 @@ export const ks4StateFundedSchoolsPerformance = createDataBlockWithChart(
       '-0.03',
       '-0.03',
     ],
+  ],
+);
+
+export const testChartsVertical = createDataBlockWithChart(
+  'GDHI per head (£) England, 2011',
+  ['la_name', 'cost'],
+  ['Region', 'Cost'],
+
+  SchoolType.Total,
+  201112,
+  [
+    ['London', '21'],
+    ['South East', '18'],
+    ['East', '17'],
+    ['South West', '15'],
+    ['East Midlands', '13'],
+    ['North West', '13'],
+    ['West Midlands', '12'],
+    ['Yorkshire', '11'],
+    ['North East', '10'],
+  ],
+  [
+    createBasicChart(
+      'horizontalbar',
+      ['cost'],
+      { title: '' },
+      { title: '', key: 'la_name' },
+      false,
+    ),
+  ],
+);
+
+export const testChartsVerticalWithReferenceLineAndAxisTitles = createDataBlockWithChart(
+  'GDHI per head (£) England, 2011',
+  ['la_name', 'cost'],
+  ['Region', 'Cost'],
+
+  SchoolType.Total,
+  201112,
+  [
+    ['London', '21'],
+    ['South East', '18'],
+    ['East', '17'],
+    ['South West', '15'],
+    ['East Midlands', '13'],
+    ['North West', '13'],
+    ['West Midlands', '12'],
+    ['Yorkshire', '11'],
+    ['North East', '10'],
+  ],
+  [
+    createBasicChart(
+      'horizontalbar',
+      ['cost'],
+      { title: 'Cost' },
+      { title: 'Local Authority', key: 'la_name' },
+      false,
+      [{ x: 17, label: 'England' }],
+    ),
+  ],
+);
+
+export const testChartsVerticalOffset = createDataBlockWithChart(
+  'GDHI per head index comparison with average (£) England, 2011',
+  ['la_name', 'cost'],
+  ['Region', '£(thousands)'],
+
+  SchoolType.Total,
+  201112,
+  [
+    ['London', '5'],
+    ['South East', '2'],
+    ['East', '0.5'],
+    ['South West', '-0.1'],
+    ['East Midlands', '-1.8'],
+    ['North West', '-1.9'],
+    ['West Midlands', '-2'],
+    ['Yorkshire', '-2.1'],
+    ['North East', '-2.2'],
+  ],
+  [
+    createBasicChart(
+      'horizontalbar',
+      ['cost'],
+      { title: '' },
+      { title: '', key: 'la_name' },
+      false,
+      // [{ x: 17, label: 'England' }],
+    ),
+  ],
+);
+
+export const testTimeSeries = createDataBlockWithChart(
+  'Time Series',
+  ['year', 'percent'],
+  ['year', 'Percent'],
+
+  SchoolType.Total,
+  200102,
+  [
+    ['1991', 50],
+    ['1992', 70],
+    ['1993', 40],
+    ['1994', 90],
+    ['1995', 10],
+    ['1996', 30],
+    ['1997', 70],
+    ['1998', 80],
+    ['1999', 50],
+    ['2000', 85],
+    ['2001', 50],
+    ['2002', 70],
+    ['2003', 40],
+    ['2004', 90],
+    ['2005', 10],
+    ['2006', 30],
+    ['2007', 70],
+    ['2008', 80],
+    ['2009', 50],
+    ['2010', 85],
+  ],
+  [
+    createBasicChart(
+      'verticalbar',
+      ['percent'],
+      { title: '', key: 'year' },
+      { title: '' },
+      false,
+    ),
+  ],
+);
+
+export const testTimeSeriesWithLine = {
+  ...testTimeSeries,
+  charts: [
+    createBasicChart(
+      'line',
+      ['percent'],
+      { title: '', key: 'year' },
+      { title: '' },
+      false,
+    ),
+  ],
+};
+
+export const testDistribution = createDataBlockWithChart(
+  'Distribution',
+  ['year', 'percent'],
+  ['year', 'Percent'],
+
+  SchoolType.Total,
+  200102,
+  [...Array(101)].map((item, idx) => [
+    idx % 10 === 0 ? 1900 + idx : '',
+    Math.random() * 100,
+  ]),
+  [
+    createBasicChart(
+      'verticalbar',
+      ['percent'],
+      { title: '', key: 'year' },
+      { title: '' },
+      false,
+    ),
   ],
 );
