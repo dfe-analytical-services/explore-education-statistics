@@ -464,7 +464,7 @@ export const testChartsVerticalWithReferenceLineAndAxisTitles = createDataBlockW
       'horizontalbar',
       ['cost'],
       { title: 'Cost' },
-      { title: 'Local Authority', key: 'la_name' },
+      { title: 'Local Authority', key: 'la_name', size: 60 },
       false,
       [{ x: 17, label: 'England' }],
     ),
