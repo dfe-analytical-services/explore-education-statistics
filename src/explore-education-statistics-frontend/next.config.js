@@ -138,6 +138,18 @@ const config = {
       );
     }
 
+    const originalEntry = config.entry;
+
+    config.entry = async () => {
+      const entries = await originalEntry();
+
+      if (entries['main.js'] && !entries['main.js'].includes('./polyfill.js')) {
+        entries['main.js'].unshift('./polyfill.js');
+      }
+
+      return entries;
+    };
+
     config.plugins.push(
       new DotEnvPlugin({
         path: path.resolve(

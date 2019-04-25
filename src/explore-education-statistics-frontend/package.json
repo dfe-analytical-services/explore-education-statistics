@@ -88,8 +88,7 @@
     "stylelint": "^9.10.1",
     "stylelint-webpack-plugin": "^0.10.5",
     "typescript": "^3.4.3",
-    "webpack-dev-server": "^3.3.1",
-    "whatwg-fetch": "^3.0.0"
+    "webpack-dev-server": "^3.3.1"
   },
   "scripts": {
     "start": "node server.js",
