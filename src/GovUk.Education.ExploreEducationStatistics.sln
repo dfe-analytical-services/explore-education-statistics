@@ -13,15 +13,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreStat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreStatistics.Admin.Tests", "GovUk.Education.ExploreStatistics.Admin.Tests\GovUk.Education.ExploreStatistics.Admin.Tests.csproj", "{3D3C5420-6BC2-42C2-82BC-5953493C9827}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreStatistics.Content.Api.Tests", "GovUk.Education.ExploreStatistics.Content.Api.Tests\GovUk.Education.ExploreStatistics.Content.Api.Tests.csproj", "{D9CB3DDD-2A72-435F-A7F9-8CA1FB612F3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreStatistics.Content.Api.Tests", "GovUk.Education.ExploreStatistics.Content.Api.Tests\GovUk.Education.ExploreStatistics.Content.Api.Tests.csproj", "{D9CB3DDD-2A72-435F-A7F9-8CA1FB612F3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Data.Seed", "GovUk.Education.ExploreEducationStatistics.Data.Seed\GovUk.Education.ExploreEducationStatistics.Data.Seed.csproj", "{0F49B58C-E614-4F53-B845-A97CF4DE2EFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Data.Seed", "GovUk.Education.ExploreEducationStatistics.Data.Seed\GovUk.Education.ExploreEducationStatistics.Data.Seed.csproj", "{0F49B58C-E614-4F53-B845-A97CF4DE2EFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Data.Model", "GovUk.Education.ExploreEducationStatistics.Data.Model\GovUk.Education.ExploreEducationStatistics.Data.Model.csproj", "{E4E6A67C-DF65-4C68-ABF6-261F04F2474B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Data.Model", "GovUk.Education.ExploreEducationStatistics.Data.Model\GovUk.Education.ExploreEducationStatistics.Data.Model.csproj", "{E4E6A67C-DF65-4C68-ABF6-261F04F2474B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Data.Importer", "GovUk.Education.ExploreEducationStatistics.Data.Importer\GovUk.Education.ExploreEducationStatistics.Data.Importer.csproj", "{98BB6AC4-AA9C-43A0-A2D8-266C034AE631}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Data.Importer", "GovUk.Education.ExploreEducationStatistics.Data.Importer\GovUk.Education.ExploreEducationStatistics.Data.Importer.csproj", "{98BB6AC4-AA9C-43A0-A2D8-266C034AE631}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Notifier", "GovUk.Education.ExploreEducationStatistics.Notifier\GovUk.Education.ExploreEducationStatistics.Notifier.csproj", "{94D12DEC-8738-4238-82E4-8A8B9BA33A1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Notifier", "GovUk.Education.ExploreEducationStatistics.Notifier\GovUk.Education.ExploreEducationStatistics.Notifier.csproj", "{2D23B0C4-2B0B-451A-966E-F2EBCA515D44}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -141,18 +141,18 @@ Global
 		{98BB6AC4-AA9C-43A0-A2D8-266C034AE631}.Release|x64.Build.0 = Release|Any CPU
 		{98BB6AC4-AA9C-43A0-A2D8-266C034AE631}.Release|x86.ActiveCfg = Release|Any CPU
 		{98BB6AC4-AA9C-43A0-A2D8-266C034AE631}.Release|x86.Build.0 = Release|Any CPU
-		{94D12DEC-8738-4238-82E4-8A8B9BA33A1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{94D12DEC-8738-4238-82E4-8A8B9BA33A1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{94D12DEC-8738-4238-82E4-8A8B9BA33A1A}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{94D12DEC-8738-4238-82E4-8A8B9BA33A1A}.Debug|x64.Build.0 = Debug|Any CPU
-		{94D12DEC-8738-4238-82E4-8A8B9BA33A1A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{94D12DEC-8738-4238-82E4-8A8B9BA33A1A}.Debug|x86.Build.0 = Debug|Any CPU
-		{94D12DEC-8738-4238-82E4-8A8B9BA33A1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{94D12DEC-8738-4238-82E4-8A8B9BA33A1A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{94D12DEC-8738-4238-82E4-8A8B9BA33A1A}.Release|x64.ActiveCfg = Release|Any CPU
-		{94D12DEC-8738-4238-82E4-8A8B9BA33A1A}.Release|x64.Build.0 = Release|Any CPU
-		{94D12DEC-8738-4238-82E4-8A8B9BA33A1A}.Release|x86.ActiveCfg = Release|Any CPU
-		{94D12DEC-8738-4238-82E4-8A8B9BA33A1A}.Release|x86.Build.0 = Release|Any CPU
+		{2D23B0C4-2B0B-451A-966E-F2EBCA515D44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D23B0C4-2B0B-451A-966E-F2EBCA515D44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D23B0C4-2B0B-451A-966E-F2EBCA515D44}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2D23B0C4-2B0B-451A-966E-F2EBCA515D44}.Debug|x64.Build.0 = Debug|Any CPU
+		{2D23B0C4-2B0B-451A-966E-F2EBCA515D44}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2D23B0C4-2B0B-451A-966E-F2EBCA515D44}.Debug|x86.Build.0 = Debug|Any CPU
+		{2D23B0C4-2B0B-451A-966E-F2EBCA515D44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D23B0C4-2B0B-451A-966E-F2EBCA515D44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D23B0C4-2B0B-451A-966E-F2EBCA515D44}.Release|x64.ActiveCfg = Release|Any CPU
+		{2D23B0C4-2B0B-451A-966E-F2EBCA515D44}.Release|x64.Build.0 = Release|Any CPU
+		{2D23B0C4-2B0B-451A-966E-F2EBCA515D44}.Release|x86.ActiveCfg = Release|Any CPU
+		{2D23B0C4-2B0B-451A-966E-F2EBCA515D44}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
