@@ -169,7 +169,7 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
                   <dt className="govuk-summary-list__key">Last edited</dt>
                   <dd className="govuk-summary-list__value  dfe-details-no-margin">
                     {' '}
-                    24 April 2019 at 16:55 by <a href="#">me</a>
+                    24 April 2019 at 16:55 by <a href="#">Ann Evans</a>
                   </dd>
                   <dd className="govuk-summary-list__actions">
                     {' '}

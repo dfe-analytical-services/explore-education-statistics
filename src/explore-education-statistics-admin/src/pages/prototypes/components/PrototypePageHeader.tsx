@@ -65,7 +65,7 @@ const PageHeader = ({ wide }: Props) => (
                   className="govuk-header__link"
                   href="/prototypes/documentation"
                 >
-                  Documentation
+                  Administrators guide
                 </a>
               </li>
               <li className="govuk-header__navigation-item">
