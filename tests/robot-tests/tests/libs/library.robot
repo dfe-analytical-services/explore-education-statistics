@@ -3,8 +3,9 @@ Library     SeleniumLibrary  timeout=${timeout}  implicit_wait=${implicit_wait} 
 Library     OperatingSystem
 #Library     XvfbRobot           # sudo apt install xvfb + pip install robotframework-xvfb
 
-Library    utilities.py
+Library    email_guerrillamail.py
 Library    file_operations.py
+Library    utilities.py
 
 *** Variables ***
 ${browser}    chrome

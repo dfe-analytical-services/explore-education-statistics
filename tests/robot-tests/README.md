@@ -1,6 +1,6 @@
 # What is this?
 
-This test framework runs acceptance tests against the Explore Education Statistics service using selenium and robot framework.
+This test framework runs UI tests against the Explore Education Statistics service using selenium and robot framework.
 
 Currently, these tests are being maintained so they can be run on Linux or Windows. They're not being maintained for MacOS, but they may work without too much trouble. If you try MacOS, ensure you're using python3 and not python2!
 
@@ -26,6 +26,8 @@ pipenv install
 
 If you intend to run the tests from your local machine, you will also need to create .env files for the relevant environments: ".env.test", ".env.stage", ".env.prod", and ".env.dfedev". Each .env file contains the URLs for that environment's public app and admin app. You can copy and rename the .env.example file in the robot-tests directory, replacing `publicAppUrl` and `adminAppUrl` with the actual URLs for that environment.
 
+When running these tests as part of the CI pipeline, they rely on `publicAppUrl` and `adminAppUrl` being set as part of the pipeline.
+
 # How do I run the tests?
 
 ```
@@ -39,7 +41,7 @@ Further instructions on how to use the test runner are included inside the run\_
 This section details what the various directories in robot-tests contain.
 
 ### scripts
-This directory holds scripts used by the run\_tests.py and the Azure pipeline.
+This directory holds scripts used by run\_tests.py and the CI pipeline.
 
 ### test-results
 This directory holds the output of a test run, including the test report and log.
@@ -48,9 +50,9 @@ This directory holds the output of a test run, including the test report and log
 This holds the actual robot framework/selenium tests. The tests are themselves organised into different folders. The `libs` folder holds python and robot framework libraries used by the tests themselves.
 
 ### webdriver
-This holds chromedriver, used by selenium to interact with the browser. It is automatically downloaded when the tests are run.
+This holds chromedriver, used by selenium to interact with the browser. It is automatically downloaded when the tests are run. If you're having trouble (e.g. browser and chromedriver versions aren't compatible) you can also manually place your chromedriver of choice in this directory.
 
-# Guidelines for people writing tests
+# Guidelines for people writing UI tests
 
 It is essential that we ensure test suites can run in parallel. This might not be the case if one test suite relies on test data that another changes. AND this might cause the tests, when run in parallel, to fail in unpredictable ways, making it difficult to determine what test data is the failure-making culprit.
 
