@@ -1,5 +1,6 @@
 import Link from '@frontend/components/Link';
 import React, { Component } from 'react';
+import Details from '@common/components/Details';
 
 export interface Publication {
   id: string;
@@ -49,32 +50,25 @@ class PublicationList extends Component<Props> {
                     </Link>
                   </div>
                   <div className="govuk-grid-column-one-third">
-                    <details className="govuk-details govuk-!-display-inline-block">
-                      <summary className="govuk-details__summary">
-                        <span className="govuk-details__summary-text">
-                          Download underlying data files
-                        </span>
-                      </summary>
-                      <div className="govuk-details__text">
-                        <ul className="govuk-list-bullet">
-                          <li>
-                            <a href="#" className="govuk-link">
-                              Download Excel files
-                            </a>
-                          </li>
-                          <li>
-                            <a href="#" className="govuk-link">
-                              Download .csv files
-                            </a>
-                          </li>
-                          <li>
-                            <a href="#" className="govuk-link">
-                              Access API
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
-                    </details>
+                    <Details summary="Download underlying data files">
+                      <ul className="govuk-list-bullet">
+                        <li>
+                          <a href="#" className="govuk-link">
+                            Download Excel files
+                          </a>
+                        </li>
+                        <li>
+                          <a href="#" className="govuk-link">
+                            Download .csv files
+                          </a>
+                        </li>
+                        <li>
+                          <a href="#" className="govuk-link">
+                            Access API
+                          </a>
+                        </li>
+                      </ul>
+                    </Details>
                   </div>
                 </div>
               </div>
