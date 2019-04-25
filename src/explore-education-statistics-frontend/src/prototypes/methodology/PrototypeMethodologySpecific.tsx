@@ -18,8 +18,8 @@ const BrowseReleasesPage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">
-            Browse education statistics and data topics to find out more about
-            them and how and why they're collected and published.
+            Browse education statistics and data to find out more about them and
+            how and why they're collected and published.
           </p>
         </div>
         <div className="govuk-grid-column-one-third">
