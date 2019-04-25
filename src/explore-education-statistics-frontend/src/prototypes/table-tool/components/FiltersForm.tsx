@@ -5,45 +5,22 @@ import ErrorSummary, {
 import { FormFieldset, FormGroup } from '@common/components/form';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
-import TimePeriod from '@common/services/types/TimePeriod';
-import { Comparison, Overwrite } from '@common/types/util';
 import { Form, Formik, FormikErrors, FormikProps, FormikTouched } from 'formik';
 import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
 import React, { Component, createRef } from 'react';
 import CategoricalFilters from './CategoricalFilters';
 import { MetaSpecification } from './meta/initialSpec';
-import ObservationalUnitFilters from './ObservationalUnitFilters';
 import SearchableGroupedFilterMenus from './SearchableGroupedFilterMenus';
 
 export interface FormValues {
   indicators: string[];
-  location: {
-    level: string;
-    national: string;
-    region: string;
-    localAuthority: string;
-  };
-  categoricalFilters: {
+  filters: {
     [key: string]: string[];
-  };
-  timePeriod: {
-    start: string;
-    end: string;
   };
 }
 
-export type FilterFormSubmitHandler = (
-  values: Overwrite<
-    FormValues,
-    {
-      timePeriod: {
-        start: TimePeriod;
-        end: TimePeriod;
-      };
-    }
-  >,
-) => void;
+export type FilterFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
   specification: MetaSpecification;
@@ -87,55 +64,15 @@ class FiltersForm extends Component<Props, State> {
   public render() {
     const { onSubmit, specification } = this.props;
 
-    const startEndDateValues = specification.observationalUnits.timePeriod.options.map(
-      ({ code, year }) => `${year}_${code}`,
-    );
-
-    let locationRules = Yup.object<FormValues['location']>({
-      level: Yup.string().notRequired(),
-      localAuthority: Yup.string().notRequired(),
-      national: Yup.string().notRequired(),
-      region: Yup.string().notRequired(),
-    });
-
-    if (
-      Object.keys(specification.observationalUnits.location.options).length > 1
-    ) {
-      locationRules = locationRules.shape({
-        ...mapValues(
-          specification.observationalUnits.location.options,
-          locationLevel =>
-            Yup.string().when('level', {
-              is: locationLevel,
-              then: Yup.string().required('Select a location'),
-            }),
-        ),
-        level: Yup.string().required('Select a location level'),
-      });
-    }
-
     return (
       <Formik<FormValues>
         initialValues={{
-          categoricalFilters: mapValues(
-            specification.categoricalFilters,
-            () => [],
-          ),
+          filters: mapValues(specification.filters, () => []),
           indicators: [],
-          location: {
-            level: '',
-            localAuthority: '',
-            national: '',
-            region: '',
-          },
-          timePeriod: {
-            end: '2016_AY',
-            start: '2012_AY',
-          },
         }}
         validationSchema={Yup.object<FormValues>({
-          categoricalFilters: Yup.object(
-            mapValues(specification.categoricalFilters, () =>
+          filters: Yup.object(
+            mapValues(specification.filters, () =>
               Yup.array()
                 .of(Yup.string())
                 .required('Select at least one option'),
@@ -144,67 +81,10 @@ class FiltersForm extends Component<Props, State> {
           indicators: Yup.array()
             .of(Yup.string())
             .required('Select at least one option'),
-          location: locationRules,
-          timePeriod: Yup.object<FormValues['timePeriod']>({
-            end: Yup.string()
-              .required('End date is required')
-              .oneOf(startEndDateValues, 'Must be one of provided dates')
-              .test(
-                'moreThanOrEqual',
-                'Must be after or same as start date',
-                function moreThanOrEqual(value: string) {
-                  const start: string = this.resolve(Yup.ref('start'));
-
-                  if (!start) {
-                    return false;
-                  }
-
-                  const endTime = TimePeriod.fromString(value);
-                  const startTime = TimePeriod.fromString(start);
-
-                  const comparison = endTime.compare(startTime);
-
-                  return (
-                    comparison === Comparison.GreaterThan ||
-                    comparison === Comparison.EqualTo
-                  );
-                },
-              ),
-            start: Yup.string()
-              .required('Start date is required')
-              .oneOf(startEndDateValues, 'Must be one of provided dates')
-              .test(
-                'lessThanOrEqual',
-                'Must be before or same as end date',
-                function lessThanOrEqual(value: string) {
-                  const end: string = this.resolve(Yup.ref('end'));
-
-                  if (!end) {
-                    return false;
-                  }
-
-                  const startTime = TimePeriod.fromString(value);
-                  const endTime = TimePeriod.fromString(end);
-
-                  const comparison = startTime.compare(endTime);
-
-                  return (
-                    comparison === Comparison.LessThan ||
-                    comparison === Comparison.EqualTo
-                  );
-                },
-              ),
-          }),
         })}
-        onSubmit={async (form, actions) => {
+        onSubmit={async (values, actions) => {
           try {
-            await onSubmit({
-              ...form,
-              timePeriod: {
-                end: TimePeriod.fromString(form.timePeriod.end),
-                start: TimePeriod.fromString(form.timePeriod.start),
-              },
-            });
+            await onSubmit(values);
           } catch (error) {
             this.setState({
               submitError: error.message,
@@ -229,16 +109,10 @@ class FiltersForm extends Component<Props, State> {
 
               <Form>
                 <div className="govuk-grid-row">
-                  <FormGroup className="govuk-grid-column-one-quarter-from-desktop">
-                    <ObservationalUnitFilters
-                      form={form}
-                      specification={specification}
-                    />
-                  </FormGroup>
                   <FormGroup className="govuk-grid-column-one-half-from-desktop">
                     <CategoricalFilters
                       form={form}
-                      specification={specification.categoricalFilters}
+                      specification={specification.filters}
                     />
                   </FormGroup>
                   <FormGroup className="govuk-grid-column-one-quarter-from-desktop">

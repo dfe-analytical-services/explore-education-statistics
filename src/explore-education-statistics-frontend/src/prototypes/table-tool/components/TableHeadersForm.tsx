@@ -11,13 +11,11 @@ import { Form, Formik } from 'formik';
 import React from 'react';
 
 interface Props {
+  indicators: IndicatorOption[];
   filters: {
-    indicators: IndicatorOption[];
-    categorical: {
-      [key: string]: FilterOption[];
-    };
-    timePeriods: TimePeriod[];
+    [key: string]: FilterOption[];
   };
+  timePeriods: TimePeriod[];
   onSubmit: (values: FormValues) => void;
 }
 
@@ -30,7 +28,7 @@ export interface FormValues {
 
 const TableHeadersForm = (props: Props) => {
   const { filters, onSubmit } = props;
-  const { categorical, indicators, timePeriods } = filters;
+  const { indicators, timePeriods } = filters;
 
   return (
     <Details summary="Re-order table headers">
@@ -41,9 +39,9 @@ const TableHeadersForm = (props: Props) => {
       <Formik<FormValues>
         enableReinitialize
         initialValues={{
-          columnGroups: categorical.schoolTypes,
+          columnGroups: filters.schoolTypes,
           columns: timePeriods,
-          rowGroups: categorical.characteristics,
+          rowGroups: filters.characteristics,
           rows: indicators,
         }}
         onSubmit={onSubmit}
@@ -79,6 +77,27 @@ const TableHeadersForm = (props: Props) => {
                     legend="Columns"
                   />
                 </div>
+              </div>
+              <div className="govuk-grid-column-one-quarter">
+                <FormFieldSortableList<FormValues>
+                  name="rows"
+                  id="sort-rows"
+                  legend="Rows"
+                />
+              </div>
+              <div className="govuk-grid-column-one-quarter">
+                <FormFieldSortableList<FormValues>
+                  name="columnGroups"
+                  id="sort-columnGroups"
+                  legend="Column groups"
+                />
+              </div>
+              <div className="govuk-grid-column-one-quarter">
+                <FormFieldSortableList<FormValues>
+                  name="columns"
+                  id="sort-columns"
+                  legend="Columns"
+                />
               </div>
 
               <Button type="submit">Re-order table</Button>

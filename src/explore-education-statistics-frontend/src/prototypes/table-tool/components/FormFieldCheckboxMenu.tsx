@@ -1,4 +1,5 @@
 import DetailsMenu from '@common/components/DetailsMenu';
+import { FormFieldCheckboxGroup } from '@common/components/form';
 import { FormCheckboxSearchGroupProps } from '@common/components/form/FormCheckboxSearchGroup';
 import FormFieldCheckboxSearchGroup from '@common/components/form/FormFieldCheckboxSearchGroup';
 import { Omit } from '@common/types/util';
@@ -24,12 +25,16 @@ const FormFieldCheckboxMenu = <T extends {}>(
         </>
       }
     >
-      <FormFieldCheckboxSearchGroup
-        {...props}
-        hideCount
-        name={name}
-        options={options}
-      />
+      {options.length > 1 ? (
+        <FormFieldCheckboxSearchGroup
+          {...props}
+          hideCount
+          name={name}
+          options={options}
+        />
+      ) : (
+        <FormFieldCheckboxGroup {...props} name={name} options={options} />
+      )}
     </DetailsMenu>
   );
 };

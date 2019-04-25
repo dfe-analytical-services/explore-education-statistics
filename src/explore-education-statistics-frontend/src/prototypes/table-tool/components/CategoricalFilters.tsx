@@ -9,7 +9,7 @@ import styles from './CategoricalFilters.module.scss';
 
 interface Props {
   form: FormikState<FormValues>;
-  specification: MetaSpecification['categoricalFilters'];
+  specification: MetaSpecification['filters'];
 }
 
 const CategoricalFilters = ({ form, specification }: Props) => {
@@ -18,7 +18,7 @@ const CategoricalFilters = ({ form, specification }: Props) => {
   return (
     <div className={styles.columns}>
       {Object.entries(specification).map(([filterKey, filterSpec]) => {
-        const filterName = `categoricalFilters.${filterKey}`;
+        const filterName = `filters.${filterKey}`;
 
         return (
           <div className={styles.group} key={filterKey}>
@@ -46,7 +46,7 @@ const CategoricalFilters = ({ form, specification }: Props) => {
                 <SearchableGroupedFilterMenus<FormValues>
                   menuOptions={filterSpec.options}
                   name={filterName}
-                  values={form.values.categoricalFilters[filterKey]}
+                  values={form.values.filters[filterKey]}
                 />
               </FormFieldset>
             )}

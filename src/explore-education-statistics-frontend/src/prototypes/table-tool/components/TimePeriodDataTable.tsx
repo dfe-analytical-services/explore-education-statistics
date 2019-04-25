@@ -20,18 +20,20 @@ interface TableHeaders {
 }
 
 interface Props {
+  indicators: IndicatorOption[];
   filters: {
-    indicators: IndicatorOption[];
-    categorical: {
-      [key: string]: FilterOption[];
-    };
-    timePeriods: TimePeriod[];
+    [key: string]: FilterOption[];
   };
+  timePeriods: TimePeriod[];
   results: DataTableResult[];
 }
 
-const TimePeriodDataTable = ({ filters, results }: Props) => {
-  const { categorical, indicators, timePeriods } = filters;
+const TimePeriodDataTable = ({
+  filters,
+  timePeriods,
+  indicators,
+  results,
+}: Props) => {
   const dataTableRef = useRef<HTMLTableElement>(null);
 
   const [prevFilters, setPrevFilters] = useState<Props['filters']>();
@@ -45,9 +47,9 @@ const TimePeriodDataTable = ({ filters, results }: Props) => {
   if (!isEqual(prevFilters, filters)) {
     setPrevFilters(filters);
     setTableHeaders({
-      columnGroups: categorical.schoolTypes,
+      columnGroups: filters.schoolTypes,
       columns: timePeriods,
-      rowGroups: categorical.characteristics,
+      rowGroups: filters.characteristics,
       rows: indicators,
     });
   }
@@ -121,6 +123,8 @@ const TimePeriodDataTable = ({ filters, results }: Props) => {
     <div>
       <TableHeadersForm
         filters={filters}
+        indicators={indicators}
+        timePeriods={timePeriods}
         onSubmit={value => {
           setTableHeaders(value as TableHeaders);
 

@@ -12,6 +12,7 @@ import PrototypePage from '@frontend/prototypes/components/PrototypePage';
 import FiltersForm, {
   FilterFormSubmitHandler,
 } from '@frontend/prototypes/table-tool/components/FiltersForm';
+import LocationFiltersForm from '@frontend/prototypes/table-tool/components/LocationFiltersForm';
 import initialMetaSpecification, {
   FilterOption,
   IndicatorOption,
@@ -19,6 +20,7 @@ import initialMetaSpecification, {
 } from '@frontend/prototypes/table-tool/components/meta/initialSpec';
 import publicationSubjectSpec from '@frontend/prototypes/table-tool/components/meta/publicationSubjectSpec';
 import TimePeriodDataTable from '@frontend/prototypes/table-tool/components/TimePeriodDataTable';
+import TimePeriodFiltersForm from '@frontend/prototypes/table-tool/components/TimePeriodFiltersForm';
 import mapOptionValues from '@frontend/prototypes/table-tool/components/utils/mapOptionValues';
 import mapValues from 'lodash/mapValues';
 import React, { Component, createRef } from 'react';
@@ -57,13 +59,14 @@ const defaultPublicationOptions = [
 ];
 
 interface State {
-  filters: {
-    indicators: IndicatorOption[];
-    categorical: {
-      [key: string]: FilterOption[];
-    };
-    timePeriods: TimePeriod[];
+  timePeriods: TimePeriod[];
+  locations: {
+    [key: string]: string[];
   };
+  filters: {
+    [key: string]: FilterOption[];
+  };
+  indicators: IndicatorOption[];
   metaSpecification: MetaSpecification;
   publicationId: string;
   publicationName: string;
@@ -72,19 +75,12 @@ interface State {
 }
 
 class PrototypeTableToolPage extends Component<{}, State> {
-  private readonly defaultFilters: State['filters'] = {
-    categorical: {
-      characteristics: [],
-      schoolTypes: [],
-    },
-    indicators: [],
-    timePeriods: [],
-  };
-
   public state: State = {
-    filters: {
-      ...this.defaultFilters,
-    },
+    filters: {},
+    timePeriods: [],
+    // eslint-disable-next-line react/no-unused-state
+    locations: {},
+    indicators: [],
     metaSpecification: initialMetaSpecification,
     publicationId: '',
     publicationName: '',
@@ -95,6 +91,8 @@ class PrototypeTableToolPage extends Component<{}, State> {
   private filtersRef = createRef<HTMLElement>();
 
   private dataTableRef = createRef<HTMLElement>();
+
+  private locationFiltersRef = createRef<HTMLElement>();
 
   private handleMenuChange: MenuChangeEventHandler = async ({
     publicationId,
@@ -114,15 +112,12 @@ class PrototypeTableToolPage extends Component<{}, State> {
       {
         publicationId,
         publicationName,
-        filters: {
-          ...this.defaultFilters,
-        },
         metaSpecification: {
           ...metaSpecification,
-          categoricalFilters: {
-            ...metaSpecification.categoricalFilters,
+          filters: {
+            ...metaSpecification.filters,
             characteristics: {
-              ...metaSpecification.categoricalFilters.characteristics,
+              ...metaSpecification.filters.characteristics,
               options: Object.entries(publicationMeta.characteristics).reduce(
                 (acc, [groupKey, group]) => {
                   return {
@@ -199,12 +194,15 @@ class PrototypeTableToolPage extends Component<{}, State> {
   };
 
   private handleFilterFormSubmit: FilterFormSubmitHandler = async ({
-    categoricalFilters,
+    filters,
     indicators,
-    timePeriod,
   }) => {
-    const { characteristics, schoolTypes } = categoricalFilters;
-    const { start, end } = timePeriod;
+    const { characteristics, schoolTypes } = filters;
+
+    const { timePeriods } = this.state;
+
+    const start = timePeriods[0].year;
+    const end = timePeriods[timePeriods.length - 1].year;
 
     // TODO: Remove this when timePeriod API finalised
     const formatToAcademicYear = (year: number) => {
@@ -220,13 +218,13 @@ class PrototypeTableToolPage extends Component<{}, State> {
         indicators,
         schoolTypes,
         publicationId,
-        endYear: formatToAcademicYear(end.year),
-        startYear: formatToAcademicYear(start.year),
+        startYear: formatToAcademicYear(start),
+        endYear: formatToAcademicYear(end),
       },
     );
 
     const categoricalFiltersByValue = mapValues(
-      metaSpecification.categoricalFilters,
+      metaSpecification.filters,
       value => mapOptionValues(value.options),
     );
 
@@ -234,21 +232,14 @@ class PrototypeTableToolPage extends Component<{}, State> {
       metaSpecification.indicators,
     );
 
-    const timePeriods = TimePeriod.createRange(start, end);
-
     this.setState(
       {
-        filters: {
-          timePeriods,
-          categorical: mapValuesWithKeys(
-            categoricalFilters,
-            ([filterGroup, selectedFilters]) =>
-              selectedFilters.map(
-                filter => categoricalFiltersByValue[filterGroup][filter],
-              ),
+        filters: mapValuesWithKeys(filters, ([filterGroup, selectedFilters]) =>
+          selectedFilters.map(
+            filter => categoricalFiltersByValue[filterGroup][filter],
           ),
-          indicators: indicators.map(indicator => indicatorsByValue[indicator]),
-        },
+        ),
+        indicators: indicators.map(indicator => indicatorsByValue[indicator]),
         tableData: result,
       },
       () => {
@@ -265,6 +256,8 @@ class PrototypeTableToolPage extends Component<{}, State> {
   public render() {
     const {
       filters,
+      indicators,
+      timePeriods,
       metaSpecification,
       publicationId,
       publicationName,
@@ -302,8 +295,8 @@ class PrototypeTableToolPage extends Component<{}, State> {
               value={publicationId}
             />
           </div>
-          <div className="govuk-grid-column-two-thirds-from-desktop">
-            {publicationId && (
+          {publicationId && (
+            <div className="govuk-grid-column-two-thirds-from-desktop">
               <>
                 <h2>
                   2. Choose your area of interest
@@ -317,8 +310,8 @@ class PrototypeTableToolPage extends Component<{}, State> {
                         publicationSubjectName: event.target.value,
                       },
                       () => {
-                        if (this.filtersRef.current) {
-                          this.filtersRef.current.scrollIntoView({
+                        if (this.locationFiltersRef.current) {
+                          this.locationFiltersRef.current.scrollIntoView({
                             behavior: 'smooth',
                             block: 'start',
                           });
@@ -330,14 +323,88 @@ class PrototypeTableToolPage extends Component<{}, State> {
                   value={publicationSubjectName}
                 />
               </>
-            )}
-          </div>
+            </div>
+          )}
         </section>
+
+        {publicationSubjectName && (
+          <section
+            className="govuk-grid-row govuk-form-group"
+            ref={this.locationFiltersRef}
+          >
+            <div className="govuk-grid-column-one-third-from-desktop">
+              <h2>
+                3. Choose location filters
+                <span className="govuk-hint">
+                  Select at least one location to compare.
+                </span>
+              </h2>
+
+              <LocationFiltersForm
+                specification={metaSpecification}
+                onSubmit={values => {
+                  this.setState(
+                    {
+                      // eslint-disable-next-line react/no-unused-state
+                      locations: {
+                        ...values,
+                      },
+                    },
+                    () => {
+                      if (this.filtersRef.current) {
+                        this.filtersRef.current.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start',
+                        });
+                      }
+                    },
+                  );
+                }}
+              />
+            </div>
+          </section>
+        )}
+
+        {publicationSubjectName && (
+          <section
+            className="govuk-grid-row govuk-form-group"
+            ref={this.locationFiltersRef}
+          >
+            <div className="govuk-grid-column-one-third-from-desktop">
+              <h2>
+                4. Choose time period
+                <span className="govuk-hint">Select a start and end date.</span>
+              </h2>
+
+              <TimePeriodFiltersForm
+                specification={metaSpecification}
+                onSubmit={values => {
+                  this.setState(
+                    {
+                      timePeriods: TimePeriod.createRange(
+                        TimePeriod.fromString(values.start),
+                        TimePeriod.fromString(values.end),
+                      ),
+                    },
+                    () => {
+                      if (this.filtersRef.current) {
+                        this.filtersRef.current.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start',
+                        });
+                      }
+                    },
+                  );
+                }}
+              />
+            </div>
+          </section>
+        )}
 
         {publicationSubjectName && (
           <section className="govuk-form-group" ref={this.filtersRef}>
             <h2>
-              3. Create your table for '{publicationName}'
+              5. Create your table for '{publicationName}'
               <span className="govuk-hint">
                 Select at least 1 option from under each of the following
                 headings
@@ -353,9 +420,14 @@ class PrototypeTableToolPage extends Component<{}, State> {
 
         {tableData.length > 0 && (
           <section ref={this.dataTableRef}>
-            <h2>4. Explore data for '{publicationName}'</h2>
+            <h2>5. Explore data for '{publicationName}'</h2>
 
-            <TimePeriodDataTable filters={filters} results={tableData} />
+            <TimePeriodDataTable
+              filters={filters}
+              indicators={indicators}
+              timePeriods={timePeriods}
+              results={tableData}
+            />
 
             <ul className="govuk-list">
               <li>
