@@ -2,9 +2,7 @@ import PrototypeDataSample from '@admin/pages/prototypes/publication/components/
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
-import publicationService, {
-  Release,
-} from '@common/services/publicationService';
+import { Release } from '@common/services/publicationService';
 import React, { Component, Fragment } from 'react';
 import {
   DragDropContext,
@@ -19,6 +17,7 @@ import Link from '../../components/Link';
 import EditableContentBlock from '../../modules/find-statistics/components/EditableContentBlock';
 import { PrototypeEditableContent } from './components/PrototypeEditableContent';
 import PrototypePage from './components/PrototypePage';
+import { PrototypePublicationService } from '@admin/pages/prototypes/components/PrototypePublicationService';
 
 interface State {
   data: Release | undefined;
@@ -76,7 +75,9 @@ class PublicationPage extends Component<{}, State> {
   public async componentDidMount() {
     const publication = 'pupil-absence-in-schools-in-england';
 
-    const request = publicationService.getLatestPublicationRelease(publication);
+    const request = PrototypePublicationService.getLatestPublicationRelease(
+      publication,
+    );
 
     const data = await request;
 
