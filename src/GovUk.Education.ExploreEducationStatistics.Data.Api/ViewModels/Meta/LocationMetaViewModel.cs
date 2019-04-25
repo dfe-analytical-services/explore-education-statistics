@@ -8,6 +8,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
         public LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>> LocalAuthorityDistrict { get; set; }
         public LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>> National { get; set; }
         public LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>> Region { get; set; }
-        public LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>> School { get; set; }
     }
 }

@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
         }
 
-        public Dictionary<IndicatorGroup, IEnumerable<Indicator>> GetGroupedIndicatorsBySubjectId(long subjectId)
+        public Dictionary<IndicatorGroup, IEnumerable<Indicator>> GetIndicatorGroupsBySubjectId(long subjectId)
         {
             return FindMany(group => group.SubjectId == subjectId,
                     new List<Expression<Func<IndicatorGroup, object>>> {group => group.Indicators})

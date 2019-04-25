@@ -4,6 +4,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 {
     public interface IIndicatorGroupService : IDataService<IndicatorGroup, long>
     {
-        Dictionary<IndicatorGroup, IEnumerable<Indicator>> GetGroupedIndicatorsBySubjectId(long subjectId);
+        Dictionary<IndicatorGroup, IEnumerable<Indicator>> GetIndicatorGroupsBySubjectId(long subjectId);
     }
 }

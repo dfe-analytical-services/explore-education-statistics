@@ -1,3 +1,5 @@
+using GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Models
 {
     public class Subject
