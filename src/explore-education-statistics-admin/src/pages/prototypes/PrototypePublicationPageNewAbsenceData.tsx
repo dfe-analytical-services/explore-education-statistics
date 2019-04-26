@@ -22,7 +22,7 @@ const PublicationDataPage = () => {
         <thead className="govuk-table__head">
           <tr className="govuk-table__row">
             <th className="govuk-table__header" scope="col">
-              Data label
+              Subject title
             </th>
             <th className="govuk-table__header" scope="col">
               Data file
@@ -123,21 +123,144 @@ const PublicationDataPage = () => {
         </tbody>
       </div>
 
-      <h2 className="govuk-heading-m govuk-!-margin-top-9">
-        Add new data to release
-      </h2>
+      <form>
+        <fieldset className="govuk-fieldset">
+          <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
+            Add new data to release
+          </legend>
 
-      <div className="govuk-form-group">
-        <label className="govuk-label" htmlFor="file-upload-1">
-          Upload a file test
-        </label>
-        <input
-          className="govuk-file-upload"
-          id="file-upload-1"
-          name="file-upload-1"
-          type="file"
-        />
-      </div>
+          <div className="govuk-form-group">
+            <label htmlFor="release-title" className="govuk-label">
+              Subject title
+            </label>
+            <input type="text" className="govuk-input govuk-!-width-one-half" />
+          </div>
+
+          <fieldset className="govuk-fieldset">
+            <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
+              Data type
+            </legend>
+            <div className="govuk-radios">
+              <div className="govuk-radios__item">
+                <input
+                  type="radio"
+                  name="data-type"
+                  id="data-type-final"
+                  value="final"
+                  className="govuk-radios__input"
+                />
+                <label
+                  htmlFor="data-type=final"
+                  className="govuk-label govuk-radios__label"
+                >
+                  Final
+                </label>
+              </div>
+              <div className="govuk-radios__item">
+                <input
+                  type="radio"
+                  name="data-type"
+                  id="data-type-provisional"
+                  value="provisional"
+                  className="govuk-radios__input"
+                />
+                <label
+                  htmlFor="data-type-final"
+                  className="govuk-label govuk-radios__label"
+                >
+                  Provisional
+                </label>
+              </div>
+              <div className="govuk-radios__item">
+                <input
+                  type="radio"
+                  name="data-type"
+                  id="data-type-revised"
+                  value="revised"
+                  className="govuk-radios__input"
+                />
+                <label
+                  htmlFor="data-type-revised"
+                  className="govuk-label govuk-radios__label"
+                >
+                  Revised
+                </label>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset className="govuk-fieldset govuk-!-margin-top-6">
+            <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
+              Level of methodology
+            </legend>
+            <div className="govuk-radios">
+              <div className="govuk-radios__item">
+                <input
+                  type="radio"
+                  name="methodology-level"
+                  id="methodology-school-location"
+                  value="school-location"
+                  className="govuk-radios__input"
+                />
+                <label
+                  htmlFor="data-type=final"
+                  className="govuk-label govuk-radios__label"
+                >
+                  School location
+                </label>
+              </div>
+              <div className="govuk-radios__item">
+                <input
+                  type="radio"
+                  name="methodology-level"
+                  id="methodology-pupil-residency"
+                  value="pupil residency"
+                  className="govuk-radios__input"
+                />
+                <label
+                  htmlFor="data-type=final"
+                  className="govuk-label govuk-radios__label"
+                >
+                  Pupil residency
+                </label>
+              </div>
+            </div>
+          </fieldset>
+
+          <div className="govuk-form-group govuk-!-margin-top-6">
+            <label
+              className="govuk-label govuk-label--s"
+              htmlFor="file-upload-1"
+            >
+              Upload data
+            </label>
+            <input
+              className="govuk-file-upload"
+              id="file-upload-1"
+              name="file-upload-1"
+              type="file"
+            />
+          </div>
+
+          <div className="govuk-form-group govuk-!-margin-top-6">
+            <label
+              className="govuk-label govuk-label--s"
+              htmlFor="file-upload-2"
+            >
+              Upload metadata
+            </label>
+            <input
+              className="govuk-file-upload"
+              id="file-upload-2"
+              name="file-upload-2"
+              type="file"
+            />
+          </div>
+        </fieldset>
+        <div className="govuk-form-group govuk-!-margin-top-6">
+          <button className="govuk-button">Upload data files</button>
+        </div>
+      </form>
     </PrototypePage>
   );
 };
