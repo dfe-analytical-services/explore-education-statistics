@@ -6,6 +6,7 @@ import PageTitle from '@frontend/components/PageTitle';
 import React from 'react';
 
 function GlossaryIndexPage() {
+  const test = 1;
   return (
     <Page breadcrumbs={[{ name: 'Glossary' }]}>
       <PageTitle title="Education statistics: glossary" />
