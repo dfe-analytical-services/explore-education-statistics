@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.ViewModels;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
@@ -19,11 +22,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             _locationService = locationService;
         }
 
+        public IEnumerable<Observation> FindObservations(Expression<Func<Observation, bool>> findExpression)
+        {
+            return DbSet().Where(findExpression)
+                .Include(observation => observation.Subject)
+                .Include(observation => observation.Location)
+                .Include(observation => observation.FilterItems)
+                .ThenInclude(item => item.FilterItem.FilterGroup);
+        }
+
         public IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(long subjectId)
         {
             var timePeriods = (from o in DbSet().Where(data => data.SubjectId == subjectId)
-                select new {o.TimeIdentifier, o.Year }).Distinct();
-            
+                select new {o.TimeIdentifier, o.Year}).Distinct();
+
             return from timePeriod in timePeriods.AsEnumerable()
                 select (timePeriod.TimeIdentifier, timePeriod.Year);
         }

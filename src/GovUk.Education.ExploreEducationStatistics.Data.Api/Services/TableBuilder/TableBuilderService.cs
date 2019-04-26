@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.TableBuilder;
@@ -56,10 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
                 return new List<Observation>();
             }
 
-            return _observationService.FindMany(queryContext.FindExpression(),
-                new List<Expression<Func<Observation, object>>>
-                    {data => data.Subject, data => data.Location}
-            );
+            return _observationService.FindObservations(queryContext.FindExpression());
         }
     }
 }
