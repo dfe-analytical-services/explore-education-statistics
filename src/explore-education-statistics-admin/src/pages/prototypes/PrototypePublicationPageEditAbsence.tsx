@@ -97,7 +97,7 @@ class PublicationPage extends Component<{}, State> {
         wide
         breadcrumbs={[
           {
-            link: '/prototypes/admin-dashboard',
+            link: '/prototypes/admin-dashboard?status=editLiveRelease',
             text: 'Administrator dashboard',
           },
           { text: 'Edit pupil absence statistics', link: '#' },

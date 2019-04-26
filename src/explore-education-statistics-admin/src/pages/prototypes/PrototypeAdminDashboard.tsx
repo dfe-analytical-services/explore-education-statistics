@@ -57,7 +57,10 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
                 <div className="govuk-summary-list__row">
                   <dt className="govuk-summary-list__key">Current status</dt>
                   <dd className="govuk-summary-list__value">
-                    Live (latest release), published 22 March 2018
+                    {location.search == '?status=editLiveRelease' && (
+                      <span className="govuk-tag">Editing in progress</span>
+                    )}{' '}
+                    Live (latest release)
                   </dd>
                   <dd className="govuk-summary-list__actions" />
                 </div>
@@ -92,7 +95,7 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
                 </div>
               </dl>
             </li>
-            {location.search == '?status=editRelease' && (
+            {location.search == '?status=editNewRelease' && (
               <li>
                 <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
                   Pupil absence statistics
@@ -118,7 +121,7 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
                     </div>
                     <div className="govuk-summary-list__actions">
                       <Link to="/prototypes/publication-create-new-absence-config">
-                        Edit this release
+                        View / edit this draft
                       </Link>
                     </div>
                   </div>
@@ -141,13 +144,10 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
                 <div className="govuk-summary-list__row">
                   <dt className="govuk-summary-list__key">Current status</dt>
                   <dd className="govuk-summary-list__value">
-                    <span className="govuk-tag">Editing in progress</span>
+                    <span className="govuk-tag">Editing in progress</span> Live
+                    (Latest release)
                   </dd>
-                  <dd className="govuk-summary-list__actions">
-                    <Link to="/prototypes/publication-create-new-absence-status">
-                      Set status
-                    </Link>
-                  </dd>
+                  <dd className="govuk-summary-list__actions" />
                 </div>
                 <div className="govuk-summary-list__row">
                   <dt className="govuk-summary-list__key">
@@ -161,7 +161,7 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
                   </dd>
                   <dd className="govuk-summary-list__actions">
                     <Link to="/prototypes/publication-edit">
-                      Edit this release
+                      View / edit this draft
                     </Link>
                   </dd>
                 </div>
@@ -185,10 +185,10 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         <TabsSection
           id="task-in-progress"
           title={`In progress ${
-            location.search == '?status=editRelease' ? '(2)' : '(1)'
+            location.search == '?status=editNewRelease' ? '(2)' : '(1)'
           }`}
         >
-          {location.search == '?status=editRelease' && (
+          {location.search == '?status=editNewRelease' && (
             <>
               <h2 className="govuk-heading-m">New releases in progress</h2>
               <ul className="govuk-list-bullet  govuk-!-margin-bottom-9">

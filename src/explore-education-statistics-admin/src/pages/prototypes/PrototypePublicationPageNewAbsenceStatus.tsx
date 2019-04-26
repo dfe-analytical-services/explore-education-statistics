@@ -10,7 +10,7 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
       wide
       breadcrumbs={[
         {
-          link: '/prototypes/admin-dashboard',
+          link: '/prototypes/admin-dashboard?status=editNewRelease',
           text: 'Administrator dashboard',
         },
         { text: 'Create new release', link: '#' },
@@ -66,14 +66,14 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
                     className="govuk-radios__input"
                     type="radio"
                     name="status"
-                    id="readyApproval"
-                    value="readyApproval"
+                    id="readyTeamApproval"
+                    value="readyTeamApproval"
                   />
                   <label
                     className="govuk-label govuk-radios__label"
                     htmlFor="readyApproval"
                   >
-                    Ready for approval
+                    Level 1: Ready for team approval
                   </label>
                 </div>
 
@@ -88,9 +88,9 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
                   />
                   <label
                     className="govuk-label govuk-radios__label"
-                    htmlFor="cancelEdit"
+                    htmlFor="readyTeamLeadApproval"
                   >
-                    Cancel and remove this release
+                    Level 2: Ready for team lead appoval
                   </label>
                 </div>
               </div>

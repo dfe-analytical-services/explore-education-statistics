@@ -11,7 +11,7 @@ const PublicationConfigPage = () => {
       wide
       breadcrumbs={[
         {
-          link: '/prototypes/admin-dashboard?status=editRelease',
+          link: '/prototypes/admin-dashboard?status=editNewRelease',
           text: 'Administrator dashboard',
         },
         { text: 'Create new release', link: '#' },
