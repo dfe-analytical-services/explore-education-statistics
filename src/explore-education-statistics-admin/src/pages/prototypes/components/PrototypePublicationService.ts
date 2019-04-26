@@ -344,76 +344,25 @@ export class PrototypePublicationService {
           '[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)',
         summary: LOREM,
         nextUpdate: '2018-03-22T00:00:00',
-        releases: [
-          {
-            id: '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5',
-            releaseName: '2018 to 2019',
-            slug: '2018-17',
-          },
-          {
-            id: 'f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d',
-            releaseName: '2015 to 2016',
-            slug: '2015-16',
-          },
-        ],
-        legacyReleases: [
-          {
-            id: '45bc02ff-de90-489b-b78e-cdc7db662353',
-            description: '2014 to 2015',
-            url:
-              'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015',
-          },
-          {
-            id: '82292fe7-1545-44eb-a094-80c5064701a7',
-            description: '2013 to 2014',
-            url:
-              'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014',
-          },
-          {
-            id: '6907625d-0c2e-4fd8-8e96-aedd85b2ff97',
-            description: '2012 to 2013',
-            url:
-              'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013',
-          },
-          {
-            id: 'a538e57a-da5e-4a2c-a89e-b74dbae0c30b',
-            description: '2011 to 2012',
-            url:
-              'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics',
-          },
-          {
-            id: '18b24d60-c56e-44f0-8baa-6db4c6e7deee',
-            description: '2010 to 2011',
-            url:
-              'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011',
-          },
-          {
-            id: 'c5444f5a-6ba5-4c80-883c-6bca0d8a9eb5',
-            description: '2009 to 2010',
-            url:
-              'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010',
-          },
-        ],
+        releases: [],
+        legacyReleases: [],
       },
-      updates: [
-        {
-          id: '9c0f0139-7f88-4750-afe0-1c85cdf1d047',
-          releaseId: '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5',
-          on: '2017-04-19T00:00:00',
-          reason:
-            'Underlying data file updated to include absence data by pupil residency and school location, and updated metadata document.',
-        },
-        {
-          id: '18e0d40e-bdf7-4c84-99dd-732e72e9c9a5',
-          releaseId: '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5',
-          on: '2017-03-22T00:00:00',
-          reason: 'First published.',
-        },
-      ],
+      updates: [],
       content: [
         {
           order: 1,
           heading: 'About this release',
+          caption: '',
+          content: [
+            {
+              type: 'MarkDownBlock',
+              body: LOREM,
+            },
+          ],
+        },
+        {
+          order: 2,
+          heading: 'New content',
           caption: '',
           content: [
             {
@@ -433,11 +382,7 @@ export class PrototypePublicationService {
         },
         charts: [
           {
-            indicators: [
-              'sess_overall_percent',
-              'sess_unauthorised_percent',
-              'sess_authorised_percent',
-            ],
+            indicators: [],
             xAxis: { title: 'School Year' },
             yAxis: { title: 'Absence Rate' },
             type: 'line',
@@ -445,15 +390,10 @@ export class PrototypePublicationService {
         ],
         // @ts-ignore
         summary: {
-          dataKeys: [
-            'sess_overall_percent',
-            'sess_authorised_percent',
-            'sess_unauthorised_percent',
-          ],
+          dataKeys: [],
           description: {
             type: 'MarkDownBlock',
-            body:
-              ' * pupils missed on average 8.2 school days \n  * overall and unauthorised absence rates up on previous year \n * unauthorised rise due to higher rates of unauthorised holidays \n * 10% of pupils persistently absent during 2016/17',
+            body: LOREM,
           },
         },
       },
