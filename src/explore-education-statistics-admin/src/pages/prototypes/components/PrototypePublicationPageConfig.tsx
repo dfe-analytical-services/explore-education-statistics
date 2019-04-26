@@ -1,5 +1,14 @@
 import React from 'react';
 import Link from '../../../components/Link';
+import {
+  FormGroup,
+  FormFieldset,
+  FormRadio,
+  FormConditionalRadioGroup,
+  FormTextInput,
+  FormSelect,
+  FormRadioGroup,
+} from '@common/components/form';
 
 interface Props {
   sectionId?: string;
@@ -22,139 +31,79 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
             id="title"
             name="title"
             type="text"
-            value="Pupil absence statistics and data for schools in England"
+            defaultValue="Pupil absence statistics and data for schools in England"
           />
         </div>
-        <div className="govuk-form-group">
-          <fieldset className="govuk-fieldset">
+
+        <FormGroup>
+          <FormFieldset id="radios">
             <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
               Release type
             </legend>
-            <div className="govuk-radios govuk-radios--conditional">
-              <div className="govuk-radios__item">
-                <input
-                  className="govuk-radios__input"
-                  type="radio"
-                  name="release-type"
-                  id="release-type-academic"
-                  value="academic-year"
-                  defaultChecked
-                />
-                <label
-                  className="govuk-label govuk-radios__label"
-                  htmlFor="release-type-academic"
-                  data-aria-controls="conditional-academic-year"
-                >
-                  Academic year
-                </label>
-              </div>
-              <div
-                className="govuk-radios__conditional govuk-radios__conditional--visible"
-                id="conditional-academic-year"
+            <FormConditionalRadioGroup>
+              <FormRadio
+                id="release-type-academic"
+                label="Academic Year"
+                name="release-type"
+                value="academic-year"
+                defaultChecked={true}
               >
-                <div className="govuk-form-group">
-                  <fieldset className="govuk-fieldset">
+                <FormFieldset id="test">
+                  <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
+                    Release period
+                  </legend>
+
+                  <FormGroup>
+                    <FormTextInput
+                      id="release-period"
+                      name="release-period"
+                      label="Year starting"
+                      value="2018"
+                      width={4}
+                    />
+                  </FormGroup>
+
+                  <span className="govuk-hint">Academic year 2018/19</span>
+
+                  <FormGroup>
+                    <FormSelect
+                      id="time-period"
+                      label="Select time period"
+                      name="time-period"
+                      options={[
+                        { label: 'Full academic year', value: 'full-year' },
+                        { label: 'Autumn term', value: 'autumn-term' },
+                        { label: 'Spring term', value: 'spring-term' },
+                        { label: 'Summer term', value: 'summer-term' },
+                      ]}
+                    />
+                  </FormGroup>
+
+                  <FormGroup>
                     <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
-                      Release period
+                      Terms per year
                     </legend>
-                    <div className="govuk-form-group">
-                      <label htmlFor="release-period" className="govuk-label">
-                        Year starting
-                      </label>
-                      <input
-                        className="govuk-input govuk-input--width-4"
-                        id="release-period"
-                        name="release-period"
-                        type="text"
-                        value="2018"
-                      />
-                    </div>
-                    <span className="govuk-hint">Academic year 2018/19</span>
-                    <div className="govuk-form-group">
-                      <label htmlFor="time-period" className="govuk-label">
-                        Select time period
-                      </label>
-                      <select
-                        name="time-period"
-                        id="time-period"
-                        className="govuk-select"
-                      >
-                        <option value="full-year">Full academic year</option>
-                        <option value="autumn-term">Autumn term</option>
-                        <option value="spring-term">Spring term</option>
-                        <option value="summer-term">Summer term</option>
-                        <option value="autumn-spring-term">
-                          Autumn and spring term
-                        </option>
-                        <option value="autumn-spring-term">
-                          Spring and summer term
-                        </option>
-                      </select>
-                    </div>
-                    <div className="govuk-form-group">
-                      <fieldset className="govuk-fieldset">
-                        <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
-                          Terms per year
-                        </legend>
-                      </fieldset>
-                      <div className="govuk-radios">
-                        <div className="govuk-radios__item">
-                          <input
-                            type="radio"
-                            name="terms-per-year"
-                            id="terms-6"
-                            value="6"
-                            className="govuk-radios__input"
-                            defaultChecked
-                          />
-                          <label
-                            htmlFor="terms-6"
-                            className="govuk-label govuk-radios__label"
-                          >
-                            6 terms
-                          </label>
-                        </div>
-                        <div className="govuk-radios__item">
-                          <input
-                            type="radio"
-                            name="terms-per-year"
-                            id="terms-5"
-                            value="5"
-                            className="govuk-radios__input"
-                          />
-                          <label
-                            htmlFor="terms-6"
-                            className="govuk-label govuk-radios__label"
-                          >
-                            5 terms
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </fieldset>
-                </div>
-              </div>
-              <div className="govuk-radios__item">
-                <input
-                  className="govuk-radios__input"
-                  type="radio"
-                  name="release-type"
-                  id="release-type-calendar-year"
-                  value="calendar-year"
-                />
-                <label
-                  className="govuk-label govuk-radios__label"
-                  htmlFor="release-type-calendar-year"
-                >
-                  Calendar year
-                </label>
-              </div>
-              <div
-                className="govuk-radios__conditional govuk-radios__conditional--visible"
-                id="conditional-calendar-year"
+
+                    <FormRadioGroup
+                      name="terms-per-year"
+                      id="terms-per-year"
+                      value="terms-6"
+                      options={[
+                        { id: 'terms-6', label: '6 terms', value: 'terms-6' },
+                        { id: 'terms-5', label: '5 terms', value: 'terms-5' },
+                      ]}
+                    />
+                  </FormGroup>
+                </FormFieldset>
+              </FormRadio>
+              <FormRadio
+                id="release-type-calendar"
+                label="Calendar year"
+                name="release-type"
+                value="calendar-year"
               >
-                <div className="govuk-form-group">
-                  <fieldset className="govuk-fieldset">
+                <FormGroup>
+                  <FormFieldset id="calendar year">
                     <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
                       Release period
                     </legend>
@@ -167,34 +116,21 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                         id="calendar-year"
                         name="calendar-year"
                         type="text"
-                        value="2019"
+                        defaultValue="2019"
                         pattern="[0-9]*"
                       />
                     </div>
-                  </fieldset>
-                </div>
-              </div>
-              <div className="govuk-radios__item">
-                <input
-                  className="govuk-radios__input"
-                  type="radio"
-                  name="release-type"
-                  id="release-type-financial"
-                  value="financial year"
-                />
-                <label
-                  className="govuk-label govuk-radios__label"
-                  htmlFor="release-type-financial"
-                >
-                  Finacial year
-                </label>
-              </div>
-              <div
-                className="govuk-radios__conditional govuk-radios__conditional--visible"
-                id="conditional-financial-year"
+                  </FormFieldset>
+                </FormGroup>
+              </FormRadio>
+              <FormRadio
+                id="release-type-financial"
+                label="Financial year"
+                name="release-type"
+                value="financial-year"
               >
-                <div className="govuk-form-group">
-                  <fieldset className="govuk-fieldset">
+                <FormGroup>
+                  <FormFieldset id="financial year">
                     <div className="govuk-form-group">
                       <fieldset className="govuk-fieldset">
                         <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
@@ -218,7 +154,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                                 name="financial-year-day"
                                 id="financial-year-day"
                                 className="govuk-input govuk-date-input__input govuk-input--width-2"
-                                value="05"
+                                defaultValue="05"
                               />
                             </div>
                           </div>
@@ -236,7 +172,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                                 name="financial-year-month"
                                 id="financial-year-month"
                                 className="govuk-input govuk-date-input__input govuk-input--width-2"
-                                value="04"
+                                defaultValue="04"
                               />
                             </div>
                           </div>
@@ -254,7 +190,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                                 name="financial-year-year"
                                 id="financial-year-year"
                                 className="govuk-input govuk-date-input__input govuk-input--width-4"
-                                value="2019"
+                                defaultValue="2019"
                               />
                             </div>
                           </div>
@@ -287,30 +223,17 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                         <option value="q2-q3">Q2 to Q4</option>
                       </select>
                     </div>
-                  </fieldset>
-                </div>
-              </div>
-              <div className="govuk-radios__item">
-                <input
-                  className="govuk-radios__input"
-                  type="radio"
-                  name="release-type"
-                  id="release-month"
-                  value="month"
-                />
-                <label
-                  className="govuk-label govuk-radios__label"
-                  htmlFor="release-type-month"
-                >
-                  Month
-                </label>
-              </div>
-              <div
-                className="govuk-radios__conditional govuk-radios__conditional--visible"
-                id="conditional-month"
+                  </FormFieldset>
+                </FormGroup>
+              </FormRadio>
+              <FormRadio
+                id="release-type-month"
+                label="Month"
+                name="release-type"
+                value="month"
               >
-                <div className="govuk-form-group">
-                  <fieldset className="govuk-fieldset">
+                <FormGroup>
+                  <FormFieldset id="month">
                     <div className="govuk-form-group">
                       <fieldset className="govuk-fieldset">
                         <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
@@ -334,7 +257,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                                 name="monthly-release-month"
                                 id="monthly-release-month"
                                 className="govuk-input govuk-date-input__input govuk-input--width-2"
-                                value="04"
+                                defaultValue="04"
                               />
                             </div>
                           </div>
@@ -352,19 +275,19 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                                 name="monthly-release-year"
                                 id="monthly-release-year"
                                 className="govuk-input govuk-date-input__input govuk-input--width-4"
-                                value="2019"
+                                defaultValue="2019"
                               />
                             </div>
                           </div>
                         </div>
                       </fieldset>
                     </div>
-                  </fieldset>
-                </div>
-              </div>
-            </div>
-          </fieldset>
-        </div>
+                  </FormFieldset>
+                </FormGroup>
+              </FormRadio>
+            </FormConditionalRadioGroup>
+          </FormFieldset>
+        </FormGroup>
 
         {!sectionId && (
           <>

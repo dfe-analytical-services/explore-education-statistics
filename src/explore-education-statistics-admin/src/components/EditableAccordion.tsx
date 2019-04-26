@@ -42,13 +42,15 @@ class EditableAccordion extends Component<EditableAccordionProps, State> {
     this.setState({ hash: location.hash });
 
     if (this.ref.current && location.hash) {
-      const anchor = this.ref.current.querySelector(
-        location.hash,
-      ) as HTMLButtonElement;
+      try {
+        const anchor = this.ref.current.querySelector(
+          location.hash,
+        ) as HTMLButtonElement;
 
-      if (anchor) {
-        anchor.scrollIntoView();
-      }
+        if (anchor) {
+          anchor.scrollIntoView();
+        }
+      } catch (_) {}
     }
   };
 
