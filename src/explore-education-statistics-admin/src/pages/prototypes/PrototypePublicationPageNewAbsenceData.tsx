@@ -15,37 +15,113 @@ const PublicationDataPage = () => {
       ]}
     >
       <PrototypeAdminNavigation sectionId="addData" />
-
-      <h2 className="govuk-heading-m">Current data for this release</h2>
-      <dl className="govuk-summary-list">
-        <div className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">Data upload 1</dt>
-          <dd className="govuk-summary-list__value">
-            <a href="#">absence_geoglevels.csv</a>
-          </dd>
-          <dd className="govuk-summary-list__actions">
-            <a href="#">Remove</a> | <a href="#">Replace file</a>
-          </dd>
-        </div>
-        <div className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">Data upload 2</dt>
-          <dd className="govuk-summary-list__value">
-            <a href="#">absence_lacharacteristics.csv</a>
-          </dd>
-          <dd className="govuk-summary-list__actions">
-            <a href="#">Remove</a> | <a href="#">Replace file</a>
-          </dd>
-        </div>
-        <div className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">Data upload 3</dt>
-          <dd className="govuk-summary-list__value">
-            <a href="#">absence_natcharacteristics.csv</a>
-          </dd>
-          <dd className="govuk-summary-list__actions">
-            <a href="#">Remove</a> | <a href="#">Replace file</a>
-          </dd>
-        </div>
-      </dl>
+      <div className="govuk-table">
+        <caption className="govuk-table__caption govuk-heading-m">
+          Current data for this release
+        </caption>
+        <thead className="govuk-table__head">
+          <tr className="govuk-table__row">
+            <th className="govuk-table__header" scope="col">
+              Data label
+            </th>
+            <th className="govuk-table__header" scope="col">
+              Data file
+            </th>
+            <th
+              className="govuk-table__header govuk-table__cell--numeric"
+              scope="col"
+            >
+              Filesize
+            </th>
+            <th
+              className="govuk-table__header govuk-table__header--numeric"
+              scope="col"
+            >
+              Number of rows
+            </th>
+            <th className="govuk-table__header" scope="col">
+              Metadata file
+            </th>
+            <th className="govuk-table__header" colSpan={3} scope="col">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr className="govuk-table__row">
+            <td className="govuk-table__cell">Geographical absence</td>
+            <td className="govuk-table__cell">
+              <a href="#">absence_geoglevels.csv</a>
+            </td>
+            <td className="govuk-table__cell govuk-table__cell--numeric">
+              61 Mb
+            </td>
+            <td className="govuk-table__cell govuk-table__cell--numeric">
+              212,000
+            </td>
+            <td className="govuk-table__cell">
+              <a href="#">meta_absence_geoglevels.csv</a>
+            </td>
+            <td className="govuk-table__cell">
+              <a href="#">Delete files</a>
+            </td>
+            <td className="govuk-table__cell">
+              <a href="#">Replace data</a>
+            </td>
+            <td className="govuk-table__cell">
+              <a href="#">Replace metadata</a>
+            </td>
+          </tr>
+          <tr className="govuk-table__row">
+            <td className="govuk-table__cell">Local authority</td>
+            <td className="govuk-table__cell">
+              <a href="#">absence_lacharacteristics.csv</a>
+            </td>
+            <td className="govuk-table__cell govuk-table__cell--numeric">
+              66 Mb
+            </td>
+            <td className="govuk-table__cell govuk-table__cell--numeric">
+              240,000
+            </td>
+            <td className="govuk-table__cell">
+              <a href="#">meta_absence_lacharacteristics.csv</a>
+            </td>
+            <td className="govuk-table__cell">
+              <a href="#">Delete files</a>
+            </td>
+            <td className="govuk-table__cell">
+              <a href="#">Replace data</a>
+            </td>
+            <td className="govuk-table__cell">
+              <a href="#">Replace metadata</a>
+            </td>
+          </tr>
+          <tr className="govuk-table__row">
+            <td className="govuk-table__cell">National characteristics</td>
+            <td className="govuk-table__cell">
+              <a href="#">absence_natcharacteristics.csv</a>
+            </td>
+            <td className="govuk-table__cell govuk-table__cell--numeric">
+              71 Mb
+            </td>
+            <td className="govuk-table__cell govuk-table__cell--numeric">
+              320,000
+            </td>
+            <td className="govuk-table__cell">
+              <a href="#">meta_absence_natcharacteristics.csv</a>
+            </td>
+            <td className="govuk-table__cell">
+              <a href="#">Delete files</a>
+            </td>
+            <td className="govuk-table__cell">
+              <a href="#">Replace data</a>
+            </td>
+            <td className="govuk-table__cell">
+              <a href="#">Replace metadata</a>
+            </td>
+          </tr>
+        </tbody>
+      </div>
 
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
         Add new data to release

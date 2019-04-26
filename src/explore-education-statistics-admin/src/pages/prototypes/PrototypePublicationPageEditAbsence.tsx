@@ -1,6 +1,7 @@
 import { Release } from '@common/services/publicationService';
 import React, { Component } from 'react';
 import PrototypePage from './components/PrototypePage';
+import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import { PrototypePublicationService } from '@admin/pages/prototypes/components/PrototypePublicationService';
 import { EditablePublicationPage } from '@admin/pages/prototypes/components/EditablePublicationPage';
 
@@ -44,10 +45,11 @@ class PublicationPage extends Component<{}, State> {
           { text: 'Edit pupil absence statistics', link: '#' },
         ]}
       >
+        <PrototypeAdminNavigation sectionId="addContent" task="editRelease" />
         <div className="govuk-form-group">
           <fieldset className="govuk-fieldset">
-            <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
-              <h1 className="govuk-fieldset__heading">Set page status</h1>
+            <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
+              <h1 className="govuk-fieldset__heading">Set page view</h1>
             </legend>
             <div className="govuk-radios govuk-radios--inline">
               <div className="govuk-radios__item">
@@ -81,7 +83,7 @@ class PublicationPage extends Component<{}, State> {
                   className="govuk-label govuk-radios__label"
                   htmlFor="edit"
                 >
-                  Editing release
+                  Edit release
                 </label>
               </div>
             </div>
