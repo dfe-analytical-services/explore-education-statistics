@@ -21,78 +21,84 @@ import { default as PrototypesIndexPage } from './pages/prototypes/PrototypesInd
 
 const history = createBrowserHistory();
 
+import { LoginContext } from './components/Login';
+import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
+
 class App extends Component {
   public render() {
     return (
       <Router history={history}>
         <Route exact path="/" component={PrototypesIndexPage} />
-        <Route exact path="/prototypes/" component={PrototypesIndexPage} />
 
-        <Route
-          exact
-          path="/prototypes/admin-dashboard"
-          component={AdminDashboardPage}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-edit"
-          component={PublicationEditPage}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new"
-          component={PublicationCreateNew}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new-absence"
-          component={PublicationCreateNewAbsence}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new-absence-config"
-          component={PublicationCreateNewAbsenceConfig}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new-absence-config-edit"
-          component={PublicationCreateNewAbsenceConfigEdit}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new-absence-data"
-          component={PublicationCreateNewAbsenceData}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new-absence-schedule"
-          component={PublicationCreateNewAbsenceSchedule}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new-absence-schedule-edit"
-          component={PublicationCreateNewAbsenceScheduleEdit}
-        />
-        <Route
-          exact
-          path="/prototypes/publication-create-new-absence-status"
-          component={PublicationCreateNewAbsenceStatus}
-        />
-        <Route
-          exact
-          path="/prototypes/documentation/"
-          component={AdminDocumentationHome}
-        />
-        <Route
-          exact
-          path="/prototypes/documentation/glossary"
-          component={AdminDocumentationGlossary}
-        />
-        <Route
-          exact
-          path="/prototypes/documentation/style-guide"
-          component={AdminDocumentationGlossary}
-        />
+        <LoginContext.Provider value={PrototypeLoginService.getUser('user1')}>
+          <Route exact path="/prototypes/" component={PrototypesIndexPage} />
+
+          <Route
+            exact
+            path="/prototypes/admin-dashboard"
+            component={AdminDashboardPage}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-edit"
+            component={PublicationEditPage}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new"
+            component={PublicationCreateNew}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-absence"
+            component={PublicationCreateNewAbsence}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-absence-config"
+            component={PublicationCreateNewAbsenceConfig}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-absence-config-edit"
+            component={PublicationCreateNewAbsenceConfigEdit}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-absence-data"
+            component={PublicationCreateNewAbsenceData}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-absence-schedule"
+            component={PublicationCreateNewAbsenceSchedule}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-absence-schedule-edit"
+            component={PublicationCreateNewAbsenceScheduleEdit}
+          />
+          <Route
+            exact
+            path="/prototypes/publication-create-new-absence-status"
+            component={PublicationCreateNewAbsenceStatus}
+          />
+          <Route
+            exact
+            path="/prototypes/documentation/"
+            component={AdminDocumentationHome}
+          />
+          <Route
+            exact
+            path="/prototypes/documentation/glossary"
+            component={AdminDocumentationGlossary}
+          />
+          <Route
+            exact
+            path="/prototypes/documentation/style-guide"
+            component={AdminDocumentationGlossary}
+          />
+        </LoginContext.Provider>
       </Router>
     );
   }
