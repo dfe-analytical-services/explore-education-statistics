@@ -3,33 +3,11 @@
 """
 *** Robot Framework Test Runner Script ***
 
-Options:
--v|--visual : Don't run the tests headless. Usage: "pipenv run python run_tests.py -v"
-
--e|--env : Run against specific environment, "local", "test", "stage", "prod".
-Usage: "pipenv run python run_tests.py -e test"
-
--t|--tag: Run specified tests with tag. Usage: "pipenv run python run_tests.py -t HappyPath"
-
--b BROWSER|--browser BROWSER : Run a different browser to the default, chrome.
-Usage: "pipenv run python run_tests.py -b firefox". You will need to install the webdriver for that browser (e.g. geckodriver for firefox)
-
--f FILE|--file FILE : To run a specific test file or folder instead of the
-entire tests/ directory. Usage: "pipenv run python run_tests.py -f tests/directorynamehere/" OR "pipenv run python run_tests.py -f tests/directorynamehere/testsuitenamehere.robot"
-
--i INTERPRETER|--interp INTERPRETER : Run tests through a different interpreter
-than pabot. Mainly for using robot, which doesn't run the test suites in parallel.
-Usage: "pipenv run python run_tests.py -i robot"
-
--p|--profile : Additionally output python profile information
-AND keyword profile information. Outputs log files to test-results directory.
-Usage: "pipenv run python run_tests.py -p"
-
---ci : Add arguments for running the tests as part of the CI pipeline
+Run 'python run_tests.py -h' to see argument options
 """
 
 import os
-import sys
+import argparse
 from robot import run_cli as robot_run_cli
 from pabot.pabot import main as pabot_run_cli
 import cProfile
@@ -38,92 +16,114 @@ import scripts.keyword_profile as kp
 import chromedriver_install as cdi
 from dotenv import load_dotenv
 
-arguments = []
+robotArgs = []
 headless = True
 tag = None
 profile = False
 ci = False
-tests = "tests/"
-browser = "chrome"
-interp = "pabot"
 
 timeout = 10
 implicit_wait = 10
 
-env = "test"  # by default, run tests against test environment
+# Parse arguments
+parser = argparse.ArgumentParser(prog="pipenv run python run_tests.py",
+                                 description="Use this script to run the UI tests, to be run locally or as part of the CI pipeline, against the environment of your choosing")
+parser.add_argument("-b", "--browser",
+                    dest="browser",
+                    default="chrome",
+                    choices=["chrome", "firefox"],
+                    help="name of the browser you wish to run the tests with (NOTE: Only chromedriver is automatically installed!)")
+parser.add_argument("-i", "--interp",
+                    dest="interp",
+                    default="pabot",
+                    choices=["pabot", "robot"],
+                    help="interpreter to use to run the tests")
+parser.add_argument("-e", "--env",
+                    dest="env",
+                    default="test",
+                    choices=["local", "test", "stage", "live", "dfedev"],
+                    help="the environment to run the tests against")
+parser.add_argument("-f", "--file",
+                    dest="tests",
+                    metavar="{file/dir}",
+                    default="tests/",
+                    help="test suite or folder of tests suites you wish to run")
+parser.add_argument("-t", "--tags",
+                    dest="tags",
+                    nargs="?",
+                    metavar="{tag(s)}",
+                    help="specify tests you wish to run by tag")
+parser.add_argument("--happypath",
+                    action="store_true",
+                    help="only run happy-path tests")
+parser.add_argument("-v", "--visual",
+                    action="store_true",
+                    help="display browser window that the tests run in")
+parser.add_argument("-p", "--profile",
+                    action="store_true",
+                    help="output profiling information")
+parser.add_argument("--ci",
+                    action="store_true",
+                    help="used by CI pipelines")
+args = parser.parse_args()
 
-# Process arguments
-for i in range(1, len(sys.argv)):
-    if sys.argv[i] == "-v" or sys.argv[i] == "--visual":
-        headless = False
-    elif sys.argv[i] == "-e" or sys.argv[i] == "--env":
-        env = sys.argv[i+1]  # NOTE: could add error checking...
-    elif sys.argv[i] == "-h" or sys.argv[i] == "--happypath":
-        happypath = True
-    elif sys.argv[i] == "-b" or sys.argv[i] == "--browser":
-        browser = sys.argv[i+1]  # NOTE: could add error checking...
-    elif sys.argv[i] == "-f" or sys.argv[i] == "--file":
-        tests = sys.argv[i+1]  # NOTE: could add error checking...
-    elif sys.argv[i] == "-i" or sys.argv[i] == "--interp":
-        interp = sys.argv[i+1]  # NOTE: could add error checking...
-    elif sys.argv[i] == "-p" or sys.argv[i] == "--profile":
-        profile = True
-    elif sys.argv[i] == "--ci":
-      ci = True
-
-arguments += ["--outputdir", "test-results/", "--exclude", "Failing",
+# Set robotArgs
+robotArgs += ["--outputdir", "test-results/", "--exclude", "Failing",
               "--exclude", "UnderConstruction"]
 
-if tag:
-    arguments += ["--include", tag]
-
-if ci:
-  arguments += ["--xunit", "xunit", "-v", "timeout:" + str(timeout), "-v", "implicit_wait:" + str(implicit_wait)]
-
-if headless:
-    arguments += ["-v", "headless:1"]
-else:
-    arguments += ["-v", "headless:0"]
+if args.tags:
+    robotArgs += ["--include", tag]
 
 url = "about:blank"
 urlAdmin = "about:blank"
-if env == 'local':
-    url = "http://localhost:3000"
-    urlAdmin = "http://localhost:3001"
-elif env == 'test':
-    load_dotenv(os.path.join(os.path.dirname(__file__), '.env.test'))
-    url = os.getenv('publicAppUrl')
-    urlAdmin = os.getenv('adminAppUrl')
-elif env in ['stage', 'staging']:
-    load_dotenv(os.path.join(os.path.dirname(__file__), '.env.stage'))
-    url = os.getenv('publicAppUrl')
-    urlAdmin = os.getenv('adminAppUrl')
-elif env in ['prod', 'live']:
-    load_dotenv(os.path.join(os.path.dirname(__file__), '.env.prod'))
-    url = os.getenv('publicAppUrl')
-    urlAdmin = os.getenv('adminAppUrl')
-elif env == 'dfedev':
-    load_dotenv(os.path.join(os.path.dirname(__file__), '.env.dfedev'))
+if args.ci:
+    robotArgs += ["--xunit", "xunit", "-v", "timeout:" + str(timeout), "-v", "implicit_wait:" + str(implicit_wait)]
     url = os.getenv('publicAppUrl')
     urlAdmin = os.getenv('adminAppUrl')
 else:
-    raise Exception('Invalid environment \"' + env + '\"! Must be \"local\", \"test\", \"stage\", or \"prod\"!')
+    if args.env == 'local':
+        url = "http://localhost:3000"
+        urlAdmin = "http://localhost:3001"
+    elif args.env == 'test':
+        load_dotenv(os.path.join(os.path.dirname(__file__), '.env.test'))
+        url = os.getenv('publicAppUrl')
+        urlAdmin = os.getenv('adminAppUrl')
+    elif args.env in ['stage', 'staging']:
+        load_dotenv(os.path.join(os.path.dirname(__file__), '.env.stage'))
+        url = os.getenv('publicAppUrl')
+        urlAdmin = os.getenv('adminAppUrl')
+    elif args.env in ['prod', 'live']:
+        load_dotenv(os.path.join(os.path.dirname(__file__), '.env.prod'))
+        url = os.getenv('publicAppUrl')
+        urlAdmin = os.getenv('adminAppUrl')
+    elif args.env == 'dfedev':
+        load_dotenv(os.path.join(os.path.dirname(__file__), '.env.dfedev'))
+        url = os.getenv('publicAppUrl')
+        urlAdmin = os.getenv('adminAppUrl')
+    else:
+        raise Exception('Invalid environment \"' + args.env + '\"!')
 
-arguments += ["-v", "url:" + url]
-arguments += ["-v", "urlAdmin:" + urlAdmin]
-arguments += ["-v", "browser:" + browser]
+robotArgs += ["-v", "url:" + url]
+robotArgs += ["-v", "urlAdmin:" + urlAdmin]
 
-arguments += [tests]
+if args.visual:
+    robotArgs += ["-v", "headless:0"]
+else:
+    robotArgs += ["-v", "headless:1"]
+
+robotArgs += ["-v", "browser:" + args.browser]
+
+robotArgs += [args.tests]
 
 # Install Chromedriver and add it to PATH
 path = cdi.install(file_directory='./webdriver/', verbose=False, chmod=True, overwrite=False, version=None)
 os.environ["PATH"] += os.pathsep + os.getcwd() + os.sep + 'webdriver'
 
 # Run tests
-if interp == "robot":
+if args.interp == "robot":
     if profile:
         # Python profiling
-        cProfile.run('robot_run_cli(arguments)', 'profile-data')
+        cProfile.run('robot_run_cli(robotArgs)', 'profile-data')
         stream = open('test-results/python-profiling-results.log', 'w')
         p = pstats.Stats('profile-data', stream=stream)
         p.sort_stats('time')
@@ -137,11 +137,11 @@ if interp == "robot":
                                writepath='test-results/keyword-profiling-results.log')
         print("\nProfiling logs created in test-results/")
     else:
-        robot_run_cli(arguments)
-elif interp == "pabot":
+        robot_run_cli(robotArgs)
+elif args.interp == "pabot":
     if profile:
         # Python profiling
-        cProfile.run('pabot_run_cli(arguments)', 'profile-data')
+        cProfile.run('pabot_run_cli(robotArgs)', 'profile-data')
         stream = open('test-results/python-profiling-results.log', 'w')
         p = pstats.Stats('profile-data', stream=stream)
         p.sort_stats('time')
@@ -155,4 +155,4 @@ elif interp == "pabot":
                                writepath='test-results/keyword-profiling-results.log')
         print("\nProfiling logs created in test-results/")
     else:
-        pabot_run_cli(arguments)
+        pabot_run_cli(robotArgs)
