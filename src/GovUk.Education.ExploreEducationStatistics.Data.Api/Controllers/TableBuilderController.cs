@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             _tableBuilderService = tableBuilderService;
         }
 
-        [HttpPost("geographic")]
+        [HttpPost]
         public ActionResult<TableBuilderResultViewModel> Query([FromBody] ObservationQueryContext query)
         {
             var result = _tableBuilderService.Query(query);

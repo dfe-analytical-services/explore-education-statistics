@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 
             return _observationService.FindMany(queryContext.FindExpression(),
                 new List<Expression<Func<Observation, object>>>
-                    {data => data.Subject, data => data.Subject.Release}
+                    {data => data.Subject, data => data.Location}
             );
         }
     }
