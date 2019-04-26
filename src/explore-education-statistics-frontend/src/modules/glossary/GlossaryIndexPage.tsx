@@ -43,20 +43,20 @@ function GlossaryIndexPage() {
           <p>No hyphen. Lower case level.</p>
           <h3 id="abbreviations-and-acronyms">Abbreviations and acronyms</h3>
           <p>
-            The first time you use an abbreviation or acronym explain it in
-            full on each page unless it’s well known, like UK, DVLA, US, EU,
-            VAT and MP. This includes government departments or schemes. Then
-            refer to it by initials, and use{' '}
+            The first time you use an abbreviation or acronym explain it in full
+            on each page unless it’s well known, like UK, DVLA, US, EU, VAT and
+            MP. This includes government departments or schemes. Then refer to
+            it by initials, and use{' '}
             <a href="https://www.gov.uk/guidance/how-to-publish-on-gov-uk/markdown#acronyms">
               acronym Markdown
             </a>{' '}
             so the full explanation is available as hover text.
           </p>
           <p>
-            If you think an acronym is well known, please provide evidence
-            that 80% of the UK population will understand and commonly use it.
-            Evidence can be from search analytics or testing of a
-            representative sample.
+            If you think an acronym is well known, please provide evidence that
+            80% of the UK population will understand and commonly use it.
+            Evidence can be from search analytics or testing of a representative
+            sample.
           </p>
           <p>Do not use full stops in abbreviations: BBC, not B.B.C.</p>
           <h3 id="the-academies-programme">the academies programme</h3>
@@ -64,8 +64,7 @@ function GlossaryIndexPage() {
           <h3 id="academy">academy</h3>
           <p>
             Only use upper case when referring to the name of an academy, like
-            Mossbourne Community Academy. See also{' '}
-            <a href="#titles">Titles</a>.
+            Mossbourne Community Academy. See also <a href="#titles">Titles</a>.
           </p>
           <h3 id="academy-converters">academy converters</h3>
           <p>Lower case.</p>
@@ -97,8 +96,8 @@ function GlossaryIndexPage() {
           </p>
           <h3 id="act-act-of-parliament">act, act of Parliament</h3>
           <p>
-            Lower case. Only use upper case when using the full title:
-            Planning and Compulsory Purchase Act 2004, for example.
+            Lower case. Only use upper case when using the full title: Planning
+            and Compulsory Purchase Act 2004, for example.
           </p>
           <h3 id="active-voice">Active voice</h3>
           <p>
@@ -107,16 +106,16 @@ function GlossaryIndexPage() {
           </p>
           <h3 id="addressing-the-user">Addressing the user</h3>
           <p>
-            Address the user as ‘you’ where possible. Content on the site
-            often makes a direct appeal to citizens and businesses to get
-            involved or take action: ‘You can contact HMRC by phone and email’
-            or ‘Pay your car tax’, for example.
+            Address the user as ‘you’ where possible. Content on the site often
+            makes a direct appeal to citizens and businesses to get involved or
+            take action: ‘You can contact HMRC by phone and email’ or ‘Pay your
+            car tax’, for example.
           </p>
           <h3 id="adoption-register">Adoption Register</h3>
           <p>Upper case when referring to the national Adoption Register.</p>
           <p>
-            Lower case in subsequent mentions that do not use the full term:
-            the register.
+            Lower case in subsequent mentions that do not use the full term: the
+            register.
           </p>
           <h3 id="adviser">adviser</h3>
           <p>
@@ -125,16 +124,15 @@ function GlossaryIndexPage() {
           </p>
           <h3 id="ages">ages</h3>
           <p>
-            Do not use hyphens in ages unless to avoid confusion, although
-            it’s always best to write in a way that avoids ambiguity. For
-            example, ‘a class of 15 16-year-old students took the A level
-            course’ can be written as ‘15 students aged 16 took the A level
-            course’.
+            Do not use hyphens in ages unless to avoid confusion, although it’s
+            always best to write in a way that avoids ambiguity. For example, ‘a
+            class of 15 16-year-old students took the A level course’ can be
+            written as ‘15 students aged 16 took the A level course’.
           </p>
           <h3 id="agile">agile</h3>
           <p>
-            Upper case when referring to the Agile Manifesto and principles
-            and processes, otherwise use lower case.
+            Upper case when referring to the Agile Manifesto and principles and
+            processes, otherwise use lower case.
           </p>
           <h3 id="al-qaida">al-Qa’ida</h3>
           <p>Not al-Qaeda’ or ‘al-Qaida.</p>
@@ -155,8 +153,8 @@ function GlossaryIndexPage() {
           </p>
           <h3 id="ampersand">Ampersand</h3>
           <p>
-            Use and rather than &amp;, unless it’s a department’s logo image
-            or a company’s name as it appears on the{' '}
+            Use and rather than &amp;, unless it’s a department’s logo image or
+            a company’s name as it appears on the{' '}
             <a rel="external" href="https://beta.companieshouse.gov.uk/">
               Companies House
             </a>{' '}
@@ -195,8 +193,7 @@ function GlossaryIndexPage() {
           <p>Used in a technical context, not “back-end” or “back end”.</p>
           <h3 id="bank-details">Bank details</h3>
           <p>
-            When adding bank details in content about paying a government
-            body:
+            When adding bank details in content about paying a government body:
           </p>
           <ul>
             <li>
@@ -227,9 +224,9 @@ function GlossaryIndexPage() {
           </p>
           <h3 id="board">board</h3>
           <p>
-            Always lower case unless it’s part of a proper title: so upper
-            case for the Judicial Executive Board, but lower case for the
-            DFT’s management board.
+            Always lower case unless it’s part of a proper title: so upper case
+            for the Judicial Executive Board, but lower case for the DFT’s
+            management board.
           </p>
           <h3 id="bold">bold</h3>
           <p>
@@ -237,19 +234,18 @@ function GlossaryIndexPage() {
             documentation or instructions.
           </p>
           <p>
-            You can use bold to explain what field a user needs to fill in on
-            a form, or what button they need to select. For example: “Select{' '}
+            You can use bold to explain what field a user needs to fill in on a
+            form, or what button they need to select. For example: “Select{' '}
             <strong>Continue</strong>. The <strong>Verify Certificate</strong>{' '}
             window opens.”
           </p>
           <p>
-            Use bold sparingly - using too much will make it difficult for
-            users to know which parts of your content they need to pay the
-            most attention to.
+            Use bold sparingly - using too much will make it difficult for users
+            to know which parts of your content they need to pay the most
+            attention to.
           </p>
           <p>
-            Do not use bold in other situations, for example to emphasise
-            text.
+            Do not use bold in other situations, for example to emphasise text.
           </p>
           <p>To emphasise words or phrases, you can:</p>
           <ul>
@@ -266,19 +262,18 @@ function GlossaryIndexPage() {
           <p>Lower case even in a name: Northampton borough council.</p>
           <h3 id="brackets">Brackets</h3>
           <p>
-            Use (round brackets), not [square brackets]. The only acceptable
-            use of square brackets is for explanatory notes in reported
-            speech:
+            Use (round brackets), not [square brackets]. The only acceptable use
+            of square brackets is for explanatory notes in reported speech:
           </p>
           <p>“Thank you [Foreign Minister] Mr Smith.”</p>
           <p>
-            Do not use round brackets to refer to something that could either
-            be singular or plural, like ‘Check which document(s) you need to
-            send to DVLA.’
+            Do not use round brackets to refer to something that could either be
+            singular or plural, like ‘Check which document(s) you need to send
+            to DVLA.’
           </p>
           <p>
-            Always use the plural instead, as this will cover each
-            possibility: ‘Check which documents you need to send to DVLA.’
+            Always use the plural instead, as this will cover each possibility:
+            ‘Check which documents you need to send to DVLA.’
           </p>
           <h3 id="britain">Britain</h3>
           <p>
@@ -301,24 +296,23 @@ function GlossaryIndexPage() {
             </li>
             <li>you do not put ‘or’ or ‘and’ after the bullets</li>
             <li>
-              if you add links they appear within the text and not as the
-              whole bullet
+              if you add links they appear within the text and not as the whole
+              bullet
             </li>
             <li>you do not put a semicolon at the end of a bullet</li>
             <li>there is no full stop after the last bullet point</li>
           </ul>
           <p>
-            Bullets should normally form a complete sentence following from
-            the lead text. But it’s sometimes necessary to add a short phrase
-            to clarify whether all or some of the points apply. For example,
-            ‘You can only register a pension scheme that is (one of the
-            following):’
+            Bullets should normally form a complete sentence following from the
+            lead text. But it’s sometimes necessary to add a short phrase to
+            clarify whether all or some of the points apply. For example, ‘You
+            can only register a pension scheme that is (one of the following):’
           </p>
           <h4 id="steps">Steps</h4>
           <p>
-            Use numbered steps instead of bullet points to guide a user
-            through a process. You do not need a lead-in line and you can use
-            links and downloads (with{' '}
+            Use numbered steps instead of bullet points to guide a user through
+            a process. You do not need a lead-in line and you can use links and
+            downloads (with{' '}
             <a href="https://www.gov.uk/guidance/how-to-publish-on-gov-uk/markdown#numbered-list">
               appropriate Markdown
             </a>
@@ -347,17 +341,15 @@ function GlossaryIndexPage() {
             <p>Upper case.</p>
             <h3 id="capitalisation">Capitalisation</h3>
             <p>
-              DO NOT USE BLOCK CAPITALS FOR LARGE AMOUNTS OF TEXT AS IT’S
-              QUITE HARD TO READ.
+              DO NOT USE BLOCK CAPITALS FOR LARGE AMOUNTS OF TEXT AS IT’S QUITE
+              HARD TO READ.
             </p>
             <p>
-              Always use lower case, even in page titles. The exceptions to
-              this are proper nouns, and:
+              Always use lower case, even in page titles. The exceptions to this
+              are proper nouns, and:
             </p>
             <ul>
-              <li>
-                departments (specific government departments - see below)
-              </li>
+              <li>departments (specific government departments - see below)</li>
               <li>the Civil Service, with lower case for ‘the’</li>
               <li>
                 job titles, ministers’ role titles: Minister for Housing, Home
@@ -384,8 +376,7 @@ function GlossaryIndexPage() {
               </li>
               <li>
                 names of specific, named government schemes known to people
-                outside government: Right to Buy, Queen’s Awards for
-                Enterprise
+                outside government: Right to Buy, Queen’s Awards for Enterprise
               </li>
               <li>
                 specific select committees: Public Administration Select
@@ -415,21 +406,20 @@ function GlossaryIndexPage() {
                 referring to a specific one: Ministry of Justice, for example
               </li>
               <li>
-                white paper, green paper, command paper, House of Commons
-                paper
+                white paper, green paper, command paper, House of Commons paper
               </li>
               <li>
-                budget, autumn statement, spring statement, unless referring
-                to and using the full name of a specific statement - for
-                example, “2016 Budget”
+                budget, autumn statement, spring statement, unless referring to
+                and using the full name of a specific statement - for example,
+                “2016 Budget”
               </li>
               <li>
-                sections or schedules within specific named acts, regulations
-                or orders
+                sections or schedules within specific named acts, regulations or
+                orders
               </li>
               <li>
-                director general (no hyphen), deputy director, director,
-                unless in a specific job title
+                director general (no hyphen), deputy director, director, unless
+                in a specific job title
               </li>
               <li>
                 group and directorate, unless referring to a specific group or
@@ -441,8 +431,8 @@ function GlossaryIndexPage() {
                 growth, local enterprise zones
               </li>
               <li>
-                general mention of select committees (but do cap specific ones
-                - see above)
+                general mention of select committees (but do cap specific ones -
+                see above)
               </li>
               <li>the military</li>
             </ul>
@@ -488,8 +478,8 @@ function GlossaryIndexPage() {
               chairman, chairwoman, chairperson
             </h3>
             <p>
-              Lower case in text. Upper case in titles: Spencer Tracy,
-              Chairman, GDS.
+              Lower case in text. Upper case in titles: Spencer Tracy, Chairman,
+              GDS.
             </p>
             <h3 id="change-notes">Change notes</h3>
             <p>
@@ -516,15 +506,14 @@ function GlossaryIndexPage() {
             <p>Lower case. Use upper case for the acronym.</p>
             <h3 id="chief-constable">chief constable</h3>
             <p>
-              Lower case except where it’s a title with the holder’s name,
-              like Chief Constable Andrew Trotter.
+              Lower case except where it’s a title with the holder’s name, like
+              Chief Constable Andrew Trotter.
             </p>
             <h3 id="child-benefit">Child Benefit</h3>
             <p>Upper case.</p>
             <h3 id="child-tax-credit">Child Tax Credit</h3>
             <p>
-              Upper case, but generic references to tax credits are lower
-              case.
+              Upper case, but generic references to tax credits are lower case.
             </p>
             <h3 id="childcare">childcare</h3>
             <p>Lower case.</p>
@@ -534,8 +523,8 @@ function GlossaryIndexPage() {
             <p>One word.</p>
             <h3 id="children-in-need">Children in Need</h3>
             <p>
-              Upper case for the BBC fundraising event, lower case for
-              children in need census.
+              Upper case for the BBC fundraising event, lower case for children
+              in need census.
             </p>
             <h3 id="civil-contingencies-secretariat">
               Civil Contingencies Secretariat
@@ -578,8 +567,8 @@ function GlossaryIndexPage() {
             <h3 id="competence-order">competence order</h3>
             <p>
               Lower case unless used in the full title, like the National
-              Assembly for Wales (Legislative Competence) (Social Welfare)
-              Order 2008.
+              Assembly for Wales (Legislative Competence) (Social Welfare) Order
+              2008.
             </p>
             <h3 id="conduct-of-business-rules">conduct of business rules</h3>
             <p>Lower case.</p>
@@ -587,8 +576,8 @@ function GlossaryIndexPage() {
               Construction Industry Scheme
             </h3>
             <p>
-              Use upper case when referring to the actual Construction
-              Industry Scheme (CIS, not the CIS).
+              Use upper case when referring to the actual Construction Industry
+              Scheme (CIS, not the CIS).
             </p>
             <h3 id="construction-industry-scheme-onlinecis-online">
               Construction Industry Scheme Online/CIS Online
@@ -631,13 +620,13 @@ function GlossaryIndexPage() {
             <h3 id="corporation-tax-online">Corporation Tax Online</h3>
             <p>
               Use upper case Online if referring to the actual service, not if
-              you’re describing using the service: ‘you can pay your
-              Corporation Tax online or at the Post Office.’
+              you’re describing using the service: ‘you can pay your Corporation
+              Tax online or at the Post Office.’
             </p>
             <h3 id="cots">COTS</h3>
             <p>
-              Meaning “commercial-off-the-shelf software”. Not “cots” or
-              “Cots”. Explain the acronym at first use.
+              Meaning “commercial-off-the-shelf software”. Not “cots” or “Cots”.
+              Explain the acronym at first use.
             </p>
             <h3 id="council">council</h3>
             <p>Lower case even in a name: Wandsworth council.</p>
@@ -645,8 +634,8 @@ function GlossaryIndexPage() {
             <p>Upper case.</p>
             <h3 id="countries-and-territories">countries and territories</h3>
             <p>
-              When referring to a country or territory, use the names listed
-              in the{' '}
+              When referring to a country or territory, use the names listed in
+              the{' '}
               <a rel="external" href="https://country.register.gov.uk/">
                 country register
               </a>{' '}
@@ -688,9 +677,7 @@ function GlossaryIndexPage() {
           <h3 id="dates">Dates</h3>
           <ul>
             <li>use upper case for months: January, February</li>
-            <li>
-              do not use a comma between the month and year: 4 June 2017
-            </li>
+            <li>do not use a comma between the month and year: 4 June 2017</li>
             <li>
               when space is an issue - in tables or publication titles, for
               example - you can use truncated months: Jan, Feb
@@ -727,9 +714,7 @@ function GlossaryIndexPage() {
           <h3 id="dedicated-schools-grant">dedicated schools grant</h3>
           <p>Lower case.</p>
           <h3 id="defence">defence</h3>
-          <p>
-            Lower case even when referring to the defence team at the MOD.
-          </p>
+          <p>Lower case even when referring to the defence team at the MOD.</p>
           <h3 id="defence-team">defence team</h3>
           <p>Lower case.</p>
           <h3 id="department">department</h3>
@@ -743,7 +728,7 @@ function GlossaryIndexPage() {
           <p>Similarly, use “WebOps”.</p>
           <h3 id="diploma">diploma</h3>
           <p>
-            Lower case unless part of a title like Edexcel L2 Diploma in IT.​
+            Lower case unless part of a title like Edexcel L2 Diploma in IT.
           </p>
           <h3 id="direct-debit">Direct Debit</h3>
           <p>Upper case.</p>
@@ -756,9 +741,7 @@ function GlossaryIndexPage() {
           </p>
           <h3 id="director-general">director general</h3>
           <p>Lower case. No hyphen.</p>
-          <h3 id="disability-living-allowance">
-            Disability Living Allowance
-          </h3>
+          <h3 id="disability-living-allowance">Disability Living Allowance</h3>
           <p>Upper case.</p>
           <h3 id="dispensation">dispensation</h3>
           <p>Lower case.</p>
@@ -807,19 +790,19 @@ function GlossaryIndexPage() {
           <p>Lower case.</p>
           <h3 id="eg-etc-and-ie">eg, etc and ie</h3>
           <p>
-            eg can sometimes be read aloud as ‘egg’ by screen reading
-            software. Instead use ‘for example’ or ‘such as’ or ‘like’ or
-            ‘including’ - whichever works best in the specific context.
+            eg can sometimes be read aloud as ‘egg’ by screen reading software.
+            Instead use ‘for example’ or ‘such as’ or ‘like’ or ‘including’ -
+            whichever works best in the specific context.
           </p>
           <p>
-            etc can usually be avoided. Try using ‘for example’ or ‘such as’
-            or ‘like’ or ‘including’. Never use etc at the end of a list
-            starting with these words.
+            etc can usually be avoided. Try using ‘for example’ or ‘such as’ or
+            ‘like’ or ‘including’. Never use etc at the end of a list starting
+            with these words.
           </p>
           <p>
-            ie - used to clarify a sentence - is not always well understood.
-            Try (re)writing sentences to avoid the need to use it. If that is
-            not possible, use an alternative such as ‘meaning’ or ‘that is’.
+            ie - used to clarify a sentence - is not always well understood. Try
+            (re)writing sentences to avoid the need to use it. If that is not
+            possible, use an alternative such as ‘meaning’ or ‘that is’.
           </p>
           <h3 id="eg-etc-ie">electronic Binding Tariff Information (eBTI)</h3>
           <p>Upper case, but note the lower case ‘e’.</p>
@@ -827,8 +810,8 @@ function GlossaryIndexPage() {
           <p>One word.</p>
           <h3 id="email-addresses">Email addresses</h3>
           <p>
-            Write email addresses in full, in lower case and as active links.
-            Do not include any other words in the link text.
+            Write email addresses in full, in lower case and as active links. Do
+            not include any other words in the link text.
           </p>
           <h3 id="emergency-plan">emergency plan</h3>
           <p>Lower case.</p>
@@ -851,9 +834,8 @@ function GlossaryIndexPage() {
             European Union vs European Community
           </h3>
           <p>
-            Use EU when you mean EU member states: EU countries, EU
-            businesses, EU consumers, goods exported from the EU, EU VAT
-            numbers.
+            Use EU when you mean EU member states: EU countries, EU businesses,
+            EU consumers, goods exported from the EU, EU VAT numbers.
           </p>
           <p>EC should be used when it’s EC directives, EC Sales List.</p>
           <h3 id="euros-the-euro">euros, the euro</h3>
@@ -902,8 +884,8 @@ function GlossaryIndexPage() {
             term.
           </p>
           <p>
-            Describe what the user might need to do, rather than what
-            government calls a thing.
+            Describe what the user might need to do, rather than what government
+            calls a thing.
           </p>
           <h3 id="fire-and-rescue-service">fire and rescue service</h3>
           <p>Lower case.</p>
@@ -953,48 +935,45 @@ function GlossaryIndexPage() {
           <p>Lower case.</p>
           <h3 id="geography-and-regions">Geography and regions</h3>
           <p>
-            Use lower case for north, south, east and west, except when
-            they’re part of a name or recognised region.
+            Use lower case for north, south, east and west, except when they’re
+            part of a name or recognised region.
           </p>
           <p>
             So, the south-west (compass direction), but the South West
             (administrative region).
           </p>
           <p>
-            Use lower case for the north, the south of England, the
-            south-west, north-east Scotland, south Wales, the west, western
-            Europe, the far east, south-east Asia.
+            Use lower case for the north, the south of England, the south-west,
+            north-east Scotland, south Wales, the west, western Europe, the far
+            east, south-east Asia.
           </p>
           <p>
-            Use upper case for East End, West End (London), Middle East,
-            Central America, South America, Latin America.
+            Use upper case for East End, West End (London), Middle East, Central
+            America, South America, Latin America.
           </p>
           <p>
             Always write out the full name of the area the first time you use
-            it. You can use a capital for a shortened version of a specific
-            area or region if it’s commonly known by that name, like the Pole
-            for the North Pole.
+            it. You can use a capital for a shortened version of a specific area
+            or region if it’s commonly known by that name, like the Pole for the
+            North Pole.
           </p>
           <h3 id="ghz">GHz</h3>
           <p>Not “Ghz”.</p>
           <h3 id="governing-body">governing body</h3>
           <p>Singular noun.</p>
           <p>
-            The governing body is meeting today. It will decide who to
-            appoint.
+            The governing body is meeting today. It will decide who to appoint.
           </p>
           <h3 id="government">government</h3>
           <p>
             Lower case unless it’s a full title. For example: ‘UK government’,
-            but ‘Her Majesty’s Government of the United Kingdom of Great
-            Britain and Northern Ireland’.
+            but ‘Her Majesty’s Government of the United Kingdom of Great Britain
+            and Northern Ireland’.
           </p>
           <p>Also ‘Welsh Government’, as it’s the full title.</p>
           <h3 id="government-offices">government offices</h3>
           <p>Lower case.</p>
-          <h3 id="government-procurement-card">
-            government procurement card
-          </h3>
+          <h3 id="government-procurement-card">government procurement card</h3>
           <p>Lower case.</p>
           <h3 id="governor">governor</h3>
           <p>Lower case.</p>
@@ -1015,13 +994,13 @@ function GlossaryIndexPage() {
           <h4 id="britain-1">Britain</h4>
           <p>
             Use UK and United Kingdom in preference to Britain and British (UK
-            business, UK foreign policy, ambassador and high commissioner).
-            But British embassy, not UK embassy.
+            business, UK foreign policy, ambassador and high commissioner). But
+            British embassy, not UK embassy.
           </p>
           <h3 id="green-deal">Green Deal</h3>
           <p>
-            Upper case because it’s the name of a programme, but note that
-            it’s Green Deal programme, Green Deal team, Green Deal assessment.
+            Upper case because it’s the name of a programme, but note that it’s
+            Green Deal programme, Green Deal team, Green Deal assessment.
           </p>
           <h3 id="green-paper">green paper</h3>
           <p>Lower case.</p>
@@ -1031,8 +1010,8 @@ function GlossaryIndexPage() {
             Knowledge and Innovation Group.
           </p>
           <p>
-            Lower case when a group has a very generic title like working
-            group or research team.
+            Lower case when a group has a very generic title like working group
+            or research team.
           </p>
           <h3 id="guardians-allowance">Guardian’s Allowance</h3>
           <p>Upper case.</p>
@@ -1047,8 +1026,7 @@ function GlossaryIndexPage() {
         <AccordionSection heading="H">
           <h3 id="harbour-authority">harbour authority</h3>
           <p>
-            Lower case unless part of a proper noun: Cardiff Harbour
-            Authority.
+            Lower case unless part of a proper noun: Cardiff Harbour Authority.
           </p>
           <h3 id="harbour-master">harbour master</h3>
           <p>Lower case.</p>
@@ -1060,8 +1038,8 @@ function GlossaryIndexPage() {
           <p>One word. You can use head if the context is clear.</p>
           <h3 id="health-protection-unit">health protection unit</h3>
           <p>
-            Lower case unless it’s the title of an organisation: North East
-            and Central London Health Protection Unit.
+            Lower case unless it’s the title of an organisation: North East and
+            Central London Health Protection Unit.
           </p>
           <h3 id="helpdesk">helpdesk</h3>
           <p>Not “help desk”.</p>
@@ -1084,8 +1062,7 @@ function GlossaryIndexPage() {
           <p>Lower case.</p>
           <h3 id="hurricane">Hurricane</h3>
           <p>
-            Upper case for named hurricanes: Hurricane Katrina, Hurricane
-            Sandy.
+            Upper case for named hurricanes: Hurricane Katrina, Hurricane Sandy.
           </p>
           <h3 id="hyphenation">Hyphenation</h3>
           <p>Hyphenate:</p>
@@ -1103,9 +1080,9 @@ function GlossaryIndexPage() {
             <li>email</li>
           </ul>
           <p>
-            Do not use a hyphen unless it’s confusing without it, for example,
-            a little used-car is different from a little-used car. You can
-            also refer to{' '}
+            Do not use a hyphen unless it’s confusing without it, for example, a
+            little used-car is different from a little-used car. You can also
+            refer to{' '}
             <a
               rel="external"
               href="https://www.theguardian.com/guardian-observer-style-guide-h"
@@ -1184,8 +1161,8 @@ function GlossaryIndexPage() {
             </p>
             <h3 id="italics">Italics</h3>
             <p>
-              Do not use italics. Use ‘single quotation marks’ if referring to
-              a document, scheme or initiative.
+              Do not use italics. Use ‘single quotation marks’ if referring to a
+              document, scheme or initiative.
             </p>
           </div>
         </AccordionSection>
@@ -1223,18 +1200,17 @@ function GlossaryIndexPage() {
           <p>Lower case.</p>
           <h3 id="legal-content">Legal content</h3>
           <p>
-            Legal content can still be written in plain English. It’s
-            important that users understand content and that we present
-            complicated information simply.
+            Legal content can still be written in plain English. It’s important
+            that users understand content and that we present complicated
+            information simply.
           </p>
           <p>
             If you have to publish legal jargon, it will be a publication so
             write a plain English summary.
           </p>
           <p>
-            Where evidence shows there’s a clear user need for including a
-            legal term (like bona vacantia), always explain it in plain
-            English.
+            Where evidence shows there’s a clear user need for including a legal
+            term (like bona vacantia), always explain it in plain English.
           </p>
           <p>
             <a href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#legal-content">
@@ -1272,8 +1248,8 @@ function GlossaryIndexPage() {
           </p>
           <p>
             Very long lists can be written as a paragraph with a lead-in
-            sentence if it looks better: ‘The following countries are in the
-            EU: Spain, France, Italy…’
+            sentence if it looks better: ‘The following countries are in the EU:
+            Spain, France, Italy…’
           </p>
           <h3 id="local-authority">local authority</h3>
           <p>Lower case. Do not use LA.</p>
@@ -1326,23 +1302,20 @@ function GlossaryIndexPage() {
             Use the minus sign for subtraction. Use the correct symbol for the
             multiplication sign (×), not the letter x.
           </p>
+          <p>Write out and hyphenate fractions: two-thirds, three-quarters.</p>
           <p>
-            Write out and hyphenate fractions: two-thirds, three-quarters.
-          </p>
-          <p>
-            Write out decimal fractions as numerals. Use the same number
-            format for a sequence: 0.75 and 0.45
+            Write out decimal fractions as numerals. Use the same number format
+            for a sequence: 0.75 and 0.45
           </p>
           <h3 id="md5">MD5</h3>
           <p>
-            Used in a technical context there’s no need to explain the
-            acronym.
+            Used in a technical context there’s no need to explain the acronym.
           </p>
           <h3 id="measurements">Measurements</h3>
           <p>Use numerals and spell out measurements at first mention.</p>
           <p>
-            Do not use a space between the numeral and abbreviated
-            measurement: 3,500kg not 3,500 kg.
+            Do not use a space between the numeral and abbreviated measurement:
+            3,500kg not 3,500 kg.
           </p>
           <p>
             <a href="/contact/govuk">Contact us</a> if you need to follow
@@ -1354,17 +1327,15 @@ function GlossaryIndexPage() {
             out.
           </p>
           <p>
-            If the measurement is more than one word, like kilometres per
-            hour, then spell it out the first time it’s used with the
-            abbreviation. From then on, abbreviate. If it’s only mentioned
-            once, do not abbreviate.
+            If the measurement is more than one word, like kilometres per hour,
+            then spell it out the first time it’s used with the abbreviation.
+            From then on, abbreviate. If it’s only mentioned once, do not
+            abbreviate.
           </p>
           <p>Use Celsius for temperature: 37°C</p>
           <h3 id="member-states-of-the-eu">member states of the EU</h3>
           <p>Lower case.</p>
-          <h3 id="memorandum-of-understanding">
-            memorandum of understanding
-          </h3>
+          <h3 id="memorandum-of-understanding">memorandum of understanding</h3>
           <p>Lower case.</p>
           <h3 id="metadata">metadata</h3>
           <p>Not “meta data”.</p>
@@ -1389,9 +1360,7 @@ function GlossaryIndexPage() {
           <h3 id="millions">Millions</h3>
           <p>Always use million in money (and billion): £138 million.</p>
           <p>Use millions in phrases: millions of people.</p>
-          <p>
-            But do not use £0.xx million for amounts less than £1 million.
-          </p>
+          <p>But do not use £0.xx million for amounts less than £1 million.</p>
           <p>Do not abbreviate million to m.</p>
           <h3 id="minister">minister</h3>
           <p>
@@ -1414,8 +1383,7 @@ function GlossaryIndexPage() {
           <h3 id="money">money</h3>
           <p>Use the £ symbol: £75</p>
           <p>
-            Do not use decimals unless pence are included: £75.50 but not
-            £75.00
+            Do not use decimals unless pence are included: £75.50 but not £75.00
           </p>
           <p>Do not use ‘£0.xx million’ for amounts less than £1 million.</p>
           <p>
@@ -1447,8 +1415,8 @@ function GlossaryIndexPage() {
           <p>Separate with a slash. Only use in tables.</p>
           <h3 id="national-assembly">National Assembly</h3>
           <p>
-            Upper case. Subsequent references would be the assembly. Lower
-            case is also used for the second assembly, the third assembly.
+            Upper case. Subsequent references would be the assembly. Lower case
+            is also used for the second assembly, the third assembly.
           </p>
           <h3 id="national-curriculum">national curriculum</h3>
           <p>Lower case.</p>
@@ -1518,9 +1486,9 @@ function GlossaryIndexPage() {
             <li>2 developing hazards in the other clip</li>
           </ul>
           <p>
-            Write all other numbers in numerals (including 2 to 9) except
-            where it’s part of a common expression like ‘one or two of them’
-            where numerals would look strange.
+            Write all other numbers in numerals (including 2 to 9) except where
+            it’s part of a common expression like ‘one or two of them’ where
+            numerals would look strange.
           </p>
           <p>
             If a number starts a sentence, write it out in full (Thirty-four,
@@ -1534,16 +1502,11 @@ function GlossaryIndexPage() {
           <p>Use MB for anything over 1MB: 4MB not 4096KB.</p>
           <p>Use KB for anything under 1MB: 569KB not 0.55MB.</p>
           <p>
-            Keep it as accurate as possible and up to 2 decimal places:
-            4.03MB.
+            Keep it as accurate as possible and up to 2 decimal places: 4.03MB.
           </p>
-          <p>
-            Addresses: use ‘to’ in address ranges: 49 to 53 Cherry Street.
-          </p>
+          <p>Addresses: use ‘to’ in address ranges: 49 to 53 Cherry Street.</p>
           <h4 id="ordinal-numbers">Ordinal numbers</h4>
-          <p>
-            Spell out first to ninth. After that use 10th, 11th and so on.
-          </p>
+          <p>Spell out first to ninth. After that use 10th, 11th and so on.</p>
           <p>In tables, use numerals throughout.</p>
           <h3 id="nursery-school">nursery school</h3>
           <p>Lower case.</p>
@@ -1551,14 +1514,14 @@ function GlossaryIndexPage() {
         <AccordionSection heading="O">
           <h3 id="occupational-pension">occupational pension</h3>
           <p>
-            Lower case. This term covers both company and public sector
-            pension schemes. Only use this term if explaining tax rules that
-            are specific to occupational pension schemes.
+            Lower case. This term covers both company and public sector pension
+            schemes. Only use this term if explaining tax rules that are
+            specific to occupational pension schemes.
           </p>
           <h3 id="ofsted-judgements">Ofsted judgements</h3>
           <p>
-            Lower case and not in inverted commas: Westminster School was
-            judged outstanding in its latest Ofsted inspection.
+            Lower case and not in inverted commas: Westminster School was judged
+            outstanding in its latest Ofsted inspection.
           </p>
           <p>There are 4 Ofsted grades:</p>
           <ul>
@@ -1610,14 +1573,12 @@ function GlossaryIndexPage() {
             passports. They will send your new passport within 3 weeks.’
           </p>
           <p>
-            The definite article can be used when referring to the
-            organisation by its full name, but should not be used with the
-            organisation’s acronym: ‘You should contact the Driver and Vehicle
-            Standards Agency if…’ but ‘You should contact DVSA if…’
+            The definite article can be used when referring to the organisation
+            by its full name, but should not be used with the organisation’s
+            acronym: ‘You should contact the Driver and Vehicle Standards Agency
+            if…’ but ‘You should contact DVSA if…’
           </p>
-          <p>
-            Use local council, instead of local authority, where possible.
-          </p>
+          <p>Use local council, instead of local authority, where possible.</p>
           <h3 id="overseas-trained-teacher">overseas-trained teacher</h3>
           <p>Lower case. Hyphenated.</p>
         </AccordionSection>
@@ -1641,9 +1602,9 @@ function GlossaryIndexPage() {
           <h3 id="patent-box">Patent Box</h3>
           <p>
             When referring to the product/relief/regime, then say the Patent
-            Box. Occasionally the definite article will be dropped, for
-            example in calculations, where we use ‘Patent Box deduction’ and
-            when using phrases like ‘Answers to your Patent Box questions’.
+            Box. Occasionally the definite article will be dropped, for example
+            in calculations, where we use ‘Patent Box deduction’ and when using
+            phrases like ‘Answers to your Patent Box questions’.
           </p>
           <h3 id="pathfinder">pathfinder</h3>
           <p>Lower case.</p>
@@ -1686,8 +1647,8 @@ function GlossaryIndexPage() {
           <p>Lower case on practitioners.</p>
           <h3 id="per-cent">Per cent</h3>
           <p>
-            Use per cent not percent. Percentage is one word. Always use %
-            with a number.
+            Use per cent not percent. Percentage is one word. Always use % with
+            a number.
           </p>
           <h3 id="performance-management">performance management</h3>
           <p>Lower case.</p>
@@ -1703,8 +1664,8 @@ function GlossaryIndexPage() {
           <p>You can write in full or use the initials.</p>
           <h3 id="plain-english">plain English</h3>
           <p>
-            Lower case plain and upper case English unless in a title: the
-            Plain English Campaign.
+            Lower case plain and upper case English unless in a title: the Plain
+            English Campaign.
           </p>
           <p>
             All content on GOV.UK should be written in{' '}
@@ -1748,13 +1709,11 @@ function GlossaryIndexPage() {
           <p>Lower case unless in a title: Hampshire Probation Trust.</p>
           <h3 id="proforma">Proforma</h3>
           <p>
-            Do not use proforma - say what it is in plain English: a template
-            or form, for example. Be specific about what to do with it.
+            Do not use proforma - say what it is in plain English: a template or
+            form, for example. Be specific about what to do with it.
           </p>
           <h3 id="programme">programme</h3>
-          <p>
-            Lower case: Troubled Families programme, Sure Start programme.
-          </p>
+          <p>Lower case: Troubled Families programme, Sure Start programme.</p>
           <h3 id="progress-8-measure">Progress 8 measure</h3>
           <p>Upper case P, lower case m.</p>
           <h3 id="public-health">public health</h3>
@@ -1763,8 +1722,8 @@ function GlossaryIndexPage() {
           <p>Lower case.</p>
           <h3 id="pull-request">pull request</h3>
           <p>
-            Lowercase, the same as GitHub does in its documentation. GitLab
-            uses the term “merge request”.
+            Lowercase, the same as GitHub does in its documentation. GitLab uses
+            the term “merge request”.
           </p>
           <h3 id="pupil-premium">pupil premium</h3>
           <p>Lower case.</p>
@@ -1778,8 +1737,8 @@ function GlossaryIndexPage() {
           <p>Upper case.</p>
           <h3 id="quotes-speech-marks">Quotes and speech marks</h3>
           <p>
-            In long passages of speech, open quotes for every new paragraph,
-            but close quotes only at the end of the final paragraph.
+            In long passages of speech, open quotes for every new paragraph, but
+            close quotes only at the end of the final paragraph.
           </p>
           <h4 id="single-quotes">Single quotes</h4>
           <p>Use single quotes:</p>
@@ -1847,8 +1806,8 @@ function GlossaryIndexPage() {
           </p>
           <h3 id="scrum">Scrum</h3>
           <p>
-            Upper case when referring to the framework and method for
-            developing products, otherwise use lower case.
+            Upper case when referring to the framework and method for developing
+            products, otherwise use lower case.
           </p>
           <h3 id="seasons">seasons</h3>
           <p>spring, summer, autumn, winter are lower case.</p>
@@ -1857,8 +1816,8 @@ function GlossaryIndexPage() {
             The Secretary of State for XXX is upper case whether or not it’s
             used with the holder’s name because there is only one. Use common
             sense to capitalise shortened versions of the SoS titles such as
-            Health Secretary. The rule for ministers is different because
-            there is more than one.
+            Health Secretary. The rule for ministers is different because there
+            is more than one.
           </p>
           <h3 id="section-2">section 2</h3>
           <p>As in part of an act or a strategy.</p>
@@ -1877,8 +1836,7 @@ function GlossaryIndexPage() {
           </p>
           <h3 id="self-assessment">self-assessment</h3>
           <p>
-            This compound noun should be hyphenated, unless it’s an HMRC
-            title.
+            This compound noun should be hyphenated, unless it’s an HMRC title.
           </p>
           <h3 id="self-assessment-for-agents-online-service">
             Self Assessment for Agents online service
@@ -1926,8 +1884,8 @@ function GlossaryIndexPage() {
           </p>
           <h3 id="services">services</h3>
           <p>
-            Lower case, even when referring to the armed forces services or
-            the services.
+            Lower case, even when referring to the armed forces services or the
+            services.
           </p>
           <h3 id="settlor">settlor</h3>
           <p>A settler of trusts.</p>
@@ -1973,8 +1931,8 @@ function GlossaryIndexPage() {
           <h3 id="spaces">spaces</h3>
           <p>One space after a full stop, not 2.</p>
           <h3 id="special-educational-needsspecial-educational-needs-and-disabilities-send">
-            special educational needs/special educational needs and
-            disabilities (SEN/D)
+            special educational needs/special educational needs and disabilities
+            (SEN/D)
           </h3>
           <p>Lower case, but use upper case for the acronym.</p>
           <h3 id="special-educational-needs-code-of-practice">
@@ -2017,9 +1975,9 @@ function GlossaryIndexPage() {
             <a rel="external" href="http://style.ons.gov.uk">
               Style.ONS
             </a>{' '}
-            to find out how to write about statistics. This has been produced
-            by the Office for National Statistics for all members of the
-            Government Statistical Service.
+            to find out how to write about statistics. This has been produced by
+            the Office for National Statistics for all members of the Government
+            Statistical Service.
           </p>
           <p>
             Upper case National Statistics for the official statistics quality
@@ -2044,8 +2002,8 @@ function GlossaryIndexPage() {
           <p>Not a title.</p>
           <h3 id="strategy">strategy</h3>
           <p>
-            Lower case. Do not capitalise a named strategy: national health
-            and welfare strategy.
+            Lower case. Do not capitalise a named strategy: national health and
+            welfare strategy.
           </p>
           <h3 id="studio-school">studio school</h3>
           <p>Lower case.</p>
@@ -2084,8 +2042,7 @@ function GlossaryIndexPage() {
           <h3 id="tax-returns">tax returns</h3>
           <p>
             Upper case when referring to proper titles for the first time:
-            Company Tax Return, Partnership Tax Return, Employer Annual
-            Return.
+            Company Tax Return, Partnership Tax Return, Employer Annual Return.
           </p>
           <p>
             Use Self Assessment tax return at first mention, as it’s not a
@@ -2093,13 +2050,13 @@ function GlossaryIndexPage() {
           </p>
           <p>
             After that refer to them in full, or if it’s clear what you’re
-            referring to, simply as a return. General references to tax
-            returns are lower case.
+            referring to, simply as a return. General references to tax returns
+            are lower case.
           </p>
           <p>
             When referring to the legal requirement we use deliver or file the
-            return. Online, we say submit the return. For Self Assessment
-            (paper or online) use send or file the return. Send is better.
+            return. Online, we say submit the return. For Self Assessment (paper
+            or online) use send or file the return. Send is better.
           </p>
           <h3 id="the-teachers-standards">the teachers’ standards</h3>
           <p>Lower case.</p>
@@ -2122,8 +2079,8 @@ function GlossaryIndexPage() {
           <p>A performance measure of level 3 vocational qualifications.</p>
           <h3 id="technical-terms">technical terms</h3>
           <p>
-            Use technical terms where you need to. They’re not jargon. You
-            just need to explain what they mean the first time you use them.
+            Use technical terms where you need to. They’re not jargon. You just
+            need to explain what they mean the first time you use them.
           </p>
           <p>
             <a href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#writing-specialists">
@@ -2145,8 +2102,8 @@ function GlossaryIndexPage() {
           <p>+44 (0)20 7450 4000</p>
           <p>+39 1 33 45 70 90</p>
           <p>
-            When a number is memorable, group the numbers into easily
-            remembered units: 0800 80 70 60.
+            When a number is memorable, group the numbers into easily remembered
+            units: 0800 80 70 60.
           </p>
           <h3 id="temperature">Temperature</h3>
           <p>Use Celsius: 37°C</p>
@@ -2155,8 +2112,8 @@ function GlossaryIndexPage() {
           <h3 id="times">Times</h3>
           <ul>
             <li>
-              use ‘to’ in time ranges, not hyphens, en rules or em dashes:
-              10am to 11am (not 10-11am)
+              use ‘to’ in time ranges, not hyphens, en rules or em dashes: 10am
+              to 11am (not 10-11am)
             </li>
             <li>5:30pm (not 1730hrs)</li>
             <li>midnight (not 00:00)</li>
@@ -2165,14 +2122,14 @@ function GlossaryIndexPage() {
           </ul>
           <p>
             Midnight is the first minute of the day, not the last. You should
-            consider using “11:59pm” to avoid confusion about a single,
-            specific time.
+            consider using “11:59pm” to avoid confusion about a single, specific
+            time.
           </p>
           <p>
-            For example, “You must register by 11:59pm on Tuesday 14 June.”
-            can only be read one way, but “You must register by midnight on
-            Tuesday 14 June” can be read in two ways (the end of Monday 13, or
-            end of Tuesday 14).
+            For example, “You must register by 11:59pm on Tuesday 14 June.” can
+            only be read one way, but “You must register by midnight on Tuesday
+            14 June” can be read in two ways (the end of Monday 13, or end of
+            Tuesday 14).
           </p>
           <h3 id="tied-oils-enquiry-service">Tied Oils Enquiry Service</h3>
           <p>Upper case.</p>
@@ -2208,8 +2165,8 @@ function GlossaryIndexPage() {
             Trust or Company Service Provider
           </h3>
           <p>
-            When used to refer to the business area covered by Money
-            Laundering Regulations.
+            When used to refer to the business area covered by Money Laundering
+            Regulations.
           </p>
           <h3 id="trust-school">trust school</h3>
           <p>Lower case.</p>
@@ -2217,8 +2174,7 @@ function GlossaryIndexPage() {
           <p>Upper case. Twitter is a trademarked name.</p>
           <h3 id="two-factor-authentication">two-factor authentication</h3>
           <p>
-            Shorten as “2FA”. Do not confuse with “multi-factor
-            authentication”.
+            Shorten as “2FA”. Do not confuse with “multi-factor authentication”.
           </p>
         </AccordionSection>
         <AccordionSection heading="U">
@@ -2275,9 +2231,9 @@ function GlossaryIndexPage() {
           <p>Lower case.</p>
           <h3 id="vat-return">VAT Return</h3>
           <p>
-            Always use VAT Return unless it’s very clear from the context
-            which return you’re referring to (as in ‘How to submit your
-            return’ within a guide on VAT Returns).
+            Always use VAT Return unless it’s very clear from the context which
+            return you’re referring to (as in ‘How to submit your return’ within
+            a guide on VAT Returns).
           </p>
           <h3 id="vat-reverse-charge-sales-list-rcsl">
             VAT Reverse Charge Sales List (RCSL)
@@ -2308,8 +2264,8 @@ function GlossaryIndexPage() {
           <p>Not “webserver”.</p>
           <h3 id="welsh-assembly">Welsh Assembly</h3>
           <p>
-            Subsequent references would be the assembly. Lower case is also
-            used for the second assembly, the third assembly.
+            Subsequent references would be the assembly. Lower case is also used
+            for the second assembly, the third assembly.
           </p>
           <h3 id="welsh-government">Welsh Government</h3>
           <p>Title case because it’s the full, official title.</p>
@@ -2367,16 +2323,14 @@ function GlossaryIndexPage() {
               key (unless it unlocks something. A subject/thing is not key -
               it’s probably important)
             </li>
-            <li>
-              land (as a verb only use if you’re talking about aircraft)
-            </li>
+            <li>land (as a verb only use if you’re talking about aircraft)</li>
             <li>leverage (unless in the financial sense)</li>
             <li>liaise</li>
             <li>overarching</li>
             <li>progress (as a verb - what are you actually doing?)</li>
             <li>
-              promote (unless you’re talking about an ad campaign or some
-              other marketing promotion)
+              promote (unless you’re talking about an ad campaign or some other
+              marketing promotion)
             </li>
             <li>robust</li>
             <li>slimming down (processes do not diet)</li>
@@ -2385,9 +2339,7 @@ function GlossaryIndexPage() {
               strengthening (unless it’s strengthening bridges or other
               structures)
             </li>
-            <li>
-              tackling (unless it’s rugby, football or some other sport)
-            </li>
+            <li>tackling (unless it’s rugby, football or some other sport)</li>
             <li>transforming (what are you actually doing to change it?)</li>
             <li>utilise</li>
           </ul>
@@ -2396,9 +2348,7 @@ function GlossaryIndexPage() {
             lead to slower comprehension of your content. For example:
           </p>
           <ul>
-            <li>
-              drive (you can only drive vehicles, not schemes or people)
-            </li>
+            <li>drive (you can only drive vehicles, not schemes or people)</li>
             <li>drive out (unless it’s cattle)</li>
             <li>
               going forward (it’s unlikely we are giving travel directions)

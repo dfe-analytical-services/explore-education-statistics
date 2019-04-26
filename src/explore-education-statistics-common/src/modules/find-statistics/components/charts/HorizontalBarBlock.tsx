@@ -55,7 +55,7 @@ export default class HorizontalBarBlock extends AbstractChart<
                 fill={colours[index]}
                 stackId={this.props.stacked ? 'a' : undefined}
               />
-            )
+            );
           })}
 
           {this.generateReferenceLines()}
