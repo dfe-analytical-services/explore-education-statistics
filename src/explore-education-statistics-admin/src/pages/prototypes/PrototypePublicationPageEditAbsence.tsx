@@ -17,6 +17,7 @@ import Link from '../../components/Link';
 import EditableContentBlock from '../../modules/find-statistics/components/EditableContentBlock';
 import { PrototypeEditableContent } from './components/PrototypeEditableContent';
 import PrototypePage from './components/PrototypePage';
+import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import { PrototypePublicationService } from '@admin/pages/prototypes/components/PrototypePublicationService';
 
 interface State {
@@ -103,6 +104,7 @@ class PublicationPage extends Component<{}, State> {
           { text: 'Edit pupil absence statistics', link: '#' },
         ]}
       >
+        <PrototypeAdminNavigation sectionId="addContent" task="editRelease" />
         <div className="govuk-form-group">
           <fieldset className="govuk-fieldset">
             <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
@@ -140,7 +142,7 @@ class PublicationPage extends Component<{}, State> {
                   className="govuk-label govuk-radios__label"
                   htmlFor="edit"
                 >
-                  Editing release
+                  Edit release
                 </label>
               </div>
             </div>
