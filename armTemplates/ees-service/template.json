@@ -340,7 +340,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "phpVersion": "off",
-          "AlwaysOn": true,
+          "AlwaysOn": false,
           "cors": {
             "allowedOrigins": [
               "*"
