@@ -1,5 +1,10 @@
 import { Release } from '@common/services/publicationService';
 
+const LOREM =
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec elementum, mauris eget vulputate iaculis, dui orci efficitur mi, at consectetur metus lorem tempor neque. Etiam in eleifend magna. Sed hendrerit vitae ante at semper. Mauris a erat a ex porta mollis. Aliquam quis justo eu lectus luctus porttitor nec at dolor. Nunc interdum, diam sed lobortis porta, massa arcu volutpat nunc, eget scelerisque arcu neque vel tortor. Fusce sit amet mauris augue. Praesent sed urna vel lacus suscipit mollis id quis nulla. Duis porta sapien et arcu ornare, eget mollis justo finibus. Nunc commodo felis justo, at efficitur purus mattis in. Donec nibh quam, mollis at eros ac, fringilla porta mi.';
+
+// const LOREM_SMALL = "Lorem ipsum dolor sit ame";
+
 export class PrototypePublicationService {
   public static getLatestPublicationRelease(_: string): Promise<Release> {
     // @ts-ignore
@@ -319,5 +324,139 @@ export class PrototypePublicationService {
         },
       },
     });
+  }
+
+  public static getNewPublication(): Release {
+    return {
+      id: '00000000-0000-0000-0000-000000000000',
+      title: 'Pupil absence data and statistics for schools in England',
+      releaseName: '2018 to 2019',
+      published: '2017-03-22T00:00:00',
+      slug: '2018-19',
+      summary: LOREM,
+      publicationId: '00000000-0000-0000-0000-000000000000',
+      publication: {
+        id: '00000000-0000-0000-0000-000000000000',
+        slug: 'pupil-absence-in-schools-in-england',
+        title: 'Pupil absence in schools in England',
+        description: '',
+        dataSource:
+          '[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)',
+        summary: LOREM,
+        nextUpdate: '2018-03-22T00:00:00',
+        releases: [
+          {
+            id: '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5',
+            releaseName: '2018 to 2019',
+            slug: '2018-17',
+          },
+          {
+            id: 'f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d',
+            releaseName: '2015 to 2016',
+            slug: '2015-16',
+          },
+        ],
+        legacyReleases: [
+          {
+            id: '45bc02ff-de90-489b-b78e-cdc7db662353',
+            description: '2014 to 2015',
+            url:
+              'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015',
+          },
+          {
+            id: '82292fe7-1545-44eb-a094-80c5064701a7',
+            description: '2013 to 2014',
+            url:
+              'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014',
+          },
+          {
+            id: '6907625d-0c2e-4fd8-8e96-aedd85b2ff97',
+            description: '2012 to 2013',
+            url:
+              'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013',
+          },
+          {
+            id: 'a538e57a-da5e-4a2c-a89e-b74dbae0c30b',
+            description: '2011 to 2012',
+            url:
+              'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics',
+          },
+          {
+            id: '18b24d60-c56e-44f0-8baa-6db4c6e7deee',
+            description: '2010 to 2011',
+            url:
+              'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011',
+          },
+          {
+            id: 'c5444f5a-6ba5-4c80-883c-6bca0d8a9eb5',
+            description: '2009 to 2010',
+            url:
+              'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010',
+          },
+        ],
+      },
+      updates: [
+        {
+          id: '9c0f0139-7f88-4750-afe0-1c85cdf1d047',
+          releaseId: '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5',
+          on: '2017-04-19T00:00:00',
+          reason:
+            'Underlying data file updated to include absence data by pupil residency and school location, and updated metadata document.',
+        },
+        {
+          id: '18e0d40e-bdf7-4c84-99dd-732e72e9c9a5',
+          releaseId: '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5',
+          on: '2017-03-22T00:00:00',
+          reason: 'First published.',
+        },
+      ],
+      content: [
+        {
+          order: 1,
+          heading: 'About this release',
+          caption: '',
+          content: [
+            {
+              type: 'MarkDownBlock',
+              body: LOREM,
+            },
+          ],
+        },
+      ],
+      keyStatistics: {
+        type: 'DataBlock',
+        dataQuery: {
+          path: '/api/tablebuilder/characteristics/national',
+          method: 'POST',
+          body:
+            '{ "indicators": ["enrolments","sess_authorised","sess_overall","enrolments_PA_10_exact","sess_unauthorised_percent","enrolments_pa_10_exact_percent","sess_authorised_percent","sess_overall_percent" ], "characteristics": [ "Total" ], "endYear": 201617, "publicationId": "cbbd299f-8297-44bc-92ac-558bcf51f8ad", "schoolTypes": [ "Total" ], "startYear": 201213}',
+        },
+        charts: [
+          {
+            indicators: [
+              'sess_overall_percent',
+              'sess_unauthorised_percent',
+              'sess_authorised_percent',
+            ],
+            xAxis: { title: 'School Year' },
+            yAxis: { title: 'Absence Rate' },
+            type: 'line',
+          },
+        ],
+        // @ts-ignore
+        summary: {
+          dataKeys: [
+            'sess_overall_percent',
+            'sess_authorised_percent',
+            'sess_unauthorised_percent',
+          ],
+          description: {
+            type: 'MarkDownBlock',
+            body:
+              ' * pupils missed on average 8.2 school days \n  * overall and unauthorised absence rates up on previous year \n * unauthorised rise due to higher rates of unauthorised holidays \n * 10% of pupils persistently absent during 2016/17',
+          },
+        },
+      },
+    };
   }
 }
