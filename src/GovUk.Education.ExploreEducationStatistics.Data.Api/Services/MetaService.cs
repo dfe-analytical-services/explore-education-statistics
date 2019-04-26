@@ -59,14 +59,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             var locationMeta = _observationService.GetLocationMeta(subject.Id);
             var timePeriods = GetTimePeriods(subject.Id);
 
-            var national = locationMeta.Country.Distinct().Select(MapCountry);
+            var national = _mapper.Map<IEnumerable<LabelValueViewModel>>(locationMeta.Country);
 
-            var localAuthority = locationMeta.LocalAuthority.Distinct().Select(MapLocalAuthority);
+            var localAuthority = _mapper.Map<IEnumerable<LabelValueViewModel>>(locationMeta.LocalAuthority);
 
             var localAuthorityDistrict =
-                locationMeta.LocalAuthorityDistrict.Distinct().Select(MapLocalAuthorityDistrict);
+                _mapper.Map<IEnumerable<LabelValueViewModel>>(locationMeta.LocalAuthorityDistrict);
 
-            var region = locationMeta.Region.Distinct().Select(MapRegion);
+            var region = _mapper.Map<IEnumerable<LabelValueViewModel>>(locationMeta.Region);
 
             return new SubjectMetaViewModel
             {
@@ -168,26 +168,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                             })
                         })
                 });
-        }
-
-        private LabelValueViewModel MapCountry(Country country)
-        {
-            return _mapper.Map<LabelValueViewModel>(country);
-        }
-
-        private LabelValueViewModel MapLocalAuthority(LocalAuthority localAuthority)
-        {
-            return _mapper.Map<LabelValueViewModel>(localAuthority);
-        }
-
-        private LabelValueViewModel MapLocalAuthorityDistrict(LocalAuthorityDistrict localAuthorityDistrict)
-        {
-            return _mapper.Map<LabelValueViewModel>(localAuthorityDistrict);
-        }
-
-        private LabelValueViewModel MapRegion(Region region)
-        {
-            return _mapper.Map<LabelValueViewModel>(region);
         }
     }
 }
