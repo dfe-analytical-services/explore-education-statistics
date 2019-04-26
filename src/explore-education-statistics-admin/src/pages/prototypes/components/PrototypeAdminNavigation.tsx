@@ -8,17 +8,6 @@ interface Props {
 const PrototypeAdminNavigation = ({ sectionId }: Props) => {
   return (
     <>
-      <span className="govuk-tag">New release in progress</span>
-      <span className="govuk-caption-l">Academic year 2018 to 2019</span>
-      <h1 className="govuk-heading-l">
-        Pupil absence statistics and data for schools in England
-      </h1>
-      <dl className="dfe-meta-content">
-        <dt className="govuk-caption-m">Scheduled publish date: </dt>
-        <dd>
-          <strong>To be set</strong>
-        </dd>
-      </dl>
       <nav className="app-navigation govuk-!-margin-bottom-9">
         <ul className="app-navigation__list govuk-!-margin-bottom-0">
           <li
@@ -93,6 +82,18 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
           </li>
         </ul>
       </nav>
+
+      <span className="govuk-tag">New release in progress</span>
+      <span className="govuk-caption-l">Academic year 2018 to 2019</span>
+      <h1 className="govuk-heading-l">
+        Pupil absence statistics and data for schools in England
+      </h1>
+      <dl className="dfe-meta-content">
+        <dt className="govuk-caption-m">Scheduled publish date: </dt>
+        <dd>
+          <strong>To be set</strong>
+        </dd>
+      </dl>
     </>
   );
 };
