@@ -14,6 +14,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
             return x => x.GeographicLevel == geographicLevel;
         }
 
+        public static Expression<Func<T, bool>> CountriesExpression<T>(IEnumerable<string> countries)
+            where T : Observation
+        {
+            return x => countries == null || !countries.Any() ||
+                        countries.Contains(x.Location.Country.Code);
+        }
+        
         public static Expression<Func<T, bool>> LocalAuthoritiesExpression<T>(IEnumerable<string> localAuthorities)
             where T : Observation
         {
