@@ -166,7 +166,7 @@ class PublicationPage extends Component<{}, State> {
               <dl className="dfe-meta-content">
                 <dt className="govuk-caption-m">Published:</dt>
                 <dd>
-                  <strong>22 March 2018</strong>
+                  <strong>To be set</strong>
                 </dd>
               </dl>
 

@@ -48,8 +48,8 @@ class PublicationPage extends Component<{}, State> {
         <PrototypeAdminNavigation sectionId="addContent" task="editRelease" />
         <div className="govuk-form-group">
           <fieldset className="govuk-fieldset">
-            <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
-              <h1 className="govuk-fieldset__heading">Set page status</h1>
+            <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
+              <h1 className="govuk-fieldset__heading">Set page view</h1>
             </legend>
             <div className="govuk-radios govuk-radios--inline">
               <div className="govuk-radios__item">
