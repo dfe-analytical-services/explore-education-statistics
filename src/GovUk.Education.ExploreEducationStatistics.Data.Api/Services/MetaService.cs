@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     new Dictionary<string, LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>
                     {
                         {
-                            GeographicLevel.Local_Authority.ToString().CamelCase(),
+                            GeographicLevel.Local_Authority.ToString().PascalCase(),
                             new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
                             {
                                 Hint = "",
@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                             }
                         },
                         {
-                            GeographicLevel.Local_Authority_District.ToString().CamelCase(),
+                            GeographicLevel.Local_Authority_District.ToString().PascalCase(),
                             new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
                             {
                                 Hint = "",
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                             }
                         },
                         {
-                            GeographicLevel.National.ToString().CamelCase(),
+                            GeographicLevel.National.ToString().PascalCase(),
                             new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
                             {
                                 Hint = "",
@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                             }
                         },
                         {
-                            GeographicLevel.Regional.ToString().CamelCase(),
+                            GeographicLevel.Regional.ToString().PascalCase(),
                             new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
                             {
                                 Hint = "",
@@ -137,11 +137,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             long subjectId)
         {
             return _indicatorGroupService.GetIndicatorGroupsBySubjectId(subjectId).ToDictionary(
-                pair => pair.Key.Label.CamelCase(),
-                pair => new LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>
+                group => group.Label.PascalCase(),
+                group => new LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>
                 {
-                    Label = pair.Key.Label,
-                    Options = _mapper.Map<IEnumerable<IndicatorMetaViewModel>>(pair.Value)
+                    Label = group.Label,
+                    Options = _mapper.Map<IEnumerable<IndicatorMetaViewModel>>(group.Indicators)
                 }
             );
         }
@@ -150,14 +150,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>> GetFilters(long subjectId)
         {
             return _filterService.GetFiltersBySubjectId(subjectId).ToDictionary(
-                filter => filter.Label.CamelCase(),
+                filter => filter.Label.PascalCase(),
                 filter => new LegendOptionsMetaValueModel<Dictionary<string,
                     LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>
                 {
                     Hint = filter.Hint,
                     Legend = filter.Label,
                     Options = filter.FilterGroups.ToDictionary(
-                        group => group.Label.CamelCase() + "_" + group.Id,
+                        group => group.Label.PascalCase(),
                         group => new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
                         {
                             Label = group.Label,

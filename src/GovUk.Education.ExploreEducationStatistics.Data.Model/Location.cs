@@ -9,6 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public Region Region { get; set; } = Region.Empty();
         public LocalAuthority LocalAuthority { get; set; } = LocalAuthority.Empty();
         public LocalAuthorityDistrict LocalAuthorityDistrict { get; set; } = LocalAuthorityDistrict.Empty();
-        public IEnumerable<Observation> Observations { get; set; }
+        public ICollection<Observation> Observations { get; set; }
     }
 }

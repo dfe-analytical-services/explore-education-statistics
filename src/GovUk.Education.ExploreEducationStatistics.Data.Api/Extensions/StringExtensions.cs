@@ -4,7 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions
 {
     public static class StringExtensions
     {
-        public static string CamelCase(this string input)
+        public static string PascalCase(this string input)
         {
             if (string.IsNullOrEmpty(input))
             {
@@ -12,8 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions
             }
 
             var s = input.Replace("_", " ");
-            s = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(s).Replace(" ", string.Empty);
-            return char.ToLower(s[0]) + s.Substring(1);
+            return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(s).Replace(" ", string.Empty);
         }
     }
 }

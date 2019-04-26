@@ -79,12 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return metaRows
                 .Where(row => row.ColumnType == ColumnType.Filter)
                 .Select(filter => (
-                    filter: new Filter
-                    {
-                        Hint = filter.FilterHint,
-                        Label = filter.Label,
-                        Subject = subject
-                    },
+                    filter: new Filter(filter.FilterHint, filter.Label, subject),
                     column: filter.ColumnName,
                     filterGroupingColumn: filter.FilterGroupingColumn));
         }
@@ -94,13 +89,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             var indicatorRows = metaRows.Where(row => row.ColumnType == ColumnType.Indicator);
 
+            // TODO need to handle no group scenario creating the Default Group
+
             var indicatorGroups = indicatorRows
                 .GroupBy(row => row.IndicatorGrouping)
-                .ToDictionary(rows => rows.Key, rows => new IndicatorGroup
-                {
-                    Label = rows.Key,
-                    Subject = subject
-                });
+                .ToDictionary(rows => rows.Key, rows => new IndicatorGroup(rows.Key, subject));
 
             return indicatorRows
                 .Select(row =>
