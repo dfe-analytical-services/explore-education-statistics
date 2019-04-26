@@ -51,13 +51,11 @@ interface Props {
 }
 
 interface State {
-  isSubmitted: boolean;
   submitError: string;
 }
 
 class FiltersForm extends Component<Props, State> {
   public state: State = {
-    isSubmitted: false,
     submitError: '',
   };
 
@@ -74,7 +72,9 @@ class FiltersForm extends Component<Props, State> {
         message: typeof message === 'string' ? message : '',
       }));
 
-    if (this.state.submitError) {
+    const { submitError } = this.state;
+
+    if (submitError) {
       summaryErrors.push({
         id: 'submit-button',
         message: 'Could not submit filters. Please try again later.',
@@ -85,7 +85,7 @@ class FiltersForm extends Component<Props, State> {
   }
 
   public render() {
-    const { specification } = this.props;
+    const { onSubmit, specification } = this.props;
 
     const startEndDateValues = specification.observationalUnits.timePeriod.options.map(
       ({ code, year }) => `${year}_${code}`,
@@ -152,7 +152,7 @@ class FiltersForm extends Component<Props, State> {
               .test(
                 'moreThanOrEqual',
                 'Must be after or same as start date',
-                function(value: string) {
+                function moreThanOrEqual(value: string) {
                   const start: string = this.resolve(Yup.ref('start'));
 
                   if (!start) {
@@ -176,7 +176,7 @@ class FiltersForm extends Component<Props, State> {
               .test(
                 'lessThanOrEqual',
                 'Must be before or same as end date',
-                function(value: string) {
+                function lessThanOrEqual(value: string) {
                   const end: string = this.resolve(Yup.ref('end'));
 
                   if (!end) {
@@ -198,7 +198,7 @@ class FiltersForm extends Component<Props, State> {
         })}
         onSubmit={async (form, actions) => {
           try {
-            await this.props.onSubmit({
+            await onSubmit({
               ...form,
               timePeriod: {
                 end: TimePeriod.fromString(form.timePeriod.end),

@@ -85,6 +85,7 @@ class TableToolPage extends Component<{}, State> {
   };
 
   private filtersRef = createRef<HTMLDivElement>();
+
   private dataTableRef = createRef<HTMLElement>();
 
   private handleMenuChange: MenuChangeEventHandler = async ({
@@ -130,13 +131,15 @@ class TableToolPage extends Component<{}, State> {
     const formatToAcademicYear = (year: number) =>
       parseInt(`${year}${`${year + 1}`.substring(2, 4)}`, 0);
 
+    const { publicationId } = this.state;
+
     const { result } = await tableBuilderService.getNationalCharacteristicsData(
       {
         characteristics,
         indicators,
         schoolTypes,
+        publicationId,
         endYear: formatToAcademicYear(endYear),
-        publicationId: this.state.publicationId,
         startYear: formatToAcademicYear(startYear),
       },
     );

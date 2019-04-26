@@ -1,5 +1,4 @@
-import {
-  default as BaseDocument,
+import BaseDocument, {
   Head,
   Main,
   NextDocumentContext,

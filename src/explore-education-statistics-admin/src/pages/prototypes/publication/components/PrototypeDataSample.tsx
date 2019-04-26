@@ -1,4 +1,4 @@
-import { PrototypeEditableContent } from '@admin/pages/prototypes/components/PrototypeEditableContent';
+import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
 import PrototypeChartSample from '@admin/pages/prototypes/publication/components/PrototypeChartSample';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';

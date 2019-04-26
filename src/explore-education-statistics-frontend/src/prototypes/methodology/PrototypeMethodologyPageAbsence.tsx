@@ -13,9 +13,9 @@ import PrototypeSection3 from '@frontend/prototypes/methodology/absence/Prototyp
 import PrototypeSection4 from '@frontend/prototypes/methodology/absence/PrototypeSection4';
 import PrototypeSection5 from '@frontend/prototypes/methodology/absence/PrototypeSection5';
 import PrototypeSection7 from '@frontend/prototypes/methodology/absence/PrototypeSection7';
-import { MethodologyContent } from '@frontend/prototypes/methodology/components/MethodologyContent';
-import { MethodologyHeader } from '@frontend/prototypes/methodology/components/MethodologyHeader';
-import { MethodologySection } from '@frontend/prototypes/methodology/components/MethodologySection';
+import MethodologyContent from '@frontend/prototypes/methodology/components/MethodologyContent';
+import MethodologyHeader from '@frontend/prototypes/methodology/components/MethodologyHeader';
+import MethodologySection from '@frontend/prototypes/methodology/components/MethodologySection';
 import React from 'react';
 
 const PublicationPage = () => {

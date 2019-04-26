@@ -92,6 +92,7 @@ describe('FormFieldSelect', () => {
           render={(props: FormikProps<FormValues>) => {
             // This is super hacky, but `change` event
             // doesn't seem to trigger touched to change
+            // eslint-disable-next-line no-param-reassign
             props.touched.test = true;
 
             return (
@@ -209,6 +210,7 @@ describe('FormFieldSelect', () => {
           render={(props: FormikProps<FormValues>) => {
             // This is super hacky, but `change` event
             // doesn't seem to trigger touched to change
+            // eslint-disable-next-line no-param-reassign
             props.touched.test = true;
 
             return (

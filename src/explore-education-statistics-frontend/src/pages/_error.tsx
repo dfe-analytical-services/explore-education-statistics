@@ -25,7 +25,9 @@ class ErrorPage extends Component<Props> {
   }
 
   private getStatusCodePage() {
-    switch (this.props.statusCode) {
+    const { statusCode } = this.props;
+
+    switch (statusCode) {
       case 404:
         return (
           <>

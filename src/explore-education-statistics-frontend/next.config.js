@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+
 const withCss = require('@zeit/next-css');
 const cssLoaderConfig = require('@zeit/next-css/css-loader-config');
 const withTypescript = require('@zeit/next-typescript');
@@ -109,7 +111,7 @@ const withESLint = createPlugin((config, options) => {
   return config;
 });
 
-const config = {
+const nextConfig = {
   transpileModules: ['explore-education-statistics-common', '@common'],
   webpack(config, options) {
     const { dev, isServer } = options;
@@ -188,4 +190,4 @@ module.exports = compose(
   withSassModules,
   withTypescript,
   withESLint,
-)(config);
+)(nextConfig);

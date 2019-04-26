@@ -27,6 +27,7 @@ const Button = ({
   );
 
   return (
+    // eslint-disable-next-line react/button-has-type
     <button
       aria-disabled={disabled}
       className={classes}
