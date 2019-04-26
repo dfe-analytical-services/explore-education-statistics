@@ -152,6 +152,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "phpVersion": "off",
+          "AlwaysOn": true,
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -247,6 +248,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "phpVersion": "off",
+          "AlwaysOn": true,
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -338,6 +340,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "phpVersion": "off",
+          "AlwaysOn": true,
           "cors": {
             "allowedOrigins": [
               "*"
