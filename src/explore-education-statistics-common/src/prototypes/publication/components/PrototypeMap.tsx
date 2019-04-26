@@ -29,24 +29,35 @@ class PrototypeMap extends Component<PrototypeMapProps, State> {
     selectedAuthority: '',
   };
 
+  // eslint-disable-next-line react/sort-comp
   private static DEFAULT_BOUNDS = new LatLngBounds(
     { lat: 48, lng: -6.5 },
     { lat: 60, lng: 2 },
   );
 
   public state: State = {
+    // eslint-disable-next-line react/destructuring-assignment
     selectedAuthority: this.props.selectedAuthority || '',
     selectedFeature: undefined,
   };
 
   private mapRef: Map | null = null;
 
-  public refresh() {
-    requestAnimationFrame(() => {
-      if (this.mapRef) {
-        this.mapRef.leafletElement.invalidateSize();
-      }
-    });
+  public componentDidMount() {
+    // force a refresh to fix a bug
+    requestAnimationFrame(() => this.refresh());
+  }
+
+  public componentDidUpdate(prevProps: Readonly<PrototypeMapProps>): void {
+    const { boundaries, selectedAuthority } = this.props;
+
+    if (prevProps.selectedAuthority !== selectedAuthority) {
+      const feature = boundaries.features.find(
+        f => f.properties.lad17nm === selectedAuthority,
+      );
+
+      this.selectFeature(feature);
+    }
   }
 
   private onEachFeature = (
@@ -77,8 +88,11 @@ class PrototypeMap extends Component<PrototypeMapProps, State> {
   };
 
   private selectFeature = (feature?: PrototypeMapBoundariesFeature) => {
-    if (this.state.selectedAuthority !== '' && this.state.selectedFeature) {
-      const currentSelectedLayer = this.state.selectedFeature.properties.layer;
+    const { onFeatureSelect } = this.props;
+    const { selectedAuthority, selectedFeature } = this.state;
+
+    if (selectedAuthority !== '' && selectedFeature) {
+      const currentSelectedLayer = selectedFeature.properties.layer;
 
       if (currentSelectedLayer) {
         const element = currentSelectedLayer.getElement();
@@ -90,9 +104,9 @@ class PrototypeMap extends Component<PrototypeMapProps, State> {
     }
 
     if (feature && feature.properties.selectable) {
-      if (this.props.onFeatureSelect && feature && feature.properties) {
-        if (this.props.onFeatureSelect) {
-          this.props.onFeatureSelect(feature.properties);
+      if (onFeatureSelect && feature && feature.properties) {
+        if (onFeatureSelect) {
+          onFeatureSelect(feature.properties);
         }
       }
 
@@ -132,13 +146,13 @@ class PrototypeMap extends Component<PrototypeMapProps, State> {
     }
   };
 
-  private handleClick = (e: {
-    sourceTarget: { feature: PrototypeMapBoundariesFeature };
-  }) => {
-    if (e.sourceTarget.feature) {
-      this.selectFeature(e.sourceTarget.feature);
-    }
-  };
+  public refresh() {
+    requestAnimationFrame(() => {
+      if (this.mapRef) {
+        this.mapRef.leafletElement.invalidateSize();
+      }
+    });
+  }
 
   // private selectAuthority = (e: ChangeEvent<HTMLSelectElement>) => {
   //   const selectedFeatureName = e.currentTarget.value;
@@ -149,21 +163,6 @@ class PrototypeMap extends Component<PrototypeMapProps, State> {
   //
   //   this.selectFeature(feature);
   // };
-
-  public componentDidMount() {
-    // force a refresh to fix a bug
-    requestAnimationFrame(() => this.refresh());
-  }
-
-  public componentDidUpdate(prevProps: Readonly<PrototypeMapProps>): void {
-    if (prevProps.selectedAuthority !== this.props.selectedAuthority) {
-      const feature = this.props.boundaries.features.find(
-        f => f.properties.lad17nm === this.props.selectedAuthority,
-      );
-
-      this.selectFeature(feature);
-    }
-  }
 
   public render() {
     const { boundaries } = this.props;
@@ -180,7 +179,9 @@ class PrototypeMap extends Component<PrototypeMapProps, State> {
           local authority
         </h3>
         <Map
-          ref={el => (this.mapRef = el)}
+          ref={el => {
+            this.mapRef = el;
+          }}
           center={position}
           className={styles.map}
           zoom={6.5}
@@ -195,7 +196,13 @@ class PrototypeMap extends Component<PrototypeMapProps, State> {
               className:
                 feature && feature.properties && feature.properties.className,
             })}
-            onClick={this.handleClick}
+            onClick={(e: {
+              sourceTarget: { feature: PrototypeMapBoundariesFeature };
+            }) => {
+              if (e.sourceTarget.feature) {
+                this.selectFeature(e.sourceTarget.feature);
+              }
+            }}
           />
         </Map>
       </div>

@@ -41,7 +41,9 @@ class SubscriptionForm extends Component<Props, State> {
         message: typeof message === 'string' ? message : '',
       }));
 
-    if (this.state.submitError) {
+    const { submitError } = this.state;
+
+    if (submitError) {
       summaryErrors.push({
         id: 'submit-button',
         message: 'Could not submit request. Please try again later.',
@@ -52,6 +54,8 @@ class SubscriptionForm extends Component<Props, State> {
   }
 
   public render() {
+    const { onSubmit } = this.props;
+
     return (
       <Formik
         initialValues={{
@@ -64,7 +68,7 @@ class SubscriptionForm extends Component<Props, State> {
         })}
         onSubmit={async (form, actions) => {
           try {
-            await this.props.onSubmit(form);
+            await onSubmit(form);
           } catch (error) {
             this.setState({
               submitError: error.message,

@@ -5,17 +5,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
 {
     public class SubscriptionEntity : TableEntity
     {
-        public Boolean Verified { get; set; }
         public string Slug  { get; set; }        
         public string Title { get; set; }
-        
-        public SubscriptionEntity(string id, string email, string title, string slug)
+        public DateTime? DateTimeCreated { get; set; }
+
+        public SubscriptionEntity(string id, string email, string title, string slug, DateTime? dateTimeCreated)
         {
             PartitionKey = id;
             RowKey = email;
-            Verified = false;
             this.Title = title;
             this.Slug = slug;
+            this.DateTimeCreated = dateTimeCreated;
+        }
+
+        public SubscriptionEntity(string id, string email)
+        {
+            PartitionKey = id;
+            RowKey = email;
+            this.Title = null;
+            this.Slug = null;
+            this.DateTimeCreated = null;
         }
 
         public SubscriptionEntity()

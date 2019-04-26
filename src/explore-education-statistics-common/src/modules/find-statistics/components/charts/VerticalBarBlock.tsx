@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import { ChartProps } from '@common/modules/find-statistics/components/charts/AbstractChart';
+import React from 'react';
 import {
   Bar,
   BarChart,
@@ -11,40 +12,46 @@ import {
 } from 'recharts';
 
 import { colours } from './Charts';
-import { ChartProps } from '@common/modules/find-statistics/components/charts/AbstractChart';
 
-export class VerticalBarBlock extends Component<ChartProps> {
-  public render() {
-    const chartData = this.props.characteristicsData.result.map(data => {
-      return data.indicators;
-    });
+export default function VerticalBarBlock({
+  characteristicsData,
+  chartDataKeys,
+  height,
+  labels,
+  xAxis,
+}: ChartProps) {
+  const chartData = characteristicsData.result.map(data => {
+    return data.indicators;
+  });
 
-    return (
-      <ResponsiveContainer width={900} height={this.props.height || 300}>
-        <BarChart
-          data={chartData}
-          margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
-        >
-          <XAxis
-            dataKey={this.props.xAxis.key || 'name'}
-            interval={0}
-            tick={{ fontSize: 12 }}
-          />
-          <CartesianGrid />
-          <YAxis />
-          <Tooltip />
-          <Legend />
+  return (
+    <ResponsiveContainer width={900} height={height || 300}>
+      <BarChart
+        data={chartData}
+        margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
+      >
+        <XAxis
+          dataKey={xAxis.key || 'name'}
+          interval={0}
+          tick={{ fontSize: 12 }}
+        />
+        <CartesianGrid />
+        <YAxis />
+        <Tooltip />
+        <Legend />
 
-          {this.props.chartDataKeys.map((key, index) => (
+        {chartDataKeys.map((dataKey, index) => {
+          const key = index;
+          return (
             <Bar
-              key={index}
-              dataKey={key}
+              key={key}
+              dataKey={dataKey}
               fill={colours[index]}
-              name={this.props.labels[key]}
+              name={labels[dataKey]}
             />
-          ))}
-        </BarChart>
-      </ResponsiveContainer>
-    );
-  }
+          );
+        })}
+      </BarChart>
+    </ResponsiveContainer>
+  );
 }

@@ -18,13 +18,14 @@ interface Props {
 }
 
 interface State {
-  id: string;
-  slug: string;
-  title: string;
   subscribed: boolean;
 }
 
 class SubscriptionPage extends Component<Props> {
+  public state: State = {
+    subscribed: false,
+  };
+
   public static async getInitialProps({
     query,
   }: NextContext<{
@@ -46,20 +47,14 @@ class SubscriptionPage extends Component<Props> {
     };
   }
 
-  public state: State = {
-    id: this.props.data.id,
-    slug: this.props.slug,
-    subscribed: false,
-    title: this.props.data.title,
-  };
-
   private handleFormSubmit: SubscriptionFormSubmitHandler = async ({
     email,
   }) => {
     if (email !== '') {
-      const slug = this.state.slug;
-      const title = this.state.title;
-      const id = this.state.id;
+      const {
+        data: { id, title },
+        slug,
+      } = this.props;
 
       await functionsService.subscribeToPublication({
         email,
@@ -74,14 +69,16 @@ class SubscriptionPage extends Component<Props> {
   };
 
   public render() {
+    const { subscribed } = this.state;
     const { data, slug, unsubscribed, verified } = this.props;
+
     let message;
 
     if (unsubscribed) {
       message = 'You have successfully unsubscribed from this publication.';
     } else if (verified) {
       message = 'You have successfully subscribed to this publication.';
-    } else if (this.state.subscribed) {
+    } else if (subscribed) {
       message =
         'Thank you. Please check your email to verify the subscription.';
     }
@@ -94,7 +91,7 @@ class SubscriptionPage extends Component<Props> {
           { name: 'subscribe' },
         ]}
       >
-        <PageTitle title={`${data.title}`} caption={'Subscription'} />
+        <PageTitle title={`${data.title}`} caption="Subscription" />
 
         {message ? (
           <p>{message}</p>

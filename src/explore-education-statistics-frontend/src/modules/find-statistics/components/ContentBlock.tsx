@@ -9,12 +9,10 @@ interface Props {
 const ContentBlock = ({ content }: Props) => {
   return content.length > 0 ? (
     <>
-      {content.map((block, index) => (
-        <ContentSubBlockRenderer
-          block={block}
-          key={`${index}-${block.heading}-${block.type}`}
-        />
-      ))}
+      {content.map((block, index) => {
+        const key = `${index}-${block.heading}-${block.type}`;
+        return <ContentSubBlockRenderer block={block} key={key} />;
+      })}
     </>
   ) : (
     <div className="govuk-inset-text">

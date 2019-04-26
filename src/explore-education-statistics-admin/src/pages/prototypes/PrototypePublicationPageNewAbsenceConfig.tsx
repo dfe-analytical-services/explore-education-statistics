@@ -4,7 +4,7 @@ import PrototypePage from './components/PrototypePage';
 import PrototypePublicationSummary from './components/PrototypePublicationPageSummary';
 
 const PublicationConfigPage = () => {
-  let sectionId = 'setup';
+  const sectionId = 'setup';
 
   return (
     <PrototypePage

@@ -23,6 +23,7 @@
     "lodash": "^4.17.11",
     "next": "^8.0.4",
     "next-images": "^1.1.1",
+    "next-server": "^8.1.0",
     "next-transpile-modules": "^2.3.1",
     "react": "^16.8.6",
     "react-beautiful-dnd": "^11.0.0-beta.3",
@@ -88,8 +89,7 @@
     "stylelint": "^9.10.1",
     "stylelint-webpack-plugin": "^0.10.5",
     "typescript": "^3.4.3",
-    "webpack-dev-server": "^3.3.1",
-    "whatwg-fetch": "^3.0.0"
+    "webpack-dev-server": "^3.3.1"
   },
   "scripts": {
     "start": "node server.js",

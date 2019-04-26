@@ -46,7 +46,15 @@ class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
   }
 
   public render() {
-    const { value, onAllChange, name, id, options, selectAll } = this.props;
+    const {
+      value,
+      onAllChange,
+      onChange,
+      name,
+      id,
+      options,
+      selectAll,
+    } = this.props;
     const isAllChecked = options.every(
       option => value.indexOf(option.value) > -1,
     );
@@ -76,8 +84,8 @@ class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
               key={option.id}
               checked={value.indexOf(option.value) > -1}
               onChange={event => {
-                if (this.props.onChange) {
-                  this.props.onChange(event);
+                if (onChange) {
+                  onChange(event);
                 }
               }}
             />
