@@ -1,9 +1,11 @@
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
+    using System.IO;
     using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
     using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
     using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
     using Microsoft.Extensions.Logging;
+    using Microsoft.WindowsAzure.Storage.Blob;
 
     public class SeedService : ISeedService
     {
@@ -11,7 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly ApplicationDbContext _context;
         private readonly IImporterService _importerService;
 
-        public SeedService(ILogger<SeedService> logger,
+        public SeedService(
+            ILogger<SeedService> logger,
             ApplicationDbContext context,
             IImporterService importerService)
         {
@@ -19,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _context = context;
             _importerService = importerService;
         }
-        
+
         public void Seed(Publication publication)
         {
             _logger.LogInformation("Seeding Publication {Publication}", publication.PublicationId);
@@ -52,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var lines = subject.GetCsvLines();
             var metaLines = subject.GetMetaLines();
-            
+
             _importerService.Import(lines, metaLines, subjectDb);
         }
 

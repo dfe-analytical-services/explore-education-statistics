@@ -1,13 +1,12 @@
 ﻿using System;
-using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUK.Education.ExploreEducationStatistics.Data.Processor;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Azure.WebJobs.Logging;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Willezone.Azure.WebJobs.Extensions.DependencyInjection;
@@ -37,9 +36,9 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
             services.AddDbContext<ApplicationDbContext>(options =>
                 options
                     .UseSqlServer("Server=db;Database=master;User=SA;Password=Your_Password123;")
-                    .EnableSensitiveDataLogging()
-            );
+                    .EnableSensitiveDataLogging());
 
+            services.AddTransient<ISeedService, SeedService>();
             services.AddTransient<IImporterService, ImporterService>();
             services.AddTransient<ImporterFilterService>();
             services.AddTransient<ImporterLocationService>();

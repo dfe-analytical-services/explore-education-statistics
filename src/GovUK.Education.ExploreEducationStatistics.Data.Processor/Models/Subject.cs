@@ -1,13 +1,13 @@
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models
 {
+    using Microsoft.WindowsAzure.Storage.Blob;
+
     public class Subject
     {
-        public DataCsvFilename Filename { get; set; }
-        public string Name { get; set; }
+        public CloudBlockBlob CsvDataBlob { get; set; }
 
-        public DataCsvMetaFilename GetMetaFilename()
-        {
-            return Filename.GetMetaFilename();
-        }
+        public CloudBlockBlob CsvMetaDataBlob { get; set; }
+
+        public string Name { get; set; }
     }
 }

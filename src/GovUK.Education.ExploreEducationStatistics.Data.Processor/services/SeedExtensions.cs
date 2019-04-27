@@ -2,25 +2,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     using System.Collections.Generic;
     using System.IO;
+    using System.Threading.Tasks;
     using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
+    using Microsoft.WindowsAzure.Storage.Blob;
 
     public static class SeedExtensions
     {
         public static IEnumerable<string> GetCsvLines(this Subject subject)
         {
-            return ReadAllLines(subject.Filename.ToString());
+            return ReadAllLinesAsync(subject.CsvDataBlob).Result;
         }
 
         public static IEnumerable<string> GetMetaLines(this Subject subject)
         {
-            return ReadAllLines(subject.GetMetaFilename().ToString());
+            return ReadAllLinesAsync(subject.CsvMetaDataBlob).Result;
         }
 
-        private static IEnumerable<string> ReadAllLines(string filename)
+        private static async Task<IEnumerable<string>> ReadAllLinesAsync(CloudBlockBlob blockBlob)
         {
-            var file = filename + ".csv";
-            var path = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "Files/" + file));
-            return File.ReadAllLines(path);
+            var list = new List<string>();
+
+            using (StreamReader reader = new StreamReader(await blockBlob.OpenReadAsync()))
+            {
+                list.Add(reader.ReadToEnd());
+            }
+
+            return list.ToArray();
         }
     }
 }

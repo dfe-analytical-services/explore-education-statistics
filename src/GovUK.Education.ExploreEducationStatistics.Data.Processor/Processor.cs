@@ -1,8 +1,14 @@
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 
 namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Threading.Tasks;
+    using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
+    using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
+    using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
     using Microsoft.Azure.WebJobs;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
@@ -21,24 +27,24 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
         public void FilesProcessorFunc(
             [QueueTrigger("filesprocessor-queue", Connection = "")]
             JObject fNotify,
-            [Inject]IImporterService importerService,
+            [Inject]ISeedService seedService,
             ILogger log,
             ExecutionContext context)
         {
             log.LogInformation($"C# Queue trigger function processed: {fNotify.ToString()}");
 
-            log.LogInformation($"importerService: {importerService}");
+            log.LogInformation($"seedService: {seedService}");
 
             var filesProcessorNotification = ExtractNotification(fNotify);
             var config = LoadAppSettings(context);
             var connectionStr = config.GetConnectionString(StorageConnectionName);
 
-            ProcessFiles(filesProcessorNotification, connectionStr, log);
+            ProcessFiles(seedService, filesProcessorNotification, connectionStr, log);
 
             log.LogInformation("Completed files processing");
         }
 
-        public void ProcessFiles(ProcessorNotification processorNotification, string connectionStr, ILogger log)
+        public void ProcessFiles(ISeedService seedService, ProcessorNotification processorNotification, string connectionStr, ILogger log)
         {
             if (CloudStorageAccount.TryParse(connectionStr, out var storageAccount))
             {
@@ -52,8 +58,14 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
                     if (blobContainer != null)
                     {
                         log.LogInformation("Found blob container");
+                        var subjects = GetSubjects(
+                            blobContainer,
+                            UploadsDir + "/" + processorNotification.PublicationId,
+                            log).Result;
 
-                        ListBlobs(blobContainer, UploadsDir + "/" + processorNotification.PublicationId, log);
+                        var publication = CreatePublication(processorNotification, subjects);
+
+                        //seedService.Seed(publication);
                     }
                 }
                 catch (StorageException ex)
@@ -61,35 +73,6 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
                     log.LogError("Error returned from the service: {0}", ex.Message);
                 }
             }
-        }
-
-        public async void ListBlobs(CloudBlobContainer blobContainer, string directory, ILogger log) {
-
-            var publicationUploadDir = blobContainer.GetDirectoryReference(directory);
-
-            BlobContinuationToken blobContinuationToken = null;
-
-            do
-            {
-                var results = await publicationUploadDir.ListBlobsSegmentedAsync(blobContinuationToken);
-
-                // Get the value of the continuation token returned by the listing call.
-                blobContinuationToken = results.ContinuationToken;
-                foreach (IListBlobItem item in results.Results)
-                {
-                    var filename = GetFileName(item);
-                    log.LogInformation($"after conversion {filename}");
-
-                    CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(item.Uri.ToString());
-                    /*
-                    using (StreamReader reader = new StreamReader(blockBlob.OpenReadAsync()))
-                    {
-                        oldContent = reader.ReadToEnd();
-                    }
-                    */
-                }
-            }
-            while (blobContinuationToken != null); // Loop while the continuation token is not null.
         }
 
         private static ProcessorNotification ExtractNotification(JObject processorNotification)
@@ -104,6 +87,74 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
                 .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
+        }
+
+        private static async Task<Subject[]> GetSubjects(CloudBlobContainer blobContainer, string directory, ILogger log)
+        {
+            var publicationUploadDir = blobContainer.GetDirectoryReference(directory);
+            List<Subject> list = new List<Subject>();
+
+            BlobContinuationToken blobContinuationToken = null;
+
+            do
+            {
+                var results = await publicationUploadDir.ListBlobsSegmentedAsync(blobContinuationToken);
+
+                // Get the value of the continuation token returned by the listing call.
+                blobContinuationToken = results.ContinuationToken;
+
+                foreach (IListBlobItem item in results.Results)
+                {
+                    var filename = GetFileName(item);
+
+                    log.LogInformation($"add subject {filename}");
+
+                    if (!filename.StartsWith("meta"))
+                    {
+                        CloudBlockBlob csvBlockBlob =
+                            blobContainer.GetBlockBlobReference(directory + "/" + filename + ".csv");
+                        CloudBlockBlob csvMetaBlockBlob =
+                            blobContainer.GetBlockBlobReference(directory + "/meta_" + filename + ".csv");
+
+                        list.Add(new Subject()
+                        {
+                            Name = filename,
+                            CsvDataBlob = csvBlockBlob,
+                            CsvMetaDataBlob = csvMetaBlockBlob
+                        });
+                        /*
+                        using (StreamReader reader = new StreamReader(await csvBlockBlob.OpenReadAsync()))
+                        {
+                            var content = reader.ReadToEnd();
+                        }
+                        */
+                    }
+                }
+            }
+            while (blobContinuationToken != null); // Loop while the continuation token is not null.
+
+            return list.ToArray();
+        }
+
+        private static Publication CreatePublication(
+            ProcessorNotification processorNotification,
+            Subject[] subjects)
+        {
+            return new Publication
+            {
+                PublicationId = new Guid(processorNotification.PublicationId),
+                Name = processorNotification.PublicationName,
+                Releases = new[]
+                {
+                    new Release
+                    {
+                        PublicationId = new Guid(processorNotification.PublicationId),
+                        ReleaseDate = DateTime.UtcNow,
+                        Name = processorNotification.ReleaseName,
+                        Subjects = subjects
+                    }
+                }
+            };
         }
 
         private static string GetFileName(IListBlobItem item)
