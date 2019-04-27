@@ -308,6 +308,7 @@ class FixedHeaderGroupedDataTable extends Component<Props> {
   }
 }
 
+// eslint-disable-next-line react/no-multi-comp
 const TableWithRef = forwardRef<HTMLElement, Props>((props, ref) => (
   <FixedHeaderGroupedDataTable {...props} innerRef={ref} />
 ));

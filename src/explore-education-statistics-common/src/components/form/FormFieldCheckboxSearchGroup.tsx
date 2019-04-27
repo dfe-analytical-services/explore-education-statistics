@@ -24,7 +24,7 @@ const FormFieldCheckboxSearchGroup = <T extends {}>(
         const { form } = fieldArrayProps;
         const { getError } = createErrorHelper(form);
 
-        let errorMessage = error ? error : getError(name);
+        let errorMessage = error || getError(name);
 
         if (!showError) {
           errorMessage = '';
