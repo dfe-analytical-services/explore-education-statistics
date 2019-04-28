@@ -53,8 +53,8 @@ const HomePage = () => {
             </Link>
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">
-            Find out more about the methodology behind education statistics and
-            data and how and why they're collected and published.
+            Browse to find out more about the methodology behind education
+            statistics and data and how and why they're collected and published.
           </p>
         </div>
         <div className="govuk-grid-column-one-half">
