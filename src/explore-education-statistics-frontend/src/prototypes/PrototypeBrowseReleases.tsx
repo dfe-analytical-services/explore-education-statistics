@@ -101,8 +101,15 @@ const BrowseReleasesPage = () => {
           caption="School capacity, admission appeals"
         >
           <h3 className="govuk-heading-s">
-            Latest capacity and admissions releases
+            These statistics and data are not yet available on the explore
+            education statistics service
           </h3>
+          <p className="govuk-body">
+            To find and download these statistics and data browse
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </p>
         </AccordionSection>
         <AccordionSection
           heading="Results"
@@ -130,15 +137,25 @@ const BrowseReleasesPage = () => {
           heading="School and pupil numbers"
           caption="Schools, pupils and their characteristics, SEN and EHC plans, SEN in England"
         >
-          <h3 className="govuk-heading-s">
-            Latest school and pupil numbers releases
-          </h3>
+          <p className="govuk-body">
+            To find and download these statistics and data browse
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </p>
         </AccordionSection>
         <AccordionSection
           heading="School finance"
           caption="Local authority and school finance"
         >
-          <h3 className="govuk-heading-s">Latest school finance releases</h3>
+          <p className="govuk-body">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </p>
         </AccordionSection>
         <AccordionSection
           heading="Teacher numbers"
