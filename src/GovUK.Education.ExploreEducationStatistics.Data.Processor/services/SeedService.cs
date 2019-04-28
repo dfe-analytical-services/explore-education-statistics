@@ -1,11 +1,9 @@
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
-    using System.IO;
     using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
     using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
     using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
     using Microsoft.Extensions.Logging;
-    using Microsoft.WindowsAzure.Storage.Blob;
 
     public class SeedService : ISeedService
     {
@@ -35,8 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private void SeedRelease(Release release)
         {
-            _logger.LogInformation("Seeding Release for {Publication}, {Release}", release.PublicationId,
-                release.Name);
+            _logger.LogInformation("Seeding Release for {Publication}, {Release}", release.PublicationId, release.Name);
 
             var releaseDb = CreateRelease(release);
 
@@ -48,15 +45,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private void SeedSubject(Model.Release release, Subject subject)
         {
-            _logger.LogInformation("Seeding Subject for {Publication}, {Subject}", release.PublicationId,
-                subject.Name);
+            _logger.LogInformation("Seeding Subject for {Publication}, {Subject}", release.PublicationId, subject.Name);
 
             var subjectDb = CreateSubject(release, subject);
 
-            var lines = subject.GetCsvLines();
-            var metaLines = subject.GetMetaLines();
-
-            _importerService.Import(lines, metaLines, subjectDb);
+            _importerService.Import(subject.GetCsvLines(), subject.GetMetaLines(), subjectDb);
         }
 
         private Model.Release CreateRelease(Release release)

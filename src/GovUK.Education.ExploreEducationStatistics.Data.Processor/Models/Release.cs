@@ -1,7 +1,7 @@
-using System;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models
 {
+    using System;
+
     public class Release
     {
         public Guid PublicationId { get; set; }

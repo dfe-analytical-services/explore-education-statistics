@@ -35,7 +35,7 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options
-                    .UseSqlServer("Server=db;Database=master;User=SA;Password=Your_Password123;")
+                    .UseSqlServer("Server=localhost;Database=master;User=SA;Password=Your_Password123;")
                     .EnableSensitiveDataLogging());
 
             services.AddTransient<ISeedService, SeedService>();

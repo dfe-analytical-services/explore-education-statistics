@@ -21,10 +21,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private static async Task<IEnumerable<string>> ReadAllLinesAsync(CloudBlockBlob blockBlob)
         {
             var list = new List<string>();
-
-            using (StreamReader reader = new StreamReader(await blockBlob.OpenReadAsync()))
+            using (StreamReader sr = new StreamReader(await blockBlob.OpenReadAsync()))
             {
-                list.Add(reader.ReadToEnd());
+                while (sr.Peek() >= 0)
+                {
+                    list.Add(sr.ReadLine());
+                }
             }
 
             return list.ToArray();
