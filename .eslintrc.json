@@ -2,6 +2,11 @@
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint", "react-hooks"],
   "settings": {
+    "import/resolver": {
+      "typescript": {
+        "directory": "./src"
+      }
+    },
     "react": {
       "version": "latest"
     }
@@ -115,39 +120,6 @@
         "global-require": "off",
         "import/no-dynamic-require": "off",
         "no-console": "off"
-      }
-    },
-    {
-      "files": ["src/explore-education-statistics-admin/**/*"],
-      "settings": {
-        "import/resolver": {
-          "typescript": {
-            "directory": "src/explore-education-statistics-admin"
-          }
-        }
-      }
-    },
-    {
-      "files": ["src/explore-education-statistics-common/**/*"],
-      "settings": {
-        "import/resolver": {
-          "typescript": {
-            "directory": "src/explore-education-statistics-common"
-          }
-        }
-      },
-      "rules": {
-        "import/no-extraneous-dependencies": "off"
-      }
-    },
-    {
-      "files": ["src/explore-education-statistics-frontend/**/*"],
-      "settings": {
-        "import/resolver": {
-          "typescript": {
-            "directory": "src/explore-education-statistics-frontend"
-          }
-        }
       }
     }
   ]
