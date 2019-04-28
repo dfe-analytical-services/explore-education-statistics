@@ -24,7 +24,7 @@ const PrototypeDownloadDropdown = ({ link }: Props) => {
             className="govuk-link govuk-!-margin-right-9 "
             to="/prototypes/table-tool"
           >
-            Create your own tables
+            Create your own tables online
           </Link>
         </div>
         <div className="govuk-grid-column-one-third">
