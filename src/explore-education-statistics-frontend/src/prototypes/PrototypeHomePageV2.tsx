@@ -68,8 +68,8 @@ const HomePage = () => {
       <hr />
       <h3 className="govuk-heading-l govuk-!-margin-top-9">Related services</h3>
       <p className="govuk-body">
-        Use these services to find and compare and contrast performance and
-        other information about schools and colleges in England:
+        Use these services to specific performance and other information about
+        schools and colleges in England:
       </p>
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
         <div className="govuk-grid-column-one-half">
@@ -96,9 +96,8 @@ const HomePage = () => {
             </a>
           </h4>
           <p className="govuk-caption-m govuk-!-margin-top-1">
-            Search this register to find and download information about schools
-            and colleges including details about educational organisations and
-            governors
+            Search to find and download information about schools, colleges,
+            educational organisations and governors
           </p>
         </div>
       </div>
