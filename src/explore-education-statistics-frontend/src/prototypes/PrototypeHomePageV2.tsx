@@ -48,16 +48,20 @@ const HomePage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-half">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="/prototypes/methodology-specific">Methodology</Link>
+            <Link to="/prototypes/methodology-specific">
+              Education statistics: methodology
+            </Link>
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">
-            Find out more about education statistics and data topics and how and
-            why they're collected and published.
+            Find out more about the methodology behind education statistics and
+            data and how and why they're collected and published.
           </p>
         </div>
         <div className="govuk-grid-column-one-half">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="#">Glossary</Link>
+            <Link to="https://eesadminprototype.z33.web.core.windows.net/prototypes/documentation/glossary">
+              Education statistics: glossary
+            </Link>
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">
             Browse our A to Z list of definitions for terms used across
@@ -97,7 +101,7 @@ const HomePage = () => {
           </h4>
           <p className="govuk-caption-m govuk-!-margin-top-1">
             Search to find and download information about schools, colleges,
-            educational organisations and governors
+            educational organisations and governors in England
           </p>
         </div>
       </div>
