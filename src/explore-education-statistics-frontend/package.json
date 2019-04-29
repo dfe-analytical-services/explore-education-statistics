@@ -17,7 +17,7 @@
     "express": "^4.16.4",
     "express-basic-auth": "^1.1.6",
     "formik": "^1.5.2",
-    "govuk-frontend": "^2.10.0",
+    "govuk-frontend": "^2.11.0",
     "helmet": "^3.16.0",
     "leaflet": "^1.4.0",
     "lodash": "^4.17.11",

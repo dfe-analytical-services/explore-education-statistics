@@ -32,7 +32,7 @@
     "eslint-plugin-react": "^7.12.4",
     "formik": "^1.5.2",
     "geojson": "^0.5.0",
-    "govuk-frontend": "^2.10.0",
+    "govuk-frontend": "^2.11.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^24.7.1",
     "jest-dom": "^3.1.2",
@@ -121,5 +121,8 @@
   },
   "jest-junit": {
     "ancestorSeparator": " › "
+  },
+  "dependencies": {
+    "govuk-frontend": "2.11.0"
   }
 }
