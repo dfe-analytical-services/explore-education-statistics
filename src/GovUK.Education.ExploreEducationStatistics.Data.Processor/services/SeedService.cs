@@ -57,8 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             _importerService.Import(subject.GetCsvLines(), subject.GetMetaLines(), subjectDb);
 
-            _blobService.MoveBlobBetweenContainers(subject.CsvDataBlob, destFolder);
-            _blobService.MoveBlobBetweenContainers(subject.CsvMetaDataBlob, destFolder);
+            _blobService.MoveBlobBetweenContainers(subject.CsvDataBlob, "processed", destFolder);
+            _blobService.MoveBlobBetweenContainers(subject.CsvMetaDataBlob, "processed", destFolder);
         }
 
         private Model.Release CreateRelease(Release release)
