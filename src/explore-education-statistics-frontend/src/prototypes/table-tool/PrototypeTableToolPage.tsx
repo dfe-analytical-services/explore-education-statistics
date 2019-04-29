@@ -4,10 +4,6 @@ import tableBuilderService, {
 } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import PageTitle from '@frontend/components/PageTitle';
-import PublicationMenu, {
-  MenuChangeEventHandler,
-} from '@frontend/modules/table-tool/components/PublicationMenu';
-import PublicationSubjectMenu from '@frontend/modules/table-tool/components/PublicationSubjectMenu';
 import PrototypePage from '@frontend/prototypes/components/PrototypePage';
 import FiltersForm, {
   FilterFormSubmitHandler,
@@ -20,10 +16,14 @@ import initialMetaSpecification, {
 } from '@frontend/prototypes/table-tool/components/meta/initialSpec';
 import publicationSubjectSpec from '@frontend/prototypes/table-tool/components/meta/publicationSubjectSpec';
 import TimePeriodDataTable from '@frontend/prototypes/table-tool/components/TimePeriodDataTable';
-import TimePeriodFiltersForm from '@frontend/prototypes/table-tool/components/TimePeriodFiltersForm';
+import TimePeriodForm from '@frontend/prototypes/table-tool/components/TimePeriodForm';
 import mapOptionValues from '@frontend/prototypes/table-tool/components/utils/mapOptionValues';
+import Wizard from '@frontend/prototypes/table-tool/components/Wizard';
+import WizardStep from '@frontend/prototypes/table-tool/components/WizardStep';
 import mapValues from 'lodash/mapValues';
 import React, { Component, createRef } from 'react';
+import PublicationForm from './components/PublicationForm';
+import PublicationSubjectForm from './components/PublicationSubjectForm';
 
 const defaultPublicationOptions = [
   {
@@ -69,7 +69,7 @@ interface State {
   indicators: IndicatorOption[];
   metaSpecification: MetaSpecification;
   publicationId: string;
-  publicationName: string;
+  // publicationName: string;
   publicationSubjectName: string;
   tableData: DataTableResult[];
 }
@@ -83,7 +83,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
     indicators: [],
     metaSpecification: initialMetaSpecification,
     publicationId: '',
-    publicationName: '',
+    // publicationName: '',
     publicationSubjectName: '',
     tableData: [],
   };
@@ -94,9 +94,10 @@ class PrototypeTableToolPage extends Component<{}, State> {
 
   private locationFiltersRef = createRef<HTMLElement>();
 
-  private handleMenuChange: MenuChangeEventHandler = async ({
+  private handlePublicationFormSubmit = async ({
     publicationId,
-    publicationName,
+  }: {
+    publicationId: string;
   }) => {
     if (!publicationId) {
       return;
@@ -111,7 +112,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
     this.setState(
       {
         publicationId,
-        publicationName,
+        // publicationName,
         metaSpecification: {
           ...metaSpecification,
           filters: {
@@ -260,7 +261,6 @@ class PrototypeTableToolPage extends Component<{}, State> {
       timePeriods,
       metaSpecification,
       publicationId,
-      publicationName,
       publicationSubjectName,
       tableData,
     } = this.state;
@@ -282,32 +282,29 @@ class PrototypeTableToolPage extends Component<{}, State> {
           for your own offline analysis.
         </p>
 
-        <section className="govuk-grid-row govuk-form-group">
-          <div className="govuk-grid-column-one-third-from-desktop">
-            <h2>
-              1. Choose your data
-              <span className="govuk-hint">Select a data set</span>
-            </h2>
-
-            <PublicationMenu
-              onChange={this.handleMenuChange}
-              options={defaultPublicationOptions}
-              value={publicationId}
-            />
-          </div>
-          {publicationId && (
-            <div className="govuk-grid-column-two-thirds-from-desktop">
-              <>
-                <h2>
-                  2. Choose your area of interest
-                  <span className="govuk-hint">Select an area of interest</span>
-                </h2>
-
-                <PublicationSubjectMenu
-                  onChange={event =>
+        <Wizard id="tableTool-steps">
+          <WizardStep title="Choose your data" hint="Select a data set">
+            {stepProps => (
+              <PublicationForm
+                {...stepProps}
+                options={defaultPublicationOptions}
+                onSubmit={this.handlePublicationFormSubmit}
+              />
+            )}
+          </WizardStep>
+          <WizardStep
+            title="Choose your area of interest"
+            hint="Select an area of interest."
+          >
+            {stepProps =>
+              publicationId && (
+                <PublicationSubjectForm
+                  {...stepProps}
+                  options={publicationSubjectSpec.subjects}
+                  onSubmit={({ publicationSubject }) =>
                     this.setState(
                       {
-                        publicationSubjectName: event.target.value,
+                        publicationSubjectName: publicationSubject,
                       },
                       () => {
                         if (this.locationFiltersRef.current) {
@@ -319,115 +316,94 @@ class PrototypeTableToolPage extends Component<{}, State> {
                       },
                     )
                   }
-                  options={publicationSubjectSpec.subjects}
-                  value={publicationSubjectName}
                 />
-              </>
-            </div>
-          )}
-        </section>
-
-        {publicationSubjectName && (
-          <section
-            className="govuk-grid-row govuk-form-group"
-            ref={this.locationFiltersRef}
+              )
+            }
+          </WizardStep>
+          <WizardStep
+            title="Choose locations"
+            hint="Select at least one location to compare"
           >
-            <div className="govuk-grid-column-one-third-from-desktop">
-              <h2>
-                3. Choose location filters
-                <span className="govuk-hint">
-                  Select at least one location to compare.
-                </span>
-              </h2>
-
-              <LocationFiltersForm
-                specification={metaSpecification}
-                onSubmit={values => {
-                  this.setState(
-                    {
-                      // eslint-disable-next-line react/no-unused-state
-                      locations: {
-                        ...values,
+            {stepProps =>
+              publicationSubjectName && (
+                <LocationFiltersForm
+                  {...stepProps}
+                  specification={metaSpecification}
+                  onSubmit={values => {
+                    this.setState(
+                      {
+                        // eslint-disable-next-line react/no-unused-state
+                        locations: {
+                          ...values,
+                        },
                       },
-                    },
-                    () => {
-                      if (this.filtersRef.current) {
-                        this.filtersRef.current.scrollIntoView({
-                          behavior: 'smooth',
-                          block: 'start',
-                        });
-                      }
-                    },
-                  );
-                }}
-              />
-            </div>
-          </section>
-        )}
-
-        {publicationSubjectName && (
-          <section
-            className="govuk-grid-row govuk-form-group"
-            ref={this.locationFiltersRef}
+                      () => {
+                        if (this.filtersRef.current) {
+                          this.filtersRef.current.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                          });
+                        }
+                      },
+                    );
+                  }}
+                />
+              )
+            }
+          </WizardStep>
+          <WizardStep
+            title="Choose time period"
+            hint="Select a start and end time"
           >
-            <div className="govuk-grid-column-one-third-from-desktop">
-              <h2>
-                4. Choose time period
-                <span className="govuk-hint">Select a start and end date.</span>
-              </h2>
-
-              <TimePeriodFiltersForm
+            {stepProps =>
+              publicationSubjectName && (
+                <TimePeriodForm
+                  {...stepProps}
+                  specification={metaSpecification}
+                  onSubmit={values => {
+                    this.setState(
+                      {
+                        timePeriods: TimePeriod.createRange(
+                          TimePeriod.fromString(values.start),
+                          TimePeriod.fromString(values.end),
+                        ),
+                      },
+                      () => {
+                        if (this.filtersRef.current) {
+                          this.filtersRef.current.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                          });
+                        }
+                      },
+                    );
+                  }}
+                />
+              )
+            }
+          </WizardStep>
+          <WizardStep
+            title="Choose your filters"
+            hint="Select at least 1 option from under each of the following
+                headings"
+          >
+            {stepProps => (
+              <FiltersForm
+                {...stepProps}
+                onSubmit={this.handleFilterFormSubmit}
                 specification={metaSpecification}
-                onSubmit={values => {
-                  this.setState(
-                    {
-                      timePeriods: TimePeriod.createRange(
-                        TimePeriod.fromString(values.start),
-                        TimePeriod.fromString(values.end),
-                      ),
-                    },
-                    () => {
-                      if (this.filtersRef.current) {
-                        this.filtersRef.current.scrollIntoView({
-                          behavior: 'smooth',
-                          block: 'start',
-                        });
-                      }
-                    },
-                  );
-                }}
               />
-            </div>
-          </section>
-        )}
-
-        {publicationSubjectName && (
-          <section className="govuk-form-group" ref={this.filtersRef}>
-            <h2>
-              5. Create your table for '{publicationName}'
-              <span className="govuk-hint">
-                Select at least 1 option from under each of the following
-                headings
-              </span>
-            </h2>
-
-            <FiltersForm
-              onSubmit={this.handleFilterFormSubmit}
-              specification={metaSpecification}
-            />
-          </section>
-        )}
-
-        {tableData.length > 0 && (
-          <section ref={this.dataTableRef}>
-            <h2>5. Explore data for '{publicationName}'</h2>
-
-            <TimePeriodDataTable
-              filters={filters}
-              indicators={indicators}
-              timePeriods={timePeriods}
-              results={tableData}
-            />
+            )}
+          </WizardStep>
+          <WizardStep title="Explore data">
+            {tableData.length > 0 && (
+              <TimePeriodDataTable
+                filters={filters}
+                indicators={indicators}
+                timePeriods={timePeriods}
+                results={tableData}
+              />
+            )}
 
             <ul className="govuk-list">
               <li>
@@ -443,8 +419,8 @@ class PrototypeTableToolPage extends Component<{}, State> {
                 <a href="#contact">Contact</a>
               </li>
             </ul>
-          </section>
-        )}
+          </WizardStep>
+        </Wizard>
       </PrototypePage>
     );
   }

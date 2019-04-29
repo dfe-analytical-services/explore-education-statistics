@@ -1,12 +1,9 @@
 import Button from '@common/components/Button';
-import ErrorSummary, {
-  ErrorSummaryMessage,
-} from '@common/components/ErrorSummary';
-import { FormFieldset, FormGroup } from '@common/components/form';
+import { Form, FormFieldset, FormGroup } from '@common/components/form';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
-import { Form, Formik, FormikErrors, FormikProps, FormikTouched } from 'formik';
-import get from 'lodash/get';
+import { InjectedWizardProps } from '@frontend/prototypes/table-tool/components/Wizard';
+import { Formik, FormikProps } from 'formik';
 import mapValues from 'lodash/mapValues';
 import React, { Component, createRef } from 'react';
 import CategoricalFilters from './CategoricalFilters';
@@ -31,38 +28,22 @@ interface State {
   submitError: string;
 }
 
-class FiltersForm extends Component<Props, State> {
+class FiltersForm extends Component<Props & InjectedWizardProps, State> {
   public state: State = {
     submitError: '',
   };
 
   private ref = createRef<HTMLDivElement>();
 
-  private getSummaryErrors(
-    errors: FormikErrors<FormValues>,
-    touched: FormikTouched<FormValues>,
-  ) {
-    const summaryErrors: ErrorSummaryMessage[] = Object.entries(errors)
-      .filter(([errorName]) => get(touched, errorName))
-      .map(([errorName, message]) => ({
-        id: `filter-${errorName}`,
-        message: typeof message === 'string' ? message : '',
-      }));
+  public render() {
+    const {
+      onSubmit,
+      specification,
+      goToNextStep,
+      goToPreviousStep,
+    } = this.props;
 
     const { submitError } = this.state;
-
-    if (submitError) {
-      summaryErrors.push({
-        id: 'submit-button',
-        message: 'Could not submit filters. Please try again later.',
-      });
-    }
-
-    return summaryErrors;
-  }
-
-  public render() {
-    const { onSubmit, specification } = this.props;
 
     return (
       <Formik<FormValues>
@@ -85,29 +66,36 @@ class FiltersForm extends Component<Props, State> {
         onSubmit={async (values, actions) => {
           try {
             await onSubmit(values);
+
+            goToNextStep();
           } catch (error) {
             this.setState({
-              submitError: error.message,
+              submitError: 'Could not submit filters. Please try again later.',
             });
           }
 
           actions.setSubmitting(false);
         }}
         render={(form: FormikProps<FormValues>) => {
-          const { errors, touched, values } = form;
-          const { getAllErrors, getError } = createErrorHelper({
-            errors,
-            touched,
-          });
+          const { values } = form;
+          const { getError } = createErrorHelper(form);
 
           return (
             <div ref={this.ref}>
-              <ErrorSummary
-                errors={this.getSummaryErrors(getAllErrors(), touched)}
-                id="filter-errors"
-              />
-
-              <Form>
+              <Form
+                {...form}
+                id="filtersForm"
+                otherErrors={
+                  submitError !== ''
+                    ? [
+                        {
+                          id: 'filtersForm-submit',
+                          message: submitError,
+                        },
+                      ]
+                    : []
+                }
+              >
                 <div className="govuk-grid-row">
                   <FormGroup className="govuk-grid-column-one-half-from-desktop">
                     <CategoricalFilters
@@ -117,7 +105,7 @@ class FiltersForm extends Component<Props, State> {
                   </FormGroup>
                   <FormGroup className="govuk-grid-column-one-quarter-from-desktop">
                     <FormFieldset
-                      id="filter-indicators"
+                      id="filtersForm-indicators"
                       legend="Indicators"
                       hint="Filter by at least one statistical indicator from the publication"
                       error={getError('indicators')}
@@ -131,34 +119,46 @@ class FiltersForm extends Component<Props, State> {
                   </FormGroup>
                 </div>
 
-                <Button
-                  disabled={form.isSubmitting}
-                  id="submit-button"
-                  onClick={event => {
-                    event.preventDefault();
+                <FormGroup>
+                  <Button
+                    disabled={form.isSubmitting}
+                    id="filtersForm-submit"
+                    onClick={event => {
+                      event.preventDefault();
 
-                    // Manually validate/submit so we can scroll
-                    // back to the top of the form if there are errors
-                    form.validateForm().then(validationErrors => {
-                      form.submitForm();
+                      // Manually validate/submit so we can scroll
+                      // back to the top of the form if there are errors
+                      form.validateForm().then(validationErrors => {
+                        form.submitForm();
 
-                      if (
-                        Object.keys(validationErrors).length > 0 &&
-                        this.ref.current
-                      ) {
-                        this.ref.current.scrollIntoView({
-                          behavior: 'smooth',
-                          block: 'start',
-                        });
-                      }
-                    });
-                  }}
-                  type="submit"
-                >
-                  {form.isSubmitting && form.isValid
-                    ? 'Creating table...'
-                    : 'Create table'}
-                </Button>
+                        if (
+                          Object.keys(validationErrors).length > 0 &&
+                          this.ref.current
+                        ) {
+                          this.ref.current.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                          });
+                        }
+                      });
+                    }}
+                    type="submit"
+                  >
+                    {form.isSubmitting && form.isValid
+                      ? 'Creating table...'
+                      : 'Create table'}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => {
+                      goToPreviousStep();
+                    }}
+                  >
+                    Previous step
+                  </Button>
+                </FormGroup>
               </Form>
             </div>
           );

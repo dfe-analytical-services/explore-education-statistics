@@ -1,5 +1,6 @@
 import Button from '@common/components/Button';
 import {
+  Form,
   FormFieldSelect,
   FormFieldset,
   FormGroup,
@@ -9,7 +10,8 @@ import Yup from '@common/lib/validation/yup';
 import TimePeriod from '@common/services/types/TimePeriod';
 import { Comparison } from '@common/types/util';
 import { MetaSpecification } from '@frontend/prototypes/table-tool/components/meta/initialSpec';
-import { Form, Formik } from 'formik';
+import { InjectedWizardProps } from '@frontend/prototypes/table-tool/components/Wizard';
+import { Formik, FormikProps } from 'formik';
 import React from 'react';
 
 interface FormValues {
@@ -22,7 +24,12 @@ interface Props {
   onSubmit: (values: FormValues) => void;
 }
 
-const TimePeriodFiltersForm = ({ specification, onSubmit }: Props) => {
+const TimePeriodForm = ({
+  specification,
+  onSubmit,
+  goToNextStep,
+  goToPreviousStep,
+}: Props & InjectedWizardProps) => {
   const startEndDateValues = specification.timePeriod.options.map(
     ({ code, year }) => `${year}_${code}`,
   );
@@ -38,7 +45,10 @@ const TimePeriodFiltersForm = ({ specification, onSubmit }: Props) => {
 
   return (
     <Formik<FormValues>
-      onSubmit={onSubmit}
+      onSubmit={values => {
+        onSubmit(values);
+        goToNextStep();
+      }}
       initialValues={{
         start: '2012_AY',
         end: '2016_AY',
@@ -93,30 +103,38 @@ const TimePeriodFiltersForm = ({ specification, onSubmit }: Props) => {
             },
           ),
       })}
-      render={() => {
+      render={(form: FormikProps<FormValues>) => {
         return (
-          <Form>
+          <Form {...form} id="timePeriodForm">
             <FormFieldset
-              id="filter-timePeriod"
+              id="timePeriodForm-timePeriod"
               legend={specification.timePeriod.legend}
               hint={specification.timePeriod.hint}
             >
               <FormFieldSelect
                 name="start"
-                id="filter-timePeriod-start"
+                id="timePeriodForm-timePeriod-start"
                 label="Start date"
                 options={timePeriodOptions}
               />
               <FormFieldSelect
                 name="end"
-                id="filter-timePeriod-end"
+                id="timePeriodForm-timePeriod-end"
                 label="End date"
                 options={timePeriodOptions}
               />
             </FormFieldset>
 
             <FormGroup>
-              <Button type="submit">Submit</Button>
+              <Button type="submit">Next step</Button>
+
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={goToPreviousStep}
+              >
+                Previous step
+              </Button>
             </FormGroup>
           </Form>
         );
@@ -125,4 +143,4 @@ const TimePeriodFiltersForm = ({ specification, onSubmit }: Props) => {
   );
 };
 
-export default TimePeriodFiltersForm;
+export default TimePeriodForm;

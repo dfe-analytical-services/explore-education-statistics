@@ -1,8 +1,9 @@
 import Button from '@common/components/Button';
-import { FormGroup } from '@common/components/form';
+import { Form, FormGroup } from '@common/components/form';
 import FormFieldCheckboxMenu from '@frontend/prototypes/table-tool/components/FormFieldCheckboxMenu';
 import { MetaSpecification } from '@frontend/prototypes/table-tool/components/meta/initialSpec';
-import { Form, Formik } from 'formik';
+import { InjectedWizardProps } from '@frontend/prototypes/table-tool/components/Wizard';
+import { Formik, FormikProps } from 'formik';
 import React from 'react';
 
 interface FormValues {
@@ -14,21 +15,29 @@ interface Props {
   onSubmit: (values: FormValues) => void;
 }
 
-const LocationFiltersForm = ({ specification, onSubmit }: Props) => {
+const LocationFiltersForm = ({
+  specification,
+  onSubmit,
+  goToNextStep,
+  goToPreviousStep,
+}: Props & InjectedWizardProps) => {
   const { locations } = specification;
 
   return (
     <Formik<FormValues>
-      onSubmit={onSubmit}
+      onSubmit={values => {
+        onSubmit(values);
+        goToNextStep();
+      }}
       initialValues={Object.keys(locations).reduce((acc, level) => {
         return {
           ...acc,
           [level]: [],
         };
       }, {})}
-      render={() => {
+      render={(form: FormikProps<FormValues>) => {
         return (
-          <Form>
+          <Form {...form} id="locationFiltersForm">
             <FormGroup>
               {Object.entries(locations).map(([levelKey, level]) => {
                 return (
@@ -37,7 +46,7 @@ const LocationFiltersForm = ({ specification, onSubmit }: Props) => {
                     name={levelKey}
                     key={levelKey}
                     options={level.options}
-                    id={`filter-location-${levelKey}`}
+                    id={`locationFiltersForm-${levelKey}`}
                     legend="Choose options"
                     legendHidden
                   />
@@ -46,7 +55,15 @@ const LocationFiltersForm = ({ specification, onSubmit }: Props) => {
             </FormGroup>
 
             <FormGroup>
-              <Button type="submit">Submit</Button>
+              <Button type="submit">Next step</Button>
+
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={goToPreviousStep}
+              >
+                Previous step
+              </Button>
             </FormGroup>
           </Form>
         );

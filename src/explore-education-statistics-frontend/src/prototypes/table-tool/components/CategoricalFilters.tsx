@@ -24,7 +24,7 @@ const CategoricalFilters = ({ form, specification }: Props) => {
           <div className={styles.group} key={filterKey}>
             {Object.keys(filterSpec.options).length === 1 ? (
               <FormFieldCheckboxGroup<FormValues>
-                id={`filter-${filterKey}`}
+                id={`filtersForm-${filterKey}`}
                 name={filterName}
                 legend={filterSpec.legend}
                 hint={filterSpec.hint}
