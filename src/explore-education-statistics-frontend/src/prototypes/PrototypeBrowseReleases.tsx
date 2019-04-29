@@ -100,16 +100,14 @@ const BrowseReleasesPage = () => {
           heading="Capacity and exclusions"
           caption="School capacity, admission appeals"
         >
-          <h3 className="govuk-heading-s">
+          <div className="govuk-inset-text">
             These statistics and data are not yet available on the explore
-            education statistics service
-          </h3>
-          <p className="govuk-body">
-            To find and download these statistics and data browse
+            education statistics service. To find and download these statistics
+            and data browse{' '}
             <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
               Statistics at DfE
             </a>
-          </p>
+          </div>
         </AccordionSection>
         <AccordionSection
           heading="Results"
@@ -137,31 +135,40 @@ const BrowseReleasesPage = () => {
           heading="School and pupil numbers"
           caption="Schools, pupils and their characteristics, SEN and EHC plans, SEN in England"
         >
-          <p className="govuk-body">
-            To find and download these statistics and data browse
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
             <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
               Statistics at DfE
             </a>
-          </p>
+          </div>
         </AccordionSection>
         <AccordionSection
           heading="School finance"
           caption="Local authority and school finance"
         >
-          <p className="govuk-body">
+          <div className="govuk-inset-text">
             These statistics and data are not yet available on the explore
             education statistics service. To find and download these statistics
-            and data browse
+            and data browse{' '}
             <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
               Statistics at DfE
             </a>
-          </p>
+          </div>
         </AccordionSection>
         <AccordionSection
           heading="Teacher numbers"
           caption="The number and characteristics of teachers"
         >
-          <h3 className="govuk-heading-s">Latest teacher number releases</h3>
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </div>
         </AccordionSection>
       </Accordion>
       <h2 className="govuk-heading-l govuk-!-margin-top-9">Higher education</h2>
@@ -170,13 +177,27 @@ const BrowseReleasesPage = () => {
           heading="Further education"
           caption="Pupil absence, permanent and fixed period exclusions"
         >
-          <h3 className="govuk-heading-s">Latest further education releases</h3>
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </div>
         </AccordionSection>
         <AccordionSection
           heading="Higher education"
           caption="School capacity, admission appeals"
         >
-          <h3 className="govuk-heading-s">Latest higher education releases</h3>
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </div>
         </AccordionSection>
       </Accordion>
       <h2 className="govuk-heading-l govuk-!-margin-top-9">Social care</h2>
@@ -185,15 +206,27 @@ const BrowseReleasesPage = () => {
           heading="Number of children"
           caption="Pupil absence, permanent and fixed period exclusions"
         >
-          <h3 className="govuk-heading-s">
-            Latest number of children releases
-          </h3>
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </div>
         </AccordionSection>
         <AccordionSection
           heading="Vulnerable children"
           caption="School capacity, admission appeals"
         >
-          <h3 className="govuk-heading-s">Latest school finance releases</h3>
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </div>
         </AccordionSection>
       </Accordion>
     </PrototypePage>
