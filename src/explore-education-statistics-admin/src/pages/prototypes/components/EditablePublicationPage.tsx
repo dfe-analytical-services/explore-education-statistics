@@ -58,7 +58,7 @@ class EditablePublicationPage extends Component<Props, State> {
       const { source } = result;
       const target: DraggableLocation = result.destination;
 
-      const { data } = this.props;
+      const { data } = this.state;
 
       if (result.type === 'accordion') {
         const sourceAccordion = getAccordionIndex(source.droppableId);
@@ -70,6 +70,7 @@ class EditablePublicationPage extends Component<Props, State> {
               const release: Release = (data as unknown) as Release;
 
               const resultList = Array.from(release.content);
+
               const [moved] = resultList.splice(source.index, 1);
               resultList.splice(target.index, 0, moved);
 
@@ -178,7 +179,7 @@ class EditablePublicationPage extends Component<Props, State> {
               {data &&
                 data.content.map(({ heading, order }, index) => (
                   <Draggable
-                    draggableId={`section(${order})`}
+                    draggableId={`section(${index})`}
                     index={index}
                     key={`${order}`}
                   >
