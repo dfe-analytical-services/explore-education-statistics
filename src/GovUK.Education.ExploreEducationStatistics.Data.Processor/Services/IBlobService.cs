@@ -4,6 +4,6 @@
 
     public interface IBlobService
     {
-        void MoveBlobBetweenContainers(CloudBlockBlob srcBlob, string destFolder);
+        void MoveBlobBetweenContainers(CloudBlockBlob srcBlob, string destContainerName, string destFolder);
     }
 }

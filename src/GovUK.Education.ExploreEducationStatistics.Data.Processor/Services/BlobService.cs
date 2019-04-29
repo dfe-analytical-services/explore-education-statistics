@@ -5,10 +5,10 @@
 
     public class BlobService : IBlobService
     {
-        public void MoveBlobBetweenContainers(CloudBlockBlob srcBlob, string destFolder)
+        public void MoveBlobBetweenContainers(CloudBlockBlob srcBlob, string destContainerName, string destFolder)
         {
             CloudBlockBlob destBlob;
-            CloudBlobContainer destContainer = srcBlob.ServiceClient.GetContainerReference("processed");
+            CloudBlobContainer destContainer = srcBlob.ServiceClient.GetContainerReference(destContainerName);
 
             using (MemoryStream memoryStream = new MemoryStream())
             {
