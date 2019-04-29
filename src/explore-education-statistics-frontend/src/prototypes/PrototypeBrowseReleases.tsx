@@ -61,7 +61,7 @@ const BrowseReleasesPage = () => {
         </div>
       </div>
       <h2 className="govuk-heading-l">Early years</h2>
-      <Accordion id="schools">
+      <Accordion id="early-years">
         <AccordionSection
           heading="Absence and exclusions"
           caption="Pupil absence and permanent and fixed-period exclusions statistics and data"
@@ -172,7 +172,7 @@ const BrowseReleasesPage = () => {
       <h2 className="govuk-heading-l govuk-!-margin-top-9">
         Further education
       </h2>
-      <Accordion id="higher-education">
+      <Accordion id="further-education">
         <AccordionSection
           heading="Further education"
           caption="Something to explain the heading above"
@@ -206,7 +206,40 @@ const BrowseReleasesPage = () => {
       <h2 className="govuk-heading-l govuk-!-margin-top-9">Schools</h2>
       <Accordion id="schools">
         <AccordionSection
-          heading="Number of children"
+          heading="Absence and exclusions"
+          caption="Pupil absence and permanent and fixed-period exclusions statistics and data"
+        >
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Pupil absence statistics
+                </h4>
+                <p className="govuk-body">
+                  Statistics and data for authorised, overall, persistent and
+                  unauthorised absence
+                </p>
+                <div className="govuk-!-margin-top-0">
+                  <PrototypeDownloadDropdown />
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Permanent and fixed-period exclusions statistics
+                </h4>
+                <p className="govuk-body">
+                  Statistics and data for fixed-period and permanent exclusion
+                </p>
+                <div className="govuk-!-margin-top-0">
+                  <PrototypeDownloadDropdown link="/prototypes/publication-exclusions" />
+                </div>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+        <AccordionSection
+          heading="School capacity"
           caption="Something to explain the heading above"
         >
           <div className="govuk-inset-text">
@@ -219,8 +252,55 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
         <AccordionSection
-          heading="Vulnerable children"
+          heading="Results"
           caption="Something to explain the heading above"
+        >
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  GCSE and equivalent results in England
+                </h4>
+                <p className="govuk-body">
+                  Statistics and data for GCSE and equivalent results in England
+                </p>
+                <div className="govuk-!-margin-top-0">
+                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
+                </div>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+        <AccordionSection
+          heading="School and pupil numbers"
+          caption="Schools, pupils and their characteristics, SEN and EHC plans, SEN in England"
+        >
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </div>
+        </AccordionSection>
+        <AccordionSection
+          heading="School finance"
+          caption="Local authority and school finance"
+        >
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </div>
+        </AccordionSection>
+        <AccordionSection
+          heading="Teacher numbers"
+          caption="The number and characteristics of teachers"
         >
           <div className="govuk-inset-text">
             These statistics and data are not yet available on the explore
