@@ -26,28 +26,6 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         <div className="govuk-grid-column-one-third">
           <aside className="app-related-items">
             <h2 className="govuk-heading-m" id="releated-content">
-              Notifications
-            </h2>
-            <nav role="navigation" aria-labelledby="subsection-title">
-              <ul className="govuk-list">
-                <li>
-                  <Link to="#">Example notification</Link>
-                </li>
-              </ul>
-            </nav>
-            <hr />
-            <h2 className="govuk-heading-m" id="releated-content">
-              Releases due in next 30 days
-            </h2>
-            <nav role="navigation" aria-labelledby="subsection-title">
-              <ul className="govuk-list">
-                <li>
-                  <Link to="#">Example release</Link>
-                </li>
-              </ul>
-            </nav>
-            <hr />
-            <h2 className="govuk-heading-m" id="releated-content">
               Help and guidance
             </h2>
             <nav role="navigation" aria-labelledby="subsection-title">

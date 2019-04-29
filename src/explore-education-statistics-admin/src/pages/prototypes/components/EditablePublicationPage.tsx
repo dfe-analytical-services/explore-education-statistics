@@ -197,7 +197,7 @@ class EditablePublicationPage extends Component<Props, State> {
       <>
         <div className={editing ? 'page-editing' : ''}>
           <span className="govuk-tag">
-            {data ? 'Editing in progress' : 'New release in progress'}
+            {data ? 'New release in progress' : 'Editing in progress'}
           </span>
           <span className="govuk-caption-l">Academic year 2018 to 2019</span>
           <PrototypeEditableContent

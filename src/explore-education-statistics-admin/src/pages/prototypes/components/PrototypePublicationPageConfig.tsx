@@ -340,8 +340,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                       className="govuk-label govuk-radios__label"
                       htmlFor="release-setup-copy-data-structure"
                     >
-                      Copy structure, content and data of current release (2017
-                      / 2018)
+                      Copy structure of current release (2017 / 2018)
                     </label>
                   </div>
                 </div>
