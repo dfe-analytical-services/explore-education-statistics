@@ -84,7 +84,7 @@ const PrototypeAdminNavigation = ({ sectionId, task }: Props) => {
         </ul>
       </nav>
 
-      {task != 'editRelease' && (
+      {task !== 'editRelease' && (
         <>
           <span className="govuk-tag">New release in progress</span>
           <span className="govuk-caption-l">Academic year 2018 to 2019</span>

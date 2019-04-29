@@ -1,5 +1,5 @@
-import { PrototypeEditableContent } from '@admin/pages/prototypes/components/PrototypeEditableContent';
-import { Component, Fragment } from 'react';
+import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
+import React, { Component } from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -7,7 +7,6 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
-import React from 'react';
 import Details from '@common/components/Details';
 import Link from '@admin/components/Link';
 import PrototypeDataSample from '@admin/pages/prototypes/publication/components/PrototypeDataSample';
@@ -38,18 +37,21 @@ function getAccordionIndex(id: string | null | undefined) {
   return null;
 }
 
-export class EditablePublicationPage extends Component<Props, State> {
+class EditablePublicationPage extends Component<Props, State> {
   public static defaultProps = { editing: false };
 
-  public state = {
-    reordering: false,
-    data: undefined,
-  };
+  public constructor(props: Props) {
+    super(props);
+
+    this.setState({ reordering: false });
+  }
 
   public onDragEnd = (result: DropResult) => {
     if (result.destination) {
-      const source = result.source;
+      const { source } = result;
       const target: DraggableLocation = result.destination;
+
+      const { data } = this.props;
 
       if (result.type === 'accordion') {
         const sourceAccordion = getAccordionIndex(source.droppableId);
@@ -57,16 +59,16 @@ export class EditablePublicationPage extends Component<Props, State> {
 
         if (sourceAccordion && targetAccordion) {
           if (source.index !== target.index) {
-            if (this.props.data) {
-              const data: Release = (this.props.data as unknown) as Release;
+            if (data) {
+              const release: Release = (data as unknown) as Release;
 
-              const resultList = Array.from(data.content);
+              const resultList = Array.from(release.content);
               const [moved] = resultList.splice(source.index, 1);
               resultList.splice(target.index, 0, moved);
 
               data.content = resultList;
 
-              this.setState({ data });
+              this.setState({ data: release });
             }
           }
         }
@@ -74,8 +76,117 @@ export class EditablePublicationPage extends Component<Props, State> {
     }
   };
 
+  private renderContentSections(data: Release, editing: boolean | undefined) {
+    const { reordering } = this.state;
+
+    if (reordering) {
+      return this.renderDraggableSections(data);
+    }
+    return this.renderContentSectionsOnly(data, editing);
+  }
+
+  private renderContentSectionsOnly(
+    data: Release,
+    editing: boolean | undefined,
+  ) {
+    return (
+      <div>
+        <h2 className="govuk-heading-l reorderable-relative">
+          <button
+            className="reorderable"
+            onClick={() => this.setState({ reordering: true })}
+            type="button"
+          >
+            Reorder sections
+          </button>
+          Contents
+        </h2>
+
+        <EditableAccordion id="contents-sections" index={0}>
+          {data.content.map(({ heading, caption, order, content }, index) => (
+            <EditableAccordionSection
+              heading={heading}
+              caption={caption}
+              index={index}
+              key={`${order}`}
+            >
+              <EditableContentBlock
+                editable={editing}
+                content={content}
+                id={`editable-block-${index}`}
+              />
+            </EditableAccordionSection>
+          ))}
+        </EditableAccordion>
+      </div>
+    );
+  }
+
+  private renderDraggableSections(data: Release) {
+    return (
+      <DragDropContext onDragEnd={this.onDragEnd}>
+        <h2 className="govuk-heading-l reorderable-relative">
+          <button
+            className="reorderable"
+            onClick={() => this.setState({ reordering: false })}
+            type="button"
+          >
+            Done
+          </button>
+          Contents
+        </h2>
+
+        <div className="govuk-accordion__controls">&nbsp;</div>
+
+        <Droppable droppableId="accordion(0)" type="accordion">
+          {droppableProvided => (
+            <div
+              {...droppableProvided.droppableProps}
+              ref={droppableProvided.innerRef}
+            >
+              {data &&
+                data.content.map(({ heading, order }, index) => (
+                  <Draggable
+                    draggableId={`section(${index})`}
+                    index={index}
+                    key={`${order}`}
+                  >
+                    {draggableProvided => (
+                      <div
+                        className="govuk-accordion__section"
+                        ref={draggableProvided.innerRef}
+                        {...draggableProvided.draggableProps}
+                      >
+                        <div className="govuk-accordion__section-header">
+                          <h2 className="govuk-accordion__section-heading reorderable-relative">
+                            <span
+                              className="drag-handle"
+                              {...draggableProvided.dragHandleProps}
+                            />
+                            <button
+                              className="govuk-accordion__section-button"
+                              type="button"
+                            >
+                              {heading}
+                            </button>
+                          </h2>
+                        </div>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+
+              {droppableProvided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+    );
+  }
+
   public render() {
-    let { editing, data } = this.props;
+    const { editing } = this.props;
+    const { data } = this.state;
 
     if (data === undefined) return <div />;
 
@@ -297,98 +408,7 @@ export class EditablePublicationPage extends Component<Props, State> {
             chartDataKeys={['unauthorised', 'authorised', 'overall']}
           />
 
-          {data.content.length > 0 ? (
-            this.state.reordering ? (
-              <Fragment>
-                <DragDropContext onDragEnd={this.onDragEnd}>
-                  <h2 className="govuk-heading-l reorderable-relative">
-                    <button
-                      className="reorderable"
-                      onClick={() => this.setState({ reordering: false })}
-                    >
-                      Done
-                    </button>
-                    Contents
-                  </h2>
-
-                  <div className="govuk-accordion__controls">&nbsp;</div>
-
-                  <Droppable droppableId={`accordion(0)`} type="accordion">
-                    {droppableProvided => (
-                      <div
-                        {...droppableProvided.droppableProps}
-                        ref={droppableProvided.innerRef}
-                      >
-                        {data &&
-                          data.content.map(({ heading }, index) => (
-                            <Draggable
-                              draggableId={`section(${index})`}
-                              index={index}
-                              key={`${heading}_${index}`}
-                            >
-                              {draggableProvided => (
-                                <div
-                                  className="govuk-accordion__section"
-                                  ref={draggableProvided.innerRef}
-                                  {...draggableProvided.draggableProps}
-                                >
-                                  <div className="govuk-accordion__section-header">
-                                    <h2 className="govuk-accordion__section-heading reorderable-relative">
-                                      <span
-                                        className="drag-handle"
-                                        {...draggableProvided.dragHandleProps}
-                                      />
-                                      <button className="govuk-accordion__section-button">
-                                        {heading}
-                                      </button>
-                                    </h2>
-                                  </div>
-                                </div>
-                              )}
-                            </Draggable>
-                          ))}
-
-                        {droppableProvided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                </DragDropContext>
-              </Fragment>
-            ) : (
-              <div>
-                <h2 className="govuk-heading-l reorderable-relative">
-                  <button
-                    className="reorderable"
-                    onClick={() => this.setState({ reordering: true })}
-                  >
-                    Reorder sections
-                  </button>
-                  Contents
-                </h2>
-
-                <EditableAccordion id="contents-sections" index={0}>
-                  {data.content.map(
-                    ({ heading, caption, order, content }, index) => (
-                      <EditableAccordionSection
-                        heading={heading}
-                        caption={caption}
-                        index={index}
-                        key={`${order}_${index}`}
-                      >
-                        <EditableContentBlock
-                          editable={editing}
-                          content={content}
-                          id={`editable-block-${index}`}
-                        />
-                      </EditableAccordionSection>
-                    ),
-                  )}
-                </EditableAccordion>
-              </div>
-            )
-          ) : (
-            ''
-          )}
+          {data.content.length > 0 && this.renderContentSections(data, editing)}
 
           <h2 className="govuk-heading-m govuk-!-margin-top-9">
             Extra information
@@ -500,3 +520,5 @@ export class EditablePublicationPage extends Component<Props, State> {
     );
   }
 }
+
+export default EditablePublicationPage;

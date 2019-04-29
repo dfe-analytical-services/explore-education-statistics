@@ -115,7 +115,7 @@ class PublicationReleasePage extends Component<Props> {
 
               <p>Use our table tool to add and remove data for this table.</p>
 
-              <Link to={`/table-tool/`} className="govuk-button">
+              <Link to="/table-tool/" className="govuk-button">
                 Explore data
               </Link>
             </Details>

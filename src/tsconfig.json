@@ -19,6 +19,13 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@admin/*": ["./explore-education-statistics-admin/src/*"],
+      "@common/*": ["./explore-education-statistics-common/src/*"],
+      "@common-test/*": ["./explore-education-statistics-common/test/*"],
+      "@frontend/*": ["./explore-education-statistics-frontend/src/*"]
+    }
   }
 }

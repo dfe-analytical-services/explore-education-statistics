@@ -1,20 +1,20 @@
 import { Release } from '@common/services/publicationService';
 import React, { Component } from 'react';
+import PrototypePublicationService from '@admin/pages/prototypes/components/PrototypePublicationService';
+import EditablePublicationPage from '@admin/pages/prototypes/components/EditablePublicationPage';
 import PrototypePage from './components/PrototypePage';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
-import { PrototypePublicationService } from '@admin/pages/prototypes/components/PrototypePublicationService';
-import { EditablePublicationPage } from '@admin/pages/prototypes/components/EditablePublicationPage';
 
 interface State {
   data: Release | undefined;
-  publication: string | undefined;
+  // publication: string | undefined;
   editing: boolean;
 }
 
 class PublicationPage extends Component<{}, State> {
   public state = {
     data: undefined,
-    publication: undefined,
+    // publication: undefined,
     editing: false,
   };
 
@@ -29,11 +29,13 @@ class PublicationPage extends Component<{}, State> {
 
     this.setState({
       data,
-      publication,
+      // publication,
     });
   }
 
   public render() {
+    const { editing, data } = this.state;
+
     return (
       <PrototypePage
         wide
@@ -92,10 +94,7 @@ class PublicationPage extends Component<{}, State> {
 
         <hr />
 
-        <EditablePublicationPage
-          editing={this.state.editing}
-          data={this.state.data}
-        />
+        <EditablePublicationPage editing={editing} data={data} />
       </PrototypePage>
     );
   }

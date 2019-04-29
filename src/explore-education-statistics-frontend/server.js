@@ -1,11 +1,11 @@
 const basicAuth = require('express-basic-auth');
 const express = require('express');
 const helmet = require('helmet');
-const next = require('next');
+const nextApp = require('next');
 const referrerPolicy = require('referrer-policy');
 const url = require('url');
 
-const app = next({
+const app = nextApp({
   dev: process.env.NODE_ENV !== 'production',
   dir: './src',
 });

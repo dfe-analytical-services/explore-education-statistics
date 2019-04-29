@@ -6,3 +6,7 @@ export const LoginContext = React.createContext<User>({
   name: 'logged out',
   permissions: [],
 });
+
+export default function() {
+  // no-op at the moment
+}

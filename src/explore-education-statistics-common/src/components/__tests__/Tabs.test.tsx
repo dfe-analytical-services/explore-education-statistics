@@ -120,11 +120,11 @@ describe('Tabs', () => {
       </Tabs>,
     );
 
-    expect(location.hash).toBe('');
+    expect(window.location.hash).toBe('');
 
     fireEvent.click(getByText('Tab 2'));
 
-    expect(location.hash).toBe('#section-2');
+    expect(window.location.hash).toBe('#section-2');
   });
 
   test('clicking tab renders lazy section', () => {
@@ -187,7 +187,7 @@ describe('Tabs', () => {
       expect(tabSection1).toHaveClass(hiddenSectionClass);
       expect(tabSection2).not.toHaveClass(hiddenSectionClass);
 
-      expect(location.hash).toBe('#section-2');
+      expect(window.location.hash).toBe('#section-2');
 
       fireEvent.keyDown(tab2, { key: 'ArrowLeft' });
 
@@ -198,7 +198,7 @@ describe('Tabs', () => {
       expect(tabSection1).not.toHaveClass(hiddenSectionClass);
       expect(tabSection2).toHaveClass(hiddenSectionClass);
 
-      expect(location.hash).toBe('#section-1');
+      expect(window.location.hash).toBe('#section-1');
     });
 
     test('pressing left arrow key cycles to end of tabs', () => {
@@ -210,7 +210,7 @@ describe('Tabs', () => {
       expect(tabSection1).not.toHaveClass(hiddenSectionClass);
       expect(tabSection3).toHaveClass(hiddenSectionClass);
 
-      expect(location.hash).toBe('#section-1');
+      expect(window.location.hash).toBe('#section-1');
 
       fireEvent.keyDown(tab1, { key: 'ArrowLeft' });
 
@@ -221,7 +221,7 @@ describe('Tabs', () => {
       expect(tabSection1).toHaveClass(hiddenSectionClass);
       expect(tabSection3).not.toHaveClass(hiddenSectionClass);
 
-      expect(location.hash).toBe('#section-3');
+      expect(window.location.hash).toBe('#section-3');
     });
 
     test('pressing right arrow key moves to next tab', () => {
@@ -233,7 +233,7 @@ describe('Tabs', () => {
       expect(tabSection2).not.toHaveClass(hiddenSectionClass);
       expect(tabSection3).toHaveClass(hiddenSectionClass);
 
-      expect(location.hash).toBe('#section-2');
+      expect(window.location.hash).toBe('#section-2');
 
       fireEvent.keyDown(tab2, { key: 'ArrowRight' });
 
@@ -244,7 +244,7 @@ describe('Tabs', () => {
       expect(tabSection2).toHaveClass(hiddenSectionClass);
       expect(tabSection3).not.toHaveClass(hiddenSectionClass);
 
-      expect(location.hash).toBe('#section-3');
+      expect(window.location.hash).toBe('#section-3');
     });
 
     test('pressing right arrow key cycles to beginning of tabs', () => {
@@ -256,7 +256,7 @@ describe('Tabs', () => {
       expect(tabSection1).toHaveClass(hiddenSectionClass);
       expect(tabSection3).not.toHaveClass(hiddenSectionClass);
 
-      expect(location.hash).toBe('#section-3');
+      expect(window.location.hash).toBe('#section-3');
 
       fireEvent.keyDown(tab3, { key: 'ArrowRight' });
 
@@ -267,7 +267,7 @@ describe('Tabs', () => {
       expect(tabSection1).not.toHaveClass(hiddenSectionClass);
       expect(tabSection3).toHaveClass(hiddenSectionClass);
 
-      expect(location.hash).toBe('#section-1');
+      expect(window.location.hash).toBe('#section-1');
     });
 
     test('pressing down arrow key focuses the tab section', async () => {

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
+import EditablePublicationPage from '@admin/pages/prototypes/components/EditablePublicationPage';
+import PrototypePublicationService from '@admin/pages/prototypes/components/PrototypePublicationService';
 import PrototypePage from './components/PrototypePage';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
-import { PrototypePublicationService } from '@admin/pages/prototypes/components/PrototypePublicationService';
-import { EditablePublicationPage } from '@admin/pages/prototypes/components/EditablePublicationPage';
 
 interface State {
   editing: boolean;
@@ -14,6 +14,8 @@ class PublicationPage extends Component<{}, State> {
   };
 
   public render() {
+    const { editing } = this.state;
+
     return (
       <PrototypePage
         wide
@@ -74,7 +76,7 @@ class PublicationPage extends Component<{}, State> {
         <hr />
 
         <EditablePublicationPage
-          editing={this.state.editing}
+          editing={editing}
           data={PrototypePublicationService.getNewPublication()}
         />
       </PrototypePage>

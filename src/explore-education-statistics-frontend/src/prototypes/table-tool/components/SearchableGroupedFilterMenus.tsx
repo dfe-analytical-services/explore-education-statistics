@@ -38,7 +38,7 @@ class SearchableGroupedFilterMenus<
 
   public render() {
     const { menuOptions, name, values } = this.props;
-    const { searchTerm } = this.state;
+    const { openFilters, searchTerm } = this.state;
 
     const containsSearchTerm = (value: string) =>
       value.search(new RegExp(searchTerm, 'i')) > -1;
@@ -58,7 +58,7 @@ class SearchableGroupedFilterMenus<
         const isMenuOpen = Boolean(
           group.options.some(
             item => searchTerm !== '' && containsSearchTerm(item.label),
-          ) || this.state.openFilters[compositeKey],
+          ) || openFilters[compositeKey],
         );
 
         const options = sortBy(
@@ -99,12 +99,12 @@ class SearchableGroupedFilterMenus<
             key={compositeKey}
             open={isMenuOpen}
             onToggle={isOpen => {
-              this.setState({
+              this.setState(prevState => ({
                 openFilters: {
-                  ...this.state.openFilters,
+                  ...prevState.openFilters,
                   [compositeKey]: isOpen,
                 },
-              });
+              }));
             }}
           >
             <FormFieldCheckboxGroup

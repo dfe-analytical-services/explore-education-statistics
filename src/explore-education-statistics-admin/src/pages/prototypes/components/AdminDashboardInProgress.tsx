@@ -1,10 +1,10 @@
 import React from 'react';
 import Link from '@admin/components/Link';
 
-export const AdminDashboardInProgress = () => {
+const AdminDashboardInProgress = () => {
   return (
     <>
-      {location.search == '?status=editNewRelease' && (
+      {window.location.search === '?status=editNewRelease' && (
         <>
           <h2 className="govuk-heading-m">New releases in progress</h2>
           <ul className="govuk-list-bullet  govuk-!-margin-bottom-9">
@@ -48,3 +48,5 @@ export const AdminDashboardInProgress = () => {
     </>
   );
 };
+
+export default AdminDashboardInProgress;

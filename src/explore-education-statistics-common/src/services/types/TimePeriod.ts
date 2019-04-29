@@ -6,6 +6,7 @@ const allowedTimePeriodCodes: TimePeriodCode[] = ['AY'];
 
 class TimePeriod {
   public readonly year: number;
+
   public readonly code: TimePeriodCode;
 
   public constructor(year: number, code: TimePeriodCode) {
@@ -49,6 +50,8 @@ class TimePeriod {
         const yearString = this.year.toString();
         return `${yearString}/${Number(yearString.substring(2, 4)) + 1}`;
       }
+      default:
+        throw new Error('Cold not parse label');
     }
   }
 
@@ -60,6 +63,8 @@ class TimePeriod {
     switch (this.code) {
       case 'AY':
         return new TimePeriod(this.year - 1, this.code);
+      default:
+        throw new Error('Could not parse previous time period');
     }
   }
 
@@ -67,6 +72,8 @@ class TimePeriod {
     switch (this.code) {
       case 'AY':
         return new TimePeriod(this.year + 1, this.code);
+      default:
+        throw new Error('Could not parse next time period');
     }
   }
 

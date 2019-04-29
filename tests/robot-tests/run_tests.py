@@ -89,7 +89,7 @@ url = "about:blank"
 urlAdmin = "about:blank"
 if env == 'local':
     url = "http://localhost:3000"
-    urlAdmin = "about:blank"
+    urlAdmin = "http://localhost:3001"
 elif env == 'test':
     load_dotenv(os.path.join(os.path.dirname(__file__), '.env.test'))
     url = os.getenv('publicAppUrl')

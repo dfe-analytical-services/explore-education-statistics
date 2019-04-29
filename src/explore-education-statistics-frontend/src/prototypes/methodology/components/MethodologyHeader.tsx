@@ -1,22 +1,17 @@
-import { MethodologySection } from '@frontend/prototypes/methodology/components/MethodologySection';
-import React from 'react';
+import React, { createRef } from 'react';
+import MethodologySection from './MethodologySection';
 
 export interface MethodologyHeaderProps {
   children: React.ReactNode;
   parent?: MethodologySection;
 }
 
-export class MethodologyHeader extends React.Component<MethodologyHeaderProps> {
-  private element: HTMLElement | null;
-  private staticRef: HTMLElement | null;
+export default class MethodologyHeader extends React.Component<
+  MethodologyHeaderProps
+> {
+  private element = createRef<HTMLDivElement>();
 
-  public constructor(props: MethodologyHeaderProps) {
-    super(props);
-    this.element = null;
-    this.staticRef = null;
-  }
-
-  private scroll = () => requestAnimationFrame(() => this.updateElements());
+  private staticRef = createRef<HTMLDivElement>();
 
   public componentDidMount(): void {
     window.addEventListener('scroll', this.scroll);
@@ -28,35 +23,38 @@ export class MethodologyHeader extends React.Component<MethodologyHeaderProps> {
     window.removeEventListener('scroll', this.scroll);
   }
 
+  private scroll = () => requestAnimationFrame(() => this.updateElements());
+
   private updateElements() {
-    if (this.element && this.props.parent && this.staticRef) {
-      const parentTop = this.props.parent.scrollTop;
-      const parentBottom = parentTop + this.props.parent.height;
-      const headerHeight = this.element.clientHeight;
+    const { parent } = this.props;
+
+    if (this.element.current && parent && this.staticRef.current) {
+      const parentTop = parent.scrollTop;
+      const parentBottom = parentTop + parent.height;
+      const headerHeight = this.element.current.clientHeight;
       const headerBottom = parentBottom - headerHeight;
 
       if (parentTop < 0) {
-        this.staticRef.classList.add('fixed');
+        this.staticRef.current.classList.add('fixed');
         if (headerBottom > 0) {
-          this.staticRef.style.top = `${-parentTop}px`;
+          this.staticRef.current.style.top = `${-parentTop}px`;
         } else {
-          this.staticRef.style.top = `${this.props.parent.height -
+          this.staticRef.current.style.top = `${parent.height -
             headerHeight}px`;
         }
       } else {
-        this.staticRef.classList.remove('fixed');
-        this.staticRef.style.top = '';
+        this.staticRef.current.classList.remove('fixed');
+        this.staticRef.current.style.top = '';
       }
     }
   }
 
   public render() {
+    const { children } = this.props;
+
     return (
-      <div
-        className="govuk-grid-column-one-quarter"
-        ref={ref => (this.element = ref)}
-      >
-        <div ref={ref => (this.staticRef = ref)}>{this.props.children}</div>
+      <div className="govuk-grid-column-one-quarter" ref={this.element}>
+        <div ref={this.staticRef}>{children}</div>
       </div>
     );
   }

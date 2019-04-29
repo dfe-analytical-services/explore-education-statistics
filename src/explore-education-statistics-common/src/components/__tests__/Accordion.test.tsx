@@ -89,7 +89,7 @@ describe('Accordion', () => {
   });
 
   test('scrolls to and opens section if location hash matches section heading ID', async () => {
-    location.hash = '#test-sections-heading-1';
+    window.location.hash = '#test-sections-heading-1';
 
     const { getByText } = render(
       <Accordion id="test-sections">
@@ -111,7 +111,7 @@ describe('Accordion', () => {
   });
 
   test('scrolls to and opens section if location hash matches section content ID', async () => {
-    location.hash = '#test-sections-heading-1';
+    window.location.hash = '#test-sections-heading-1';
 
     const { container, getByText } = render(
       <Accordion id="test-sections">
@@ -139,7 +139,7 @@ describe('Accordion', () => {
   });
 
   test('scrolls to and opens section if location hash matches an element in the section content', async () => {
-    location.hash = '#test-heading';
+    window.location.hash = '#test-heading';
 
     const { container, getByText } = render(
       <Accordion id="test-sections">

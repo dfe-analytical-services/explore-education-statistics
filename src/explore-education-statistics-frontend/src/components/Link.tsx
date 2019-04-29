@@ -1,6 +1,7 @@
 import classNames from 'classnames';
+// eslint-disable-next-line import/no-unresolved
 import { UrlLike } from 'next-server/router';
-import { default as RouterLink } from 'next/link';
+import RouterLink from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
 
 type Props = {
@@ -18,15 +19,12 @@ const Link = ({
   className,
   prefetch,
   to,
+  href,
   unvisited = false,
   ...props
 }: Props) => {
-  // We support href and to for backwards
-  // compatibility with react-router.
-  const href = props.href || to;
-
   return (
-    <RouterLink href={href} as={as} prefetch={prefetch}>
+    <RouterLink href={href || to} as={as} prefetch={prefetch}>
       <a
         {...props}
         className={classNames(

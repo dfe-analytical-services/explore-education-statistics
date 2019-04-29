@@ -1,15 +1,15 @@
 import React from 'react';
 import Link from '@admin/components/Link';
 
-export const AdminDashboardReadyForApproval = () => {
+const AdminDashboardReadyForApproval = () => {
   return (
     <>
-      {location.search != '?status=readyApproval' && (
+      {window.location.search !== '?status=readyApproval' && (
         <div className="govuk-inset-text">
           There are currenly no releases ready for approval
         </div>
       )}
-      {location.search == '?status=readyApproval' && (
+      {window.location.search === '?status=readyApproval' && (
         <>
           <h2 className="govuk-heading-m">Ready for approval</h2>
           <ul className="govuk-list-bullet">
@@ -36,3 +36,5 @@ export const AdminDashboardReadyForApproval = () => {
     </>
   );
 };
+
+export default AdminDashboardReadyForApproval;
