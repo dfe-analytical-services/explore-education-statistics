@@ -1,8 +1,8 @@
-import { PrototypeEditableContent } from '@admin/pages/prototypes/components/PrototypeEditableContent';
+import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
 import { ContentBlock } from '@common/services/publicationService';
 import marked from 'marked';
 import React, { Component } from 'react';
-import { Draggable } from 'react-beautiful-dnd';
+// import { Draggable } from 'react-beautiful-dnd';
 import { DataBlock } from './DataBlock';
 
 interface Props {
@@ -14,11 +14,13 @@ interface Props {
 
 class EditableContentSubBlockRenderer extends Component<Props> {
   public getBlockHTML(block: ContentBlock) {
+    const { editable } = this.props;
+
     switch (block.type) {
       case 'MarkDownBlock':
         return (
           <PrototypeEditableContent
-            editable={this.props.editable}
+            editable={editable}
             content={`
          <p className="govuk-body">${marked(block.body)} </p>
       `}
@@ -28,11 +30,11 @@ class EditableContentSubBlockRenderer extends Component<Props> {
         return (
           <div className="govuk-inset-text">
             <PrototypeEditableContent
-              editable={this.props.editable}
+              editable={editable}
               content={`
             ${
               block.heading
-                ? '<h3 className="govuk-heading-s">' + block.heading + '</h3>'
+                ? `<h3 className="govuk-heading-s">${block.heading}</h3>`
                 : ''
             }
 
@@ -53,23 +55,23 @@ class EditableContentSubBlockRenderer extends Component<Props> {
   }
 
   public render() {
-    const { block, id, index } = this.props;
+    const { block } = this.props;
 
     return this.getBlockHTML(block);
 
-    return (
-      <Draggable draggableId={`draggable_block_${id}_${index}`} index={index}>
-        {provided => (
-          <div ref={provided.innerRef} {...provided.draggableProps}>
-            <div className="drag-handle small" {...provided.dragHandleProps} />
-
-            {this.getBlockHTML(block)}
-
-            {provided.placeholder}
-          </div>
-        )}
-      </Draggable>
-    );
+    // return (
+    //   <Draggable draggableId={`draggable_block_${id}_${index}`} index={index}>
+    //     {provided => (
+    //       <div ref={provided.innerRef} {...provided.draggableProps}>
+    //         <div className="drag-handle small" {...provided.dragHandleProps} />
+    //
+    //         {this.getBlockHTML(block)}
+    //
+    //         {provided.placeholder}
+    //       </div>
+    //     )}
+    //   </Draggable>
+    // );
   }
 }
 

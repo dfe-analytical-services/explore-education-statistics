@@ -19,7 +19,7 @@ export type FormSortableListProps = {
 } & FieldSetProps;
 
 const FormSortableList = (props: FormSortableListProps) => {
-  const { onChange, value } = props;
+  const { id, onChange, value } = props;
 
   return (
     <FormFieldset {...props}>
@@ -40,7 +40,7 @@ const FormSortableList = (props: FormSortableListProps) => {
           }
         }}
       >
-        <Droppable droppableId={props.id}>
+        <Droppable droppableId={id}>
           {(droppableProvided, droppableSnapshot) => (
             <div
               {...droppableProvided.droppableProps}

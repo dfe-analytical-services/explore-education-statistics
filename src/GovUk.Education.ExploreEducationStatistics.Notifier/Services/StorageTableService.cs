@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
         public async Task RemoveSubscriber(CloudTable table, SubscriptionEntity subscription)
         {   
             subscription.ETag = "*";
-            table.ExecuteAsync(TableOperation.Delete(subscription));
+            await table.ExecuteAsync(TableOperation.Delete(subscription));
         }
         
         public async Task<SubscriptionEntity> RetrieveSubscriber(CloudTable table, SubscriptionEntity subscription)
@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionStr);                
             CloudTableClient tableClient = storageAccount.CreateCloudTableClient();                
             CloudTable table = tableClient.GetTableReference(storageTableName);
-            table.CreateIfNotExistsAsync();
+            await table.CreateIfNotExistsAsync();
             return table;
         }
     }

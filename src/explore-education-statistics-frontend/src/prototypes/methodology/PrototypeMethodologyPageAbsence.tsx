@@ -13,9 +13,9 @@ import PrototypeSection3 from '@frontend/prototypes/methodology/absence/Prototyp
 import PrototypeSection4 from '@frontend/prototypes/methodology/absence/PrototypeSection4';
 import PrototypeSection5 from '@frontend/prototypes/methodology/absence/PrototypeSection5';
 import PrototypeSection7 from '@frontend/prototypes/methodology/absence/PrototypeSection7';
-import { MethodologyContent } from '@frontend/prototypes/methodology/components/MethodologyContent';
-import { MethodologyHeader } from '@frontend/prototypes/methodology/components/MethodologyHeader';
-import { MethodologySection } from '@frontend/prototypes/methodology/components/MethodologySection';
+import MethodologyContent from '@frontend/prototypes/methodology/components/MethodologyContent';
+import MethodologyHeader from '@frontend/prototypes/methodology/components/MethodologyHeader';
+import MethodologySection from '@frontend/prototypes/methodology/components/MethodologySection';
 import React from 'react';
 
 const PublicationPage = () => {
@@ -53,8 +53,8 @@ const PublicationPage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">
-            Find out more about pupil absence statistics and data and how and
-            why they're collected and published.
+            Find out about the methodology behind pupil absence statistics and
+            data and how and why they're collected and published.
           </p>
         </div>
 
@@ -233,6 +233,20 @@ const PublicationPage = () => {
           </MethodologySection>
         </AccordionSection>
 
+        <AccordionSection heading="6. Data quality">
+          <MethodologySection>
+            <MethodologyHeader>
+              <h3 className="govuk-heading-s">In this section</h3>
+              <ul className="govuk-body-s">
+                <li>
+                  <a href="#section6-1">Data quality</a>
+                </li>
+              </ul>
+            </MethodologyHeader>
+            <MethodologyContent />
+          </MethodologySection>
+        </AccordionSection>
+
         <AccordionSection heading="7. Contacts">
           <PrototypeSection7 />
         </AccordionSection>
@@ -249,10 +263,10 @@ const PublicationPage = () => {
         <AccordionSection heading="Annex C - School attendance codes">
           <PrototypeAnnexC />
         </AccordionSection>
-        <AccordionSection heading="Annex D - Links to pupil absence national statistics publications">
+        <AccordionSection heading="Annex D - Links to pupil absence national statistics and data">
           <PrototypeAnnexD />
         </AccordionSection>
-        <AccordionSection heading="Annex E - Standard breakdowns that are currently published">
+        <AccordionSection heading="Annex E - Standard breakdowns">
           <PrototypeAnnexE />
         </AccordionSection>
         <AccordionSection heading="Annex F - Timeline">

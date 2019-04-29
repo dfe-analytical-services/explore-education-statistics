@@ -258,7 +258,9 @@ const PublicationDataPage = () => {
           </div>
         </fieldset>
         <div className="govuk-form-group govuk-!-margin-top-6">
-          <button className="govuk-button">Upload data files</button>
+          <button className="govuk-button" type="button">
+            Upload data files
+          </button>
         </div>
       </form>
     </PrototypePage>

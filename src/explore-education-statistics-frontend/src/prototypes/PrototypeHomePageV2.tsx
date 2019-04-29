@@ -48,16 +48,20 @@ const HomePage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-half">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="/prototypes/methodology-specific">Methodology</Link>
+            <Link to="/prototypes/methodology-specific">
+              Education statistics: methodology
+            </Link>
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">
-            Find out more about education statistics and data topics and how and
-            why they're collected and published.
+            Browse to find out more about the methodology behind education
+            statistics and data and how and why they're collected and published.
           </p>
         </div>
         <div className="govuk-grid-column-one-half">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="#">Glossary</Link>
+            <Link to="https://eesadminprototype.z33.web.core.windows.net/prototypes/documentation/glossary">
+              Education statistics: glossary
+            </Link>
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">
             Browse our A to Z list of definitions for terms used across
@@ -68,8 +72,8 @@ const HomePage = () => {
       <hr />
       <h3 className="govuk-heading-l govuk-!-margin-top-9">Related services</h3>
       <p className="govuk-body">
-        Use these services to find and compare and contrast performance and
-        other information about schools and colleges in England:
+        Use these services to specific performance and other information about
+        schools and colleges in England:
       </p>
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
         <div className="govuk-grid-column-one-half">
@@ -96,9 +100,8 @@ const HomePage = () => {
             </a>
           </h4>
           <p className="govuk-caption-m govuk-!-margin-top-1">
-            Search this register to find and download information about schools
-            and colleges including details about educational organisations and
-            governors
+            Search to find and download information about schools, colleges,
+            educational organisations and governors in England
           </p>
         </div>
       </div>

@@ -15,7 +15,7 @@ describe('FormGroup', () => {
 
   test('renders correctly when there is an error', () => {
     const { container } = render(
-      <FormGroup hasError={true}>
+      <FormGroup hasError>
         <p>Some content</p>
       </FormGroup>,
     );

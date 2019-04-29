@@ -22,9 +22,21 @@
       "defaultValue": "West Europe"
     },
 
-    "sku": {
+    "skuPublic": {
       "type": "string",
-      "defaultValue": "Standard S1"
+      "defaultValue": "B1 Basic"
+    },
+    "skuData": {
+      "type": "string",
+      "defaultValue": "B1 Basic"
+    },
+    "skuContent": {
+      "type": "string",
+      "defaultValue": "B1 Basic"
+    },
+    "skuAdmin": {
+      "type": "string",
+      "defaultValue": "F1 Free"
     },
 
     "sqlAdministratorLogin": {
@@ -140,6 +152,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "phpVersion": "off",
+          "AlwaysOn": true,
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -180,8 +193,8 @@
     {
       "type": "Microsoft.Web/serverfarms",
       "sku": {
-        "Tier": "[first(skip(split(parameters('sku'), ' '), 1))]",
-        "Name": "[first(split(parameters('sku'), ' '))]"
+        "Tier": "[first(skip(split(parameters('skuData'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuData'), ' '))]"
       },
       "name": "[variables('dataPlanName')]",
       "apiVersion": "2015-08-01",
@@ -235,6 +248,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "phpVersion": "off",
+          "AlwaysOn": true,
           "cors": {
             "allowedOrigins": [
               "[concat('https://', variables('publicAppName'),'.azurewebsites.net')]",
@@ -271,8 +285,8 @@
     {
       "type": "Microsoft.Web/serverfarms",
       "sku": {
-        "Tier": "[first(skip(split(parameters('sku'), ' '), 1))]",
-        "Name": "[first(split(parameters('sku'), ' '))]"
+        "Tier": "[first(skip(split(parameters('skuContent'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuContent'), ' '))]"
       },
       "name": "[variables('contentPlanName')]",
       "apiVersion": "2015-08-01",
@@ -326,6 +340,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "phpVersion": "off",
+          "AlwaysOn": false,
           "cors": {
             "allowedOrigins": [
               "*"
@@ -369,8 +384,8 @@
     {
       "type": "Microsoft.Web/serverfarms",
       "sku": {
-        "Tier": "[first(skip(split(parameters('sku'), ' '), 1))]",
-        "Name": "[first(split(parameters('sku'), ' '))]"
+        "Tier": "[first(skip(split(parameters('skuAdmin'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuAdmin'), ' '))]"
       },
       "name": "[variables('adminPlanName')]",
       "apiVersion": "2015-08-01",
@@ -457,8 +472,8 @@
     {
       "type": "Microsoft.Web/serverfarms",
       "sku": {
-        "Tier": "Basic",
-        "Name": "B1"
+        "Tier": "[first(skip(split(parameters('skuPublic'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuPublic'), ' '))]"
       },
       "name": "[variables('publicPlanName')]",
       "apiVersion": "2015-08-01",

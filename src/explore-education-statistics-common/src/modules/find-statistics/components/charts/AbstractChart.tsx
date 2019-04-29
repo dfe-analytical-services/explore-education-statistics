@@ -1,14 +1,15 @@
-import { CharacteristicsData } from '@common/services/tableBuilderService';
 import { Axis, ReferenceLine } from '@common/services/publicationService';
-import { Component, ReactNode } from 'react';
-import React from 'react';
-import * as Recharts from 'recharts';
-import { PositionType } from 'recharts';
-import { Label } from 'recharts';
-import { XAxisProps } from 'recharts';
-import { XAxis } from 'recharts';
-import { YAxisProps } from 'recharts';
-import { YAxis } from 'recharts';
+import { CharacteristicsData } from '@common/services/tableBuilderService';
+import React, { Component, ReactNode } from 'react';
+import {
+  Label,
+  PositionType,
+  ReferenceLine as RechartsReferenceLine,
+  XAxis,
+  XAxisProps,
+  YAxis,
+  YAxisProps,
+} from 'recharts';
 
 export interface ChartProps {
   characteristicsData: CharacteristicsData;
@@ -24,29 +25,7 @@ export class AbstractChart<P extends ChartProps, S = {}> extends Component<
   P,
   S
 > {
-  protected calculateMargins() {
-    const margin = {
-      top: 15,
-      right: 30,
-      left: 60,
-      bottom: 25,
-    };
-
-    if (this.props.referenceLines && this.props.referenceLines.length > 0) {
-      this.props.referenceLines.forEach(line => {
-        if (line.x) margin.top = 25;
-        if (line.y) margin.left = 75;
-      });
-    }
-
-    if (this.props.xAxis.title) {
-      //margin.bottom +=25;
-    }
-
-    return margin;
-  }
-
-  private calculateAxis(
+  private static calculateAxis(
     axis: Axis,
     position: PositionType,
     angle: number = 0,
@@ -67,9 +46,34 @@ export class AbstractChart<P extends ChartProps, S = {}> extends Component<
     return { size, title };
   }
 
+  protected calculateMargins() {
+    const margin = {
+      top: 15,
+      right: 30,
+      left: 60,
+      bottom: 25,
+    };
+
+    const { xAxis, referenceLines } = this.props;
+
+    if (referenceLines && referenceLines.length > 0) {
+      referenceLines.forEach(line => {
+        if (line.x) margin.top = 25;
+        if (line.y) margin.left = 75;
+      });
+    }
+
+    if (xAxis.title) {
+      // margin.bottom +=25;
+    }
+
+    return margin;
+  }
+
   protected calculateXAxis(props: XAxisProps): ReactNode {
-    const { size: height, title } = this.calculateAxis(
-      this.props.xAxis,
+    const { xAxis } = this.props;
+    const { size: height, title } = AbstractChart.calculateAxis(
+      xAxis,
       'insideBottom',
     );
     return (
@@ -80,8 +84,9 @@ export class AbstractChart<P extends ChartProps, S = {}> extends Component<
   }
 
   protected calculateYAxis(props: YAxisProps): ReactNode {
-    const { size: width, title } = this.calculateAxis(
-      this.props.yAxis,
+    const { yAxis } = this.props;
+    const { size: width, title } = AbstractChart.calculateAxis(
+      yAxis,
       'left',
       270,
       90,
@@ -112,11 +117,13 @@ export class AbstractChart<P extends ChartProps, S = {}> extends Component<
       // appears to be a fix, but this is not valid for the types.
       // issue raised https://github.com/recharts/recharts/issues/1710
       // @ts-ignore
-      return <Recharts.ReferenceLine {...referenceLineProps} />;
+      return <RechartsReferenceLine {...referenceLineProps} />;
     };
 
-    if (this.props.referenceLines && this.props.referenceLines.length > 0) {
-      return this.props.referenceLines.map(generateReferenceLine);
+    const { referenceLines } = this.props;
+
+    if (referenceLines && referenceLines.length > 0) {
+      return referenceLines.map(generateReferenceLine);
     }
 
     return '';

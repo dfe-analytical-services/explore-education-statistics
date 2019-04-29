@@ -5,7 +5,7 @@ const LOREM =
 
 // const LOREM_SMALL = "Lorem ipsum dolor sit ame";
 
-export class PrototypePublicationService {
+export default class PrototypePublicationService {
   public static getLatestPublicationRelease(_: string): Promise<Release> {
     // @ts-ignore
     return Promise.resolve({

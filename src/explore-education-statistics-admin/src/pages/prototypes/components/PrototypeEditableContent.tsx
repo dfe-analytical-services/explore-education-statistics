@@ -17,7 +17,7 @@ interface State {
   unsaved: boolean;
 }
 
-export class PrototypeEditableContent extends React.Component<Props, State> {
+class PrototypeEditableContent extends React.Component<Props, State> {
   private ref: HTMLElement | null = null;
 
   private temporaryContent: string = '';
@@ -33,27 +33,33 @@ export class PrototypeEditableContent extends React.Component<Props, State> {
   };
 
   public componentDidMount() {
+    const { content } = this.props;
+    const { editing } = this.state;
+
     this.setState({
-      content: this.props.content,
+      content,
       editing: false,
       unsaved: false,
     });
 
-    this.temporaryContent = this.props.content;
+    this.temporaryContent = content;
 
-    if (!this.state.editing && this.ref) {
-      this.ref.innerHTML = this.state.content;
+    if (!editing && this.ref) {
+      this.ref.innerHTML = content;
     }
   }
 
   public componentDidUpdate() {
-    if (!this.state.editing && this.ref) {
-      this.ref.innerHTML = this.state.content;
+    const { editing, content } = this.state;
+    if (!editing && this.ref) {
+      this.ref.innerHTML = content;
     }
   }
 
   public setEditing = () => {
-    if (this.props.editable && !this.state.editing) {
+    const { editable } = this.props;
+    const { editing } = this.state;
+    if (editable && !editing) {
       this.setState({ editing: true });
     }
   };
@@ -67,16 +73,19 @@ export class PrototypeEditableContent extends React.Component<Props, State> {
   };
 
   public render() {
+    const { editing, content, unsaved } = this.state;
     return (
       <Fragment>
-        {this.state.editing ? (
+        {editing ? (
           <div className="editable-content-editing">
             <div className="editable-button">
-              <button onClick={this.save}>Save</button>
+              <button onClick={this.save} type="button">
+                Save
+              </button>
             </div>
             <CKEditor
               editor={ClassicEditor}
-              data={this.state.content}
+              data={content}
               onChange={(event: ChangeEvent, editor: { getData(): string }) => {
                 this.temporaryContent = editor.getData();
               }}
@@ -88,16 +97,20 @@ export class PrototypeEditableContent extends React.Component<Props, State> {
         ) : (
           // eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events
           <div
-            className={`editable-content ${
-              this.state.unsaved ? 'unsaved' : ''
-            }`}
+            className={`editable-content ${unsaved ? 'unsaved' : ''}`}
             onClick={this.setEditing}
           >
             <div className="editable-button" />
-            <div ref={ref => (this.ref = ref)} />
+            <div
+              ref={ref => {
+                this.ref = ref;
+              }}
+            />
           </div>
         )}
       </Fragment>
     );
   }
 }
+
+export default PrototypeEditableContent;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const AdminDashboardNeedsWork = () => {
+const AdminDashboardNeedsWork = () => {
   return (
     <>
       <div className="govuk-inset-text">
@@ -9,3 +9,5 @@ export const AdminDashboardNeedsWork = () => {
     </>
   );
 };
+
+export default AdminDashboardNeedsWork;

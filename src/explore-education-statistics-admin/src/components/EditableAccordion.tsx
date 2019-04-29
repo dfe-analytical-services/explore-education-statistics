@@ -15,9 +15,11 @@ interface State {
 }
 
 class EditableAccordion extends Component<EditableAccordionProps, State> {
+  /*
   public state = {
     hash: '',
   };
+  */
 
   private ref = createRef<HTMLDivElement>();
 
@@ -39,18 +41,20 @@ class EditableAccordion extends Component<EditableAccordionProps, State> {
   }
 
   private goToHash = () => {
-    this.setState({ hash: location.hash });
+    // this.setState({ hash: window.location.hash });
 
-    if (this.ref.current && location.hash) {
+    if (this.ref.current && window.location.hash) {
       try {
         const anchor = this.ref.current.querySelector(
-          location.hash,
+          window.location.hash,
         ) as HTMLButtonElement;
 
         if (anchor) {
           anchor.scrollIntoView();
         }
-      } catch (_) {}
+      } catch (_) {
+        // ignoring any errors
+      }
     }
   };
 

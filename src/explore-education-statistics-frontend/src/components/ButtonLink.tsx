@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+// eslint-disable-next-line import/no-unresolved
 import { UrlLike } from 'next-server/router';
 import Link from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
@@ -15,14 +16,11 @@ const ButtonLink = ({
   className,
   disabled = false,
   to,
+  href,
   ...props
 }: Props) => {
-  // We support href and to for backwards
-  // compatibility with react-router.
-  const href = props.href || to;
-
   return (
-    <Link {...props} href={href}>
+    <Link {...props} href={href || to}>
       <a
         {...props}
         className={classNames(

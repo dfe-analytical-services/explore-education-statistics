@@ -1,15 +1,15 @@
 const co = require('co');
 const azure = require('azure-storage');
 const parse = require('csv-parse');
-const MongoClient = require('mongodb').MongoClient;
+const { MongoClient } = require('mongodb');
 
 module.exports = async function(context, myQueueItem) {
   context.log('Message', myQueueItem);
 
   co(function*() {
-    var blobService = azure.createBlobService();
+    const blobService = azure.createBlobService();
 
-    var client = yield MongoClient.connect(
+    const client = yield MongoClient.connect(
       'mongodb://root:example@mongo:27017/test',
       { db: { authSource: 'admin' } },
     );
@@ -43,7 +43,7 @@ module.exports = async function(context, myQueueItem) {
         })
         .on('end', function() {
           context.log(`end - records: ${output.length}`);
-          for (let c of chunk(output, 5000)) {
+          for (const c of chunk(output, 5000)) {
             collection.insertMany(c);
             collection
               .find({})

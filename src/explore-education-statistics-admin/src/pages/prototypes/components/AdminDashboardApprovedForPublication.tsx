@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const AdminDashboardApprovedForPublication = () => {
+const AdminDashboardApprovedForPublication = () => {
   return (
     <>
       <div className="govuk-inset-text">
@@ -9,3 +9,5 @@ export const AdminDashboardApprovedForPublication = () => {
     </>
   );
 };
+
+export default AdminDashboardApprovedForPublication;

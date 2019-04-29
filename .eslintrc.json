@@ -2,6 +2,11 @@
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint", "react-hooks"],
   "settings": {
+    "import/resolver": {
+      "typescript": {
+        "directory": "./src"
+      }
+    },
     "react": {
       "version": "latest"
     }
@@ -12,9 +17,11 @@
     "node": true
   },
   "extends": [
+    "airbnb",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
     "plugin:jsx-a11y/recommended",
+    "plugin:import/typescript",
     "prettier",
     "prettier/@typescript-eslint"
   ],
@@ -24,6 +31,8 @@
       "error",
       { "argsIgnorePattern": "^_$" }
     ],
+    "import/no-cycle": "off",
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
     "react/no-unescaped-entities": [
       "error",
       {
@@ -39,17 +48,77 @@
         ]
       }
     ],
+    "react/jsx-filename-extension": [
+      "error",
+      {
+        "extensions": [".jsx", ".tsx"]
+      }
+    ],
+    "react/jsx-one-expression-per-line": "off",
+    "react/jsx-wrap-multilines": ["error", { "prop": "ignore" }],
+    "react/sort-comp": [
+      "error",
+      {
+        "order": [
+          "displayName",
+          "propTypes",
+          "contextTypes",
+          "childContextTypes",
+          "mixins",
+          "defaultProps",
+          "statics",
+          "state",
+          "instance-variables",
+          "lifecycle",
+          "static-methods",
+          "getters",
+          "setters",
+          "/^(get|set)(?!(InitialState$|DefaultProps$|ChildContext$)).+$/",
+          "instance-methods",
+          "everything-else",
+          "/^on.+$/",
+          "rendering"
+        ],
+        "groups": {
+          "lifecycle": [
+            "constructor",
+            "getDefaultProps",
+            "getInitialState",
+            "getChildContext",
+            "componentWillMount",
+            "componentDidMount",
+            "componentWillReceiveProps",
+            "shouldComponentUpdate",
+            "componentWillUpdate",
+            "componentDidUpdate",
+            "componentWillUnmount"
+          ],
+          "rendering": ["/^render.+$/", "render"]
+        }
+      }
+    ],
     "react/prop-types": "off",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "jsx-a11y/anchor-is-valid": "off",
-    "no-console": "warn"
+    "jsx-a11y/label-has-associated-control": [
+      "error",
+      {
+        "assert": "htmlFor"
+      }
+    ],
+    "no-console": "warn",
+    "no-use-before-define": "off",
+    "no-useless-constructor": "off",
+    "spaced-comment": ["warn", "always", { "markers": ["/"] }]
   },
   "overrides": [
     {
       "files": ["**/*.js"],
       "rules": {
         "@typescript-eslint/no-var-requires": "off",
+        "global-require": "off",
+        "import/no-dynamic-require": "off",
         "no-console": "off"
       }
     }

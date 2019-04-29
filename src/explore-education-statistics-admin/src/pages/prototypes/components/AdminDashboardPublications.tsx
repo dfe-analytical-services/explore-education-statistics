@@ -1,7 +1,7 @@
-import { DashboardRelease } from '@admin/pages/prototypes/components/DashboardRelease';
+import DashboardRelease from '@admin/pages/prototypes/components/DashboardRelease';
 import React from 'react';
 
-export const AdminDashboardPublications = () => {
+const AdminDashboardPublications = () => {
   return (
     <>
       <h2 className="govuk-heading-l govuk-!-margin-bottom-0">
@@ -17,17 +17,17 @@ export const AdminDashboardPublications = () => {
           <DashboardRelease
             title="Pupil absense statistics and data for schools in England"
             years="2017 to 2018"
-            editing={location.search == '?status=editLiveRelease'}
+            editing={window.location.search === '?status=editLiveRelease'}
             lastEdited={new Date('2019-03-20 17:37')}
             lastEditor={{ id: 'me', name: 'me', permissions: [] }}
           />
         </li>
-        {location.search == '?status=editNewRelease' && (
+        {window.location.search === '?status=editNewRelease' && (
           <li>
             <DashboardRelease
               title="Pupil absense statistics and data for schools in England"
               years="2018 to 2019"
-              isNew={location.search == '?status=editNewRelease'}
+              isNew={window.location.search === '?status=editNewRelease'}
               lastEdited={new Date('2019-03-20 17:37')}
               lastEditor={{ id: 'me', name: 'me', permissions: [] }}
             />
@@ -37,7 +37,7 @@ export const AdminDashboardPublications = () => {
           <DashboardRelease
             title="Permanent and fixed-period exclusions statistics"
             years="2017 to 2018"
-            editing={true}
+            editing
             isNew={false}
             lastEdited={new Date('2019-04-24 16:55')}
             lastEditor={{ id: 'me', name: 'Ann Evans', permissions: [] }}
@@ -47,3 +47,5 @@ export const AdminDashboardPublications = () => {
     </>
   );
 };
+
+export default AdminDashboardPublications;

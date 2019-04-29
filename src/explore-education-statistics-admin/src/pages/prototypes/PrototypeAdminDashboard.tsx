@@ -1,17 +1,14 @@
-// import Accordion from '@common/components/Accordion';
-// import AccordionSection from '@common/components/AccordionSection';
-// import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React from 'react';
 import { RouteChildrenProps } from 'react-router';
-import Link from '../../components/Link';
+import AdminDashboardPublications from '@admin/pages/prototypes/components/AdminDashboardPublications';
+import AdminDashboardInProgress from '@admin/pages/prototypes/components/AdminDashboardInProgress';
+import AdminDashboardReadyForApproval from '@admin/pages/prototypes/components/AdminDashboardReadyForApproval';
+import AdminDashboardNeedsWork from '@admin/pages/prototypes/components/AdminDashboardNeedsWork';
+import AdminDashboardApprovedForPublication from '@admin/pages/prototypes/components/AdminDashboardApprovedForPublication';
 import PrototypePage from './components/PrototypePage';
-import { AdminDashboardPublications } from '@admin/pages/prototypes/components/AdminDashboardPublications';
-import { AdminDashboardInProgress } from '@admin/pages/prototypes/components/AdminDashboardInProgress';
-import { AdminDashboardReadyForApproval } from '@admin/pages/prototypes/components/AdminDashboardReadyForApproval';
-import { AdminDashboardNeedsWork } from '@admin/pages/prototypes/components/AdminDashboardNeedsWork';
-import { AdminDashboardApprovedForPublication } from '@admin/pages/prototypes/components/AdminDashboardApprovedForPublication';
+import Link from '../../components/Link';
 
 const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
   return (
@@ -28,6 +25,28 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         </div>
         <div className="govuk-grid-column-one-third">
           <aside className="app-related-items">
+            <h2 className="govuk-heading-m" id="releated-content">
+              Notifications
+            </h2>
+            <nav role="navigation" aria-labelledby="subsection-title">
+              <ul className="govuk-list">
+                <li>
+                  <Link to="#">Example notification</Link>
+                </li>
+              </ul>
+            </nav>
+            <hr />
+            <h2 className="govuk-heading-m" id="releated-content">
+              Releases due in next 30 days
+            </h2>
+            <nav role="navigation" aria-labelledby="subsection-title">
+              <ul className="govuk-list">
+                <li>
+                  <Link to="#">Example release</Link>
+                </li>
+              </ul>
+            </nav>
+            <hr />
             <h2 className="govuk-heading-m" id="releated-content">
               Help and guidance
             </h2>
@@ -50,7 +69,7 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         <TabsSection
           id="task-in-progress"
           title={`In progress ${
-            location.search == '?status=editNewRelease' ? '(2)' : '(1)'
+            location.search === '?status=editNewRelease' ? '(2)' : '(1)'
           }`}
         >
           <AdminDashboardInProgress />
@@ -58,7 +77,7 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         <TabsSection
           id="task-ready-approval"
           title={`Ready for approval ${
-            location.search == '?status=readyApproval' ? '(1)' : ''
+            location.search === '?status=readyApproval' ? '(1)' : ''
           }`}
         >
           <AdminDashboardReadyForApproval />
@@ -115,7 +134,7 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
                   </div>
                 </div>
               </li>
-              {location.search == '?status=editRelease' && (
+              {location.search === '?status=editRelease' && (
                 <li className="govuk-!-margin-top-6">
                   {' '}
                   <h4 className="govuk-heading-m govuk-!-margin-bottom-0">

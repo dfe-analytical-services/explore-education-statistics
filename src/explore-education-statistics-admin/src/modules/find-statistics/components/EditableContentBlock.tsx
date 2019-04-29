@@ -10,18 +10,21 @@ interface Props {
 
 class EditableContentBlock extends Component<Props> {
   public render() {
-    let { content, id = '' } = this.props;
+    const { content, id = '', editable } = this.props;
 
     return content.length > 0 ? (
-      content.map((block, index) => (
-        <EditableContentSubBlockRenderer
-          editable={this.props.editable}
-          block={block}
-          key={`${index}-${block.heading}-${block.type}`}
-          id={id}
-          index={index}
-        />
-      ))
+      content.map((block, index) => {
+        const key = `${index}-${block.heading}-${block.type}`;
+        return (
+          <EditableContentSubBlockRenderer
+            editable={editable}
+            block={block}
+            key={key}
+            id={id}
+            index={index}
+          />
+        );
+      })
     ) : (
       <div className="govuk-inset-text">
         There is no content for this section.

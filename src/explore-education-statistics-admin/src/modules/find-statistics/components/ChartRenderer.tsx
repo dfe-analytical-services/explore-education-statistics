@@ -1,10 +1,10 @@
-import { HorizontalBarBlock } from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
-import { LineChartBlock } from '@common/modules/find-statistics/components/charts/LineChartBlock';
+import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
+import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 
 import DynamicMapBlock, {
   MapFeature,
 } from '@common/modules/find-statistics/components/charts/MapBlock';
-import { VerticalBarBlock } from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
+import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
 import { Axis } from '@common/services/publicationService';
 import {
   CharacteristicsData,
@@ -25,13 +25,25 @@ export interface ChartRendererProps {
   geometry?: MapFeature;
 }
 
-export class ChartRenderer extends Component<ChartRendererProps> {
+export default class ChartRenderer extends Component<ChartRendererProps> {
   public render() {
+    const {
+      data,
+      geometry,
+      height,
+      meta,
+      indicators,
+      stacked,
+      type,
+      xAxis = { title: '' },
+      yAxis = { title: '' },
+    } = this.props;
+
     const allIndicatorLabels = Array.prototype.concat(
-      ...Object.values(this.props.meta.indicators),
+      ...Object.values(meta.indicators),
     );
 
-    const usedIndicatorLabels = this.props.indicators
+    const usedIndicatorLabels = indicators
       .map(indicatorName =>
         allIndicatorLabels.find(({ name }) => name === indicatorName),
       )
@@ -44,71 +56,70 @@ export class ChartRenderer extends Component<ChartRendererProps> {
       };
     }, {});
 
-    const characteristicsData: CharacteristicsData = this.props.data;
+    const characteristicsData: CharacteristicsData = data;
 
     // TODO : Temporary sort on the results to get them in date order
     characteristicsData.result.sort((a, b) => {
-      return a.timePeriod < b.timePeriod
-        ? -1
-        : a.timePeriod > b.timePeriod
-        ? 1
-        : 0;
+      if (a.timePeriod < b.timePeriod) {
+        return -1;
+      }
+
+      if (a.timePeriod > b.timePeriod) {
+        return 1;
+      }
+
+      return 0;
     });
 
-    const xAxis = this.props.xAxis || { title: '' };
-    const yAxis = this.props.yAxis || { title: '' };
-
-    switch (this.props.type.toLowerCase()) {
+    switch (type.toLowerCase()) {
       case 'line':
         return (
           <LineChartBlock
-            chartDataKeys={this.props.indicators}
+            chartDataKeys={indicators}
             characteristicsData={characteristicsData}
             labels={labels}
             xAxis={xAxis}
             yAxis={yAxis}
-            height={this.props.height}
+            height={height}
           />
         );
       case 'verticalbar':
         return (
           <VerticalBarBlock
-            chartDataKeys={this.props.indicators}
+            chartDataKeys={indicators}
             characteristicsData={characteristicsData}
             labels={labels}
             xAxis={xAxis}
             yAxis={yAxis}
-            height={this.props.height}
+            height={height}
           />
         );
       case 'horizontalbar':
         return (
           <HorizontalBarBlock
-            chartDataKeys={this.props.indicators}
+            chartDataKeys={indicators}
             characteristicsData={characteristicsData}
             labels={labels}
             xAxis={xAxis}
             yAxis={yAxis}
-            height={this.props.height}
-            stacked={this.props.stacked}
+            height={height}
+            stacked={stacked}
           />
         );
       case 'map':
         return (
           <DynamicMapBlock
-            chartDataKeys={this.props.indicators}
+            chartDataKeys={indicators}
             characteristicsData={characteristicsData}
             labels={labels}
             xAxis={xAxis}
             yAxis={yAxis}
-            height={this.props.height}
-            geometry={this.props.geometry}
+            height={height}
+            geometry={geometry}
           />
         );
       default:
-        return (
-          <div>[ Unimplemented chart type requested ${this.props.type} ]</div>
-        );
+        return <div>[ Unimplemented chart type requested ${type} ]</div>;
     }
   }
 }

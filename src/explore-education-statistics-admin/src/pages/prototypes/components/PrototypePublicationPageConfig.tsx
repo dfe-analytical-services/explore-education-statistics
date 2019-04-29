@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from '../../../components/Link';
 import {
   FormGroup,
   FormFieldset,
@@ -9,6 +8,7 @@ import {
   FormSelect,
   FormRadioGroup,
 } from '@common/components/form';
+import Link from '../../../components/Link';
 
 interface Props {
   sectionId?: string;
@@ -46,7 +46,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                 label="Academic Year"
                 name="release-type"
                 value="academic-year"
-                defaultChecked={true}
+                defaultChecked
               >
                 <FormFieldset id="test">
                   <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">

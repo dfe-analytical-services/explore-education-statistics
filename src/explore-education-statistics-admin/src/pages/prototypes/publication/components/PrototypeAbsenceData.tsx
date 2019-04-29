@@ -9,6 +9,29 @@ import classNames from 'classnames';
 import React, { Component, RefAttributes } from 'react';
 import styles from './PrototypeAbsenceData.module.scss';
 
+function preprocessBoundaryData(data: PrototypeMapBoundariesFeatureCollection) {
+  const dataParsed: PrototypeMapBoundariesFeatureCollection = {
+    ...data,
+  };
+
+  dataParsed.features.sort((a, b) => {
+    const first = a.properties ? a.properties.lad17nm : '';
+    const second = b.properties ? b.properties.lad17nm : '';
+
+    if (first < second) {
+      return -1;
+    }
+
+    if (second > first) {
+      return 1;
+    }
+
+    return 0;
+  });
+
+  return dataParsed;
+}
+
 interface State {
   absenceData?: {
     values: {
@@ -42,27 +65,8 @@ class PrototypeAbsenceData extends Component<
     import(
       '@common/prototypes/publication/components/PrototypeMapBoundaries'
     ).then(({ boundaries }) => {
-      this.generateLegendData(this.preprocessBoundaryData(boundaries));
+      this.generateLegendData(preprocessBoundaryData(boundaries));
     });
-  }
-
-  private preprocessBoundaryData(
-    data: PrototypeMapBoundariesFeatureCollection,
-  ) {
-    const dataParsed: PrototypeMapBoundariesFeatureCollection = {
-      ...data,
-    };
-
-    dataParsed.features.sort((a, b) => {
-      const c = [
-        a.properties ? a.properties.lad17nm : '',
-        b.properties ? b.properties.lad17nm : '',
-      ];
-
-      return c[0] < c[1] ? -1 : c[1] > c[0] ? 1 : 0;
-    });
-
-    return dataParsed;
   }
 
   private generateLegendData(data: PrototypeMapBoundariesFeatureCollection) {
@@ -122,7 +126,7 @@ class PrototypeAbsenceData extends Component<
   }
 
   public render() {
-    const { data, legend } = this.state;
+    const { absenceData, data, legend, selectedAuthority } = this.state;
 
     const localAuthorityOptions = data ? data.features : [];
 
@@ -141,7 +145,7 @@ class PrototypeAbsenceData extends Component<
                 name="selectedAuthority"
                 id="selectedAuthority"
                 label="Select a local authority"
-                value={this.state.selectedAuthority}
+                value={selectedAuthority}
                 onChange={e => {
                   this.setState({
                     selectedAuthority: e.currentTarget.value,
@@ -168,7 +172,7 @@ class PrototypeAbsenceData extends Component<
             </div>
           </form>
 
-          {this.state.absenceData ? (
+          {absenceData ? (
             <div>
               <div className="dfe-dash-tiles__tile govuk-!-margin-bottom-6">
                 <h3 className="govuk-heading-m dfe-dash-tiles__heading">
@@ -178,7 +182,7 @@ class PrototypeAbsenceData extends Component<
                   className="govuk-heading-xl govuk-!-margin-bottom-2"
                   aria-label="Overall absence"
                 >
-                  <span> {this.state.absenceData.values.overall}% </span>
+                  <span> {absenceData.values.overall}% </span>
                 </p>
                 <Details summary="What is overall absence?">
                   Overall absence is the adipisicing elit. Dolorum hic nobis
@@ -193,7 +197,7 @@ class PrototypeAbsenceData extends Component<
                   className="govuk-heading-xl govuk-!-margin-bottom-2"
                   aria-label="Authorised absence"
                 >
-                  <span> {this.state.absenceData.values.authorised}% </span>
+                  <span> {absenceData.values.authorised}% </span>
                 </p>
                 <Details summary="What is authorised absence?">
                   Authorised absence is the adipisicing elit. Dolorum hic nobis
@@ -208,7 +212,7 @@ class PrototypeAbsenceData extends Component<
                   className="govuk-heading-xl govuk-!-margin-bottom-2"
                   aria-label="Unauthorised absence"
                 >
-                  <span> {this.state.absenceData.values.unauthorised}% </span>
+                  <span> {absenceData.values.unauthorised}% </span>
                 </p>
                 <Details summary="What is unauthorised absence?">
                   Unauthorised absence is the adipisicing elit. Dolorum hic
@@ -258,8 +262,12 @@ class PrototypeAbsenceData extends Component<
                   });
                 }
               }}
-              ref={el => el && (this.mapRef = el)}
-              selectedAuthority={this.state.selectedAuthority}
+              ref={el => {
+                if (el) {
+                  this.mapRef = el;
+                }
+              }}
+              selectedAuthority={selectedAuthority}
             />
           )}
         </div>

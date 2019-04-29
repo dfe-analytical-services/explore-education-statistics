@@ -13,7 +13,7 @@ interface Props {
   lastEditor: User;
 }
 
-export const DashboardRelease = ({
+const DashboardRelease = ({
   title,
   isNew,
   editing,
@@ -91,3 +91,5 @@ export const DashboardRelease = ({
     </>
   );
 };
+
+export default DashboardRelease;
