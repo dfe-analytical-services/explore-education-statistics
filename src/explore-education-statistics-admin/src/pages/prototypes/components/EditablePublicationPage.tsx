@@ -82,24 +82,26 @@ export class EditablePublicationPage extends Component<Props, State> {
     return (
       <>
         <div className={editing ? 'page-editing' : ''}>
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-two-thirds">
-              <PrototypeEditableContent
-                editable={editing}
-                content={`
-          <h1 className="govuk-heading-xl">
+          <span className="govuk-tag">
+            {data ? 'Editing in progress' : 'New release in progress'}
+          </span>
+          <span className="govuk-caption-l">Academic year 2018 to 2019</span>
+          <PrototypeEditableContent
+            editable={editing}
+            content={`
+          <h1 class="govuk-heading-l">
             Pupil absence statistics and data for schools in England
           </h1>
           `}
-              />
-
-              <dl className="dfe-meta-content">
-                <dt className="govuk-caption-m">Published:</dt>
-                <dd>
-                  <strong>22 March 2018</strong>
-                </dd>
-              </dl>
-
+          />
+          <dl className="dfe-meta-content">
+            <dt className="govuk-caption-m">Published:</dt>
+            <dd>
+              <strong>To be set</strong>
+            </dd>
+          </dl>
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-two-thirds">
               <PrototypeEditableContent
                 editable={editing}
                 content={`
@@ -117,14 +119,12 @@ export class EditablePublicationPage extends Component<Props, State> {
           </p>
           `}
               />
-
               <p>
                 <Link to="/prototypes/methodology-absence">
                   Find out more about our pupil absence data and statistics
                   methodology and terminology
                 </Link>
               </p>
-
               <Details summary="Download underlying data files">
                 <ul className="govuk-list">
                   <li>

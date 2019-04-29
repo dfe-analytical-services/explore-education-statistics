@@ -46,7 +46,7 @@ class PublicationPage extends Component<{}, State> {
         ]}
       >
         <PrototypeAdminNavigation sectionId="addContent" task="editRelease" />
-        <div className="govuk-form-group">
+        <div className="govuk-width-container govuk-form-group">
           <fieldset className="govuk-fieldset">
             <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
               <h1 className="govuk-fieldset__heading">Set page view</h1>
@@ -91,11 +91,12 @@ class PublicationPage extends Component<{}, State> {
         </div>
 
         <hr />
-
-        <EditablePublicationPage
-          editing={this.state.editing}
-          data={this.state.data}
-        />
+        <div className="govuk-width-container">
+          <EditablePublicationPage
+            editing={this.state.editing}
+            data={this.state.data}
+          />
+        </div>
       </PrototypePage>
     );
   }
