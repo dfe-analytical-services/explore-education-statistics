@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                 new Subject
                                 {
                                     Filename = DataCsvFilename.absence_by_geographic_level,
-                                    Name = "Absence_by_geographic_level"
+                                    Name = "Absence by geographic level"
                                 },
                                 new Subject
                                 {
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                 new Subject
                                 {
                                     Filename = DataCsvFilename.absence_rate_percent_bands,
-                                    Name = "Absence rate_percent_bands"
+                                    Name = "Absence rate percent bands"
                                 }
                             }
                         }

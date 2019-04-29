@@ -22,35 +22,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return LookupOrCreateFilterItem(filterGroup, filterItemLabel);
         }
 
-        private FilterItem LookupOrCreateFilterItem(FilterGroup filterGroup, string filterItemLabel)
+        private FilterItem LookupOrCreateFilterItem(FilterGroup filterGroup, string label)
         {
-            if (string.IsNullOrWhiteSpace(filterItemLabel))
+            if (string.IsNullOrWhiteSpace(label))
             {
-                filterItemLabel = "Not specified";
+                label = "Not specified";
             }
 
-            var cacheKey = filterGroup.Id + "_" + filterItemLabel.ToLower();
+            var cacheKey = GetFilterItemCacheKey(filterGroup, label);
             if (_cache.TryGetValue(cacheKey, out FilterItem filterItem))
             {
                 return filterItem;
             }
-            
+
             // TODO change expiry or introduce lookup
 
-            filterItem = CreateFilterItem(filterGroup, filterItemLabel);
+            filterItem = CreateFilterItem(filterGroup, label);
             _cache.Set(cacheKey, filterItem,
                 new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
 
             return filterItem;
         }
 
-        private FilterItem CreateFilterItem(FilterGroup filterGroup, string filterItemLabel)
+        private FilterItem CreateFilterItem(FilterGroup filterGroup, string label)
         {
-            return _context.FilterItem.Add(new FilterItem
-            {
-                Label = filterItemLabel,
-                FilterGroup = filterGroup
-            }).Entity;
+            return _context.FilterItem.Add(new FilterItem(label, filterGroup)).Entity;
         }
 
         private FilterGroup LookupOrCreateFilterGroup(Filter filter, string label)
@@ -60,14 +56,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 label = "Default";
             }
 
-            var cacheKey = filter.Id + "_" + label.ToLower();
+            var cacheKey = GetFilterGroupCacheKey(filter, label);
             if (_cache.TryGetValue(cacheKey, out FilterGroup filterGroup))
             {
                 return filterGroup;
             }
 
             // TODO change expiry or introduce lookup
-            
+
             filterGroup = CreateFilterGroup(filter, label);
             _cache.Set(cacheKey, filterGroup,
                 new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
@@ -77,13 +73,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         private FilterGroup CreateFilterGroup(Filter filter, string label)
         {
-            var filterGroup = _context.FilterGroup.Add(new FilterGroup
-            {
-                Filter = filter,
-                Label = label
-            }).Entity;
+            var filterGroup = _context.FilterGroup.Add(new FilterGroup(filter, label)).Entity;
             _context.SaveChanges();
             return filterGroup;
+        }
+
+        private static string GetFilterGroupCacheKey(Filter filter, string filterGroupLabel)
+        {
+            return typeof(FilterGroup).Name + "_" +
+                   filter.Id + "_" +
+                   filterGroupLabel.ToLower().Replace(" ", "_");            
+        } 
+        
+        private static string GetFilterItemCacheKey(FilterGroup filterGroup, string filterItemLabel)
+        {
+            return typeof(FilterItem).Name + "_" +
+                   filterGroup.Id + "_" +
+                   filterItemLabel.ToLower().Replace(" ", "_");
         }
     }
 }

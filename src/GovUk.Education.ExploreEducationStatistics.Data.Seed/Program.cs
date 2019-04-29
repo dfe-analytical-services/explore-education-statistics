@@ -41,11 +41,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                         .UseSqlServer("Server=db;Database=master;User=SA;Password=Your_Password123;")
                         .EnableSensitiveDataLogging()
                 )
-                .AddTransient<ISeedService, SeedService>()
-                .AddTransient<IImporterService, ImporterService>()
                 .AddTransient<ImporterFilterService>()
                 .AddTransient<ImporterLocationService>()
                 .AddTransient<ImporterMetaService>()
+                .AddTransient<IImporterService, ImporterService>()
+                .AddTransient<ISeedService, SeedService>()
                 .BuildServiceProvider();
         }
     }

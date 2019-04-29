@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -11,6 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class MetaService : IMetaService
     {
+        private readonly IFilterService _filterService;
         private readonly IIndicatorGroupService _indicatorGroupService;
         private readonly IObservationService _observationService;
         private readonly IReleaseService _releaseService;
@@ -18,12 +20,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly IMapper _mapper;
 
         public MetaService(
+            IFilterService filterService,
             IIndicatorGroupService indicatorGroupService,
             IObservationService observationService,
             IReleaseService releaseService,
             ISubjectService subjectService,
             IMapper mapper)
         {
+            _filterService = filterService;
             _indicatorGroupService = indicatorGroupService;
             _observationService = observationService;
             _releaseService = releaseService;
@@ -55,56 +59,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             var locationMeta = _observationService.GetLocationMeta(subject.Id);
             var timePeriods = GetTimePeriods(subject.Id);
 
-            var national = locationMeta.Country.Distinct().Select(MapCountry);
+            var national = _mapper.Map<IEnumerable<LabelValueViewModel>>(locationMeta.Country);
 
-            var localAuthority = locationMeta.LocalAuthority.Distinct().Select(MapLocalAuthority);
+            var localAuthority = _mapper.Map<IEnumerable<LabelValueViewModel>>(locationMeta.LocalAuthority);
 
             var localAuthorityDistrict =
-                locationMeta.LocalAuthorityDistrict.Distinct().Select(MapLocalAuthorityDistrict);
+                _mapper.Map<IEnumerable<LabelValueViewModel>>(locationMeta.LocalAuthorityDistrict);
 
-            var region = locationMeta.Region.Distinct().Select(MapRegion);
+            var region = _mapper.Map<IEnumerable<LabelValueViewModel>>(locationMeta.Region);
 
             return new SubjectMetaViewModel
             {
-                CategoricalFilters = filters,
+                Filters = filters,
                 Indicators = indicators,
-                ObservationalUnits = new ObservationalUnitsMetaViewModel
-                {
-                    Location = new LegendOptionsMetaValueModel<LocationMetaViewModel>
+                Locations =
+                    new Dictionary<string, LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>
                     {
-                        Hint = "Filter statistics by location level",
-                        Legend = "Location",
-                        Options = new LocationMetaViewModel
                         {
-                            LocalAuthority = new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                            GeographicLevel.Local_Authority.ToString().PascalCase(),
+                            new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
                             {
-                                Label = "Local Authority",
+                                Hint = "",
+                                Legend = "Local Authority",
                                 Options = localAuthority
-                            },
-                            LocalAuthorityDistrict = new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                            }
+                        },
+                        {
+                            GeographicLevel.Local_Authority_District.ToString().PascalCase(),
+                            new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
                             {
-                                Label = "Local Authority District",
+                                Hint = "",
+                                Legend = "Local Authority District",
                                 Options = localAuthorityDistrict
-                            },
-                            National = new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                            }
+                        },
+                        {
+                            GeographicLevel.National.ToString().PascalCase(),
+                            new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
                             {
-                                Label = "National",
+                                Hint = "",
+                                Legend = "National",
                                 Options = national
-                            },
-                            Region = new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                            }
+                        },
+                        {
+                            GeographicLevel.Regional.ToString().PascalCase(),
+                            new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
                             {
-                                Label = "Region",
+                                Hint = "",
+                                Legend = "Region",
                                 Options = region
-                            },
-                            School = new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
-                            {
-                                Label = "School",
-                                Options = new List<LabelValueViewModel>()
                             }
                         }
                     },
-                    TimePeriod = timePeriods
-                }
+                TimePeriod = timePeriods
             };
         }
 
@@ -128,12 +136,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private Dictionary<string, LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>> GetIndicators(
             long subjectId)
         {
-            return _indicatorGroupService.GetGroupedIndicatorsBySubjectId(subjectId).ToDictionary(
-                pair => pair.Key.Id.ToString(),
-                pair => new LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>
+            return _indicatorGroupService.GetIndicatorGroupsBySubjectId(subjectId).ToDictionary(
+                group => group.Label.PascalCase(),
+                group => new LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>
                 {
-                    Label = pair.Key.Label,
-                    Options = _mapper.Map<IEnumerable<IndicatorMetaViewModel>>(pair.Value)
+                    Label = group.Label,
+                    Options = _mapper.Map<IEnumerable<IndicatorMetaViewModel>>(group.Indicators)
                 }
             );
         }
@@ -141,277 +149,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private Dictionary<string, LegendOptionsMetaValueModel<Dictionary<string,
             LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>> GetFilters(long subjectId)
         {
-            return new Dictionary<string,
-                LegendOptionsMetaValueModel<Dictionary<string,
-                    LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>>
-            {
+            return _filterService.GetFiltersBySubjectId(subjectId).ToDictionary(
+                filter => filter.Label.PascalCase(),
+                filter => new LegendOptionsMetaValueModel<Dictionary<string,
+                    LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>
                 {
-                    "1", // Filter.Id
-                    new LegendOptionsMetaValueModel<Dictionary<string,
-                        LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>
-                    {
-                        Hint = "Filter by pupil characteristic", // Filter.Hint
-                        Legend = "Characteristic", // Filter.Label
-                        Options =
-                            new Dictionary<string, LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>
+                    Hint = filter.Hint,
+                    Legend = filter.Label,
+                    Options = filter.FilterGroups.ToDictionary(
+                        group => group.Label.PascalCase(),
+                        group => new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                        {
+                            Label = group.Label,
+                            Options = group.FilterItems.Select(item => new LabelValueViewModel
                             {
-                                {
-                                    "6", // FilterGroup.Id
-                                    new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
-                                    {
-                                        Label = "NC year", // FilterGroup.Label
-                                        Options = new List<LabelValueViewModel>
-                                        {
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "NC Year 1 and below", // FilterItem.Label
-                                                Value = "29" // FilterItem.Id
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "NC Year 2",
-                                                Value = "30"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "NC Year 3",
-                                                Value = "31"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "NC Year 4",
-                                                Value = "32"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "NC Year 5",
-                                                Value = "33"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "NC Year 6",
-                                                Value = "34"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "NC Year 7",
-                                                Value = "35"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "NC Year 8",
-                                                Value = "36"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "NC Year 9",
-                                                Value = "37"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "NC Year 10",
-                                                Value = "38"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "NC Year 11",
-                                                Value = "39"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "NC Year 12 and above",
-                                                Value = "40"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "NC Year not followed or missing",
-                                                Value = "41"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "NC Year Unclassified",
-                                                Value = "75"
-                                            }
-                                        }
-                                    }
-                                },
-                                {
-                                    "3",
-                                    new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
-                                    {
-                                        Label = "Gender",
-                                        Options = new List<LabelValueViewModel>
-                                        {
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "Gender female",
-                                                Value = "3"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "Gender male",
-                                                Value = "4"
-                                            }
-                                        }
-                                    }
-                                },
-                                {
-                                    "9",
-                                    new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
-                                    {
-                                        Label = "SEN provision",
-                                        Options = new List<LabelValueViewModel>
-                                        {
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "SEN provision No identified SEN",
-                                                Value = "48"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "SEN provision Statement or EHCP",
-                                                Value = "49"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "SEN provision SEN Support",
-                                                Value = "50"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "SEN provision Unclassified",
-                                                Value = "51"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "SEN provision statement",
-                                                Value = "73"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "SEN provision SEN without statement",
-                                                Value = "74"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "SEN provision School Action",
-                                                Value = "80"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "SEN provision School Action Plus",
-                                                Value = "81"
-                                            }
-                                        }
-                                    }
-                                },
-                                {
-                                    "7",
-                                    new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
-                                    {
-                                        Label = "FSM",
-                                        Options = new List<LabelValueViewModel>
-                                        {
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "FSM eligible",
-                                                Value = "42"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "FSM not eligible",
-                                                Value = "43"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "FSM unclassified",
-                                                Value = "44"
-                                            }
-                                        }
-                                    }
-                                },
-                                {
-                                    "1",
-                                    new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
-                                    {
-                                        Label = "All pupils",
-                                        Options = new List<LabelValueViewModel>
-                                        {
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "All pupils",
-                                                Value = "1"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                    }
-                },
-                {
-                    "2",
-                    new LegendOptionsMetaValueModel<Dictionary<string,
-                        LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>
-                    {
-                        Hint = "Filter by school type",
-                        Legend = "School type",
-                        Options =
-                            new Dictionary<string, LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>
-                            {
-                                {
-                                    "2",
-                                    new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
-                                    {
-                                        Label = "Default",
-                                        Options = new List<LabelValueViewModel>
-                                        {
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "All schools",
-                                                Value = "2"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "State-funded primary",
-                                                Value = "70"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "State-funded secondary",
-                                                Value = "71"
-                                            },
-                                            new LabelValueViewModel
-                                            {
-                                                Label = "Special",
-                                                Value = "72"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                    }
-                }
-            };
-        }
-
-        private LabelValueViewModel MapCountry(Country country)
-        {
-            return _mapper.Map<LabelValueViewModel>(country);
-        }
-
-        private LabelValueViewModel MapLocalAuthority(LocalAuthority localAuthority)
-        {
-            return _mapper.Map<LabelValueViewModel>(localAuthority);
-        }
-
-        private LabelValueViewModel MapLocalAuthorityDistrict(LocalAuthorityDistrict localAuthorityDistrict)
-        {
-            return _mapper.Map<LabelValueViewModel>(localAuthorityDistrict);
-        }
-
-        private LabelValueViewModel MapRegion(Region region)
-        {
-            return _mapper.Map<LabelValueViewModel>(region);
+                                Label = item.Label,
+                                Value = item.Id.ToString()
+                            })
+                        })
+                });
         }
     }
 }

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Seed.Models;
 using Microsoft.Extensions.Logging;
 

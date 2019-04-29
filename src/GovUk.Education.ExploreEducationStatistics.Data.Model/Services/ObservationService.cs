@@ -33,11 +33,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var locations = GetLocations(subjectId);
             return new LocationMeta
             {
-                Country = locations.GroupBy(composite => composite.Country).Select(group => group.Key),
-                LocalAuthority = locations.GroupBy(composite => composite.LocalAuthority).Select(group => group.Key),
-                LocalAuthorityDistrict = locations.GroupBy(composite => composite.LocalAuthorityDistrict)
+                Country = locations.GroupBy(composite => composite.Country)
+                    .Where(grouping => grouping.Key != null)
                     .Select(group => group.Key),
-                Region = locations.GroupBy(composite => composite.Region).Select(group => group.Key)
+                LocalAuthority = locations.GroupBy(composite => composite.LocalAuthority)
+                    .Where(grouping => grouping.Key.Code != null)
+                    .Select(group => group.Key),
+                LocalAuthorityDistrict = locations.GroupBy(composite => composite.LocalAuthorityDistrict)
+                    .Where(grouping => grouping.Key.Code != null)
+                    .Select(group => group.Key),
+                Region = locations.GroupBy(composite => composite.Region)
+                    .Where(grouping => grouping.Key.Code != null)
+                    .Select(group => group.Key)
             };
         }
 

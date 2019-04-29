@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Data.Seed.Models;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
+namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions
 {
     public static class SeedExtensions
     {

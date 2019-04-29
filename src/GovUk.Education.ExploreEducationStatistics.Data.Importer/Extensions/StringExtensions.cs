@@ -1,6 +1,6 @@
-namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
+namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Extensions
 {
-    public static class ImporterExtensions
+    public static class StringExtensions
     {
         public static string NullIfWhiteSpace(this string value)
         {
