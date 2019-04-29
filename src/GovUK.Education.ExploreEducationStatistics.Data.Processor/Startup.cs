@@ -3,10 +3,12 @@ using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUK.Education.ExploreEducationStatistics.Data.Processor;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
+using GovUK.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Azure.WebJobs.Logging;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Willezone.Azure.WebJobs.Extensions.DependencyInjection;
@@ -29,15 +31,23 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
 
         public IServiceProvider Build()
         {
+            IConfigurationRoot config = new ConfigurationBuilder()
+                .SetBasePath(Environment.CurrentDirectory)
+                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
+
+            var connectionString = config.GetConnectionString("SQLConnectionString");
             var services = new ServiceCollection();
 
             services.AddMemoryCache();
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options
-                    .UseSqlServer("Server=localhost;Database=master;User=SA;Password=Your_Password123;")
+                    .UseSqlServer(connectionString)
                     .EnableSensitiveDataLogging());
 
+            services.AddTransient<IBlobService, BlobService>();
             services.AddTransient<ISeedService, SeedService>();
             services.AddTransient<IImporterService, ImporterService>();
             services.AddTransient<ImporterFilterService>();

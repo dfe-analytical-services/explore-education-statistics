@@ -2,6 +2,8 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
     using System.Threading.Tasks;
     using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
     using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
@@ -20,9 +22,9 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
         private const string UploadsDir = "admin-file-uploads";
 
         [FunctionName("FilesProcessor")]
-        public void FilesProcessorFunc(
-            [QueueTrigger("filesprocessor-queue", Connection = "")]
-            JObject fNotify,
+        public static void FilesProcessorFunc(
+            [QueueTrigger("publications-pending", Connection = "")] JObject fNotify,
+            [Queue("publications-processed", Connection = "")] out JObject fNotifyOut,
             [Inject]ISeedService seedService,
             ILogger log,
             ExecutionContext context)
@@ -31,16 +33,22 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
 
             var filesProcessorNotification = ExtractNotification(fNotify);
             var config = LoadAppSettings(context);
-            var connectionStr = config.GetConnectionString(StorageConnectionName);
+            var blobStorageConnectionStr = config.GetConnectionString(StorageConnectionName);
 
-            ProcessFiles(seedService, filesProcessorNotification, connectionStr, log);
+            ProcessFiles(seedService, filesProcessorNotification, blobStorageConnectionStr, log);
 
             log.LogInformation("Completed files processing");
+
+            fNotifyOut = fNotify;
         }
 
-        public void ProcessFiles(ISeedService seedService, ProcessorNotification processorNotification, string connectionStr, ILogger log)
+        private static void ProcessFiles(
+            ISeedService seedService,
+            ProcessorNotification processorNotification,
+            string blobStorageConnectionStr,
+            ILogger log)
         {
-            if (CloudStorageAccount.TryParse(connectionStr, out var storageAccount))
+            if (CloudStorageAccount.TryParse(blobStorageConnectionStr, out var storageAccount))
             {
                 try
                 {
@@ -114,19 +122,18 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
                 // Get the value of the continuation token returned by the listing call.
                 blobContinuationToken = results.ContinuationToken;
 
-                foreach (IListBlobItem item in results.Results)
+                foreach (IListBlobItem item in results.Results.Where(
+                    r => Path.GetFileName(r.Uri.AbsolutePath).EndsWith(".csv")
+                                      && !Path.GetFileName(r.Uri.AbsolutePath).StartsWith("meta")))
                 {
-                    var filename = GetFileName(item);
+                    var sName = GetSubjectName(item);
 
-                    if (!filename.StartsWith("meta"))
+                    list.Add(new Subject()
                     {
-                        list.Add(new Subject()
-                        {
-                            Name = filename,
-                            CsvDataBlob = blobContainer.GetBlockBlobReference(directory + "/" + filename + ".csv"),
-                            CsvMetaDataBlob = blobContainer.GetBlockBlobReference(directory + "/meta_" + filename + ".csv")
-                        });
-                    }
+                        Name = sName,
+                        CsvDataBlob = blobContainer.GetBlockBlobReference(directory + "/" + sName + ".csv"),
+                        CsvMetaDataBlob = blobContainer.GetBlockBlobReference(directory + "/meta_" + sName + ".csv")
+                    });
                 }
             }
             while (blobContinuationToken != null); // Loop while the continuation token is not null.
@@ -134,9 +141,9 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
             return list.ToArray();
         }
 
-        private static string GetFileName(IListBlobItem item)
+        private static string GetSubjectName(IListBlobItem item)
         {
-            var filename = System.IO.Path.GetFileName(item.Uri.AbsolutePath);
+            var filename = Path.GetFileName(item.Uri.AbsolutePath);
             var lastindex = filename.LastIndexOf('.');
             if (lastindex != -1)
             {

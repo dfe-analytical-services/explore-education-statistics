@@ -3,6 +3,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
     using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
     using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
+    using GovUK.Education.ExploreEducationStatistics.Data.Processor.Services;
     using Microsoft.Extensions.Logging;
 
     public class SeedService : ISeedService
@@ -10,15 +11,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly ILogger _logger;
         private readonly ApplicationDbContext _context;
         private readonly IImporterService _importerService;
+        private readonly IBlobService _blobService;
 
         public SeedService(
             ILogger<SeedService> logger,
             ApplicationDbContext context,
-            IImporterService importerService)
+            IImporterService importerService,
+            IBlobService blobService)
         {
             _logger = logger;
             _context = context;
             _importerService = importerService;
+            _blobService = blobService;
         }
 
         public void Seed(Publication publication)
@@ -46,10 +50,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private void SeedSubject(Model.Release release, Subject subject)
         {
             _logger.LogInformation("Seeding Subject for {Publication}, {Subject}", release.PublicationId, subject.Name);
-
+ 
             var subjectDb = CreateSubject(release, subject);
+            var sSubject = subjectDb.Name.Split("_");
+            var destFolder = sSubject[0] + "/" + release.PublicationId.ToString();
 
             _importerService.Import(subject.GetCsvLines(), subject.GetMetaLines(), subjectDb);
+
+            _blobService.MoveBlobBetweenContainers(subject.CsvDataBlob, destFolder);
+            _blobService.MoveBlobBetweenContainers(subject.CsvMetaDataBlob, destFolder);
         }
 
         private Model.Release CreateRelease(Release release)
