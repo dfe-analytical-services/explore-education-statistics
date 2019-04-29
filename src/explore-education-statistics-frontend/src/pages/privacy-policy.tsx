@@ -10,10 +10,10 @@ function PrivacyPolicyPage() {
       <div>
         <h3>Who we are</h3>
         <p>
-          The Explore education statistics service is operated by the Department
+          The explore education statistics service is operated by the Department
           for Education ('we' or 'us'). For the purpose of data protection
           legislation, DfE is the data controller for the personal data
-          processed as part of the Explore education statistics service.
+          processed as part of the explore education statistics service.
         </p>
         <p>
           This privacy policy sets out how we collect and process your personal
@@ -22,7 +22,7 @@ function PrivacyPolicyPage() {
         </p>
       </div>
       <div>
-        <h3>How well use your information</h3>
+        <h3>How we'll use your information</h3>
         <p>
           We receive your personal data when you visit our service, complete our
           feedback survey or tell us if something is wrong. We use this
@@ -41,7 +41,7 @@ function PrivacyPolicyPage() {
           your personal data as set out in this privacy policy, which
           supplements our terms of use for the{' '}
           <a href="" target="_blank">
-            Explore education statistics service
+            explore education statistics service
             <span> opens in a new window </span>
           </a>
           .
@@ -49,7 +49,14 @@ function PrivacyPolicyPage() {
       </div>
       <div>
         <h3>The nature of your personal data we will be using</h3>
-        <p>SECTION AND CONTENT TBC</p>
+        <p>
+          We’ll be using the following categories of your personal data for our
+          service:
+        </p>
+        <ul>
+          <li>type of personal data 1</li>
+          <li>type of personal data 2</li>
+        </ul>
       </div>
       <div>
         <h3>Why our use of your personal data is lawful</h3>
