@@ -43,7 +43,12 @@ class EditablePublicationPage extends Component<Props, State> {
   public constructor(props: Props) {
     super(props);
 
-    this.setState({ reordering: false });
+    this.state = { reordering: false, data: undefined };
+  }
+
+  public componentDidMount() {
+    const { data } = this.props;
+    this.setState({ data });
   }
 
   public onDragEnd = (result: DropResult) => {
@@ -187,8 +192,6 @@ class EditablePublicationPage extends Component<Props, State> {
   public render() {
     const { editing } = this.props;
     const { data } = this.state;
-
-    if (data === undefined) return <div />;
 
     return (
       <>
@@ -408,7 +411,9 @@ class EditablePublicationPage extends Component<Props, State> {
             chartDataKeys={['unauthorised', 'authorised', 'overall']}
           />
 
-          {data.content.length > 0 && this.renderContentSections(data, editing)}
+          {data &&
+            data.content.length > 0 &&
+            this.renderContentSections(data, editing)}
 
           <h2 className="govuk-heading-m govuk-!-margin-top-9">
             Extra information
