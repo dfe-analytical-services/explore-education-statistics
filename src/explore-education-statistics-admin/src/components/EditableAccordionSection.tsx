@@ -1,6 +1,6 @@
 import GoToTopLink from '@common/components/GoToTopLink';
 import classNames from 'classnames';
-import React, { createElement, createRef, ReactNode } from 'react';
+import React, { createElement, createRef, ReactNode, useState } from 'react';
 
 export interface EditableAccordionSectionProps {
   caption?: string;
@@ -33,21 +33,24 @@ const EditableAccordionSection = ({
   onToggle,
 }: EditableAccordionSectionProps) => {
   const target = createRef<HTMLDivElement>();
+  const [isOpen, setIsOpen] = useState(open);
+  const [previousOpen, setPreviousOpen] = useState(open);
+
+  if (open !== previousOpen) {
+    setPreviousOpen(open);
+    setIsOpen(open);
+  }
 
   return (
     <div
       ref={target}
-      onClick={event => {
+      onClick={() => {
         if (onToggle) {
-          onToggle(
-            event.currentTarget.classList.contains(
-              'govuk-accordion__section--expanded',
-            ),
-          );
+          onToggle(isOpen);
         }
       }}
       className={classNames('govuk-accordion__section', className, {
-        'govuk-accordion__section--expanded': open,
+        'govuk-accordion__section--expanded': isOpen,
       })}
       role="presentation"
     >
@@ -58,9 +61,7 @@ const EditableAccordionSection = ({
             className: 'govuk-accordion__section-heading',
             onClick: () => {
               if (target.current) {
-                target.current.classList.toggle(
-                  'govuk-accordion__section--expanded',
-                );
+                setIsOpen(!isOpen);
               }
             },
           },

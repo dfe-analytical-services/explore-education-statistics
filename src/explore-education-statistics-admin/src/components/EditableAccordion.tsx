@@ -11,29 +11,17 @@ export interface EditableAccordionProps {
 }
 
 interface State {
-  hash: string;
+  openAll: boolean;
 }
 
 class EditableAccordion extends Component<EditableAccordionProps, State> {
-  /*
-  public state = {
-    hash: '',
-  };
-  */
-
   private ref = createRef<HTMLDivElement>();
 
-  public componentDidMount(): void {
-    /*
-    import('govuk-frontend/components/accordion/accordion').then(
-      ({ default: GovUkAccordion }) => {
-        if (this.ref.current) {
-          new GovUkAccordion(this.ref.current).init();
-        }
-      },
-    );
-    */
+  public state = {
+    openAll: false,
+  };
 
+  public componentDidMount(): void {
     this.goToHash();
     window.addEventListener('hashchange', this.goToHash);
   }
@@ -60,6 +48,14 @@ class EditableAccordion extends Component<EditableAccordionProps, State> {
     }
   };
 
+  private toggleAll() {
+    const { openAll } = this.state;
+
+    this.setState({
+      openAll: !openAll,
+    });
+  }
+
   public render() {
     const { children, id, index } = this.props;
 
@@ -70,15 +66,19 @@ class EditableAccordion extends Component<EditableAccordionProps, State> {
             type="button"
             className="govuk-accordion__open-all"
             aria-expanded="false"
+            onClick={() => this.toggleAll()}
           >
             Open all<span className="govuk-visually-hidden"> sections</span>
           </button>
         </div>
         {React.Children.map(children, (child, thisIndex) => {
           if (isComponentType(child, EditableAccordionSection)) {
+            const { openAll } = this.state;
+
             return cloneElement<EditableAccordionSectionProps>(child, {
               index: thisIndex,
               droppableIndex: index,
+              open: openAll,
             });
           }
 
