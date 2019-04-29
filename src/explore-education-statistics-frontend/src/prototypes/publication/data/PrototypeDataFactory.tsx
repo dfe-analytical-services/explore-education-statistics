@@ -39,12 +39,12 @@ function createDataValues(
 
       return row.reduce((result, next, index) => {
         if (next) {
-          const newIndicators = [...indicators];
-          newIndicators[index] = `${next}`;
-
           return {
             ...result,
-            indicators: newIndicators,
+            indicators: {
+              ...result.indicators,
+              [indicators[index]]: `${next}`,
+            },
           };
         }
         return result;
