@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public abstract class AbstractDataService<TEntity, TKey> : IDataService<TEntity, TKey> where TEntity : class
     {
-        private readonly ApplicationDbContext _context;
+        protected readonly ApplicationDbContext _context;
 
         private readonly ILogger _logger;
 

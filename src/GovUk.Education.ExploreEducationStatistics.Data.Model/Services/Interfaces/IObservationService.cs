@@ -7,8 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 {
     public interface IObservationService : IDataService<Observation, long>
     {
-        IEnumerable<Observation> FindObservations(Expression<Func<Observation, bool>> findExpression);
+        IEnumerable<Observation> FindObservations(Expression<Func<Observation, bool>> findExpression,
+            IEnumerable<long> filters);
+
         LocationMeta GetLocationMeta(long subjectId);
+
         IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(long subjectId);
     }
 }

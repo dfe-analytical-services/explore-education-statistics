@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public long SubjectId { get; set; }
         public int StartYear { get; set; }
         public int EndYear { get; set; }
-        public IEnumerable<string> Filters { get; set; }
+        public IEnumerable<long> Filters { get; set; }
         public GeographicLevel GeographicLevel { get; set; }
         public IEnumerable<long> Indicators { get; set; }
         public IEnumerable<string> Countries { get; set; }

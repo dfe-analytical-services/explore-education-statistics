@@ -22,13 +22,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             _locationService = locationService;
         }
 
-        public IEnumerable<Observation> FindObservations(Expression<Func<Observation, bool>> findExpression)
-        {
-            return DbSet().Where(findExpression)
+        public IEnumerable<Observation> FindObservations(Expression<Func<Observation, bool>> findExpression, IEnumerable<long> filters)
+        {            
+            var queryable = DbSet().Where(findExpression)
                 .Include(observation => observation.Subject)
                 .Include(observation => observation.Location)
                 .Include(observation => observation.FilterItems)
                 .ThenInclude(item => item.FilterItem.FilterGroup);
+
+            return
+                from ofi in _context.ObservationFilterItem
+                join o in queryable on ofi.ObservationId equals o.Id
+                where filters.Contains(ofi.FilterItemId)
+                select o;
         }
 
         public IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(long subjectId)

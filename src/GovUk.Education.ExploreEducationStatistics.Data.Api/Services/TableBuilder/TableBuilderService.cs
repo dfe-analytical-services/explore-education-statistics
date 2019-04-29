@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
                 return new List<Observation>();
             }
 
-            return _observationService.FindObservations(queryContext.FindExpression());
+            return _observationService.FindObservations(queryContext.FindExpression(), queryContext.Filters);
         }
     }
 }
