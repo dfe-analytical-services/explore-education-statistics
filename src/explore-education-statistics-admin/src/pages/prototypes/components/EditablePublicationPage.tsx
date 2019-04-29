@@ -1,3 +1,5 @@
+/* eslint-disable react/destructuring-assignment,prefer-destructuring */
+
 import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
 import React, { Component } from 'react';
 import {
@@ -81,6 +83,26 @@ class EditablePublicationPage extends Component<Props, State> {
     }
   };
 
+  public addNewSection() {
+    if (this.state.data) {
+      const { data } = this.state;
+
+      data.content.push({
+        heading: 'New section',
+        order: data.content.length + 1,
+        caption: '',
+        content: [
+          {
+            type: 'MarkDownBlock',
+            body: 'editable',
+          },
+        ],
+      });
+
+      this.setState({ data });
+    }
+  }
+
   private renderContentSections(data: Release, editing: boolean | undefined) {
     const { reordering } = this.state;
 
@@ -123,6 +145,10 @@ class EditablePublicationPage extends Component<Props, State> {
             </EditableAccordionSection>
           ))}
         </EditableAccordion>
+
+        <button type="button" onClick={() => this.addNewSection()}>
+          Add new section
+        </button>
       </div>
     );
   }
@@ -152,7 +178,7 @@ class EditablePublicationPage extends Component<Props, State> {
               {data &&
                 data.content.map(({ heading, order }, index) => (
                   <Draggable
-                    draggableId={`section(${index})`}
+                    draggableId={`section(${order})`}
                     index={index}
                     key={`${order}`}
                   >

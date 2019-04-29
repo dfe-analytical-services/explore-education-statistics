@@ -24,6 +24,7 @@ class EditableAccordion extends Component<EditableAccordionProps, State> {
   private ref = createRef<HTMLDivElement>();
 
   public componentDidMount(): void {
+    /*
     import('govuk-frontend/components/accordion/accordion').then(
       ({ default: GovUkAccordion }) => {
         if (this.ref.current) {
@@ -31,6 +32,7 @@ class EditableAccordion extends Component<EditableAccordionProps, State> {
         }
       },
     );
+    */
 
     this.goToHash();
     window.addEventListener('hashchange', this.goToHash);
@@ -63,6 +65,15 @@ class EditableAccordion extends Component<EditableAccordionProps, State> {
 
     return (
       <div className="govuk-accordion" ref={this.ref} id={id}>
+        <div className="govuk-accordion__controls">
+          <button
+            type="button"
+            className="govuk-accordion__open-all"
+            aria-expanded="false"
+          >
+            Open all<span className="govuk-visually-hidden"> sections</span>
+          </button>
+        </div>
         {React.Children.map(children, (child, thisIndex) => {
           if (isComponentType(child, EditableAccordionSection)) {
             return cloneElement<EditableAccordionSectionProps>(child, {
