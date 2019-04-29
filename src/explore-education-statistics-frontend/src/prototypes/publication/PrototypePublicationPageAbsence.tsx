@@ -436,52 +436,55 @@ const PublicationPage = () => {
             chartDataKeys={['primary', 'secondary', 'primary and secondary']}
           />
           <p>
-            The percentage of enrolments in state-funded primary and
-            state-funded secondary schools that were classified as persistent
-            absentees in 2016/17 was 10.8 per cent. This is up from the
-            equivalent figure of 10.5 per cent in 2015/16 (see Figure 2).
+            Persistent absence in primary and secondary schools in 2016/17 was
+            10.8% up from 10.5% in 2015/16.
           </p>
           <p>
-            In 2016/17, persistent absentees accounted for 37.6 per cent of all
-            absence compared to 36.6 per cent in 2015/16. Longer term, there has
-            been a decrease in the proportion of absence that persistent
-            absentees account for – down from 43.3 per cent in 2011/12.
+            It accounted for 37.6% of all absence in 2016/17 up from 36.6% in
+            2015/16 but still down on the 43.3% rater recorded in 2011/12.
           </p>
           <p>
             The overall absence rate for persistent absentees across all schools
-            was 18.1 per cent, nearly four times higher than the rate for all
-            pupils. This is a slight increase from 2015/16, when the overall
-            absence rate for persistent absentees was 17.6 per cent.
+            was 18.1%, nearly 4 times higher than the rate for all pupils.
           </p>
           <p>
-            Persistent absentees account for almost a third, 31.6 per cent, of
-            all authorised absence and more than half, 53.8 per cent of all
-            unauthorised absence. The rate of illness absences is almost 4 times
-            higher for persistent absentees compared to other pupils, at 7.6 per
-            cent and 2.0 per cent respectively.
+            This is a slight increase from 2015/16 when the overall absence rate
+            for persistent absentees was 17.6%.
+          </p>
+          <p>
+            Persistent absence accounts for almost a third (31.6%) of all
+            authorised absence and more than half (53.8%) of all unauthorised
+            absence.
+          </p>
+          <p>
+            The rate of illness absences is almost 4 times higher (7.6%) for
+            persistent absentees compared to other pupils (2%).
           </p>
         </AccordionSection>
 
         <AccordionSection heading="Reasons for absence">
           <div className="govuk-inset-text">
             <p>
-              Within this release absence by reason is broken down in three
-              different ways:
+              Within this release absence by reason is broken down in the
+              following ways:
             </p>
-            <p>
-              Distribution of absence by reason: The proportion of absence for
-              each reason, calculated by taking the number of absences for a
-              specific reason as a percentage of the total number of absences.
-            </p>
-            <p>
-              Rate of absence by reason: The rate of absence for each reason,
-              calculated by taking the number of absences for a specific reason
-              as a percentage of the total number of possible sessions.
-            </p>
-            <p>
-              One or more sessions missed due to each reason: The number of
-              pupil enrolments missing at least one session due to each reason.
-            </p>
+            <ul className="govuk-list">
+              <li>
+                Distribution of absence by reason - the proportion of absence
+                for each reason, calculated by taking the number of absences for
+                a specific reason as a percentage of the total number of
+                absences
+              </li>
+              <li>
+                Rate of absence by reason - the rate of absence for each reason,
+                calculated by taking the number of absences for a specific
+                reason as a percentage of the total number of possible sessions
+              </li>
+              <li>
+                One or more sessions missed due to each reason - the number of
+                pupil enrolments missing at least 1 session due to each reason
+              </li>
+            </ul>
           </div>
           <PrototypeDataSample
             sectionId="reasonAbsence"
@@ -523,48 +526,49 @@ const PublicationPage = () => {
             chartDataKeys={['overall', 'illness', 'family holiday']}
           />
           <p>
-            Illness is the main driver for overall absence rates, however whilst
-            overall absence rates have increased slightly since 2015/16, illness
-            rates have remained the same at 2.6 per cent. Illness absence
-            accounted for 55.3 per cent of all absence in 2016/17, a lower
-            proportion than seen in previous years - 57.3 in 2015/16 and 60.1 in
-            2014/15.
+            Illness is the main driver for overall absence rates but while
+            overall absence rates have increased slightly since 2015/16 illness
+            rates have remained the same at 2.6%.
+          </p>
+          <p>
+            Illness accounted for 55.3% of all absence in 2016/17 down from
+            57.3% in 2015/16 and 60.1% in 2014/15.
           </p>
           <p>
             The rate of absence due to other unauthorised circumstances has
-            remained the same as in 2015/16 at 0.7 per cent.
+            remained the same as in 2015/16 at 0.7%.
           </p>
           <h3 className="govuk-heading-s">Absence due to family holiday</h3>
           <p>
-            The percentage of pupils who missed at least one session due to a
-            family holiday in 2016/17 was 16.9 per cent, compared with 14.7 per
-            cent in 2015/16.
+            The percentage of pupils who missed at least 1 session due to a
+            family holiday in 2016/17 was 16.9% compared with 14.7% in 2015/16.
           </p>
           <p>
-            The absence rate due to family holidays agreed by the school was 0.1
-            in 2016/17, which was the same as in 2015/16. The percentage of all
-            possible sessions missed due to unauthorised family holidays
-            increased from 0.3 per cent in 2015/16 to 0.4 in 2016/17.
+            The absence rate due to family holidays agreed by the school statyed
+            at 0.1% for 2016/17 while the percentage of all possible sessions
+            missed due to unauthorised family holidays increased from 0.3% in
+            2015/16 to 0.4% in 2016/17.
           </p>
           <p>
             Unauthorised holiday absence rates have been increasing gradually
-            since 2006/07, authorised holiday absence rates are much lower now
-            than in 2006/07 but have remained steady over recent years. From
-            September 2013 a regulations amendment stated that term time leave
-            may only be granted in exceptional circumstances, which explains the
-            sharp fall in authorised holiday absence between 2012/13 and
+            since 2006/07 while authorised holiday absence rates are much lower
+            now than in 2006/07 and remained steady over recent years.
+          </p>
+          <p>
+            A regulation amendment in September 2013 stated that term-time leave
+            could only be granted in exceptional circumstances which explains
+            the sharp fall in authorised holiday absence between 2012/13 and
             2013/14.
           </p>
           <p>
-            The figures in this publication relate to the period after the Isle
-            of Wight Council v Jon Platt High Court judgment (which was in May
-            2016) where the High Court supported a local magistrates’ ruling
-            that there was no case to answer and partially to the period after
-            the judgment in the Supreme Court (which was in April 2017) where
-            the Supreme Court unanimously agreed that no children should be
-            taken out of school without good reason and clarified that
-            ‘regularly’ means ‘in accordance with the rules prescribed by the
-            school’.
+            The statistics and data shown here relate to the period after the
+            Isle of Wight Council v Jon Platt High Court judgment (May 2016)
+            where the High Court supported a local magistrates’ ruling that
+            there was no case to answer and partially to the period after the
+            April 2017 Supreme Court judgment where it unanimously agreed that
+            no children should be taken out of school without good reason and
+            clarified that 'regularly' means 'in accordance with the rules
+            prescribed by the school'.
           </p>
         </AccordionSection>
         <AccordionSection heading="Distribution of absence">
