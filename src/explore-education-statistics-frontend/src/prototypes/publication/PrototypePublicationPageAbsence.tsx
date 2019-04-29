@@ -573,27 +573,27 @@ const PublicationPage = () => {
         </AccordionSection>
         <AccordionSection heading="Distribution of absence">
           <p>
-            Nearly half of all pupils (48.9 per cent) were absent for five days
-            or fewer across state-funded primary, secondary and special schools
-            in 2016/17, down from 49.1 per cent in 2015/16.
+            Nearly half of all pupils (48.9%) were absent for 5 days or fewer
+            across primary, secondary and special schools in 2016/17, down from
+            49.1% in 2015/16.
           </p>
           <p>
-            4.3 per cent of pupil enrolments had more than 25 days of absence in
-            2016/17 (the same as in 2015/16). These pupil enrolments accounted
-            for 23.5 per cent of days missed. 8.2 per cent of pupil enrolments
+            The rate of pupils who had more than 25 days of absence in 2016/17
+            (4.3% ) was the same as in 2015/16.
+          </p>
+          <p>
+            These pupils accounted for 23.5% of days missed while 8.2% of pupils
             had no absence during 2016/17.
           </p>
           <p>
-            Per pupil enrolment, the average total absence in primary schools
-            was 7.2 days, compared to 16.9 days in special schools and 9.3 days
-            in secondary schools.
+            The average total absence in primary schools per pupil was 7.2 days
+            compared to 16.9 days in special and 9.3 days in secondary schools.
           </p>
           <p>
-            When looking at absence rates across terms for primary, secondary
-            and special schools, the overall absence rate is lowest in the
-            autumn term and highest in the summer term. The authorised rate is
-            highest in the spring term and lowest in the summer term, and the
-            unauthorised rate is highest in the summer term.
+            Across all schools, the overall absence rate is lowest in the autumn
+            and highest in the summer term, authorised absence is in the spring
+            and lowest in the summer term while unauthorised absence is highest
+            in the summer term.
           </p>
         </AccordionSection>
         <AccordionSection heading="Absence by pupil characteristics">
@@ -601,75 +601,80 @@ const PublicationPage = () => {
             The patterns of absence rates for pupils with different
             characteristics have been consistent across recent years.
           </p>
-          <h3 className="govuk-heading-s">Gender</h3>
+          <h3 className="govuk-heading-s">Ethnic group</h3>
           <p>
-            The overall absence rates across state-funded primary, secondary and
-            special schools were very similar for boys and girls, at 4.7 per
-            cent and 4.6 per cent respectively. The persistent absence rates
-            were also similar, at 10.9 per cent for boys and 10.6 per cent for
-            girls.
+            The highest overall absence rates were for Traveller of Irish
+            Heritage and Gypsy/ Roma pupils at 18.1% and 12.9% respectively.
+          </p>
+          <p>
+            Overall absence rates for pupils of a Chinese and Black African
+            ethnicity were substantially lower than the national average of 4.7%
+            at 2.4% and 2.9% respectively.
+          </p>
+          <p>
+            A similar pattern is seen in persistent absence rates where
+            Traveller of Irish heritage pupils had the highest rate at 64% and
+            Chinese pupils had the lowest rate at 3.1%.
           </p>
           <h3 className="govuk-heading-s">
             Free school meals (FSM) eligibility
           </h3>
           <p>
             Absence rates are higher for pupils who are known to be eligible for
-            and claiming free school meals. The overall absence rate for these
-            pupils was 7.3 per cent, compared to 4.2 per cent for non FSM
-            pupils. The persistent absence rate for pupils who were eligible for
-            FSM was more than twice the rate for those pupils not eligible for
-            FSM.
+            and claiming free school meals.
+          </p>
+          <p>
+            The overall absence rate was 7.3% compared to 4.2% for non-FSM
+            pupils while persistent absence was more than double the rate for
+            non-FSM pupils.
+          </p>
+          <h3 className="govuk-heading-s">Gender</h3>
+          <p>
+            Overall absence rates were very similar for boys (4.7%) and girls
+            (4.6%) and persistent absence rates were also similar for boys
+            (10.9%) and girls (10.6%).
           </p>
           <h3 className="govuk-heading-s">National curriculum year group</h3>
           <p>
-            Pupils in national curriculum year groups 3 and 4 had the lowest
-            overall absence rates at 3.9 and 4 per cent respectively. Pupils in
-            national curriculum year groups 10 and 11 had the highest overall
-            absence rate at 6.1 per cent and 6.2 per cent respectively. This
-            trend is repeated for persistent absence.
+            Pupils in national curriculum year groups 3 (3.9%) and 4 (4%) had
+            the lowest overall absence rates while pupils in year groups 10
+            (6.1%) and 11 (6.2%) had the highest rates. This trend is repeated
+            for persistent absence.
           </p>
           <h3 className="govuk-heading-s">Special educational need (SEN)</h3>
           <p>
             Pupils with a statement of special educational needs (SEN) or
-            education healthcare plan (EHC) had an overall absence rate of 8.2
-            per cent compared to 4.3 per cent for those with no identified SEN.
-            The percentage of pupils with a statement of SEN or an EHC plan that
-            are persistent absentees was more than two times higher than the
-            percentage for pupils with no identified SEN.
+            education healthcare plan (EHC) had an overall absence rate of 8.2%
+            compared to 4.3% for those with no identified SEN.
           </p>
-          <h3 className="govuk-heading-s">Ethnic group</h3>
           <p>
-            The highest overall absence rates were for Traveller of Irish
-            Heritage and Gypsy/ Roma pupils at 18.1 per cent and 12.9 per cent
-            respectively. Overall absence rates for pupils of a Chinese and
-            Black African ethnicity were substantially lower than the national
-            average of 4.7 per cent at 2.4 per cent and 2.9 per cent
-            respectively. A similar pattern is seen in persistent absence rates;
-            Traveller of Irish heritage pupils had the highest rate at 64 per
-            cent and Chinese pupils had the lowest rate at 3.1 per cent.
+            The persistent absence rate was more than 2 times higher for pupils
+            with an SEN statement or EHC plan compared to thise with no
+            identified SEN.
           </p>
         </AccordionSection>
-        <AccordionSection heading="Absence for four year olds">
+        <AccordionSection heading="Absence for 4-year-olds">
           <p>
-            The overall absence rate for four year olds in 2016/17 was 5.1 per
-            cent which is lower than the rate of 5.2 per cent which it has been
-            for the last two years.
+            The overall absence rate for 4-year-olds in 2016/17 was 5.1% which
+            is down on the 5.2% rate for the previous 2 years.
           </p>
           <p>
-            Absence recorded for four year olds is not treated as 'authorised'
-            or 'unauthorised' and is therefore reported as overall absence only.
+            Absence recorded for 4-year-olds is not treated as 'authorised' or
+            'unauthorised' and is therefore reported as overall absence only.
           </p>
         </AccordionSection>
         <AccordionSection heading="Pupil referral unit absence">
           <p>
             The overall absence rate for pupil referral units in 2016/17 was
-            33.9 per cent, compared to 32.6 per cent in 2015/16. The percentage
-            of enrolments in pupil referral units who were persistent absentees
-            was 73.9 per cent in 2016/17, compared to 72.5 per cent in 2015/16.
+            33.9% compared to 32.6% in 2015/16.
+          </p>
+          <p>
+            Persistent absence in pupil referral units was 73.9% in 2016/17
+            compared to 72.5% in 2015/16.
           </p>
         </AccordionSection>
         <AccordionSection
-          heading="Pupil absence by local authority"
+          heading="Pupil absence by local authority (LA)"
           onToggle={() => mapRef && mapRef.refresh()}
         >
           <PrototypeAbsenceData
@@ -682,23 +687,53 @@ const PublicationPage = () => {
           />
 
           <p>
-            There is variation in overall and persistent absence rates across
-            state-funded primary, secondary and special schools by region and
-            local authority. Similarly to last year, the three regions with the
-            highest overall absence rate across all state-funded primary,
-            secondary and special schools are the North East (4.9 per cent),
-            Yorkshire and the Humber (4.9 per cent) and the South West (4.8 per
-            cent), with Inner and Outer London having the lowest overall absence
-            rate (4.4 per cent). The region with the highest persistent absence
-            rate is Yorkshire and the Humber, where 11.9 per cent of pupil
-            enrolments are persistent absentees, with Outer London having the
-            lowest rate of persistent absence (at 10.0 per cent).
+            Overall and persistent absence rates vary across primary, secondary
+            and special schools by region LA.
           </p>
           <p>
-            Absence information at local authority district level is also
-            published within this release, in the accompanying underlying data
-            files.
+            Similar to last year, the 3 regions with the highest overall absence
+            rate across all school types are the North East (4.9%), Yorkshire
+            and the Humber (4.9%) and the South West (4.8%) with Inner and Outer
+            London having the lowest overall absence rate (4.4%).
           </p>
+          <p>
+            The region with the highest persistent absence rate is Yorkshire and
+            the Humber (11.9%) with Outer London having the lowest rate of
+            persistent absence (10%).
+          </p>
+          <p>
+            For LA-level absence statistics and data download our data files.
+          </p>
+          <p>
+            You can customise and download data as Excel or .csv files. Our data
+            can also be accessed via an API.
+          </p>
+          <ul className="govuk-list">
+            <li>
+              <a href="#" className="govuk-link">
+                Download .csv files
+              </a>
+            </li>
+            <li>
+              <a href="#" className="govuk-link">
+                Download Excel files
+              </a>
+            </li>
+            <li>
+              <a href="#" className="govuk-link">
+                Download pdf files
+              </a>
+            </li>
+            <li>
+              <a href="#" className="govuk-link">
+                Access API
+              </a>{' '}
+              -{' '}
+              <a href="#" className="govuk-link">
+                What is an API?
+              </a>
+            </li>
+          </ul>
         </AccordionSection>
       </Accordion>
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
@@ -739,19 +774,22 @@ const PublicationPage = () => {
             Designation can be broadly interpreted to mean that the statistics:
           </p>
           <ul className="govuk-list govuk-list--bullet">
-            <li>meet identified user needs;</li>
-            <li>are well explained and readily accessible;</li>
-            <li>are produced according to sound methods, and</li>
+            <li>meet identified user needs</li>
+            <li>are well explained and readily accessible</li>
+            <li>are produced according to sound methods</li>
             <li>
               are managed impartially and objectively in the public interest
             </li>
           </ul>
           <p className="govuk-body">
-            Once statistics have been designated as National Statistics it is a
+            Once statistics have been designated as National Statistics it's a
             statutory requirement that the Code of Practice shall continue to be
-            observed. Information on improvements made to these statistics to
-            continue their compliance with the Code of Practice are provided in
-            this <a href="#">accompanying document</a>
+            observed.
+          </p>
+          <p>
+            Information on improvements made to these statistics to continue
+            their compliance with the Code of Practice are provided in this{' '}
+            <a href="#">accompanying document</a>
           </p>
         </AccordionSection>
         <AccordionSection heading="Feedback and questions" headingTag="h3">
