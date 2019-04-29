@@ -15,22 +15,24 @@ export const AdminDashboardPublications = () => {
       <ul className="govuk-list govuk-list--bullet">
         <li>
           <DashboardRelease
-            title="Public absense statistics"
+            title="Pupil absense statistics and data for schools in England"
             years="2017 to 2018"
             editing={location.search == '?status=editLiveRelease'}
             lastEdited={new Date('2019-03-20 17:37')}
             lastEditor={{ id: 'me', name: 'me', permissions: [] }}
           />
         </li>
-        <li>
-          <DashboardRelease
-            title="Public absense statistics"
-            years="2018 to 2019"
-            isNew={location.search == '?status=editNewRelease'}
-            lastEdited={new Date('2019-03-20 17:37')}
-            lastEditor={{ id: 'me', name: 'me', permissions: [] }}
-          />
-        </li>
+        {location.search == '?status=editNewRelease' && (
+          <li>
+            <DashboardRelease
+              title="Pupil absense statistics and data for schools in England"
+              years="2018 to 2019"
+              isNew={location.search == '?status=editNewRelease'}
+              lastEdited={new Date('2019-03-20 17:37')}
+              lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+            />
+          </li>
+        )}
         <li>
           <DashboardRelease
             title="Permanent and fixed-period exclusions statistics"
