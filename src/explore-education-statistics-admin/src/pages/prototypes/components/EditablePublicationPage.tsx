@@ -147,9 +147,15 @@ class EditablePublicationPage extends Component<Props, State> {
           ))}
         </EditableAccordion>
 
-        <button type="button" onClick={() => this.addNewSection()}>
-          Add new section
-        </button>
+        <h2 className="govuk-heading-l reorderable-relative">
+          <button
+            type="button"
+            className="reorderable"
+            onClick={() => this.addNewSection()}
+          >
+            Add new section
+          </button>
+        </h2>
       </div>
     );
   }
