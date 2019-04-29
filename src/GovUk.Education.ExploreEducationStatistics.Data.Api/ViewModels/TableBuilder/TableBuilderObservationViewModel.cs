@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.TableBu
 {
     public class TableBuilderObservationViewModel
     {
-        public Dictionary<long, string> Filters { get; set; }
+        public IEnumerable<long> Filters { get; set; }
         
         public LocationViewModel Location { get; set; }
 

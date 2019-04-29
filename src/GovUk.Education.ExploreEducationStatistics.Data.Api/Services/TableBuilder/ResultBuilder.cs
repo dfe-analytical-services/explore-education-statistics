@@ -28,13 +28,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             };
         }
 
-        private static Dictionary<long, string> FilterItems(Observation observation)
+        private static IEnumerable<long> FilterItems(Observation observation)
         {
-            return observation.FilterItems
-                .Select(item => item.FilterItem)
-                .ToDictionary(
-                    item => item.FilterGroup.FilterId,
-                    item => item.Label);
+            return observation.FilterItems.Select(item => item.FilterItemId);
         }
 
         private static Dictionary<long, string> Measures(Observation observation, IEnumerable<long> indicators)
