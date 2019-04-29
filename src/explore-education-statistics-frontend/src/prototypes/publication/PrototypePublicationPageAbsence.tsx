@@ -378,17 +378,22 @@ const PublicationPage = () => {
         <AccordionSection heading="Persistent absence">
           <Details summary="Persistent absence definition">
             <p>
-              A pupil enrolment is identified as a persistent absentee if they
-              miss 10% or more of their possible sessions
+              'Persistent absence' occurs when a pupil (also known as a 'pupil
+              enrolment') misses 10% or more of their possible sessions.
             </p>
             <p>
-              The persistent absentee measure changed as of the start of the
-              2015/16 academic year. Time series data in this release has been
-              recalculated using the new methodology but caution should be used
-              when interpreting these series as they may be impacted by the
-              change in the measure itself. For more information on this and on
-              the methodologies used in previous years, please see the
-              <a href="#">guide to absence statistics</a>.
+              This definition changed at the start of the 2015/16 academic year
+              and data on this page has been recalculated using the new
+              methodology.
+            </p>
+            <p>
+              As a result, use caution when interpreting the data as it may be
+              impacted by this change in methodology.
+            </p>
+            <p>
+              For more information on this subject and previous methodologies
+              read our <a href="#">Pupil absence statistics: methodology</a>
+              guidance.
             </p>
           </Details>
           <PrototypeDataSample
@@ -451,9 +456,9 @@ const PublicationPage = () => {
           <p>
             Persistent absentees account for almost a third, 31.6 per cent, of
             all authorised absence and more than half, 53.8 per cent of all
-            unauthorised absence. The rate of illness absences is almost four
-            times higher for persistent absentees compared to other pupils, at
-            7.6 per cent and 2.0 per cent respectively.
+            unauthorised absence. The rate of illness absences is almost 4 times
+            higher for persistent absentees compared to other pupils, at 7.6 per
+            cent and 2.0 per cent respectively.
           </p>
         </AccordionSection>
 
