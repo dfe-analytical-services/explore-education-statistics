@@ -49,6 +49,7 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
 
             services.AddTransient<IBlobService, BlobService>();
             services.AddTransient<ISeedService, SeedService>();
+            services.AddTransient<IProcessorService, ProcessorService>();
             services.AddTransient<IImporterService, ImporterService>();
             services.AddTransient<ImporterFilterService>();
             services.AddTransient<ImporterLocationService>();
