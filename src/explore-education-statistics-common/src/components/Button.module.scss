@@ -1,0 +1,5 @@
+@import '../styles/govuk-base';
+
+.marginRight:not(:last-child) {
+  margin-right: govuk-spacing(1);
+}

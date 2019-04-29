@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import React, { MouseEventHandler, ReactNode } from 'react';
+import styles from './Button.module.scss';
 
 export interface ButtonProps {
   children: ReactNode;
@@ -7,6 +8,7 @@ export interface ButtonProps {
   disabled?: boolean;
   id?: string;
   onClick?: MouseEventHandler;
+  variant?: 'secondary' | 'warning';
   type?: 'button' | 'submit' | 'reset';
 }
 
@@ -16,21 +18,23 @@ const Button = ({
   id,
   onClick,
   disabled = false,
+  variant,
   type = 'button',
 }: ButtonProps) => {
-  const classes = classNames(
-    'govuk-button',
-    {
-      'govuk-button--disabled': disabled,
-    },
-    className,
-  );
-
   return (
     // eslint-disable-next-line react/button-has-type
     <button
       aria-disabled={disabled}
-      className={classes}
+      className={classNames(
+        'govuk-button',
+        styles.marginRight,
+        {
+          'govuk-button--disabled': disabled,
+          'govuk-button--secondary': variant === 'secondary',
+          'govuk-button--warning': variant === 'warning',
+        },
+        className,
+      )}
       disabled={disabled}
       id={id}
       onClick={onClick}
