@@ -17,13 +17,14 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
       ]}
     >
       <PrototypeAdminNavigation sectionId="status" />
-      {location.search === '?status=readyApproval' && (
+      {location.search === '?status=readyTeamApproval' && (
         <>
           <div className="govuk-panel govuk-panel--confirmation">
-            <h1 className="govuk-panel__title">Release ready for approval</h1>
+            <h1 className="govuk-panel__title">
+              Release ready for team approval
+            </h1>
             <div className="govuk-panel__body">
-              This release had been sent for moderation. You will receive a
-              notification in your dashboard once a decision has been made.
+              This release had been marked for moderation by the team.
             </div>
           </div>
           <div className="govuk-!-margin-top-6 govuk-!-margin-bottom-6">
@@ -36,7 +37,7 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
           </Link>
         </>
       )}
-      {location.search !== '?status=readyApproval' && (
+      {location.search !== '?status=readyTeamApproval' && (
         <form action="/prototypes/publication-create-new-absence-status">
           <div className="govuk-form-group">
             <fieldset className="govuk-fieldset">
