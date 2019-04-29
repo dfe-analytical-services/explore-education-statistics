@@ -1,3 +1,4 @@
+export { default as Form } from './Form';
 export { default as FormCheckbox } from './FormCheckbox';
 export { default as FormCheckboxGroup } from './FormCheckboxGroup';
 export { default as FormCheckboxSearchGroup } from './FormCheckboxSearchGroup';
