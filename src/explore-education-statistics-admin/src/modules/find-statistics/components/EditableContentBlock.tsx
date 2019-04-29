@@ -1,4 +1,4 @@
-import { Release } from '@common/services/publicationService';
+import { Release, ContentBlock } from '@common/services/publicationService';
 import React, { Component } from 'react';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
 
@@ -6,11 +6,12 @@ interface Props {
   content: Release['content'][0]['content'];
   id?: string;
   editable?: boolean;
+  onContentChange?: (block: ContentBlock, content: string) => void;
 }
 
 class EditableContentBlock extends Component<Props> {
   public render() {
-    const { content, id = '', editable } = this.props;
+    const { content, id = '', editable, onContentChange } = this.props;
 
     return content.length > 0 ? (
       content.map((block, index) => {
@@ -22,6 +23,11 @@ class EditableContentBlock extends Component<Props> {
             key={key}
             id={id}
             index={index}
+            onContentChange={newContent => {
+              if (onContentChange) {
+                onContentChange(block, newContent);
+              }
+            }}
           />
         );
       })

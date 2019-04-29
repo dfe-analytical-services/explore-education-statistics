@@ -9,6 +9,7 @@ import React, { ChangeEvent, Fragment } from 'react';
 interface Props {
   editable?: boolean;
   content: string;
+  onContentChange?: (content: string) => void;
 }
 
 interface State {
@@ -70,6 +71,11 @@ class PrototypeEditableContent extends React.Component<Props, State> {
       unsaved: true,
       content: this.temporaryContent,
     });
+
+    const { onContentChange } = this.props;
+    if (onContentChange) {
+      onContentChange(this.temporaryContent);
+    }
   };
 
   public render() {

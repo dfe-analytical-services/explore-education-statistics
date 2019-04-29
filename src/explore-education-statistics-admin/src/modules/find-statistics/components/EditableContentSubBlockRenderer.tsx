@@ -10,17 +10,19 @@ interface Props {
   id: string;
   index: number;
   editable?: boolean;
+  onContentChange?: (content: string) => void;
 }
 
 class EditableContentSubBlockRenderer extends Component<Props> {
   public getBlockHTML(block: ContentBlock) {
-    const { editable } = this.props;
+    const { editable, onContentChange } = this.props;
 
     switch (block.type) {
       case 'MarkDownBlock':
         return (
           <PrototypeEditableContent
             editable={editable}
+            onContentChange={onContentChange}
             content={`
          <p className="govuk-body">${marked(block.body)} </p>
       `}
@@ -31,6 +33,7 @@ class EditableContentSubBlockRenderer extends Component<Props> {
           <div className="govuk-inset-text">
             <PrototypeEditableContent
               editable={editable}
+              onContentChange={onContentChange}
               content={`
             ${
               block.heading

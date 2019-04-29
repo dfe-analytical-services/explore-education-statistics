@@ -1,4 +1,4 @@
-/* eslint-disable react/destructuring-assignment,prefer-destructuring */
+/* eslint-disable react/destructuring-assignment,prefer-destructuring,no-param-reassign */
 
 import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
 import React, { Component } from 'react';
@@ -110,13 +110,10 @@ class EditablePublicationPage extends Component<Props, State> {
     if (reordering) {
       return this.renderDraggableSections(data);
     }
-    return this.renderContentSectionsOnly(data, editing);
+    return this.renderEditableSections(data, editing);
   }
 
-  private renderContentSectionsOnly(
-    data: Release,
-    editing: boolean | undefined,
-  ) {
+  private renderEditableSections(data: Release, editing: boolean | undefined) {
     return (
       <div>
         <h2 className="govuk-heading-l reorderable-relative">
@@ -142,6 +139,9 @@ class EditablePublicationPage extends Component<Props, State> {
                 editable={editing}
                 content={content}
                 id={`editable-block-${index}`}
+                onContentChange={(block, newContent) => {
+                  block.body = newContent;
+                }}
               />
             </EditableAccordionSection>
           ))}
@@ -185,7 +185,7 @@ class EditablePublicationPage extends Component<Props, State> {
               {data &&
                 data.content.map(({ heading, order }, index) => (
                   <Draggable
-                    draggableId={`section(${index})`}
+                    draggableId={`section(${order})`}
                     index={index}
                     key={`${order}`}
                   >
