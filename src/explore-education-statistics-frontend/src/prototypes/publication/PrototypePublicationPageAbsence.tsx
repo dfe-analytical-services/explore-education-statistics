@@ -245,21 +245,36 @@ const PublicationPage = () => {
       />
 
       <Accordion id="contents-sections">
-        <AccordionSection heading="About this release">
+        <AccordionSection heading="About this statistics and data release">
           <p className="govuk-body">
-            This statistical first release (SFR) reports on absence of pupils of
-            compulsory school age in state-funded primary, secondary and special
-            schools during the 2016/17 academic year. Information on absence in
-            pupil referral units, and for pupils aged four, is also included.
-            The Department uses two key measures to monitor pupil absence –
-            overall and persistent absence. Absence by reason and pupils
-            characteristics is also included in this release. Figures are
-            available at national, regional, local authority and school level.
-            Figures held in this release are used for policy development as key
-            indicators in behaviour and school attendance policy. Schools and
-            local authorities also use the statistics to compare their local
-            absence rates to regional and national averages for different pupil
-            groups.
+            The statistics and data show the absence of pupils of compulsory
+            school age during the 2016/17 academic year in the following
+            state-funded school types:
+          </p>
+          <ul className="govuk-list">
+            <li>primary schools</li>
+            <li>secondary schools</li>
+            <li>special schools</li>
+          </ul>
+          <p>
+            Known as a statistical first release (SFR) - the statistic and data
+            also includes information on absence in pupil referral units and for
+            pupils aged 4.
+          </p>
+          <p>
+            We use the key measures of 'overall' and 'persistent' absence to
+            monitor pupil absence while 'absence by reason' and 'pupil
+            characteristics' are also included.
+          </p>
+          <p>
+            The statistics and data are available at national, regional, local
+            authority (LA) and school level and are used by LAs and schools to
+            compare their local absence rates to regional and national averages
+            for different pupil groups.
+          </p>
+          <p>
+            The statistics and data are also used for policy development as key
+            indicators in behaviour and school attendance policy.
           </p>
         </AccordionSection>
 
