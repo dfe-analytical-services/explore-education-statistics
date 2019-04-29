@@ -10,10 +10,10 @@ function PrivacyPolicyPage() {
       <div>
         <h3>Who we are</h3>
         <p>
-          The Explore education statistics service is operated by the Department
+          The explore education statistics service is operated by the Department
           for Education ('we' or 'us'). For the purpose of data protection
           legislation, DfE is the data controller for the personal data
-          processed as part of the Explore education statistics service.
+          processed as part of the explore education statistics service.
         </p>
         <p>
           This privacy policy sets out how we collect and process your personal
@@ -22,7 +22,7 @@ function PrivacyPolicyPage() {
         </p>
       </div>
       <div>
-        <h3>How well use your information</h3>
+        <h3>How we'll use your information</h3>
         <p>
           We receive your personal data when you visit our service, complete our
           feedback survey or tell us if something is wrong. We use this
@@ -41,7 +41,7 @@ function PrivacyPolicyPage() {
           your personal data as set out in this privacy policy, which
           supplements our terms of use for the{' '}
           <a href="" target="_blank">
-            Explore education statistics service
+            explore education statistics service
             <span> opens in a new window </span>
           </a>
           .
@@ -49,7 +49,14 @@ function PrivacyPolicyPage() {
       </div>
       <div>
         <h3>The nature of your personal data we will be using</h3>
-        <p>SECTION AND CONTENT TBC</p>
+        <p>
+          We’ll be using the following categories of your personal data for our
+          service:
+        </p>
+        <ul>
+          <li>type of personal data 1</li>
+          <li>type of personal data 2</li>
+        </ul>
       </div>
       <div>
         <h3>Why our use of your personal data is lawful</h3>
@@ -69,8 +76,8 @@ function PrivacyPolicyPage() {
         <h3>Keeping your data secure</h3>
         <p>
           Transmitting information over the internet is generally not completely
-          secure, and we cannot guarantee the security of your data. Any data
-          you transmit is at your own risk.
+          secure and we cannot guarantee the security of your data. Any data you
+          transmit is at your own risk.
         </p>
         <p>
           We have appropriate procedures and security features in place to keep
@@ -78,14 +85,14 @@ function PrivacyPolicyPage() {
         </p>
         <p>
           We won't share your information with any other organisations for
-          marketing, market research or commercial purposes, and we do not pass
+          marketing, market research or commercial purposes and we do not pass
           on your details to other websites.
         </p>
       </div>
       <div>
-        <h3>How long we will keep your personal data</h3>
+        <h3>How long we'll keep your personal data</h3>
         <p>
-          We'll keep your personal data for a maximum of 3 years, after which
+          We'll keep your personal data for a maximum of 3 years after which
           point it will be securely destroyed.
         </p>
         <p>
@@ -95,24 +102,23 @@ function PrivacyPolicyPage() {
       </div>
       <div>
         <h3>Your data protection rights</h3>
-        <p>You have the right:</p>
+        <p>You have the right to:</p>
         <ul>
-          <li>to ask us for access to information about you that we hold</li>
+          <li>ask us for access to information about you that we hold</li>
           <li>
-            to have your personal data rectified, if it's inaccurate or
-            incomplete
+            have your personal data rectified if it's inaccurate or incomplete
           </li>
           <li>
-            to request the deletion or removal of personal data where there is
-            no compelling reason for its continued processing
+            request the deletion or removal of personal data where there's no
+            compelling reason for its continued processing
           </li>
           <li>
-            to restrict our processing of your personal data (ie permitting its
+            restrict our processing of your personal data (ie permitting its
             storage but no further processing)
           </li>
           <li>
-            to object to direct marketing (including profiling) and processing
-            for the purposes of scientific/historical research and statistics
+            object to direct marketing (including profiling) and processing for
+            the purposes of scientific/historical research and statistics
           </li>
           <li>
             not to be subject to decisions based purely on automated processing
@@ -150,17 +156,21 @@ function PrivacyPolicyPage() {
         <h3>Last updated</h3>
         <p>
           We may need to update this privacy notice periodically so we recommend
-          that you revisit this information from time to time. This version was
-          last updated on DD/MM/YY.
+          you revisit from time to time. This version was last updated on
+          DD/MM/YY.
         </p>
       </div>
       <div>
-        <h3>Following a link to CSP from another website</h3>
+        <h3>
+          Following a link to explore education statistics from another website
+        </h3>
         <p>
           If you come to our service from another website, we may receive
-          personal information about you from the other website. You should read
-          the privacy policy of the website you came from to find out more about
-          this.
+          personal information about you from the other website.
+        </p>
+        <p>
+          You should read the privacy policy of the website you came from to
+          find out more about this.
         </p>
       </div>
       <div>
@@ -173,7 +183,7 @@ function PrivacyPolicyPage() {
           browse our service and for security and monitoring of our service.
         </p>
         <p>
-          You consent to the storage of cookies by the Explore education
+          You consent to the storage of cookies by the explore education
           statistics service on your computer's hard drive.
         </p>
       </div>
