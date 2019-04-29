@@ -326,46 +326,52 @@ const PublicationPage = () => {
           />
           <p>
             The overall absence rate across state-funded primary, secondary and
-            special schools increased from 4.6 per cent in 2015/16 to 4.7 per
-            cent in 2016/17. In primary schools the overall absence rate stayed
-            the same at 4 per cent and the rate in secondary schools increased
-            from 5.2 per cent to 5.4 per cent. Absence in special schools is
-            much higher at 9.7 per cent in 2016/17
+            special schools increased from 4.6% in 2015/16 to 4.7% in 2016/17.
           </p>
+          <p>
+            In primary schools the overall absence rate stayed the same at 4%
+            and the rate in secondary schools increased from 5.2% to 5.4%.
+          </p>
+          <p>Absence in special schools is much higher at 9.7% in 2016/17.</p>
           <p>
             The increase in overall absence rate has been driven by an increase
             in the unauthorised absence rate across state-funded primary,
-            secondary and special schools - which increased from 1.1 per cent to
-            1.3 per cent between 2015/16 and 2016/17.
+            secondary and special schools - which increased from 1.1% to 1.3%
+            between 2015/16 and 2016/17.
           </p>
           <p>
-            Looking at longer-term trends, overall and authorised absence rates
+            Looking at longer-term trends - overall and authorised absence rates
             have been fairly stable over recent years after decreasing gradually
-            between 2006/07 and 2013/14. Unauthorised absence rates have not
-            varied much since 2006/07, however the unauthorised absence rate is
-            now at its highest since records began, at 1.3 per cent.
+            between 2006/07 and 2013/14.
           </p>
           <p>
-            This increase in unauthorised absence is due to an increase in
-            absence due to family holidays that were not agreed by the school.
-            The authorised absence rate has not changed since last year, at 3.4
-            per cent. Though in primary schools authorised absence rates have
-            been decreasing across recent years.
+            Unauthorised absence rates have not varied much since 2006/07 button
+            the unauthorised absence rate at 1.3% is now at its highest since
+            records began.
+          </p>
+          <p>
+            This is due to an increase in absence due to family holidays that
+            were not agreed by the school.
+          </p>
+          <p>
+            The authorised absence rate at 3.4% has not changed since last year
+            but have been decreasing across recent years in primary schools.
           </p>
           <p>
             The total number of days missed due to overall absence across
-            state-funded primary, secondary and special schools has increased
-            since last year, from 54.8 million in 2015/16 to 56.7 million in
-            2016/17. This partly reflects the rise in the total number of pupil
-            enrolments, the average number of days missed per enrolment has
+            state-funded primary, secondary and special schools increased from
+            54.8 million in 2015/16 to 56.7 million in 2016/17.
+          </p>
+          <p>
+            This partly reflects the rise in the total number of pupil
+            enrolments - the average number of days missed per enrolment has
             increased very slightly from 8.1 days in 2015/16 to 8.2 days in
             2016/17.
           </p>
           <p>
-            In 2016/17, 91.8 per cent of pupils in state-funded primary,
-            state-funded secondary and special schools missed at least one
-            session during the school year, this is similar to the previous year
-            (91.7 per cent in 2015/16).
+            In 2016/17, 91.8% of pupils in primary, secondary and special
+            schools missed at least 1 session during the school year which is
+            similar to 91.7% figure in 2015/16.
           </p>
         </AccordionSection>
 
