@@ -280,11 +280,10 @@ const PublicationPage = () => {
 
         <AccordionSection heading="Pupil absence rates">
           <Details summary="Overall absence rate definition">
-            The overall absence rate is the total number of overall absence
-            sessions for all pupils as a percentage of the total number of
-            possible sessions for all pupils, where overall absence is the sum
-            of authorised and unauthorised absence and one session is equal to
-            half a day.
+            The total number of overall absence sessions for all pupils as a
+            percentage of the total number of possible sessions for all pupils,
+            where overall absence is the sum of authorised and unauthorised
+            absence and 1 session is equal to half-a-day.
           </Details>
           <PrototypeDataSample
             sectionId="absenceRates"
