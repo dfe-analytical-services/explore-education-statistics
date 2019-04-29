@@ -108,66 +108,6 @@ const BrowseReleasesPage = () => {
             </a>
           </div>
         </AccordionSection>
-        <AccordionSection
-          heading="Results"
-          caption="Something to explain the heading above"
-        >
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-list-bullet">
-              <li>
-                {' '}
-                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  GCSE and equivalent results in England
-                </h4>
-                <p className="govuk-body">
-                  Statistics and data for GCSE and equivalent results in England
-                </p>
-                <div className="govuk-!-margin-top-0">
-                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
-                </div>
-              </li>
-            </ul>
-          </div>
-        </AccordionSection>
-        <AccordionSection
-          heading="School and pupil numbers"
-          caption="Schools, pupils and their characteristics, SEN and EHC plans, SEN in England"
-        >
-          <div className="govuk-inset-text">
-            These statistics and data are not yet available on the explore
-            education statistics service. To find and download these statistics
-            and data browse{' '}
-            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-              Statistics at DfE
-            </a>
-          </div>
-        </AccordionSection>
-        <AccordionSection
-          heading="School finance"
-          caption="Local authority and school finance"
-        >
-          <div className="govuk-inset-text">
-            These statistics and data are not yet available on the explore
-            education statistics service. To find and download these statistics
-            and data browse{' '}
-            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-              Statistics at DfE
-            </a>
-          </div>
-        </AccordionSection>
-        <AccordionSection
-          heading="Teacher numbers"
-          caption="The number and characteristics of teachers"
-        >
-          <div className="govuk-inset-text">
-            These statistics and data are not yet available on the explore
-            education statistics service. To find and download these statistics
-            and data browse{' '}
-            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-              Statistics at DfE
-            </a>
-          </div>
-        </AccordionSection>
       </Accordion>
       <h2 className="govuk-heading-l govuk-!-margin-top-9">
         Further education
