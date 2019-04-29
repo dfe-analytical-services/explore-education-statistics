@@ -14,7 +14,7 @@
             {
                 srcBlob.DownloadToStreamAsync(memoryStream);
 
-                destBlob = destContainer.GetBlockBlobReference(destFolder + "/" + srcBlob.Name);
+                destBlob = destContainer.GetBlockBlobReference(destFolder + "/" + Path.GetFileName(srcBlob.Uri.AbsolutePath));
 
                 destBlob.StartCopyAsync(srcBlob);
             }
