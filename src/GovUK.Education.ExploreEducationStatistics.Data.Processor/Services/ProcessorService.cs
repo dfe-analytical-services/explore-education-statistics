@@ -44,9 +44,9 @@
                             uploadsDir + "/" + processorNotification.PublicationId,
                             _logger).Result;
 
-                        var publication = CreatePublication(processorNotification, subjects);
+                        var release = CreateRelease(processorNotification, subjects);
 
-                        _seedService.Seed(publication);
+                        _seedService.SeedRelease(release);
                     }
                 }
                 catch (StorageException ex)
@@ -56,24 +56,16 @@
             }
         }
 
-        private static Publication CreatePublication(
+        private static Release CreateRelease(
             ProcessorNotification processorNotification,
             Subject[] subjects)
         {
-            return new Publication
+            return new Release
             {
                 PublicationId = Guid.Parse(processorNotification.PublicationId),
-                Name = processorNotification.PublicationName,
-                Releases = new[]
-                {
-                    new Release
-                    {
-                        PublicationId = Guid.Parse(processorNotification.PublicationId),
-                        ReleaseDate = DateTime.Parse(processorNotification.ReleaseDate),
-                        Name = processorNotification.ReleaseName,
-                        Subjects = subjects
-                    }
-                }
+                ReleaseDate = DateTime.Parse(processorNotification.ReleaseDate),
+                Name = processorNotification.ReleaseName,
+                Subjects = subjects
             };
         }
 

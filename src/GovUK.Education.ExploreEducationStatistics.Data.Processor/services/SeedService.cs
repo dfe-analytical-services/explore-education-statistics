@@ -25,17 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _blobService = blobService;
         }
 
-        public void Seed(Publication publication)
-        {
-            _logger.LogInformation("Seeding Publication {Publication}", publication.PublicationId);
-
-            foreach (var release in publication.Releases)
-            {
-                SeedRelease(release);
-            }
-        }
-
-        private void SeedRelease(Release release)
+        public void SeedRelease(Release release)
         {
             _logger.LogInformation("Seeding Release for {Publication}, {Release}", release.PublicationId, release.Name);
 

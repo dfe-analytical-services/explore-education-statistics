@@ -18,10 +18,10 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
             [QueueTrigger("imports-pending", Connection = "")] JObject fNotify,
             [Queue("imports-processed", Connection = "")] out JObject fNotifyOut,
             [Inject]IProcessorService processorService,
-            ILogger log,
+            ILogger logger,
             ExecutionContext context)
         {
-            log.LogInformation($"C# Queue trigger function processed: {fNotify.ToString()}");
+            logger.LogInformation($"C# Queue trigger function processed: {fNotify.ToString()}");
 
             var filesProcessorNotification = ExtractNotification(fNotify);
             var config = LoadAppSettings(context);
@@ -29,7 +29,7 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
 
             processorService.ProcessFiles(filesProcessorNotification, ContainerName, blobStorageConnectionStr, UploadsDir);
 
-            log.LogInformation("Completed files processing");
+            logger.LogInformation("Completed files processing");
 
             fNotifyOut = fNotify;
         }
