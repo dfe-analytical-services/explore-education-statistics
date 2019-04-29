@@ -14,9 +14,9 @@ const PrototypeDownloadDropdown = ({ link }: Props) => {
         <div className="govuk-grid-column-one-third">
           <Link
             className="govuk-link govuk-!-margin-right-9 "
-            to={link ? link : '/prototypes/publication'}
+            to={link || '/prototypes/publication'}
           >
-            View statistics
+            View statistics and data
           </Link>
         </div>
         <div className="govuk-grid-column-one-third">
@@ -24,14 +24,14 @@ const PrototypeDownloadDropdown = ({ link }: Props) => {
             className="govuk-link govuk-!-margin-right-9 "
             to="/prototypes/table-tool"
           >
-            Create charts and tables
+            Create your own tables online
           </Link>
         </div>
         <div className="govuk-grid-column-one-third">
           <details className="govuk-details govuk-!-display-inline-block">
             <summary className="govuk-details__summary">
               <span className="govuk-details__summary-text">
-                Download underlying data files
+                Download data files
               </span>
             </summary>
             <div className="govuk-details__text">

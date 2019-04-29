@@ -1,3 +1,4 @@
+/* eslint-disable react/no-multi-comp */
 import React, { Component } from 'react';
 import { fireEvent, render } from 'react-testing-library';
 import { RadioChangeEventHandler } from '../FormRadio';
@@ -41,9 +42,10 @@ describe('FormRadioGroup', () => {
       };
 
       public render() {
+        const { value } = this.state;
         return (
           <FormRadioGroup
-            value={this.state.value}
+            value={value}
             onChange={this.handleChange}
             id="test-radios"
             name="test-radios"
@@ -77,9 +79,10 @@ describe('FormRadioGroup', () => {
       };
 
       public render() {
+        const { value } = this.state;
         return (
           <FormRadioGroup
-            value={this.state.value}
+            value={value}
             onChange={this.handleChange}
             id="test-radios"
             name="test-radios"

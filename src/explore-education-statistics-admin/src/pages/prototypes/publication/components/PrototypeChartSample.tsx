@@ -35,6 +35,8 @@ const symbols: ('circle' | 'square' | 'triangle' | 'cross' | 'star')[] = [
   'star',
 ];
 
+/* eslint-disable react/no-array-index-key */
+
 const CustomToolTip = (props: TooltipProps) => {
   const { active, payload, label } = props;
 
@@ -47,13 +49,15 @@ const CustomToolTip = (props: TooltipProps) => {
             return (b.value as number) - (a.value as number);
           })
           .map((_, index) => (
-            <p key={index}>{`${payload[index].name} : ${
-              payload[index].value
-            }`}</p>
+            <p key={index}>
+              {`${payload[index].name} : ${payload[index].value}`}
+            </p>
           ))}
       </div>
     );
   }
+
+  return null;
 };
 
 const PrototypeChartSample = ({

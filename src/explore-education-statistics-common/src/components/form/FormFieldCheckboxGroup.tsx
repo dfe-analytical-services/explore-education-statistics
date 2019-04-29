@@ -19,7 +19,7 @@ const FormFieldCheckboxGroup = <T extends {}>(props: Props<T>) => {
       {({ form, ...helpers }) => {
         const { getError } = createErrorHelper(form);
 
-        let errorMessage = error ? error : getError(name);
+        let errorMessage = error || getError(name);
 
         if (!showError) {
           errorMessage = '';

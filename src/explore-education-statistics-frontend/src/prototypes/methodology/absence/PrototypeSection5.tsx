@@ -201,35 +201,6 @@ const PrototypeMethodologySection = () => {
         Further checks are carried out on the consistency of figures compared
         with previous years, both nationally and at local authority level.
       </p>
-      <h3 id="section5-5">5.5 Data quality</h3>
-      <p>
-        The following should be taken into account when reviewing published
-        pupil absence statistics.
-      </p>
-      <p>
-        The absence information reported in published releases is based on data
-        returned by schools as part of the school census. This might include
-        duplicates if schools have recorded duplicated pupils.
-      </p>
-      <p>
-        It does not include data which has been submitted by local authorities
-        or schools outside of the school census.{' '}
-      </p>
-      <p>
-        It is a school’s responsibility to record absence data correctly in
-        their school census return and the parent’s responsibility to truthfully
-        report the reason for a child’s absence from school.
-      </p>
-      <p>
-        Only full year absence statistics give a definitive view of pupil
-        absence, so figures presented in the interim termly publications should
-        be treated with caution.
-      </p>
-      <p>
-        Caution is recommended when interpreting the data for Traveller of Irish
-        Heritage and Gypsy/Roma children due to potential under-reporting for
-        these ethnic classifications
-      </p>
     </>
   );
 };

@@ -32,6 +32,7 @@ class SearchableFilterMenus<
 
   public render() {
     const { menuOptions, name, searchTerm, values } = this.props;
+    const { openFilters } = this.state;
 
     const containsSearchTerm = (value: string) =>
       value.search(new RegExp(searchTerm, 'i')) > -1;
@@ -53,7 +54,7 @@ class SearchableFilterMenus<
             item =>
               (searchTerm !== '' && containsSearchTerm(item.label)) ||
               values.indexOf(item.name) > -1,
-          ) || this.state.openFilters[compositeKey],
+          ) || openFilters[compositeKey],
         );
 
         const options = sortBy(
@@ -80,7 +81,7 @@ class SearchableFilterMenus<
             onToggle={isOpen => {
               this.setState({
                 openFilters: {
-                  ...this.state.openFilters,
+                  ...openFilters,
                   [compositeKey]: isOpen,
                 },
               });

@@ -98,6 +98,8 @@ const Tabs = ({ children }: Props) => {
                   case 'ArrowDown':
                     sectionElements[selectedTabIndex].focus();
                     break;
+                  default:
+                    break;
                 }
               }}
             >

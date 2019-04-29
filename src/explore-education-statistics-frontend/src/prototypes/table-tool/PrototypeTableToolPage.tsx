@@ -93,6 +93,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
   };
 
   private filtersRef = createRef<HTMLElement>();
+
   private dataTableRef = createRef<HTMLElement>();
 
   private handleMenuChange: MenuChangeEventHandler = async ({
@@ -107,6 +108,8 @@ class PrototypeTableToolPage extends Component<{}, State> {
       publicationId,
     );
 
+    const { metaSpecification } = this.state;
+
     this.setState(
       {
         publicationId,
@@ -115,12 +118,11 @@ class PrototypeTableToolPage extends Component<{}, State> {
           ...this.defaultFilters,
         },
         metaSpecification: {
-          ...this.state.metaSpecification,
+          ...metaSpecification,
           categoricalFilters: {
-            ...this.state.metaSpecification.categoricalFilters,
+            ...metaSpecification.categoricalFilters,
             characteristics: {
-              ...this.state.metaSpecification.categoricalFilters
-                .characteristics,
+              ...metaSpecification.categoricalFilters.characteristics,
               options: Object.entries(publicationMeta.characteristics).reduce(
                 (acc, [groupKey, group]) => {
                   return {
@@ -210,24 +212,26 @@ class PrototypeTableToolPage extends Component<{}, State> {
       return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
     };
 
+    const { metaSpecification, publicationId } = this.state;
+
     const { result } = await tableBuilderService.getNationalCharacteristicsData(
       {
         characteristics,
         indicators,
         schoolTypes,
+        publicationId,
         endYear: formatToAcademicYear(end.year),
-        publicationId: this.state.publicationId,
         startYear: formatToAcademicYear(start.year),
       },
     );
 
     const categoricalFiltersByValue = mapValues(
-      this.state.metaSpecification.categoricalFilters,
+      metaSpecification.categoricalFilters,
       value => mapOptionValues(value.options),
     );
 
     const indicatorsByValue = mapOptionValues<IndicatorOption>(
-      this.state.metaSpecification.indicators,
+      metaSpecification.indicators,
     );
 
     const timePeriods = TimePeriod.createRange(start, end);

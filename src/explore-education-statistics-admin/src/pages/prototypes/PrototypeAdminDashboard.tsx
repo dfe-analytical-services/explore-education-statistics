@@ -23,10 +23,10 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
             <TabsSection
               id="task-in-progress"
               title={`In progress ${
-                location.search == '?status=editRelease' ? '(2)' : '(1)'
+                location.search === '?status=editRelease' ? '(2)' : '(1)'
               }`}
             >
-              {location.search == '?status=editRelease' && (
+              {location.search === '?status=editRelease' && (
                 <>
                   <h2 className="govuk-heading-m">New releases in progress</h2>
                   <ul className="govuk-list-bullet  govuk-!-margin-bottom-9">
@@ -71,15 +71,15 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
             <TabsSection
               id="task-ready-approval"
               title={`Ready for approval ${
-                location.search == '?status=readyApproval' ? '(1)' : ''
+                location.search === '?status=readyApproval' ? '(1)' : ''
               }`}
             >
-              {location.search != '?status=readyApproval' && (
+              {location.search !== '?status=readyApproval' && (
                 <div className="govuk-inset-text">
                   There are currenly no releases ready for approval
                 </div>
               )}
-              {location.search == '?status=readyApproval' && (
+              {location.search === '?status=readyApproval' && (
                 <>
                   <h2 className="govuk-heading-m">Ready for approval</h2>
                   <ul className="govuk-list-bullet">
@@ -202,7 +202,7 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
                   </div>
                 </div>
               </li>
-              {location.search == '?status=editRelease' && (
+              {location.search === '?status=editRelease' && (
                 <li className="govuk-!-margin-top-6">
                   {' '}
                   <h4 className="govuk-heading-m govuk-!-margin-bottom-0">

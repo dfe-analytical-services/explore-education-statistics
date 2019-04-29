@@ -1,7 +1,7 @@
 import debounce from 'lodash/debounce';
-import React, { Component, FormEvent, KeyboardEvent } from 'react';
-import styles from './PrototypeSearchForm.module.scss';
 import intersection from 'lodash/intersection';
+import React, { ChangeEvent, Component } from 'react';
+import styles from './PrototypeSearchForm.module.scss';
 
 interface SearchResult {
   element: Element;
@@ -21,9 +21,10 @@ class PrototypeSearchForm extends Component<{}, State> {
     searchResults: [],
     searchValue: '',
   };
-  private readonly boundPerformSearch: () => void;
 
-  private findElementsWithText(text: string) {
+  private boundPerformSearch = debounce(this.performSearch, 1000);
+
+  private static findElementsWithText(text: string) {
     const lowerCase = text.toLocaleLowerCase();
     return Array.from(document.querySelectorAll('p')).filter(e =>
       e.innerHTML.toLocaleLowerCase().includes(lowerCase),
@@ -34,12 +35,13 @@ class PrototypeSearchForm extends Component<{}, State> {
     element: Element,
     ...className: string[]
   ) {
-    let parentElement = element.parentElement;
+    let { parentElement } = element;
     while (
       parentElement &&
       parentElement !== document.documentElement &&
       intersection(className, parentElement.classList).length === 0
     ) {
+      // eslint-disable-next-line prefer-destructuring
       parentElement = parentElement.parentElement;
     }
     return parentElement || document.documentElement;
@@ -70,68 +72,40 @@ class PrototypeSearchForm extends Component<{}, State> {
     return '';
   }
 
-  public constructor(props: {}) {
-    super(props);
+  private static calculateLocationOfElement(
+    element: HTMLElement,
+    collapsedContainer: HTMLElement,
+  ) {
+    const location: string[] = [];
 
-    this.boundPerformSearch = debounce(this.performSearch, 1000);
-  }
+    const locationHeaderElement = PrototypeSearchForm.findSiblingsBeforeOfElementType(
+      element,
+      'h3',
+      'h2',
+      'h4',
+    );
 
-  private performSearch() {
-    if (this.state.searchValue.length <= 3) {
-      return;
+    if (locationHeaderElement) {
+      location.unshift(
+        PrototypeSearchForm.substring(
+          locationHeaderElement.textContent || '',
+          20,
+        ),
+      );
     }
 
-    const elements = this.findElementsWithText(this.state.searchValue);
-
-    const searchResults: SearchResult[] = elements.map(element => {
-      let scrollIntoView: () => void;
-
-      const accordionContainer = PrototypeSearchForm.parentUntilClassname(
-        element,
-        'govuk-accordion__section',
+    if (collapsedContainer.classList.contains('govuk-accordion__section')) {
+      const accordionHeader = collapsedContainer.querySelector(
+        '.govuk-accordion__section-heading button',
       );
+      if (accordionHeader) {
+        location.unshift(
+          PrototypeSearchForm.substring(accordionHeader.textContent || '', 20),
+        );
+      }
+    }
 
-      const detailsContainer = PrototypeSearchForm.parentUntilClassname(
-        element,
-        'govuk-details',
-      );
-
-      const tabContainer = PrototypeSearchForm.parentUntilClassname(
-        element,
-        'govuk-tabs',
-      );
-
-      const location = PrototypeSearchForm.calculateLocationOfElement(
-        element,
-        accordionContainer,
-      );
-
-      scrollIntoView = () => {
-        if (accordionContainer.classList.contains('govuk-accordion__section')) {
-          PrototypeSearchForm.openAccordion(accordionContainer);
-        }
-
-        if (detailsContainer.classList.contains('govuk-details')) {
-          PrototypeSearchForm.openDetails(detailsContainer);
-        }
-
-        if (tabContainer.classList.contains('govuk-tabs')) {
-          PrototypeSearchForm.openTab(element, tabContainer);
-        }
-
-        this.resetSearch();
-        element.scrollIntoView();
-      };
-
-      return {
-        element,
-        location,
-        scrollIntoView,
-        text: PrototypeSearchForm.substring(element.textContent || '', 30),
-      };
-    });
-
-    this.setState({ searchResults });
+    return location;
   }
 
   private static openTab(target: Element, container: Element) {
@@ -214,6 +188,64 @@ class PrototypeSearchForm extends Component<{}, State> {
     potentialAccordion.classList.add('govuk-accordion__section--expanded');
   }
 
+  private performSearch() {
+    const { searchValue } = this.state;
+
+    if (searchValue.length <= 3) {
+      return;
+    }
+
+    const elements = PrototypeSearchForm.findElementsWithText(searchValue);
+
+    const searchResults: SearchResult[] = elements.map(element => {
+      const accordionContainer = PrototypeSearchForm.parentUntilClassname(
+        element,
+        'govuk-accordion__section',
+      );
+
+      const detailsContainer = PrototypeSearchForm.parentUntilClassname(
+        element,
+        'govuk-details',
+      );
+
+      const tabContainer = PrototypeSearchForm.parentUntilClassname(
+        element,
+        'govuk-tabs',
+      );
+
+      const location = PrototypeSearchForm.calculateLocationOfElement(
+        element,
+        accordionContainer,
+      );
+
+      const scrollIntoView = () => {
+        if (accordionContainer.classList.contains('govuk-accordion__section')) {
+          PrototypeSearchForm.openAccordion(accordionContainer);
+        }
+
+        if (detailsContainer.classList.contains('govuk-details')) {
+          PrototypeSearchForm.openDetails(detailsContainer);
+        }
+
+        if (tabContainer.classList.contains('govuk-tabs')) {
+          PrototypeSearchForm.openTab(element, tabContainer);
+        }
+
+        this.resetSearch();
+        element.scrollIntoView();
+      };
+
+      return {
+        element,
+        location,
+        scrollIntoView,
+        text: PrototypeSearchForm.substring(element.textContent || '', 30),
+      };
+    });
+
+    this.setState({ searchResults });
+  }
+
   private resetSearch() {
     this.setState({
       currentlyHighlighted: undefined,
@@ -222,77 +254,7 @@ class PrototypeSearchForm extends Component<{}, State> {
     });
   }
 
-  private static calculateLocationOfElement(
-    element: HTMLElement,
-    collapsedContainer: HTMLElement,
-  ) {
-    const location: string[] = [];
-
-    const locationHeaderElement = PrototypeSearchForm.findSiblingsBeforeOfElementType(
-      element,
-      'h3',
-      'h2',
-      'h4',
-    );
-
-    if (locationHeaderElement) {
-      location.unshift(
-        PrototypeSearchForm.substring(
-          locationHeaderElement.textContent || '',
-          20,
-        ),
-      );
-    }
-
-    if (collapsedContainer.classList.contains('govuk-accordion__section')) {
-      const accordionHeader = collapsedContainer.querySelector(
-        '.govuk-accordion__section-heading button',
-      );
-      if (accordionHeader) {
-        location.unshift(
-          PrototypeSearchForm.substring(accordionHeader.textContent || '', 20),
-        );
-      }
-    }
-
-    return location;
-  }
-
-  private onKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-      const direction = e.key === 'ArrowUp' ? -1 : 1;
-
-      const len = this.state.searchResults.length;
-
-      let currentlyHighlighted: number | undefined = this.state
-        .currentlyHighlighted;
-
-      if (currentlyHighlighted !== undefined) {
-        currentlyHighlighted =
-          ((this.state.currentlyHighlighted || 0) + direction + len) % len;
-      } else {
-        if (direction === -1) {
-          currentlyHighlighted = len - 1;
-        } else {
-          currentlyHighlighted = 0;
-        }
-      }
-
-      this.setState({ currentlyHighlighted });
-    }
-
-    if (e.key === 'Enter') {
-      if (this.state.currentlyHighlighted !== undefined) {
-        this.state.searchResults[
-          this.state.currentlyHighlighted
-        ].scrollIntoView();
-
-        e.preventDefault();
-      }
-    }
-  };
-
-  private onChange = (e: FormEvent<HTMLInputElement>) => {
+  private onChange = (e: ChangeEvent<HTMLInputElement>) => {
     e.persist();
 
     this.setState({
@@ -305,6 +267,8 @@ class PrototypeSearchForm extends Component<{}, State> {
   };
 
   public render() {
+    const { searchResults, currentlyHighlighted, searchValue } = this.state;
+
     return (
       <form
         className={styles.container}
@@ -322,8 +286,35 @@ class PrototypeSearchForm extends Component<{}, State> {
             id="search"
             placeholder="Search this page"
             type="search"
-            value={this.state.searchValue}
-            onKeyDown={this.onKeyDown}
+            value={searchValue}
+            onKeyDown={e => {
+              let { currentlyHighlighted: nextHighlighted } = this.state;
+
+              if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                const direction = e.key === 'ArrowUp' ? -1 : 1;
+
+                const len = searchResults.length;
+
+                if (nextHighlighted !== undefined) {
+                  nextHighlighted =
+                    ((nextHighlighted || 0) + direction + len) % len;
+                } else if (direction === -1) {
+                  nextHighlighted = len - 1;
+                } else {
+                  nextHighlighted = 0;
+                }
+
+                this.setState({ currentlyHighlighted: nextHighlighted });
+              }
+
+              if (e.key === 'Enter') {
+                if (nextHighlighted !== undefined) {
+                  searchResults[nextHighlighted].scrollIntoView();
+
+                  e.preventDefault();
+                }
+              }
+            }}
             onInput={this.onChange}
             onChange={this.onChange}
           />
@@ -334,28 +325,28 @@ class PrototypeSearchForm extends Component<{}, State> {
             onClick={() => this.performSearch()}
           />
         </div>
-        {this.state.searchResults.length > 0 ? (
+        {searchResults.length > 0 && (
           <ul className={styles.results}>
-            {this.state.searchResults.map((result: SearchResult, index) => (
-              // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions,jsx-a11y/click-events-have-key-events
-              <li
-                key={`search_result_${index}`}
-                className={
-                  this.state.currentlyHighlighted === index
-                    ? styles.highlighted
-                    : ''
-                }
-                onClick={result.scrollIntoView}
-              >
-                <span className={styles.resultHeader}>{result.text}</span>
-                <span className={styles.resultLocation}>
-                  {result.location.join(' > ')}
-                </span>
-              </li>
-            ))}
+            {searchResults.map((result: SearchResult, index) => {
+              const key = `search_result_${index}`;
+
+              return (
+                // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions,jsx-a11y/click-events-have-key-events
+                <li
+                  key={key}
+                  className={
+                    currentlyHighlighted === index ? styles.highlighted : ''
+                  }
+                  onClick={result.scrollIntoView}
+                >
+                  <span className={styles.resultHeader}>{result.text}</span>
+                  <span className={styles.resultLocation}>
+                    {result.location.join(' > ')}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
-        ) : (
-          ''
         )}
       </form>
     );

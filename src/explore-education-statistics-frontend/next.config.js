@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+
 const withCss = require('@zeit/next-css');
 const cssLoaderConfig = require('@zeit/next-css/css-loader-config');
 const withTypescript = require('@zeit/next-typescript');
@@ -109,7 +111,7 @@ const withESLint = createPlugin((config, options) => {
   return config;
 });
 
-const config = {
+const nextConfig = {
   transpileModules: ['explore-education-statistics-common', '@common'],
   webpack(config, options) {
     const { dev, isServer } = options;
@@ -137,6 +139,18 @@ const config = {
         }),
       );
     }
+
+    const originalEntry = config.entry;
+
+    config.entry = async () => {
+      const entries = await originalEntry();
+
+      if (entries['main.js'] && !entries['main.js'].includes('./polyfill.js')) {
+        entries['main.js'].unshift('./polyfill.js');
+      }
+
+      return entries;
+    };
 
     config.plugins.push(
       new DotEnvPlugin({
@@ -176,4 +190,4 @@ module.exports = compose(
   withSassModules,
   withTypescript,
   withESLint,
-)(config);
+)(nextConfig);

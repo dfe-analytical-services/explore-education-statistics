@@ -20,15 +20,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
         {
             return new TableBuilderObservationViewModel
             {
-                // TODO add filters
-                Filters = new Dictionary<long, string>(),
+                Filters = FilterItems(observation),
                 Location = _mapper.Map<LocationViewModel>(observation.Location),
-                Measures = indicators.Any()
-                    ? QueryUtil.FilterMeasures(observation.Measures, indicators)
-                    : observation.Measures,
+                Measures = Measures(observation, indicators),
                 TimeIdentifier = observation.TimeIdentifier,
                 Year = observation.Year
             };
+        }
+
+        private static Dictionary<long, string> FilterItems(Observation observation)
+        {
+            return observation.FilterItems
+                .Select(item => item.FilterItem)
+                .ToDictionary(
+                    item => item.FilterGroup.FilterId,
+                    item => item.Label);
+        }
+
+        private static Dictionary<long, string> Measures(Observation observation, IEnumerable<long> indicators)
+        {
+            return indicators.Any() ? QueryUtil.FilterMeasures(observation.Measures, indicators) : observation.Measures;
         }
     }
 }

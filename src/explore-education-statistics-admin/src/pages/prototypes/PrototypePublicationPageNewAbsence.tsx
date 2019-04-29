@@ -7,7 +7,7 @@ import Details from '@common/components/Details';
 import PrototypeMap from '@common/prototypes/publication/components/PrototypeMap';
 import React from 'react';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
-import { PrototypeEditableContent } from './components/PrototypeEditableContent';
+import PrototypeEditableContent from './components/PrototypeEditableContent';
 import PrototypePage from './components/PrototypePage';
 
 const PublicationPage = () => {
@@ -163,13 +163,13 @@ const PublicationPage = () => {
         <AccordionSection heading="Absence rates">
           <Details summary="Overall absence rate definition">
             <PrototypeEditableContent
-              content={`
+              content="
             The overall absence rate is the total number of overall absence
             sessions for all pupils as a percentage of the total number of
             possible sessions for all pupils, where overall absence is the sum
             of authorised and unauthorised absence and one session is equal to
             half a day.
-            `}
+            "
             />
           </Details>
           <PrototypeDataSample
@@ -580,7 +580,14 @@ const PublicationPage = () => {
           heading="Pupil absence by local authority"
           onToggle={() => mapRef && mapRef.refresh()}
         >
-          <PrototypeAbsenceData ref={el => el && (mapRef = el.mapRef)} />
+          <PrototypeAbsenceData
+            ref={el => {
+              if (el) {
+                // eslint-disable-next-line prefer-destructuring
+                mapRef = el.mapRef;
+              }
+            }}
+          />
 
           <PrototypeEditableContent
             content={`

@@ -1,40 +1,36 @@
 import isComponentType from '@common/lib/type-guards/components/isComponentType';
-import {
-  MethodologyHeader,
-  MethodologyHeaderProps,
-} from '@frontend/prototypes/methodology/components/MethodologyHeader';
-import React, { cloneElement, Component, ReactNode } from 'react';
+import React, { cloneElement, Component, createRef, ReactNode } from 'react';
+import MethodologyHeader, { MethodologyHeaderProps } from './MethodologyHeader';
 
 interface MethodologySectionProps {
   children: React.ReactNode;
 }
 
-export class MethodologySection extends Component<MethodologySectionProps> {
-  private container: HTMLElement | null;
-
-  public constructor(props: MethodologySectionProps) {
-    super(props);
-    this.container = null;
-  }
+export default class MethodologySection extends Component<
+  MethodologySectionProps
+> {
+  private container = createRef<HTMLDivElement>();
 
   public get height() {
-    if (this.container) {
-      return this.container.offsetHeight;
+    if (this.container.current) {
+      return this.container.current.offsetHeight;
     }
     return 0;
   }
 
   public get scrollTop() {
-    if (this.container) {
-      return this.container.getBoundingClientRect().top;
+    if (this.container.current) {
+      return this.container.current.getBoundingClientRect().top;
     }
     return 0;
   }
 
   public render() {
+    const { children } = this.props;
+
     return (
-      <div className="govuk-grid-row" ref={ref => (this.container = ref)}>
-        {React.Children.map(this.props.children, (child: ReactNode) => {
+      <div className="govuk-grid-row" ref={this.container}>
+        {React.Children.map(children, (child: ReactNode) => {
           if (isComponentType(child, MethodologyHeader)) {
             return cloneElement<MethodologyHeaderProps>(child, {
               parent: this,

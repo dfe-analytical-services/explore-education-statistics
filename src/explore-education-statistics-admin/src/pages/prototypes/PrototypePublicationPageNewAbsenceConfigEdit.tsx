@@ -4,7 +4,7 @@ import PrototypePage from './components/PrototypePage';
 import PrototypePublicationConfig from './components/PrototypePublicationPageConfig';
 
 const PublicationConfigEditPage = () => {
-  let sectionId = 'setup';
+  const sectionId = 'setup';
 
   return (
     <PrototypePage

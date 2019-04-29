@@ -1,9 +1,5 @@
-import loadPolyfill from '@common/polyfill';
 import { logPageView } from '@frontend/services/googleAnalyticsService';
-import 'core-js/fn/array/virtual/flat-map';
-import 'core-js/fn/array/virtual/includes';
-import 'cross-fetch/polyfill';
-import { Container, default as BaseApp, NextAppContext } from 'next/app';
+import BaseApp, { Container, NextAppContext } from 'next/app';
 import Router from 'next/router';
 import React from 'react';
 import Helmet from 'react-helmet';
@@ -18,12 +14,6 @@ class App extends BaseApp {
     }
 
     return { pageProps };
-  }
-
-  public async componentWillMount() {
-    if (process.browser) {
-      await loadPolyfill();
-    }
   }
 
   public componentDidMount() {

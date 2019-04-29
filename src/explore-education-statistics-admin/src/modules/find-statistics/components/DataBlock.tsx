@@ -1,12 +1,10 @@
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
-import {
-  SummaryRenderer,
+import SummaryRenderer, {
   SummaryRendererProps,
 } from '@common/modules/find-statistics/components/SummaryRenderer';
-import {
-  TableRenderer,
+import TableRenderer, {
   TableRendererProps,
 } from '@common/modules/find-statistics/components/TableRenderer';
 import { baseUrl } from '@common/services/api';
@@ -16,7 +14,7 @@ import {
   PublicationMeta,
 } from '@common/services/tableBuilderService';
 import React, { Component } from 'react';
-import { ChartRenderer, ChartRendererProps } from './ChartRenderer';
+import ChartRenderer, { ChartRendererProps } from './ChartRenderer';
 
 export interface DataBlockProps {
   type: string;
@@ -42,12 +40,12 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
   private currentDataQuery?: DataQuery = undefined;
 
   public async componentDidMount() {
-    const { dataQuery } = this.props;
+    const { dataQuery, data, meta } = this.props;
 
     if (dataQuery) {
       await this.getData(dataQuery);
     } else {
-      this.parseDataResponse(this.props.data, this.props.meta);
+      this.parseDataResponse(data, meta);
     }
   }
 
@@ -70,7 +68,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
     const json: CharacteristicsData = await response.json();
 
-    const publicationId = json.publicationId;
+    const { publicationId } = json;
 
     const metaResponse = await fetch(
       `${
@@ -96,8 +94,10 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
         newState.tables = [{ data: json, meta: jsonMeta }];
       }
 
-      if (this.props.charts) {
-        newState.charts = this.props.charts.map((chart: Chart) => ({
+      const { charts, summary } = this.props;
+
+      if (charts) {
+        newState.charts = charts.map((chart: Chart) => ({
           ...chart,
           geometry: chart.geometry as MapFeature,
           data: json,
@@ -105,9 +105,9 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
         }));
       }
 
-      if (this.props.summary) {
+      if (summary) {
         newState.summary = {
-          ...this.props.summary,
+          ...summary,
           data: json,
           meta: jsonMeta,
         };
@@ -120,35 +120,37 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
   public render() {
     const id = new Date().getDate();
 
+    const { heading, height } = this.props;
+    const { charts, summary, tables } = this.state;
+
     return (
       <div className="govuk-datablock">
         <Tabs>
-          {this.state.summary && (
+          {summary && (
             <TabsSection id={`${id}_summary`} title="Summary">
-              <h3>{this.props.heading}</h3>
-              <SummaryRenderer {...this.state.summary} />
+              <h3>{heading}</h3>
+              <SummaryRenderer {...summary} />
             </TabsSection>
           )}
 
-          {this.state.tables && (
+          {tables && (
             <TabsSection id={`${id}0`} title="Data tables">
-              <h3>{this.props.heading}</h3>
-              {this.state.tables.map((table, idx) => (
-                <TableRenderer key={`${id}0_table_${idx}`} {...table} />
-              ))}
+              <h3>{heading}</h3>
+              {tables.map((table, idx) => {
+                const key = `${id}0_table_${idx}`;
+
+                return <TableRenderer key={key} {...table} />;
+              })}
             </TabsSection>
           )}
 
-          {this.state.charts && (
+          {charts && (
             <TabsSection id={`${id}1`} title="Charts" lazy={false}>
-              <h3>{this.props.heading}</h3>
-              {this.state.charts.map((chart, idx) => (
-                <ChartRenderer
-                  key={`${id}_chart_${idx}`}
-                  {...chart}
-                  height={this.props.height}
-                />
-              ))}
+              <h3>{heading}</h3>
+              {charts.map((chart, idx) => {
+                const key = `${id}_chart_${idx}`;
+                return <ChartRenderer key={key} {...chart} height={height} />;
+              })}
             </TabsSection>
           )}
 

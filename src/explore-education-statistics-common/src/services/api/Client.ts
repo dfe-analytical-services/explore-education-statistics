@@ -11,7 +11,7 @@ class Client {
     url: string,
     config?: AxiosRequestConfig,
   ): Promise<T> {
-    return this.unboxResponse(this.api.get(url, config));
+    return Client.unboxResponse(this.api.get(url, config));
   }
 
   public post<T = unknown>(
@@ -19,7 +19,7 @@ class Client {
     data?: unknown,
     config?: AxiosRequestConfig,
   ): Promise<T> {
-    return this.unboxResponse(this.api.post(url, data, config));
+    return Client.unboxResponse(this.api.post(url, data, config));
   }
 
   public put<T = unknown>(
@@ -27,7 +27,7 @@ class Client {
     data?: unknown,
     config?: AxiosRequestConfig,
   ): Promise<T> {
-    return this.unboxResponse(this.api.put(url, data, config));
+    return Client.unboxResponse(this.api.put(url, data, config));
   }
 
   public patch<T = unknown>(
@@ -35,17 +35,17 @@ class Client {
     data?: unknown,
     config?: AxiosRequestConfig,
   ): Promise<T> {
-    return this.unboxResponse(this.api.patch(url, data, config));
+    return Client.unboxResponse(this.api.patch(url, data, config));
   }
 
   public delete<T = unknown>(
     url: string,
     config?: AxiosRequestConfig,
   ): Promise<T> {
-    return this.unboxResponse(this.api.delete(url, config));
+    return Client.unboxResponse(this.api.delete(url, config));
   }
 
-  private unboxResponse<T>(promise: AxiosPromise<T>) {
+  private static unboxResponse<T>(promise: AxiosPromise<T>) {
     return promise.then(({ data }) => data);
   }
 }
