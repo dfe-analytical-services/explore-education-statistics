@@ -58,6 +58,7 @@ class PrototypeEditableContent extends React.Component<Props, State> {
   }
 
   public setEditing = () => {
+    console.log('click');
     const { editable } = this.props;
     const { editing } = this.state;
     if (editable && !editing) {

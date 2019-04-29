@@ -1,6 +1,7 @@
 import GoToTopLink from '@common/components/GoToTopLink';
 import classNames from 'classnames';
 import React, { createElement, createRef, ReactNode, useState } from 'react';
+// import PrototypeEditableContent from "@admin/pages/prototypes/components/PrototypeEditableContent";
 
 export interface EditableAccordionSectionProps {
   caption?: string;
@@ -18,6 +19,7 @@ export interface EditableAccordionSectionProps {
   onToggle?: (open: boolean) => void;
   index: number;
   droppableIndex?: number;
+  editable?: boolean;
 }
 
 const EditableAccordionSection = ({
@@ -30,6 +32,7 @@ const EditableAccordionSection = ({
   headingId,
   headingTag = 'h2',
   open = false,
+  // editable = false,
   onToggle,
 }: EditableAccordionSectionProps) => {
   const target = createRef<HTMLDivElement>();
@@ -65,13 +68,9 @@ const EditableAccordionSection = ({
               }
             },
           },
-          <button
-            type="button"
-            className="govuk-accordion__section-button"
-            id={headingId}
-          >
+          <span className="govuk-accordion__section-button" id={headingId}>
             {heading}
-          </button>,
+          </span>,
           <span className="govuk-accordion__icon" />,
         )}
         {caption && (
