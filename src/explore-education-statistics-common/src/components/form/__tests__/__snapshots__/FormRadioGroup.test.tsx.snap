@@ -1,5 +1,63 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`FormRadioGroup generates option IDs from id and value if none specified 1`] = `
+
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset"
+            id="test-radios"
+  >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+      Test radios
+    </legend>
+    <div class="govuk-radios">
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input"
+               id="test-radios-opt-1"
+               name="test-radios"
+               type="radio"
+               data-testid="Test radio 1"
+               value="opt1"
+        >
+        <label class="govuk-label govuk-radios__label"
+               for="test-radios-opt-1"
+        >
+          Test radio 1
+        </label>
+      </div>
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input"
+               id="test-radios-opt-2"
+               name="test-radios"
+               type="radio"
+               data-testid="Test radio 2"
+               value="opt-2"
+        >
+        <label class="govuk-label govuk-radios__label"
+               for="test-radios-opt-2"
+        >
+          Test radio 2
+        </label>
+      </div>
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input"
+               id="test-radios-opt-3"
+               name="test-radios"
+               type="radio"
+               data-testid="Test radio 3"
+               value="opt.3"
+        >
+        <label class="govuk-label govuk-radios__label"
+               for="test-radios-opt-3"
+        >
+          Test radio 3
+        </label>
+      </div>
+    </div>
+  </fieldset>
+</div>
+
+`;
+
 exports[`FormRadioGroup renders correctly with legend 1`] = `
 
 <div class="govuk-form-group">
@@ -8,6 +66,77 @@ exports[`FormRadioGroup renders correctly with legend 1`] = `
   >
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
       Choose a radio
+    </legend>
+    <div class="govuk-radios">
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input"
+               id="radio-1"
+               name="test-radios"
+               type="radio"
+               data-testid="Test radio 1"
+               value="1"
+        >
+        <label class="govuk-label govuk-radios__label"
+               for="radio-1"
+        >
+          Test radio 1
+        </label>
+      </div>
+    </div>
+  </fieldset>
+</div>
+
+`;
+
+exports[`FormRadioGroup renders correctly with small size variants 1`] = `
+<div>
+  <div
+    class="govuk-form-group"
+  >
+    <fieldset
+      class="govuk-fieldset"
+      id="test-radios"
+    >
+      <legend
+        class="govuk-fieldset__legend govuk-fieldset__legend--m"
+      >
+        Choose a radio
+      </legend>
+      <div
+        class="govuk-radios govuk-radios--small"
+      >
+        <div
+          class="govuk-radios__item"
+        >
+          <input
+            class="govuk-radios__input"
+            data-testid="Test radio 1"
+            id="radio-1"
+            name="test-radios"
+            type="radio"
+            value="1"
+          />
+          <label
+            class="govuk-label govuk-radios__label"
+            for="radio-1"
+          >
+            Test radio 1
+          </label>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+`;
+
+exports[`FormRadioGroup renders list of radios in correct order 1`] = `
+
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset"
+            id="test-radios"
+  >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+      Test radios
     </legend>
     <div class="govuk-radios">
       <div class="govuk-radios__item">
@@ -58,12 +187,15 @@ exports[`FormRadioGroup renders correctly with legend 1`] = `
 
 `;
 
-exports[`FormRadioGroup renders list of radios in correct order 1`] = `
+exports[`FormRadioGroup renders option with conditional contents 1`] = `
 
 <div class="govuk-form-group">
   <fieldset class="govuk-fieldset"
             id="test-radios"
   >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+      Test radios
+    </legend>
     <div class="govuk-radios">
       <div class="govuk-radios__item">
         <input class="govuk-radios__input"
@@ -79,6 +211,13 @@ exports[`FormRadioGroup renders list of radios in correct order 1`] = `
           Test radio 1
         </label>
       </div>
+      <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
+           hidden
+      >
+        <p>
+          Conditional 1
+        </p>
+      </div>
       <div class="govuk-radios__item">
         <input class="govuk-radios__input"
                id="radio-2"
@@ -86,12 +225,18 @@ exports[`FormRadioGroup renders list of radios in correct order 1`] = `
                type="radio"
                data-testid="Test radio 2"
                value="2"
+               checked
         >
         <label class="govuk-label govuk-radios__label"
                for="radio-2"
         >
           Test radio 2
         </label>
+      </div>
+      <div class="govuk-radios__conditional">
+        <p>
+          Conditional 2
+        </p>
       </div>
       <div class="govuk-radios__item">
         <input class="govuk-radios__input"
@@ -106,6 +251,13 @@ exports[`FormRadioGroup renders list of radios in correct order 1`] = `
         >
           Test radio 3
         </label>
+      </div>
+      <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
+           hidden
+      >
+        <p>
+          Conditional 3
+        </p>
       </div>
     </div>
   </fieldset>

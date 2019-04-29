@@ -7,7 +7,7 @@ export interface FormTextInputProps {
   error?: ReactNode | string;
   hint?: string;
   id: string;
-  label?: ReactNode | string;
+  label: ReactNode | string;
   name: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   width?: 20 | 10 | 5 | 4 | 3 | 2;

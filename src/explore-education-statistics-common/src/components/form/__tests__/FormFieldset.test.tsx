@@ -11,6 +11,9 @@ describe('FormFieldset', () => {
       </FormFieldset>,
     );
 
+    const legend = container.querySelector('legend') as HTMLLegendElement;
+
+    expect(legend.textContent).toBe('Fill the form');
     expect(container.querySelector('#test-fieldset')).not.toBeNull();
     expect(container.innerHTML).toMatchSnapshot();
   });
@@ -111,6 +114,24 @@ describe('FormFieldset', () => {
 
     expect(container.querySelector('legend')).toHaveClass(
       'govuk-fieldset__legend--xl',
+    );
+  });
+
+  test('setting `legendHidden` to true hides the legend', () => {
+    const { container } = render(
+      <FormFieldset
+        id="test-fieldset"
+        legend="Fill the form"
+        hint="All fields are required"
+        legendHidden
+      >
+        <input type="text" name="test-input-1" />
+        <input type="text" name="test-input-2" />
+      </FormFieldset>,
+    );
+
+    expect(container.querySelector('legend')).toHaveClass(
+      'govuk-visually-hidden',
     );
   });
 });

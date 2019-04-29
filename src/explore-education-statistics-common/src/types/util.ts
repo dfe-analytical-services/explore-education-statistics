@@ -30,3 +30,8 @@ export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
  * the corresponding keys from U.
  */
 export type Overwrite<T, U> = Omit<T, keyof T & keyof U> & U;
+
+/**
+ * Make specified keys from T optional.
+ */
+export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

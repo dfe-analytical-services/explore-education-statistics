@@ -10,7 +10,14 @@ import {
 } from '@frontend/prototypes/table-tool/components/meta/initialSpec';
 import TableHeadersForm from '@frontend/prototypes/table-tool/components/TableHeadersForm';
 import isEqual from 'lodash/isEqual';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+
+interface TableHeaders {
+  columnGroups: FilterOption[];
+  columns: TimePeriod[];
+  rowGroups: FilterOption[];
+  rows: IndicatorOption[];
+}
 
 interface Props {
   filters: {
@@ -23,30 +30,9 @@ interface Props {
   results: DataTableResult[];
 }
 
-const TimePeriodDataTable = (props: Props) => {
-  const { filters, results } = props;
+const TimePeriodDataTable = ({ filters, results }: Props) => {
   const { categorical, indicators, timePeriods } = filters;
-
-  const startLabel = timePeriods[0].label;
-  const endLabel = timePeriods[timePeriods.length - 1].label;
-
-  const caption =
-    startLabel !== endLabel
-      ? `Comparing statistics for ${startLabel}`
-      : `Comparing statistics between ${startLabel} and ${endLabel}`;
-
-  // TODO: Remove this when timePeriod API finalised
-  const formatToAcademicYear = (year: number) => {
-    const nextYear = year + 1;
-    return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
-  };
-
-  interface TableHeaders {
-    columnGroups: FilterOption[];
-    columns: TimePeriod[];
-    rowGroups: FilterOption[];
-    rows: IndicatorOption[];
-  }
+  const dataTableRef = useRef<HTMLTableElement>(null);
 
   const [prevFilters, setPrevFilters] = useState<Props['filters']>();
   const [tableHeaders, setTableHeaders] = useState<TableHeaders>({
@@ -65,6 +51,20 @@ const TimePeriodDataTable = (props: Props) => {
       rows: indicators,
     });
   }
+
+  const startLabel = timePeriods[0].label;
+  const endLabel = timePeriods[timePeriods.length - 1].label;
+
+  const caption =
+    startLabel !== endLabel
+      ? `Comparing statistics for ${startLabel}`
+      : `Comparing statistics between ${startLabel} and ${endLabel}`;
+
+  // TODO: Remove this when timePeriod API finalised
+  const formatToAcademicYear = (year: number) => {
+    const nextYear = year + 1;
+    return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
+  };
 
   const headerRow: HeaderGroup[] = tableHeaders.columnGroups.map(
     columnGroup => {
@@ -91,16 +91,17 @@ const TimePeriodDataTable = (props: Props) => {
           });
 
           if (!matchingResult) {
-            return '--';
+            return 'n/a';
           }
 
-          const value = Number(matchingResult.indicators[row.value]);
+          const rawValue = matchingResult.indicators[row.value];
+          const parsedValue = Number(rawValue);
 
-          if (Number.isNaN(value)) {
-            return '--';
+          if (Number.isNaN(parsedValue)) {
+            return rawValue;
           }
 
-          return `${value.toLocaleString('en-GB')}${row.unit}`;
+          return `${parsedValue.toLocaleString('en-GB')}${row.unit}`;
         }),
       );
 
@@ -122,6 +123,13 @@ const TimePeriodDataTable = (props: Props) => {
         filters={filters}
         onSubmit={value => {
           setTableHeaders(value as TableHeaders);
+
+          if (dataTableRef.current) {
+            dataTableRef.current.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+          }
         }}
       />
 
@@ -129,6 +137,7 @@ const TimePeriodDataTable = (props: Props) => {
         caption={caption}
         headers={headerRow}
         rowGroups={groupedData}
+        ref={dataTableRef}
       />
     </div>
   );

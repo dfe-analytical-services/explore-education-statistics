@@ -2,7 +2,7 @@ import Button from '@common/components/Button';
 import ErrorSummary, {
   ErrorSummaryMessage,
 } from '@common/components/ErrorSummary';
-import { FormFieldset, FormFieldTextInput } from '@common/components/form';
+import { FormFieldTextInput } from '@common/components/form';
 import Yup from '@common/lib/validation/yup';
 import { Form, Formik, FormikErrors, FormikProps, FormikTouched } from 'formik';
 import React, { Component, createRef } from 'react';
@@ -86,17 +86,13 @@ class SubscriptionForm extends Component<Props, State> {
               />
 
               <Form>
-                <FormFieldset
-                  id="email-address"
-                  legend="Email address"
+                <FormFieldTextInput<FormValues>
+                  id="email-id"
+                  label="Email address"
                   hint="We’ll only use this to send you subscriptions. You can unsubscribe from these at any time."
-                >
-                  <FormFieldTextInput<FormValues>
-                    id="email-id"
-                    name="email"
-                    width={20}
-                  />
-                </FormFieldset>
+                  name="email"
+                  width={20}
+                />
 
                 <Button
                   disabled={form.isSubmitting}

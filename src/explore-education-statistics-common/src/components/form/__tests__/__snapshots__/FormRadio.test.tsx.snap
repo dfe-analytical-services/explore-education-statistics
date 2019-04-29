@@ -1,5 +1,56 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`FormRadio does not render conditional content when not checked 1`] = `
+
+<div class="govuk-radios__item">
+  <input class="govuk-radios__input"
+         id="test-radio"
+         name="test"
+         type="radio"
+         data-testid="Test radio"
+         value="true"
+  >
+  <label class="govuk-label govuk-radios__label"
+         for="test-radio"
+  >
+    Test radio
+  </label>
+</div>
+<div class="govuk-radios__conditional govuk-radios__conditional--hidden"
+     hidden
+>
+  <p>
+    The conditional content
+  </p>
+</div>
+
+`;
+
+exports[`FormRadio renders conditional content when checked 1`] = `
+
+<div class="govuk-radios__item">
+  <input class="govuk-radios__input"
+         id="test-radio"
+         name="test"
+         type="radio"
+         data-testid="Test radio"
+         value="true"
+         checked
+  >
+  <label class="govuk-label govuk-radios__label"
+         for="test-radio"
+  >
+    Test radio
+  </label>
+</div>
+<div class="govuk-radios__conditional">
+  <p>
+    The conditional content
+  </p>
+</div>
+
+`;
+
 exports[`FormRadio renders correctly when \`hint\` is provided 1`] = `
 
 <div class="govuk-radios__item">

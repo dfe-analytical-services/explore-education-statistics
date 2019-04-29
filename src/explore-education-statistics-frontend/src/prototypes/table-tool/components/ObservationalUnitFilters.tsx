@@ -41,6 +41,8 @@ const ObservationalUnitFilters = ({ form, specification }: Props) => {
         >
           <FormFieldRadioGroup
             name="location.level"
+            legend="Choose location level"
+            legendHidden
             options={Object.entries(locationSpecification).map(
               ([locationLevel, option]) => ({
                 id: `filter-locationLevel-${locationLevel}`,

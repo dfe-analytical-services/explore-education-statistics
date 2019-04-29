@@ -34,6 +34,7 @@ const CategoricalFilters = ({ form, specification }: Props) => {
                   value: option.value,
                 }))}
                 selectAll
+                small
               />
             ) : (
               <FormFieldset

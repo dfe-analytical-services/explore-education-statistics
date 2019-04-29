@@ -1,6 +1,6 @@
+import DetailsMenu from '@common/components/DetailsMenu';
 import { FormGroup } from '@common/components/form';
 import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
-import MenuDetails from '@frontend/modules/table-tool/components/MenuDetails';
 import { GroupedFilterOptions } from '@frontend/prototypes/table-tool/components/meta/initialSpec';
 import SearchTextInput from '@frontend/prototypes/table-tool/components/SearchTextInput';
 import classNames from 'classnames';
@@ -43,6 +43,9 @@ class SearchableGroupedFilterMenus<
     const containsSearchTerm = (value: string) =>
       value.search(new RegExp(searchTerm, 'i')) > -1;
 
+    // Remove dots from field name as this does not work well in Robot tests
+    const compositeKeyName = (name as string).replace('.', '-');
+
     const groups = sortBy(Object.entries(menuOptions), ([groupKey]) => groupKey)
       .filter(
         ([_, group]) =>
@@ -53,7 +56,7 @@ class SearchableGroupedFilterMenus<
           ),
       )
       .map(([groupKey, group]) => {
-        const compositeKey = `${name}-${camelCase(groupKey)}`;
+        const compositeKey = `${compositeKeyName}-${camelCase(groupKey)}`;
 
         const isMenuOpen = Boolean(
           group.options.some(
@@ -83,7 +86,7 @@ class SearchableGroupedFilterMenus<
         );
 
         return (
-          <MenuDetails
+          <DetailsMenu
             summary={
               <>
                 {groupKey}
@@ -109,12 +112,15 @@ class SearchableGroupedFilterMenus<
           >
             <FormFieldCheckboxGroup
               name={name as string}
+              legend="Choose an option"
+              legendHidden
               options={options}
               id={compositeKey}
               selectAll
+              small
               showError={false}
             />
-          </MenuDetails>
+          </DetailsMenu>
         );
       });
 

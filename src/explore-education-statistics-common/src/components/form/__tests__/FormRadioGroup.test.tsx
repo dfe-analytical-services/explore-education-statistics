@@ -11,6 +11,7 @@ describe('FormRadioGroup', () => {
         value={null}
         id="test-radios"
         name="test-radios"
+        legend="Test radios"
         options={[
           { id: 'radio-1', label: 'Test radio 1', value: '1' },
           { id: 'radio-2', label: 'Test radio 2', value: '2' },
@@ -49,6 +50,7 @@ describe('FormRadioGroup', () => {
             onChange={this.handleChange}
             id="test-radios"
             name="test-radios"
+            legend="Test radios"
             options={[{ id: 'radio-1', label: 'Test radio', value: '1' }]}
           />
         );
@@ -86,6 +88,7 @@ describe('FormRadioGroup', () => {
             onChange={this.handleChange}
             id="test-radios"
             name="test-radios"
+            legend="Test radios"
             options={[
               { id: 'radio-1', label: 'Test radio 1', value: '1' },
               { id: 'radio-2', label: 'Test radio 2', value: '2' },
@@ -118,15 +121,96 @@ describe('FormRadioGroup', () => {
         legend="Choose a radio"
         id="test-radios"
         name="test-radios"
-        options={[
-          { id: 'radio-1', label: 'Test radio 1', value: '1' },
-          { id: 'radio-2', label: 'Test radio 2', value: '2' },
-          { id: 'radio-3', label: 'Test radio 3', value: '3' },
-        ]}
+        options={[{ id: 'radio-1', label: 'Test radio 1', value: '1' }]}
       />,
     );
 
     expect(getByText('Choose a radio')).toBeDefined();
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders correctly with small size variants', () => {
+    const { container } = render(
+      <FormRadioGroup
+        id="test-radios"
+        name="test-radios"
+        legend="Choose a radio"
+        small
+        options={[{ id: 'radio-1', label: 'Test radio 1', value: '1' }]}
+      />,
+    );
+
+    expect(container.querySelector('.govuk-radios--small')).not.toBeNull();
+    expect(container).toMatchSnapshot();
+  });
+
+  test('renders option with conditional contents', () => {
+    const { container, getByText } = render(
+      <FormRadioGroup
+        value="2"
+        id="test-radios"
+        name="test-radios"
+        legend="Test radios"
+        options={[
+          {
+            id: 'radio-1',
+            label: 'Test radio 1',
+            value: '1',
+            conditional: <p>Conditional 1</p>,
+          },
+          {
+            id: 'radio-2',
+            label: 'Test radio 2',
+            value: '2',
+            conditional: <p>Conditional 2</p>,
+          },
+          {
+            id: 'radio-3',
+            label: 'Test radio 3',
+            value: '3',
+            conditional: <p>Conditional 3</p>,
+          },
+        ]}
+      />,
+    );
+
+    const hiddenClass = 'govuk-radios__conditional--hidden';
+
+    expect(getByText('Conditional 1').parentElement).toHaveClass(hiddenClass);
+    expect(getByText('Conditional 2').parentElement).not.toHaveClass(
+      hiddenClass,
+    );
+    expect(getByText('Conditional 3').parentElement).toHaveClass(hiddenClass);
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('generates option IDs from id and value if none specified', () => {
+    const { container, getByLabelText } = render(
+      <FormRadioGroup
+        id="test-radios"
+        name="test-radios"
+        legend="Test radios"
+        options={[
+          { label: 'Test radio 1', value: 'opt1' },
+          { label: 'Test radio 2', value: 'opt-2' },
+          { label: 'Test radio 3', value: 'opt.3' },
+        ]}
+      />,
+    );
+
+    expect(getByLabelText('Test radio 1')).toHaveAttribute(
+      'id',
+      'test-radios-opt-1',
+    );
+    expect(getByLabelText('Test radio 2')).toHaveAttribute(
+      'id',
+      'test-radios-opt-2',
+    );
+    expect(getByLabelText('Test radio 3')).toHaveAttribute(
+      'id',
+      'test-radios-opt-3',
+    );
+
     expect(container.innerHTML).toMatchSnapshot();
   });
 });
