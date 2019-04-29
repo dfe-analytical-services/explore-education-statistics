@@ -223,9 +223,6 @@ const PublicationPage = () => {
                 <li>
                   <a href="#section5-4">5.4 Consistency checks</a>
                 </li>
-                <li>
-                  <a href="#section5-5">5.5 Data quality</a>
-                </li>
               </ul>
             </MethodologyHeader>
             <MethodologyContent>
