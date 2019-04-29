@@ -6,7 +6,7 @@
 
         public string PublicationName { get; set; }
 
-        public string ReleaseId { get; set; }
+        public string ReleaseDate { get; set; }
 
         public string ReleaseName { get; set; }
     }

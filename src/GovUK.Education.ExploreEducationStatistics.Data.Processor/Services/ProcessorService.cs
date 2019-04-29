@@ -69,7 +69,7 @@
                     new Release
                     {
                         PublicationId = Guid.Parse(processorNotification.PublicationId),
-                        ReleaseDate = DateTime.UtcNow,
+                        ReleaseDate = DateTime.Parse(processorNotification.ReleaseDate),
                         Name = processorNotification.ReleaseName,
                         Subjects = subjects
                     }

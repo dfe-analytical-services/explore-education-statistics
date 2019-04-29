@@ -15,8 +15,8 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
 
         [FunctionName("FilesProcessor")]
         public static void FilesProcessorFunc(
-            [QueueTrigger("publications-pending", Connection = "")] JObject fNotify,
-            [Queue("publications-processed", Connection = "")] out JObject fNotifyOut,
+            [QueueTrigger("imports-pending", Connection = "")] JObject fNotify,
+            [Queue("imports-processed", Connection = "")] out JObject fNotifyOut,
             [Inject]IProcessorService processorService,
             ILogger log,
             ExecutionContext context)
