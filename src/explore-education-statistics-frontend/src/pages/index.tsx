@@ -110,21 +110,6 @@ function HomePage() {
           </p>
         </div>
       </div>
-      <div className="govuk-grid-column-one-half">
-        <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-          <a
-            className="govuk-link"
-            href="https://www.get-information-schools.service.gov.uk/"
-          >
-            Get information about schools
-          </a>
-        </h4>
-        <p className="govuk-caption-m govuk-!-margin-top-1">
-          Search this register to find and download information about of schools
-          and colleges in England including details educational organisations
-          and governors
-        </p>
-      </div>
     </Page>
   );
 }

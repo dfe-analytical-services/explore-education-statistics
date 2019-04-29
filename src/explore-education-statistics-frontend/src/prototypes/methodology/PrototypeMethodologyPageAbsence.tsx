@@ -12,6 +12,7 @@ import PrototypeSection2 from '@frontend/prototypes/methodology/absence/Prototyp
 import PrototypeSection3 from '@frontend/prototypes/methodology/absence/PrototypeSection3';
 import PrototypeSection4 from '@frontend/prototypes/methodology/absence/PrototypeSection4';
 import PrototypeSection5 from '@frontend/prototypes/methodology/absence/PrototypeSection5';
+import PrototypeSection6 from '@frontend/prototypes/methodology/absence/PrototypeSection6';
 import PrototypeSection7 from '@frontend/prototypes/methodology/absence/PrototypeSection7';
 import MethodologyContent from '@frontend/prototypes/methodology/components/MethodologyContent';
 import MethodologyHeader from '@frontend/prototypes/methodology/components/MethodologyHeader';
@@ -243,7 +244,9 @@ const PublicationPage = () => {
                 </li>
               </ul>
             </MethodologyHeader>
-            <MethodologyContent />
+            <MethodologyContent>
+              <PrototypeSection6 />
+            </MethodologyContent>
           </MethodologySection>
         </AccordionSection>
 
