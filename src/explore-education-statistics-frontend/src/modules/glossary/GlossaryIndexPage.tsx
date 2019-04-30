@@ -12,9 +12,8 @@ function GlossaryIndexPage() {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">
-            The Government Digital Service style guide covers style, spelling
-            and grammar conventions for all content published on GOV.UK,
-            arranged alphabetically.
+            Browse our A to Z list of definitions for terms used across
+            education statistics and data.
           </p>
         </div>
         <div className="govuk-grid-column-one-third">
