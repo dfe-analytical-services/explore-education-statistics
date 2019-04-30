@@ -29,7 +29,7 @@ Validate Privacy Policy page
     [Tags]  HappyPath
     user clicks link    Privacy policy
     user waits until page contains  Explore education statistics privacy policy
-    user waits until page contains  The Explore education statistics service is operated by the Department for Education
+    user waits until page contains  The explore education statistics service is operated by the Department for Education
 
     ${current_url}=  get location
     should be equal  ${current_url}   ${url}/privacy-policy
