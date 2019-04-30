@@ -11,7 +11,6 @@ class FormConditionalRadioGroup extends Component<Props> {
     if (this.ref.current) {
       import('govuk-frontend/components/radios/radios').then(
         ({ default: GovUkRadios }) => {
-          console.log(this.ref.current);
           new GovUkRadios(this.ref.current).init();
         },
       );
