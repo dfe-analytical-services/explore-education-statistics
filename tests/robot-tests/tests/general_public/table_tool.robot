@@ -16,8 +16,8 @@ Go to Table Tool page
 
 Select Pupil absence publication
     [Tags]  HappyPath
-    user clicks element    css:[data-testid="Early years and schools"]
-    user clicks element    css:[data-testid="Absence and exclusions"]
+    user clicks details    css:[data-testid="Early years and schools"]
+    user clicks details    css:[data-testid="Absence and exclusions"]
     user clicks element    css:[data-testid="Pupil absence"]
     user waits until page contains    2. Filter statistics from
 
@@ -31,16 +31,16 @@ Select School type Total
     user clicks element  css:#filter-schoolTypes-total
 
 Select a few Indicators
-    [Tags]  HappyPath
-    user clicks element   css:[data-testid="Absence fields"]
+    [Tags]  HappyPath  Failing
+    user clicks details   css:[data-testid="Absence fields"]
 
     user clicks element   css:#sess_authorised_percent
     user clicks element   css:#sess_overall_percent
     user clicks element   css:#sess_unauthorised_percent
 
 Select a few Characteristics
-    [Tags]  HappyPath
-    user clicks element   css:[data-testid="Total"]
+    [Tags]  HappyPath   Failing
+    user clicks details   css:[data-testid="Total"]
     user clicks element   css:input#Total
 
 Generate a table
