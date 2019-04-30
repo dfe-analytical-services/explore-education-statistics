@@ -655,16 +655,6 @@
 
 
     {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('importerAccountName')]",
-      "apiVersion": "2016-12-01",
-      "location": "[resourceGroup().location]",
-      "kind": "Storage",
-      "sku": {
-        "name": "Standard_LRS"
-      }
-    },
-    {
       "apiVersion": "2015-05-01",
       "name": "[variables('importerAppInsights')]",
       "type": "Microsoft.Insights/components",
