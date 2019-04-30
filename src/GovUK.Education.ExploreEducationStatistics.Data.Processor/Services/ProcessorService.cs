@@ -17,7 +17,7 @@
         private readonly ISeedService _seedService;
 
         public ProcessorService(
-            ILogger<SeedService> logger,
+            ILogger logger,
             ISeedService seedService)
         {
             _logger = logger;
@@ -69,7 +69,7 @@
             };
         }
 
-        private static async Task<Subject[]> GetSubjects(CloudBlobContainer blobContainer, string directory, ILogger log)
+        private static async Task<Subject[]> GetSubjects(CloudBlobContainer blobContainer, string directory, ILogger logger)
         {
             var publicationUploadDir = blobContainer.GetDirectoryReference(directory);
             List<Subject> list = new List<Subject>();
@@ -87,6 +87,8 @@
                                       && !Path.GetFileName(r.Uri.AbsolutePath).StartsWith("meta")))
                 {
                     var sName = GetSubjectName(item);
+
+                    logger.LogInformation($"adding subject {sName} to release for import process");
 
                     list.Add(new Subject()
                     {

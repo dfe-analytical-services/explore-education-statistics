@@ -42,23 +42,21 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
 
             services.AddMemoryCache();
 
-            services.AddDbContext<ApplicationDbContext>(options =>
+            return services.AddDbContext<ApplicationDbContext>(options =>
                 options
                     .UseSqlServer(connectionString)
-                    .EnableSensitiveDataLogging());
+                    .EnableSensitiveDataLogging())
 
-            services.AddTransient<IBlobService, BlobService>();
-            services.AddTransient<ISeedService, SeedService>();
-            services.AddTransient<IProcessorService, ProcessorService>();
-            services.AddTransient<IImporterService, ImporterService>();
-            services.AddTransient<ImporterFilterService>();
-            services.AddTransient<ImporterLocationService>();
-            services.AddTransient<ImporterMetaService>();
-
+            .AddTransient<IBlobService, BlobService>()
+            .AddTransient<ISeedService, SeedService>()
+            .AddTransient<IProcessorService, ProcessorService>()
+            .AddTransient<IImporterService, ImporterService>()
+            .AddTransient<ImporterFilterService>()
+            .AddTransient<ImporterLocationService>()
+            .AddTransient<ImporterMetaService>()
             // Important: We need to call CreateFunctionUserCategory, otherwise our log entries might be filtered out.
-            services.AddSingleton<ILogger>(_ => _loggerFactory.CreateLogger(LogCategories.CreateFunctionUserCategory("Common")));
-
-            return services.BuildServiceProvider();
+            .AddSingleton<ILogger>(_ => _loggerFactory.CreateLogger(LogCategories.CreateFunctionUserCategory("Common")))
+            .BuildServiceProvider();
         }
     }
 }

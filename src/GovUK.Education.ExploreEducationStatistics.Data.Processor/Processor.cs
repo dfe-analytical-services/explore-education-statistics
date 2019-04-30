@@ -15,15 +15,15 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
 
         [FunctionName("FilesProcessor")]
         public static void FilesProcessorFunc(
-            [QueueTrigger("imports-pending", Connection = "")] JObject fNotify,
+            [QueueTrigger("imports-pending", Connection = "")] JObject fNotifyIn,
             [Queue("imports-processed", Connection = "")] out JObject fNotifyOut,
             [Inject]IProcessorService processorService,
             ILogger logger,
             ExecutionContext context)
         {
-            logger.LogInformation($"C# Queue trigger function processed: {fNotify.ToString()}");
+            logger.LogInformation($"C# Queue trigger function processed: {fNotifyIn.ToString()}");
 
-            var filesProcessorNotification = ExtractNotification(fNotify);
+            var filesProcessorNotification = ExtractNotification(fNotifyIn);
             var config = LoadAppSettings(context);
             var blobStorageConnectionStr = config.GetConnectionString(StorageConnectionName);
 
@@ -31,7 +31,7 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
 
             logger.LogInformation("Completed files processing");
 
-            fNotifyOut = fNotify;
+            fNotifyOut = fNotifyIn;
         }
 
         private static ProcessorNotification ExtractNotification(JObject processorNotification)

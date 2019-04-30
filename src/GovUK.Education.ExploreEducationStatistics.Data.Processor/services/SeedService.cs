@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IBlobService _blobService;
 
         public SeedService(
-            ILogger<SeedService> logger,
+            ILogger logger,
             ApplicationDbContext context,
             IImporterService importerService,
             IBlobService blobService)

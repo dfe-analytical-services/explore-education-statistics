@@ -10,7 +10,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
 {
     public class TokenService : ITokenService
     {
-        public string GenerateToken(string secretKey, string email, ILogger log, DateTime expiryDateTime)
+        private readonly ILogger _logger;
+
+        public TokenService(ILogger logger)
+        {
+            _logger = logger;
+        }
+
+        public string GenerateToken(string secretKey, string email, DateTime expiryDateTime)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -29,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
             return handler.WriteToken(secToken);
         }
 
-        public string GetEmailFromToken(string authToken, string secretKey, ILogger log)
+        public string GetEmailFromToken(string authToken, string secretKey)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var validationParameters = GetValidationParameters(secretKey);
@@ -45,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
             }
             catch (Exception e)
             {
-                log.LogInformation($"error validating token : {e.Message}");
+                _logger.LogInformation($"error validating token : {e.Message}");
             }
 
             return email;

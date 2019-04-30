@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Notify.Exceptions;
+using Willezone.Azure.WebJobs.Extensions.DependencyInjection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier
 {
@@ -30,17 +31,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         private const string NotificationEmailTemplateIdName = "PublicationNotificationEmailTemplateId";
         private const string VerificationEmailTemplateIdName = "VerificationEmailTemplateId";
 
-        // Dependency injection is not quite there yet in Azure functions so create the services.
-        private readonly IEmailService _emailService = new EmailService();
-        private readonly ITokenService _tokenService = new TokenService();
-        private readonly IStorageTableService _storageTableService = new StorageTableService();
-
         [FunctionName("PublicationNotifier")]
-        public async void PublicationNotifierFunc([QueueTrigger("publication-queue", Connection = "")]
-            JObject pn, ILogger log, ExecutionContext context)
+        public static void PublicationNotifierFunc(
+            [QueueTrigger("publication-queue", Connection = "")]
+            JObject pn,
+            [Inject]ITokenService tokenService,
+            [Inject]IEmailService emailService,
+            [Inject]IStorageTableService storageTableService,
+            ILogger logger,
+            ExecutionContext context)
         {            
             
-            log.LogInformation($"C# Queue trigger function processed: {pn.ToString()}");
+            logger.LogInformation($"C# Queue trigger function processed: {pn.ToString()}");
             
             var publicationNotification = extractNotification(pn);           
             var config = LoadAppSettings(context);
@@ -49,20 +51,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             var webApplicationBaseUrl = config.GetValue<string>(WebApplicationBaseUrlName);
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
             var client = GetNotifyClient(config);
-            var table = GetCloudTable(config, SubscriptionsTblName);            
+            var table = GetCloudTable(storageTableService, config, SubscriptionsTblName);            
             var query = new TableQuery<SubscriptionEntity>()
                 .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, publicationNotification.PublicationId));
             
             TableContinuationToken token = null;
             do
             {
-                TableQuerySegment<SubscriptionEntity> resultSegment = await table.ExecuteQuerySegmentedAsync(query, token);
+                TableQuerySegment<SubscriptionEntity> resultSegment = table.ExecuteQuerySegmentedAsync(query, token).Result;
                 token = resultSegment.ContinuationToken;
 
                 foreach (SubscriptionEntity entity in resultSegment.Results)
                 {
-                    log.LogInformation($"There are {resultSegment.Results.Count} subscribed to this publication");
-                    var unsubscribeToken = _tokenService.GenerateToken(tokenSecretKey, entity.RowKey, log, DateTime.UtcNow.AddYears(1));
+                    logger.LogInformation($"There are {resultSegment.Results.Count} subscribed to this publication");
+                    var unsubscribeToken = tokenService.GenerateToken(tokenSecretKey, entity.RowKey, DateTime.UtcNow.AddYears(1));
                     var vals = new Dictionary<string, dynamic>
                        {
                            // Use values from the queue just in case the name or slug of the publication chnages
@@ -71,22 +73,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                            {"unsubscribe_link", baseUrl + entity.PartitionKey + "/unsubscribe/" + unsubscribeToken}
                        };
                    
-                    _emailService.sendEmail(client, entity.RowKey, emailTemplateId, vals); 
+                    emailService.sendEmail(client, entity.RowKey, emailTemplateId, vals); 
                 }
             } while (token != null);
         }
         
         [FunctionName("PublicationSubscribe")]
-        public async Task<IActionResult> PublicationSubscribeFunc([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "publication/subscribe/")]HttpRequest req, 
-            ILogger log, ExecutionContext context)
+        public static async Task<IActionResult> PublicationSubscribeFunc(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "publication/subscribe/")]HttpRequest req,
+            [Inject]ITokenService tokenService,
+            [Inject]IEmailService emailService,
+            [Inject]IStorageTableService storageTableService,
+            ILogger logger,
+            ExecutionContext context)
         {            
             var config = LoadAppSettings(context);
             var baseUrl = config.GetValue<string>(BaseUrlName);
             var emailTemplateId = config.GetValue<string>(VerificationEmailTemplateIdName);
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
             var connectionStr = config.GetConnectionString(StorageConnectionName);
-            var subscriptionsTable = GetCloudTable(config, SubscriptionsTblName);
-            var pendingSubscriptionsTable = GetCloudTable(config, PendingSubscriptionsTblName);
+            var subscriptionsTable = GetCloudTable(storageTableService, config, SubscriptionsTblName);
+            var pendingSubscriptionsTable = GetCloudTable(storageTableService, config, PendingSubscriptionsTblName);
             var client = GetNotifyClient(config);
 
             string id = req.Query["id"];
@@ -103,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             slug = slug ?? data?.slug;
             title = title ?? data?.title;
             
-            log.LogInformation($"email: {email} id: {id} slug: {slug} title: {title}");
+            logger.LogInformation($"email: {email} id: {id} slug: {slug} title: {title}");
 
             if (id == null || email == null || slug == null || title == null)
             {
@@ -112,16 +119,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
 
             try
             {              
-                subscriptionPending = _storageTableService.RetrieveSubscriber(pendingSubscriptionsTable, new SubscriptionEntity(id, email)).Result != null ? true : false;
+                subscriptionPending = storageTableService.RetrieveSubscriber(pendingSubscriptionsTable, new SubscriptionEntity(id, email)).Result != null ? true : false;
 
-                log.LogInformation($"pending subscription found? : {subscriptionPending}");
+                logger.LogInformation($"pending subscription found? : {subscriptionPending}");
 
                 // If already existing and pending then don't send another one
                 if (!subscriptionPending)
                 {
                     // Now check if already subscribed
 
-                    if (_storageTableService
+                    if (storageTableService
                             .RetrieveSubscriber(subscriptionsTable, new SubscriptionEntity(id, email)).Result !=
                         null)
                     {
@@ -130,9 +137,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
 
                     // Verifciation Token expires in 1 hour
                     var expiryDateTime = DateTime.UtcNow.AddHours(1);
-                    var activationCode = _tokenService.GenerateToken(tokenSecretKey, email, log, expiryDateTime);
+                    var activationCode = tokenService.GenerateToken(tokenSecretKey, email, expiryDateTime);
 
-                    await _storageTableService.UpdateSubscriber(pendingSubscriptionsTable,
+                    await storageTableService.UpdateSubscriber(pendingSubscriptionsTable,
                         new SubscriptionEntity(id, email, title, slug, expiryDateTime));
 
                     var vals = new Dictionary<string, dynamic>
@@ -141,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                         {"verification_link", baseUrl + id + "/verify-subscription/" + activationCode}
                     };
 
-                    _emailService.sendEmail(client, email, emailTemplateId, vals);
+                    emailService.sendEmail(client, email, emailTemplateId, vals);
                 }
 
                 return new OkObjectResult("Thanks! Please check your email.");
@@ -151,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                 // Remove the subscriber from storage if we could not successfully send the email & just added it
                 if (!subscriptionPending)
                 {
-                    await _storageTableService.RemoveSubscriber(pendingSubscriptionsTable, new SubscriptionEntity(id, email));
+                    await storageTableService.RemoveSubscriber(pendingSubscriptionsTable, new SubscriptionEntity(id, email));
                 }
 
                 return new BadRequestObjectResult($"There are problems sending the subscription verification email: {ex.Message}");
@@ -163,26 +170,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         }
         
         [FunctionName("PublicationUnsubscribe")]
-        public async Task<IActionResult> PublicationUnsubscribeFunc([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/unsubscribe/{token}")]
-            HttpRequestMessage req, ILogger log, ExecutionContext context, string id, string token)
+        public static async Task<IActionResult> PublicationUnsubscribeFunc(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/unsubscribe/{token}")]HttpRequestMessage req,
+            [Inject]ITokenService tokenService,
+            [Inject]IStorageTableService storageTableService,
+            ILogger logger,
+            ExecutionContext context,
+            string id,
+            string token)
         {
             var config = LoadAppSettings(context);
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
             var webApplicationBaseUrl = config.GetValue<string>(WebApplicationBaseUrlName);
-            var email = _tokenService.GetEmailFromToken(token, tokenSecretKey, log);
+            var email = tokenService.GetEmailFromToken(token, tokenSecretKey);
 
-            log.LogInformation($"Unsubscribe:{ email } from {id}");
+            logger.LogInformation($"Unsubscribe:{ email } from {id}");
             
             if (email != null)
             {
-                var table = GetCloudTable(config, SubscriptionsTblName);
+                var table = GetCloudTable(storageTableService, config, SubscriptionsTblName);
                 var sub = new SubscriptionEntity(id, email);
-                sub = _storageTableService.RetrieveSubscriber(table, sub).Result;
+                sub = storageTableService.RetrieveSubscriber(table, sub).Result;
 
                 if (sub != null)
                 {
-                    await _storageTableService.RemoveSubscriber(table, sub);
-                    log.LogInformation(
+                    await storageTableService.RemoveSubscriber(table, sub);
+                    logger.LogInformation(
                         $"redirect to:{webApplicationBaseUrl}subscriptions?slug={sub.Slug}?unsubscribed=true");
 
                     return new RedirectResult(
@@ -194,29 +207,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         }
        
         [FunctionName("PublicationSubscriptionVerify")]
-        public async Task<IActionResult> PublicationSubscriptionVerifyFunc([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/verify-subscription/{token}")]
-            HttpRequestMessage req, ILogger log, ExecutionContext context, string id, string token)
+        public static async Task<IActionResult> PublicationSubscriptionVerifyFunc([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/verify-subscription/{token}")]HttpRequestMessage req,
+            [Inject]ITokenService tokenService,
+            [Inject]IStorageTableService storageTableService,
+            ILogger logger,
+            ExecutionContext context,
+            string id,
+            string token)
         {
             var config = LoadAppSettings(context);
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
             var webApplicationBaseUrl = config.GetValue<string>(WebApplicationBaseUrlName);
-            var email = _tokenService.GetEmailFromToken(token, tokenSecretKey, log);
+            var email = tokenService.GetEmailFromToken(token, tokenSecretKey);
             
             if (email != null)
             {
-                var pendingSubscriptionsTbl = GetCloudTable(config, PendingSubscriptionsTblName);
-                var subscriptionsTbl = GetCloudTable(config, SubscriptionsTblName);
-                var sub = _storageTableService.RetrieveSubscriber(pendingSubscriptionsTbl, new SubscriptionEntity(id, email)).Result;
+                var pendingSubscriptionsTbl = GetCloudTable(storageTableService, config, PendingSubscriptionsTblName);
+                var subscriptionsTbl = GetCloudTable(storageTableService, config, SubscriptionsTblName);
+                var sub = storageTableService.RetrieveSubscriber(pendingSubscriptionsTbl, new SubscriptionEntity(id, email)).Result;
                 
                 if (sub != null)
                 {
                     // Remove the pending subscription from the the file now verified
-                    log.LogInformation($"removing {email} from pending subscribers");
-                    await _storageTableService.RemoveSubscriber(pendingSubscriptionsTbl, sub);
+                    logger.LogInformation($"removing {email} from pending subscribers");
+                    await storageTableService.RemoveSubscriber(pendingSubscriptionsTbl, sub);
                     sub.DateTimeCreated = DateTime.UtcNow;
                     // Add them to the verified subscribers table
-                    log.LogInformation($"adding {email} to subscribers");
-                    await _storageTableService.UpdateSubscriber(subscriptionsTbl, sub);
+                    logger.LogInformation($"adding {email} to subscribers");
+                    await storageTableService.UpdateSubscriber(subscriptionsTbl, sub);
                     return new RedirectResult(webApplicationBaseUrl + $"subscriptions?slug={sub.Slug}&verified=true", true);
                 }
             }  
@@ -225,12 +243,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         }
         
         [FunctionName("RemoveNonVerifiedSubcriptions")]
-        public async void RemoveNonVerifiedSubcriptionsFunc([TimerTrigger("0 0 * * * *")]TimerInfo myTimer, ExecutionContext context, ILogger log)
+        public static async void RemoveNonVerifiedSubcriptionsFunc([TimerTrigger("0 0 * * * *")]TimerInfo myTimer,
+            [Inject]IStorageTableService storageTableService,
+            ExecutionContext context,
+            ILogger logger)
         {
-            log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
+            logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
             var config = LoadAppSettings(context);
-            var pendingSubscriptionsTbl = GetCloudTable(config, PendingSubscriptionsTblName);
+            var pendingSubscriptionsTbl = GetCloudTable(storageTableService, config, PendingSubscriptionsTblName);
             // Remove any pending subscriptions where the token has expired i.e. more than 1 hour old
             var query = new TableQuery<SubscriptionEntity>()
                 .Where(TableQuery.GenerateFilterConditionForDate("DateTimeCreated", QueryComparisons.LessThan, DateTime.UtcNow.AddHours(1)));
@@ -243,8 +264,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
 
                 foreach (SubscriptionEntity entity in resultSegment.Results)
                 {
-                    log.LogInformation($"Removing {entity.RowKey}");
-                    await _storageTableService.RemoveSubscriber(pendingSubscriptionsTbl, entity);
+                    logger.LogInformation($"Removing {entity.RowKey}");
+                    await storageTableService.RemoveSubscriber(pendingSubscriptionsTbl, entity);
                 }
             } while (token != null);
         }
@@ -264,13 +285,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             return new NotificationClient(notifyApiKey);
         }
 
-        private CloudTable GetCloudTable(IConfiguration config, string tableName)
+        private static CloudTable GetCloudTable(IStorageTableService storageTableService, IConfiguration config, string tableName)
         {
             var connectionStr = config.GetConnectionString(StorageConnectionName);
-            return _storageTableService.GetTable(config, connectionStr, tableName).Result;
+            return storageTableService.GetTable(config, connectionStr, tableName).Result;
         }
         
-        private PublicationNotification extractNotification(JObject publicationNotification)
+        private static PublicationNotification extractNotification(JObject publicationNotification)
         {
             return publicationNotification.ToObject<PublicationNotification>();          
         }
