@@ -16,15 +16,6 @@ import scripts.keyword_profile as kp
 import chromedriver_install as cdi
 from dotenv import load_dotenv
 
-robotArgs = []
-headless = True
-tag = None
-profile = False
-ci = False
-
-timeout = 10
-implicit_wait = 10
-
 # Parse arguments
 parser = argparse.ArgumentParser(prog="pipenv run python run_tests.py",
                                  description="Use this script to run the UI tests, to be run locally or as part of the CI pipeline, against the environment of your choosing")
@@ -53,26 +44,35 @@ parser.add_argument("-t", "--tags",
                     nargs="?",
                     metavar="{tag(s)}",
                     help="specify tests you wish to run by tag")
-parser.add_argument("--happypath",
-                    action="store_true",
-                    help="only run happy-path tests")
 parser.add_argument("-v", "--visual",
+                    dest="visual",
                     action="store_true",
                     help="display browser window that the tests run in")
 parser.add_argument("-p", "--profile",
+                    dest="profile",
                     action="store_true",
                     help="output profiling information")
-parser.add_argument("--ci",
+parser.add_argument("--happypath",
+                    dest="happypath",
                     action="store_true",
-                    help="used by CI pipelines")
+                    help="only run happy-path tests")
+parser.add_argument("--ci",
+                    dest="ci",
+                    action="store_true",
+                    help="for use by the CI pipeline")
 args = parser.parse_args()
 
+# Default values
+chromedriver_version = "74.0.3729.6"
+timeout = 10
+implicit_wait = 10
+
 # Set robotArgs
-robotArgs += ["--outputdir", "test-results/", "--exclude", "Failing",
-              "--exclude", "UnderConstruction"]
+robotArgs = ["--outputdir", "test-results/", "--exclude", "Failing",
+             "--exclude", "UnderConstruction"]
 
 if args.tags:
-    robotArgs += ["--include", tag]
+    robotArgs += ["--include", args.tags]
 
 url = "about:blank"
 urlAdmin = "about:blank"
@@ -80,29 +80,15 @@ if args.ci:
     robotArgs += ["--xunit", "xunit", "-v", "timeout:" + str(timeout), "-v", "implicit_wait:" + str(implicit_wait)]
     url = os.getenv('publicAppUrl')
     urlAdmin = os.getenv('adminAppUrl')
+    chromedriver_version = "73.0.3683.68"
 else:
     if args.env == 'local':
         url = "http://localhost:3000"
         urlAdmin = "http://localhost:3001"
-    elif args.env == 'test':
-        load_dotenv(os.path.join(os.path.dirname(__file__), '.env.test'))
-        url = os.getenv('publicAppUrl')
-        urlAdmin = os.getenv('adminAppUrl')
-    elif args.env in ['stage', 'staging']:
-        load_dotenv(os.path.join(os.path.dirname(__file__), '.env.stage'))
-        url = os.getenv('publicAppUrl')
-        urlAdmin = os.getenv('adminAppUrl')
-    elif args.env in ['prod', 'live']:
-        load_dotenv(os.path.join(os.path.dirname(__file__), '.env.prod'))
-        url = os.getenv('publicAppUrl')
-        urlAdmin = os.getenv('adminAppUrl')
-    elif args.env == 'dfedev':
-        load_dotenv(os.path.join(os.path.dirname(__file__), '.env.dfedev'))
-        url = os.getenv('publicAppUrl')
-        urlAdmin = os.getenv('adminAppUrl')
     else:
-        raise Exception('Invalid environment \"' + args.env + '\"!')
-
+        load_dotenv(os.path.join(os.path.dirname(__file__), '.env.' + args.env))
+        url = os.getenv('publicAppUrl')
+        urlAdmin = os.getenv('adminAppUrl')
 robotArgs += ["-v", "url:" + url]
 robotArgs += ["-v", "urlAdmin:" + urlAdmin]
 
@@ -115,13 +101,17 @@ robotArgs += ["-v", "browser:" + args.browser]
 
 robotArgs += [args.tests]
 
-# Install Chromedriver and add it to PATH
-path = cdi.install(file_directory='./webdriver/', verbose=False, chmod=True, overwrite=False, version="74.0.3729.6")
+# Install chromedriver and add it to PATH
+path = cdi.install(file_directory='./webdriver/',
+                   verbose=False,
+                   chmod=True,
+                   overwrite=False,
+                   version=chromedriver_version)
 os.environ["PATH"] += os.pathsep + os.getcwd() + os.sep + 'webdriver'
 
 # Run tests
 if args.interp == "robot":
-    if profile:
+    if args.profile:
         # Python profiling
         cProfile.run('robot_run_cli(robotArgs)', 'profile-data')
         stream = open('test-results/python-profiling-results.log', 'w')
@@ -139,7 +129,7 @@ if args.interp == "robot":
     else:
         robot_run_cli(robotArgs)
 elif args.interp == "pabot":
-    if profile:
+    if args.profile:
         # Python profiling
         cProfile.run('pabot_run_cli(robotArgs)', 'profile-data')
         stream = open('test-results/python-profiling-results.log', 'w')
