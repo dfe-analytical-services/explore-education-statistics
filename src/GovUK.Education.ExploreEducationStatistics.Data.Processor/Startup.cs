@@ -37,7 +37,7 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
                 .AddEnvironmentVariables()
                 .Build();
 
-            var connectionString = config.GetConnectionString("SQLConnectionString");
+            var connectionString = config.GetConnectionString("ContentDb");
             var services = new ServiceCollection();
 
             services.AddMemoryCache();

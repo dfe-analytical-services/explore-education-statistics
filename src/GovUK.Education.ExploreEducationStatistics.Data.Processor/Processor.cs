@@ -9,7 +9,7 @@ namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
 
     public class Processor
     {
-        private const string StorageConnectionName = "BlobStorageConnString";
+        private const string StorageConnectionName = "AzureStorage";
         private const string ContainerName = "releases";
         private const string UploadsDir = "admin-file-uploads";
 
