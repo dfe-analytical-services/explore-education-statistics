@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
             modelBuilder.Entity<ObservationFilterItem>()
                 .HasOne(observationFilterItem => observationFilterItem.FilterItem)
-                .WithMany(filterItem => filterItem.Observations)
+                .WithMany()
                 .HasForeignKey(observationFilterItem => observationFilterItem.FilterItemId)
                 .OnDelete(DeleteBehavior.Restrict);
         }

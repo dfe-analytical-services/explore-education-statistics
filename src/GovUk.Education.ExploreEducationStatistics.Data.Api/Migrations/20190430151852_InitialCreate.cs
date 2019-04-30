@@ -84,8 +84,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 {
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Label = table.Column<string>(nullable: true),
                     Hint = table.Column<string>(nullable: true),
+                    Label = table.Column<string>(nullable: true),
                     SubjectId = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
@@ -162,8 +162,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 {
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Label = table.Column<string>(nullable: true),
-                    FilterId = table.Column<long>(nullable: false)
+                    FilterId = table.Column<long>(nullable: false),
+                    Label = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

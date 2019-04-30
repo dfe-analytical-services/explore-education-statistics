@@ -81,10 +81,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private void ImportObservations(IEnumerable<string> lines, IEnumerable<string> metaLines, Subject subject,
             SubjectMeta subjectMeta)
         {
-            var observations = GetObservations(lines, subject, subjectMeta);
-
             var index = 1;
-            var batches = observations.Batch(10000);
+            var headers = lines.First().Split(',').ToList();
+            var batches = lines.Skip(1).Batch(10000);
             var stopWatch = new Stopwatch();
 
             stopWatch.Start();
@@ -94,7 +93,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     "Importing batch {Index} of {TotalCount} for Publication {Publication}, {Subject}", index,
                     batches.Count(), subject.Release.PublicationId, subject.Name);
 
-                _context.Observation.AddRange(batch);
+                var observations = GetObservations(batch, headers, subject, subjectMeta);
+                _context.Observation.AddRange(observations);
                 _context.SaveChanges();
                 index++;
 
@@ -108,13 +108,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         }
 
         private IEnumerable<Observation> GetObservations(IEnumerable<string> lines,
+            List<string> headers,
             Subject subject,
             SubjectMeta subjectMeta)
         {
-            var headers = lines.First().Split(',').ToList();
-            return lines
-                .Skip(1)
-                .Select(line => ObservationsFromCsv(line, headers, subject, subjectMeta)).ToList();
+            return lines.Select(line => ObservationsFromCsv(line, headers, subject, subjectMeta));
         }
 
         private Observation ObservationsFromCsv(string raw,

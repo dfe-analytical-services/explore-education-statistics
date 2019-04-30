@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class FilterItem
@@ -8,7 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string Label { get; set; }
         public FilterGroup FilterGroup { get; set; }
         public long FilterGroupId { get; set; }
-        public ICollection<ObservationFilterItem> Observations { get; set; }
 
         private FilterItem()
         {
@@ -18,7 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         {
             Label = label;
             FilterGroup = filterGroup;
-            Observations = new List<ObservationFilterItem>();
         }
     }
 }

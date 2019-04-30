@@ -375,7 +375,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ObservationFilterItem", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItem", "FilterItem")
-                        .WithMany("Observations")
+                        .WithMany()
                         .HasForeignKey("FilterItemId")
                         .OnDelete(DeleteBehavior.Restrict);
 
