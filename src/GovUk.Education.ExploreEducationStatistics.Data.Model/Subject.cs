@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Meta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
@@ -9,8 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string Name { get; set; }
         public Release Release { get; set; }
         public long ReleaseId { get; set; }
-        public IEnumerable<CharacteristicMeta> Characteristics { get; set; }
-        public IEnumerable<IndicatorMeta> Indicators { get; set; }
+        public IEnumerable<Observation> Observations { get; set; }
 
         public Subject()
         {

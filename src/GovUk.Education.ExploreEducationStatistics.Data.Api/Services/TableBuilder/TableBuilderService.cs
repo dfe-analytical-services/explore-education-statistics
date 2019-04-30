@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
@@ -12,73 +10,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 {
     public class TableBuilderService : ITableBuilderService
     {
-        private readonly IReleaseService _releaseService;
-        private readonly IGeographicDataService _geographicDataService;
-        private readonly ICharacteristicDataService _characteristicDataService;
-        private readonly GeographicResultBuilder _geographicResultBuilder;
-        private readonly CharacteristicResultBuilder _characteristicResultBuilder;
-        private readonly LaCharacteristicResultBuilder _laCharacteristicResultBuilder;
+        private readonly IObservationService _observationService;
+        private readonly ISubjectService _subjectService;
 
-        public TableBuilderService(IReleaseService releaseService,
-            IGeographicDataService geographicDataService,
-            ICharacteristicDataService characteristicDataService,
-            GeographicResultBuilder geographicResultBuilder,
-            CharacteristicResultBuilder characteristicResultBuilder,
-            LaCharacteristicResultBuilder laCharacteristicResultBuilder)
+        private readonly IResultBuilder<Observation, TableBuilderObservationViewModel> _resultBuilder;
+
+        public TableBuilderService(
+            IObservationService observationService,
+            ISubjectService subjectService,
+            IResultBuilder<Observation, TableBuilderObservationViewModel> resultBuilder)
         {
-            _releaseService = releaseService;
-            _geographicDataService = geographicDataService;
-            _characteristicDataService = characteristicDataService;
-            _geographicResultBuilder = geographicResultBuilder;
-            _characteristicResultBuilder = characteristicResultBuilder;
-            _laCharacteristicResultBuilder = laCharacteristicResultBuilder;
+            _observationService = observationService;
+            _subjectService = subjectService;
+            _resultBuilder = resultBuilder;
         }
 
-        public TableBuilderResult GetGeographic(GeographicQueryContext query)
+        public TableBuilderResultViewModel Query(IQueryContext<Observation> queryContext)
         {
-            return BuildResult(_geographicDataService, query, _geographicResultBuilder);
-        }
-
-        public TableBuilderResult GetLocalAuthority(LaQueryContext query)
-        {
-            return BuildResult(_characteristicDataService, query, _laCharacteristicResultBuilder);
-        }
-
-        public TableBuilderResult GetNational(NationalQueryContext query)
-        {
-            return BuildResult(_characteristicDataService, query, _characteristicResultBuilder);
-        }
-
-        private IEnumerable<TEntity> GetData<TEntity, TKey>(IDataService<TEntity, TKey> dataService,
-            IQueryContext<TEntity> queryContext) where TEntity : TidyData
-        {
-            var releaseId = _releaseService.GetLatestRelease(queryContext.PublicationId);
-            return dataService.FindMany(queryContext.FindExpression(releaseId),
-                new List<Expression<Func<TEntity, object>>>
-                    {data => data.Level, data => data.Subject, data => data.Subject.Release}
-            );
-        }
-
-        private TableBuilderResult BuildResult<TEntity, TKey>(IDataService<TEntity, TKey> dataService,
-            IQueryContext<TEntity> queryContext,
-            IResultBuilder<TEntity, ITableBuilderData> resultBuilder) where TEntity : TidyData
-        {
-            var data = GetData(dataService, queryContext);
-
-            if (!data.Any())
+            var observations = GetObservations(queryContext);
+            if (!observations.Any())
             {
-                return new TableBuilderResult();
+                return new TableBuilderResultViewModel();
             }
 
-            var first = data.FirstOrDefault();
-            return new TableBuilderResult
+            var first = observations.FirstOrDefault();
+            return new TableBuilderResultViewModel
             {
                 PublicationId = first.Subject.Release.PublicationId,
-                ReleaseId = first.SubjectId,
+                ReleaseId = first.Subject.Release.Id,
+                SubjectId = first.Subject.Id,
                 ReleaseDate = first.Subject.Release.ReleaseDate,
-                Level = first.Level.Level,
-                Result = data.Select(tidyData => resultBuilder.BuildResult(tidyData, queryContext.Indicators))
+                GeographicLevel = first.GeographicLevel,
+                Result = observations.Select(observation =>
+                    _resultBuilder.BuildResult(observation, queryContext.Indicators))
             };
+        }
+
+        private IEnumerable<Observation> GetObservations(IQueryContext<Observation> queryContext)
+        {
+            if (!_subjectService.IsSubjectForLatestRelease(queryContext.SubjectId))
+            {
+                // TODO throw exception?
+                return new List<Observation>();
+            }
+
+            return _observationService.FindObservations(queryContext.FindExpression(), queryContext.Filters);
         }
     }
 }

@@ -1,17 +1,15 @@
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Models
 {
     public class Subject
     {
-        public CharacteristicMeta[] CharacteristicMetas { get; set; }
         public DataCsvFilename Filename { get; set; }
-        public MetaGroup<IndicatorMeta>[] IndicatorMetas { get; set; }
         public string Name { get; set; }
 
-        public ImportFileType GetImportFileType()
+        public DataCsvMetaFilename GetMetaFilename()
         {
-            return Filename.GetImportFileTypeFromDataFileAttributeOfEnumType(Filename.GetType());
+            return Filename.GetMetaFilename();
         }
     }
 }
