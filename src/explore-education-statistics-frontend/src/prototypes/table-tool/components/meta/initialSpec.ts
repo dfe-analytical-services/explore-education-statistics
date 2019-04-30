@@ -64,12 +64,12 @@ export interface MetaSpecification {
 const metaSpecification: MetaSpecification = {
   categoricalFilters: {
     characteristics: {
-      hint: 'Filter by pupil characteristics',
+      hint: 'Select at least 1 characteristic',
       legend: 'Characteristics',
       options: {},
     },
     schoolTypes: {
-      hint: 'Filter by number of pupils in school type(s)',
+      hint: 'Select at least 1 school type',
       legend: 'School type',
       options: {
         default: {
@@ -99,7 +99,7 @@ const metaSpecification: MetaSpecification = {
   indicators: {},
   observationalUnits: {
     location: {
-      hint: 'Filter statistics by location level',
+      hint: 'Select a location',
       legend: 'Location',
       options: {
         localAuthority: {
@@ -128,8 +128,8 @@ const metaSpecification: MetaSpecification = {
       },
     },
     timePeriod: {
-      hint: 'Filter statistics by a given start and end date',
-      legend: 'Academic Year',
+      hint: 'Select a start and end date',
+      legend: 'Academic year',
       options: [
         { code: 'AY', label: '2011/12', year: 2011 },
         { code: 'AY', label: '2012/13', year: 2012 },

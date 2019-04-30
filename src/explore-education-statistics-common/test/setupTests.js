@@ -15,6 +15,18 @@ global.localStorage = localStorageMock;
 
 Element.prototype.scrollIntoView = jest.fn();
 
+// This is just a little hack to silence a warning that we'll get until React
+// fixes this: https://github.com/facebook/react/pull/14853
+const originalError = console.error;
+beforeAll(() => {
+  console.error = (...args) => {
+    if (/Warning.*not wrapped in act/.test(args[0])) {
+      return;
+    }
+    originalError.call(console, ...args);
+  };
+});
+
 beforeEach(() => {
   window.matchMedia = jest.fn(() => {
     return {

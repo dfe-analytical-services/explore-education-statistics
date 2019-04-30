@@ -8,6 +8,7 @@ describe('FormCheckboxGroup', () => {
       <FormCheckboxGroup
         id="test-checkboxes"
         name="test-checkboxes"
+        legend="Test checkboxes"
         options={[
           { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
           { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
@@ -31,6 +32,7 @@ describe('FormCheckboxGroup', () => {
       <FormCheckboxGroup
         id="test-checkboxes"
         name="test-checkboxes"
+        legend="Test checkboxes"
         options={[
           { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
           { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
@@ -56,16 +58,27 @@ describe('FormCheckboxGroup', () => {
         legend="Choose some checkboxes"
         id="test-checkboxes"
         name="test-checkboxes"
-        options={[
-          { id: 'radio-1', label: 'Test radio 1', value: '1' },
-          { id: 'radio-2', label: 'Test radio 2', value: '2' },
-          { id: 'radio-3', label: 'Test radio 3', value: '3' },
-        ]}
+        options={[{ id: 'checkbox-1', label: 'Test checkbox 1', value: '1' }]}
       />,
     );
 
     expect(getByText('Choose some checkboxes')).toBeDefined();
     expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders correctly with small size variants', () => {
+    const { container } = render(
+      <FormCheckboxGroup
+        id="test-checkboxes"
+        name="test-checkboxes"
+        legend="Test checkboxes"
+        small
+        options={[{ id: 'checkbox-1', label: 'Test checkbox 1', value: '1' }]}
+      />,
+    );
+
+    expect(container.querySelector('.govuk-checkboxes--small')).not.toBeNull();
+    expect(container).toMatchSnapshot();
   });
 
   test('renders unchecked `Select all` option when `selectAll` is true', () => {
@@ -74,6 +87,7 @@ describe('FormCheckboxGroup', () => {
         value={[]}
         id="test-checkboxes"
         name="test-checkboxes"
+        legend="Test checkboxes"
         selectAll
         options={[
           { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
@@ -96,6 +110,7 @@ describe('FormCheckboxGroup', () => {
         value={['1', '2', '3']}
         id="test-checkboxes"
         name="test-checkboxes"
+        legend="Test checkboxes"
         selectAll
         options={[
           { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
@@ -110,12 +125,33 @@ describe('FormCheckboxGroup', () => {
     expect(selectAllCheckbox.checked).toBe(true);
   });
 
+  test('renders `Select all` with small variant', () => {
+    const { container } = render(
+      <FormCheckboxGroup
+        value={[]}
+        id="test-checkboxes"
+        name="test-checkboxes"
+        legend="Test checkboxes"
+        selectAll
+        small
+        options={[
+          { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
+          { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
+          { id: 'checkbox-3', label: 'Test checkbox 3', value: '3' },
+        ]}
+      />,
+    );
+
+    expect(container.querySelector('.govuk-checkboxes--small')).not.toBeNull();
+  });
+
   test('does not render checked `Select all` checkbox when checked values do not match options', () => {
     const { getByLabelText } = render(
       <FormCheckboxGroup
         value={['4', '5', '6']}
         id="test-checkboxes"
         name="test-checkboxes"
+        legend="Test checkboxes"
         selectAll
         options={[
           { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
@@ -136,6 +172,7 @@ describe('FormCheckboxGroup', () => {
         value={[]}
         id="test-checkboxes"
         name="test-checkboxes"
+        legend="Test checkboxes"
         selectAll
         options={[{ id: 'checkbox-1', label: 'Test checkbox 1', value: '1' }]}
       />,
@@ -143,5 +180,75 @@ describe('FormCheckboxGroup', () => {
 
     expect(queryByLabelText('Select all')).toBeNull();
     expect(queryByLabelText('Test checkbox 1')).not.toBeNull();
+  });
+
+  test('renders option with conditional contents', () => {
+    const { container, getByText } = render(
+      <FormCheckboxGroup
+        value={['2']}
+        id="test-checkboxes"
+        name="test-checkboxes"
+        legend="Test checkboxes"
+        options={[
+          {
+            id: 'checkbox-1',
+            label: 'Test checkbox 1',
+            value: '1',
+            conditional: <p>Conditional 1</p>,
+          },
+          {
+            id: 'checkbox-2',
+            label: 'Test checkbox 2',
+            value: '2',
+            conditional: <p>Conditional 2</p>,
+          },
+          {
+            id: 'checkbox-3',
+            label: 'Test checkbox 3',
+            value: '3',
+            conditional: <p>Conditional 3</p>,
+          },
+        ]}
+      />,
+    );
+
+    const hiddenClass = 'govuk-checkboxes__conditional--hidden';
+
+    expect(getByText('Conditional 1').parentElement).toHaveClass(hiddenClass);
+    expect(getByText('Conditional 2').parentElement).not.toHaveClass(
+      hiddenClass,
+    );
+    expect(getByText('Conditional 3').parentElement).toHaveClass(hiddenClass);
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('generates option IDs from id and value if none specified', () => {
+    const { container, getByLabelText } = render(
+      <FormCheckboxGroup
+        id="test-checkboxes"
+        name="test-checkboxes"
+        legend="Test checkboxes"
+        options={[
+          { label: 'Test checkbox 1', value: 'opt1' },
+          { label: 'Test checkbox 2', value: 'opt-2' },
+          { label: 'Test checkbox 3', value: 'opt.3' },
+        ]}
+      />,
+    );
+
+    expect(getByLabelText('Test checkbox 1')).toHaveAttribute(
+      'id',
+      'test-checkboxes-opt-1',
+    );
+    expect(getByLabelText('Test checkbox 2')).toHaveAttribute(
+      'id',
+      'test-checkboxes-opt-2',
+    );
+    expect(getByLabelText('Test checkbox 3')).toHaveAttribute(
+      'id',
+      'test-checkboxes-opt-3',
+    );
+
+    expect(container.innerHTML).toMatchSnapshot();
   });
 });

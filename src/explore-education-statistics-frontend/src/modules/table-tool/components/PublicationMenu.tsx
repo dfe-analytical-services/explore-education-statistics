@@ -1,6 +1,6 @@
+import DetailsMenu from '@common/components/DetailsMenu';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import React from 'react';
-import MenuDetails from './MenuDetails';
 
 export type MenuChangeEventHandler = (values: {
   publicationId: string;
@@ -28,11 +28,13 @@ const PublicationMenu = ({ options, onChange, value }: Props) => {
   return (
     <>
       {options.map(option => (
-        <MenuDetails summary={option.name} key={option.id}>
+        <DetailsMenu summary={option.name} key={option.id}>
           {option.topics.map(topic => (
-            <MenuDetails summary={topic.name} key={topic.id}>
+            <DetailsMenu summary={topic.name} key={topic.id}>
               <FormRadioGroup
                 value={value}
+                legend="Choose publication"
+                legendHidden
                 name="publicationId"
                 id={topic.id}
                 onChange={event => {
@@ -53,9 +55,9 @@ const PublicationMenu = ({ options, onChange, value }: Props) => {
                   value: publication.id,
                 }))}
               />
-            </MenuDetails>
+            </DetailsMenu>
           ))}
-        </MenuDetails>
+        </DetailsMenu>
       ))}
     </>
   );

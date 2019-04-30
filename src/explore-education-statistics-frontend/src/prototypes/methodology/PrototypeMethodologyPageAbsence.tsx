@@ -91,6 +91,41 @@ const PublicationPage = () => {
                     1.2 Uses and users of absence statistics and data
                   </a>
                 </li>
+                <li>
+                  <a href="#section1-3">1.3 Current termly publications</a>
+                </li>
+                <li>
+                  <a href="#section1-4">1.4 Key absence measures</a>
+                </li>
+                <li>
+                  <a href="#section1-5">1.5 Cohort used in absence measures</a>
+                </li>
+                <li>
+                  <a href="#section1-6">
+                    1.6 The school year (five half terms vs six half terms)
+                  </a>
+                </li>
+                <li>
+                  <a href="#section1-7">
+                    1.7 Published geographical and characteristics breakdowns
+                  </a>
+                </li>
+                <li>
+                  <a href="#section1-8">
+                    1.8 Underlying data provided alongside publications
+                  </a>
+                </li>
+                <li>
+                  <a href="#section1-9">1.9 Suppression of absence data</a>
+                </li>
+                <li>
+                  <a href="#section1-10">1.10 Other related publications</a>
+                </li>
+                <li>
+                  <a href="#section1-11">
+                    1.11 Devolved administration statistics on absence
+                  </a>
+                </li>
               </ul>
             </MethodologyHeader>
 
@@ -106,39 +141,10 @@ const PublicationPage = () => {
               <h3 className="govuk-heading-s">In this section</h3>
               <ul className="govuk-body-s">
                 <li>
-                  <a href="#section2-1">2.1 Current termly publications</a>
+                  <a href="#section2-1">2.1 Update this content</a>
                 </li>
                 <li>
-                  <a href="#section2-2">2.2 Key absence measures</a>
-                </li>
-                <li>
-                  <a href="#section2-3">2.3 Cohort used in absence measures</a>
-                </li>
-                <li>
-                  <a href="#section2-4">
-                    2.4 The school year (five half terms vs six half terms)
-                  </a>
-                </li>
-                <li>
-                  <a href="#section2-5">
-                    2.5 Published geographical and characteristics breakdowns
-                  </a>
-                </li>
-                <li>
-                  <a href="#section2-6">
-                    2.6 Underlying data provided alongside publications
-                  </a>
-                </li>
-                <li>
-                  <a href="#section2-7">2.7 Suppression of absence data</a>
-                </li>
-                <li>
-                  <a href="#section2-8">2.8 Other related publications</a>
-                </li>
-                <li>
-                  <a href="#section2-9">
-                    2.9 Devolved administration statistics on absence
-                  </a>
+                  <a href="#section2-2">2.2 Update this content</a>
                 </li>
               </ul>
             </MethodologyHeader>
@@ -222,9 +228,6 @@ const PublicationPage = () => {
                 </li>
                 <li>
                   <a href="#section5-4">5.4 Consistency checks</a>
-                </li>
-                <li>
-                  <a href="#section5-5">5.5 Data quality</a>
                 </li>
               </ul>
             </MethodologyHeader>

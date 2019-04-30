@@ -1,7 +1,7 @@
+import DetailsMenu from '@common/components/DetailsMenu';
 import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
 import sortBy from 'lodash/sortBy';
 import React, { PureComponent } from 'react';
-import MenuDetails from './MenuDetails';
 
 interface Props<FormValues> {
   menuOptions: {
@@ -74,7 +74,7 @@ class SearchableFilterMenus<
         );
 
         return (
-          <MenuDetails
+          <DetailsMenu
             summary={groupKey}
             key={compositeKey}
             open={isMenuOpen}
@@ -88,13 +88,15 @@ class SearchableFilterMenus<
             }}
           >
             <FormFieldCheckboxGroup
+              legend="Choose option"
+              legendHidden
               name={name as string}
               options={options}
               id={compositeKey}
               selectAll
               showError={false}
             />
-          </MenuDetails>
+          </DetailsMenu>
         );
       });
 

@@ -16,7 +16,7 @@ const PrototypeDownloadDropdown = ({ link }: Props) => {
             className="govuk-link govuk-!-margin-right-9 "
             to={link || '/prototypes/publication'}
           >
-            View statistics
+            View statistics and data
           </Link>
         </div>
         <div className="govuk-grid-column-one-third">

@@ -2,9 +2,11 @@ import Yup from '@common/lib/validation/yup';
 import { Formik } from 'formik';
 import React from 'react';
 import { fireEvent, render, wait } from 'react-testing-library';
-import FormFieldCheckboxGroup from '../FormFieldCheckboxGroup';
+import FormFieldCheckboxSearchGroup from '../FormFieldCheckboxSearchGroup';
 
-describe('FormFieldCheckboxGroup', () => {
+jest.mock('lodash/debounce');
+
+describe('FormFieldCheckboxSearchGroup', () => {
   interface FormValues {
     test: string[];
   }
@@ -17,7 +19,7 @@ describe('FormFieldCheckboxGroup', () => {
         }}
         onSubmit={() => null}
         render={() => (
-          <FormFieldCheckboxGroup<FormValues>
+          <FormFieldCheckboxSearchGroup<FormValues>
             name="test"
             id="checkboxes"
             legend="Test checkboxes"
@@ -50,7 +52,7 @@ describe('FormFieldCheckboxGroup', () => {
         }}
         onSubmit={() => null}
         render={() => (
-          <FormFieldCheckboxGroup<FormValues>
+          <FormFieldCheckboxSearchGroup<FormValues>
             name="test"
             id="checkboxes"
             legend="Test checkboxes"
@@ -83,7 +85,7 @@ describe('FormFieldCheckboxGroup', () => {
         }}
         onSubmit={() => null}
         render={() => (
-          <FormFieldCheckboxGroup<FormValues>
+          <FormFieldCheckboxSearchGroup<FormValues>
             name="test"
             id="checkboxes"
             legend="Test checkboxes"
@@ -119,7 +121,7 @@ describe('FormFieldCheckboxGroup', () => {
         }}
         onSubmit={() => null}
         render={() => (
-          <FormFieldCheckboxGroup<FormValues>
+          <FormFieldCheckboxSearchGroup<FormValues>
             name="test"
             id="checkboxes"
             legend="Test checkboxes"
@@ -157,7 +159,7 @@ describe('FormFieldCheckboxGroup', () => {
         }}
         onSubmit={() => null}
         render={() => (
-          <FormFieldCheckboxGroup<FormValues>
+          <FormFieldCheckboxSearchGroup<FormValues>
             name="test"
             id="checkboxes"
             legend="Test checkboxes"
@@ -200,7 +202,7 @@ describe('FormFieldCheckboxGroup', () => {
         }}
         onSubmit={() => null}
         render={() => (
-          <FormFieldCheckboxGroup<FormValues>
+          <FormFieldCheckboxSearchGroup<FormValues>
             name="test"
             id="checkboxes"
             legend="Test checkboxes"
@@ -241,7 +243,7 @@ describe('FormFieldCheckboxGroup', () => {
             test: Yup.array().required('Select at least one option'),
           })}
           render={() => (
-            <FormFieldCheckboxGroup<FormValues>
+            <FormFieldCheckboxSearchGroup<FormValues>
               name="test"
               id="checkboxes"
               legend="Test checkboxes"
@@ -269,7 +271,7 @@ describe('FormFieldCheckboxGroup', () => {
             test: Yup.array().required('Select at least one option'),
           })}
           render={() => (
-            <FormFieldCheckboxGroup<FormValues>
+            <FormFieldCheckboxSearchGroup<FormValues>
               name="test"
               id="checkboxes"
               legend="Test checkboxes"
@@ -304,7 +306,7 @@ describe('FormFieldCheckboxGroup', () => {
           }}
           onSubmit={() => null}
           render={() => (
-            <FormFieldCheckboxGroup<FormValues>
+            <FormFieldCheckboxSearchGroup<FormValues>
               name="test"
               id="checkboxes"
               legend="Test checkboxes"
@@ -333,7 +335,7 @@ describe('FormFieldCheckboxGroup', () => {
             test: Yup.array().required('Select at least one option'),
           })}
           render={() => (
-            <FormFieldCheckboxGroup<FormValues>
+            <FormFieldCheckboxSearchGroup<FormValues>
               name="test"
               id="checkboxes"
               legend="Test checkboxes"
@@ -360,5 +362,51 @@ describe('FormFieldCheckboxGroup', () => {
       expect(checkbox.checked).toBe(false);
       expect(queryByText('Select at least one option')).toBeNull();
     });
+  });
+
+  test('providing a search term does not remove checkboxes that have already been checked', () => {
+    jest.useFakeTimers();
+
+    const { getAllByLabelText, getByLabelText } = render(
+      <Formik
+        initialValues={{
+          test: ['1'],
+        }}
+        onSubmit={() => null}
+        render={() => (
+          <FormFieldCheckboxSearchGroup<FormValues>
+            name="test"
+            id="checkboxes"
+            legend="Test checkboxes"
+            searchLabel="Search options"
+            options={[
+              { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
+              { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
+              { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
+            ]}
+          />
+        )}
+      />,
+    );
+
+    const searchInput = getByLabelText('Search options') as HTMLInputElement;
+
+    expect(getByLabelText('Checkbox 1')).toHaveAttribute('checked');
+
+    fireEvent.change(searchInput, {
+      target: {
+        value: '2',
+      },
+    });
+
+    jest.runAllTimers();
+
+    const checkboxes = getAllByLabelText(/Checkbox/);
+
+    expect(checkboxes).toHaveLength(2);
+    expect(checkboxes[0]).toHaveAttribute('value', '1');
+    expect(checkboxes[0]).toHaveAttribute('checked');
+    expect(checkboxes[1]).toHaveAttribute('value', '2');
+    expect(checkboxes[1]).not.toHaveAttribute('checked');
   });
 });

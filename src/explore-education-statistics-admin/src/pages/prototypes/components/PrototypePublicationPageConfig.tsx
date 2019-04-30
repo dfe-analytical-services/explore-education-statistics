@@ -36,10 +36,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
         </div>
 
         <FormGroup>
-          <FormFieldset id="radios">
-            <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
-              Release type
-            </legend>
+          <FormFieldset id="radios" legend="Release type">
             <FormConditionalRadioGroup>
               <FormRadio
                 id="release-type-academic"
@@ -48,7 +45,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                 value="academic-year"
                 defaultChecked
               >
-                <FormFieldset id="test">
+                <FormFieldset id="test" legend="">
                   <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
                     Release period
                   </legend>
@@ -85,6 +82,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                     </legend>
 
                     <FormRadioGroup
+                      legend=""
                       name="terms-per-year"
                       id="terms-per-year"
                       value="terms-6"
@@ -96,6 +94,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                   </FormGroup>
                 </FormFieldset>
               </FormRadio>
+
               <FormRadio
                 id="release-type-calendar"
                 label="Calendar year"
@@ -103,10 +102,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                 value="calendar-year"
               >
                 <FormGroup>
-                  <FormFieldset id="calendar year">
-                    <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
-                      Release period
-                    </legend>
+                  <FormFieldset id="calendar year" legend="Release period">
                     <div className="govuk-form-group">
                       <label htmlFor="calendar-year" className="govuk-label">
                         Year
@@ -130,12 +126,12 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                 value="financial-year"
               >
                 <FormGroup>
-                  <FormFieldset id="financial year">
+                  <FormFieldset
+                    id="financial year"
+                    legend="Financial year start date"
+                  >
                     <div className="govuk-form-group">
                       <fieldset className="govuk-fieldset">
-                        <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
-                          Financial year start date
-                        </legend>
                         <div
                           className="govuk-date-input"
                           id="financial-year-start-date"
@@ -226,6 +222,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                   </FormFieldset>
                 </FormGroup>
               </FormRadio>
+
               <FormRadio
                 id="release-type-month"
                 label="Month"
@@ -233,7 +230,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                 value="month"
               >
                 <FormGroup>
-                  <FormFieldset id="month">
+                  <FormFieldset id="month" legend="">
                     <div className="govuk-form-group">
                       <fieldset className="govuk-fieldset">
                         <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">

@@ -281,11 +281,11 @@ class PrototypeTableToolPage extends Component<{}, State> {
 
         <p>
           Choose the data and area of interest you want to explore and then use
-          the filters to create your table.
+          filters to create your table.
         </p>
 
         <p>
-          Once you've built your table, you can download the data it contains
+          Once you've created your table, you can download the data it contains
           for your own offline analysis.
         </p>
 
@@ -293,7 +293,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
           <div className="govuk-grid-column-one-third-from-desktop">
             <h2>
               1. Choose your data
-              <span className="govuk-hint">Select a data set.</span>
+              <span className="govuk-hint">Select a data set</span>
             </h2>
 
             <PublicationMenu
@@ -307,9 +307,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
               <>
                 <h2>
                   2. Choose your area of interest
-                  <span className="govuk-hint">
-                    Select an area of interest.
-                  </span>
+                  <span className="govuk-hint">Select an area of interest</span>
                 </h2>
 
                 <PublicationSubjectMenu
@@ -339,9 +337,10 @@ class PrototypeTableToolPage extends Component<{}, State> {
         {publicationSubjectName && (
           <section className="govuk-form-group" ref={this.filtersRef}>
             <h2>
-              3. Choose your filters for '{publicationName}'
+              3. Create your table for '{publicationName}'
               <span className="govuk-hint">
-                Select any combination of filters.
+                Select at least 1 option from under each of the following
+                headings
               </span>
             </h2>
 

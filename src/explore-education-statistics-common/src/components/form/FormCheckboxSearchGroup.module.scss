@@ -1,0 +1,13 @@
+@import '../../styles/govuk-base';
+
+.inputContainer {
+  padding: 0 govuk-spacing(2);
+}
+
+.optionsContainer {
+  margin: govuk-spacing(4) govuk-spacing(2) govuk-spacing(1);
+  max-height: 20vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: govuk-spacing(2);
+}

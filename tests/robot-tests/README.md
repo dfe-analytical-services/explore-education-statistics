@@ -34,7 +34,10 @@ When running these tests as part of the CI pipeline, they rely on `publicAppUrl`
 pipenv run python run_tests.py
 ```
 
-Further instructions on how to use the test runner are included inside the run\_tests.py file itself.
+Further instructions on how to use the test runner script
+```
+pipenv run python run_tests.py -h
+```
 
 # Directory structure
 

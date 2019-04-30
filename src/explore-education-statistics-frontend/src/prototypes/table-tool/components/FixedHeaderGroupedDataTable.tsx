@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import throttle from 'lodash/throttle';
-import React, { Component, createRef, forwardRef } from 'react';
+import React, { Component, createRef, forwardRef, Ref } from 'react';
+import DataTableKeys from './DataTableKeys';
 import styles from './FixedHeaderGroupedDataTable.module.scss';
 
 const dataTableCaption = 'dataTableCaption';
@@ -21,6 +22,7 @@ export interface RowGroup {
 interface Props {
   caption: string;
   headers: HeaderGroup[];
+  innerRef?: Ref<HTMLElement>;
   rowGroups: RowGroup[];
 }
 
@@ -173,8 +175,6 @@ GroupedDataTable.displayName = 'GroupedDataTable';
 
 // eslint-disable-next-line react/no-multi-comp
 class FixedHeaderGroupedDataTable extends Component<Props> {
-  private containerRef = createRef<HTMLDivElement>();
-
   private mainTableRef = createRef<HTMLTableElement>();
 
   private headerTableRef = createRef<HTMLTableElement>();
@@ -247,17 +247,18 @@ class FixedHeaderGroupedDataTable extends Component<Props> {
   }, 200);
 
   public render() {
-    const { caption } = this.props;
+    const { caption, innerRef } = this.props;
 
     return (
-      <figure className={styles.figure}>
+      <figure className={styles.figure} ref={innerRef}>
         <figcaption>
           <strong id={dataTableCaption}>{caption}</strong>
+
+          <DataTableKeys />
         </figcaption>
 
         <div
           className={styles.container}
-          ref={this.containerRef}
           role="region"
           tabIndex={-1}
           onScroll={event => {
@@ -307,4 +308,11 @@ class FixedHeaderGroupedDataTable extends Component<Props> {
   }
 }
 
-export default FixedHeaderGroupedDataTable;
+// eslint-disable-next-line react/no-multi-comp
+const TableWithRef = forwardRef<HTMLElement, Props>((props, ref) => (
+  <FixedHeaderGroupedDataTable {...props} innerRef={ref} />
+));
+
+TableWithRef.displayName = 'FixedHeaderGroupedDataTable';
+
+export default TableWithRef;

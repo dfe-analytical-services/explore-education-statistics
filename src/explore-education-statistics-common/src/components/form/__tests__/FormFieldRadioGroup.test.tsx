@@ -20,6 +20,7 @@ describe('FormFieldRadioGroup', () => {
           <FormFieldRadioGroup<FormValues>
             name="test"
             id="radios"
+            legend="Test radios"
             options={[
               { id: 'radio-1', value: '1', label: 'Radio 1' },
               { id: 'radio-2', value: '2', label: 'Radio 2' },
@@ -52,6 +53,7 @@ describe('FormFieldRadioGroup', () => {
           <FormFieldRadioGroup<FormValues>
             name="test"
             id="radios"
+            legend="Test radios"
             options={[
               { id: 'radio-1', value: '1', label: 'Radio 1' },
               { id: 'radio-2', value: '2', label: 'Radio 2' },
@@ -91,6 +93,7 @@ describe('FormFieldRadioGroup', () => {
             <FormFieldRadioGroup<FormValues>
               name="test"
               id="radios"
+              legend="Test radios"
               options={[
                 { id: 'radio-1', value: '1', label: 'Radio 1' },
                 { id: 'radio-2', value: '2', label: 'Radio 2' },
@@ -119,6 +122,7 @@ describe('FormFieldRadioGroup', () => {
               <FormFieldRadioGroup<FormValues>
                 name="test"
                 id="radios"
+                legend="Test radios"
                 options={[
                   { id: 'radio-1', value: '1', label: 'Radio 1' },
                   { id: 'radio-2', value: '2', label: 'Radio 2' },
@@ -152,6 +156,7 @@ describe('FormFieldRadioGroup', () => {
             <FormFieldRadioGroup<FormValues>
               name="test"
               id="radios"
+              legend="Test radios"
               error="Invalid radio selection"
               options={[
                 { id: 'radio-1', value: '1', label: 'Radio 1' },
@@ -181,6 +186,7 @@ describe('FormFieldRadioGroup', () => {
               <FormFieldRadioGroup<FormValues>
                 name="test"
                 id="radios"
+                legend="Test radios"
                 showError={false}
                 options={[
                   { id: 'radio-1', value: '1', label: 'Radio 1' },

@@ -37,10 +37,12 @@ const ObservationalUnitFilters = ({ form, specification }: Props) => {
         <FormFieldset
           id="filter-location"
           legend="Location"
-          hint="Filter statistics by location"
+          hint="Select a location"
         >
           <FormFieldRadioGroup
             name="location.level"
+            legend="Choose location level"
+            legendHidden
             options={Object.entries(locationSpecification).map(
               ([locationLevel, option]) => ({
                 id: `filter-locationLevel-${locationLevel}`,
@@ -101,13 +103,13 @@ const ObservationalUnitFilters = ({ form, specification }: Props) => {
         <FormFieldSelect
           name="timePeriod.start"
           id="filter-timePeriodStart"
-          label="Start date"
+          label="Start"
           options={timePeriodOptions}
         />
         <FormFieldSelect
           name="timePeriod.end"
           id="filter-timePeriodEnd"
-          label="End date"
+          label="End"
           options={timePeriodOptions}
         />
       </FormFieldset>
