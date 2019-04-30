@@ -159,19 +159,6 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
         <AccordionSection
-          heading="School capacity"
-          caption="Something to explain the heading above"
-        >
-          <div className="govuk-inset-text">
-            These statistics and data are not yet available on the explore
-            education statistics service. To find and download these statistics
-            and data browse{' '}
-            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-              Statistics at DfE
-            </a>
-          </div>
-        </AccordionSection>
-        <AccordionSection
           heading="Results"
           caption="Something to explain the heading above"
         >
@@ -195,6 +182,19 @@ const BrowseReleasesPage = () => {
         <AccordionSection
           heading="School and pupil numbers"
           caption="Schools, pupils and their characteristics, SEN and EHC plans, SEN in England"
+        >
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </div>
+        </AccordionSection>
+        <AccordionSection
+          heading="School capacity"
+          caption="Something to explain the heading above"
         >
           <div className="govuk-inset-text">
             These statistics and data are not yet available on the explore
