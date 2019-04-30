@@ -191,3 +191,7 @@ user selects from list by label
 user presses keys
   [Arguments]   ${keys}
   press keys  ${None}    ${keys}
+
+user clicks details
+  [Arguments]   ${locator}
+  user clicks element  ${locator} span
