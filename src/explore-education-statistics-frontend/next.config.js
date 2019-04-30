@@ -3,11 +3,19 @@
 const withCss = require('@zeit/next-css');
 const cssLoaderConfig = require('@zeit/next-css/css-loader-config');
 const withTypescript = require('@zeit/next-typescript');
+const DotEnv = require('dotenv');
 const DotEnvPlugin = require('dotenv-webpack');
+const fs = require('fs');
 const compose = require('lodash/fp/compose');
 const withImages = require('next-images');
 const withTranspileModules = require('next-transpile-modules');
 const path = require('path');
+
+let envConfig = {};
+
+if (fs.existsSync('.env')) {
+  envConfig = DotEnv.parse(fs.readFileSync('.env'));
+}
 
 const createPlugin = plugin => {
   return (nextConfig = {}) =>
@@ -94,7 +102,7 @@ const withSassModules = createPlugin((config, options) => {
 const withESLint = createPlugin((config, options) => {
   const { dev } = options;
 
-  if (dev) {
+  if (dev && envConfig.ESLINT_DISABLE !== 'true') {
     config.module.rules.push({
       enforce: 'pre',
       test: /\.(ts|tsx|js|jsx)$/,
@@ -135,7 +143,7 @@ const nextConfig = {
         new StylelintPlugin({
           // Next doesn't play nicely with emitted errors
           // so we'll just display warnings instead
-          emitErrors: !dev,
+          emitErrors: false,
         }),
       );
     }
