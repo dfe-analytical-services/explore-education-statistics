@@ -71,7 +71,12 @@ function PublicationList({ publications }: Props) {
         ))
       ) : (
         <div className="govuk-inset-text">
-          No publications currently released.
+          These statistics and data are not yet available on the explore
+          education statistics service. To find and download these statistics
+          and data browse{' '}
+          <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+            Statistics at DfE
+          </a>
         </div>
       )}
     </>
