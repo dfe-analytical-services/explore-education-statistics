@@ -2,7 +2,9 @@
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // @ts-ignore
 import CKEditor from '@ckeditor/ckeditor5-react';
-import React, { ChangeEvent, Fragment } from 'react';
+import React, { ChangeEvent, createRef, Fragment } from 'react';
+
+import styles from './PrototypeEditableContent.module.scss';
 
 // import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
@@ -19,7 +21,7 @@ interface State {
 }
 
 class PrototypeEditableContent extends React.Component<Props, State> {
-  private ref: HTMLElement | null = null;
+  private ref = createRef<HTMLDivElement>();
 
   private temporaryContent: string = '';
 
@@ -45,15 +47,15 @@ class PrototypeEditableContent extends React.Component<Props, State> {
 
     this.temporaryContent = content;
 
-    if (!editing && this.ref) {
-      this.ref.innerHTML = content;
+    if (!editing && this.ref.current) {
+      this.ref.current.innerHTML = content;
     }
   }
 
   public componentDidUpdate() {
     const { editing, content } = this.state;
-    if (!editing && this.ref) {
-      this.ref.innerHTML = content;
+    if (!editing && this.ref.current) {
+      this.ref.current.innerHTML = content;
     }
   }
 
@@ -78,42 +80,55 @@ class PrototypeEditableContent extends React.Component<Props, State> {
     }
   };
 
+  private renderEditableArea(unsaved: boolean, editable?: boolean) {
+    return (
+      // eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events
+      <div
+        className={
+          editable
+            ? `${styles['editable-content']}  ${unsaved ? styles.unsaved : ''}`
+            : ''
+        }
+        onClick={this.setEditing}
+      >
+        <div className={editable ? styles['editable-button'] : ''} />
+        <div ref={this.ref} />
+      </div>
+    );
+  }
+
+  private renderEditor(content: string) {
+    return (
+      <div className={styles['editable-content-editing']}>
+        <div className={styles['editable-button']}>
+          <button onClick={this.save} type="button">
+            Save
+          </button>
+        </div>
+        <CKEditor
+          editor={ClassicEditor}
+          data={content}
+          onChange={(event: ChangeEvent, editor: { getData(): string }) => {
+            this.temporaryContent = editor.getData();
+          }}
+          onInit={(editor: { editing: { view: { focus(): void } } }) => {
+            editor.editing.view.focus();
+          }}
+        />
+      </div>
+    );
+  }
+
   public render() {
     const { editing, content, unsaved } = this.state;
+
+    const { editable } = this.props;
+
     return (
       <Fragment>
-        {editing ? (
-          <div className="editable-content-editing">
-            <div className="editable-button">
-              <button onClick={this.save} type="button">
-                Save
-              </button>
-            </div>
-            <CKEditor
-              editor={ClassicEditor}
-              data={content}
-              onChange={(event: ChangeEvent, editor: { getData(): string }) => {
-                this.temporaryContent = editor.getData();
-              }}
-              onInit={(editor: { editing: { view: { focus(): void } } }) => {
-                editor.editing.view.focus();
-              }}
-            />
-          </div>
-        ) : (
-          // eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events
-          <div
-            className={`editable-content ${unsaved ? 'unsaved' : ''}`}
-            onClick={this.setEditing}
-          >
-            <div className="editable-button" />
-            <div
-              ref={ref => {
-                this.ref = ref;
-              }}
-            />
-          </div>
-        )}
+        {editing
+          ? this.renderEditor(content)
+          : this.renderEditableArea(unsaved, editable)}
       </Fragment>
     );
   }
