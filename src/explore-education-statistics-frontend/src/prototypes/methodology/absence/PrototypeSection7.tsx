@@ -3,12 +3,13 @@ import React from 'react';
 const PrototypeMethodologySection = () => {
   return (
     <>
-      <h3>School absence and exclusions team</h3>
       <p>
         If you have a specific enquiry about absence and exclusion statistics
         and data:
       </p>
-      <p>School absence and exclusions team</p>
+      <p>
+        <strong>School absence and exclusions team</strong>
+      </p>
       <p>Email</p>
       <p>
         <a href="mailto:schools.statistics@education.gov.uk">
@@ -23,7 +24,10 @@ const PrototypeMethodologySection = () => {
       <p>Telephone</p>
       <p>020 7925 6789 </p>
       <h4>Public enquiries</h4>
-      <p>If you have a general enquiry about education contact:</p>
+      <p>
+        If you have a general enquiry about the Department for Education (DfE)
+        or education:
+      </p>
       <p>Telephone</p>
       <p>037 0000 2288</p>
     </>

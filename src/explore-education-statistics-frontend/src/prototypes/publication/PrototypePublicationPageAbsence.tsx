@@ -812,37 +812,33 @@ const PublicationPage = () => {
           </ul>
         </AccordionSection>
         <AccordionSection heading="Contact us" headingTag="h3">
-          <h4 className="govuk-heading-">Media enquiries</h4>
-          <address className="govuk-body dfe-font-style-normal">
-            Press Office News Desk
-            <br />
-            Department for Education (DfE)
-            <br />
-            Sanctuary Buildings <br />
-            Great Smith Street <br />
-            London
-            <br />
-            SW1P 3BT <br />
-            Telephone: 020 7783 8300
-          </address>
+          <p>
+            If you have a specific enquiry about absence and exclusion
+            statistics and data:
+          </p>
+          <p>
+            <strong>School absence and exclusions team</strong>
+          </p>
+          <p>Email</p>
+          <p>
+            <a href="mailto:schools.statistics@education.gov.uk">
+              schools.statistics@education.gov.uk
+            </a>
+          </p>
+          <p>Telephone: Mark Pearson</p>
+          <p>0114 274 2585</p>
 
-          <h4 className="govuk-heading-">Other enquiries</h4>
-          <address className="govuk-body dfe-font-style-normal">
-            Data Insight and Statistics Division
-            <br />
-            Level 1<br />
-            Department for Education (DfE)
-            <br />
-            Sanctuary Buildings <br />
-            Great Smith Street
-            <br />
-            London
-            <br />
-            SW1P 3BT <br />
-            Telephone: 020 7783 8300
-            <br />
-            Email: <a href="#">schools.statistics@education.gov.uk</a>
-          </address>
+          <h4>Press office</h4>
+          <p>If you have a media enquiry:</p>
+          <p>Telephone</p>
+          <p>020 7925 6789 </p>
+          <h4>Public enquiries</h4>
+          <p>
+            If you have a general enquiry about the Department for Education
+            (DfE) or education:
+          </p>
+          <p>Telephone</p>
+          <p>037 0000 2288</p>
         </AccordionSection>
       </Accordion>
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
