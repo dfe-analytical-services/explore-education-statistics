@@ -54,7 +54,9 @@ class PrototypeEditableContent extends React.Component<Props, State> {
 
   public componentDidUpdate() {
     const { editing, content } = this.state;
-    if (!editing && this.ref.current) {
+    const { editable } = this.props;
+
+    if (!(editing && editable) && this.ref.current) {
       this.ref.current.innerHTML = content;
     }
   }
@@ -131,7 +133,7 @@ class PrototypeEditableContent extends React.Component<Props, State> {
 
     return (
       <Fragment>
-        {editing
+        {editable && editing
           ? this.renderEditor(content)
           : this.renderEditableArea(unsaved, editable)}
       </Fragment>

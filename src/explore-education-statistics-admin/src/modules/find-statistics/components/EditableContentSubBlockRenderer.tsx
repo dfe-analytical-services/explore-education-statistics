@@ -24,7 +24,7 @@ class EditableContentSubBlockRenderer extends Component<Props> {
             editable={editable}
             onContentChange={onContentChange}
             content={`
-         <p className="govuk-body">${marked(block.body)} </p>
+         <div className="govuk-body">${marked(block.body)} </div>
       `}
           />
         );
@@ -41,7 +41,7 @@ class EditableContentSubBlockRenderer extends Component<Props> {
                 : ''
             }
 
-            <p className="govuk-body">${marked(block.body)} </p>
+            <div className="govuk-body">${marked(block.body)} </div>
           `}
             />
           </div>

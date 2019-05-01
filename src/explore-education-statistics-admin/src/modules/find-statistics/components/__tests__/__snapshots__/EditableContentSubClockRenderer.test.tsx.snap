@@ -9,13 +9,11 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
     </div>
   </div>
   <div>
-    <p classname="govuk-body">
-    </p>
-    <p>
-      test
-    </p>
-    <p>
-    </p>
+    <div classname="govuk-body">
+      <p>
+        test
+      </p>
+    </div>
   </div>
 </div>
 
@@ -30,13 +28,11 @@ exports[`EditableContentSubBlockRenderer Renders non-editable Markdown block cor
     </div>
   </div>
   <div>
-    <p classname="govuk-body">
-    </p>
-    <p>
-      test
-    </p>
-    <p>
-    </p>
+    <div classname="govuk-body">
+      <p>
+        test
+      </p>
+    </div>
   </div>
 </div>
 
