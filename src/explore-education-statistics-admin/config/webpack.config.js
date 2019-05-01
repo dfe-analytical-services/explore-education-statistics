@@ -23,11 +23,13 @@ const StylelintPlugin = require('stylelint-webpack-plugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 
-const { DEPLOY_ENV } = process.env;
+const { BUILD_ENV } = process.env;
 
-if (DEPLOY_ENV === 'example') {
-  throw new Error('DEPLOY_ENV cannot be `example`');
+if (['local', 'example'].includes(BUILD_ENV)) {
+  throw new Error('Invalid BUILD_ENV provided');
 }
+
+const localEnvFile = fs.existsSync('.env.local') ? '.env.local' : '.env';
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
@@ -600,7 +602,7 @@ module.exports = webpackEnv => {
         }),
 
       new DotEnvPlugin({
-        path: DEPLOY_ENV ? `./.env.${DEPLOY_ENV}` : './.env',
+        path: BUILD_ENV ? `.env.${BUILD_ENV}` : localEnvFile,
         safe: true,
       }),
 

@@ -11,11 +11,16 @@ const withImages = require('next-images');
 const withTranspileModules = require('next-transpile-modules');
 const path = require('path');
 
-let envConfig = {};
+const { BUILD_ENV } = process.env;
 
-if (fs.existsSync('.env')) {
-  envConfig = DotEnv.parse(fs.readFileSync('.env'));
+if (['local', 'example'].includes(BUILD_ENV)) {
+  throw new Error('Invalid BUILD_ENV provided');
 }
+
+const localEnvFile = fs.existsSync('.env.local') ? '.env.local' : '.env';
+
+const envFilePath = BUILD_ENV ? `.env.${BUILD_ENV}` : localEnvFile;
+const envConfig = DotEnv.parse(fs.readFileSync(envFilePath));
 
 const createPlugin = plugin => {
   return (nextConfig = {}) =>
@@ -162,10 +167,7 @@ const nextConfig = {
 
     config.plugins.push(
       new DotEnvPlugin({
-        path: path.resolve(
-          __dirname,
-          process.env.BUILD_ENV ? `.env.${process.env.BUILD_ENV}` : '.env',
-        ),
+        path: envFilePath,
         safe: true,
       }),
     );
