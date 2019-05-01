@@ -28,7 +28,7 @@
   "rules": {
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-unused-vars": [
-      "error",
+      "warn",
       { "argsIgnorePattern": "^_$" }
     ],
     "import/no-cycle": "off",
