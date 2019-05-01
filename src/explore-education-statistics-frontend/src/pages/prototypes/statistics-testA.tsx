@@ -1,3 +1,3 @@
-import Page from '@frontend/prototypes/methodology/PrototypeMethodologySpecific';
+import Page from '@frontend/prototypes/methodology/PrototypeStatisticsTestA';
 
 export default Page;
