@@ -37,7 +37,7 @@ const PublicationPage = () => {
         This is the latest data{' '}
       </strong>
       <h1 className="govuk-heading-xl">
-        GCSE and equivalent results in England
+        GCSE and equivalent result statistics and data for schools in England
       </h1>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
@@ -264,14 +264,21 @@ const PublicationPage = () => {
       />
       <h2 className="govuk-heading-l">Contents</h2>
       <Accordion id="contents-sections">
-        <AccordionSection heading="About this release">
+        <AccordionSection heading="About these statistics">
           <p>
-            This release shows results for GCSE and equivalent Key Stage 4 (KS4)
+            This release provides information on the achievements in GCSE
+            examinations and other qualifications of young people in academic
+            year 2016 to 2017. This typically covers those starting the academic
+            year aged 15.
+          </p>
+          <p>
+            It shows results for GCSE and equivalent Key Stage 4 (KS4)
             qualifications in 2018 across a range of measures, broken down by
             pupil characteristics and education institutions. Results are also
             provided on schools below the floor standards and meeting the
             coasting definition.{' '}
           </p>
+
           <p>
             This is an update to Provisional figures released in October 2018.
             Users should be careful when comparing headline measures to results
@@ -287,10 +294,7 @@ const PublicationPage = () => {
           </p>
         </AccordionSection>
 
-        <AccordionSection
-          heading="School performance for 2018"
-          caption="School performance for 2018 shows small increases across all headline measures compared to 2017"
-        >
+        <AccordionSection heading="School performance">
           <DataBlock {...kS4SchoolPerformanceDataBlock} />
 
           <p>
@@ -354,10 +358,7 @@ const PublicationPage = () => {
             </li>
           </ul>
         </AccordionSection>
-        <AccordionSection
-          heading="Schools meeting the coasting and floor standard"
-          caption="Over 250 schools failed to support pupils to fulfil their potential in 2018"
-        >
+        <AccordionSection heading="Schools meeting the coasting and floor standard">
           <p>
             <strong>
               There is wide variation in the percentage of schools meeting the
@@ -395,10 +396,7 @@ const PublicationPage = () => {
             </li>
           </ul>
         </AccordionSection>
-        <AccordionSection
-          heading="Pupil characteristics"
-          caption="Disadvantaged pupils and those with Special Education Needs continue to do less well than their peers"
-        >
+        <AccordionSection heading="Pupil characteristics">
           <DataBlock
             {...ks4SchoolAverageHeadlineScoresByPupilCharacteristics}
           />
@@ -438,10 +436,7 @@ const PublicationPage = () => {
             {...ks4TrendInDisavdantagePuilsAttainmentGapIndex}
           />
         </AccordionSection>
-        <AccordionSection
-          heading="Headline performance"
-          caption="Results across headline performance measures vary by ethnicity"
-        >
+        <AccordionSection heading="Headline performance">
           <DataBlock
             height={400}
             {...ks4AverageHeadlineScoresByPupilEthnicity}
@@ -468,10 +463,7 @@ const PublicationPage = () => {
             unclassified.
           </p>
         </AccordionSection>
-        <AccordionSection
-          heading="Regional and local authority (LA) breakdown"
-          caption="Performance by local authority varies considerably "
-        >
+        <AccordionSection heading="Regional and local authority (LA) breakdown">
           <p>
             Performance varies considerably across the country – for Attainment
             8 score per pupil there is nearly a 23 point gap between the poorest
@@ -487,10 +479,7 @@ const PublicationPage = () => {
             height={400}
           />
         </AccordionSection>
-        <AccordionSection
-          heading="Pupil subject areas"
-          caption="Pupil subject entries are highest for science and humanities and continue to increase"
-        >
+        <AccordionSection heading="Pupil subject areas">
           <div className={styles['hide-dates-from-datablock']}>
             <DataBlock {...ks4RevisedAttainmentData} />
           </div>
@@ -549,10 +538,7 @@ const PublicationPage = () => {
             fall in entries has occurred.{' '}
           </p>
         </AccordionSection>
-        <AccordionSection
-          heading="Schools performance"
-          caption="Across state-funded schools performance is typically higher in converter academies, the most common school type"
-        >
+        <AccordionSection heading="Schools performance">
           <DataBlock {...ks4StateFundedSchoolsPerformance} />
           [TABLE - Key stage 4 revised attainment data ]
           <p>
@@ -580,10 +566,7 @@ const PublicationPage = () => {
             points to 37.0%.
           </p>
         </AccordionSection>
-        <AccordionSection
-          heading="Attainment"
-          caption="Multi-academy trust schools generally perform below national averages, but typically face greater challenges. "
-        >
+        <AccordionSection heading="Attainment">
           <p>
             Academies are state schools directly funded by the government, each
             belonging to a trust. Multi-Academy Trusts (MATs) can be responsible
@@ -629,9 +612,7 @@ const PublicationPage = () => {
           </p>
         </AccordionSection>
       </Accordion>
-      <h2 className="govuk-heading-m govuk-!-margin-top-9">
-        Extra information
-      </h2>
+      <h2 className="govuk-heading-m govuk-!-margin-top-9">Help and support</h2>
       <Accordion id="extra-information-sections">
         <AccordionSection
           heading="Where does this data come from?"
@@ -732,15 +713,14 @@ const PublicationPage = () => {
         </AccordionSection>
       </Accordion>
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
-        Exploring the data
+        Create your own tables online
       </h2>
       <p>
-        The statistics can be viewed as reports, or you can customise and
-        download as excel or .csv files . The data can also be accessed via an
-        API. <a href="#">What is an API?</a>
+        Use our tool to build tables using our range of national and regional
+        data.
       </p>
       <Link to="/prototypes/table-tool" className="govuk-button">
-        Create charts and tables
+        Create tables
       </Link>
       <div className="govuk-!-margin-top-9">
         <a href="#print" className="govuk-link">
