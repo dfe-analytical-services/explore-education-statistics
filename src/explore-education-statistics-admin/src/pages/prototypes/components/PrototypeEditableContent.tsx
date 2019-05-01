@@ -86,12 +86,17 @@ class PrototypeEditableContent extends React.Component<Props, State> {
       <div
         className={
           editable
-            ? `${styles['editable-content']}  ${unsaved ? styles.unsaved : ''}`
+            ? `${styles.editableContent}  ${unsaved ? styles.unsaved : ''}`
             : ''
         }
         onClick={this.setEditing}
       >
-        <div className={editable ? styles['editable-button'] : ''} />
+        <div className={styles.editableButton}>
+          <div className={styles.editableButtonContent}>
+            Click to edit this section
+            {unsaved ? '\u000amodified' : ''}
+          </div>
+        </div>
         <div ref={this.ref} />
       </div>
     );
@@ -99,8 +104,8 @@ class PrototypeEditableContent extends React.Component<Props, State> {
 
   private renderEditor(content: string) {
     return (
-      <div className={styles['editable-content-editing']}>
-        <div className={styles['editable-button']}>
+      <div className={styles.editableContentEditing}>
+        <div className={styles.editableButton}>
           <button onClick={this.save} type="button">
             Save
           </button>

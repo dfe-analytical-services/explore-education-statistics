@@ -19,7 +19,6 @@ export interface EditableAccordionSectionProps {
   onToggle?: (open: boolean) => void;
   index: number;
   droppableIndex?: number;
-  editable?: boolean;
 }
 
 const EditableAccordionSection = ({
@@ -32,7 +31,6 @@ const EditableAccordionSection = ({
   headingId,
   headingTag = 'h2',
   open = false,
-  // editable = false,
   onToggle,
 }: EditableAccordionSectionProps) => {
   const target = createRef<HTMLDivElement>();

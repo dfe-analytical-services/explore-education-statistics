@@ -134,7 +134,6 @@ class EditablePublicationPage extends Component<Props, State> {
               caption={caption}
               index={index}
               key={`${order}`}
-              editable={editing}
             >
               <EditableContentBlock
                 editable={editing}
