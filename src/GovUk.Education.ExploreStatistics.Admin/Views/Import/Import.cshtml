@@ -1,0 +1,33 @@
+@model CreatePublicationModel
+@{
+    ViewData["Title"] = "Send import notification";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="govuk-heading-l">Send import notification</h1>
+
+
+<div class="govuk-warning-text">
+    <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+    <strong class="govuk-warning-text__text">
+        <span class="govuk-warning-text__assistive">Warning</span>
+        This will import uploaded files for a selected publication / release
+    </strong>
+</div>
+
+<form asp-controller="Import" asp-action="Import" method="post">
+
+    <div class="govuk-form-group">
+        <label class="govuk-label" for="sort">
+            Publication to be processed
+        </label>
+        <select class="govuk-select" asp-for="Id" asp-items="@(new SelectList(Model.PublicationsToImport, "PublicationId", "PublicationName"))" required="required">
+            <option>Select publication</option>
+        </select>
+    </div>
+    
+    <button type="submit" class="govuk-button">
+        Send import notification
+    </button>
+
+</form>

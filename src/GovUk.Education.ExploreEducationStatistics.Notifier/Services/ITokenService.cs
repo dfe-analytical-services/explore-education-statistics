@@ -5,8 +5,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
 {
     public interface ITokenService
     {
-        string GetEmailFromToken(string authToken, string secretKey, ILogger log);
+        string GetEmailFromToken(string authToken, string secretKey);
 
-        string GenerateToken(string secretKey, string email, ILogger log, DateTime expiryDateTime);
+        string GenerateToken(string secretKey, string email, DateTime expiryDateTime);
     }
 }

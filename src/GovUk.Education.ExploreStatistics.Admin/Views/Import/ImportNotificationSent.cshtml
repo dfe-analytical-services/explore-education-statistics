@@ -1,0 +1,17 @@
+@model ImportViewModel
+@{
+    ViewData["Title"] = "Import Notifciation Sent";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="govuk-panel govuk-panel--confirmation">
+    <h1 class="govuk-panel__title">
+        Import Notification sent
+    </h1>
+    <div class="govuk-panel__body">
+        <strong>@Model.PublicationName</strong>
+        <br>@Model.PublicationId
+        <strong>@Model.ReleaseName</strong>
+        <br>@Model.ReleaseDate
+    </div>
+</div>

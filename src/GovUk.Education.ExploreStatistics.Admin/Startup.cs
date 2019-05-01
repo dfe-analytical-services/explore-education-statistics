@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreStatistics.Admin.Services;
+﻿using GovUk.Education.ExploreStatistics.Admin.Services;
 using GovUk.Education.ExploreStatistics.Admin.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
@@ -10,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Routing;
@@ -54,6 +49,7 @@ namespace GovUk.Education.ExploreStatistics.Admin
 
             services.AddTransient<IFileStorageService, FileStorageService>();
             services.AddTransient<INotificationService, NotificationService>();
+            services.AddTransient<IImportService, ImportService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
