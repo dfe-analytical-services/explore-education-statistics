@@ -39,13 +39,6 @@ services:
 #      - "10000:10000"
 #      - "10001:10001"
 #      - "10002:10002"
-#  data-import:
-#    container_name: ees-import
-#    build: explore-education-statistics-data-import
-#    ports:
-#      - "8080:80"
-#    depends_on:
-#      - mongo
   db:
     container_name: ees-mssql
     image: "mcr.microsoft.com/mssql/server"
