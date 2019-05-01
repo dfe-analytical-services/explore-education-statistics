@@ -40,18 +40,20 @@ const PublicationPage = () => {
             <div className="govuk-grid-column-three-quarters">
               <p className="govuk-body">
                 Read national statistical summaries, view charts and tables and
-                download pupil absence data files.
+                download data files.
               </p>
 
               <p className="govuk-inset-text">
-                View a regional breakdown of statistics and data within the{' '}
+                View a regional breakdown of statistics and data under the{' '}
                 <a href="#contents-sections-heading-9">
-                  'Pupil absence by local authority' section
-                </a>
+                  Regional and local authority (LA) breakdown
+                </a>{' '}
+                section
               </p>
 
               <p>
-                Find out more -{' '}
+                Find out how and why these statistics are collected and
+                published -{' '}
                 <Link to="/prototypes/methodology-absence">
                   Pupil absence statistics: methodology
                 </Link>
@@ -673,7 +675,7 @@ const PublicationPage = () => {
           </p>
         </AccordionSection>
         <AccordionSection
-          heading="Pupil absence by local authority (LA)"
+          heading="Regional and local authority (LA) breakdown"
           onToggle={() => mapRef && mapRef.refresh()}
         >
           <PrototypeAbsenceData

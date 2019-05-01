@@ -37,7 +37,7 @@ const PublicationPage = () => {
         This is the latest data{' '}
       </strong>
       <h1 className="govuk-heading-xl">
-        GCSE and equivalent results in England, 2016 to 2017
+        GCSE and equivalent results in England
       </h1>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
@@ -60,17 +60,15 @@ const PublicationPage = () => {
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-three-quarters">
               <p className="govuk-body">
-                This statistical first release (SFR) provides information on the
-                achievements in GCSE examinations and other qualifications of
-                young people in academic year 2016 to 2017. This typically
-                covers those starting the academic year aged 15.
+                Read national statistical summaries, view charts and tables and
+                download data files.
               </p>
               <p className="govuk-body">
-                You can also view a regional breakdown of statistics and data
-                within the{' '}
+                View a regional breakdown of statistics and data under the{' '}
                 <a href="#contents-sections-heading-6">
-                  <strong>local authorities section</strong>
-                </a>
+                  Regional and local authority (LA) breakdown
+                </a>{' '}
+                section
               </p>
             </div>
             <div className="govuk-grid-column-one-quarter">
@@ -84,13 +82,17 @@ const PublicationPage = () => {
           </div>
 
           <p>
-            <Link to="#">
-              Find out more about our GCSE and equivalent results methodology
-              and terminology
+            Find out how and why these statistics are collected and published -{' '}
+            <Link to="https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/772862/2018_Key_stage_4_Methodology.pdf">
+              GCSE and equivalent results: methodology
             </Link>
           </p>
 
-          <Details summary="Download underlying data files">
+          <Details summary="Download data files">
+            <p>
+              You can customise and download data as Excel or .csv files. Our
+              data can also be accessed via an API.
+            </p>
             <ul className="govuk-list">
               <li>
                 <a href="#" className="govuk-link">
@@ -208,8 +210,8 @@ const PublicationPage = () => {
             <nav role="navigation" aria-labelledby="related-content">
               <ul className="govuk-list">
                 <li>
-                  <Link to="#">
-                    GCSE absence statistics: guidance and methodology
+                  <Link to="https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/772862/2018_Key_stage_4_Methodology.pdf">
+                    GCSE and equivalent results: methodology
                   </Link>
                 </li>
               </ul>
@@ -467,7 +469,7 @@ const PublicationPage = () => {
           </p>
         </AccordionSection>
         <AccordionSection
-          heading="Local authority"
+          heading="Regional and local authority (LA) breakdown"
           caption="Performance by local authority varies considerably "
         >
           <p>
