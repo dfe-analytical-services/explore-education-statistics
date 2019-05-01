@@ -245,7 +245,7 @@ const PublicationPage = () => {
       />
 
       <Accordion id="contents-sections">
-        <AccordionSection heading="About this statistics and data release">
+        <AccordionSection heading="About these statistics">
           <p className="govuk-body">
             The statistics and data show the absence of pupils of compulsory
             school age during the 2016/17 academic year in the following
@@ -257,9 +257,8 @@ const PublicationPage = () => {
             <li>special schools</li>
           </ul>
           <p>
-            Known as a statistical first release (SFR) - the statistic and data
-            also includes information on absence in pupil referral units and for
-            pupils aged 4.
+            The statistics and data also includes information on absence in
+            pupil referral units and for pupils aged 4.
           </p>
           <p>
             We use the key measures of 'overall' and 'persistent' absence to
@@ -736,9 +735,7 @@ const PublicationPage = () => {
           </ul>
         </AccordionSection>
       </Accordion>
-      <h2 className="govuk-heading-m govuk-!-margin-top-9">
-        Extra information
-      </h2>
+      <h2 className="govuk-heading-m govuk-!-margin-top-9">Help and support</h2>
       <Accordion id="extra-information-sections">
         <AccordionSection
           heading="Pupil absence statistics: methodology"
