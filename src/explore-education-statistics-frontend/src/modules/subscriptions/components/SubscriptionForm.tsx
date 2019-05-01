@@ -88,8 +88,9 @@ class SubscriptionForm extends Component<Props, State> {
               <Form>
                 <FormFieldTextInput<FormValues>
                   id="email-id"
-                  label="Email address"
-                  hint="We’ll only use this to send you subscriptions. You can unsubscribe from these at any time."
+                  label="Enter your email address"
+                  hint="This will only be used to subscribe you to notifications.
+                  You can unsubscribe at any time."
                   name="email"
                   width={20}
                 />
@@ -118,7 +119,9 @@ class SubscriptionForm extends Component<Props, State> {
                   }}
                   type="submit"
                 >
-                  {form.isSubmitting && form.isValid ? 'Submitting' : 'Submit'}
+                  {form.isSubmitting && form.isValid
+                    ? 'Submitting'
+                    : 'Subscribe'}
                 </Button>
               </Form>
             </div>

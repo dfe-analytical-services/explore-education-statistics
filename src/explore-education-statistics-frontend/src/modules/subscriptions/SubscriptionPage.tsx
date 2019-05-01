@@ -75,12 +75,12 @@ class SubscriptionPage extends Component<Props> {
     let message;
 
     if (unsubscribed) {
-      message = 'You have successfully unsubscribed from this publication.';
+      message = 'You have successfully unsubscribed from these updates.';
     } else if (verified) {
-      message = 'You have successfully subscribed to this publication.';
+      message = 'You have successfully subscribed to these updates.';
     } else if (subscribed) {
       message =
-        'Thank you. Please check your email to verify the subscription.';
+        'Thank you. Please check your email to verify your subscription.';
     }
 
     return (
@@ -91,7 +91,12 @@ class SubscriptionPage extends Component<Props> {
           { name: 'subscribe' },
         ]}
       >
-        <PageTitle title={`${data.title}`} caption="Subscription" />
+        <PageTitle title={`${data.title}`} caption="Notify me" />
+
+        <p>
+          Subscribe to receive updates when new statistics are released or
+          existing statistics are changed or corrected.
+        </p>
 
         {message ? (
           <p>{message}</p>
