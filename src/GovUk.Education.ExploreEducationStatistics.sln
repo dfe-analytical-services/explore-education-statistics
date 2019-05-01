@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEduc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Notifier", "GovUk.Education.ExploreEducationStatistics.Notifier\GovUk.Education.ExploreEducationStatistics.Notifier.csproj", "{2D23B0C4-2B0B-451A-966E-F2EBCA515D44}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUK.Education.ExploreEducationStatistics.Data.Processor", "GovUK.Education.ExploreEducationStatistics.Data.Processor\GovUK.Education.ExploreEducationStatistics.Data.Processor.csproj", "{A2C4B1D6-AF13-4AF2-A292-8FE1E9E027A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Data.Processor", "GovUk.Education.ExploreEducationStatistics.Data.Processor\GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj", "{A2C4B1D6-AF13-4AF2-A292-8FE1E9E027A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

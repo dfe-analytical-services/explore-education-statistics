@@ -1,6 +1,6 @@
 ﻿using System;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
-using GovUK.Education.ExploreEducationStatistics.Notifier;
+using GovUk.Education.ExploreEducationStatistics.Notifier;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Azure.WebJobs.Logging;
@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Willezone.Azure.WebJobs.Extensions.DependencyInjection;
 
 [assembly: WebJobsStartup(typeof(Startup))]
-namespace GovUK.Education.ExploreEducationStatistics.Notifier
+namespace GovUk.Education.ExploreEducationStatistics.Notifier
 {
     internal class Startup : IWebJobsStartup
     {

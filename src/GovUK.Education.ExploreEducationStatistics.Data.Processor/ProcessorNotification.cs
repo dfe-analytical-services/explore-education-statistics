@@ -1,4 +1,4 @@
-﻿namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
+﻿namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
     public class ProcessorNotification
     {

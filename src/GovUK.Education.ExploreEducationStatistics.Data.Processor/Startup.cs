@@ -1,9 +1,8 @@
 ﻿using System;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUK.Education.ExploreEducationStatistics.Data.Processor;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
-using GovUK.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Azure.WebJobs.Logging;
@@ -14,7 +13,7 @@ using Microsoft.Extensions.Logging;
 using Willezone.Azure.WebJobs.Extensions.DependencyInjection;
 
 [assembly: WebJobsStartup(typeof(Startup))]
-namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
+namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
     internal class Startup : IWebJobsStartup
     {

@@ -1,4 +1,4 @@
-﻿namespace GovUK.Education.ExploreEducationStatistics.Data.Processor.Services
+﻿namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     using System.IO;
     using Microsoft.WindowsAzure.Storage.Blob;
