@@ -9,16 +9,22 @@ interface Props {
   block: ContentBlock;
   id: string;
   index: number;
+  editable?: boolean;
+  onContentChange?: (content: string) => void;
 }
 
 class EditableContentSubBlockRenderer extends Component<Props> {
-  public static getBlockHTML(block: ContentBlock) {
+  public render() {
+    const { block, editable, onContentChange } = this.props;
+
     switch (block.type) {
       case 'MarkDownBlock':
         return (
           <PrototypeEditableContent
+            editable={editable}
+            onContentChange={onContentChange}
             content={`
-         <p className="govuk-body">${marked(block.body)} </p>
+         <div className="govuk-body">${marked(block.body)} </div>
       `}
           />
         );
@@ -26,6 +32,8 @@ class EditableContentSubBlockRenderer extends Component<Props> {
         return (
           <div className="govuk-inset-text">
             <PrototypeEditableContent
+              editable={editable}
+              onContentChange={onContentChange}
               content={`
             ${
               block.heading
@@ -33,7 +41,7 @@ class EditableContentSubBlockRenderer extends Component<Props> {
                 : ''
             }
 
-            <p className="govuk-body">${marked(block.body)} </p>
+            <div className="govuk-body">${marked(block.body)} </div>
           `}
             />
           </div>
@@ -47,26 +55,6 @@ class EditableContentSubBlockRenderer extends Component<Props> {
       default:
         return null;
     }
-  }
-
-  public render() {
-    const { block } = this.props;
-
-    return EditableContentSubBlockRenderer.getBlockHTML(block);
-
-    // return (
-    //   <Draggable draggableId={`draggable_block_${id}_${index}`} index={index}>
-    //     {provided => (
-    //       <div ref={provided.innerRef} {...provided.draggableProps}>
-    //         <div className="drag-handle small" {...provided.dragHandleProps} />
-    //
-    //         {this.getBlockHTML(block)}
-    //
-    //         {provided.placeholder}
-    //       </div>
-    //     )}
-    //   </Draggable>
-    // );
   }
 }
 

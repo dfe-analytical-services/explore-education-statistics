@@ -5,6 +5,7 @@ export type RadioChangeEventHandler = ChangeEventHandler<HTMLInputElement>;
 
 export interface FormRadioProps {
   checked?: boolean;
+  defaultChecked?: boolean;
   conditional?: ReactNode;
   hint?: string;
   id: string;
@@ -16,6 +17,7 @@ export interface FormRadioProps {
 
 const FormRadio = ({
   checked,
+  defaultChecked,
   conditional,
   hint,
   id,
@@ -29,8 +31,10 @@ const FormRadio = ({
       <div className="govuk-radios__item">
         <input
           aria-describedby={hint ? `${id}-item-hint` : undefined}
+          data-aria-controls={conditional ? `${id}-conditional` : undefined}
           className="govuk-radios__input"
           checked={checked}
+          defaultChecked={defaultChecked}
           id={id}
           name={name}
           onChange={onChange}
@@ -56,7 +60,7 @@ const FormRadio = ({
           className={classNames('govuk-radios__conditional', {
             'govuk-radios__conditional--hidden': !checked,
           })}
-          hidden={!checked}
+          id={`${id}-conditional`}
         >
           {conditional}
         </div>

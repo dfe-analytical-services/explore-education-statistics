@@ -1,6 +1,7 @@
 import GoToTopLink from '@common/components/GoToTopLink';
 import classNames from 'classnames';
-import React, { createElement, ReactNode } from 'react';
+import React, { createElement, createRef, ReactNode, useState } from 'react';
+// import PrototypeEditableContent from "@admin/pages/prototypes/components/PrototypeEditableContent";
 
 export interface EditableAccordionSectionProps {
   caption?: string;
@@ -32,19 +33,25 @@ const EditableAccordionSection = ({
   open = false,
   onToggle,
 }: EditableAccordionSectionProps) => {
+  const target = createRef<HTMLDivElement>();
+  const [isOpen, setIsOpen] = useState(open);
+  const [previousOpen, setPreviousOpen] = useState(open);
+
+  if (open !== previousOpen) {
+    setPreviousOpen(open);
+    setIsOpen(open);
+  }
+
   return (
     <div
-      onClick={event => {
+      ref={target}
+      onClick={() => {
         if (onToggle) {
-          onToggle(
-            event.currentTarget.classList.contains(
-              'govuk-accordion__section--expanded',
-            ),
-          );
+          onToggle(isOpen);
         }
       }}
       className={classNames('govuk-accordion__section', className, {
-        'govuk-accordion__section--expanded': open,
+        'govuk-accordion__section--expanded': isOpen,
       })}
       role="presentation"
     >
@@ -53,10 +60,16 @@ const EditableAccordionSection = ({
           headingTag,
           {
             className: 'govuk-accordion__section-heading',
+            onClick: () => {
+              if (target.current) {
+                setIsOpen(!isOpen);
+              }
+            },
           },
           <span className="govuk-accordion__section-button" id={headingId}>
             {heading}
           </span>,
+          <span className="govuk-accordion__icon" />,
         )}
         {caption && (
           <span className="govuk-accordion__section-summary">{caption}</span>

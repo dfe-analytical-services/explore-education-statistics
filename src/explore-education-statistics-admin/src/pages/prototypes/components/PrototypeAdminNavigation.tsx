@@ -3,22 +3,12 @@ import Link from '../../../components/Link';
 
 interface Props {
   sectionId?: string;
+  task?: string;
 }
 
-const PrototypeAdminNavigation = ({ sectionId }: Props) => {
+const PrototypeAdminNavigation = ({ sectionId, task }: Props) => {
   return (
     <>
-      <span className="govuk-tag">New release in progress</span>
-      <span className="govuk-caption-l">Academic year 2018 to 2019</span>
-      <h1 className="govuk-heading-l">
-        Pupil absence statistics and data for schools in England
-      </h1>
-      <dl className="dfe-meta-content">
-        <dt className="govuk-caption-m">Scheduled publish date: </dt>
-        <dd>
-          <strong>To be set</strong>
-        </dd>
-      </dl>
       <nav className="app-navigation govuk-!-margin-bottom-9">
         <ul className="app-navigation__list govuk-!-margin-bottom-0">
           <li
@@ -46,7 +36,7 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
               to="/prototypes/publication-create-new-absence-data"
               className="govuk-link govuk-link--no-visited-state"
             >
-              Add data
+              Add / edit data
             </Link>
           </li>
           <li
@@ -60,7 +50,7 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
               to="/prototypes/publication-create-new-absence"
               className="govuk-link govuk-link--no-visited-state"
             >
-              Add / edit content
+              Preview / edit content
             </Link>
           </li>
           <li
@@ -88,11 +78,27 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
               to="/prototypes/publication-create-new-absence-status"
               className="govuk-link govuk-link--no-visited-state"
             >
-              Set status
+              Set publish status
             </Link>
           </li>
         </ul>
       </nav>
+
+      {task !== 'editRelease' && (
+        <>
+          <span className="govuk-tag">New release in progress</span>
+          <span className="govuk-caption-l">Academic year 2018 to 2019</span>
+          <h1 className="govuk-heading-l">
+            Pupil absence statistics and data for schools in England
+          </h1>
+          <dl className="dfe-meta-content">
+            <dt className="govuk-caption-m">Scheduled publish date: </dt>
+            <dd>
+              <strong>To be set</strong>
+            </dd>
+          </dl>
+        </>
+      )}
     </>
   );
 };

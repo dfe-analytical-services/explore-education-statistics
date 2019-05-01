@@ -198,7 +198,8 @@ exports[`FormRadioGroup renders option with conditional contents 1`] = `
     </legend>
     <div class="govuk-radios">
       <div class="govuk-radios__item">
-        <input class="govuk-radios__input"
+        <input data-aria-controls="radio-1-conditional"
+               class="govuk-radios__input"
                id="radio-1"
                name="test-radios"
                type="radio"
@@ -212,14 +213,15 @@ exports[`FormRadioGroup renders option with conditional contents 1`] = `
         </label>
       </div>
       <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
-           hidden
+           id="radio-1-conditional"
       >
         <p>
           Conditional 1
         </p>
       </div>
       <div class="govuk-radios__item">
-        <input class="govuk-radios__input"
+        <input data-aria-controls="radio-2-conditional"
+               class="govuk-radios__input"
                id="radio-2"
                name="test-radios"
                type="radio"
@@ -233,13 +235,16 @@ exports[`FormRadioGroup renders option with conditional contents 1`] = `
           Test radio 2
         </label>
       </div>
-      <div class="govuk-radios__conditional">
+      <div class="govuk-radios__conditional"
+           id="radio-2-conditional"
+      >
         <p>
           Conditional 2
         </p>
       </div>
       <div class="govuk-radios__item">
-        <input class="govuk-radios__input"
+        <input data-aria-controls="radio-3-conditional"
+               class="govuk-radios__input"
                id="radio-3"
                name="test-radios"
                type="radio"
@@ -253,7 +258,7 @@ exports[`FormRadioGroup renders option with conditional contents 1`] = `
         </label>
       </div>
       <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
-           hidden
+           id="radio-3-conditional"
       >
         <p>
           Conditional 3

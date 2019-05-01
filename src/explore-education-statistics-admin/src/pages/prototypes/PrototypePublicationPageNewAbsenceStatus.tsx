@@ -10,20 +10,21 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
       wide
       breadcrumbs={[
         {
-          link: '/prototypes/admin-dashboard',
+          link: '/prototypes/admin-dashboard?status=editNewRelease',
           text: 'Administrator dashboard',
         },
         { text: 'Create new release', link: '#' },
       ]}
     >
       <PrototypeAdminNavigation sectionId="status" />
-      {location.search === '?status=readyApproval' && (
+      {location.search === '?status=readyTeamApproval' && (
         <>
           <div className="govuk-panel govuk-panel--confirmation">
-            <h1 className="govuk-panel__title">Release ready for approval</h1>
+            <h1 className="govuk-panel__title">
+              Release ready for team approval
+            </h1>
             <div className="govuk-panel__body">
-              This release had been sent for moderation. You will receive a
-              notification in your dashboard once a decision has been made.
+              This release had been marked for moderation by the team.
             </div>
           </div>
           <div className="govuk-!-margin-top-6 govuk-!-margin-bottom-6">
@@ -36,7 +37,7 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
           </Link>
         </>
       )}
-      {location.search !== '?status=readyApproval' && (
+      {location.search !== '?status=readyTeamApproval' && (
         <form action="/prototypes/publication-create-new-absence-status">
           <div className="govuk-form-group">
             <fieldset className="govuk-fieldset">
@@ -66,14 +67,14 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
                     className="govuk-radios__input"
                     type="radio"
                     name="status"
-                    id="readyApproval"
-                    value="readyApproval"
+                    id="readyTeamApproval"
+                    value="readyTeamApproval"
                   />
                   <label
                     className="govuk-label govuk-radios__label"
                     htmlFor="readyApproval"
                   >
-                    Ready for approval
+                    Level 1: Ready for team approval
                   </label>
                 </div>
 
@@ -88,9 +89,9 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
                   />
                   <label
                     className="govuk-label govuk-radios__label"
-                    htmlFor="cancelEdit"
+                    htmlFor="readyTeamLeadApproval"
                   >
-                    Cancel and remove this release
+                    Level 2: Ready for team lead appoval
                   </label>
                 </div>
               </div>

@@ -1,11 +1,14 @@
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React from 'react';
 import { RouteChildrenProps } from 'react-router';
-import Link from '../../components/Link';
+import AdminDashboardPublications from '@admin/pages/prototypes/components/AdminDashboardPublications';
+import AdminDashboardInProgress from '@admin/pages/prototypes/components/AdminDashboardInProgress';
+import AdminDashboardReadyForApproval from '@admin/pages/prototypes/components/AdminDashboardReadyForApproval';
+import AdminDashboardNeedsWork from '@admin/pages/prototypes/components/AdminDashboardNeedsWork';
+import AdminDashboardApprovedForPublication from '@admin/pages/prototypes/components/AdminDashboardApprovedForPublication';
 import PrototypePage from './components/PrototypePage';
+import Link from '../../components/Link';
 
 const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
   return (
@@ -19,130 +22,9 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
               Not you? <Link to="#">Sign out</Link>
             </span>
           </h1>
-          <Tabs>
-            <TabsSection
-              id="task-in-progress"
-              title={`In progress ${
-                location.search === '?status=editRelease' ? '(2)' : '(1)'
-              }`}
-            >
-              {location.search === '?status=editRelease' && (
-                <>
-                  <h2 className="govuk-heading-m">New releases in progress</h2>
-                  <ul className="govuk-list-bullet  govuk-!-margin-bottom-9">
-                    <li>
-                      {' '}
-                      <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-                        Pupil absence statistics
-                      </h4>
-                      <dl className="dfe-meta-content govuk-!-margin-0">
-                        <dt className="govuk-caption-m">Last edited: </dt>
-                        <dd>
-                          20 March 2019 at 17:37 by <a href="#">me</a>
-                        </dd>
-                      </dl>
-                      <div className="govuk-!-margin-top-0">
-                        <Link to="/prototypes/publication-create-new-absence-config">
-                          Edit
-                        </Link>
-                      </div>
-                    </li>
-                  </ul>
-                </>
-              )}
-              <h2 className="govuk-heading-m">Editing current releases</h2>
-              <ul className="govuk-list-bullet">
-                <li className="govuk-!-margin-top-6">
-                  <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-                    GCSE and equivalent results in England
-                  </h4>
-                  <dl className="dfe-meta-content govuk-!-margin-0">
-                    <dt className="govuk-caption-m">Last edited: </dt>
-                    <dd>
-                      20 March 2019 at 17:37 by <a href="#">me</a>
-                    </dd>
-                  </dl>
-                  <div className="govuk-!-margin-top-0">
-                    <Link to="#">Edit</Link>
-                  </div>
-                </li>
-              </ul>
-            </TabsSection>
-            <TabsSection
-              id="task-ready-approval"
-              title={`Ready for approval ${
-                location.search === '?status=readyApproval' ? '(1)' : ''
-              }`}
-            >
-              {location.search !== '?status=readyApproval' && (
-                <div className="govuk-inset-text">
-                  There are currenly no releases ready for approval
-                </div>
-              )}
-              {location.search === '?status=readyApproval' && (
-                <>
-                  <h2 className="govuk-heading-m">Ready for approval</h2>
-                  <ul className="govuk-list-bullet">
-                    <li>
-                      {' '}
-                      <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-                        Pupil absence statistics
-                      </h4>
-                      <dl className="dfe-meta-content govuk-!-margin-0">
-                        <dt className="govuk-caption-m">Last edited: </dt>
-                        <dd>
-                          20 March 2019 at 17:37 by <a href="#">me</a>
-                        </dd>
-                      </dl>
-                      <div className="govuk-!-margin-top-0">
-                        <Link to="/prototypes/publication-create-new-absence-config">
-                          Edit
-                        </Link>
-                      </div>
-                    </li>
-                  </ul>
-                </>
-              )}
-            </TabsSection>
-            <TabsSection id="task-ready-approval" title="Needs work">
-              <div className="govuk-inset-text">
-                There are currenly no releases requiring work
-              </div>
-            </TabsSection>
-            <TabsSection
-              id="task-ready-approval"
-              title="Approved for publication"
-            >
-              <div className="govuk-inset-text">
-                There are currenly no releases approved for publication
-              </div>
-            </TabsSection>
-          </Tabs>
         </div>
         <div className="govuk-grid-column-one-third">
           <aside className="app-related-items">
-            <h2 className="govuk-heading-m" id="releated-content">
-              Notifications
-            </h2>
-            <nav role="navigation" aria-labelledby="subsection-title">
-              <ul className="govuk-list">
-                <li>
-                  <Link to="#">Example notification</Link>
-                </li>
-              </ul>
-            </nav>
-            <hr />
-            <h2 className="govuk-heading-m" id="releated-content">
-              Releases due in next 30 days
-            </h2>
-            <nav role="navigation" aria-labelledby="subsection-title">
-              <ul className="govuk-list">
-                <li>
-                  <Link to="#">Example release</Link>
-                </li>
-              </ul>
-            </nav>
-            <hr />
             <h2 className="govuk-heading-m" id="releated-content">
               Help and guidance
             </h2>
@@ -158,7 +40,35 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
           </aside>
         </div>
       </div>
-      <h2 className="govuk-heading-l">Early years and schools</h2>
+      <Tabs>
+        <TabsSection id="publications" title="Publications">
+          <AdminDashboardPublications />
+        </TabsSection>
+        <TabsSection
+          id="task-in-progress"
+          title={`In progress ${
+            location.search === '?status=editNewRelease' ? '(2)' : '(1)'
+          }`}
+        >
+          <AdminDashboardInProgress />
+        </TabsSection>
+        <TabsSection
+          id="task-ready-approval"
+          title={`Ready for approval ${
+            location.search === '?status=readyApproval' ? '(1)' : ''
+          }`}
+        >
+          <AdminDashboardReadyForApproval />
+        </TabsSection>
+        <TabsSection id="task-ready-approval" title="Needs work">
+          <AdminDashboardNeedsWork />
+        </TabsSection>
+        <TabsSection id="task-ready-approval" title="Approved for publication">
+          <AdminDashboardApprovedForPublication />
+        </TabsSection>
+      </Tabs>
+
+      {/* <h2 className="govuk-heading-l">Early years and schools</h2>
       <Accordion id="schools">
         <AccordionSection
           heading="Absence and exclusions"
@@ -371,7 +281,7 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         >
           <h3 className="govuk-heading-s">Latest school finance releases</h3>
         </AccordionSection>
-      </Accordion>
+              </Accordion> */}
     </PrototypePage>
   );
 };

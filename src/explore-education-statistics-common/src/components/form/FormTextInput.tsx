@@ -11,6 +11,7 @@ export interface FormTextInputProps {
   name: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   width?: 20 | 10 | 5 | 4 | 3 | 2;
+  value?: string;
 }
 
 const FormTextInput = ({
@@ -21,6 +22,7 @@ const FormTextInput = ({
   name,
   onChange,
   width,
+  value,
 }: FormTextInputProps) => {
   return (
     <>
@@ -50,6 +52,7 @@ const FormTextInput = ({
             onChange(event);
           }
         }}
+        value={value}
       />
     </>
   );
