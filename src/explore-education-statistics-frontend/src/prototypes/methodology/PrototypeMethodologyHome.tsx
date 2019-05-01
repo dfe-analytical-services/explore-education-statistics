@@ -80,9 +80,8 @@ const HomePage = () => {
             </a>
           </h4>
           <p className="govuk-caption-m govuk-!-margin-top-1">
-            Search this register to find and download information about of
-            schools and colleges in England including details educational
-            organisations and governors
+            Search to find and download information about schools, colleges,
+            educational organisations and governors in England
           </p>
         </div>
       </div>
