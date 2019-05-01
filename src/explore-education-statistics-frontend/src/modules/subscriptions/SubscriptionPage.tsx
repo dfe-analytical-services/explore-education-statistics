@@ -79,8 +79,7 @@ class SubscriptionPage extends Component<Props> {
     } else if (verified) {
       message = 'You have successfully subscribed to these updates.';
     } else if (subscribed) {
-      message =
-        'Thank you. Please check your email to verify your subscription.';
+      message = 'Thank you. Check your email to verify your subscription.';
     }
 
     return (

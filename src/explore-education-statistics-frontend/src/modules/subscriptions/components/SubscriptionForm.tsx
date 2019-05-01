@@ -90,7 +90,7 @@ class SubscriptionForm extends Component<Props, State> {
                   id="email-id"
                   label="Enter your email address"
                   hint="This will only be used to subscribe you to notifications.
-                  You can unsubscribe at any time."
+                  You can unsubscribe at any time"
                   name="email"
                   width={20}
                 />
