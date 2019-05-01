@@ -65,11 +65,11 @@ generally be used for local development.
 
 #### Adding variables
 
-Environment variables should be supplied to both the specific `.env.{env}` file and the `.env.example` 
-file (example versions of variables should be placed here). 
+Required environment variables should be supplied to both the specific `.env.{env}` file and the 
+`.env.example` file (example versions of variables should be placed here). 
 
-The `.env.example` file is used to validate that the `.env.{env}` file in use is not missing any required 
-variables and consequently needs to be in sync with any changes.
+The `.env.example` file is used to validate that the `.env.{env}` file in use is not missing any 
+required variables and consequently needs to be in sync with any changes.
 
 ### Dependency management with Lerna
 
@@ -156,7 +156,7 @@ code style.
 
 #### Disabling linting upon save
 
-During development, code is linted upon save, but if required this can be disabled by changing the 
+During development, code is linted upon save, but if required this can be disabled by adding the 
 following in your `.env.local`:
 
 ```
