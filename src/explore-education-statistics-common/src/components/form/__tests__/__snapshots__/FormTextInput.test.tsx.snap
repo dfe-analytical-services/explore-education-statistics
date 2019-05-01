@@ -17,6 +17,7 @@ exports[`FormTextInput renders correctly with error 1`] = `
        class="govuk-input"
        id="test-input"
        name="testInput"
+       value
 >
 
 `;
@@ -38,6 +39,7 @@ exports[`FormTextInput renders correctly with hint 1`] = `
        class="govuk-input"
        id="test-input"
        name="testInput"
+       value
 >
 
 `;
@@ -53,6 +55,7 @@ exports[`FormTextInput renders correctly with required props 1`] = `
        class="govuk-input"
        id="test-input"
        name="testInput"
+       value
 >
 
 `;
@@ -74,6 +77,7 @@ exports[`FormTextInput renders with a specific width class 1`] = `
        class="govuk-input govuk-input--width-20"
        id="test-input"
        name="testInput"
+       value
 >
 
 `;
