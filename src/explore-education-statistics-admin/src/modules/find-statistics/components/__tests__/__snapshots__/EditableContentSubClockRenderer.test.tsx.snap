@@ -2,8 +2,11 @@
 
 exports[`EditableContentSubBlockRenderer Renders editable Markdown block correctly 1`] = `
 
-<div class="editable-content  ">
-  <div class="editable-button">
+<div class="editableContent  ">
+  <div class="editableButton">
+    <div class="editableButtonContent">
+      Click to edit this section
+    </div>
   </div>
   <div>
     <p classname="govuk-body">
@@ -21,7 +24,10 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
 exports[`EditableContentSubBlockRenderer Renders non-editable Markdown block correctly 1`] = `
 
 <div class>
-  <div class>
+  <div class="editableButton">
+    <div class="editableButtonContent">
+      Click to edit this section
+    </div>
   </div>
   <div>
     <p classname="govuk-body">
