@@ -243,7 +243,7 @@ const PublicationPage = () => {
               <h3 className="govuk-heading-s">In this section</h3>
               <ul className="govuk-body-s">
                 <li>
-                  <a href="#section6-1">Data quality</a>
+                  <a href="#section6-1">6.1 Data quality</a>
                 </li>
               </ul>
             </MethodologyHeader>
@@ -258,7 +258,7 @@ const PublicationPage = () => {
         </AccordionSection>
       </Accordion>
 
-      <h2 className="govuk-heading-l govuk-!-margin-top-9">Annex</h2>
+      <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
       <Accordion id="annex-sections">
         <AccordionSection heading="Annex A - Glossary">
           <PrototypeAnnexA />
