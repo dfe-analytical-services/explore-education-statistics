@@ -32,7 +32,7 @@ const PageFooter = ({ wide }: Props) => (
                 to="/privacy-policy"
                 data-testid="footer--privacy-policy-link"
               >
-                Privacy policy
+                Privacy notice
               </Link>
             </li>
             <li className="govuk-footer__inline-list-item">

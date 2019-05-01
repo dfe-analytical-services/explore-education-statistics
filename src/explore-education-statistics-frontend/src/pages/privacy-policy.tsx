@@ -11,98 +11,103 @@ function PrivacyPolicyPage() {
         <h3>Who we are</h3>
         <p>
           The explore education statistics service is operated by the Department
-          for Education ('we' or 'us'). For the purpose of data protection
-          legislation, DfE is the data controller for the personal data
-          processed as part of the explore education statistics service.
+          for Education (DfE).
         </p>
         <p>
-          This privacy policy sets out how we collect and process your personal
-          data through the service. This policy applies to all users of the
-          service ('you').
+          For the purpose of data protection legislation, DfE is the data
+          controller for the personal data processed as part of the explore
+          education statistics service.
         </p>
       </div>
       <div>
         <h3>How we'll use your information</h3>
         <p>
-          We receive your personal data when you visit our service, complete our
-          feedback survey or tell us if something is wrong. We use this
-          information to improve the service. You can find out more at:{' '}
-          <a
-            href="https://www.gov.uk/government/organisations/department-for-education"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            www.gov.uk/government/organisations/department-for-education{' '}
-            <span> opens in a new window </span>
-          </a>
+          We receive your personal data when you sign up and subscribe to
+          receive notifications about the explore education statistics service.
+        </p>
+        <p>
+          We’ll process your data in order to email you updates to let you know
+          when the service has been updated and keep you informed about any
+          changes to the statistics and data it contains.
         </p>
         <p>
           Your use of our service means you accept and consent to our use of
-          your personal data as set out in this privacy policy, which
-          supplements our terms of use for the{' '}
-          <a href="" target="_blank">
-            explore education statistics service
-            <span> opens in a new window </span>
-          </a>
-          .
+          your personal data as set out in this privacy policy.
         </p>
       </div>
       <div>
-        <h3>The nature of your personal data we will be using</h3>
+        <h3>The nature of your personal data we'll be using</h3>
         <p>
-          We’ll be using the following categories of your personal data for our
-          service:
+          In terms of your personal data, we’ll be using your email address to
+          send you notifications about the service.
         </p>
-        <ul>
-          <li>type of personal data 1</li>
-          <li>type of personal data 2</li>
-        </ul>
       </div>
       <div>
         <h3>Why our use of your personal data is lawful</h3>
         <p>
           In order for our use of your personal data to be lawful, we need to
-          meet 1 (or more) conditions in the data protection legislation. For
-          the purpose of this service, the relevant condition(s) we're meeting
-          are as set out in Article 6(1)(e) and Article 9(2)(e and g) of the
-          General Data Protection Regulation (GDPR).
+          meet 1 (or more) conditions in the data protection legislation.
+        </p>
+        <p>
+          For the purpose of this service, the relevant condition(s) we're
+          meeting are as set out in Article 6(1)(e) and Article 9(2)(e and g) of
+          the General Data Protection Regulation (GDPR).
+        </p>
+      </div>
+      <div>
+        <h3>Who we’ll make your personal data available to</h3>
+        <p>
+          We sometimes need to make personal data available to other
+          organisations.
+        </p>
+        <p>
+          These might include contracted partners (who we have employed to
+          process your personal data on our behalf) and/or other organisations
+          (with whom we need to share your personal data for specific purposes).
+        </p>
+        <p>
+          Where we need to share your personal data with others, we ensure that
+          this data sharing complies with data protection legislation.
+        </p>
+        <p>
+          For the purpose of this service we need to share your personal data
+          with{' '}
+          <a href="https://www.notifications.service.gov.uk/">GOV.UK Notify</a>
+          (a service provided by the Government Digital Service which is part of
+          the Cabinet Office) in order for them to send you email notifications
+          about this service.
+        </p>
+        <p>
+          This data sharing is lawful because (insert reason/relevant
+          condition(s) which make this sharing lawful here).
         </p>
       </div>
       <div>
         <h3>Where your data is stored</h3>
-        <p>SECTION AND CONTENT TBC</p>
-      </div>
-      <div>
-        <h3>Keeping your data secure</h3>
         <p>
-          Transmitting information over the internet is generally not completely
-          secure and we cannot guarantee the security of your data. Any data you
-          transmit is at your own risk.
-        </p>
-        <p>
-          We have appropriate procedures and security features in place to keep
-          your data secure once we receive it.
-        </p>
-        <p>
-          We won't share your information with any other organisations for
-          marketing, market research or commercial purposes and we do not pass
-          on your details to other websites.
+          We store your data on secure servers in the
+          <a href="https://www.gov.uk/eu-eea">European Economic Area (EEA)</a>.
+          By submitting your personal data, you agree to this.
         </p>
       </div>
       <div>
         <h3>How long we'll keep your personal data</h3>
         <p>
-          We'll keep your personal data for a maximum of 3 years after which
-          point it will be securely destroyed.
+          We’ll only keep your personal data for as long as we need it for the
+          purpose(s) of this piece of work, after which point it will be
+          securely destroyed.
         </p>
         <p>
-          We'll share your information with third parties only where the law
-          allows it.
+          Please note that, under Data Protection legislation, and in compliance
+          with the relevant data processing conditions, personal data can be
+          kept for longer periods of time when processed purely for archiving
+          purposes in the public interest, statistical purposes and historical
+          or scientific research.
         </p>
       </div>
       <div>
         <h3>Your data protection rights</h3>
-        <p>You have the right to:</p>
+        <p>Under certain circumstances, you have the right to:</p>
         <ul>
           <li>ask us for access to information about you that we hold</li>
           <li>
@@ -126,30 +131,43 @@ function PrivacyPolicyPage() {
           </li>
         </ul>
         <p>
-          Further information about{' '}
-          <a
-            href="https://ico.org.uk/for-organisations/guide-to-data-protection/principle-6-rights/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            your data protection rights <span> opens in a new window </span>
+          If you need to contact us regarding any of the above use the details
+          on DfE's{' '}
+          <a href="https://www.gov.uk/contact-dfe">
+            Contact the Department for Education (DfE)
           </a>{' '}
-          appears on the Information Commissioner's website.
+          page.
+        </p>
+        <p>
+          Further information about your data protection rights can be found on
+          the{' '}
+          <a href="https://ico.org.uk/for-organisations/guide-to-data-protection/principle-6-rights">
+            Information Commissioner’s Office (ICO)
+          </a>{' '}
+          website.
         </p>
       </div>
       <div>
-        <h3>The right to lodge a complaint</h3>
+        <h3>Withdrawal of consent and the right to lodge a complaint</h3>
         <p>
-          You have the right to raise any concerns with the Information
-          Commissioner’s Office (ICO) via their website at{' '}
-          <a
-            href="https://ico.org.uk/concerns/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            https://ico.org.uk/concerns/ <span> opens in a new window </span>
+          Where we’re processing your personal data with your consent, you have
+          the right to withdraw that consent.
+        </p>
+        <p>
+          If you change your mind, or you are unhappy with our use of your
+          personal data, please let us know by contacting the explore education
+          statistics service at{' '}
+          <a href="mailto:explore.statistics@education.gov.uk">
+            explore.statistics@education.gov.uk
           </a>
           .
+        </p>
+        <p>
+          You have the right to raise any concerns via the{' '}
+          <a href="https://ico.org.uk/make-a-complaint/">
+            Information Commissioner’s Office (ICO)
+          </a>{' '}
+          website.
         </p>
       </div>
       <div>
@@ -161,37 +179,18 @@ function PrivacyPolicyPage() {
         </p>
       </div>
       <div>
-        <h3>
-          Following a link to explore education statistics from another website
-        </h3>
-        <p>
-          If you come to our service from another website, we may receive
-          personal information about you from the other website.
-        </p>
-        <p>
-          You should read the privacy policy of the website you came from to
-          find out more about this.
-        </p>
-      </div>
-      <div>
-        <h3>Cookies</h3>
-        <p>
-          We put small files (known as 'cookies') onto your computer or other
-          internet-enabled device when you visit our service. Cookies are stored
-          by your browser and hard drive and are used to distinguish you from
-          other visitors to our servie, to collect information about how you
-          browse our service and for security and monitoring of our service.
-        </p>
-        <p>
-          You consent to the storage of cookies by the explore education
-          statistics service on your computer's hard drive.
-        </p>
-      </div>
-      <div>
         <h3>Contact information</h3>
         <p>
           If you have any questions about how your personal information will be
-          processed, contact us at DETAILS TBC.
+          used, please contact the explore education statistics service at
+          <a href="mailto:explore.statistics@education.gov.uk">
+            explore.statistics@education.gov.uk
+          </a>{' '}
+          or contact the DfE Data Protection Officer (DPO) via DfE's{' '}
+          <a href="https://www.gov.uk/contact-dfe">
+            Contact the Department for Education (DfE)
+          </a>{' '}
+          page.
         </p>
       </div>
     </Page>
