@@ -1,4 +1,4 @@
-﻿namespace GovUK.Education.ExploreEducationStatistics.Data.Processor.Services
+﻿namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     using System;
     using System.Collections.Generic;
@@ -6,7 +6,6 @@
     using System.Linq;
     using System.Threading.Tasks;
     using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
-    using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
     using Microsoft.Extensions.Logging;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;

@@ -1,6 +1,6 @@
-namespace GovUK.Education.ExploreEducationStatistics.Data.Processor
+namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
-    using GovUK.Education.ExploreEducationStatistics.Data.Processor.Services;
+    using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
     using Microsoft.Azure.WebJobs;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
