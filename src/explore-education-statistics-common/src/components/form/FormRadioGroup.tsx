@@ -34,7 +34,7 @@ class FormRadioGroup extends Component<FormRadioGroupProps> {
 
   public componentDidMount(): void {
     if (this.ref.current) {
-      import('govuk-frontend/components/checkboxes/checkboxes').then(
+      import('govuk-frontend/components/radios/radios').then(
         ({ default: GovUkRadios }) => {
           new GovUkRadios(this.ref.current).init();
         },

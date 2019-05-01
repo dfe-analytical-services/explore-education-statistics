@@ -3,7 +3,8 @@
 exports[`FormRadio does not render conditional content when not checked 1`] = `
 
 <div class="govuk-radios__item">
-  <input class="govuk-radios__input"
+  <input data-aria-controls="test-radio-conditional"
+         class="govuk-radios__input"
          id="test-radio"
          name="test"
          type="radio"
@@ -17,7 +18,7 @@ exports[`FormRadio does not render conditional content when not checked 1`] = `
   </label>
 </div>
 <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
-     hidden
+     id="test-radio-conditional"
 >
   <p>
     The conditional content
@@ -29,7 +30,8 @@ exports[`FormRadio does not render conditional content when not checked 1`] = `
 exports[`FormRadio renders conditional content when checked 1`] = `
 
 <div class="govuk-radios__item">
-  <input class="govuk-radios__input"
+  <input data-aria-controls="test-radio-conditional"
+         class="govuk-radios__input"
          id="test-radio"
          name="test"
          type="radio"
@@ -43,7 +45,9 @@ exports[`FormRadio renders conditional content when checked 1`] = `
     Test radio
   </label>
 </div>
-<div class="govuk-radios__conditional">
+<div class="govuk-radios__conditional"
+     id="test-radio-conditional"
+>
   <p>
     The conditional content
   </p>

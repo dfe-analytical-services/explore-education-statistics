@@ -1,9 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   FormGroup,
   FormFieldset,
-  FormRadio,
-  FormConditionalRadioGroup,
   FormTextInput,
   FormSelect,
   FormRadioGroup,
@@ -16,6 +14,8 @@ interface Props {
 }
 
 const PrototypePublicationConfig = ({ sectionId }: Props) => {
+  const [value, setValue] = useState('academic-year');
+
   return (
     <>
       {sectionId === 'setup' && (
@@ -36,15 +36,20 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
         </div>
 
         <FormGroup>
-          <FormFieldset id="radios" legend="Release type">
-            <FormConditionalRadioGroup>
-              <FormRadio
-                id="release-type-academic"
-                label="Academic Year"
-                name="release-type"
-                value="academic-year"
-                defaultChecked
-                conditional={
+          <FormRadioGroup
+            legend="Release type"
+            id="release-type"
+            name="release-type"
+            value={value}
+            onChange={event => {
+              setValue(event.target.value);
+            }}
+            options={[
+              {
+                id: 'release-type-academic',
+                label: 'Academic Year',
+                value: 'academic-year',
+                conditional: (
                   <FormFieldset id="test" legend="">
                     <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
                       Release period
@@ -93,15 +98,13 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                       />
                     </FormGroup>
                   </FormFieldset>
-                }
-              />
-
-              <FormRadio
-                id="release-type-calendar"
-                label="Calendar year"
-                name="release-type"
-                value="calendar-year"
-                conditional={
+                ),
+              },
+              {
+                id: 'release-type-calendar',
+                label: 'Calendar year',
+                value: 'calendar-year',
+                conditional: (
                   <FormGroup>
                     <FormFieldset id="calendar year" legend="Release period">
                       <div className="govuk-form-group">
@@ -119,14 +122,13 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                       </div>
                     </FormFieldset>
                   </FormGroup>
-                }
-              />
-              <FormRadio
-                id="release-type-financial"
-                label="Financial year"
-                name="release-type"
-                value="financial-year"
-                conditional={
+                ),
+              },
+              {
+                id: 'release-type-financial',
+                label: 'Financial year',
+                value: 'financial-year',
+                conditional: (
                   <FormGroup>
                     <FormFieldset
                       id="financial year"
@@ -223,15 +225,13 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                       </div>
                     </FormFieldset>
                   </FormGroup>
-                }
-              />
-
-              <FormRadio
-                id="release-type-month"
-                label="Month"
-                name="release-type"
-                value="month"
-                conditional={
+                ),
+              },
+              {
+                id: 'release-type-month',
+                label: 'Month',
+                value: 'month',
+                conditional: (
                   <FormGroup>
                     <FormFieldset id="month" legend="">
                       <div className="govuk-form-group">
@@ -284,10 +284,10 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                       </div>
                     </FormFieldset>
                   </FormGroup>
-                }
-              />
-            </FormConditionalRadioGroup>
-          </FormFieldset>
+                ),
+              },
+            ]}
+          />
         </FormGroup>
 
         {!sectionId && (
