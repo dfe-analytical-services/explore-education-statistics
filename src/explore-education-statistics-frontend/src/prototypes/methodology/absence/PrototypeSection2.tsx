@@ -17,7 +17,7 @@ const PrototypeMethodologySection = () => {
         single term releases were badged as National Statistics as of the autumn
         term 2009 publication.
       </p>
-      <h3 id="section2-1">2.1 Current termly publications</h3>
+      <h3 id="section2-1">2.1 National Statistics designation</h3>
       <p>
         The United Kingdom Statistics Authority (UKSA) designated these
         statistics as National Statistics in Month Year in accordance with the

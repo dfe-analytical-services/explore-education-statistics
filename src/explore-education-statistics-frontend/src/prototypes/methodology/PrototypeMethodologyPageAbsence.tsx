@@ -141,10 +141,7 @@ const PublicationPage = () => {
               <h3 className="govuk-heading-s">In this section</h3>
               <ul className="govuk-body-s">
                 <li>
-                  <a href="#section2-1">2.1 Update this content</a>
-                </li>
-                <li>
-                  <a href="#section2-2">2.2 Update this content</a>
+                  <a href="#section2-1">2.1 National Statistics designation</a>
                 </li>
               </ul>
             </MethodologyHeader>
