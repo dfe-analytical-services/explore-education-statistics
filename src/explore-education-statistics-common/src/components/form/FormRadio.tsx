@@ -13,7 +13,6 @@ export interface FormRadioProps {
   name: string;
   onChange?: RadioChangeEventHandler;
   value: string;
-  children?: ReactNode;
 }
 
 const FormRadio = ({
@@ -26,14 +25,13 @@ const FormRadio = ({
   name,
   onChange,
   value,
-  children,
 }: FormRadioProps) => {
   return (
     <>
       <div className="govuk-radios__item">
         <input
           aria-describedby={hint ? `${id}-item-hint` : undefined}
-          data-aria-controls={children ? `${id}-conditional` : undefined}
+          data-aria-controls={conditional ? `${id}-conditional` : undefined}
           className="govuk-radios__input"
           checked={checked}
           defaultChecked={defaultChecked}
@@ -62,18 +60,9 @@ const FormRadio = ({
           className={classNames('govuk-radios__conditional', {
             'govuk-radios__conditional--hidden': !checked,
           })}
-          hidden={!checked}
-        >
-          {conditional}
-        </div>
-      )}
-
-      {children && (
-        <div
-          className="govuk-radios__conditional govuk-radios__conditional--hidden"
           id={`${id}-conditional`}
         >
-          {children}
+          {conditional}
         </div>
       )}
     </>
