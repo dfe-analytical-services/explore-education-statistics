@@ -38,7 +38,11 @@ const PrototypeMethodologySection = () => {
       </p>
       <p>
         Information on improvements made to these statistics to continue their
-        compliance with the Code of Practice are available.
+        compliance with the Code of Practice are available our{' '}
+        <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
+          Standards for official statistics published by DfE
+        </a>{' '}
+        guidance.
       </p>
     </>
   );
