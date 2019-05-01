@@ -26,7 +26,7 @@ class PrototypeEditableContent extends React.Component<Props, State> {
   private temporaryContent: string = '';
 
   public static defaultProps = {
-    editable: true,
+    editable: false,
   };
 
   public state: State = {

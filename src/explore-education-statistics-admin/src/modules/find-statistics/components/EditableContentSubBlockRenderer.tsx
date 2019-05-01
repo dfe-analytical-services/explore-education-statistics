@@ -14,8 +14,8 @@ interface Props {
 }
 
 class EditableContentSubBlockRenderer extends Component<Props> {
-  public getBlockHTML(block: ContentBlock) {
-    const { editable, onContentChange } = this.props;
+  public render() {
+    const { block, editable, onContentChange } = this.props;
 
     switch (block.type) {
       case 'MarkDownBlock':
@@ -55,26 +55,6 @@ class EditableContentSubBlockRenderer extends Component<Props> {
       default:
         return null;
     }
-  }
-
-  public render() {
-    const { block } = this.props;
-
-    return this.getBlockHTML(block);
-
-    // return (
-    //   <Draggable draggableId={`draggable_block_${id}_${index}`} index={index}>
-    //     {provided => (
-    //       <div ref={provided.innerRef} {...provided.draggableProps}>
-    //         <div className="drag-handle small" {...provided.dragHandleProps} />
-    //
-    //         {this.getBlockHTML(block)}
-    //
-    //         {provided.placeholder}
-    //       </div>
-    //     )}
-    //   </Draggable>
-    // );
   }
 }
 
