@@ -1,5 +1,5 @@
 # Explore education statistics service
-[![Build Status](https://dev.azure.com/dfe-statistics/Explore%20education%20statistics/_apis/build/status/Application?branchName=master)](https://dev.azure.com/dfe-statistics/Explore%20education%20statistics/_build/latest?definitionId=8&branchName=master)
+[![Build Status](https://dfe-gov-uk.visualstudio.com/s101-Explore-Education-Statistics/_apis/build/status/Explore%20Education%20Statistics?branchName=master)](https://dfe-gov-uk.visualstudio.com/s101-Explore-Education-Statistics/_build/latest?definitionId=200&branchName=master)
 
 ## Getting started
 
