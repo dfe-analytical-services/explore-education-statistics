@@ -109,6 +109,22 @@ function HomePage() {
           </p>
         </div>
       </div>
+      <div className="govuk-grid-row govuk-!-margin-bottom-9">
+        <div className="govuk-grid-column-one-half">
+          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+            <a
+              className="govuk-link"
+              href="https://schools-financial-benchmarking.service.gov.uk/"
+            >
+              Schools financial benchmarking
+            </a>
+          </h4>
+          <p className="govuk-caption-m govuk-!-margin-top-1">
+            Compare your school's income and expenditure with other schools in
+            England.
+          </p>
+        </div>
+      </div>
     </Page>
   );
 }
