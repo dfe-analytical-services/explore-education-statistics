@@ -1,5 +1,6 @@
 import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
 import { FeatureCollection } from 'geojson';
+import { DataBlockRequest } from '@common/services/dataBlockService';
 import { contentApi } from './api';
 
 export interface Publication {
@@ -61,7 +62,7 @@ export interface ContentBlock {
   type: string;
   body: string;
   heading?: string;
-  dataQuery?: DataQuery;
+  dataBlockRequest?: DataBlockRequest;
   charts?: Chart[];
 }
 

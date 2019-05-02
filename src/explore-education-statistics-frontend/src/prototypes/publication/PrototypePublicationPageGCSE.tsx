@@ -2,7 +2,7 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import Link from '@frontend/components/Link';
-import { DataBlock } from '@frontend/modules/find-statistics/components/DataBlock';
+import DataBlock from '@frontend/modules/find-statistics/components/DataBlock';
 import PrototypePage from '@frontend/prototypes/components/PrototypePage';
 import PrototypeSearchForm from '@frontend/prototypes/components/PrototypeSearchForm';
 import PrototypeDataSampleGCSE from '@frontend/prototypes/publication/components/PrototypeDataSampleGCSE';

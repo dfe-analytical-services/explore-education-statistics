@@ -14,14 +14,14 @@ import {
 import { colours } from './Charts';
 
 export default function VerticalBarBlock({
-  characteristicsData,
+  data,
   chartDataKeys,
   height,
   labels,
   xAxis,
 }: ChartProps) {
-  const chartData = characteristicsData.result.map(data => {
-    return data.indicators;
+  const chartData = data.result.map(dataItem => {
+    return dataItem.measures;
   });
 
   return (

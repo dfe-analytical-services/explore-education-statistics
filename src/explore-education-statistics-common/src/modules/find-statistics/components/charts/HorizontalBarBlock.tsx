@@ -22,7 +22,7 @@ export default class HorizontalBarBlock extends AbstractChart<
   StackedBarHorizontalProps
 > {
   public render() {
-    const chartData = this.props.characteristicsData.result.map(data => {
+    const chartData = this.props.data.result.map(data => {
       return data.indicators;
     });
 

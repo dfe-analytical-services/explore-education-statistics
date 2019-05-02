@@ -10,9 +10,10 @@ import {
   YAxis,
   YAxisProps,
 } from 'recharts';
+import { DataBlockData } from '@common/services/dataBlockService';
 
 export interface ChartProps {
-  characteristicsData: CharacteristicsData;
+  data: DataBlockData;
   chartDataKeys: string[];
   labels: { [key: string]: string };
   xAxis: Axis;

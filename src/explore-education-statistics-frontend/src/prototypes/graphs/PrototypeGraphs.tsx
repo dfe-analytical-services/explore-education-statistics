@@ -16,7 +16,7 @@ import {
   testTimeSeriesWithLine,
   testDistribution,
 } from '@frontend/prototypes/publication/data/PrototypeDataFactory';
-import { DataBlock } from '@frontend/modules/find-statistics/components/DataBlock';
+import DataBlock from '@frontend/modules/find-statistics/components/DataBlock';
 
 const GraphsPage = () => {
   return (

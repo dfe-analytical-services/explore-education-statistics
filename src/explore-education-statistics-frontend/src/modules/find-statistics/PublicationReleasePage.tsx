@@ -14,7 +14,7 @@ import { NextContext } from 'next';
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
 import ContentBlock from './components/ContentBlock';
-import { DataBlock } from './components/DataBlock';
+import DataBlock from './components/DataBlock';
 
 interface Props {
   publication: string;

@@ -1,12 +1,13 @@
+/* eslint-disable */
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
 import SummaryRenderer, {
   SummaryRendererProps,
 } from '@common/modules/find-statistics/components/SummaryRenderer';
-import TableRenderer, {
-  TableRendererProps,
-} from '@common/modules/find-statistics/components/TableRenderer';
+import TableRenderer2, {
+  Props as TableRendererProps,
+} from '@common/modules/find-statistics/components/TableRenderer2';
 import { baseUrl } from '@common/services/api';
 import { Chart, DataQuery, Summary } from '@common/services/publicationService';
 import {
@@ -15,12 +16,20 @@ import {
 } from '@common/services/tableBuilderService';
 import Link from '@frontend/components/Link';
 import React, { Component } from 'react';
-import { ChartRenderer, ChartRendererProps } from './ChartRenderer';
+import DataBlockService, {
+  DataBlockRequest,
+  DataBlockMetadata,
+  DataBlockData,
+} from '@common/services/dataBlockService';
+import {
+  ChartRenderer,
+  ChartRendererProps,
+} from '@common/modules/find-statistics/components/ChartRenderer';
 
 export interface DataBlockProps {
   type: string;
   heading?: string;
-  dataQuery?: DataQuery;
+  dataBlockRequest?: DataBlockRequest;
   charts?: Chart[];
   summary?: Summary;
   data?: CharacteristicsData;
@@ -36,7 +45,7 @@ interface DataBlockState {
   summary?: SummaryRendererProps;
 }
 
-export class DataBlock extends Component<DataBlockProps, DataBlockState> {
+class DataBlock extends Component<DataBlockProps, DataBlockState> {
   public static defaultProps = {
     showTables: true,
   };
@@ -46,12 +55,18 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
   private currentDataQuery?: DataQuery = undefined;
 
   public async componentDidMount() {
-    const { dataQuery, data, meta } = this.props;
+    const { dataBlockRequest, data, meta } = this.props;
 
-    if (dataQuery) {
-      await this.getData(dataQuery);
+    if (dataBlockRequest) {
+      const result = await DataBlockService.getDataBlockForSubject(
+        dataBlockRequest,
+      );
+
+      this.parseDataResponse(result.data, result.metaData);
+
+      console.log(dataBlockRequest);
     } else {
-      this.parseDataResponse(data, meta);
+      // this.parseDataResponse(data, meta);
     }
   }
 
@@ -59,65 +74,25 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
     this.currentDataQuery = undefined;
   }
 
-  private async getData(dataQuery: DataQuery) {
-    if (this.currentDataQuery === dataQuery) return;
-
-    this.currentDataQuery = dataQuery;
-
-    const response = await fetch(`${baseUrl.data}${dataQuery.path}`, {
-      body: dataQuery.body,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      method: dataQuery.method,
-    });
-
-    const json: CharacteristicsData = await response.json();
-
-    const { publicationId } = json;
-
-    const metaResponse = await fetch(
-      `${
-        baseUrl.data
-      }/api/TableBuilder/meta/CharacteristicDataNational/${publicationId}`,
-    );
-
-    const jsonMeta: PublicationMeta = await metaResponse.json();
-
-    if (this.currentDataQuery === dataQuery) {
-      this.parseDataResponse(json, jsonMeta);
-    }
-  }
-
   private parseDataResponse(
-    json?: CharacteristicsData,
-    jsonMeta?: PublicationMeta,
+    json: DataBlockData,
+    jsonMeta: DataBlockMetadata,
   ): void {
     const newState: DataBlockState = {};
 
-    if (json && jsonMeta) {
-      if (json.result.length > 0) {
-        newState.tables = [{ data: json, meta: jsonMeta }];
-      }
+    if (json.result.length > 0) {
+      newState.tables = [{ data: json, meta: jsonMeta }];
+    }
 
-      const { charts, summary } = this.props;
+    const { charts, summary } = this.props;
 
-      if (charts) {
-        newState.charts = charts.map(chart => ({
-          ...chart,
-          geometry: chart.geometry as MapFeature,
-          data: json,
-          meta: jsonMeta,
-        }));
-      }
-
-      if (summary) {
-        newState.summary = {
-          ...summary,
-          data: json,
-          meta: jsonMeta,
-        };
-      }
+    if (charts) {
+      newState.charts = charts.map(chart => ({
+        ...chart,
+        geometry: chart.geometry as MapFeature,
+        data: json,
+        meta: jsonMeta,
+      }));
     }
 
     this.setState(newState);
@@ -145,7 +120,7 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
               {tables.map((table, idx) => {
                 const key = `${id}0_table_${idx}`;
 
-                return <TableRenderer key={key} {...table} />;
+                return <TableRenderer2 key={key} {...table} />;
               })}
               <h2 className="govuk-heading-m govuk-!-margin-top-9">
                 Explore and edit this data online
@@ -196,3 +171,5 @@ export class DataBlock extends Component<DataBlockProps, DataBlockState> {
     );
   }
 }
+
+export default DataBlock;

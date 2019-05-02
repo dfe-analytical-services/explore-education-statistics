@@ -10,6 +10,10 @@ import {
 } from '@common/services/tableBuilderService';
 import dynamic from 'next-server/dynamic';
 import React, { Component } from 'react';
+import {
+  DataBlockData,
+  DataBlockMetadata,
+} from '@common/services/dataBlockService';
 
 const DynamicMapBlock = dynamic(
   () => import('@common/modules/find-statistics/components/charts/MapBlock'),
@@ -21,8 +25,8 @@ const DynamicMapBlock = dynamic(
 export interface ChartRendererProps {
   type: string;
   indicators: string[];
-  data: CharacteristicsData;
-  meta: PublicationMeta;
+  data: DataBlockData;
+  meta: DataBlockMetadata;
   xAxis?: Axis;
   yAxis?: Axis;
   height?: number;
@@ -63,15 +67,13 @@ export class ChartRenderer extends Component<ChartRendererProps> {
       };
     }, {});
 
-    const characteristicsData: CharacteristicsData = data;
-
     // TODO : Temporary sort on the results to get them in date order
-    characteristicsData.result.sort((a, b) => {
-      if (a.timePeriod < b.timePeriod) {
+    data.result.sort((a, b) => {
+      if (a.year < b.year) {
         return -1;
       }
 
-      if (a.timePeriod > b.timePeriod) {
+      if (a.year > b.year) {
         return 1;
       }
 
@@ -83,7 +85,7 @@ export class ChartRenderer extends Component<ChartRendererProps> {
         return (
           <LineChartBlock
             chartDataKeys={indicators}
-            characteristicsData={characteristicsData}
+            data={data}
             labels={labels}
             xAxis={xAxis}
             yAxis={yAxis}
@@ -95,7 +97,7 @@ export class ChartRenderer extends Component<ChartRendererProps> {
         return (
           <VerticalBarBlock
             chartDataKeys={indicators}
-            characteristicsData={characteristicsData}
+            data={data}
             labels={labels}
             xAxis={xAxis}
             yAxis={yAxis}
@@ -107,7 +109,7 @@ export class ChartRenderer extends Component<ChartRendererProps> {
         return (
           <HorizontalBarBlock
             chartDataKeys={indicators}
-            characteristicsData={characteristicsData}
+            data={data}
             labels={labels}
             xAxis={xAxis}
             yAxis={yAxis}
@@ -120,7 +122,7 @@ export class ChartRenderer extends Component<ChartRendererProps> {
         return (
           <DynamicMapBlock
             chartDataKeys={indicators}
-            characteristicsData={characteristicsData}
+            data={data}
             labels={labels}
             xAxis={xAxis}
             yAxis={yAxis}
