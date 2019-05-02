@@ -16,7 +16,7 @@ interface State {
   searchValue: string;
 }
 
-class PrototypeSearchForm extends Component<{}, State> {
+class SearchForm extends Component<{}, State> {
   public state: State = {
     searchResults: [],
     searchValue: '',
@@ -78,7 +78,7 @@ class PrototypeSearchForm extends Component<{}, State> {
   ) {
     const location: string[] = [];
 
-    const locationHeaderElement = PrototypeSearchForm.findSiblingsBeforeOfElementType(
+    const locationHeaderElement = SearchForm.findSiblingsBeforeOfElementType(
       element,
       'h3',
       'h2',
@@ -87,10 +87,7 @@ class PrototypeSearchForm extends Component<{}, State> {
 
     if (locationHeaderElement) {
       location.unshift(
-        PrototypeSearchForm.substring(
-          locationHeaderElement.textContent || '',
-          20,
-        ),
+        SearchForm.substring(locationHeaderElement.textContent || '', 20),
       );
     }
 
@@ -100,7 +97,7 @@ class PrototypeSearchForm extends Component<{}, State> {
       );
       if (accordionHeader) {
         location.unshift(
-          PrototypeSearchForm.substring(accordionHeader.textContent || '', 20),
+          SearchForm.substring(accordionHeader.textContent || '', 20),
         );
       }
     }
@@ -110,10 +107,7 @@ class PrototypeSearchForm extends Component<{}, State> {
 
   private static openTab(target: Element, container: Element) {
     // find the panel in which the element lives
-    const panel = PrototypeSearchForm.parentUntilClassname(
-      target,
-      'govuk-tabs__panel',
-    );
+    const panel = SearchForm.parentUntilClassname(target, 'govuk-tabs__panel');
 
     // find all the sections within the container
     const allSections = container.querySelectorAll('.govuk-tabs__panel');
@@ -195,40 +189,40 @@ class PrototypeSearchForm extends Component<{}, State> {
       return;
     }
 
-    const elements = PrototypeSearchForm.findElementsWithText(searchValue);
+    const elements = SearchForm.findElementsWithText(searchValue);
 
     const searchResults: SearchResult[] = elements.map(element => {
-      const accordionContainer = PrototypeSearchForm.parentUntilClassname(
+      const accordionContainer = SearchForm.parentUntilClassname(
         element,
         'govuk-accordion__section',
       );
 
-      const detailsContainer = PrototypeSearchForm.parentUntilClassname(
+      const detailsContainer = SearchForm.parentUntilClassname(
         element,
         'govuk-details',
       );
 
-      const tabContainer = PrototypeSearchForm.parentUntilClassname(
+      const tabContainer = SearchForm.parentUntilClassname(
         element,
         'govuk-tabs',
       );
 
-      const location = PrototypeSearchForm.calculateLocationOfElement(
+      const location = SearchForm.calculateLocationOfElement(
         element,
         accordionContainer,
       );
 
       const scrollIntoView = () => {
         if (accordionContainer.classList.contains('govuk-accordion__section')) {
-          PrototypeSearchForm.openAccordion(accordionContainer);
+          SearchForm.openAccordion(accordionContainer);
         }
 
         if (detailsContainer.classList.contains('govuk-details')) {
-          PrototypeSearchForm.openDetails(detailsContainer);
+          SearchForm.openDetails(detailsContainer);
         }
 
         if (tabContainer.classList.contains('govuk-tabs')) {
-          PrototypeSearchForm.openTab(element, tabContainer);
+          SearchForm.openTab(element, tabContainer);
         }
 
         this.resetSearch();
@@ -239,7 +233,7 @@ class PrototypeSearchForm extends Component<{}, State> {
         element,
         location,
         scrollIntoView,
-        text: PrototypeSearchForm.substring(element.textContent || '', 30),
+        text: SearchForm.substring(element.textContent || '', 30),
       };
     });
 
@@ -353,4 +347,4 @@ class PrototypeSearchForm extends Component<{}, State> {
   }
 }
 
-export default PrototypeSearchForm;
+export default SearchForm;
