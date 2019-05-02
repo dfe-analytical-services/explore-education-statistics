@@ -1,5 +1,5 @@
 import { FormFieldset } from '@common/components/form';
-import { FieldSetProps } from '@common/components/form/FormFieldset';
+import { FormFieldsetProps } from '@common/components/form/FormFieldset';
 import reorder from '@common/lib/utils/reorder';
 import classNames from 'classnames';
 import React from 'react';
@@ -16,7 +16,7 @@ type SortableOptionChangeEventHandler = (value: SortableOption[]) => void;
 export type FormSortableListProps = {
   onChange?: SortableOptionChangeEventHandler;
   value: SortableOption[];
-} & FieldSetProps;
+} & FormFieldsetProps;
 
 const FormSortableList = (props: FormSortableListProps) => {
   const { id, onChange, value } = props;

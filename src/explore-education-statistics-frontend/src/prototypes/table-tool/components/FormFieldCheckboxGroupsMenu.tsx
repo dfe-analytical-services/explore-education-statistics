@@ -1,13 +1,13 @@
 import DetailsMenu from '@common/components/DetailsMenu';
-import { FormFieldCheckboxGroup } from '@common/components/form';
-import FormFieldCheckboxSearchGroup, {
-  FormFieldCheckboxSearchGroupProps,
-} from '@common/components/form/FormFieldCheckboxSearchGroup';
+import FormFieldCheckboxSearchGroup from '@common/components/form/FormFieldCheckboxSearchGroup';
+import FormFieldCheckboxSearchSubGroups, {
+  FormFieldCheckboxSearchSubGroupsProps,
+} from '@common/components/form/FormFieldCheckboxSearchSubGroups';
 import FormCheckboxSelectionCount from '@frontend/prototypes/table-tool/components/FormCheckboxSelectedCount';
 import React, { useEffect, useState } from 'react';
 
-const FormFieldCheckboxMenu = <T extends {}>(
-  props: FormFieldCheckboxSearchGroupProps<T>,
+const FormFieldCheckboxGroupsMenu = <T extends {}>(
+  props: FormFieldCheckboxSearchSubGroupsProps<T>,
 ) => {
   const { error, name, options, legend } = props;
   const [open, setOpen] = useState();
@@ -28,25 +28,19 @@ const FormFieldCheckboxMenu = <T extends {}>(
         </>
       }
     >
-      {options.length > 1 ? (
+      {options.length > 1 && (
+        <FormFieldCheckboxSearchSubGroups {...props} hideCount legendHidden />
+      )}
+
+      {options.length === 1 && (
         <FormFieldCheckboxSearchGroup
           {...props}
-          hideCount
-          legendHidden
           selectAll
-          name={name}
-          options={options}
-        />
-      ) : (
-        <FormFieldCheckboxGroup
-          {...props}
-          selectAll
-          name={name}
-          options={options}
+          options={options[0].options}
         />
       )}
     </DetailsMenu>
   );
 };
 
-export default FormFieldCheckboxMenu;
+export default FormFieldCheckboxGroupsMenu;

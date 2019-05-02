@@ -42,12 +42,11 @@ const LocationFiltersForm = ({
               {Object.entries(locations).map(([levelKey, level]) => {
                 return (
                   <FormFieldCheckboxMenu
-                    summary={level.legend}
                     name={levelKey}
                     key={levelKey}
                     options={level.options}
                     id={`locationFiltersForm-${levelKey}`}
-                    legend="Choose options"
+                    legend={level.legend}
                     legendHidden
                   />
                 );

@@ -1,14 +1,15 @@
 import Button from '@common/components/Button';
-import { Form, FormFieldset, FormGroup } from '@common/components/form';
+import { Form, FormGroup } from '@common/components/form';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
+import FormFieldCheckboxGroupsMenu from '@frontend/prototypes/table-tool/components/FormFieldCheckboxGroupsMenu';
+import FormFieldCheckboxMenu from '@frontend/prototypes/table-tool/components/FormFieldCheckboxMenu';
 import { InjectedWizardProps } from '@frontend/prototypes/table-tool/components/Wizard';
 import { Formik, FormikProps } from 'formik';
+import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import React, { Component, createRef } from 'react';
-import CategoricalFilters from './CategoricalFilters';
 import { MetaSpecification } from './meta/initialSpec';
-import SearchableGroupedFilterMenus from './SearchableGroupedFilterMenus';
 
 export interface FormValues {
   indicators: string[];
@@ -77,7 +78,6 @@ class FiltersForm extends Component<Props & InjectedWizardProps, State> {
           actions.setSubmitting(false);
         }}
         render={(form: FormikProps<FormValues>) => {
-          const { values } = form;
           const { getError } = createErrorHelper(form);
 
           return (
@@ -96,28 +96,68 @@ class FiltersForm extends Component<Props & InjectedWizardProps, State> {
                     : []
                 }
               >
-                <div className="govuk-grid-row">
-                  <FormGroup className="govuk-grid-column-one-half-from-desktop">
-                    <CategoricalFilters
-                      form={form}
-                      specification={specification.filters}
-                    />
-                  </FormGroup>
-                  <FormGroup className="govuk-grid-column-one-quarter-from-desktop">
-                    <FormFieldset
-                      id="filtersForm-indicators"
-                      legend="Indicators"
-                      hint="Filter by at least one statistical indicator from the publication"
-                      error={getError('indicators')}
-                    >
-                      <SearchableGroupedFilterMenus<FormValues>
-                        menuOptions={specification.indicators}
-                        name="indicators"
-                        values={values.indicators}
-                      />
-                    </FormFieldset>
-                  </FormGroup>
-                </div>
+                <FormGroup>
+                  {Object.entries(specification.filters).map(
+                    ([filterKey, filterSpec]) => {
+                      const filterName = `filters.${filterKey}`;
+
+                      return (
+                        <div key={filterKey}>
+                          {Object.keys(filterSpec.options).length === 1 ? (
+                            <FormFieldCheckboxMenu<FormValues>
+                              id={`filtersForm-${camelCase(filterName)}`}
+                              name={filterName}
+                              legend={filterSpec.legend}
+                              hint={filterSpec.hint}
+                              error={getError(filterName)}
+                              selectAll
+                              options={filterSpec.options.default.options.map(
+                                option => ({
+                                  id: `${filterKey}-${option.value}`,
+                                  label: option.label,
+                                  value: option.value,
+                                }),
+                              )}
+                            />
+                          ) : (
+                            <FormFieldCheckboxGroupsMenu<FormValues>
+                              name={filterName}
+                              id={`filtersForm-${camelCase(filterName)}`}
+                              legend={filterSpec.legend}
+                              hint={filterSpec.hint}
+                              error={getError(filterName)}
+                              selectAll
+                              options={Object.entries(filterSpec.options).map(
+                                ([_, group]) => {
+                                  return {
+                                    legend: group.label,
+                                    options: group.options,
+                                  };
+                                },
+                              )}
+                            />
+                          )}
+                        </div>
+                      );
+                    },
+                  )}
+
+                  <FormFieldCheckboxGroupsMenu
+                    name="indicators"
+                    id="filtersForm-indicators"
+                    legend="Indicators"
+                    hint="Filter by at least one statistical indicator from the publication"
+                    error={getError('indicators')}
+                    options={Object.entries(specification.indicators).map(
+                      ([_, group]) => {
+                        return {
+                          legend: group.label,
+                          options: group.options,
+                        };
+                      },
+                    )}
+                  />
+                </FormGroup>
 
                 <FormGroup>
                   <Button

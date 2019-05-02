@@ -59,98 +59,100 @@ const PublicationForm = ({
 
         return (
           <Form {...form} id="publicationForm">
-            <FormGroup>
-              <FormTextSearchInput
-                id="publicationForm-publicationIdSearch"
-                label="Search publications"
-                name="publicationSearch"
-                onChange={event => setSearchTerm(event.target.value)}
-                width={20}
-              />
-            </FormGroup>
-
             <FormFieldset
               error={getError('publicationId')}
               id="publicationForm-publicationId"
               legend="Choose a publication"
               legendHidden
             >
-              {options
-                .filter(option => {
-                  return option.topics.some(topic =>
-                    topic.publications.some(
-                      publication =>
-                        publication.id === values.publicationId ||
-                        publication.name.search(new RegExp(searchTerm, 'i')) >
-                          -1,
-                    ),
-                  );
-                })
-                .map(option => {
-                  return (
-                    <DetailsMenu
-                      summary={option.name}
-                      key={option.id}
-                      open={
-                        searchTerm !== '' ||
-                        option.topics.some(topic =>
-                          topic.publications.some(
-                            publication =>
-                              publication.id === values.publicationId,
-                          ),
-                        )
-                      }
-                    >
-                      {option.topics
-                        .filter(topic => {
-                          return topic.publications.find(
-                            publication =>
-                              publication.id === values.publicationId ||
-                              publication.name.search(
-                                new RegExp(searchTerm, 'i'),
-                              ) > -1,
-                          );
-                        })
-                        .map(topic => (
-                          <DetailsMenu
-                            summary={topic.name}
-                            key={topic.id}
-                            open={
-                              searchTerm !== '' ||
-                              topic.publications.some(
-                                publication =>
-                                  publication.id === values.publicationId,
-                              )
-                            }
-                          >
-                            <FormFieldRadioGroup
-                              legend={`Choose option from ${topic.name}`}
-                              legendHidden
-                              small
-                              showError={false}
-                              name="publicationId"
-                              id={`publicationForm-publicationId-${camelCase(
-                                topic.name,
-                              )}`}
-                              options={topic.publications
-                                .filter(
+              <FormGroup>
+                <FormTextSearchInput
+                  id="publicationForm-publicationIdSearch"
+                  label="Search publications"
+                  name="publicationSearch"
+                  onChange={event => setSearchTerm(event.target.value)}
+                  width={20}
+                />
+              </FormGroup>
+
+              <FormGroup>
+                {options
+                  .filter(option => {
+                    return option.topics.some(topic =>
+                      topic.publications.some(
+                        publication =>
+                          publication.id === values.publicationId ||
+                          publication.name.search(new RegExp(searchTerm, 'i')) >
+                            -1,
+                      ),
+                    );
+                  })
+                  .map(option => {
+                    return (
+                      <DetailsMenu
+                        summary={option.name}
+                        key={option.id}
+                        open={
+                          searchTerm !== '' ||
+                          option.topics.some(topic =>
+                            topic.publications.some(
+                              publication =>
+                                publication.id === values.publicationId,
+                            ),
+                          )
+                        }
+                      >
+                        {option.topics
+                          .filter(topic => {
+                            return topic.publications.find(
+                              publication =>
+                                publication.id === values.publicationId ||
+                                publication.name.search(
+                                  new RegExp(searchTerm, 'i'),
+                                ) > -1,
+                            );
+                          })
+                          .map(topic => (
+                            <DetailsMenu
+                              summary={topic.name}
+                              key={topic.id}
+                              open={
+                                searchTerm !== '' ||
+                                topic.publications.some(
                                   publication =>
-                                    publication.id === values.publicationId ||
-                                    publication.name.search(
-                                      new RegExp(searchTerm, 'i'),
-                                    ) > -1,
+                                    publication.id === values.publicationId,
                                 )
-                                .map(publication => ({
-                                  id: publication.id,
-                                  label: publication.name,
-                                  value: publication.id,
-                                }))}
-                            />
-                          </DetailsMenu>
-                        ))}
-                    </DetailsMenu>
-                  );
-                })}
+                              }
+                            >
+                              <FormFieldRadioGroup
+                                legend={`Choose option from ${topic.name}`}
+                                legendHidden
+                                small
+                                showError={false}
+                                name="publicationId"
+                                id={`publicationForm-publicationId-${camelCase(
+                                  topic.name,
+                                )}`}
+                                options={topic.publications
+                                  .filter(
+                                    publication =>
+                                      publication.id === values.publicationId ||
+                                      publication.name.search(
+                                        new RegExp(searchTerm, 'i'),
+                                      ) > -1,
+                                  )
+                                  .map(publication => ({
+                                    id: publication.id,
+                                    label: publication.name,
+                                    value: publication.id,
+                                  }))}
+                              />
+                            </DetailsMenu>
+                          ))}
+                      </DetailsMenu>
+                    );
+                  })}
+              </FormGroup>
             </FormFieldset>
 
             <FormGroup>
