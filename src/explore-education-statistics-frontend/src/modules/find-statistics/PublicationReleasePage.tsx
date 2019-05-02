@@ -10,6 +10,7 @@ import publicationService, {
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
+import SearchForm from '@common/components/SearchForm';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -67,14 +68,23 @@ class PublicationReleasePage extends Component<Props> {
 
         <PageTitle title={data.title} />
 
-        <dl className="dfe-meta-content">
-          <dt className="govuk-caption-m">Published: </dt>
-          <dd>
-            <strong>
-              <FormattedDate>{data.published}</FormattedDate>
-            </strong>
-          </dd>
-        </dl>
+        <div className="govuk-grid-row">
+          <div className="govuk-grid-column-two-thirds">
+            <dl className="dfe-meta-content govuk-!-margin-0">
+              <dt className="govuk-caption-m">Published: </dt>
+              <dd>
+                <strong>
+                  <FormattedDate>{data.published}</FormattedDate>
+                </strong>
+              </dd>
+            </dl>
+          </div>
+          <div className="govuk-grid-column-one-third">
+            <SearchForm />
+          </div>
+        </div>
+
+        <hr />
 
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">

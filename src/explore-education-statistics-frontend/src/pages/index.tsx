@@ -13,7 +13,7 @@ function HomePage() {
         Choose how to explore our statistics and data
       </h1>
       <p className="govuk-body-l">
-        Select an option to find the national and regional level statistical and
+        Select an option to find the national and regional level statistics and
         data you’re looking for.
       </p>
 
@@ -36,7 +36,7 @@ function HomePage() {
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">
             Use our tool to build tables using our range of national and
-            regional statistics and data.
+            regional data.
           </p>
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
             <Link to="/statistics" data-testid="home--download-data-link">
