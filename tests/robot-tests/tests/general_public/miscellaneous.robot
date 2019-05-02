@@ -25,17 +25,17 @@ Validate names of cookies appear on Cookie Page
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Cookies
 
-Validate Privacy Policy page
+Validate Privacy notice page
     [Tags]  HappyPath
-    user clicks link    Privacy policy
-    user waits until page contains  Explore education statistics privacy policy
+    user clicks link   Privacy notice
+    user waits until page contains  Explore education statistics privacy notice
     user waits until page contains  The explore education statistics service is operated by the Department for Education
 
     ${current_url}=  get location
-    should be equal  ${current_url}   ${url}/privacy-policy
+    should be equal  ${current_url}   ${url}/privacy-notice
 
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Privacy Policy
+    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Privacy notice
 
 Validate Feedback page
     [Tags]  HappyPath

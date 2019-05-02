@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/library.robot
 
-Force Tags  GeneralPublic  UnderConstruction
+Force Tags  GeneralPublic
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -14,8 +14,8 @@ Go to Table Tool page
 
 Select "Pupil absence" publication
     [Tags]  HappyPath
-    user clicks element    css:[data-testid="Early years and schools"]
-    user clicks element    css:[data-testid="Absence and exclusions"]
+    user clicks details    css:[data-testid="Early years and schools"]
+    user clicks details    css:[data-testid="Absence and exclusions"]
     user clicks element    css:[data-testid="Pupil absence"]
     user waits until page contains    2. Choose your area of interest
 
