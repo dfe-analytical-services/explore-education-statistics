@@ -6,14 +6,15 @@ import FormCheckbox, {
   CheckboxChangeEventHandler,
   FormCheckboxProps,
 } from './FormCheckbox';
-import FormFieldset, { FieldSetProps } from './FormFieldset';
+import FormFieldset, { FormFieldsetProps } from './FormFieldset';
 
 export type CheckboxOption = PartialBy<
   Omit<FormCheckboxProps, 'name' | 'checked' | 'onChange'>,
   'id'
 >;
 
-export type FormCheckboxGroupProps = {
+interface BaseFormCheckboxGroupProps {
+  id: string;
   name: string;
   onAllChange?: CheckboxChangeEventHandler;
   onChange?: CheckboxChangeEventHandler;
@@ -21,7 +22,10 @@ export type FormCheckboxGroupProps = {
   selectAll?: boolean;
   small?: boolean;
   value: string[];
-} & FieldSetProps;
+}
+
+export type FormCheckboxGroupProps = BaseFormCheckboxGroupProps &
+  FormFieldsetProps;
 
 interface State {
   checkedCount: number;
@@ -31,7 +35,10 @@ interface State {
  * Basic checkbox group that should be used as a controlled component.
  * When using Formik, use {@see FormFieldRadioGroup} instead.
  */
-class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
+export class BaseFormCheckboxGroup extends Component<
+  BaseFormCheckboxGroupProps,
+  State
+> {
   public static defaultProps = {
     legendSize: 'm',
     selectAll: false,
@@ -69,46 +76,52 @@ class FormCheckboxGroup extends Component<FormCheckboxGroupProps, State> {
     );
 
     return (
-      <FormFieldset {...this.props}>
-        <div
-          className={classNames('govuk-checkboxes', {
-            'govuk-checkboxes--small': small,
-          })}
-          ref={this.ref}
-        >
-          {options.length > 1 && selectAll && (
-            <FormCheckbox
-              id={`${id}-all`}
-              label="Select all"
-              name={name}
-              value="select-all"
-              checked={isAllChecked}
-              onChange={event => {
-                if (onAllChange) {
-                  onAllChange(event);
-                }
-              }}
-            />
-          )}
+      <div
+        className={classNames('govuk-checkboxes', {
+          'govuk-checkboxes--small': small,
+        })}
+        ref={this.ref}
+      >
+        {options.length > 1 && selectAll && (
+          <FormCheckbox
+            id={`${id}-all`}
+            label="Select all"
+            name={name}
+            value="select-all"
+            checked={isAllChecked}
+            onChange={event => {
+              if (onAllChange) {
+                onAllChange(event);
+              }
+            }}
+          />
+        )}
 
-          {options.map(option => (
-            <FormCheckbox
-              {...option}
-              id={option.id ? option.id : `${id}-${kebabCase(option.value)}`}
-              name={name}
-              key={option.value}
-              checked={value.indexOf(option.value) > -1}
-              onChange={event => {
-                if (onChange) {
-                  onChange(event);
-                }
-              }}
-            />
-          ))}
-        </div>
-      </FormFieldset>
+        {options.map(option => (
+          <FormCheckbox
+            {...option}
+            id={option.id ? option.id : `${id}-${kebabCase(option.value)}`}
+            name={name}
+            key={option.value}
+            checked={value.indexOf(option.value) > -1}
+            onChange={event => {
+              if (onChange) {
+                onChange(event);
+              }
+            }}
+          />
+        ))}
+      </div>
     );
   }
 }
+
+const FormCheckboxGroup = (props: FormCheckboxGroupProps) => {
+  return (
+    <FormFieldset {...props}>
+      <BaseFormCheckboxGroup {...props} />
+    </FormFieldset>
+  );
+};
 
 export default FormCheckboxGroup;

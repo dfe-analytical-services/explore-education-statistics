@@ -2,7 +2,7 @@ import { Omit, PartialBy } from '@common/types/util';
 import classNames from 'classnames';
 import kebabCase from 'lodash/kebabCase';
 import React, { Component, createRef } from 'react';
-import FormFieldset, { FieldSetProps } from './FormFieldset';
+import FormFieldset, { FormFieldsetProps } from './FormFieldset';
 import FormRadio, {
   FormRadioProps,
   RadioChangeEventHandler,
@@ -20,7 +20,7 @@ export type FormRadioGroupProps = {
   options: RadioOption[];
   small?: boolean;
   value: string | null;
-} & FieldSetProps;
+} & FormFieldsetProps;
 
 class FormRadioGroup extends Component<FormRadioGroupProps> {
   public static defaultProps = {

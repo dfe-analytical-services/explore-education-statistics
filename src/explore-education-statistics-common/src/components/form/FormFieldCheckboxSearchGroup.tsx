@@ -1,7 +1,5 @@
-import createErrorHelper from '@common/lib/validation/createErrorHelper';
+import FieldCheckboxArray from '@common/components/form/FieldCheckboxArray';
 import { Omit } from '@common/types/util';
-import { FieldArray } from 'formik';
-import get from 'lodash/get';
 import React from 'react';
 import FormCheckboxSearchGroup, {
   FormCheckboxSearchGroupProps,
@@ -16,32 +14,22 @@ export type FormFieldCheckboxSearchGroupProps<FormValues> = {
 const FormFieldCheckboxSearchGroup = <T extends {}>(
   props: FormFieldCheckboxSearchGroupProps<T>,
 ) => {
-  const { error, name, options, showError = true } = props;
+  const { options } = props;
 
   return (
-    <FieldArray name={name}>
+    <FieldCheckboxArray {...props}>
       {fieldArrayProps => {
-        const { form } = fieldArrayProps;
-        const { getError } = createErrorHelper(form);
-
-        let errorMessage = error || getError(name);
-
-        if (!showError) {
-          errorMessage = '';
-        }
-
         return (
           <FormCheckboxSearchGroup
             {...props}
-            error={errorMessage}
+            {...fieldArrayProps}
             options={options}
-            value={get(form.values, name)}
             onAllChange={onAllChange(fieldArrayProps, options)}
             onChange={onChange(fieldArrayProps)}
           />
         );
       }}
-    </FieldArray>
+    </FieldCheckboxArray>
   );
 };
 

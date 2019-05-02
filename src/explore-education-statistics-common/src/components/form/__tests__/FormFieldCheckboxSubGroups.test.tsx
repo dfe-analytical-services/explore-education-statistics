@@ -2,9 +2,9 @@ import Yup from '@common/lib/validation/yup';
 import { Formik } from 'formik';
 import React from 'react';
 import { fireEvent, render, wait } from 'react-testing-library';
-import FormFieldCheckboxGroup from '../FormFieldCheckboxGroup';
+import FormFieldCheckboxSubGroups from '../FormFieldCheckboxSubGroups';
 
-describe('FormFieldCheckboxGroup', () => {
+describe('FormFieldCheckboxSubGroups', () => {
   interface FormValues {
     test: string[];
   }
@@ -17,14 +17,25 @@ describe('FormFieldCheckboxGroup', () => {
         }}
         onSubmit={() => null}
         render={() => (
-          <FormFieldCheckboxGroup<FormValues>
+          <FormFieldCheckboxSubGroups<FormValues>
             name="test"
             id="checkboxes"
             legend="Test checkboxes"
             options={[
-              { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-              { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-              { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
+              {
+                legend: 'Group A',
+                options: [
+                  { value: '1', label: 'Checkbox 1' },
+                  { value: '2', label: 'Checkbox 2' },
+                ],
+              },
+              {
+                legend: 'Group B',
+                options: [
+                  { value: '3', label: 'Checkbox 3' },
+                  { value: '4', label: 'Checkbox 4' },
+                ],
+              },
             ]}
           />
         )}
@@ -50,14 +61,25 @@ describe('FormFieldCheckboxGroup', () => {
         }}
         onSubmit={() => null}
         render={() => (
-          <FormFieldCheckboxGroup<FormValues>
+          <FormFieldCheckboxSubGroups<FormValues>
             name="test"
             id="checkboxes"
             legend="Test checkboxes"
             options={[
-              { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-              { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-              { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
+              {
+                legend: 'Group A',
+                options: [
+                  { value: '1', label: 'Checkbox 1' },
+                  { value: '2', label: 'Checkbox 2' },
+                ],
+              },
+              {
+                legend: 'Group B',
+                options: [
+                  { value: '3', label: 'Checkbox 3' },
+                  { value: '4', label: 'Checkbox 4' },
+                ],
+              },
             ]}
           />
         )}
@@ -75,7 +97,7 @@ describe('FormFieldCheckboxGroup', () => {
     expect(checkbox.checked).toBe(false);
   });
 
-  test('checking `Select all` option checks all values', () => {
+  test('checking `Select all` option checks all values for that group', () => {
     const { getByLabelText } = render(
       <Formik
         initialValues={{
@@ -83,14 +105,25 @@ describe('FormFieldCheckboxGroup', () => {
         }}
         onSubmit={() => null}
         render={() => (
-          <FormFieldCheckboxGroup<FormValues>
+          <FormFieldCheckboxSubGroups<FormValues>
             name="test"
             id="checkboxes"
             legend="Test checkboxes"
             options={[
-              { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-              { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-              { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
+              {
+                legend: 'Group A',
+                options: [
+                  { value: '1', label: 'Checkbox 1' },
+                  { value: '2', label: 'Checkbox 2' },
+                ],
+              },
+              {
+                legend: 'Group B',
+                options: [
+                  { value: '3', label: 'Checkbox 3' },
+                  { value: '4', label: 'Checkbox 4' },
+                ],
+              },
             ]}
             selectAll
           />
@@ -101,35 +134,49 @@ describe('FormFieldCheckboxGroup', () => {
     const checkbox1 = getByLabelText('Checkbox 1') as HTMLInputElement;
     const checkbox2 = getByLabelText('Checkbox 2') as HTMLInputElement;
     const checkbox3 = getByLabelText('Checkbox 3') as HTMLInputElement;
+    const checkbox4 = getByLabelText('Checkbox 4') as HTMLInputElement;
 
     expect(checkbox1.checked).toBe(false);
     expect(checkbox2.checked).toBe(false);
     expect(checkbox3.checked).toBe(false);
+    expect(checkbox4.checked).toBe(false);
 
     fireEvent.click(getByLabelText('Select all'));
 
     expect(checkbox1.checked).toBe(true);
     expect(checkbox2.checked).toBe(true);
-    expect(checkbox3.checked).toBe(true);
+    expect(checkbox3.checked).toBe(false);
+    expect(checkbox4.checked).toBe(false);
   });
 
-  test('un-checking `Select all` option un-checks all values', () => {
+  test('un-checking `Select all` option un-checks all values for that group', () => {
     const { getByLabelText } = render(
       <Formik
         initialValues={{
-          test: ['1', '2', '3'],
+          test: ['1', '2'],
         }}
         onSubmit={() => null}
         render={() => (
-          <FormFieldCheckboxGroup<FormValues>
+          <FormFieldCheckboxSubGroups<FormValues>
             name="test"
             id="checkboxes"
             legend="Test checkboxes"
             selectAll
             options={[
-              { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-              { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-              { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
+              {
+                legend: 'Group A',
+                options: [
+                  { value: '1', label: 'Checkbox 1' },
+                  { value: '2', label: 'Checkbox 2' },
+                ],
+              },
+              {
+                legend: 'Group B',
+                options: [
+                  { value: '3', label: 'Checkbox 3' },
+                  { value: '4', label: 'Checkbox 4' },
+                ],
+              },
             ]}
           />
         )}
@@ -139,19 +186,22 @@ describe('FormFieldCheckboxGroup', () => {
     const checkbox1 = getByLabelText('Checkbox 1') as HTMLInputElement;
     const checkbox2 = getByLabelText('Checkbox 2') as HTMLInputElement;
     const checkbox3 = getByLabelText('Checkbox 3') as HTMLInputElement;
+    const checkbox4 = getByLabelText('Checkbox 4') as HTMLInputElement;
 
     expect(checkbox1.checked).toBe(true);
     expect(checkbox2.checked).toBe(true);
-    expect(checkbox3.checked).toBe(true);
+    expect(checkbox3.checked).toBe(false);
+    expect(checkbox4.checked).toBe(false);
 
     fireEvent.click(getByLabelText('Select all'));
 
     expect(checkbox1.checked).toBe(false);
     expect(checkbox2.checked).toBe(false);
     expect(checkbox3.checked).toBe(false);
+    expect(checkbox4.checked).toBe(false);
   });
 
-  test('checking all options checks the `Select all` checkbox', async () => {
+  test('checking all options for a group checks the corresponding `Select all` checkbox', async () => {
     const { getByLabelText } = render(
       <Formik
         initialValues={{
@@ -159,15 +209,26 @@ describe('FormFieldCheckboxGroup', () => {
         }}
         onSubmit={() => null}
         render={() => (
-          <FormFieldCheckboxGroup<FormValues>
+          <FormFieldCheckboxSubGroups<FormValues>
             name="test"
             id="checkboxes"
             legend="Test checkboxes"
             selectAll
             options={[
-              { id: 'checkbox-1', label: 'Checkbox 1', value: '1' },
-              { id: 'checkbox-2', label: 'Checkbox 2', value: '2' },
-              { id: 'checkbox-3', label: 'Checkbox 3', value: '3' },
+              {
+                legend: 'Group A',
+                options: [
+                  { value: '1', label: 'Checkbox 1' },
+                  { value: '2', label: 'Checkbox 2' },
+                ],
+              },
+              {
+                legend: 'Group B',
+                options: [
+                  { value: '3', label: 'Checkbox 3' },
+                  { value: '4', label: 'Checkbox 4' },
+                ],
+              },
             ]}
           />
         )}
@@ -176,21 +237,19 @@ describe('FormFieldCheckboxGroup', () => {
 
     const checkbox1 = getByLabelText('Checkbox 1') as HTMLInputElement;
     const checkbox2 = getByLabelText('Checkbox 2') as HTMLInputElement;
-    const checkbox3 = getByLabelText('Checkbox 3') as HTMLInputElement;
     const selectAll = getByLabelText('Select all') as HTMLInputElement;
 
     expect(checkbox1.checked).toBe(false);
+    expect(checkbox2.checked).toBe(false);
     expect(selectAll.checked).toBe(false);
 
     fireEvent.click(checkbox1);
     fireEvent.click(checkbox2);
-    fireEvent.click(checkbox3);
 
     await wait();
 
     expect(checkbox1.checked).toBe(true);
     expect(checkbox2.checked).toBe(true);
-    expect(checkbox3.checked).toBe(true);
     expect(selectAll.checked).toBe(true);
   });
 
@@ -198,36 +257,50 @@ describe('FormFieldCheckboxGroup', () => {
     const { getByLabelText } = render(
       <Formik
         initialValues={{
-          test: ['1', '2', '3'],
+          test: ['1', '2'],
         }}
         onSubmit={() => null}
         render={() => (
-          <FormFieldCheckboxGroup<FormValues>
+          <FormFieldCheckboxSubGroups<FormValues>
             name="test"
             id="checkboxes"
             legend="Test checkboxes"
             selectAll
             options={[
-              { id: 'checkbox-1', label: 'Checkbox 1', value: '1' },
-              { id: 'checkbox-2', label: 'Checkbox 2', value: '2' },
-              { id: 'checkbox-3', label: 'Checkbox 3', value: '3' },
+              {
+                legend: 'Group A',
+                options: [
+                  { value: '1', label: 'Checkbox 1' },
+                  { value: '2', label: 'Checkbox 2' },
+                ],
+              },
+              {
+                legend: 'Group B',
+                options: [
+                  { value: '3', label: 'Checkbox 3' },
+                  { value: '4', label: 'Checkbox 4' },
+                ],
+              },
             ]}
           />
         )}
       />,
     );
 
-    const checkbox = getByLabelText('Checkbox 1') as HTMLInputElement;
+    const checkbox1 = getByLabelText('Checkbox 1') as HTMLInputElement;
+    const checkbox2 = getByLabelText('Checkbox 2') as HTMLInputElement;
     const selectAll = getByLabelText('Select all') as HTMLInputElement;
 
-    expect(checkbox.checked).toBe(true);
+    expect(checkbox1.checked).toBe(true);
+    expect(checkbox2.checked).toBe(true);
     expect(selectAll.checked).toBe(true);
 
-    fireEvent.click(checkbox);
+    fireEvent.click(checkbox1);
 
     await wait();
 
-    expect(checkbox.checked).toBe(false);
+    expect(checkbox1.checked).toBe(false);
+    expect(checkbox2.checked).toBe(true);
     expect(selectAll.checked).toBe(false);
   });
 
@@ -243,14 +316,25 @@ describe('FormFieldCheckboxGroup', () => {
             test: Yup.array().required('Select at least one option'),
           })}
           render={() => (
-            <FormFieldCheckboxGroup<FormValues>
+            <FormFieldCheckboxSubGroups<FormValues>
               name="test"
               id="checkboxes"
               legend="Test checkboxes"
               options={[
-                { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-                { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-                { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
+                {
+                  legend: 'Group A',
+                  options: [
+                    { value: '1', label: 'Checkbox 1' },
+                    { value: '2', label: 'Checkbox 2' },
+                  ],
+                },
+                {
+                  legend: 'Group B',
+                  options: [
+                    { value: '3', label: 'Checkbox 3' },
+                    { value: '4', label: 'Checkbox 4' },
+                  ],
+                },
               ]}
             />
           )}
@@ -271,14 +355,25 @@ describe('FormFieldCheckboxGroup', () => {
             test: Yup.array().required('Select at least one option'),
           })}
           render={() => (
-            <FormFieldCheckboxGroup<FormValues>
+            <FormFieldCheckboxSubGroups<FormValues>
               name="test"
               id="checkboxes"
               legend="Test checkboxes"
               options={[
-                { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-                { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-                { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
+                {
+                  legend: 'Group A',
+                  options: [
+                    { value: '1', label: 'Checkbox 1' },
+                    { value: '2', label: 'Checkbox 2' },
+                  ],
+                },
+                {
+                  legend: 'Group B',
+                  options: [
+                    { value: '3', label: 'Checkbox 3' },
+                    { value: '4', label: 'Checkbox 4' },
+                  ],
+                },
               ]}
             />
           )}
@@ -306,15 +401,26 @@ describe('FormFieldCheckboxGroup', () => {
           }}
           onSubmit={() => null}
           render={() => (
-            <FormFieldCheckboxGroup<FormValues>
+            <FormFieldCheckboxSubGroups<FormValues>
               name="test"
               id="checkboxes"
               legend="Test checkboxes"
               error="Invalid checkbox selection"
               options={[
-                { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-                { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-                { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
+                {
+                  legend: 'Group A',
+                  options: [
+                    { value: '1', label: 'Checkbox 1' },
+                    { value: '2', label: 'Checkbox 2' },
+                  ],
+                },
+                {
+                  legend: 'Group B',
+                  options: [
+                    { value: '3', label: 'Checkbox 3' },
+                    { value: '4', label: 'Checkbox 4' },
+                  ],
+                },
               ]}
             />
           )}
@@ -335,15 +441,26 @@ describe('FormFieldCheckboxGroup', () => {
             test: Yup.array().required('Select at least one option'),
           })}
           render={() => (
-            <FormFieldCheckboxGroup<FormValues>
+            <FormFieldCheckboxSubGroups<FormValues>
               name="test"
               id="checkboxes"
               legend="Test checkboxes"
               showError={false}
               options={[
-                { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
-                { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
-                { id: 'checkbox-3', value: '3', label: 'Checkbox 3' },
+                {
+                  legend: 'Group A',
+                  options: [
+                    { value: '1', label: 'Checkbox 1' },
+                    { value: '2', label: 'Checkbox 2' },
+                  ],
+                },
+                {
+                  legend: 'Group B',
+                  options: [
+                    { value: '3', label: 'Checkbox 3' },
+                    { value: '4', label: 'Checkbox 4' },
+                  ],
+                },
               ]}
             />
           )}
