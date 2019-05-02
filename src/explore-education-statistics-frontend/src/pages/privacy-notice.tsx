@@ -2,10 +2,10 @@ import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
 import React from 'react';
 
-function PrivacyPolicyPage() {
+function PrivacyNoticePage() {
   return (
-    <Page breadcrumbs={[{ name: 'Privacy Policy' }]}>
-      <PageTitle title="Explore education statistics privacy policy" />
+    <Page breadcrumbs={[{ name: 'Privacy notice' }]}>
+      <PageTitle title="Explore education statistics privacy notice" />
 
       <div>
         <h3>Who we are</h3>
@@ -32,7 +32,7 @@ function PrivacyPolicyPage() {
         </p>
         <p>
           Your use of our service means you accept and consent to our use of
-          your personal data as set out in this privacy policy.
+          your personal data as set out in this privacy notice.
         </p>
       </div>
       <div>
@@ -197,4 +197,4 @@ function PrivacyPolicyPage() {
   );
 }
 
-export default PrivacyPolicyPage;
+export default PrivacyNoticePage;

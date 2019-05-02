@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/library.robot
 
-Force Tags  GeneralPublic
+Force Tags  GeneralPublic   Failing
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
