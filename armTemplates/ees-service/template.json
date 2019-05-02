@@ -112,7 +112,7 @@
     "storageEnv": "[concat('ees', parameters('envNumber'))]",
 
     "coreStorageAccountName": "[concat(parameters('subscription'), 'storage', variables('storageEnv'), 'core')]",
-    "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]",
+    "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('coreStorageAccountName'))]",
 
     "sqlserverName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
 
