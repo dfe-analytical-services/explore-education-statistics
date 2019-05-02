@@ -51,6 +51,10 @@ class FindStatisticsPage extends Component<Props> {
                 national and regional statistical data and trends
               </li>
               <li>
+                our table tool to build your own tables online and explore our
+                range of national and regional data
+              </li>
+              <li>
                 links to underlying data so you can download files and carry out
                 your own statistical analysis
               </li>
@@ -64,10 +68,12 @@ class FindStatisticsPage extends Component<Props> {
               <nav role="navigation" aria-labelledby="subsection-title">
                 <ul className="govuk-list">
                   <li>
-                    <Link to="/methodology">Methodology</Link>
+                    <Link to="/methodology">
+                      Education statistics: methodology
+                    </Link>
                   </li>
                   <li>
-                    <Link to="/glossary">Glossary</Link>
+                    <Link to="/glossary">Education statistics: glossary</Link>
                   </li>
                 </ul>
               </nav>

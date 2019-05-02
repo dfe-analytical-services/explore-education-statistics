@@ -31,12 +31,12 @@ function HomePage() {
           </p>
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
             <Link to="/table-tool" data-testid="home--table-tool-link">
-              Create your own charts and tables online
+              Create your own tables online
             </Link>
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">
-            Use our tool to build charts and tables using our range of national
-            and regional statistics and data.
+            Use our tool to build tables using our range of national and
+            regional statistics and data.
           </p>
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
             <Link to="/statistics" data-testid="home--download-data-link">
@@ -55,16 +55,16 @@ function HomePage() {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-half">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="/methodology">Methodology</Link>
+            <Link to="/methodology">Education statistics: methodology</Link>
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">
-            Browse to find out about the methodology behind specific education
-            statistics and data and how and why they're collected and published.
+            Browse to find out about the methodology behind education statistics
+            and data and how and why they're collected and published.
           </p>
         </div>
         <div className="govuk-grid-column-one-half">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="/glossary">Glossary</Link>
+            <Link to="/glossary">Education statistics: glossary</Link>
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">
             Browse our A to Z list of definitions for terms used across
@@ -76,8 +76,8 @@ function HomePage() {
       <hr />
       <h3 className="govuk-heading-l govuk-!-margin-top-9">Related services</h3>
       <p className="govuk-body">
-        Use these services to find and compare and contrast performance and
-        other information about schools and colleges near you:
+        Use these services to specific performance and other information about
+        schools and colleges in England:
       </p>
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
         <div className="govuk-grid-column-one-half">
@@ -91,7 +91,7 @@ function HomePage() {
           </h4>
           <p className="govuk-caption-m govuk-!-margin-top-1">
             Search for and check the performance of primary, secondary and
-            special needs schools and colleges
+            special needs schools and colleges.
           </p>
         </div>
         <div className="govuk-grid-column-one-half">
@@ -104,9 +104,8 @@ function HomePage() {
             </a>
           </h4>
           <p className="govuk-caption-m govuk-!-margin-top-1">
-            Search this register to find and download information about of
-            schools and colleges in England including details educational
-            organisations and governors
+            Search to find and download information about schools, colleges,
+            educational organisations and governors in England.
           </p>
         </div>
       </div>
