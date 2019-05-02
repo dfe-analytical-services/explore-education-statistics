@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 # Parse arguments
 parser = argparse.ArgumentParser(prog="pipenv run python run_tests.py",
-                                 description="Use this script to run the UI tests, to be run locally or as part of the CI pipeline, against the environment of your choosing")
+                                 description="Use this script to run the UI tests, locally or as part of the CI pipeline, against the environment of your choosing")
 parser.add_argument("-b", "--browser",
                     dest="browser",
                     default="chrome",
@@ -31,8 +31,8 @@ parser.add_argument("-i", "--interp",
                     help="interpreter to use to run the tests")
 parser.add_argument("-e", "--env",
                     dest="env",
-                    default="test",
-                    choices=["local", "test", "stage", "live", "dfedev"],
+                    default="dev",
+                    choices=["local", "dev", "dev02", "dev03"],
                     help="the environment to run the tests against")
 parser.add_argument("-f", "--file",
                     dest="tests",
