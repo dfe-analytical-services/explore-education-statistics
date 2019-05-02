@@ -4,7 +4,7 @@ import Link from '@frontend/components/Link';
 import PrototypePage from '@frontend/prototypes/components/PrototypePage';
 import React from 'react';
 
-const BrowseReleasesPage = () => {
+const PrototypeMethodologySpecific = () => {
   return (
     <PrototypePage
       breadcrumbs={[
@@ -149,4 +149,4 @@ const BrowseReleasesPage = () => {
   );
 };
 
-export default BrowseReleasesPage;
+export default PrototypeMethodologySpecific;

@@ -24,7 +24,9 @@ function GlossaryIndexPage() {
             <nav role="navigation" aria-labelledby="subsection-title">
               <ul className="govuk-list">
                 <li>
-                  <Link to="/methodology">Methodology</Link>
+                  <Link to="/methodology">
+                    Education statistics: methodology
+                  </Link>
                 </li>
               </ul>
             </nav>
