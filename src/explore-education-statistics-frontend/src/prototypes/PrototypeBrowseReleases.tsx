@@ -267,7 +267,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Looked-after children
+                  Statistics: looked-after children
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -280,7 +280,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Secure childrens homes
+                  Statistics: secure children’s homes
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -295,13 +295,23 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
         <AccordionSection heading="Childrens social work workforce" caption="">
-          <div className="govuk-inset-text">
-            These statistics and data are not yet available on the explore
-            education statistics service. To find and download these statistics
-            and data browse{' '}
-            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-              Statistics at DfE
-            </a>
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Statistics: children's social work workforce
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection heading="Workforce" caption="">
@@ -310,7 +320,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Childrens social work workforce
+                  Statistics: children's social work workforce
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
