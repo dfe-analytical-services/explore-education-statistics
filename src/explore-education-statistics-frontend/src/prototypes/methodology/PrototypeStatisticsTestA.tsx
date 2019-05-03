@@ -74,7 +74,7 @@ const BrowseReleasesPage = () => {
               statistics are not yet available on the explore education
               statistics service. Find them on GOV.UK at{' '}
               <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
+                Statistics under DfE
               </a>
             </li>
           </ul>
@@ -84,29 +84,38 @@ const BrowseReleasesPage = () => {
               statistics are not yet available on the explore education
               statistics service. Find them on GOV.UK at{' '}
               <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
+                Statistics under DfE
               </a>
             </li>
           </ul>
           <ul>
             <li>
-              <Link to="/prototypes/methodology-absence">
-                Education and training statistics
-              </Link>
+              <strong>Education and training statistics</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK at{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics under DfE
+              </a>
             </li>
           </ul>
           <ul>
             <li>
-              <Link to="/prototypes/methodology-absence">
-                Parental responsibility measures statistics
-              </Link>
+              <strong>Parental responsibility measures statistics</strong> -
+              These statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK at{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics under DfE
+              </a>
             </li>
           </ul>
           <ul>
             <li>
-              <Link to="/prototypes/methodology-absence">
-                Special educational needs (SEN) statistics
-              </Link>
+              <strong>Special educational needs (SEN) statistics</strong> -
+              These statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK at{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics under DfE
+              </a>
             </li>
           </ul>
           <hr />
