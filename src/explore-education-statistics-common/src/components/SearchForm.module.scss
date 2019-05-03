@@ -1,0 +1,77 @@
+@import '../styles/govuk-base';
+
+.container {
+  margin-bottom: govuk-spacing(0);
+  position: relative;
+
+  @include govuk-media-query($until: tablet) {
+    button {
+      margin-top: govuk-spacing(2);
+    }
+  }
+
+  .dfeSearchButton {
+    background: $govuk-link-colour url('/static/images/search-button.png') 1px -17px;
+    border: 2px solid $govuk-input-border-colour;
+    box-sizing: content-box;
+    height: 36px;
+    padding: 0;
+    position: absolute;
+    right: 0;
+    text-indent: -5000px;
+    width: 36px;
+  }
+
+  .dfeSearchButton:focus,
+  .dfeSearchButton:hover {
+    background: $govuk-link-hover-colour url('/static/images/search-button.png')
+      1px -17px;
+    border: 2px solid $govuk-focus-colour;
+    outline: 0;
+  }
+}
+
+.results {
+  background-color: #fff;
+  border: 2px solid $govuk-border-colour;
+  border-top: 0;
+  list-style: none;
+  margin-top: 0;
+  max-height: 50vh;
+  overflow: auto;
+  padding-left: 0;
+  padding-top: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 2000;
+}
+
+.results li {
+  margin: 0;
+  padding: 5px;
+
+  &:focus,
+  &:hover {
+    background-color: $govuk-brand-colour;
+    color: govuk-colour('white');
+    cursor: pointer;
+  }
+
+  &:not(:first-child) {
+    border-top: 1px solid $govuk-border-colour;
+  }
+}
+
+.highlighted {
+  background-color: $govuk-brand-colour;
+  color: govuk-colour('white');
+}
+
+.resultHeader {
+  display: block;
+  width: 100%;
+}
+
+.resultLocation {
+  font-size: 0.9rem;
+}
