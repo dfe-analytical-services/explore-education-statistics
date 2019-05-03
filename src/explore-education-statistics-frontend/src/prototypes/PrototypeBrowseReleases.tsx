@@ -62,48 +62,50 @@ const BrowseReleasesPage = () => {
       </div>
       <h2 className="govuk-heading-l">Early years</h2>
       <Accordion id="early-years">
-        <AccordionSection
-          heading="Childcare and early years"
-          caption="Something to explain the heading above"
-        >
-          <div className="govuk-inset-text">
-            These statistics and data are not yet available on the explore
-            education statistics service. To find and download these statistics
-            and data browse{' '}
-            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-              Statistics at DfE
-            </a>
-          </div>
-        </AccordionSection>
-        <AccordionSection
-          heading="Early years foundation stage profile"
-          caption="Something to explain the heading above"
-        >
-          <div className="govuk-inset-text">
-            These statistics and data are not yet available on the explore
-            education statistics service. To find and download these statistics
-            and data browse{' '}
-            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-              Statistics at DfE
-            </a>
-          </div>
-        </AccordionSection>
-      </Accordion>
-      <h2 className="govuk-heading-l govuk-!-margin-top-9">
-        Further education
-      </h2>
-      <Accordion id="further-education">
-        <AccordionSection
-          heading="Further education"
-          caption="Something to explain the heading above"
-        >
-          <div className="govuk-inset-text">
-            These statistics and data are not yet available on the explore
-            education statistics service. To find and download these statistics
-            and data browse{' '}
-            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-              Statistics at DfE
-            </a>
+        <AccordionSection heading="Attainment and outcomes" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Children in need and child protection statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Looked-after children statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Secure children’s homes statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
       </Accordion>
@@ -254,7 +256,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Statistics: children in need and child protection
+                  Children in need and child protection statistics
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -267,7 +269,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Statistics: looked-after children
+                  Looked-after children statistics
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -280,7 +282,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Statistics: secure children’s homes
+                  Secure children’s homes statistics
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -294,7 +296,7 @@ const BrowseReleasesPage = () => {
             </ul>
           </div>
         </AccordionSection>
-        <AccordionSection heading="Childrens social work workforce" caption="">
+        <AccordionSection heading="Children's social work workforce" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <ul className="govuk-list-bullet">
               <li>
