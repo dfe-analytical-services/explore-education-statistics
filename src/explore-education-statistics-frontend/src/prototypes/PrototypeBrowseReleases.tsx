@@ -126,11 +126,25 @@ const BrowseReleasesPage = () => {
       <h2 className="govuk-heading-l govuk-!-margin-top-9">Schools</h2>
       <Accordion id="schools">
         <AccordionSection
-          heading="Absence and exclusions"
+          heading="Absence, admissions and exclusions"
           caption="Pupil absence and permanent and fixed-period exclusions statistics and data"
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Admission appeals statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
@@ -240,7 +254,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Children in need and child protection
+                  Statistics: children in need and child protection
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
