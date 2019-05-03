@@ -208,15 +208,62 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
         <AccordionSection heading="Higher education">
-          <h3>Attainment and outcomes</h3>
-          <ul className="govuk-list-bullet">
-            <li>
-              <Link to="#">Children in need statistics: methodology</Link>
-            </li>
-            <li>
-              <Link to="#">Looked after children statistics: methodology</Link>
-            </li>
-          </ul>
+          <h3>Education and training</h3>
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </div>
+          <h3>Higher education graduate employment and earnings</h3>
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </div>
+          <h3>Higher education statistics</h3>
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </div>
+          <h3>
+            Not in education, employment or training (NEET) and participation
+          </h3>
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </div>
+          <h3>Participation rates in higher education</h3>
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </div>
+          <h3>Widening participation in higher education</h3>
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </div>
         </AccordionSection>
         <AccordionSection heading="Schools">
           <h3>Attainment and outcomes</h3>
