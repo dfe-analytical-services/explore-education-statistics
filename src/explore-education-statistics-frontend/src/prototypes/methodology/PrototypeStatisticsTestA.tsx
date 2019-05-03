@@ -20,9 +20,27 @@ const BrowseReleasesPage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">
-            Browse to find out more about the methodology behind education
-            statistics and data and how and why they're collected and published.
+            Browse to find the statistics and data you’re looking for and open
+            the section to get links to:
           </p>
+          <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <li>
+              up-to-date national statistical headlines, breakdowns and
+              explanations
+            </li>
+            <li>
+              charts and tables to help you compare, contrast and view national
+              and regional statistical data and trends
+            </li>
+            <li>
+              our table tool to build your own tables online and explore our
+              range of national and regional data
+            </li>
+            <li>
+              links to underlying data so you can download files and carry out
+              your own statistical analysis
+            </li>
+          </ul>
         </div>
         <div className="govuk-grid-column-one-third">
           <aside className="app-related-items">
