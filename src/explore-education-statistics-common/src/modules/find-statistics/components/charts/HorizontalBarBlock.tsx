@@ -23,7 +23,7 @@ export default class HorizontalBarBlock extends AbstractChart<
 > {
   public render() {
     const chartData = this.props.data.result.map(data => {
-      return data.indicators;
+      return data.measures;
     });
 
     return (

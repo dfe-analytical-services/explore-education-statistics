@@ -63,8 +63,6 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       );
 
       this.parseDataResponse(result.data, result.metaData);
-
-      console.log(dataBlockRequest);
     } else {
       // this.parseDataResponse(data, meta);
     }
@@ -95,6 +93,8 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       }));
     }
 
+    console.log(newState);
+
     this.setState(newState);
   }
 
@@ -107,6 +107,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
     return (
       <div className="govuk-datablock" data-testid={`DataBlock ${heading}`}>
         <Tabs>
+          {/*
           {summary && (
             <TabsSection id={`${id}_summary`} title="Summary">
               <h3>{heading}</h3>
@@ -131,9 +132,10 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
               </Link>
             </TabsSection>
           )}
+*/}
 
           {charts && (
-            <TabsSection id={`${id}1`} title="Charts" lazy={showTables}>
+            <TabsSection id={`${id}1`} title="Charts" lazy={false}>
               <h3>{heading}</h3>
               {charts.map((chart, idx) => {
                 const key = `${id}_chart_${idx}`;
@@ -150,6 +152,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
             </TabsSection>
           )}
 
+          {/*
           <TabsSection id={`${id}2`} title="Data downloads">
             <p>
               You can customise and download data as Excel or .csv files. Our
@@ -166,6 +169,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
               Explore data
             </Link>
           </TabsSection>
+*/}
         </Tabs>
       </div>
     );

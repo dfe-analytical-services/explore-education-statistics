@@ -64,44 +64,67 @@ export interface DataBlockData {
   result: Result[];
 }
 
+// --- Meta data
+
 interface LabelValueMetadata {
   label: string;
-  value: string;
+  value: number;
 }
 
 interface LabelValueHintMetadata extends LabelValueMetadata {
   hint: string;
 }
 
-interface OptionMetadata {
+interface ObjectMap<T> {
+  [name: string]: T;
+}
+
+interface OptionListMetadata<T extends LabelValueMetadata> {
+  options: T[];
+}
+
+interface OptionMetadata extends OptionListMetadata<LabelValueMetadata> {
   label: string;
-  options: LabelValueMetadata[];
+}
+
+interface TimePeriodOptionMetadata {
+  label: string;
+  code: string;
+  year: number;
 }
 
 interface FilterMetadata {
   hint: string;
   legend: string;
-  options: {
-    [name: string]: OptionMetadata;
-  };
+  options: ObjectMap<OptionMetadata>;
 }
 
-interface IndicatorMetadata {
+interface TimePeriodMetadata {
+  hint: string;
+  legend: string;
+  options: TimePeriodOptionMetadata[];
+}
+
+interface IndicatorMetadata extends OptionListMetadata<LabelValueHintMetadata> {
   label: string;
-  options: LabelValueHintMetadata[];
 }
 
-export interface DataBlockMetadata {
+interface ResponseMetaData {
   subject: {
     id: number;
     label: string;
   };
-  filters: {
-    [filterName: string]: FilterMetadata;
-  };
-  indicators: {
-    [indicatorName: string]: IndicatorMetadata;
-  };
+  filters: ObjectMap<FilterMetadata>;
+  indicators: ObjectMap<IndicatorMetadata>;
+  timePeriod: TimePeriodMetadata;
+}
+
+// ------------------------------------------
+
+export interface DataBlockMetadata {
+  indicators: ObjectMap<LabelValueHintMetadata>;
+  filters: ObjectMap<LabelValueMetadata>;
+  timePeriods: ObjectMap<LabelValueMetadata>;
 }
 
 export interface DataBlockRequest {
@@ -118,73 +141,118 @@ export interface DataBlockRequest {
 }
 
 export interface DataBlockResponse {
-  meta: DataBlockMetadata;
+  metaData: DataBlockMetadata;
   data: DataBlockData;
 }
 
-export interface UsedMetadata {
-  indicators: LabelValueHintMetadata;
-  filters: LabelValueMetadata;
+function mapOptions<T extends LabelValueMetadata>(ids: number[], options: T[]) {
+  return Object.values(options).reduce((results, option) => {
+    if (ids.includes(+option.value)) {
+      return { ...results, [option.value]: option };
+    }
+
+    return results;
+  }, {});
 }
 
-function remapIndicators(indicatorIds: number[], meta: DataBlockMetadata) {
-  const { indicators } = meta;
+function mapTimePeriodOptions(
+  years: number[],
+  options: TimePeriodOptionMetadata[],
+) {
+  return Object.values(options).reduce((results, option) => {
+    if (years.includes(option.year)) {
+      return { ...results, [option.year]: option };
+    }
 
-  const mapped: { [indicatorName: string]: LabelValueHintMetadata } = {};
-
-  Object.values(indicators).forEach(indicator => {
-    indicator.options.forEach(option => {
-      if (indicatorIds.includes(+option.value)) {
-        if (mapped[option.value])
-          console.error(`Existing indicator ${option.value}`);
-        mapped[option.value] = option;
-      }
-    });
-  });
-
-  return mapped;
+    return results;
+  }, {});
 }
 
-function remapFilters(filterIds: number[], meta: DataBlockMetadata) {
-  const { filters } = meta;
+function mapOptionsMap<
+  R extends LabelValueMetadata,
+  T extends OptionListMetadata<R>
+>(ids: number[], options: ObjectMap<T>): ObjectMap<R> {
+  return Object.values(options).reduce(
+    (mapped, option) => ({ ...mapped, ...mapOptions(ids, option.options) }),
+    {},
+  );
+}
 
-  const mapped: { [filterName: string]: LabelValueMetadata } = {};
+function remapIndicators(
+  indicatorIds: number[],
+  { indicators }: ResponseMetaData,
+): ObjectMap<LabelValueHintMetadata> {
+  return mapOptionsMap(indicatorIds, indicators);
+}
 
-  Object.values(filters).forEach(filter => {
-    Object.values(filter.options).forEach(filterOption => {
-      filterOption.options.forEach(option => {
-        if (filterIds.includes(+option.value)) {
-          if (mapped[option.value])
-            console.error(`Existing indicator ${option.value}`);
-          mapped[option.value] = option;
-        }
-      });
-    });
-  });
+function remapFilters(
+  filterIds: number[],
+  { filters }: ResponseMetaData,
+): ObjectMap<LabelValueMetadata> {
+  return Object.values(filters).reduce(
+    (mapped, filter) => ({
+      ...mapped,
+      ...mapOptionsMap(filterIds, filter.options),
+    }),
+    {},
+  );
+}
 
-  return mapped;
+function remapTimePeriod(
+  years: number[],
+  { timePeriod }: ResponseMetaData,
+): ObjectMap<LabelValueMetadata> {
+  return mapTimePeriodOptions(years, timePeriod.options);
+
+  /*
+  return Object.values(timePeriod)
+    .reduce((mapped, option) => mapIo
+        ({...mapped, ...mapOptions(timeIds, option.options)}),
+      {});
+
+
+   */
+}
+
+function getUsedTimeIdentifiers(data: DataBlockData) {
+  return Array.from(
+    data.result.reduce((timeIdentifiers, result) => {
+      console.log(result);
+      return timeIdentifiers.add(result.year);
+    }, new Set<number>()),
+  );
 }
 
 const DataBlockService = {
   async getDataBlockForSubject(request: DataBlockRequest) {
-    const metaData: DataBlockMetadata = await dataApi.get(
+    // TODO: move all this into the API
+    const metaData: ResponseMetaData = await dataApi.get(
       `/meta/subject/${request.subjectId}`,
     );
 
     const data: DataBlockData = await dataApi.post('/tablebuilder', request);
 
     const usedIndicators = remapIndicators(request.indicators, metaData);
-
-    console.log(usedIndicators);
-
     const usedFilters = remapFilters(request.filters, metaData);
 
-    console.log(usedFilters);
+    const times = getUsedTimeIdentifiers(data);
 
-    return {
-      metaData,
+    const usedTimeIdentifiers = remapTimePeriod(times, metaData);
+
+    const usedMetadata: DataBlockMetadata = {
+      indicators: usedIndicators,
+      filters: usedFilters,
+      timePeriods: usedTimeIdentifiers,
+    };
+
+    const response: DataBlockResponse = {
+      metaData: usedMetadata,
       data,
     };
+
+    console.log(usedMetadata);
+
+    return response;
   },
 };
 
