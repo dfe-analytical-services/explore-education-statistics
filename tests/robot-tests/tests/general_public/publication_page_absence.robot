@@ -53,7 +53,7 @@ Validate "About these statistics" -- "Last updated"
     [Tags]     HappyPath
     user checks element contains  css:[data-testid="last-updated"] time     19 April 2017
 
-    user clicks element   css:[data-testid="See all 2 updates"] [data-testid="details--expand"]
+    user clicks details   css:[data-testid="See all 2 updates"]
     element attribute value should be  css:[data-testid="See all 2 updates"] summary   aria-expanded   true
 
     user checks element contains  css:[data-testid="last-updated-element"]:nth-child(1) time   19 April 2017
@@ -62,7 +62,7 @@ Validate "About these statistics" -- "Last updated"
     user checks element contains  css:[data-testid="last-updated-element"]:nth-child(2) time   22 March 2017
     user checks element contains  css:[data-testid="last-updated-element"]:nth-child(2) p   First published.
 
-    user clicks element   css:[data-testid="See all 2 updates"] [data-testid="details--expand"]
+    user clicks details   css:[data-testid="See all 2 updates"]
     element attribute value should be  css:[data-testid="See all 2 updates"] summary   aria-expanded   false
 
 Validate Key Statistics data block -- Summary tab
