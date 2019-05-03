@@ -235,22 +235,40 @@ const BrowseReleasesPage = () => {
       <h2 className="govuk-heading-l govuk-!-margin-top-9">Social care</h2>
       <Accordion id="social">
         <AccordionSection
-          heading="Number of children"
-          caption="Something to explain the heading above"
+          heading="Absence and exclusions"
+          caption="Pupil absence and permanent and fixed-period exclusions statistics and data"
         >
-          <div className="govuk-inset-text">
-            These statistics and data are not yet available on the explore
-            education statistics service. To find and download these statistics
-            and data browse{' '}
-            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-              Statistics at DfE
-            </a>
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Pupil absence statistics
+                </h4>
+                <p className="govuk-body">
+                  Statistics and data for authorised, overall, persistent and
+                  unauthorised absence
+                </p>
+                <div className="govuk-!-margin-top-0">
+                  <PrototypeDownloadDropdown />
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Permanent and fixed-period exclusions statistics
+                </h4>
+                <p className="govuk-body">
+                  Statistics and data for fixed-period and permanent exclusion
+                </p>
+                <div className="govuk-!-margin-top-0">
+                  <PrototypeDownloadDropdown link="/prototypes/publication-exclusions" />
+                </div>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
-        <AccordionSection
-          heading="Vulnerable children"
-          caption="Something to explain the heading above"
-        >
+
+        <AccordionSection heading="Workforce" caption="">
           <div className="govuk-inset-text">
             These statistics and data are not yet available on the explore
             education statistics service. To find and download these statistics
