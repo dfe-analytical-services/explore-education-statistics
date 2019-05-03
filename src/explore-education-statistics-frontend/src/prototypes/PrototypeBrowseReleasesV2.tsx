@@ -613,7 +613,7 @@ const BrowseReleasesPage = () => {
       </Accordion>
 
       <h2 className="govuk-heading-l govuk-!-margin-top-9">
-        Teachers and workforce
+        Teaching and workforce
       </h2>
       <Accordion id="teachers-and-workforce">
         <AccordionSection heading="Children's social work workforce" caption="">
