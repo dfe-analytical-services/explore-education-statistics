@@ -492,7 +492,8 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  NEET and participation statistics
+                  Not in education, employment or training (NEET) and
+                  participation statistics
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -750,7 +751,8 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  NEET and participation statistics
+                  Not in education, employment or training (NEET) and
+                  participation statistics
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1151,7 +1153,8 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  NEET and participation statistics
+                  Not in education, employment or training (NEET) and
+                  participation statistics
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
