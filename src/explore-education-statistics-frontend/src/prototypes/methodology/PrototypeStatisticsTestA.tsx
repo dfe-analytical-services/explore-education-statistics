@@ -50,8 +50,13 @@ const BrowseReleasesPage = () => {
             <nav role="navigation" aria-labelledby="subsection-title">
               <ul className="govuk-list">
                 <li>
-                  <Link to="/prototypes/browse-releases">
-                    Find statistics and data
+                  <Link to="/prototypes/methodology-home">
+                    Education statistics: methodology
+                  </Link>
+                </li>
+                <li>
+                  <Link to="https://eesadminprototype.z33.web.core.windows.net/prototypes/documentation/glossary">
+                    Education statistics: glossary
                   </Link>
                 </li>
               </ul>
@@ -61,18 +66,50 @@ const BrowseReleasesPage = () => {
       </div>
 
       <Accordion id="methodology-specific">
-        <AccordionSection heading="Early years and schools">
-          <h3>Absence and exclusions</h3>
+        <AccordionSection heading="Early years">
+          <h3>Attainment and outcomes</h3>
           <ul className="govuk-list-bullet">
             <li>
-              <Link to="#">Pupil exclusion statistics: methodology</Link>
+              <strong>Childcare and early years statistics</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK at{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics at DfE
+              </a>
             </li>
+          </ul>
+          <ul>
+            <li>
+              <strong>Childcare and early years statistics</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK at{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics at DfE
+              </a>
+            </li>
+          </ul>
+          <ul>
             <li>
               <Link to="/prototypes/methodology-absence">
-                Pupil absence statistics: methodology
+                Education and training statistics
               </Link>
             </li>
           </ul>
+          <ul>
+            <li>
+              <Link to="/prototypes/methodology-absence">
+                Parental responsibility measures statistics
+              </Link>
+            </li>
+          </ul>
+          <ul>
+            <li>
+              <Link to="/prototypes/methodology-absence">
+                Special educational needs (SEN) statistics
+              </Link>
+            </li>
+          </ul>
+          <hr />
           <hr />
           <h3>Capacity and admissions</h3>
           <ul className="govuk-list-bullet">
