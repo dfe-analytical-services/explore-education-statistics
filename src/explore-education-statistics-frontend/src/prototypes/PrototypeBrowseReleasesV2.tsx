@@ -64,10 +64,7 @@ const BrowseReleasesPage = () => {
         Children and early years - including social care
       </h2>
       <Accordion id="children-and-early-years">
-        <AccordionSection
-          heading="Childcare and early years statistics"
-          caption=""
-        >
+        <AccordionSection heading="Childcare and early years" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <div className="govuk-inset-text">
               These statistics and data are not yet available on the explore

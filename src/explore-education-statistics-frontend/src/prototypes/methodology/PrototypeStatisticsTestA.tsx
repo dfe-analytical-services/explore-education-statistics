@@ -14,9 +14,7 @@ const BrowseReleasesPage = () => {
         },
       ]}
     >
-      <h1 className="govuk-heading-xl">
-        Find statistics and download data - TEST A
-      </h1>
+      <h1 className="govuk-heading-xl">Find statistics and download data</h1>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">
@@ -65,62 +63,60 @@ const BrowseReleasesPage = () => {
         </div>
       </div>
 
-      <Accordion id="methodology-specific">
+      <Accordion id="early-years">
         <AccordionSection heading="Early years">
           <h3>Attainment and outcomes</h3>
           <ul className="govuk-list-bullet">
             <li>
-              <strong>Childcare and early years statistics</strong> - These
+              <strong>Childcare and early years</strong> - These statistics are
+              not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul>
+            <li>
+              <strong>Early years foundation stage profile</strong> - These
               statistics are not yet available on the explore education
-              statistics service. Find them on GOV.UK at{' '}
+              statistics service. Find them on GOV.UK under{' '}
               <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics under DfE
+                Statistics DfE
               </a>
             </li>
           </ul>
           <ul>
             <li>
-              <strong>Childcare and early years statistics</strong> - These
+              <strong>Education and training</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul>
+            <li>
+              <strong>Parental responsibility measures</strong> - These
               statistics are not yet available on the explore education
-              statistics service. Find them on GOV.UK at{' '}
+              statistics service. Find them on GOV.UK under{' '}
               <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics under DfE
+                Statistics DfE
               </a>
             </li>
           </ul>
           <ul>
             <li>
-              <strong>Education and training statistics</strong> - These
+              <strong>Special educational needs (SEN)</strong> - These
               statistics are not yet available on the explore education
-              statistics service. Find them on GOV.UK at{' '}
+              statistics service. Find them on GOV.UK under{' '}
               <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics under DfE
+                Statistics DfE
               </a>
             </li>
           </ul>
-          <ul>
-            <li>
-              <strong>Parental responsibility measures statistics</strong> -
-              These statistics are not yet available on the explore education
-              statistics service. Find them on GOV.UK at{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics under DfE
-              </a>
-            </li>
-          </ul>
-          <ul>
-            <li>
-              <strong>Special educational needs (SEN) statistics</strong> -
-              These statistics are not yet available on the explore education
-              statistics service. Find them on GOV.UK at{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics under DfE
-              </a>
-            </li>
-          </ul>
-          <hr />
-          <hr />
-          <h3>Capacity and admissions</h3>
+          <h3>Finance</h3>
           <ul className="govuk-list-bullet">
             <li>
               <Link to="#">Admissions and appeals statistics: methodology</Link>
@@ -129,8 +125,7 @@ const BrowseReleasesPage = () => {
               <Link to="#">School capacity statistics: methodology</Link>
             </li>
           </ul>
-          <hr />
-          <h3>Results</h3>
+          <h3>Institutions</h3>
           <ul className="govuk-list-bullet">
             <li>
               <Link to="#">Key stage 1 (KS1) statistics: methodology</Link>
@@ -151,8 +146,7 @@ const BrowseReleasesPage = () => {
               </Link>
             </li>
           </ul>
-          <hr />
-          <h3>School and pupil numbers</h3>
+          <h3>Participants and characteristics</h3>
           <ul className="govuk-list-bullet">
             <li>
               {' '}
@@ -164,20 +158,9 @@ const BrowseReleasesPage = () => {
               <Link to="#">School worksforce statistics: methodology</Link>
             </li>
           </ul>
-          <hr />
-          <h3>Teacher numbers</h3>
-          <ul className="govuk-list-bullet">
-            <li>
-              {' '}
-              <Link to="#">
-                Initial teacher training (ITT) performance statistics:
-                methodology
-              </Link>
-            </li>
-          </ul>
         </AccordionSection>
-        <AccordionSection heading="Higher education">
-          <h3>Further education</h3>
+        <AccordionSection heading="Further education">
+          <h3>Attainment and outcomes</h3>
           <ul className="govuk-list-bullet">
             <li>
               <Link to="#">Destination of leavers statistics: methodology</Link>
@@ -196,6 +179,28 @@ const BrowseReleasesPage = () => {
               <Link to="#">
                 16 to 18 school performance statistics: methodology
               </Link>
+            </li>
+          </ul>
+        </AccordionSection>
+        <AccordionSection heading="Higher education">
+          <h3>Attainment and outcomes</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <Link to="#">Children in need statistics: methodology</Link>
+            </li>
+            <li>
+              <Link to="#">Looked after children statistics: methodology</Link>
+            </li>
+          </ul>
+        </AccordionSection>
+        <AccordionSection heading="Schools">
+          <h3>Attainment and outcomes</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <Link to="#">Children in need statistics: methodology</Link>
+            </li>
+            <li>
+              <Link to="#">Looked after children statistics: methodology</Link>
             </li>
           </ul>
         </AccordionSection>

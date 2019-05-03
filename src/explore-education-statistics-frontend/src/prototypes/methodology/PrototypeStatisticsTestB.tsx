@@ -14,15 +14,31 @@ const BrowseReleasesPage = () => {
         },
       ]}
     >
-      <h1 className="govuk-heading-xl">
-        Find statistics and download data - TEST B
-      </h1>
+      <h1 className="govuk-heading-xl">Find statistics and download data</h1>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">
-            Browse to find out more about the methodology behind education
-            statistics and data and how and why they're collected and published.
+            Browse to find the statistics and data you’re looking for and open
+            the section to get links to:
           </p>
+          <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <li>
+              up-to-date national statistical headlines, breakdowns and
+              explanations
+            </li>
+            <li>
+              charts and tables to help you compare, contrast and view national
+              and regional statistical data and trends
+            </li>
+            <li>
+              our table tool to build your own tables online and explore our
+              range of national and regional data
+            </li>
+            <li>
+              links to underlying data so you can download files and carry out
+              your own statistical analysis
+            </li>
+          </ul>
         </div>
         <div className="govuk-grid-column-one-third">
           <aside className="app-related-items">
@@ -32,8 +48,13 @@ const BrowseReleasesPage = () => {
             <nav role="navigation" aria-labelledby="subsection-title">
               <ul className="govuk-list">
                 <li>
-                  <Link to="/prototypes/browse-releases">
-                    Find statistics and data
+                  <Link to="/prototypes/methodology-home">
+                    Education statistics: methodology
+                  </Link>
+                </li>
+                <li>
+                  <Link to="https://eesadminprototype.z33.web.core.windows.net/prototypes/documentation/glossary">
+                    Education statistics: glossary
                   </Link>
                 </li>
               </ul>
@@ -42,31 +63,36 @@ const BrowseReleasesPage = () => {
         </div>
       </div>
 
-      <Accordion id="methodology-specific">
-        <AccordionSection heading="Early years and schools">
-          <h3>Absence and exclusions</h3>
-          <ul className="govuk-list-bullet">
-            <li>
-              <Link to="#">Pupil exclusion statistics: methodology</Link>
-            </li>
-            <li>
-              <Link to="/prototypes/methodology-absence">
-                Pupil absence statistics: methodology
-              </Link>
-            </li>
-          </ul>
-          <hr />
-          <h3>Capacity and admissions</h3>
-          <ul className="govuk-list-bullet">
-            <li>
-              <Link to="#">Admissions and appeals statistics: methodology</Link>
-            </li>
-            <li>
-              <Link to="#">School capacity statistics: methodology</Link>
-            </li>
-          </ul>
-          <hr />
-          <h3>Results</h3>
+      <Accordion id="children-and-early-years">
+        <AccordionSection heading="Children and early years - including social care">
+          <h3>Childcare and early years statistics</h3>
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </div>
+          <h3>Children in need and child protection</h3>
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </div>
+          <h3>Early years foundation stage profile</h3>
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
+          </div>
+          <h3>Institutions</h3>
           <ul className="govuk-list-bullet">
             <li>
               <Link to="#">Key stage 1 (KS1) statistics: methodology</Link>
@@ -87,8 +113,7 @@ const BrowseReleasesPage = () => {
               </Link>
             </li>
           </ul>
-          <hr />
-          <h3>School and pupil numbers</h3>
+          <h3>Participants and characteristics</h3>
           <ul className="govuk-list-bullet">
             <li>
               {' '}
@@ -100,20 +125,9 @@ const BrowseReleasesPage = () => {
               <Link to="#">School worksforce statistics: methodology</Link>
             </li>
           </ul>
-          <hr />
-          <h3>Teacher numbers</h3>
-          <ul className="govuk-list-bullet">
-            <li>
-              {' '}
-              <Link to="#">
-                Initial teacher training (ITT) performance statistics:
-                methodology
-              </Link>
-            </li>
-          </ul>
         </AccordionSection>
-        <AccordionSection heading="Higher education">
-          <h3>Further education</h3>
+        <AccordionSection heading="Further education">
+          <h3>Attainment and outcomes</h3>
           <ul className="govuk-list-bullet">
             <li>
               <Link to="#">Destination of leavers statistics: methodology</Link>
@@ -132,6 +146,28 @@ const BrowseReleasesPage = () => {
               <Link to="#">
                 16 to 18 school performance statistics: methodology
               </Link>
+            </li>
+          </ul>
+        </AccordionSection>
+        <AccordionSection heading="Higher education">
+          <h3>Attainment and outcomes</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <Link to="#">Children in need statistics: methodology</Link>
+            </li>
+            <li>
+              <Link to="#">Looked after children statistics: methodology</Link>
+            </li>
+          </ul>
+        </AccordionSection>
+        <AccordionSection heading="Schools">
+          <h3>Attainment and outcomes</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <Link to="#">Children in need statistics: methodology</Link>
+            </li>
+            <li>
+              <Link to="#">Looked after children statistics: methodology</Link>
             </li>
           </ul>
         </AccordionSection>

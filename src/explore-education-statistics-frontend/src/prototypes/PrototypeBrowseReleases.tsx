@@ -68,7 +68,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Childcare and early years statistics
+                  Childcare and early years
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -81,7 +81,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Early years foundation stage profile statistics
+                  Early years foundation stage profile
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -94,7 +94,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training statistics
+                  Education and training
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -107,7 +107,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Parental responsibility measures statistics
+                  Parental responsibility measures
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -120,7 +120,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Special educational needs (SEN) statistics
+                  Special educational needs (SEN)
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -140,7 +140,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training statistics
+                  Education and training
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -160,7 +160,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Childcare and early years statistics
+                  Childcare and early years
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -174,7 +174,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training statistics
+                  Education and training
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -197,7 +197,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Childcare and early years statistics
+                  Childcare and early years
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -210,7 +210,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training statistics
+                  Education and training
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -223,7 +223,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Parental responsibility measures statistics
+                  Parental responsibility measures
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -236,7 +236,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Pupil projections statistics
+                  Pupil projections
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -249,7 +249,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Special educational needs (SEN) statistics
+                  Special educational needs (SEN)
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -274,7 +274,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  16 to 19 attainment statistics
+                  16 to 19 attainment
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -287,7 +287,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training statistics
+                  Education and training
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -300,7 +300,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Further education and skills statistics
+                  Further education and skills
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -313,7 +313,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Further education for benefits claimants statistics
+                  Further education for benefits claimants
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -326,7 +326,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  National achievement rates tables statistics
+                  National achievement rates tables
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -339,7 +339,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Outcome based success measures statistics
+                  Outcome based success measures
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -352,7 +352,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Performance tables statistics
+                  Performance tables
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -372,7 +372,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Advance learner loands statistics
+                  Advance learner loands
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -385,7 +385,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training statistics
+                  Education and training
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -398,7 +398,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Further education and skills statistics
+                  Further education and skills
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -417,7 +417,7 @@ const BrowseReleasesPage = () => {
             <ul className="govuk-list-bullet">
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training statistics
+                  Education and training
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -440,7 +440,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training statistics
+                  Education and training
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -453,7 +453,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  FE Choices statistics
+                  FE Choices
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -466,7 +466,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Further education and skills statistics
+                  Further education and skills
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -479,7 +479,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Further education for benefits claimants statistics
+                  Further education for benefits claimants
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -493,7 +493,7 @@ const BrowseReleasesPage = () => {
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
                   Not in education, employment or training (NEET) and
-                  participation statistics
+                  participation
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -516,7 +516,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training statistics
+                  Education and training
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -529,7 +529,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Graduate labour market statistics
+                  Graduate labour market
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -542,7 +542,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Higher education graduate employment and earnings statistics
+                  Higher education graduate employment and earnings
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -555,7 +555,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Higher education statistics statistics
+                  Higher education statistics
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -568,7 +568,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Initial teacher training (ITT) statistics
+                  Initial teacher training (ITT)
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -581,7 +581,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Performance tables statistics
+                  Performance tables
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -594,7 +594,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Widening participation in higher education statistics
+                  Widening participation in higher education
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -615,7 +615,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training statistics
+                  Education and training
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -628,7 +628,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Higher education graduate employment and earnings statistics
+                  Higher education graduate employment and earnings
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -641,7 +641,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Student loan forecasts statistics
+                  Student loan forecasts
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -662,7 +662,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training statistics
+                  Education and training
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -675,7 +675,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Higher education statistics statistics
+                  Higher education statistics
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -699,7 +699,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training statistics
+                  Education and training
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -712,7 +712,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Higher education graduate employment and earnings statistics
+                  Higher education graduate employment and earnings
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -725,7 +725,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Higher education statistics
+                  Higher education
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -738,7 +738,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Initial teacher training (ITT) statistics
+                  Initial teacher training (ITT)
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -752,7 +752,7 @@ const BrowseReleasesPage = () => {
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
                   Not in education, employment or training (NEET) and
-                  participation statistics
+                  participation
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -765,7 +765,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Participation rates in higher education statistics
+                  Participation rates in higher education
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -778,7 +778,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Widening participation in higher education statistics
+                  Widening participation in higher education
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -799,7 +799,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Higher education statistics
+                  Higher education
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -823,7 +823,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  16 to 19 attainment statistics
+                  16 to 19 attainment
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -837,7 +837,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Destinations of key stage 4 and key stage 5 pupils statistics
+                  Destinations of key stage 4 and key stage 5 pupils
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -851,7 +851,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training statistics
+                  Education and training
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -865,7 +865,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  GCSEs (key stage 4) and equivalent results statistics
+                  GCSEs (key stage 4) and equivalent results
                 </h4>
                 <p className="govuk-body">
                   View statistics, create charts and tables and download data
@@ -877,7 +877,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Key stage 1 statistics
+                  Key stage 1
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -890,7 +890,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Key stage 2 statistics
+                  Key stage 2
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -903,7 +903,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Parental responsibility measures statistics
+                  Parental responsibility measures
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -916,7 +916,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Performance tables statistics
+                  Performance tables
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -929,7 +929,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Special educational needs (SEN) statistics
+                  Special educational needs (SEN)
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -950,7 +950,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training statistics
+                  Education and training
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -963,7 +963,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Local authority and school finance statistics
+                  Local authority and school finance
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -984,7 +984,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Admission appeals statistics
+                  Admission appeals
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -997,7 +997,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training statistics
+                  Education and training
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1011,7 +1011,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  GCSEs (key stage 4) and equivalent results statistics
+                  GCSEs (key stage 4) and equivalent results
                 </h4>
                 <p className="govuk-body">
                   View statistics, create charts and tables and download data
@@ -1023,7 +1023,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  School applications statistics
+                  School applications
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1036,7 +1036,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  School capacity statistics
+                  School capacity
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1049,7 +1049,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  School and pupil numbers statistics
+                  School and pupil numbers
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1062,7 +1062,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Workforce statistics and analysis statistics
+                  Workforce statistics and analysis
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1086,7 +1086,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  16 to 19 attainment statistics
+                  16 to 19 attainment
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1100,7 +1100,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Admission appeals statistics
+                  Admission appeals
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1114,7 +1114,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Destinations of key stage 4 and key stage 5 pupils statistics
+                  Destinations of key stage 4 and key stage 5 pupils
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1127,7 +1127,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Exclusions statistics
+                  Exclusions
                 </h4>
                 <p className="govuk-body">
                   View statistics, create charts and tables and download data
@@ -1140,7 +1140,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training statistics
+                  Education and training
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1154,7 +1154,7 @@ const BrowseReleasesPage = () => {
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
                   Not in education, employment or training (NEET) and
-                  participation statistics
+                  participation
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1167,7 +1167,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Parental responsibility measures statistics
+                  Parental responsibility measures
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1181,7 +1181,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Pupil absence statistics
+                  Pupil absence
                 </h4>
                 <p className="govuk-body">
                   View statistics, create charts and tables and download data
@@ -1194,7 +1194,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Pupil projections statistics
+                  Pupil projections
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1207,7 +1207,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  School and pupil numbers statistics
+                  School and pupil numbers
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1220,7 +1220,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  School applications statistics
+                  School applications
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1233,7 +1233,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Special educational needs (SEN) statistics
+                  Special educational needs (SEN)
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1254,7 +1254,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Initial teacher training (ITT) statistics
+                  Initial teacher training (ITT)
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1267,7 +1267,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  School workforce statistics
+                  School workforce
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1280,7 +1280,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Workforce statistics and analysis statistics
+                  Workforce statistics and analysis
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1303,7 +1303,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Children in need and child protection statistics
+                  Children in need and child protection
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1316,7 +1316,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Looked-after children statistics
+                  Looked-after children
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1329,7 +1329,7 @@ const BrowseReleasesPage = () => {
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Secure children’s homes statistics
+                  Secure children’s homes
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1349,7 +1349,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Secure children’s homes statistics
+                  Secure children’s homes
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
@@ -1369,7 +1369,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Statistics: children's social work workforce
+                  Children's social work workforce
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
