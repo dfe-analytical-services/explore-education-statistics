@@ -281,15 +281,13 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
         <AccordionSection heading="Childrens social work workforce" caption="">
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+          <div className="govuk-inset-text">
+            These statistics and data are not yet available on the explore
+            education statistics service. To find and download these statistics
+            and data browse{' '}
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              Statistics at DfE
+            </a>
           </div>
         </AccordionSection>
         <AccordionSection heading="Workforce" caption="">
