@@ -13,7 +13,7 @@ const BrowseReleasesPage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <h1 className="govuk-heading-xl">
-            Find statistics and download data TEST
+            Find statistics and download data
           </h1>
           <p className="govuk-body-l">
             Browse to find the statistics and data you’re looking for and open
@@ -27,6 +27,10 @@ const BrowseReleasesPage = () => {
             <li>
               charts and tables to help you compare, contrast and view national
               and regional statistical data and trends
+            </li>
+            <li>
+              our table tool to build your own tables online and explore our
+              range of national and regional data
             </li>
             <li>
               links to underlying data so you can download files and carry out
@@ -43,7 +47,12 @@ const BrowseReleasesPage = () => {
               <ul className="govuk-list">
                 <li>
                   <Link to="/prototypes/methodology-home">
-                    Methodology and guidance
+                    Education statistics: methodology
+                  </Link>
+                </li>
+                <li>
+                  <Link to="https://eesadminprototype.z33.web.core.windows.net/prototypes/documentation/glossary">
+                    Education statistics: glossary
                   </Link>
                 </li>
               </ul>
@@ -51,124 +60,1328 @@ const BrowseReleasesPage = () => {
           </aside>
         </div>
       </div>
-      <h2 className="govuk-heading-l">Early years and schools</h2>
-      <Accordion id="schools">
-        <AccordionSection
-          heading="Absence and exclusions"
-          caption="Pupil absence and permanent and fixed-period exclusions statistics and data"
-        >
+      <h2 className="govuk-heading-l">
+        Children and early years - including social care
+      </h2>
+      <Accordion id="children-early-years">
+        <AccordionSection heading="Attainment and outcomes" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <ul className="govuk-list-bullet">
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Pupil absence statistics
+                  Childcare and early years statistics
                 </h4>
-                <p className="govuk-body">
-                  View statistics, create charts and tables and download data
-                  files for authorised, overall, persistent and unauthorised
-                  absence
-                </p>
-                <div className="govuk-!-margin-top-0">
-                  <PrototypeDownloadDropdown />
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
                 </div>
               </li>
               <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Permanent and fixed-period exclusions statistics
+                  Early years foundation stage profile statistics
                 </h4>
-                <p className="govuk-body">
-                  View statistics, create charts and tables and download data
-                  files for fixed-period and permanent exclusion statistics
-                </p>
-                <div className="govuk-!-margin-top-0">
-                  <PrototypeDownloadDropdown link="/prototypes/publication-exclusions" />
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Education and training statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Parental responsibility measures statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Special educational needs (SEN) statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+        <AccordionSection heading="Finance" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Education and training statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+        <AccordionSection heading="Institutions" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Childcare and early years statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Education and training statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
                 </div>
               </li>
             </ul>
           </div>
         </AccordionSection>
         <AccordionSection
-          heading="Capacity and exclusions"
-          caption="School capacity, admission appeals"
-        >
-          <h3 className="govuk-heading-s">
-            Latest capacity and admissions releases
-          </h3>
-        </AccordionSection>
-        <AccordionSection
-          heading="Results"
-          caption="Local authority and school finance"
+          heading="Participation and characteristics"
+          caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <ul className="govuk-list-bullet">
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  GCSE and equivalent results in England
+                  Childcare and early years statistics
                 </h4>
-                <p className="govuk-body">
-                  View statistics, create charts and tables and download data
-                  files for GCSE and equivalent results in England
-                </p>
-                <div className="govuk-!-margin-top-0">
-                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Education and training statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Parental responsibility measures statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Pupil projections statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Special educational needs (SEN) statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+      </Accordion>
+      <h2 className="govuk-heading-l govuk-!-margin-top-9">
+        Further education
+      </h2>
+      <Accordion id="further-education">
+        <AccordionSection heading="Attainment and outcomes" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  16 to 19 attainment statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Education and training statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Further education and skills statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Further education for benefits claimants statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  National achievement rates tables statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Outcome based success measures statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Performance tables statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+        <AccordionSection heading="Finance" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Advance learner loands statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Education and training statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Further education and skills statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+        <AccordionSection heading="Institutions" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Education and training statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
                 </div>
               </li>
             </ul>
           </div>
         </AccordionSection>
         <AccordionSection
-          heading="School and pupil numbers"
-          caption="Schools, pupils and their characteristics, SEN and EHC plans, SEN in England"
+          heading="Participation and characteristics"
+          caption=""
         >
-          <h3 className="govuk-heading-s">
-            Latest school and pupil numbers releases
-          </h3>
-        </AccordionSection>
-        <AccordionSection
-          heading="School finance"
-          caption="Local authority and school finance"
-        >
-          <h3 className="govuk-heading-s">Latest school finance releases</h3>
-        </AccordionSection>
-        <AccordionSection
-          heading="Teacher numbers"
-          caption="The number and characteristics of teachers"
-        >
-          <h3 className="govuk-heading-s">Latest teacher number releases</h3>
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Education and training statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  FE Choices statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Further education and skills statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Further education for benefits claimants statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  NEET and participation statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
         </AccordionSection>
       </Accordion>
       <h2 className="govuk-heading-l govuk-!-margin-top-9">Higher education</h2>
       <Accordion id="higher-education">
-        <AccordionSection
-          heading="Further education"
-          caption="Pupil absence, permanent and fixed period exclusions"
-        >
-          <h3 className="govuk-heading-s">Latest further education releases</h3>
+        <AccordionSection heading="Attainment and outcomes" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Education and training statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Graduate labour market statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Higher education graduate employment and earnings statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Higher education statistics statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Initial teacher training (ITT) statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Performance tables statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Widening participation in higher education statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
         </AccordionSection>
+
+        <AccordionSection heading="Finance" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Education and training statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Higher education graduate employment and earnings statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Student loan forecasts statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+
+        <AccordionSection heading="Institutions" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Education and training statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Higher education statistics statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+
         <AccordionSection
-          heading="Higher education"
-          caption="School capacity, admission appeals"
+          heading="Participation and characteristics"
+          caption=""
         >
-          <h3 className="govuk-heading-s">Latest higher education releases</h3>
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Education and training statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Higher education graduate employment and earnings statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Higher education statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Initial teacher training (ITT) statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  NEET and participation statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Participation rates in higher education statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Widening participation in higher education statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+
+        <AccordionSection heading="Workforce" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Higher education statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+      </Accordion>
+
+      <h2 className="govuk-heading-l govuk-!-margin-top-9">Schools</h2>
+      <Accordion id="schools">
+        <AccordionSection heading="Attainment and outcomes" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  16 to 19 attainment statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Destinations of key stage 4 and key stage 5 pupils statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Education and training statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  GCSEs (key stage 4) statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Key stage 1 statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Key stage 2 statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Parental responsibility measures statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Performance tables statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Special educational needs (SEN) statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+
+        <AccordionSection heading="Finance" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Education and training statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Local authority and school finance statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+
+        <AccordionSection heading="Institutions" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Admission appeals statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Education and training statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  GCSEs (key stage 4) statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  School applications statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  School capacity statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  School and pupil numbers statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Workforce statistics and analysis statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+
+        <AccordionSection
+          heading="Participation and characteristics"
+          caption=""
+        >
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  16 to 19 attainment statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Admission appeals statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Destinations of key stage 4 and key stage 5 pupils statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Exclusions statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Education and training statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  NEET and participation statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Parental responsibility measures statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Pupil absence statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Pupil projections statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  School and pupil numbers statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  School applications statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Special educational needs (SEN) statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+
+        <AccordionSection heading="Workforce" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Initial teacher training (ITT) statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  School workforce statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Workforce statistics and analysis statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
         </AccordionSection>
       </Accordion>
       <h2 className="govuk-heading-l govuk-!-margin-top-9">Social care</h2>
       <Accordion id="social">
-        <AccordionSection
-          heading="Number of children"
-          caption="Pupil absence, permanent and fixed period exclusions"
-        >
-          <h3 className="govuk-heading-s">
-            Latest number of children releases
-          </h3>
+        <AccordionSection heading="Children’s social care" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Children in need and child protection statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Looked-after children statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+              <li className="govuk-!-margin-top-6">
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Secure children’s homes statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
         </AccordionSection>
-        <AccordionSection
-          heading="Vulnerable children"
-          caption="School capacity, admission appeals"
-        >
-          <h3 className="govuk-heading-s">Latest school finance releases</h3>
+        <AccordionSection heading="Institutions" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Secure children’s homes statistics
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+        <AccordionSection heading="Workforce" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-list-bullet">
+              <li>
+                {' '}
+                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Statistics: children's social work workforce
+                </h4>
+                <div className="govuk-inset-text">
+                  These statistics and data are not yet available on the explore
+                  education statistics service. To find and download these
+                  statistics and data browse{' '}
+                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                    Statistics at DfE
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
         </AccordionSection>
       </Accordion>
     </PrototypePage>

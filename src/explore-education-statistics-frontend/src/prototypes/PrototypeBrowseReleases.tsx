@@ -860,17 +860,17 @@ const BrowseReleasesPage = () => {
                   </a>
                 </div>
               </li>
-              <li className="govuk-!-margin-top-6">
+              <li>
+                {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  GCSEs (key stage 4) statistics
+                  GCSEs (key stage 4) and equivalent results statistics
                 </h4>
-                <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
-                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                    Statistics at DfE
-                  </a>
+                <p className="govuk-body">
+                  View statistics, create charts and tables and download data
+                  files for GCSE and equivalent results in England
+                </p>
+                <div className="govuk-!-margin-top-0">
+                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
                 </div>
               </li>
               <li className="govuk-!-margin-top-6">
@@ -1006,17 +1006,17 @@ const BrowseReleasesPage = () => {
                   </a>
                 </div>
               </li>
-              <li className="govuk-!-margin-top-6">
+              <li>
+                {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  GCSEs (key stage 4) statistics
+                  GCSEs (key stage 4) and equivalent results statistics
                 </h4>
-                <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
-                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                    Statistics at DfE
-                  </a>
+                <p className="govuk-body">
+                  View statistics, create charts and tables and download data
+                  files for GCSE and equivalent results in England
+                </p>
+                <div className="govuk-!-margin-top-0">
+                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
                 </div>
               </li>
               <li className="govuk-!-margin-top-6">
@@ -1123,18 +1123,16 @@ const BrowseReleasesPage = () => {
                   </a>
                 </div>
               </li>
-              <li>
-                {' '}
+              <li className="govuk-!-margin-top-6">
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
                   Exclusions statistics
                 </h4>
-                <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
-                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                    Statistics at DfE
-                  </a>
+                <p className="govuk-body">
+                  View statistics, create charts and tables and download data
+                  files for fixed-period and permanent exclusion statistics
+                </p>
+                <div className="govuk-!-margin-top-0">
+                  <PrototypeDownloadDropdown link="/prototypes/publication-exclusions" />
                 </div>
               </li>
               <li>
@@ -1177,17 +1175,18 @@ const BrowseReleasesPage = () => {
                   </a>
                 </div>
               </li>
-              <li className="govuk-!-margin-top-6">
+              <li>
+                {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
                   Pupil absence statistics
                 </h4>
-                <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
-                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                    Statistics at DfE
-                  </a>
+                <p className="govuk-body">
+                  View statistics, create charts and tables and download data
+                  files for authorised, overall, persistent and unauthorised
+                  absence
+                </p>
+                <div className="govuk-!-margin-top-0">
+                  <PrototypeDownloadDropdown />
                 </div>
               </li>
               <li className="govuk-!-margin-top-6">
