@@ -9,6 +9,7 @@ export interface InjectedWizardProps {
   stepNumber: number;
   currentStep: number;
   setCurrentStep: (step: number) => void;
+  isActive: boolean;
   goToNextStep: () => void;
   goToPreviousStep: () => void;
 }
@@ -38,6 +39,7 @@ const Wizard = ({ children, initialStep = 1, id }: Props) => {
               currentStep,
               setCurrentStep,
               id: child.props.id || `${id}-${stepNumber}`,
+              isActive: stepNumber === currentStep,
               goToPreviousStep: () => {
                 setCurrentStep(stepNumber - 1 < 1 ? 1 : stepNumber - 1);
               },
