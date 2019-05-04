@@ -32,7 +32,9 @@ const FormFieldRadioGroup = <T extends {}>(props: Props<T>) => {
                 onChange(event, option);
               }
 
-              field.onChange(event);
+              if (!event.isDefaultPrevented()) {
+                field.onChange(event);
+              }
             }}
             error={errorMessage}
           />
