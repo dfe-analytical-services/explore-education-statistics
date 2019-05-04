@@ -1009,13 +1009,55 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
 
         <AccordionSection heading="Social care">
+          <h3>Children's social care</h3>
           <ul className="govuk-list-bullet">
             <li>
-              <strong>
-                Not in education, employment or training (NEET) and
-                participation
-              </strong>{' '}
-              - These statistics are not yet available on the explore education
+              <strong>Children in need and child protection</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Looked-after children</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Secure children’s homes</strong> - These statistics are
+              not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+
+          <h3>Institutions</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Secure children’s homes</strong> - These statistics are
+              not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+
+          <h3>Workforce</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Children's social work workforce</strong> - These
+              statistics are not yet available on the explore education
               statistics service. Find them on GOV.UK under{' '}
               <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                 Statistics DfE
