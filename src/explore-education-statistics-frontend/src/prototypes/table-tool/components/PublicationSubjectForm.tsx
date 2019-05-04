@@ -1,9 +1,12 @@
 import Button from '@common/components/Button';
 import { Form, FormFieldRadioGroup, FormGroup } from '@common/components/form';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import { InjectedWizardProps } from '@frontend/prototypes/table-tool/components/Wizard';
 import { Formik, FormikProps } from 'formik';
-import React from 'react';
+import React, { useState } from 'react';
+import { InjectedWizardProps } from './Wizard';
+import WizardStepHeading from './WizardStepHeading';
 
 export interface PublicationSubjectMenuOption {
   value: string;
@@ -11,47 +14,60 @@ export interface PublicationSubjectMenuOption {
 }
 
 interface FormValues {
-  publicationSubject: string;
+  publicationSubjectId: string;
 }
 
 interface Props {
-  onSubmit: (values: FormValues) => void;
+  onSubmit: (values: {
+    publicationSubjectId: string;
+    publicationSubjectName: string;
+  }) => void;
   options: PublicationSubjectMenuOption[];
 }
 
-const PublicationSubjectForm = ({
-  onSubmit,
-  options,
-  goToNextStep,
-  goToPreviousStep,
-}: Props & InjectedWizardProps) => {
+const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
+  const { isActive, onSubmit, options, goToNextStep, goToPreviousStep } = props;
+  const [publicationSubjectName, setPublicationSubjectName] = useState('');
+
+  const stepHeading = (
+    <WizardStepHeading {...props} fieldsetHeading>
+      Choose a subject
+    </WizardStepHeading>
+  );
+
   return (
     <Formik
-      onSubmit={values => {
-        onSubmit(values);
+      onSubmit={({ publicationSubjectId }) => {
+        onSubmit({
+          publicationSubjectId,
+          publicationSubjectName,
+        });
         goToNextStep();
       }}
       initialValues={{
-        publicationSubject: '',
+        publicationSubjectId: '',
       }}
       validationSchema={Yup.object<FormValues>({
-        publicationSubject: Yup.string().required(
+        publicationSubjectId: Yup.string().required(
           'Choose a publication subject',
         ),
       })}
       render={(form: FormikProps<FormValues>) => {
-        return (
+        return isActive ? (
           <Form {...form} id="publicationSubjectForm">
             <FormFieldRadioGroup
-              name="publicationSubject"
-              legend="Choose publication"
-              legendHidden
+              name="publicationSubjectId"
+              legend={stepHeading}
+              legendSize="l"
               options={options.map(option => ({
                 id: option.value,
                 label: option.label,
                 value: option.value,
               }))}
-              id="publicationSubject"
+              id="publicationSubjectForm-publicationSubjectId"
+              onChange={(event, option) => {
+                setPublicationSubjectName(option.label);
+              }}
             />
 
             <FormGroup>
@@ -66,6 +82,15 @@ const PublicationSubjectForm = ({
               </Button>
             </FormGroup>
           </Form>
+        ) : (
+          <>
+            {stepHeading}
+            <SummaryList noBorder>
+              <SummaryListItem term="Subject">
+                {publicationSubjectName}
+              </SummaryListItem>
+            </SummaryList>
+          </>
         );
       }}
     />

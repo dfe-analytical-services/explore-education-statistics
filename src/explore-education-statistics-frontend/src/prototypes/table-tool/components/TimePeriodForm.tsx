@@ -6,13 +6,16 @@ import {
   FormGroup,
 } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import TimePeriod from '@common/services/types/TimePeriod';
 import { Comparison } from '@common/types/util';
-import { MetaSpecification } from '@frontend/prototypes/table-tool/components/meta/initialSpec';
-import { InjectedWizardProps } from '@frontend/prototypes/table-tool/components/Wizard';
 import { Formik, FormikProps } from 'formik';
 import React from 'react';
+import { MetaSpecification } from './meta/initialSpec';
+import { InjectedWizardProps } from './Wizard';
+import WizardStepHeading from './WizardStepHeading';
 
 interface FormValues {
   start: string;
@@ -24,12 +27,14 @@ interface Props {
   onSubmit: (values: FormValues) => void;
 }
 
-const TimePeriodForm = ({
-  specification,
-  onSubmit,
-  goToNextStep,
-  goToPreviousStep,
-}: Props & InjectedWizardProps) => {
+const TimePeriodForm = (props: Props & InjectedWizardProps) => {
+  const {
+    specification,
+    onSubmit,
+    isActive,
+    goToNextStep,
+    goToPreviousStep,
+  } = props;
   const startEndDateValues = specification.timePeriod.options.map(
     ({ code, year }) => `${year}_${code}`,
   );
@@ -41,6 +46,12 @@ const TimePeriodForm = ({
         value: `${option.year}_${option.code}`,
       };
     },
+  );
+
+  const stepHeading = (
+    <WizardStepHeading {...props} fieldsetHeading>
+      Choose time period
+    </WizardStepHeading>
   );
 
   return (
@@ -104,12 +115,12 @@ const TimePeriodForm = ({
           ),
       })}
       render={(form: FormikProps<FormValues>) => {
-        return (
+        return isActive ? (
           <Form {...form} id="timePeriodForm">
             <FormFieldset
               id="timePeriodForm-timePeriod"
-              legend={specification.timePeriod.legend}
-              hint={specification.timePeriod.hint}
+              legend={stepHeading}
+              legendSize="l"
             >
               <FormFieldSelect
                 name="start"
@@ -137,6 +148,18 @@ const TimePeriodForm = ({
               </Button>
             </FormGroup>
           </Form>
+        ) : (
+          <>
+            {stepHeading}
+            <SummaryList noBorder>
+              <SummaryListItem term="Start date">
+                {TimePeriod.fromString(form.values.start).label}
+              </SummaryListItem>
+              <SummaryListItem term="End date">
+                {TimePeriod.fromString(form.values.end).label}
+              </SummaryListItem>
+            </SummaryList>
+          </>
         );
       }}
     />

@@ -69,7 +69,7 @@ interface State {
   indicators: IndicatorOption[];
   metaSpecification: MetaSpecification;
   publicationId: string;
-  // publicationName: string;
+  publicationName: string;
   publicationSubjectName: string;
   tableData: DataTableResult[];
 }
@@ -83,10 +83,12 @@ class PrototypeTableToolPage extends Component<{}, State> {
     indicators: [],
     metaSpecification: initialMetaSpecification,
     publicationId: '',
-    // publicationName: '',
+    publicationName: '',
     publicationSubjectName: '',
     tableData: [],
   };
+
+  private publicationSubjectRef = createRef<HTMLLIElement>();
 
   private filtersRef = createRef<HTMLElement>();
 
@@ -96,11 +98,21 @@ class PrototypeTableToolPage extends Component<{}, State> {
 
   private handlePublicationFormSubmit = async ({
     publicationId,
+    publicationName,
   }: {
     publicationId: string;
+    publicationName: string;
   }) => {
     if (!publicationId) {
       return;
+    }
+
+    if (this.publicationSubjectRef.current) {
+      this.publicationSubjectRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+      this.publicationSubjectRef.current.focus();
     }
 
     const publicationMeta = await tableBuilderService.getCharacteristicsMeta(
@@ -108,11 +120,10 @@ class PrototypeTableToolPage extends Component<{}, State> {
     );
 
     const { metaSpecification } = this.state;
-
     this.setState(
       {
         publicationId,
-        // publicationName,
+        publicationName,
         metaSpecification: {
           ...metaSpecification,
           filters: {
@@ -158,39 +169,15 @@ class PrototypeTableToolPage extends Component<{}, State> {
         publicationSubjectName: '',
         tableData: [],
       },
-      // async () => {
-      //   this.handleFilterFormSubmit({
-      //     categoricalFilters: {
-      //       characteristics: [
-      //         'Ethnicity_Major_Black_Total',
-      //         'Ethnicity_Major_White_Total',
-      //         'Ethnicity_Major_Chinese',
-      //         'Ethnicity_Major_Mixed_Total',
-      //       ],
-      //       schoolTypes: [
-      //         'StateFundedPrimary',
-      //         'StateFundedSecondary',
-      //         'Special',
-      //       ],
-      //     },
-      //     indicators: [
-      //       'sess_authorised',
-      //       'sess_authorised_percent',
-      //       'sess_unauthorised',
-      //       'sess_unauthorised_percent',
-      //     ],
-      //     location: {
-      //       level: '',
-      //       localAuthority: '',
-      //       national: '',
-      //       region: '',
-      //     },
-      //     timePeriod: {
-      //       start: new TimePeriod(2012, 'AY'),
-      //       end: new TimePeriod(2016, 'AY')
-      //     },
-      //   });
-      // }
+      () => {
+        if (this.publicationSubjectRef.current) {
+          this.publicationSubjectRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
+          this.publicationSubjectRef.current.focus();
+        }
+      },
     );
   };
 
@@ -261,6 +248,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
       timePeriods,
       metaSpecification,
       publicationId,
+      publicationName,
       publicationSubjectName,
       tableData,
     } = this.state;
@@ -283,7 +271,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
         </p>
 
         <Wizard id="tableTool-steps">
-          <WizardStep title="Choose your data" hint="Select a data set">
+          <WizardStep>
             {stepProps => (
               <PublicationForm
                 {...stepProps}
@@ -292,38 +280,30 @@ class PrototypeTableToolPage extends Component<{}, State> {
               />
             )}
           </WizardStep>
-          <WizardStep
-            title="Choose your area of interest"
-            hint="Select an area of interest."
-          >
-            {stepProps =>
-              publicationId && (
-                <PublicationSubjectForm
-                  {...stepProps}
-                  options={publicationSubjectSpec.subjects}
-                  onSubmit={({ publicationSubject }) =>
-                    this.setState(
-                      {
-                        publicationSubjectName: publicationSubject,
-                      },
-                      () => {
-                        if (this.locationFiltersRef.current) {
-                          this.locationFiltersRef.current.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start',
-                          });
-                        }
-                      },
-                    )
-                  }
-                />
-              )
-            }
+          <WizardStep ref={this.publicationSubjectRef}>
+            {stepProps => (
+              <PublicationSubjectForm
+                {...stepProps}
+                options={publicationSubjectSpec.subjects}
+                onSubmit={values =>
+                  this.setState(
+                    {
+                      publicationSubjectName: values.publicationSubjectName,
+                    },
+                    () => {
+                      if (this.locationFiltersRef.current) {
+                        this.locationFiltersRef.current.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start',
+                        });
+                      }
+                    },
+                  )
+                }
+              />
+            )}
           </WizardStep>
-          <WizardStep
-            title="Choose locations"
-            hint="Select at least one location to compare"
-          >
+          <WizardStep>
             {stepProps =>
               publicationSubjectName && (
                 <LocationFiltersForm
@@ -351,42 +331,33 @@ class PrototypeTableToolPage extends Component<{}, State> {
               )
             }
           </WizardStep>
-          <WizardStep
-            title="Choose time period"
-            hint="Select a start and end time"
-          >
-            {stepProps =>
-              publicationSubjectName && (
-                <TimePeriodForm
-                  {...stepProps}
-                  specification={metaSpecification}
-                  onSubmit={values => {
-                    this.setState(
-                      {
-                        timePeriods: TimePeriod.createRange(
-                          TimePeriod.fromString(values.start),
-                          TimePeriod.fromString(values.end),
-                        ),
-                      },
-                      () => {
-                        if (this.filtersRef.current) {
-                          this.filtersRef.current.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start',
-                          });
-                        }
-                      },
-                    );
-                  }}
-                />
-              )
-            }
+          <WizardStep>
+            {stepProps => (
+              <TimePeriodForm
+                {...stepProps}
+                specification={metaSpecification}
+                onSubmit={values => {
+                  this.setState(
+                    {
+                      timePeriods: TimePeriod.createRange(
+                        TimePeriod.fromString(values.start),
+                        TimePeriod.fromString(values.end),
+                      ),
+                    },
+                    () => {
+                      if (this.filtersRef.current) {
+                        this.filtersRef.current.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start',
+                        });
+                      }
+                    },
+                  );
+                }}
+              />
+            )}
           </WizardStep>
-          <WizardStep
-            title="Choose your filters"
-            hint="Select at least 1 option from under each of the following
-                headings"
-          >
+          <WizardStep>
             {stepProps => (
               <FiltersForm
                 {...stepProps}
@@ -395,7 +366,7 @@ class PrototypeTableToolPage extends Component<{}, State> {
               />
             )}
           </WizardStep>
-          <WizardStep title="Explore data">
+          <WizardStep>
             {tableData.length > 0 && (
               <TimePeriodDataTable
                 filters={filters}

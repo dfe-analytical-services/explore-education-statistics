@@ -1,15 +1,18 @@
 import Button from '@common/components/Button';
 import { Form, FormGroup } from '@common/components/form';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
-import FormFieldCheckboxGroupsMenu from '@frontend/prototypes/table-tool/components/FormFieldCheckboxGroupsMenu';
-import FormFieldCheckboxMenu from '@frontend/prototypes/table-tool/components/FormFieldCheckboxMenu';
-import { InjectedWizardProps } from '@frontend/prototypes/table-tool/components/Wizard';
 import { Formik, FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import React, { Component, createRef } from 'react';
+import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
+import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
 import { MetaSpecification } from './meta/initialSpec';
+import { InjectedWizardProps } from './Wizard';
+import WizardStepHeading from './WizardStepHeading';
 
 export interface FormValues {
   indicators: string[];
@@ -38,6 +41,7 @@ class FiltersForm extends Component<Props & InjectedWizardProps, State> {
 
   public render() {
     const {
+      isActive,
       onSubmit,
       specification,
       goToNextStep,
@@ -45,6 +49,10 @@ class FiltersForm extends Component<Props & InjectedWizardProps, State> {
     } = this.props;
 
     const { submitError } = this.state;
+
+    const stepHeading = (
+      <WizardStepHeading {...this.props}>Choose your filters</WizardStepHeading>
+    );
 
     return (
       <Formik<FormValues>
@@ -80,7 +88,7 @@ class FiltersForm extends Component<Props & InjectedWizardProps, State> {
         render={(form: FormikProps<FormValues>) => {
           const { getError } = createErrorHelper(form);
 
-          return (
+          return isActive ? (
             <div ref={this.ref}>
               <Form
                 {...form}
@@ -96,6 +104,8 @@ class FiltersForm extends Component<Props & InjectedWizardProps, State> {
                     : []
                 }
               >
+                {stepHeading}
+
                 <FormGroup>
                   {Object.entries(specification.filters).map(
                     ([filterKey, filterSpec]) => {
@@ -201,6 +211,13 @@ class FiltersForm extends Component<Props & InjectedWizardProps, State> {
                 </FormGroup>
               </Form>
             </div>
+          ) : (
+            <>
+              {stepHeading}
+              <SummaryList noBorder>
+                <SummaryListItem term="Publication">Test</SummaryListItem>
+              </SummaryList>
+            </>
           );
         }}
       />

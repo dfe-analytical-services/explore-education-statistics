@@ -5,11 +5,13 @@ import styles from './WizardStepHeading.module.scss';
 
 interface Props {
   children: ReactNode;
+  fieldsetHeading?: boolean;
 }
 
 const WizardStepHeading = ({
   children,
   currentStep,
+  fieldsetHeading = false,
   isActive,
   stepNumber,
   setCurrentStep,
@@ -19,7 +21,11 @@ const WizardStepHeading = ({
   return (
     <>
       {isActive ? (
-        <h2 className="govuk-fieldset__heading">
+        <h2
+          className={classNames({
+            'govuk-fieldset__heading': fieldsetHeading,
+          })}
+        >
           <span className="govuk-visually-hidden">{`Step ${stepNumber}:`}</span>
           {children}
         </h2>
