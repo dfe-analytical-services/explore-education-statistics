@@ -19,6 +19,7 @@
     "formik": "^1.5.2",
     "govuk-frontend": "^2.11.0",
     "helmet": "^3.16.0",
+    "immer": "^3.1.1",
     "leaflet": "^1.4.0",
     "lodash": "^4.17.11",
     "next": "^8.0.4",
@@ -34,6 +35,7 @@
     "react-markdown": "^4.0.7",
     "recharts": "^1.5.0",
     "referrer-policy": "^1.1.0",
+    "use-immer": "^0.3.0",
     "webpack": "^4.30.0",
     "yup": "^0.27.0"
   },
