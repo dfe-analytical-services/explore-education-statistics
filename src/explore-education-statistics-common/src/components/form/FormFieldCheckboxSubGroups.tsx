@@ -1,14 +1,14 @@
-import FieldCheckboxArray from '@common/components/form/FieldCheckboxArray';
-import FormCheckboxSubGroups, {
-  FormCheckboxSubGroupsProps,
-} from '@common/components/form/FormCheckboxSubGroups';
 import { Omit } from '@common/types/util';
 import React from 'react';
+import FieldCheckboxArray from './FieldCheckboxArray';
+import FormCheckboxSubGroups, {
+  FormCheckboxSubGroupsProps,
+} from './FormCheckboxSubGroups';
 import { onAllChange, onChange } from './util/checkboxGroupFieldHelpers';
 
 export type FormFieldCheckboxSearchSubGroupsProps<FormValues> = {
   showError?: boolean;
-} & Omit<FormCheckboxSubGroupsProps, 'onChange' | 'onAllChange' | 'value'>;
+} & Omit<FormCheckboxSubGroupsProps, 'value'>;
 
 const FormFieldCheckboxSubGroups = <T extends {}>(
   props: FormFieldCheckboxSearchSubGroupsProps<T>,
@@ -20,10 +20,20 @@ const FormFieldCheckboxSubGroups = <T extends {}>(
           {...props}
           {...fieldArrayProps}
           small
-          onAllChange={(event, options) =>
-            onAllChange(fieldArrayProps, options)(event)
-          }
-          onChange={onChange(fieldArrayProps)}
+          onAllChange={(event, options) => {
+            if (props.onAllChange) {
+              props.onAllChange(event, options);
+            }
+
+            onAllChange(fieldArrayProps, options)(event);
+          }}
+          onChange={(event, option) => {
+            if (props.onChange) {
+              props.onChange(event, option);
+            }
+
+            onChange(fieldArrayProps)(event);
+          }}
         />
       )}
     </FieldCheckboxArray>

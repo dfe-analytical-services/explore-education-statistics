@@ -1,13 +1,13 @@
-import FieldCheckboxArray from '@common/components/form/FieldCheckboxArray';
 import { Omit } from '@common/types/util';
 import React from 'react';
+import FieldCheckboxArray from './FieldCheckboxArray';
 import FormCheckboxGroup, { FormCheckboxGroupProps } from './FormCheckboxGroup';
 import { onAllChange, onChange } from './util/checkboxGroupFieldHelpers';
 
 type Props<FormValues> = {
   name: keyof FormValues | string;
   showError?: boolean;
-} & Omit<FormCheckboxGroupProps, 'onChange' | 'onAllChange' | 'value'>;
+} & Omit<FormCheckboxGroupProps, 'value'>;
 
 const FormFieldCheckboxGroup = <T extends {}>(props: Props<T>) => {
   const { options } = props;
@@ -19,8 +19,20 @@ const FormFieldCheckboxGroup = <T extends {}>(props: Props<T>) => {
           {...props}
           {...fieldArrayProps}
           options={options}
-          onAllChange={onAllChange(fieldArrayProps, options)}
-          onChange={onChange(fieldArrayProps)}
+          onAllChange={event => {
+            if (props.onAllChange) {
+              props.onAllChange(event);
+            }
+
+            onAllChange(fieldArrayProps, options)(event);
+          }}
+          onChange={(event, option) => {
+            if (props.onChange) {
+              props.onChange(event, option);
+            }
+
+            onChange(fieldArrayProps)(event);
+          }}
         />
       )}
     </FieldCheckboxArray>

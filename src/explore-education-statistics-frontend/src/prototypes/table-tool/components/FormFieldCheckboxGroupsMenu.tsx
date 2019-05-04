@@ -9,8 +9,8 @@ import React, { useEffect, useState } from 'react';
 const FormFieldCheckboxGroupsMenu = <T extends {}>(
   props: FormFieldCheckboxSearchSubGroupsProps<T>,
 ) => {
-  const { error, name, options, legend } = props;
-  const [open, setOpen] = useState();
+  const { error, name, options, onAllChange, legend } = props;
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (error) {
@@ -35,6 +35,11 @@ const FormFieldCheckboxGroupsMenu = <T extends {}>(
       {options.length === 1 && (
         <FormFieldCheckboxSearchGroup
           {...props}
+          onAllChange={event => {
+            if (onAllChange) {
+              onAllChange(event, options[0].options);
+            }
+          }}
           selectAll
           options={options[0].options}
         />

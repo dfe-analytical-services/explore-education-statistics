@@ -10,7 +10,7 @@ type Props<FormValues> = {
 } & Omit<FormRadioGroupProps, 'value'>;
 
 const FormFieldRadioGroup = <T extends {}>(props: Props<T>) => {
-  const { error, name, showError = true } = props;
+  const { error, name, onChange, showError = true } = props;
 
   return (
     <Field name={name}>
@@ -23,7 +23,20 @@ const FormFieldRadioGroup = <T extends {}>(props: Props<T>) => {
           errorMessage = '';
         }
 
-        return <FormRadioGroup {...props} {...field} error={errorMessage} />;
+        return (
+          <FormRadioGroup
+            {...props}
+            {...field}
+            onChange={(event, option) => {
+              if (onChange) {
+                onChange(event, option);
+              }
+
+              field.onChange(event);
+            }}
+            error={errorMessage}
+          />
+        );
       }}
     </Field>
   );
