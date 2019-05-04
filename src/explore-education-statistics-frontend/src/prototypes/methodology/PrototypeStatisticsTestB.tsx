@@ -66,32 +66,38 @@ const BrowseReleasesPage = () => {
       <Accordion id="children-and-early-years">
         <AccordionSection heading="Children and early years - including social care">
           <h3>Childcare and early years</h3>
-          <div className="govuk-inset-text">
-            These statistics and data are not yet available on the explore
-            education statistics service. To find and download these statistics
-            and data browse{' '}
-            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-              Statistics at DfE
-            </a>
-          </div>
+          <ul className="govuk-list-bullet">
+            <li>
+              These statistics and data are not yet available on the explore
+              education statistics service. To find and download these
+              statistics and data browse{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics at DfE
+              </a>
+            </li>
+          </ul>
           <h3>Children in need and child protection</h3>
-          <div className="govuk-inset-text">
-            These statistics and data are not yet available on the explore
-            education statistics service. To find and download these statistics
-            and data browse{' '}
-            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-              Statistics at DfE
-            </a>
-          </div>
+          <ul className="govuk-list-bullet">
+            <li>
+              These statistics and data are not yet available on the explore
+              education statistics service. To find and download these
+              statistics and data browse{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics at DfE
+              </a>
+            </li>
+          </ul>
           <h3>Early years foundation stage profile</h3>
-          <div className="govuk-inset-text">
-            These statistics and data are not yet available on the explore
-            education statistics service. To find and download these statistics
-            and data browse{' '}
-            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-              Statistics at DfE
-            </a>
-          </div>
+          <ul className="govuk-list-bullet">
+            <li>
+              These statistics and data are not yet available on the explore
+              education statistics service. To find and download these
+              statistics and data browse{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics at DfE
+              </a>
+            </li>
+          </ul>
           <h3>Looked-after children</h3>
           <div className="govuk-inset-text">
             These statistics and data are not yet available on the explore
