@@ -372,7 +372,7 @@ const BrowseReleasesPage = () => {
               <li>
                 {' '}
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Advance learner loands
+                  Advance learner loans
                 </h4>
                 <div className="govuk-inset-text">
                   These statistics and data are not yet available on the explore
