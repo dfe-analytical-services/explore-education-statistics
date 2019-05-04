@@ -26,6 +26,10 @@ const WizardStep = forwardRef<HTMLLIElement, WizardStepProps>(
         tabIndex={-1}
       >
         <div className={styles.content}>
+          <span className={styles.number} aria-hidden>
+            <span className={styles.numberInner}>{stepNumber}</span>
+          </span>
+
           {typeof children === 'function'
             ? children(injectedWizardProps)
             : children}

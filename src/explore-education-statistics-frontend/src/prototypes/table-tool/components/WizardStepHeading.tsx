@@ -19,13 +19,7 @@ const WizardStepHeading = ({
   return (
     <>
       {isActive ? (
-        <h2
-          className={classNames('govuk-fieldset__heading', styles.stepActive)}
-        >
-          <span className={styles.number} aria-hidden>
-            <span className={styles.numberInner}>{stepNumber}</span>
-          </span>
-
+        <h2 className="govuk-fieldset__heading">
           <span className="govuk-visually-hidden">{`Step ${stepNumber}:`}</span>
           {children}
         </h2>
@@ -44,14 +38,8 @@ const WizardStepHeading = ({
             }}
             className={styles.stepButton}
           >
-            <span className={styles.number} aria-hidden>
-              <span className={styles.numberInner}>{stepNumber}</span>
-            </span>
-
-            <span>
-              <span className="govuk-visually-hidden">{`Step ${stepNumber}:`}</span>
-              {children}
-            </span>
+            <span className="govuk-visually-hidden">{`Step ${stepNumber}:`}</span>
+            {children}
 
             {stepEnabled && (
               <span

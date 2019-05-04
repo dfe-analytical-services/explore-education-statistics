@@ -27,37 +27,6 @@ $step-padding-top: govuk-spacing(6);
   font-weight: $govuk-font-weight-regular;
 }
 
-.number {
-  align-items: center;
-  background: #fff;
-  border: $circle-border-size solid $govuk-border-colour;
-  border-radius: 50%;
-  display: inline-flex;
-  height: $circle-size;
-  justify-content: center;
-  left: 0;
-  position: absolute;
-  top: $step-padding-top;
-  width: $circle-size;
-  z-index: 3;
-}
-
-.numberInner {
-  font-size: 1rem;
-  font-weight: $govuk-font-weight-bold;
-}
-
-.stepActive {
-  &::before,
-  &:last-child::after {
-    border-color: govuk-colour('black');
-  }
-
-  .number {
-    border-color: govuk-colour('black');
-  }
-}
-
 .stepEnabled {
   .stepButton {
     @include govuk-focusable;
