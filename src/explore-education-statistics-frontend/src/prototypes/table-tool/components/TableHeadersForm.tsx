@@ -27,8 +27,7 @@ export interface FormValues {
 }
 
 const TableHeadersForm = (props: Props) => {
-  const { filters, onSubmit } = props;
-  const { indicators, timePeriods } = filters;
+  const { filters, onSubmit, indicators, timePeriods } = props;
 
   return (
     <Details summary="Re-order table headers">
@@ -77,27 +76,6 @@ const TableHeadersForm = (props: Props) => {
                     legend="Columns"
                   />
                 </div>
-              </div>
-              <div className="govuk-grid-column-one-quarter">
-                <FormFieldSortableList<FormValues>
-                  name="rows"
-                  id="sort-rows"
-                  legend="Rows"
-                />
-              </div>
-              <div className="govuk-grid-column-one-quarter">
-                <FormFieldSortableList<FormValues>
-                  name="columnGroups"
-                  id="sort-columnGroups"
-                  legend="Column groups"
-                />
-              </div>
-              <div className="govuk-grid-column-one-quarter">
-                <FormFieldSortableList<FormValues>
-                  name="columns"
-                  id="sort-columns"
-                  legend="Columns"
-                />
               </div>
 
               <Button type="submit">Re-order table</Button>
