@@ -2,16 +2,18 @@ import { Omit, PartialBy } from '@common/types/util';
 import classNames from 'classnames';
 import kebabCase from 'lodash/kebabCase';
 import React, { ChangeEvent, Component, createRef } from 'react';
-import FormCheckbox, {
-  CheckboxChangeEventHandler,
-  FormCheckboxProps,
-} from './FormCheckbox';
+import FormCheckbox, { FormCheckboxProps } from './FormCheckbox';
 import FormFieldset, { FormFieldsetProps } from './FormFieldset';
 
 export type CheckboxOption = PartialBy<
   Omit<FormCheckboxProps, 'name' | 'checked' | 'onChange'>,
   'id'
 >;
+
+export type CheckboxGroupAllChangeEventHandler = (
+  event: ChangeEvent<HTMLInputElement>,
+  options: CheckboxOption[],
+) => void;
 
 export type CheckboxGroupChangeEventHandler = (
   event: ChangeEvent<HTMLInputElement>,
@@ -21,7 +23,7 @@ export type CheckboxGroupChangeEventHandler = (
 interface BaseFormCheckboxGroupProps {
   id: string;
   name: string;
-  onAllChange?: CheckboxChangeEventHandler;
+  onAllChange?: CheckboxGroupAllChangeEventHandler;
   onChange?: CheckboxGroupChangeEventHandler;
   options: CheckboxOption[];
   selectAll?: boolean;
@@ -96,7 +98,7 @@ export class BaseFormCheckboxGroup extends Component<
             checked={isAllChecked}
             onChange={event => {
               if (onAllChange) {
-                onAllChange(event);
+                onAllChange(event, options);
               }
             }}
           />
