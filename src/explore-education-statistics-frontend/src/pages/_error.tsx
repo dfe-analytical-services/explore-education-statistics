@@ -33,9 +33,9 @@ class ErrorPage extends Component<Props> {
           <>
             <PageTitle title={ErrorPage.statusCodeTitles[404]} />
 
-            <p>If you typed the web address, check it is correct.</p>
+            <p>If you typed the web address, check it's correct.</p>
             <p>
-              If you pasted the web address, check you copied the entire
+              If you cut and pasted the web address, check you copied the entire
               address.
             </p>
           </>
@@ -45,7 +45,7 @@ class ErrorPage extends Component<Props> {
           <>
             <PageTitle title={ErrorPage.statusCodeTitles[500]} />
 
-            <p>Please try again later.</p>
+            <p>Try again later.</p>
           </>
         );
     }
