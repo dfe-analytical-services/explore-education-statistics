@@ -606,32 +606,6 @@ const BrowseReleasesPage = () => {
           <h3>Attainment and outcomes</h3>
           <ul className="govuk-list-bullet">
             <li>
-              <strong>
-                Not in education, employment or training (NEET) and
-                participation
-              </strong>{' '}
-              - These statistics are not yet available on the explore education
-              statistics service. Find them on GOV.UK under{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics DfE
-              </a>
-            </li>
-          </ul>
-          <ul className="govuk-list-bullet">
-            <li>
-              <strong>
-                Not in education, employment or training (NEET) and
-                participation
-              </strong>{' '}
-              - These statistics are not yet available on the explore education
-              statistics service. Find them on GOV.UK under{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics DfE
-              </a>
-            </li>
-          </ul>
-          <ul className="govuk-list-bullet">
-            <li>
               <strong>16 to 19 attainment</strong> - These statistics are not
               yet available on the explore education statistics service. Find
               them on GOV.UK under{' '}
