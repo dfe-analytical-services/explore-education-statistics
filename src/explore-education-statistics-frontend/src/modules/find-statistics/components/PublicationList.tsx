@@ -32,7 +32,7 @@ function PublicationList({ publications }: Props) {
                     as={`/statistics/${slug}`}
                     data-testid={`view-stats-${slug}`}
                   >
-                    View statistics
+                    View statistics and data
                   </Link>
                 </div>
                 <div className="govuk-grid-column-one-third">
@@ -41,11 +41,11 @@ function PublicationList({ publications }: Props) {
                     to={`/table-tool/${slug}`}
                     data-testid={`create-table-${slug}`}
                   >
-                    Create charts and tables
+                    Create your own tables online
                   </Link>
                 </div>
                 <div className="govuk-grid-column-one-third">
-                  <Details summary="Download underlying data files">
+                  <Details summary="Download data files">
                     <ul className="govuk-list-bullet">
                       <li>
                         <a href="#" className="govuk-link">

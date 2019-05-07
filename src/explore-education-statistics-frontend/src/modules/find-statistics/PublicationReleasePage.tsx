@@ -10,6 +10,7 @@ import publicationService, {
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
+import SearchForm from '@common/components/SearchForm';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -67,14 +68,23 @@ class PublicationReleasePage extends Component<Props> {
 
         <PageTitle title={data.title} />
 
-        <dl className="dfe-meta-content">
-          <dt className="govuk-caption-m">Published: </dt>
-          <dd>
-            <strong>
-              <FormattedDate>{data.published}</FormattedDate>
-            </strong>
-          </dd>
-        </dl>
+        <div className="govuk-grid-row">
+          <div className="govuk-grid-column-two-thirds">
+            <dl className="dfe-meta-content govuk-!-margin-0">
+              <dt className="govuk-caption-m">Published: </dt>
+              <dd>
+                <strong>
+                  <FormattedDate>{data.published}</FormattedDate>
+                </strong>
+              </dd>
+            </dl>
+          </div>
+          <div className="govuk-grid-column-one-third">
+            <SearchForm />
+          </div>
+        </div>
+
+        <hr />
 
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
@@ -91,7 +101,7 @@ class PublicationReleasePage extends Component<Props> {
                 />
               </div>
             </div>
-            <Details summary="Download underlying data files">
+            <Details summary="Download data files">
               <ul className="govuk-list">
                 <li>
                   <a
@@ -104,8 +114,32 @@ class PublicationReleasePage extends Component<Props> {
                   </a>
                 </li>
                 <li>
+                  <a
+                    href={`${baseUrl.data}/downloads/${
+                      data.publication.slug
+                    }/excel/`}
+                    className="govuk-link"
+                  >
+                    Download Excel files
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={`${baseUrl.data}/downloads/${
+                      data.publication.slug
+                    }/pdf/`}
+                    className="govuk-link"
+                  >
+                    Download .pdf files
+                  </a>
+                </li>
+                <li>
                   <a href={baseUrl.data} className="govuk-link">
                     Access API
+                  </a>{' '}
+                  -{' '}
+                  <a href={baseUrl.data} className="govuk-link">
+                    What is an API?
                   </a>
                 </li>
               </ul>
@@ -185,13 +219,27 @@ class PublicationReleasePage extends Component<Props> {
                   </Link>
                 </span>
               </h4>
+
+              {/* <h2
+                className="govuk-heading-m govuk-!-margin-top-6"
+                id="related-content"
+              >
+                Related guidance
+              </h2>
+              <nav role="navigation" aria-labelledby="related-content">
+                <ul className="govuk-list">
+                  <li>
+                    [Link to relevant methodology section here]
+                  </li>
+                </ul>
+              </nav> */}
             </aside>
           </div>
         </div>
 
         <hr />
 
-        <h2>Latest headline facts and figures - {data.releaseName}</h2>
+        <h2>Headline facts and figures - {data.releaseName}</h2>
 
         {data.keyStatistics && <DataBlock {...data.keyStatistics} />}
 
@@ -219,7 +267,7 @@ class PublicationReleasePage extends Component<Props> {
           className="govuk-heading-m govuk-!-margin-top-9"
           data-testid="extra-information"
         >
-          Extra information
+          Help and support
         </h2>
 
         <Accordion id="extra-information-sections">
@@ -319,20 +367,19 @@ class PublicationReleasePage extends Component<Props> {
         </Accordion>
 
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
-          Exploring the data
+          Create your own tables online
         </h2>
 
         <p>
-          The statistics can be viewed as reports, or you can customise and
-          download as excel or .csv files . The data can also be accessed via an
-          API. <a href="#">What is an API?</a>
+          Use our tool to build tables using our range of national and regional
+          data.
         </p>
 
         <Link
           to={`/table-tool/${data.publication.slug}`}
           className="govuk-button"
         >
-          Create charts and tables
+          Create tables
         </Link>
 
         <GoToTopLink />

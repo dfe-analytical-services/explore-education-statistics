@@ -14,15 +14,31 @@ const BrowseReleasesPage = () => {
         },
       ]}
     >
-      <h1 className="govuk-heading-xl">
-        Find statistics and download data - TEST A
-      </h1>
+      <h1 className="govuk-heading-xl">Find statistics and download data</h1>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">
-            Browse to find out more about the methodology behind education
-            statistics and data and how and why they're collected and published.
+            Browse to find the statistics and data you’re looking for and open
+            the section to get links to:
           </p>
+          <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <li>
+              up-to-date national statistical headlines, breakdowns and
+              explanations
+            </li>
+            <li>
+              charts and tables to help you compare, contrast and view national
+              and regional statistical data and trends
+            </li>
+            <li>
+              our table tool to build your own tables online and explore our
+              range of national and regional data
+            </li>
+            <li>
+              links to underlying data so you can download files and carry out
+              your own statistical analysis
+            </li>
+          </ul>
         </div>
         <div className="govuk-grid-column-one-third">
           <aside className="app-related-items">
@@ -32,8 +48,13 @@ const BrowseReleasesPage = () => {
             <nav role="navigation" aria-labelledby="subsection-title">
               <ul className="govuk-list">
                 <li>
-                  <Link to="/prototypes/browse-releases">
-                    Find statistics and data
+                  <Link to="/prototypes/methodology-home">
+                    Education statistics: methodology
+                  </Link>
+                </li>
+                <li>
+                  <Link to="https://eesadminprototype.z33.web.core.windows.net/prototypes/documentation/glossary">
+                    Education statistics: glossary
                   </Link>
                 </li>
               </ul>
@@ -42,107 +63,979 @@ const BrowseReleasesPage = () => {
         </div>
       </div>
 
-      <Accordion id="methodology-specific">
-        <AccordionSection heading="Early years and schools">
-          <h3>Absence and exclusions</h3>
+      <Accordion id="early-years">
+        <AccordionSection heading="Early years">
+          <h3>Attainment and outcomes</h3>
           <ul className="govuk-list-bullet">
             <li>
-              <Link to="#">Pupil exclusion statistics: methodology</Link>
-            </li>
-            <li>
-              <Link to="/prototypes/methodology-absence">
-                Pupil absence statistics: methodology
-              </Link>
+              <strong>Childcare and early years</strong> - These statistics are
+              not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
             </li>
           </ul>
-          <hr />
-          <h3>Capacity and admissions</h3>
-          <ul className="govuk-list-bullet">
+          <ul>
             <li>
-              <Link to="#">Admissions and appeals statistics: methodology</Link>
-            </li>
-            <li>
-              <Link to="#">School capacity statistics: methodology</Link>
-            </li>
-          </ul>
-          <hr />
-          <h3>Results</h3>
-          <ul className="govuk-list-bullet">
-            <li>
-              <Link to="#">Key stage 1 (KS1) statistics: methodology</Link>
-            </li>
-            <li>
-              <Link to="#">Key stage 4 (KS4) statistics: methodology</Link>
-            </li>
-            <li>
-              <Link to="#">
-                Phonics screening check and KS1 assessments statistics:
-                methodology
-              </Link>
-            </li>
-            <li>
-              <Link to="#">
-                Early years foundation stage (EYFS) profile statistics:
-                methodology
-              </Link>
+              <strong>Early years foundation stage profile</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
             </li>
           </ul>
-          <hr />
-          <h3>School and pupil numbers</h3>
-          <ul className="govuk-list-bullet">
+          <ul>
             <li>
-              {' '}
-              <Link to="#">
-                School pupil characteristics statistics: methodology
-              </Link>
-            </li>
-            <li>
-              <Link to="#">School worksforce statistics: methodology</Link>
+              <strong>Education and training</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
             </li>
           </ul>
-          <hr />
-          <h3>Teacher numbers</h3>
+          <ul>
+            <li>
+              <strong>Parental responsibility measures</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul>
+            <li>
+              <strong>Special educational needs (SEN)</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <h3>Finance</h3>
           <ul className="govuk-list-bullet">
             <li>
-              {' '}
-              <Link to="#">
-                Initial teacher training (ITT) performance statistics:
-                methodology
-              </Link>
+              <strong>Education and training</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <h3>Institutions</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Childcare and early years</strong> - These statistics are
+              not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Education and training</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <h3>Participants and characteristics</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Childcare and early years</strong> - These statistics are
+              not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul>
+            <li>
+              <strong>Education and training</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul>
+            <li>
+              <strong>Parental responsibility measures</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul>
+            <li>
+              <strong>Pupil projections</strong> - These statistics are not yet
+              available on the explore education statistics service. Find them
+              on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul>
+            <li>
+              <strong>Special educational needs (SEN)</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+        </AccordionSection>
+        <AccordionSection heading="Further education">
+          <h3>Attainment and outcomes</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>16 to 19 attainment</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Education and training</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Further education and skills</strong> - These statistics
+              are not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Further education for benefits claimants</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>National achievement rates tables</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Outcome based success measures</strong> - These statistics
+              are not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Performance tables</strong> - These statistics are not yet
+              available on the explore education statistics service. Find them
+              on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+
+          <h3>Finance</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Advance learner loans</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Education and training</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Further education and skills</strong> - These statistics
+              are not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+
+          <h3>Institutions</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Education and training</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+
+          <h3>Participation and characteristics</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Education and training</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>FE Choices</strong> - These statistics are not yet
+              available on the explore education statistics service. Find them
+              on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Further education and skills</strong> - These statistics
+              are not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Further education for benefits claimants</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>
+                Not in education, employment or training (NEET) and
+                participation
+              </strong>{' '}
+              - These statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
             </li>
           </ul>
         </AccordionSection>
         <AccordionSection heading="Higher education">
-          <h3>Further education</h3>
+          <h3>Attainment and outcomes</h3>
           <ul className="govuk-list-bullet">
             <li>
-              <Link to="#">Destination of leavers statistics: methodology</Link>
+              <strong>
+                Not in education, employment or training (NEET) and
+                participation
+              </strong>{' '}
+              - These statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
             </li>
+          </ul>
+
+          <h3>Attainment and outcomes</h3>
+          <ul className="govuk-list-bullet">
             <li>
-              <Link to="#">
-                Apprenticeships and traineeships statistics: methodology
-              </Link>
+              <strong>Education and training</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
             </li>
+          </ul>
+          <ul className="govuk-list-bullet">
             <li>
-              <Link to="#">
-                Further education and skills statistics: methodology
-              </Link>
+              <strong>Graduate labour market</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
             </li>
+          </ul>
+          <ul className="govuk-list-bullet">
             <li>
-              <Link to="#">
-                16 to 18 school performance statistics: methodology
-              </Link>
+              <strong>Higher education graduate employment and earnings</strong>{' '}
+              - These statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Higher education statistics</strong> - These statistics
+              are not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Initial teacher training (ITT)</strong> - These statistics
+              are not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Performance tables</strong> - These statistics are not yet
+              available on the explore education statistics service. Find them
+              on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Widening participation in higher education</strong> -
+              These statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+
+          <h3>Finance</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Education and training</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Higher education graduate employment and earnings</strong>{' '}
+              - These statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Student loan forecasts</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+
+          <h3>Institutions</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Education and training</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Higher education statistics</strong> - These statistics
+              are not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+
+          <h3>Participation and characteristics</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Education and training</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Higher education graduate employment and earnings</strong>{' '}
+              - These statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Higher education</strong> - These statistics are not yet
+              available on the explore education statistics service. Find them
+              on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Initial teacher training (ITT)</strong> - These statistics
+              are not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>
+                Not in education, employment or training (NEET) and
+                participation
+              </strong>{' '}
+              - These statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Participation rates in higher education</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Widening participation in higher education</strong> -
+              These statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+
+          <h3>Workforce</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Higher education</strong> - These statistics are not yet
+              available on the explore education statistics service. Find them
+              on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
             </li>
           </ul>
         </AccordionSection>
-        <AccordionSection heading="Social care">
-          <h3>Number of children</h3>
+
+        <AccordionSection heading="Schools">
+          <h3>Attainment and outcomes</h3>
           <ul className="govuk-list-bullet">
             <li>
-              <Link to="#">Children in need statistics: methodology</Link>
+              <strong>16 to 19 attainment</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
             </li>
+          </ul>
+          <ul className="govuk-list-bullet">
             <li>
-              <Link to="#">Looked after children statistics: methodology</Link>
+              <strong>
+                Destinations of key stage 4 and key stage 5 pupils
+              </strong>{' '}
+              - These statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Education and training</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>GCSEs (key stage 4) and equivalent results</strong> -
+              These statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <div className="govuk-inset-text">
+              <p>
+                View statistics, create charts and tables and download data
+                files for GCSE and equivalent results in England
+              </p>
+            </div>
+            <div className="govuk-!-margin-top-0" />
+            <p>
+              <strong>NEED TO GET DROPDOWN INSERED IN HERE</strong>
+            </p>
+          </div>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Key stage 1</strong> - These statistics are not yet
+              available on the explore education statistics service. Find them
+              on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Key stage 2</strong> - These statistics are not yet
+              available on the explore education statistics service. Find them
+              on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Parental responsibility measures</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Performance tables</strong> - These statistics are not yet
+              available on the explore education statistics service. Find them
+              on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Special educational needs (SEN)</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+
+          <h3>Finance</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Education and training</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Local authority and school finance</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+
+          <h3>Institutions</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Admission appeals</strong> - These statistics are not yet
+              available on the explore education statistics service. Find them
+              on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Education and training</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>GCSEs (key stage 4) and equivalent results</strong> -
+              These statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <div className="govuk-inset-text">
+              <p>
+                View statistics, create charts and tables and download data
+                files for GCSE and equivalent results in England
+              </p>
+            </div>
+            <div className="govuk-!-margin-top-0" />
+            <p>
+              <strong>NEED TO GET DROPDOWN INSERED IN HERE</strong>
+            </p>
+          </div>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>School applications</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>School capacity</strong> - These statistics are not yet
+              available on the explore education statistics service. Find them
+              on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>School and pupil numbers</strong> - These statistics are
+              not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Workforce statistics and analysis</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+
+          <h3>Participation and characteristics</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>16 to 19 attainment</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Admission appeals</strong> - These statistics are not yet
+              available on the explore education statistics service. Find them
+              on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>
+                Destinations of key stage 4 and key stage 5 pupils
+              </strong>{' '}
+              - These statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Exclusions</strong> - These statistics are not yet
+              available on the explore education statistics service. Find them
+              on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <div className="govuk-inset-text">
+              <p>
+                View statistics, create charts and tables and download data
+                files for GCSE and equivalent results in England
+              </p>
+            </div>
+            <div className="govuk-!-margin-top-0" />
+            <p>
+              <strong>NEED TO GET DROPDOWN INSERED IN HERE</strong>
+            </p>
+          </div>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Education and training</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>
+                Not in education, employment or training (NEET) and
+                participation
+              </strong>{' '}
+              - These statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Parental responsibility measures</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Pupil absence</strong> - These statistics are not yet
+              available on the explore education statistics service. Find them
+              on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <div className="govuk-inset-text">
+              <p>
+                View statistics, create charts and tables and download data
+                files for GCSE and equivalent results in England
+              </p>
+            </div>
+            <div className="govuk-!-margin-top-0" />
+            <p>
+              <strong>NEED TO GET DROPDOWN INSERED IN HERE</strong>
+            </p>
+          </div>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Pupil projections</strong> - These statistics are not yet
+              available on the explore education statistics service. Find them
+              on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>School and pupil numbers</strong> - These statistics are
+              not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>School applications</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Special educational needs (SEN)</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+
+          <h3>Workforce</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>
+                Not in education, employment or training (NEET) and
+                participation
+              </strong>{' '}
+              - These statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+        </AccordionSection>
+
+        <AccordionSection heading="Social care">
+          <h3>Children's social care</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Children in need and child protection</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Looked-after children</strong> - These statistics are not
+              yet available on the explore education statistics service. Find
+              them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Secure children’s homes</strong> - These statistics are
+              not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+
+          <h3>Institutions</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Secure children’s homes</strong> - These statistics are
+              not yet available on the explore education statistics service.
+              Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
+            </li>
+          </ul>
+
+          <h3>Workforce</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              <strong>Children's social work workforce</strong> - These
+              statistics are not yet available on the explore education
+              statistics service. Find them on GOV.UK under{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics DfE
+              </a>
             </li>
           </ul>
         </AccordionSection>

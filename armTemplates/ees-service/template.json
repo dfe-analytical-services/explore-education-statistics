@@ -94,7 +94,7 @@
   },
   "variables": {
     "dataAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-data')]",
-    "dataPlanName": "[concat(parameters('subscription'), '-asp', parameters('environment'), '-data')]",
+    "dataPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-data')]",
     "dataAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-data')]",
 
     "contentAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-content')]",
@@ -112,7 +112,7 @@
     "storageEnv": "[concat('ees', parameters('envNumber'))]",
 
     "coreStorageAccountName": "[concat(parameters('subscription'), 'storage', variables('storageEnv'), 'core')]",
-    "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]",
+    "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('coreStorageAccountName'))]",
 
     "sqlserverName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
 

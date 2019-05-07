@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/library.robot
 
-Force Tags  GeneralPublic  UnderConstruction
+Force Tags  GeneralPublic
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -14,49 +14,49 @@ Go to Table Tool page
 
 Select "Pupil absence" publication
     [Tags]  HappyPath
-    user clicks element    css:[data-testid="Early years and schools"]
-    user clicks element    css:[data-testid="Absence and exclusions"]
+    user clicks details    css:[data-testid="Early years and schools"]
+    user clicks details    css:[data-testid="Absence and exclusions"]
     user clicks element    css:[data-testid="Pupil absence"]
     user waits until page contains    2. Choose your area of interest
 
 Select "Geographic levels" area of interest
-    [Tags]  HappyPath
+    [Tags]  HappyPath  UnderConstruction
     user clicks element   css:#geoglevels
     user waits until page contains    3. Choose your filters for 'Pupil absence'
 
 Select Location "National"
-    [Tags]  HappyPath
+    [Tags]  HappyPath  UnderConstruction
     user clicks element   css:#filter-locationLevel-national
 
 Select start and end years
-    [Tags]  HappyPath
+    [Tags]  HappyPath  UnderConstruction
     user selects from list by label   css:#filter-timePeriodStart   2012/13
     user selects from list by label   css:#filter-timePeriodEnd   2015/16
 
 Select a few Characteristics
-    [Tags]  HappyPath
+    [Tags]  HappyPath   UnderConstruction
     user clicks element child containing text   css:#filter-characteristics     Total
     user clicks element   css:[id="categoricalFilters.characteristics-total-Total"]
 
 Select a few School types
-    [Tags]  HappyPath
+    [Tags]  HappyPath   UnderConstruction
     user clicks element     css:#schoolTypes-State_Funded_Primary
     user clicks element     css:#schoolTypes-State_Funded_Secondary
 
 Select a few Indicators
-    [Tags]  HappyPath
+    [Tags]  HappyPath   UnderConstruction
     user clicks element child containing text  css:#filter-indicators    Absence fields
     user clicks element     css:#indicators-absenceFields-sess_authorised_percent
     user clicks element     css:#indicators-absenceFields-sess_unauthorised_percent
     user clicks element     css:#indicators-absenceFields-sess_overall_percent
 
 Create table
-    [Tags]  HappyPath
+    [Tags]  HappyPath   UnderConstruction
     user clicks element     css:#submit-button
     user waits until page contains  4. Explore data for 'Pupil absence'
 
 Validate results table column headings
-    [Tags]  HappyPath
+    [Tags]  HappyPath   UnderConstruction
     table cell should contain   css:table:nth-child(4)  1   1   ${EMPTY}
     table cell should contain   css:table:nth-child(4)  1   2   Primary schools
     table cell should contain   css:table:nth-child(4)  1   3   Secondary school
@@ -71,7 +71,7 @@ Validate results table column headings
     table cell should contain   css:table:nth-child(4)  2   9   2015/16
 
 Validate Authorised absence rate row
-    [Tags]  HappyPath
+    [Tags]  HappyPath   UnderConstruction
     table cell should contain    css:table:nth-child(4)  3    1     All pupils
     table cell should contain    css:table:nth-child(4)  3    2     Authorised absence rate
     table cell should contain    css:table:nth-child(4)  3    3     3.9%
@@ -84,7 +84,7 @@ Validate Authorised absence rate row
     table cell should contain    css:table:nth-child(4)  3    10    3.8%
 
 Validate Unauthorised absence rate row
-    [Tags]  HappyPath
+    [Tags]  HappyPath   UnderConstruction
     table cell should contain    css:table:nth-child(4)  4    1     Unauthorised absence rate
     table cell should contain    css:table:nth-child(4)  4    2     0.8%
     table cell should contain    css:table:nth-child(4)  4    3     0.8%
@@ -96,7 +96,7 @@ Validate Unauthorised absence rate row
     table cell should contain    css:table:nth-child(4)  4    9     1.4%
 
 Validate Overall absence rate row
-    [Tags]  HappyPath
+    [Tags]  HappyPath   UnderConstruction
     table cell should contain    css:table:nth-child(4)  5    1     Overall absence rate
     table cell should contain    css:table:nth-child(4)  5    2     4.7%
     table cell should contain    css:table:nth-child(4)  5    3     3.9%
@@ -108,7 +108,7 @@ Validate Overall absence rate row
     table cell should contain    css:table:nth-child(4)  5    9     5.2%
 
 Reorder results table
-    [Tags]  HappyPath
+    [Tags]  HappyPath   UnderConstruction
     user clicks element containing text     Re-order table headers
     user waits until page contains element   css:[data-testid="Re-order table headers"][open]
     user drags and drops   css:#sort-columnGroups > div > div:nth-child(1) strong  css:#sort-columnGroups > div > div:nth-child(2) strong
@@ -117,7 +117,7 @@ Reorder results table
     user clicks element child containing text  css:form:nth-child(2)  Re-order table
 
 Validate results table headings have reordered
-    [Tags]  HappyPath
+    [Tags]  HappyPath   UnderConstruction
     table cell should contain   css:table:nth-child(4)  1   1   ${EMPTY}
     table cell should contain   css:table:nth-child(4)  1   2   Secondary schools
     table cell should contain   css:table:nth-child(4)  1   3   Primary school
@@ -132,7 +132,7 @@ Validate results table headings have reordered
     table cell should contain   css:table:nth-child(4)  2   9   2015/16
 
 Validate Overall absence rate row has reordered
-    [Tags]  HappyPath
+    [Tags]  HappyPath   UnderConstruction
     table cell should contain    css:table:nth-child(4)  3    1     All pupils
     table cell should contain    css:table:nth-child(4)  3    2     Overall absence rate
     table cell should contain    css:table:nth-child(4)  3    3     5.9%
@@ -145,7 +145,7 @@ Validate Overall absence rate row has reordered
     table cell should contain    css:table:nth-child(4)  3    10    4%
 
 Validate Authorised absence rate row has reordered
-    [Tags]  HappyPath
+    [Tags]  HappyPath   UnderConstruction
     table cell should contain    css:table:nth-child(4)  4    1     Authorised absence rate
     table cell should contain    css:table:nth-child(4)  4    2     4.5%
     table cell should contain    css:table:nth-child(4)  4    3     3.9%
@@ -157,7 +157,7 @@ Validate Authorised absence rate row has reordered
     table cell should contain    css:table:nth-child(4)  4    9     3.1%
 
 Validate Unauthorised absence rate row has reordered
-    [Tags]  HappyPath
+    [Tags]  HappyPath   UnderConstruction
     table cell should contain    css:table:nth-child(4)  5    1     Unauthorised absence rate
     table cell should contain    css:table:nth-child(4)  5    2     1.4%
     table cell should contain    css:table:nth-child(4)  5    3     1.3%

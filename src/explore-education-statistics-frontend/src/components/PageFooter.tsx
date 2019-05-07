@@ -29,8 +29,8 @@ const PageFooter = ({ wide }: Props) => (
             <li className="govuk-footer__inline-list-item">
               <Link
                 className="govuk-footer__link"
-                to="/privacy-policy"
-                data-testid="footer--privacy-policy-link"
+                to="/privacy-notice"
+                data-testid="footer--privacy-notice-link"
               >
                 Privacy notice
               </Link>

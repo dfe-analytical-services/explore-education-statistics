@@ -1,5 +1,5 @@
 # Explore education statistics service
-[![Build Status](https://dev.azure.com/dfe-statistics/Explore%20education%20statistics/_apis/build/status/Application?branchName=master)](https://dev.azure.com/dfe-statistics/Explore%20education%20statistics/_build/latest?definitionId=8&branchName=master)
+[![Build Status](https://dfe-gov-uk.visualstudio.com/s101-Explore-Education-Statistics/_apis/build/status/Explore%20Education%20Statistics?branchName=master)](https://dfe-gov-uk.visualstudio.com/s101-Explore-Education-Statistics/_build/latest?definitionId=200&branchName=master)
 
 ## Getting started
 
@@ -21,20 +21,14 @@ To develop the application you will require:
     npm run bootstrap
     ```
 
-2. Create the frontend .env file:
-
-    ```bash
-    cp src/explore-education-statistics-frontend/.env.example src/explore-education-statistics-frontend/.env
-    ```
-
-3. Startup required any required backend services:
+2. Startup required any required backend services:
     
     ```bash
     cd src/
     docker-compose up -d data-api content-api
     ```
        
-4. Run the frontend applications by running from the project root
+3. Run the frontend applications by running from the project root
 
     ```bash
     # Admin frontend
@@ -50,12 +44,32 @@ To develop the application you will require:
     npm start
     ```
 
-5. Access frontend applications at:
+4. Access frontend applications at:
 
     - `http://localhost:3000` for the public frontend
     - `http://localhost:3001` for the admin frontend
 
 ## Frontend development
+
+### Environment variables
+
+Out of the box, each sub-project should come with a default set of environment variables (in `.env`) 
+that should work for development.
+
+If you need to change any environment variables only for your local environment, you can create a
+corresponding `.env.local` file which will be loaded in preference to `.env`. `.env.local` is 
+ignored by Git.
+
+Various `.env.{env}` files are checked into Git for use in our deployment environments, but will not
+generally be used for local development.
+
+#### Adding variables
+
+Required environment variables should be supplied to both the specific `.env.{env}` file and the 
+`.env.example` file (example versions of variables should be placed here). 
+
+The `.env.example` file is used to validate that the `.env.{env}` file in use is not missing any 
+required variables and consequently needs to be in sync with any changes.
 
 ### Dependency management with Lerna
 
@@ -134,6 +148,20 @@ These can only be run from the project root `package.json`.
 These can only be run from a sub-project `package.json`.
 
 - `npm start` - Start a sub-project dev server.
+
+### Code style
+
+We use ESLint with the [Airbnb style guide](https://github.com/airbnb/javascript) for the project
+code style.
+
+#### Disabling linting upon save
+
+During development, code is linted upon save, but if required this can be disabled by adding the 
+following in your `.env.local`:
+
+```
+ESLINT_DISABLE=true
+```
 
 ## Contributing
 
