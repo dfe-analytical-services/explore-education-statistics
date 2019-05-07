@@ -92,10 +92,11 @@ class SubscriptionPage extends Component<Props> {
       >
         <PageTitle title={`${data.title}`} caption="Notify me" />
 
-        <p>
-          Subscribe to receive updates when new statistics are released or
-          existing statistics are changed or corrected.
-        </p>
+        <p>Subscribe to receive updates when:</p>
+        <ul className="govuk-list govuk-list--bullet">
+          <li>new statistics and data are released</li>
+          <li>existing statistics and data are changed or corrected</li>
+        </ul>
 
         {message ? (
           <p>{message}</p>

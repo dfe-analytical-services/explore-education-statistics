@@ -89,7 +89,7 @@ class SubscriptionForm extends Component<Props, State> {
                 <FormFieldTextInput<FormValues>
                   id="email-id"
                   label="Enter your email address"
-                  hint="This will only be used to subscribe you to notifications.
+                  hint="This will only be used to subscribe you to updates.
                   You can unsubscribe at any time"
                   name="email"
                   width={20}
