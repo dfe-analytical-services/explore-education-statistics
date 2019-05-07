@@ -71,8 +71,8 @@ interface LabelValueMetadata {
   value: number;
 }
 
-interface LabelValueHintMetadata extends LabelValueMetadata {
-  hint: string;
+interface LabelValueUnitMetadata extends LabelValueMetadata {
+  unit: string;
 }
 
 interface ObjectMap<T> {
@@ -105,7 +105,7 @@ interface TimePeriodMetadata {
   options: TimePeriodOptionMetadata[];
 }
 
-interface IndicatorMetadata extends OptionListMetadata<LabelValueHintMetadata> {
+interface IndicatorMetadata extends OptionListMetadata<LabelValueUnitMetadata> {
   label: string;
 }
 
@@ -122,7 +122,7 @@ interface ResponseMetaData {
 // ------------------------------------------
 
 export interface DataBlockMetadata {
-  indicators: ObjectMap<LabelValueHintMetadata>;
+  indicators: ObjectMap<LabelValueUnitMetadata>;
   filters: ObjectMap<LabelValueMetadata>;
   timePeriods: ObjectMap<LabelValueMetadata>;
 }
@@ -181,7 +181,7 @@ function mapOptionsMap<
 function remapIndicators(
   indicatorIds: number[],
   { indicators }: ResponseMetaData,
-): ObjectMap<LabelValueHintMetadata> {
+): ObjectMap<LabelValueUnitMetadata> {
   return mapOptionsMap(indicatorIds, indicators);
 }
 
@@ -203,21 +203,11 @@ function remapTimePeriod(
   { timePeriod }: ResponseMetaData,
 ): ObjectMap<LabelValueMetadata> {
   return mapTimePeriodOptions(years, timePeriod.options);
-
-  /*
-  return Object.values(timePeriod)
-    .reduce((mapped, option) => mapIo
-        ({...mapped, ...mapOptions(timeIds, option.options)}),
-      {});
-
-
-   */
 }
 
 function getUsedTimeIdentifiers(data: DataBlockData) {
   return Array.from(
     data.result.reduce((timeIdentifiers, result) => {
-      console.log(result);
       return timeIdentifiers.add(result.year);
     }, new Set<number>()),
   );
@@ -249,8 +239,6 @@ const DataBlockService = {
       metaData: usedMetadata,
       data,
     };
-
-    console.log(usedMetadata);
 
     return response;
   },

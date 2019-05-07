@@ -1,4 +1,5 @@
 import { ChartProps } from '@common/modules/find-statistics/components/charts/AbstractChart';
+
 import React, { Component } from 'react';
 import {
   AxisDomain,
@@ -59,8 +60,6 @@ export default class LineChartBlock extends Component<ChartProps> {
         { name: parseCondensedTimePeriodRange(`${result.year}`) },
       );
     });
-
-    console.log(data);
 
     let yAxisDomain: [AxisDomain, AxisDomain] = [0, 0];
 

@@ -1,5 +1,4 @@
 import { Axis, ReferenceLine } from '@common/services/publicationService';
-import { CharacteristicsData } from '@common/services/tableBuilderService';
 import React, { Component, ReactNode } from 'react';
 import {
   Label,
