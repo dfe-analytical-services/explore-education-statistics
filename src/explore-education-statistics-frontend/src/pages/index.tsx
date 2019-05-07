@@ -58,8 +58,8 @@ function HomePage() {
             <Link to="/methodology">Education statistics: methodology</Link>
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">
-            Browse to find out about the methodology behind education statistics
-            and data and how and why they're collected and published.
+            Browse to find out more about the methodology behind education
+            statistics and data and how and why they're collected and published.
           </p>
         </div>
         <div className="govuk-grid-column-one-half">
