@@ -40,6 +40,7 @@ const FormFieldCheckboxGroupsMenu = <T extends {}>(
               onAllChange(event, options[0].options);
             }
           }}
+          hideCount
           selectAll
           options={options[0].options}
         />

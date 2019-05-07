@@ -137,7 +137,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
 
                 <div className="govuk-grid-row">
                   <div className="govuk-grid-column-one-half-from-desktop">
-                    <FormFieldCheckboxGroupsMenu
+                    <FormFieldCheckboxGroupsMenu<FormValues>
                       name="indicators"
                       id="filtersForm-indicators"
                       legend="Indicators"
