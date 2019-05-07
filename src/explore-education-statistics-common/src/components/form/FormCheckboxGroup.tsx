@@ -1,8 +1,13 @@
 import { Omit, PartialBy } from '@common/types/util';
 import classNames from 'classnames';
 import kebabCase from 'lodash/kebabCase';
-import React, { ChangeEvent, Component, createRef } from 'react';
-import FormCheckbox, { FormCheckboxProps } from './FormCheckbox';
+import sortBy from 'lodash/sortBy';
+import memoize from 'memoizee';
+import React, { ChangeEvent, createRef, PureComponent } from 'react';
+import FormCheckbox, {
+  CheckboxChangeEventHandler,
+  FormCheckboxProps,
+} from './FormCheckbox';
 import FormFieldset, { FormFieldsetProps } from './FormFieldset';
 
 export type CheckboxOption = PartialBy<
@@ -28,6 +33,9 @@ interface BaseFormCheckboxGroupProps {
   options: CheckboxOption[];
   selectAll?: boolean;
   small?: boolean;
+  sort?:
+    | string[]
+    | ((option: CheckboxOption) => CheckboxOption[keyof CheckboxOption])[];
   value: string[];
 }
 
@@ -42,7 +50,7 @@ interface State {
  * Basic checkbox group that should be used as a controlled component.
  * When using Formik, use {@see FormFieldRadioGroup} instead.
  */
-export class BaseFormCheckboxGroup extends Component<
+export class BaseFormCheckboxGroup extends PureComponent<
   BaseFormCheckboxGroupProps,
   State
 > {
@@ -50,6 +58,7 @@ export class BaseFormCheckboxGroup extends Component<
     legendSize: 'm',
     selectAll: false,
     small: false,
+    sort: ['label'],
     value: [],
   };
 
@@ -67,17 +76,28 @@ export class BaseFormCheckboxGroup extends Component<
     }
   }
 
+  private handleAllChange: CheckboxChangeEventHandler = event => {
+    const { onAllChange, options } = this.props;
+
+    if (onAllChange) {
+      onAllChange(event, options);
+    }
+  };
+
+  // eslint-disable-next-line react/sort-comp
+  private handleChange = memoize(
+    (option: CheckboxOption): CheckboxChangeEventHandler => event => {
+      const { onChange } = this.props;
+
+      if (onChange) {
+        onChange(event, option);
+      }
+    },
+    { primitive: true },
+  );
+
   public render() {
-    const {
-      value,
-      onAllChange,
-      onChange,
-      name,
-      id,
-      options,
-      selectAll,
-      small,
-    } = this.props;
+    const { value, name, id, options, selectAll, sort, small } = this.props;
     const isAllChecked = options.every(
       option => value.indexOf(option.value) > -1,
     );
@@ -96,26 +116,18 @@ export class BaseFormCheckboxGroup extends Component<
             name={name}
             value="select-all"
             checked={isAllChecked}
-            onChange={event => {
-              if (onAllChange) {
-                onAllChange(event, options);
-              }
-            }}
+            onChange={this.handleAllChange}
           />
         )}
 
-        {options.map(option => (
+        {sortBy(options, sort || []).map(option => (
           <FormCheckbox
             {...option}
             id={option.id ? option.id : `${id}-${kebabCase(option.value)}`}
             name={name}
             key={option.value}
             checked={value.indexOf(option.value) > -1}
-            onChange={event => {
-              if (onChange) {
-                onChange(event, option);
-              }
-            }}
+            onChange={this.handleChange(option)}
           />
         ))}
       </div>
