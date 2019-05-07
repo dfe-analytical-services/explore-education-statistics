@@ -244,23 +244,13 @@ class PublicationReleasePage extends Component<Props> {
         {data.keyStatistics && <DataBlock {...data.keyStatistics} />}
 
         {data.content.length > 0 && (
-          <>
-            <h2 className="govuk-heading-l" data-testid="contents">
-              Contents
-            </h2>
-
-            <Accordion id="contents-sections">
-              {data.content.map(({ heading, caption, order, content }) => (
-                <AccordionSection
-                  heading={heading}
-                  caption={caption}
-                  key={order}
-                >
-                  <ContentBlock content={content} />
-                </AccordionSection>
-              ))}
-            </Accordion>
-          </>
+          <Accordion id="contents-sections">
+            {data.content.map(({ heading, caption, order, content }) => (
+              <AccordionSection heading={heading} caption={caption} key={order}>
+                <ContentBlock content={content} />
+              </AccordionSection>
+            ))}
+          </Accordion>
         )}
 
         <h2
