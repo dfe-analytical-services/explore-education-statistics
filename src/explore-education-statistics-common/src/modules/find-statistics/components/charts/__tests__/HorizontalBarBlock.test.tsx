@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { render } from 'react-testing-library';
+import { render, wait } from 'react-testing-library';
 import HorzontalBarBlock from '../HorizontalBarBlock';
 
 import testData from './__data__/testBlockData';
@@ -17,8 +17,10 @@ const elementContainingText = (
 describe('HorzontalBarBlock', () => {
   test('renders with correct output', async () => {
     const { container } = render(
-      <HorzontalBarBlock {...testData.AbstractChartProps} />,
+      <HorzontalBarBlock {...testData.AbstractChartProps} stacked />,
     );
+
+    await wait();
 
     /*
     expect(
