@@ -5,7 +5,7 @@ import React from 'react';
 function ContactPage() {
   return (
     <Page breadcrumbs={[{ name: 'Contact' }]}>
-      <PageTitle title="Contact" />
+      <PageTitle title="Contact explore education statistics" />
     </Page>
   );
 }

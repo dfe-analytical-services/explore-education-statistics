@@ -76,8 +76,8 @@ function HomePage() {
       <hr />
       <h3 className="govuk-heading-l govuk-!-margin-top-9">Related services</h3>
       <p className="govuk-body">
-        Use these services to specific performance and other information about
-        schools and colleges in England:
+        Use these services to find specific performance and other information
+        about schools and colleges in England:
       </p>
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
         <div className="govuk-grid-column-one-half">
