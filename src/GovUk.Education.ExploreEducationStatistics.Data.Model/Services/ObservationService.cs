@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var filtersListParam = CreateIdListType("filtersList", filters);
             
             var inner = _context.Query<IdWrapper>().AsNoTracking()
-                .FromSql("EXEC dbo.FilteredObservations2 " +
+                .FromSql("EXEC dbo.FilteredObservations " +
                          "@subjectId," +
                          "@geographicLevel," +
                          "@yearList," +
