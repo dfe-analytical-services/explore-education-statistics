@@ -97,7 +97,16 @@ export class BaseFormCheckboxGroup extends PureComponent<
   );
 
   public render() {
-    const { value, name, id, options, selectAll, sort, small } = this.props;
+    const {
+      value,
+      name,
+      id,
+      options,
+      selectAll,
+      sort = [],
+      small,
+    } = this.props;
+
     const isAllChecked = options.every(
       option => value.indexOf(option.value) > -1,
     );
@@ -120,7 +129,7 @@ export class BaseFormCheckboxGroup extends PureComponent<
           />
         )}
 
-        {sortBy(options, sort || []).map(option => (
+        {sortBy(options, sort).map(option => (
           <FormCheckbox
             {...option}
             id={option.id ? option.id : `${id}-${kebabCase(option.value)}`}
