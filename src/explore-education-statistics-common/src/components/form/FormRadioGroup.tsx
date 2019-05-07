@@ -50,7 +50,10 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
         onChange(event, option);
       }
     },
-    { primitive: true },
+    {
+      normalizer: ([option]: [RadioOption]) =>
+        `${option.value}-${option.label}-${option.id}`,
+    },
   );
 
   // eslint-disable-next-line react/sort-comp

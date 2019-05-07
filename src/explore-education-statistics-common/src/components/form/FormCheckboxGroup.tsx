@@ -93,7 +93,10 @@ export class BaseFormCheckboxGroup extends PureComponent<
         onChange(event, option);
       }
     },
-    { primitive: true },
+    {
+      normalizer: ([option]: [CheckboxOption]) =>
+        `${option.value}-${option.label}-${option.id}`,
+    },
   );
 
   public render() {
