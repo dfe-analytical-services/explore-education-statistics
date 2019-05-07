@@ -41,7 +41,7 @@ class ErrorPage extends Component<Props> {
             <p>
               If the web address is correct or you clicked a link or button and
               ended up on this page,{' '}
-              <a className="govuk-link" href="#">
+              <a className="govuk-link" href="/contact">
                 contact our Explore education statistics team
               </a>{' '}
               if you need any help or support.
@@ -56,7 +56,7 @@ class ErrorPage extends Component<Props> {
             <p>Try again later.</p>
             <p>
               In the meantime, if you need any help or support{' '}
-              <a className="govuk-link" href="#">
+              <a className="govuk-link" href="/contact">
                 contact our Explore education statistics team
               </a>
               .
