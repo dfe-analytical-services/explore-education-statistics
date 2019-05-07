@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`LineChartBlock renders 1`] = `
+exports[`LineChartBlock renders with correct output 1`] = `
 <div>
   <div
     class="recharts-responsive-container"
@@ -58,8 +58,8 @@ exports[`LineChartBlock renders 1`] = `
               x1="80"
               x2="870"
               y="5"
-              y1="168.40425531914894"
-              y2="168.40425531914894"
+              y1="173"
+              y2="173"
             />
             <line
               fill="none"
@@ -71,8 +71,8 @@ exports[`LineChartBlock renders 1`] = `
               x1="80"
               x2="870"
               y="5"
-              y1="91.80851063829789"
-              y2="91.80851063829789"
+              y1="101"
+              y2="101"
             />
             <line
               fill="none"
@@ -194,7 +194,7 @@ exports[`LineChartBlock renders 1`] = `
                   dy="0.71em"
                   x="100"
                 >
-                  2014/
+                  2014
                 </tspan>
               </text>
             </g>
@@ -228,7 +228,7 @@ exports[`LineChartBlock renders 1`] = `
                   dy="0.71em"
                   x="850"
                 >
-                  2015/
+                  2015
                 </tspan>
               </text>
             </g>
@@ -313,8 +313,8 @@ exports[`LineChartBlock renders 1`] = `
                 x1="74"
                 x2="80"
                 y="5"
-                y1="168.40425531914894"
-                y2="168.40425531914894"
+                y1="173"
+                y2="173"
               />
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
@@ -324,7 +324,7 @@ exports[`LineChartBlock renders 1`] = `
                 text-anchor="end"
                 width="60"
                 x="72"
-                y="168.40425531914894"
+                y="173"
               >
                 <tspan
                   dy="0.355em"
@@ -347,8 +347,8 @@ exports[`LineChartBlock renders 1`] = `
                 x1="74"
                 x2="80"
                 y="5"
-                y1="91.80851063829789"
-                y2="91.80851063829789"
+                y1="101"
+                y2="101"
               />
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
@@ -358,7 +358,7 @@ exports[`LineChartBlock renders 1`] = `
                 text-anchor="end"
                 width="60"
                 x="72"
-                y="91.80851063829789"
+                y="101"
               >
                 <tspan
                   dy="0.355em"
@@ -398,7 +398,7 @@ exports[`LineChartBlock renders 1`] = `
                   dy="0.355em"
                   x="72"
                 >
-                  9.4%
+                  10%
                 </tspan>
               </text>
             </g>
@@ -423,7 +423,7 @@ exports[`LineChartBlock renders 1`] = `
         >
           <path
             class="recharts-curve recharts-line-curve"
-            d="M100,196.48936170212767L850,196.48936170212767"
+            d="M100,173L850,173"
             fill="none"
             height="240"
             stroke="#4763a5"
@@ -451,7 +451,7 @@ exports[`LineChartBlock renders 1`] = `
         >
           <path
             class="recharts-curve recharts-line-curve"
-            d="M100,53.51063829787233L850,53.51063829787233"
+            d="M100,125L850,125"
             fill="none"
             height="240"
             stroke="#005ea5"

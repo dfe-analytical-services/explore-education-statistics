@@ -57,7 +57,7 @@ export default class LineChartBlock extends Component<ChartProps> {
             [indicatorName]: result.measures[indicatorName],
           };
         },
-        { name: parseCondensedTimePeriodRange(`${result.year}`) },
+        { name: `${result.year}` },
       );
     });
 

@@ -1,8 +1,9 @@
 import React from 'react';
-import { render, wait } from 'react-testing-library';
+
+import { render } from 'react-testing-library';
 import LineChartBlock from '../LineChartBlock';
 
-import testData from './testBlockData';
+import testData from './__data__/testBlockData';
 
 const elementContainingText = (
   container: HTMLElement,
@@ -14,17 +15,19 @@ const elementContainingText = (
   );
 
 describe('LineChartBlock', () => {
-  test('renders', async () => {
+  test('renders with correct output', async () => {
     const { container } = render(
       <LineChartBlock {...testData.AbstractChartProps} />,
     );
 
     expect(
-      elementContainingText(container, 'text tspan', 'test x axis').length,
+      elementContainingText(container, '.xAxis text tspan', 'test x axis')
+        .length,
     ).toBe(1);
 
     expect(
-      elementContainingText(container, 'text tspan', 'test y axis').length,
+      elementContainingText(container, '.yAxis text tspan', 'test y axis')
+        .length,
     ).toBe(1);
 
     expect(elementContainingText(container, 'text tspan', '2014').length).toBe(
@@ -34,6 +37,10 @@ describe('LineChartBlock', () => {
     expect(elementContainingText(container, 'text tspan', '2015').length).toBe(
       1,
     );
+
+    expect(
+      Array.from(container.querySelectorAll('.recharts-line')).length,
+    ).toBe(3);
 
     expect(container).toMatchSnapshot();
   });
