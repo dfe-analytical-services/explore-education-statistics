@@ -36,6 +36,15 @@ const PageFooter = ({ wide }: Props) => (
               </Link>
             </li>
             <li className="govuk-footer__inline-list-item">
+              <Link
+                className="govuk-footer__link"
+                to="/contact"
+                data-testid="footer--contact-link"
+              >
+                Contact
+              </Link>
+            </li>
+            <li className="govuk-footer__inline-list-item">
               <Link className="govuk-footer__link" to="/prototypes">
                 Prototypes
               </Link>
