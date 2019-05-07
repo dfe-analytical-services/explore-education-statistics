@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             _resultBuilder = resultBuilder;
         }
 
-        public TableBuilderResultViewModel Query(IQueryContext<Observation> queryContext)
+        public TableBuilderResultViewModel Query(ObservationQueryContext queryContext)
         {
             var observations = GetObservations(queryContext);
             if (!observations.Any())
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             };
         }
 
-        private IEnumerable<Observation> GetObservations(IQueryContext<Observation> queryContext)
+        private IEnumerable<Observation> GetObservations(ObservationQueryContext queryContext)
         {
             if (!_subjectService.IsSubjectForLatestRelease(queryContext.SubjectId))
             {
@@ -54,7 +54,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
                 return new List<Observation>();
             }
 
-            return _observationService.FindObservations(queryContext.FindExpression(), queryContext.Filters);
+            return _observationService.FindObservations(queryContext.SubjectId,
+                queryContext.GeographicLevel,
+                QueryUtil.YearsQuery(queryContext.Years, queryContext.StartYear, queryContext.EndYear),
+                queryContext.Countries,
+                queryContext.Regions,
+                queryContext.LocalAuthorities,
+                queryContext.LocalAuthorityDistricts,
+                queryContext.Filters);
         }
     }
 }

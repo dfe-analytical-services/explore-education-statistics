@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 
         private static IEnumerable<long> FilterItems(Observation observation)
         {
-            return observation.FilterItems.Select(item => item.FilterItemId);
+            return observation.FilterItems.Select(item => item.FilterItemId).OrderBy(l => l);
         }
 
         private static Dictionary<long, string> Measures(Observation observation, IEnumerable<long> indicators)
