@@ -2,11 +2,9 @@
 import {
   DataBlockData,
   DataBlockMetadata,
-  DataBlockResponse,
   GeographicLevel,
 } from '@common/services/dataBlockService';
-import { Axis } from '@common/services/publicationService';
-import { ChartProps } from '@common/modules/find-statistics/components/charts/AbstractChart';
+import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 const data: DataBlockData = {
   publicationId: 'test',
@@ -91,6 +89,16 @@ const metaData: DataBlockMetadata = {
   },
 
   indicators: {
+    '23': {
+      label: 'Unauthorised absence rate',
+      unit: '%',
+      value: 28,
+    },
+    '26': {
+      label: 'Overall absence rate',
+      unit: '%',
+      value: 28,
+    },
     '28': {
       label: 'Authorised absence rate',
       unit: '%',
@@ -112,6 +120,7 @@ const metaData: DataBlockMetadata = {
 
 const AbstractChartProps: ChartProps = {
   data,
+  meta: metaData,
   labels,
   chartDataKeys: ['23', '26', '28'],
   xAxis: { title: 'test x axis' },

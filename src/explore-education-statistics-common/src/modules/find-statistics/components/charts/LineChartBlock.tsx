@@ -1,4 +1,4 @@
-import { ChartProps } from '@common/modules/find-statistics/components/charts/AbstractChart';
+import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import React, { Component } from 'react';
 import {
@@ -14,7 +14,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { colours, parseCondensedTimePeriodRange, symbols } from './Charts';
+import { colours, symbols } from './Charts';
 
 const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
   if (active) {

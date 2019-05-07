@@ -1,7 +1,6 @@
-import {
-  AbstractChart,
+import ChartFunctions, {
   ChartProps,
-} from '@common/modules/find-statistics/components/charts/AbstractChart';
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React from 'react';
 import {
   Bar,
@@ -18,49 +17,60 @@ interface StackedBarHorizontalProps extends ChartProps {
   stacked?: boolean;
 }
 
-export default class HorizontalBarBlock extends AbstractChart<
-  StackedBarHorizontalProps
-> {
-  public render() {
-    const chartData = this.props.data.result.map(data => {
-      return data.measures;
-    });
+export default function HorizontalBarBlock(props: StackedBarHorizontalProps) {
+  const {
+    data,
+    meta,
+    height,
+    width,
+    xAxis,
+    referenceLines,
+    yAxis,
+    stacked,
+    chartDataKeys,
+  } = props;
 
-    return (
-      <ResponsiveContainer width="100%" height={this.props.height || 600}>
-        <BarChart
-          data={chartData}
-          layout="vertical"
-          margin={this.calculateMargins()}
-        >
-          {this.calculateYAxis({
-            type: 'category',
-            dataKey: this.props.yAxis.key || 'name',
-          })}
+  const chartData = data.result.map(({ measures, year }) => ({
+    name: `${year}`,
+    ...measures,
+  }));
 
-          <CartesianGrid />
+  console.log(chartData);
 
-          {this.calculateXAxis({ type: 'number' })}
+  return (
+    <ResponsiveContainer width={width || '100%'} height={height || 600}>
+      <BarChart
+        data={chartData}
+        layout="vertical"
+        margin={ChartFunctions.calculateMargins(xAxis, referenceLines)}
+      >
+        {ChartFunctions.calculateYAxis(yAxis, {
+          type: 'category',
+          dataKey: yAxis.key || 'name',
+        })}
 
-          <Tooltip cursor={false} />
-          <Legend />
+        <CartesianGrid />
 
-          {this.props.chartDataKeys.map((dataKey, index) => {
-            const key = index;
-            return (
-              <Bar
-                key={key}
-                dataKey={dataKey}
-                name={this.props.labels[dataKey]}
-                fill={colours[index]}
-                stackId={this.props.stacked ? 'a' : undefined}
-              />
-            );
-          })}
+        {ChartFunctions.calculateXAxis(xAxis, { type: 'number' })}
 
-          {this.generateReferenceLines()}
-        </BarChart>
-      </ResponsiveContainer>
-    );
-  }
+        <Tooltip cursor={false} />
+        <Legend />
+
+        {chartDataKeys.map((dataKey, index) => {
+          return (
+            <Bar
+              key={dataKey}
+              dataKey={dataKey}
+              name={(meta && meta.indicators[dataKey].label) || 'a'}
+              fill={colours[index]}
+              stackId={stacked ? 'a' : undefined}
+            />
+          );
+        })}
+
+        {referenceLines &&
+          ChartFunctions.generateReferenceLines(referenceLines)}
+      </BarChart>
+    </ResponsiveContainer>
+  );
 }

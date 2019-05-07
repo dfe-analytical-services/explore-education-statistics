@@ -17,30 +17,34 @@ const elementContainingText = (
 describe('HorzontalBarBlock', () => {
   test('renders with correct output', async () => {
     const { container } = render(
-      <HorzontalBarBlock {...testData.AbstractChartProps} stacked />,
+      <HorzontalBarBlock
+        {...testData.AbstractChartProps}
+        stacked
+        height={600}
+        width={900}
+      />,
     );
 
     await wait();
 
-    /*
     expect(
-      elementContainingText(container, '.xAxis text tspan', 'test x axis').length,
+      elementContainingText(container, '.xAxis text tspan', 'test x axis')
+        .length,
     ).toBe(1);
 
     expect(
-      elementContainingText(container, '.yAxis text tspan', 'test y axis').length,
+      elementContainingText(container, '.yAxis text tspan', 'test y axis')
+        .length,
     ).toBe(1);
 
-    expect(elementContainingText(container, 'text tspan', '2014').length)
-      .toBe(1);
+    expect(elementContainingText(container, 'text tspan', '2014').length).toBe(
+      1,
+    );
 
-    expect(elementContainingText(container, 'text tspan', '2015').length)
-      .toBe(1);
+    expect(elementContainingText(container, 'text tspan', '2015').length).toBe(
+      1,
+    );
 
-    expect(Array.from(container.querySelectorAll(".recharts-line")).length)
-      .toBe(3);
-
-*/
     expect(container).toMatchSnapshot();
   });
 });

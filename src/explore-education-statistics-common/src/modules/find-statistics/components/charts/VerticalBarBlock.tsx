@@ -1,4 +1,4 @@
-import { ChartProps } from '@common/modules/find-statistics/components/charts/AbstractChart';
+import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React from 'react';
 import {
   Bar,
