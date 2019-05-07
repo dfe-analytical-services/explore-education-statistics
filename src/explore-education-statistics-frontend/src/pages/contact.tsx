@@ -12,7 +12,7 @@ function ContactPage() {
       </p>
 
       <p>
-        <strong>Explore education statistics team at</strong>
+        <strong>Explore education statistics team</strong>
       </p>
 
       <p>Email</p>
