@@ -38,6 +38,14 @@ class ErrorPage extends Component<Props> {
               If you cut and pasted the web address, check you copied the entire
               address.
             </p>
+            <p>
+              If the web address is correct or you clicked a link or button and
+              ended up on this page,{' '}
+              <a className="govuk-link" href="#">
+                contact our Explore education statistics team
+              </a>{' '}
+              if you need any help or support.
+            </p>
           </>
         );
       default:
@@ -46,6 +54,13 @@ class ErrorPage extends Component<Props> {
             <PageTitle title={ErrorPage.statusCodeTitles[500]} />
 
             <p>Try again later.</p>
+            <p>
+              In the meantime, if you need any help or support{' '}
+              <a className="govuk-link" href="#">
+                contact our Explore education statistics team
+              </a>
+              .
+            </p>
           </>
         );
     }
