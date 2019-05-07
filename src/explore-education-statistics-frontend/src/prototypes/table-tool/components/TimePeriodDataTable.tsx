@@ -9,8 +9,7 @@ import {
   IndicatorOption,
 } from '@frontend/prototypes/table-tool/components/meta/initialSpec';
 import TableHeadersForm from '@frontend/prototypes/table-tool/components/TableHeadersForm';
-import isEqual from 'lodash/isEqual';
-import React, { useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 
 interface TableHeaders {
   columnGroups: FilterOption[];
@@ -36,23 +35,21 @@ const TimePeriodDataTable = ({
 }: Props) => {
   const dataTableRef = useRef<HTMLTableElement>(null);
 
-  const [prevFilters, setPrevFilters] = useState<Props['filters']>();
   const [tableHeaders, setTableHeaders] = useState<TableHeaders>({
-    columnGroups: [],
-    columns: [],
-    rowGroups: [],
-    rows: [],
+    columnGroups: filters.schoolTypes,
+    columns: timePeriods,
+    rowGroups: filters.characteristics,
+    rows: indicators,
   });
 
-  if (!isEqual(prevFilters, filters)) {
-    setPrevFilters(filters);
+  useEffect(() => {
     setTableHeaders({
       columnGroups: filters.schoolTypes,
       columns: timePeriods,
       rowGroups: filters.characteristics,
       rows: indicators,
     });
-  }
+  }, [filters, timePeriods, indicators]);
 
   const startLabel = timePeriods[0].label;
   const endLabel = timePeriods[timePeriods.length - 1].label;
@@ -147,4 +144,4 @@ const TimePeriodDataTable = ({
   );
 };
 
-export default TimePeriodDataTable;
+export default memo(TimePeriodDataTable);
