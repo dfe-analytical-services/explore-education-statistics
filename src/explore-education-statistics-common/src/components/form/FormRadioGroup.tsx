@@ -1,9 +1,13 @@
 import { Omit, PartialBy } from '@common/types/util';
 import classNames from 'classnames';
 import kebabCase from 'lodash/kebabCase';
-import React, { ChangeEvent, Component, createRef } from 'react';
+import memoize from 'memoizee';
+import React, { ChangeEvent, createRef, PureComponent } from 'react';
 import FormFieldset, { FormFieldsetProps } from './FormFieldset';
-import FormRadio, { FormRadioProps } from './FormRadio';
+import FormRadio, {
+  FormRadioProps,
+  RadioChangeEventHandler,
+} from './FormRadio';
 
 type RadioOption = PartialBy<
   Omit<FormRadioProps, 'checked' | 'name' | 'onChange'>,
@@ -24,7 +28,7 @@ export type FormRadioGroupProps = {
   value: string | null;
 } & FormFieldsetProps;
 
-class FormRadioGroup extends Component<FormRadioGroupProps> {
+class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
   public static defaultProps = {
     inline: false,
     legendSize: 'm',
@@ -34,6 +38,19 @@ class FormRadioGroup extends Component<FormRadioGroupProps> {
 
   private ref = createRef<HTMLInputElement>();
 
+  // eslint-disable-next-line react/sort-comp
+  private handleChange = memoize(
+    (option: RadioOption): RadioChangeEventHandler => event => {
+      const { onChange } = this.props;
+
+      if (onChange) {
+        onChange(event, option);
+      }
+    },
+    { primitive: true },
+  );
+
+  // eslint-disable-next-line react/sort-comp
   public componentDidMount(): void {
     if (this.ref.current) {
       import('govuk-frontend/components/radios/radios').then(
@@ -45,7 +62,7 @@ class FormRadioGroup extends Component<FormRadioGroupProps> {
   }
 
   public render() {
-    const { id, inline, name, onChange, options, small, value } = this.props;
+    const { id, inline, name, options, small, value } = this.props;
 
     return (
       <FormFieldset {...this.props}>
@@ -63,11 +80,7 @@ class FormRadioGroup extends Component<FormRadioGroupProps> {
               checked={value === option.value}
               key={option.value}
               name={name}
-              onChange={event => {
-                if (onChange) {
-                  onChange(event, option);
-                }
-              }}
+              onChange={this.handleChange(option)}
             />
           ))}
         </div>
