@@ -64,7 +64,7 @@ class SubscriptionForm extends Component<Props, State> {
         validationSchema={Yup.object({
           email: Yup.string()
             .required('Email is required')
-            .email('Please enter a valid email'),
+            .email('Enter a valid email'),
         })}
         onSubmit={async (form, actions) => {
           try {
