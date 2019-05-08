@@ -5,6 +5,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import { Dictionary } from '@common/types/util';
 import { Formik, FormikProps } from 'formik';
 import mapValues from 'lodash/mapValues';
+import sortBy from 'lodash/sortBy';
 import React from 'react';
 import { useImmer } from 'use-immer';
 import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
@@ -121,7 +122,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                     term={specification.locations[levelKey].legend}
                     key={levelKey}
                   >
-                    {levelOptions.map(level => (
+                    {sortBy(levelOptions, ['label']).map(level => (
                       <React.Fragment key={level.value}>
                         {level.label}
                         <br />
