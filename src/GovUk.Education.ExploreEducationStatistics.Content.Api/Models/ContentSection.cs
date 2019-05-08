@@ -52,8 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
 
         public string Heading { get; set; }
         
-        public DataQuery DataQuery { get; set; }
-
+        public DataBlockRequest DataBlockRequest { get; set; }
+    
         public List<IContentBlockChart> Charts { get; set; }
 
         public Summary Summary { get; set; }

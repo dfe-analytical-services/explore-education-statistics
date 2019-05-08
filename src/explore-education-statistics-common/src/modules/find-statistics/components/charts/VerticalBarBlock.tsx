@@ -1,4 +1,6 @@
-import { ChartProps } from '@common/modules/find-statistics/components/charts/AbstractChart';
+import ChartFunctions, {
+  ChartProps,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React from 'react';
 import {
   Bar,
@@ -7,47 +9,51 @@ import {
   Legend,
   ResponsiveContainer,
   Tooltip,
-  XAxis,
-  YAxis,
 } from 'recharts';
 
 import { colours } from './Charts';
 
 export default function VerticalBarBlock({
-  characteristicsData,
+  data,
   chartDataKeys,
   height,
-  labels,
   xAxis,
+  yAxis,
+  width,
+  meta,
 }: ChartProps) {
-  const chartData = characteristicsData.result.map(data => {
-    return data.indicators;
-  });
+  const chartData = data.result.map(({ measures, year }) => ({
+    name: `${year}`,
+    ...measures,
+  }));
 
   return (
-    <ResponsiveContainer width={900} height={height || 300}>
+    <ResponsiveContainer width={width || 900} height={height || 300}>
       <BarChart
         data={chartData}
-        margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
+        margin={ChartFunctions.calculateMargins(xAxis, yAxis, undefined)}
       >
-        <XAxis
-          dataKey={xAxis.key || 'name'}
-          interval={0}
-          tick={{ fontSize: 12 }}
-        />
+        {ChartFunctions.calculateXAxis(xAxis, {
+          interval: 0,
+          tick: { fontSize: 12 },
+          dataKey: xAxis.key || 'name',
+        })}
+
         <CartesianGrid />
-        <YAxis />
+
+        {ChartFunctions.calculateYAxis(yAxis, { type: 'number' })}
+
         <Tooltip />
         <Legend />
 
         {chartDataKeys.map((dataKey, index) => {
-          const key = index;
           return (
             <Bar
-              key={key}
+              key={dataKey}
               dataKey={dataKey}
               fill={colours[index]}
-              name={labels[dataKey]}
+              name={(meta && meta.indicators[dataKey].label) || 'a'}
+              isAnimationActive={false}
             />
           );
         })}

@@ -1,5 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;

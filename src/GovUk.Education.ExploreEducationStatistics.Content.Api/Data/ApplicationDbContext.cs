@@ -271,22 +271,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
 
                     KeyStatistics = new DataBlock
                     {
-                        DataQuery = new DataQuery
+
+                        DataBlockRequest = new DataBlockRequest
                         {
-                            method = "POST",
-                            path = "/api/tablebuilder/characteristics/national",
-                            body =
-                                "{ \"indicators\": [\"enrolments\",\"sess_authorised\",\"sess_overall\",\"enrolments_PA_10_exact\",\"sess_unauthorised_percent\",\"enrolments_pa_10_exact_percent\",\"sess_authorised_percent\",\"sess_overall_percent\" ], \"characteristics\": [ \"Total\" ], \"endYear\": 201617, \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\", \"schoolTypes\": [ \"Total\" ], \"startYear\": 201213}"
+                            subjectId= 1,
+                            geographicLevel= "National",
+                            startYear= 2016,
+                            endYear= 2017,
+                            filters= new List<int>{1,2},
+                            indicators= new List<int>{23, 26, 28}
                         },
 
                         Summary = new Summary
                         {
                             dataKeys = new List<string>
                             {
-                                "sess_overall_percent",
-                                "sess_authorised_percent",
-                                "sess_unauthorised_percent"
-                            },
+                                "23",
+                                "26",
+                                "28"
+                            },                                                        
 
                             description = new MarkDownBlock
                             {
@@ -294,27 +297,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                        " * overall and unauthorised absence rates up on previous year \n" +
                                        " * unauthorised rise due to higher rates of unauthorised holidays \n" +
                                        " * 10% of pupils persistently absent during 2016/17"
-                            }
-                        },
-
-                        Charts = new List<IContentBlockChart>
-                        {
-                            new LineChart
-                            {
-                                XAxis = new Axis
-                                {
-                                    title = "School Year"
-                                },
-                                YAxis = new Axis
-                                {
-                                    title = "Absence Rate"
-                                },
-                                Indicators = new List<string>
-                                {
-                                    "sess_overall_percent",
-                                    "sess_unauthorised_percent",
-                                    "sess_authorised_percent"
-                                },
                             }
                         }
                     },
@@ -346,12 +328,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                 new DataBlock
                                 {
                                     Heading = null,
-                                    DataQuery = new DataQuery
+                                    DataBlockRequest = new DataBlockRequest
                                     {
-                                        method = "POST",
-                                        path = "/api/tablebuilder/characteristics/national",
-                                        body =
-                                            "{ \"indicators\": [ \"num_schools\", \"enrolments\", \"sess_overall_percent\", \"sess_unauthorised_percent\", \"sess_authorised_percent\" ], \"characteristics\": [ \"Total\" ], \"endYear\": 201617, \"publicationId\": \"cbbd299f-8297-44bc-92ac-558bcf51f8ad\", \"schoolTypes\": [ \"Total\" ], \"startYear\": 201213}"
+                                        subjectId= 1,
+                                        geographicLevel= "National",
+                                        startYear= 2012,
+                                        endYear= 2017,
+                                        filters= new List<int>{1,2},
+                                        indicators= new List<int>{23, 26, 28}
                                     },
                                     Charts = new List<IContentBlockChart>
                                     {
@@ -367,9 +351,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                             },
                                             Indicators = new List<string>
                                             {
-                                                "sess_overall_percent",
-                                                "sess_unauthorised_percent",
-                                                "sess_authorised_percent"
+                                                "23","26","28"
                                             },
                                         }
                                     }
@@ -515,13 +497,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                               "You can also view a regional breakdown of statistics and data within the [local authorities section](#contents-sections-heading-9)",
                     KeyStatistics = new DataBlock
                     {
-                        DataQuery = new DataQuery
-                        {
-                            method = "POST",
-                            path = "/api/tablebuilder/characteristics/national",
-                            body =
-                                "{ \"indicators\": [\"perm_excl_rate\",\"perm_excl\",\"fixed_excl_rate\" ], \"characteristics\": [ \"Total\" ], \"endYear\": 201617, \"publicationId\": \"bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9\", \"schoolTypes\": [ \"Total\" ], \"startYear\": 201213}"
-                        },
                         
                         Summary = new Summary
                         {
