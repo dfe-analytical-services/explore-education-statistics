@@ -64,7 +64,6 @@ const PublicationPage = () => {
                 src="/static/images/UKSA-quality-mark.jpg"
                 alt="UK statistics authority quality mark"
                 height="130"
-                width="130"
               />
             </div>
           </div>
@@ -113,7 +112,7 @@ const PublicationPage = () => {
               <span className="govuk-caption-m govuk-caption-inline">
                 For school year:{' '}
               </span>
-              2016/17 (latest data)
+              2016 to 2017 (latest data)
             </h3>
 
             <Details summary="See previous 7 releases">
@@ -205,7 +204,9 @@ const PublicationPage = () => {
         </div>
       </div>
       <hr />
-      <h2 className="govuk-heading-l">Headline facts and figures - 2016/17</h2>
+      <h2 className="govuk-heading-l">
+        Headline facts and figures - 2016 to 2017
+      </h2>
       <PrototypeDataSample
         sectionId="headlines"
         chartTitle="change in absence types in England"
@@ -762,7 +763,7 @@ const PublicationPage = () => {
             </li>
           </ul>
         </AccordionSection>
-        <AccordionSection heading="National statistics" headingTag="h3">
+        <AccordionSection heading="National Statistics" headingTag="h3">
           <p className="govuk-body">
             The United Kingdom Statistics Authority designated these statistics
             as National Statistics in <a href="#">Month Year</a> in accordance
