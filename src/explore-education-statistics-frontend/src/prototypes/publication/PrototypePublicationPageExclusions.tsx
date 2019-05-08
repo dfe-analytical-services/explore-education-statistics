@@ -40,7 +40,7 @@ const PublicationPageExclusions = () => {
               </p>
               <p className="govuk-inset-text">
                 View a regional breakdown of statistics and data under the{' '}
-                <a href="#contents-sections-heading-9">
+                <a href="#contents-exclusions-sections-heading-9">
                   Regional and local authority (LA) breakdown
                 </a>{' '}
                 section
@@ -49,8 +49,8 @@ const PublicationPageExclusions = () => {
               <p>
                 Find out how and why these statistics are collected and
                 published -{' '}
-                <Link to="/prototypes/methodology-absence">
-                  Pupil absence statistics: methodology
+                <Link to="#">
+                  Permanent and fixed-period exclusions statistics: methodology
                 </Link>
               </p>
             </div>
@@ -64,13 +64,11 @@ const PublicationPageExclusions = () => {
             </div>
           </div>
 
-          <p>
-            <Link to="#">
-              Find out more about our permanent and fixed-period exclusions data
-              and statistics methodology and terminology
-            </Link>
-          </p>
-          <Details summary="Download underlying data files">
+          <Details summary="Download data files">
+            <p>
+              You can customise and download data as Excel or .csv files. Our
+              data can also be accessed via an API.
+            </p>
             <ul className="govuk-list">
               <li>
                 <a href="#" className="govuk-link">
@@ -185,13 +183,13 @@ const PublicationPageExclusions = () => {
               className="govuk-heading-m govuk-!-margin-top-6"
               id="related-content"
             >
-              Related content
+              Related guidance
             </h2>
             <nav role="navigation" aria-labelledby="related-content">
               <ul className="govuk-list">
                 <li>
-                  <Link to="/prototypes/methodology-absence">
-                    Permanent and fixed-period exclusions: guidance and
+                  <Link to="#">
+                    Permanent and fixed-period exclusions statistics:
                     methodology
                   </Link>
                 </li>
@@ -203,9 +201,7 @@ const PublicationPageExclusions = () => {
 
       <hr />
 
-      <h2 className="govuk-heading-l">
-        Latest headline facts and figures - 2016/17
-      </h2>
+      <h2 className="govuk-heading-l">Headline facts and figures - 2016/17</h2>
 
       <PrototypeDataSample
         sectionId="headlines"

@@ -34,7 +34,7 @@ const PublicationPage = () => {
     >
       <strong className="govuk-tag govuk-!-margin-bottom-2">
         {' '}
-        This is the latest data{' '}
+        Latest statistics and data{' '}
       </strong>
       <h1 className="govuk-heading-xl">
         GCSE and equivalent result statistics and data for schools in England
