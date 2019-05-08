@@ -34,7 +34,7 @@ const PublicationPage = () => {
     >
       <strong className="govuk-tag govuk-!-margin-bottom-2">
         {' '}
-        This is the latest data{' '}
+        Latest statistics and data{' '}
       </strong>
       <h1 className="govuk-heading-xl">
         GCSE and equivalent result statistics and data for schools in England
@@ -63,7 +63,7 @@ const PublicationPage = () => {
                 Read national statistical summaries, view charts and tables and
                 download data files.
               </p>
-              <p className="govuk-body">
+              <p className="govuk-inset-text">
                 View a regional breakdown of statistics and data under the{' '}
                 <a href="#contents-sections-heading-6">
                   Regional and local authority (LA) breakdown
@@ -128,7 +128,7 @@ const PublicationPage = () => {
               <span className="govuk-caption-m govuk-caption-inline">
                 For school year:{' '}
               </span>
-              2016/17 (latest data)
+              2016 to 2017 (latest data)
             </h3>
 
             <Details summary="See previous 7 releases">
@@ -205,13 +205,13 @@ const PublicationPage = () => {
               className="govuk-heading-m govuk-!-margin-top-6"
               id="related-content"
             >
-              Related content
+              Related guidance
             </h2>
             <nav role="navigation" aria-labelledby="related-content">
               <ul className="govuk-list">
                 <li>
                   <Link to="https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/772862/2018_Key_stage_4_Methodology.pdf">
-                    GCSE and equivalent results: methodology
+                    GCSE and equivalent results statistics: methodology
                   </Link>
                 </li>
               </ul>
@@ -221,7 +221,7 @@ const PublicationPage = () => {
       </div>
       <hr />
       <h2 className="govuk-heading-l">
-        Latest headline facts and figures - 2016/17
+        Headline facts and figures - 2016 to 2017
       </h2>
       <PrototypeDataSampleGCSE
         sectionId="headlines"
@@ -615,8 +615,8 @@ const PublicationPage = () => {
       <h2 className="govuk-heading-m govuk-!-margin-top-9">Help and support</h2>
       <Accordion id="extra-information-sections">
         <AccordionSection
-          heading="Where does this data come from?"
-          caption="Our methodology, how we collect and process the data"
+          heading="GCSE and equivalent results statistics: methodology"
+          caption="How we collect and process statistics and data"
           headingTag="h3"
         >
           <ul className="govuk-list">
@@ -637,7 +637,7 @@ const PublicationPage = () => {
             </li>
           </ul>
         </AccordionSection>
-        <AccordionSection heading="National statistics" headingTag="h3">
+        <AccordionSection heading="National Statistics" headingTag="h3">
           <p className="govuk-body">
             The United Kingdom Statistics Authority designated these statistics
             as National Statistics in <a href="#">Month Year</a> in accordance
