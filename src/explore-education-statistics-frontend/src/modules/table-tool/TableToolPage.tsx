@@ -252,7 +252,7 @@ class TableToolPage extends Component<{}, State> {
     } = this.state;
 
     return (
-      <Page breadcrumbs={[{ name: 'Create your own tables online' }]}>
+      <Page breadcrumbs={[{ name: 'Create your own tables online' }]} wide>
         <PageTitle caption="Table tool" title="Create your own tables online" />
 
         <p>
