@@ -19,10 +19,10 @@ const PublicationPageExclusions = () => {
     >
       <strong className="govuk-tag govuk-!-margin-bottom-2">
         {' '}
-        This is the latest data{' '}
+        Latest statistics and data{' '}
       </strong>
       <h1 className="govuk-heading-xl">
-        Permanent and fixed-period exclusions statistics in England
+        Permanent and fixed-period exclusions statistics for schools in England
       </h1>
       <dl className="dfe-meta-content">
         <dt className="govuk-caption-m">Published: </dt>
@@ -35,16 +35,23 @@ const PublicationPageExclusions = () => {
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-three-quarters">
               <p className="govuk-body">
-                Read national statistical summaries and definitions, view charts
-                and tables and download data files across a range of permanent
-                and fixed-period exclusion subject areas.
+                Read national statistical summaries, view charts and tables and
+                download data files.
               </p>
-              <p className="govuk-body">
-                You can also view a regional breakdown of statistics and data
-                within the{' '}
-                <a href="#contents-exclusions-sections-heading-9">
-                  <strong>local authorities section</strong>
-                </a>
+              <p className="govuk-inset-text">
+                View a regional breakdown of statistics and data under the{' '}
+                <a href="#contents-sections-heading-9">
+                  Regional and local authority (LA) breakdown
+                </a>{' '}
+                section
+              </p>
+
+              <p>
+                Find out how and why these statistics are collected and
+                published -{' '}
+                <Link to="/prototypes/methodology-absence">
+                  Pupil absence statistics: methodology
+                </Link>
               </p>
             </div>
             <div className="govuk-grid-column-one-quarter">
@@ -614,7 +621,7 @@ const PublicationPageExclusions = () => {
             in an offer of reinstatement.
           </p>
         </AccordionSection>
-        <AccordionSection heading="Exclusions from pupil referral units">
+        <AccordionSection heading="Pupil referral unit exclusions">
           <p>
             The rate of permanent exclusion in pupil referral units decreased
             from 0.14 per cent in 2015/16 to 0.13 in 2016/17. After an increase
@@ -629,7 +636,7 @@ const PublicationPageExclusions = () => {
             from 58.15 per cent in 2015/16.
           </p>
         </AccordionSection>
-        <AccordionSection heading="Exclusions by local authority">
+        <AccordionSection heading="Regional and local authority (LA) breakdown">
           <p>
             There is considerable variation in the permanent and fixed-period
             exclusion rate at local authority level (see accompanying maps on
