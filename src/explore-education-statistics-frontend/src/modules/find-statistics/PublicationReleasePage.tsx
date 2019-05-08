@@ -330,39 +330,42 @@ class PublicationReleasePage extends Component<Props> {
             </ul>
           </AccordionSection>
           <AccordionSection heading="Contact us" headingTag="h3">
-            <h4>Media enquiries</h4>
-            <address className="govuk-body dfe-font-style-normal">
-              Press Office News Desk
-              <br />
-              Department for Education <br />
-              Sanctuary Buildings <br />
-              Great Smith Street <br />
-              London
-              <br />
-              SW1P 3BT <br />
-              Telephone: 020 7783 8300
-            </address>
-
-            <h4>Other enquiries</h4>
-            <address className="govuk-body dfe-font-style-normal">
-              Data Insight and Statistics Division
-              <br />
-              Level 1<br />
-              Department for Education
-              <br />
-              Sanctuary Buildings <br />
-              Great Smith Street
-              <br />
-              London
-              <br />
-              SW1P 3BT <br />
-              Telephone: 020 7783 8300
-              <br />
-              Email:{' '}
-              <a href="mailto:Schools.statistics@education.co.uk">
-                Schools.statistics@education.gov.uk
+            <p>
+              If you have a specific enquiry about [[ THEME ]] statistics and
+              data:
+            </p>
+            <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+              [[ TEAM NAME ]]
+            </h4>
+            <p className="govuk-!-margin-top-0">
+              Email <br />
+              <a href="mailto:schools.statistics@education.gov.uk">
+                [[ TEAM EMAIL ADDRESS ]]
               </a>
-            </address>
+            </p>
+            <p>
+              Telephone: [[ LEAD STATISTICIAN NAME ]] <br /> [[ LEAD
+              STATISTICIAN TEL. NO.]]
+            </p>
+            <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+              Press office
+            </h4>
+            <p className="govuk-!-margin-top-0">If you have a media enquiry:</p>
+            <p>
+              Telephone <br />
+              020 7925 6789
+            </p>
+            <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+              Public enquiries
+            </h4>
+            <p className="govuk-!-margin-top-0">
+              If you have a general enquiry about the Department for Education
+              (DfE) or education:
+            </p>
+            <p>
+              Telephone <br />
+              037 0000 2288
+            </p>
           </AccordionSection>
         </Accordion>
 

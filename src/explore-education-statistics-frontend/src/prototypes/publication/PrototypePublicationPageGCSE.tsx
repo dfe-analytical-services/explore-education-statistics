@@ -687,29 +687,40 @@ const PublicationPage = () => {
             If you have a specific enquiry about absence and exclusion
             statistics and data:
           </p>
-          <p>
-            <strong>Attainment statistics team</strong>
-          </p>
-          <p>Email</p>
-          <p>
+          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+            Attainment statistics team
+          </h4>
+          <p className="govuk-!-margin-top-0">
+            Email
+            <br />
             <a href="mailto:attainment.statistics@education.gov.uk">
               attainment.statistics@education.gov.uk
             </a>
           </p>
-          <p>Telephone: Kathryn Kenney</p>
-          <p>01325 340 620</p>
-
-          <h4>Press office</h4>
-          <p>If you have a media enquiry:</p>
-          <p>Telephone</p>
-          <p>020 7925 6789 </p>
-          <h4>Public enquiries</h4>
           <p>
+            Telephone: Kathryn Kenney <br />
+            01325 340 620
+          </p>
+
+          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+            Press office
+          </h4>
+          <p className="govuk-!-margin-top-0">If you have a media enquiry:</p>
+          <p>
+            Telephone <br />
+            020 7925 6789
+          </p>
+          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+            Public enquiries
+          </h4>
+          <p className="govuk-!-margin-top-0">
             If you have a general enquiry about the Department for Education
             (DfE) or education:
           </p>
-          <p>Telephone</p>
-          <p>037 0000 2288</p>
+          <p>
+            Telephone <br />
+            037 0000 2288
+          </p>
         </AccordionSection>
       </Accordion>
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
