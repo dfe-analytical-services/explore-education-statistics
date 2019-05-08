@@ -141,6 +141,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       name="indicators"
                       id="filtersForm-indicators"
                       legend="Indicators"
+                      legendHidden
                       hint="Select at least 1 indicator"
                       error={getError('indicators')}
                       options={Object.entries(specification.indicators).map(
