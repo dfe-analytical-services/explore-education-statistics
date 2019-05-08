@@ -6,7 +6,7 @@ import TimePeriod from '@common/services/types/TimePeriod';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
 import mapValues from 'lodash/mapValues';
-import React, { Component, createRef } from 'react';
+import React, { Component } from 'react';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
 import LocationFiltersForm from './components/LocationFiltersForm';
 import initialMetaSpecification, {
@@ -86,14 +86,6 @@ class TableToolPage extends Component<{}, State> {
     tableData: [],
   };
 
-  private publicationSubjectRef = createRef<HTMLLIElement>();
-
-  private filtersRef = createRef<HTMLElement>();
-
-  private dataTableRef = createRef<HTMLElement>();
-
-  private locationFiltersRef = createRef<HTMLElement>();
-
   private handlePublicationFormSubmit = async ({
     publicationId,
     publicationName,
@@ -105,48 +97,21 @@ class TableToolPage extends Component<{}, State> {
       return;
     }
 
-    if (this.publicationSubjectRef.current) {
-      this.publicationSubjectRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-      this.publicationSubjectRef.current.focus();
-    }
-
     const publicationMeta = await tableBuilderService.getCharacteristicsMeta(
       publicationId,
     );
 
     const { metaSpecification } = this.state;
-    this.setState(
-      {
-        publicationId,
-        publicationName,
-        metaSpecification: {
-          ...metaSpecification,
-          filters: {
-            ...metaSpecification.filters,
-            characteristics: {
-              ...metaSpecification.filters.characteristics,
-              options: Object.entries(publicationMeta.characteristics).reduce(
-                (acc, [groupKey, group]) => {
-                  return {
-                    ...acc,
-                    [groupKey]: {
-                      label: groupKey,
-                      options: group.map(option => ({
-                        label: option.label,
-                        value: option.name,
-                      })),
-                    },
-                  };
-                },
-                {},
-              ),
-            },
-          },
-          indicators: {
-            ...Object.entries(publicationMeta.indicators).reduce(
+    this.setState({
+      publicationId,
+      publicationName,
+      metaSpecification: {
+        ...metaSpecification,
+        filters: {
+          ...metaSpecification.filters,
+          characteristics: {
+            ...metaSpecification.filters.characteristics,
+            options: Object.entries(publicationMeta.characteristics).reduce(
               (acc, [groupKey, group]) => {
                 return {
                   ...acc,
@@ -154,7 +119,6 @@ class TableToolPage extends Component<{}, State> {
                     label: groupKey,
                     options: group.map(option => ({
                       label: option.label,
-                      unit: option.unit,
                       value: option.name,
                     })),
                   },
@@ -164,19 +128,28 @@ class TableToolPage extends Component<{}, State> {
             ),
           },
         },
-        publicationSubjectName: '',
-        tableData: [],
+        indicators: {
+          ...Object.entries(publicationMeta.indicators).reduce(
+            (acc, [groupKey, group]) => {
+              return {
+                ...acc,
+                [groupKey]: {
+                  label: groupKey,
+                  options: group.map(option => ({
+                    label: option.label,
+                    unit: option.unit,
+                    value: option.name,
+                  })),
+                },
+              };
+            },
+            {},
+          ),
+        },
       },
-      () => {
-        if (this.publicationSubjectRef.current) {
-          this.publicationSubjectRef.current.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
-          this.publicationSubjectRef.current.focus();
-        }
-      },
-    );
+      publicationSubjectName: '',
+      tableData: [],
+    });
   };
 
   private handleFilterFormSubmit: FilterFormSubmitHandler = async ({
@@ -218,25 +191,15 @@ class TableToolPage extends Component<{}, State> {
       metaSpecification.indicators,
     );
 
-    this.setState(
-      {
-        filters: mapValuesWithKeys(filters, ([filterGroup, selectedFilters]) =>
-          selectedFilters.map(
-            filter => categoricalFiltersByValue[filterGroup][filter],
-          ),
+    this.setState({
+      filters: mapValuesWithKeys(filters, ([filterGroup, selectedFilters]) =>
+        selectedFilters.map(
+          filter => categoricalFiltersByValue[filterGroup][filter],
         ),
-        indicators: indicators.map(indicator => indicatorsByValue[indicator]),
-        tableData: result,
-      },
-      () => {
-        if (this.dataTableRef.current) {
-          this.dataTableRef.current.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
-        }
-      },
-    );
+      ),
+      indicators: indicators.map(indicator => indicatorsByValue[indicator]),
+      tableData: result,
+    });
   };
 
   public render() {
@@ -275,25 +238,15 @@ class TableToolPage extends Component<{}, State> {
               />
             )}
           </WizardStep>
-          <WizardStep ref={this.publicationSubjectRef}>
+          <WizardStep>
             {stepProps => (
               <PublicationSubjectForm
                 {...stepProps}
                 options={publicationSubjectSpec.subjects}
                 onSubmit={values =>
-                  this.setState(
-                    {
-                      publicationSubjectName: values.publicationSubjectName,
-                    },
-                    () => {
-                      if (this.locationFiltersRef.current) {
-                        this.locationFiltersRef.current.scrollIntoView({
-                          behavior: 'smooth',
-                          block: 'start',
-                        });
-                      }
-                    },
-                  )
+                  this.setState({
+                    publicationSubjectName: values.publicationSubjectName,
+                  })
                 }
               />
             )}
@@ -305,22 +258,12 @@ class TableToolPage extends Component<{}, State> {
                   {...stepProps}
                   specification={metaSpecification}
                   onSubmit={values => {
-                    this.setState(
-                      {
-                        // eslint-disable-next-line react/no-unused-state
-                        locations: {
-                          ...values,
-                        },
+                    this.setState({
+                      // eslint-disable-next-line react/no-unused-state
+                      locations: {
+                        ...values,
                       },
-                      () => {
-                        if (this.filtersRef.current) {
-                          this.filtersRef.current.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start',
-                          });
-                        }
-                      },
-                    );
+                    });
                   }}
                 />
               )
@@ -332,22 +275,12 @@ class TableToolPage extends Component<{}, State> {
                 {...stepProps}
                 specification={metaSpecification}
                 onSubmit={values => {
-                  this.setState(
-                    {
-                      timePeriods: TimePeriod.createRange(
-                        TimePeriod.fromString(values.start),
-                        TimePeriod.fromString(values.end),
-                      ),
-                    },
-                    () => {
-                      if (this.filtersRef.current) {
-                        this.filtersRef.current.scrollIntoView({
-                          behavior: 'smooth',
-                          block: 'start',
-                        });
-                      }
-                    },
-                  );
+                  this.setState({
+                    timePeriods: TimePeriod.createRange(
+                      TimePeriod.fromString(values.start),
+                      TimePeriod.fromString(values.end),
+                    ),
+                  });
                 }}
               />
             )}
