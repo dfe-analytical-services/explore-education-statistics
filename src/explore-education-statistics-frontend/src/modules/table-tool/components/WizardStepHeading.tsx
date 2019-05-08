@@ -1,7 +1,7 @@
+import { InjectedWizardProps } from '@frontend/modules/table-tool/components/Wizard';
+import styles from '@frontend/modules/table-tool/components/WizardStepHeading.module.scss';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
-import { InjectedWizardProps } from './Wizard';
-import styles from './WizardStepHeading.module.scss';
 
 interface Props {
   children: ReactNode;

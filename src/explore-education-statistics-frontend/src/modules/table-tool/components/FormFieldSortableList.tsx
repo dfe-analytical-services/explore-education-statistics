@@ -1,7 +1,7 @@
 import { Omit } from '@common/types/util';
 import FormSortableList, {
   FormSortableListProps,
-} from '@frontend/prototypes/table-tool/components/FormSortableList';
+} from '@frontend/modules/table-tool/components/FormSortableList';
 import { Field, FieldProps } from 'formik';
 import React from 'react';
 

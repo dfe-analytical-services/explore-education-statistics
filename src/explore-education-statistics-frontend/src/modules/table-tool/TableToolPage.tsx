@@ -1,21 +1,27 @@
-import Tabs from '@common/components/Tabs';
-import TabsSection from '@common/components/TabsSection';
-import CharacteristicsDataTable from '@common/modules/table-tool/components/CharacteristicsDataTable';
+import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import tableBuilderService, {
   DataTableResult,
-  PublicationMeta,
 } from '@common/services/tableBuilderService';
-import SchoolType from '@common/services/types/SchoolType';
+import TimePeriod from '@common/services/types/TimePeriod';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
-import range from 'lodash/range';
+import mapValues from 'lodash/mapValues';
 import React, { Component, createRef } from 'react';
-import CharacteristicsFilterForm, {
-  CharacteristicsFilterFormSubmitHandler,
-} from './components/CharacteristicsFilterForm';
-import PublicationMenu, {
-  MenuChangeEventHandler,
-} from './components/PublicationMenu';
+import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
+import LocationFiltersForm from './components/LocationFiltersForm';
+import initialMetaSpecification, {
+  FilterOption,
+  IndicatorOption,
+  MetaSpecification,
+} from './components/meta/initialSpec';
+import publicationSubjectSpec from './components/meta/publicationSubjectSpec';
+import PublicationForm from './components/PublicationForm';
+import PublicationSubjectForm from './components/PublicationSubjectForm';
+import TimePeriodDataTable from './components/TimePeriodDataTable';
+import TimePeriodForm from './components/TimePeriodForm';
+import mapOptionValues from './components/utils/mapOptionValues';
+import Wizard from './components/Wizard';
+import WizardStep from './components/WizardStep';
 
 const defaultPublicationOptions = [
   {
@@ -51,87 +57,146 @@ const defaultPublicationOptions = [
 ];
 
 interface State {
-  filters: {
-    characteristics: string[];
-    indicators: string[];
-    schoolTypes: SchoolType[];
-    years: number[];
+  timePeriods: TimePeriod[];
+  locations: {
+    [key: string]: string[];
   };
+  filters: {
+    [key: string]: FilterOption[];
+  };
+  indicators: IndicatorOption[];
+  metaSpecification: MetaSpecification;
   publicationId: string;
-  publicationMeta: Pick<PublicationMeta, 'characteristics' | 'indicators'>;
   publicationName: string;
+  publicationSubjectName: string;
   tableData: DataTableResult[];
 }
 
 class TableToolPage extends Component<{}, State> {
-  private readonly defaultFilters: State['filters'] = {
-    characteristics: [],
-    indicators: [],
-    schoolTypes: [],
-    years: [],
-  };
-
   public state: State = {
-    filters: {
-      ...this.defaultFilters,
-    },
+    filters: {},
+    timePeriods: [],
+    // eslint-disable-next-line react/no-unused-state
+    locations: {},
+    indicators: [],
+    metaSpecification: initialMetaSpecification,
     publicationId: '',
-    publicationMeta: {
-      characteristics: {},
-      indicators: {},
-    },
     publicationName: '',
+    publicationSubjectName: '',
     tableData: [],
   };
 
-  private filtersRef = createRef<HTMLDivElement>();
+  private publicationSubjectRef = createRef<HTMLLIElement>();
+
+  private filtersRef = createRef<HTMLElement>();
 
   private dataTableRef = createRef<HTMLElement>();
 
-  private handleMenuChange: MenuChangeEventHandler = async ({
+  private locationFiltersRef = createRef<HTMLElement>();
+
+  private handlePublicationFormSubmit = async ({
     publicationId,
     publicationName,
+  }: {
+    publicationId: string;
+    publicationName: string;
   }) => {
     if (!publicationId) {
       return;
+    }
+
+    if (this.publicationSubjectRef.current) {
+      this.publicationSubjectRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+      this.publicationSubjectRef.current.focus();
     }
 
     const publicationMeta = await tableBuilderService.getCharacteristicsMeta(
       publicationId,
     );
 
+    const { metaSpecification } = this.state;
     this.setState(
       {
         publicationId,
-        publicationMeta,
         publicationName,
-        filters: {
-          ...this.defaultFilters,
+        metaSpecification: {
+          ...metaSpecification,
+          filters: {
+            ...metaSpecification.filters,
+            characteristics: {
+              ...metaSpecification.filters.characteristics,
+              options: Object.entries(publicationMeta.characteristics).reduce(
+                (acc, [groupKey, group]) => {
+                  return {
+                    ...acc,
+                    [groupKey]: {
+                      label: groupKey,
+                      options: group.map(option => ({
+                        label: option.label,
+                        value: option.name,
+                      })),
+                    },
+                  };
+                },
+                {},
+              ),
+            },
+          },
+          indicators: {
+            ...Object.entries(publicationMeta.indicators).reduce(
+              (acc, [groupKey, group]) => {
+                return {
+                  ...acc,
+                  [groupKey]: {
+                    label: groupKey,
+                    options: group.map(option => ({
+                      label: option.label,
+                      unit: option.unit,
+                      value: option.name,
+                    })),
+                  },
+                };
+              },
+              {},
+            ),
+          },
         },
+        publicationSubjectName: '',
         tableData: [],
       },
       () => {
-        if (this.filtersRef.current) {
-          this.filtersRef.current.scrollIntoView({
+        if (this.publicationSubjectRef.current) {
+          this.publicationSubjectRef.current.scrollIntoView({
             behavior: 'smooth',
             block: 'start',
           });
+          this.publicationSubjectRef.current.focus();
         }
       },
     );
   };
 
-  private handleFilterFormSubmit: CharacteristicsFilterFormSubmitHandler = async ({
-    characteristics,
+  private handleFilterFormSubmit: FilterFormSubmitHandler = async ({
+    filters,
     indicators,
-    schoolTypes,
-    startYear,
-    endYear,
   }) => {
-    const formatToAcademicYear = (year: number) =>
-      parseInt(`${year}${`${year + 1}`.substring(2, 4)}`, 0);
+    const { characteristics, schoolTypes } = filters;
 
-    const { publicationId } = this.state;
+    const { timePeriods } = this.state;
+
+    const start = timePeriods[0].year;
+    const end = timePeriods[timePeriods.length - 1].year;
+
+    // TODO: Remove this when timePeriod API finalised
+    const formatToAcademicYear = (year: number) => {
+      const nextYear = year + 1;
+      return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
+    };
+
+    const { metaSpecification, publicationId } = this.state;
 
     const { result } = await tableBuilderService.getNationalCharacteristicsData(
       {
@@ -139,21 +204,28 @@ class TableToolPage extends Component<{}, State> {
         indicators,
         schoolTypes,
         publicationId,
-        endYear: formatToAcademicYear(endYear),
-        startYear: formatToAcademicYear(startYear),
+        startYear: formatToAcademicYear(start),
+        endYear: formatToAcademicYear(end),
       },
     );
 
-    const years = range(startYear, endYear + 1).map(formatToAcademicYear);
+    const categoricalFiltersByValue = mapValues(
+      metaSpecification.filters,
+      value => mapOptionValues(value.options),
+    );
+
+    const indicatorsByValue = mapOptionValues<IndicatorOption>(
+      metaSpecification.indicators,
+    );
 
     this.setState(
       {
-        filters: {
-          characteristics,
-          indicators,
-          schoolTypes,
-          years,
-        },
+        filters: mapValuesWithKeys(filters, ([filterGroup, selectedFilters]) =>
+          selectedFilters.map(
+            filter => categoricalFiltersByValue[filterGroup][filter],
+          ),
+        ),
+        indicators: indicators.map(indicator => indicatorsByValue[indicator]),
         tableData: result,
       },
       () => {
@@ -170,85 +242,134 @@ class TableToolPage extends Component<{}, State> {
   public render() {
     const {
       filters,
-      publicationMeta,
+      indicators,
+      timePeriods,
+      metaSpecification,
       publicationId,
       publicationName,
+      publicationSubjectName,
       tableData,
     } = this.state;
 
     return (
-      <Page breadcrumbs={[{ name: 'Create your own table' }]}>
-        <PageTitle caption="Table tool" title="Create your own table" />
+      <Page breadcrumbs={[{ name: 'Create your own tables online' }]}>
+        <PageTitle caption="Table tool" title="Create your own tables online" />
 
-        <ul>
-          <li>You can create your own tables from our publication data.</li>
-          <li>
-            You can filter it by things like year, school type, area or pupil
-            characteristics.
-          </li>
-          <li>
-            You can also download it, visualise it or copy and paste it as you
-            need.
-          </li>
-        </ul>
+        <p>
+          Choose the data and area of interest you want to explore and then use
+          filters to create your table.
+        </p>
 
-        <section>
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-full">
-              <h2>
-                1. Choose a publication
-                <span className="govuk-hint">
-                  Pick a publication below to explore its statistics
-                </span>
-              </h2>
+        <p>
+          Once you've created your table, you can download the data it contains
+          for your own offline analysis.
+        </p>
 
-              <PublicationMenu
-                onChange={this.handleMenuChange}
+        <Wizard id="tableTool-steps">
+          <WizardStep>
+            {stepProps => (
+              <PublicationForm
+                {...stepProps}
                 options={defaultPublicationOptions}
-                value={publicationId}
+                onSubmit={this.handlePublicationFormSubmit}
               />
-            </div>
-          </div>
-        </section>
-
-        {publicationName && (
-          <section>
-            <div className="govuk-grid-row" ref={this.filtersRef}>
-              <div className="govuk-grid-column-full">
-                <h2>
-                  2. Filter statistics from '{publicationName}'
-                  <span className="govuk-hint">
-                    Select any options you are interested in from the groups
-                    below.
-                  </span>
-                </h2>
-
-                <Tabs>
-                  <TabsSection id="characteristics" title="Characteristics">
-                    <CharacteristicsFilterForm
-                      publicationMeta={publicationMeta}
-                      onSubmit={this.handleFilterFormSubmit}
-                    />
-                  </TabsSection>
-                </Tabs>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {tableData.length > 0 && (
-          <section ref={this.dataTableRef}>
-            <h2>3. Explore statistics from '{publicationName}'</h2>
-
-            <CharacteristicsDataTable
-              characteristics={filters.characteristics}
-              characteristicsMeta={publicationMeta.characteristics}
-              indicators={filters.indicators}
-              indicatorsMeta={publicationMeta.indicators}
-              results={tableData}
-              schoolTypes={filters.schoolTypes}
-              years={filters.years}
-            />
+            )}
+          </WizardStep>
+          <WizardStep ref={this.publicationSubjectRef}>
+            {stepProps => (
+              <PublicationSubjectForm
+                {...stepProps}
+                options={publicationSubjectSpec.subjects}
+                onSubmit={values =>
+                  this.setState(
+                    {
+                      publicationSubjectName: values.publicationSubjectName,
+                    },
+                    () => {
+                      if (this.locationFiltersRef.current) {
+                        this.locationFiltersRef.current.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start',
+                        });
+                      }
+                    },
+                  )
+                }
+              />
+            )}
+          </WizardStep>
+          <WizardStep>
+            {stepProps =>
+              publicationSubjectName && (
+                <LocationFiltersForm
+                  {...stepProps}
+                  specification={metaSpecification}
+                  onSubmit={values => {
+                    this.setState(
+                      {
+                        // eslint-disable-next-line react/no-unused-state
+                        locations: {
+                          ...values,
+                        },
+                      },
+                      () => {
+                        if (this.filtersRef.current) {
+                          this.filtersRef.current.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                          });
+                        }
+                      },
+                    );
+                  }}
+                />
+              )
+            }
+          </WizardStep>
+          <WizardStep>
+            {stepProps => (
+              <TimePeriodForm
+                {...stepProps}
+                specification={metaSpecification}
+                onSubmit={values => {
+                  this.setState(
+                    {
+                      timePeriods: TimePeriod.createRange(
+                        TimePeriod.fromString(values.start),
+                        TimePeriod.fromString(values.end),
+                      ),
+                    },
+                    () => {
+                      if (this.filtersRef.current) {
+                        this.filtersRef.current.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start',
+                        });
+                      }
+                    },
+                  );
+                }}
+              />
+            )}
+          </WizardStep>
+          <WizardStep>
+            {stepProps => (
+              <FiltersForm
+                {...stepProps}
+                onSubmit={this.handleFilterFormSubmit}
+                specification={metaSpecification}
+              />
+            )}
+          </WizardStep>
+          <WizardStep>
+            {tableData.length > 0 && (
+              <TimePeriodDataTable
+                filters={filters}
+                indicators={indicators}
+                timePeriods={timePeriods}
+                results={tableData}
+              />
+            )}
 
             <ul className="govuk-list">
               <li>
@@ -264,8 +385,8 @@ class TableToolPage extends Component<{}, State> {
                 <a href="#contact">Contact</a>
               </li>
             </ul>
-          </section>
-        )}
+          </WizardStep>
+        </Wizard>
       </Page>
     );
   }

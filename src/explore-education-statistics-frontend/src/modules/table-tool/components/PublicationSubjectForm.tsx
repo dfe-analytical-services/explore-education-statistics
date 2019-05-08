@@ -3,10 +3,10 @@ import { Form, FormFieldRadioGroup, FormGroup } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
+import { InjectedWizardProps } from '@frontend/modules/table-tool/components/Wizard';
+import WizardStepHeading from '@frontend/modules/table-tool/components/WizardStepHeading';
 import { Formik, FormikProps } from 'formik';
 import React, { useState } from 'react';
-import { InjectedWizardProps } from './Wizard';
-import WizardStepHeading from './WizardStepHeading';
 
 export interface PublicationSubjectMenuOption {
   value: string;

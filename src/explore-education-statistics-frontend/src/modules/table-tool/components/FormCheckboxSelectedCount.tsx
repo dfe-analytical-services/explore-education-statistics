@@ -1,4 +1,4 @@
-import styles from '@frontend/prototypes/table-tool/components/FormCheckboxSelectedCount.module.scss';
+import styles from '@frontend/modules/table-tool/components/FormCheckboxSelectedCount.module.scss';
 import classNames from 'classnames';
 import { connect, FormikContext, FormikValues } from 'formik';
 import get from 'lodash/get';

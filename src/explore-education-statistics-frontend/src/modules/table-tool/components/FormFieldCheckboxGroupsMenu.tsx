@@ -3,7 +3,7 @@ import FormFieldCheckboxSearchGroup from '@common/components/form/FormFieldCheck
 import FormFieldCheckboxSearchSubGroups, {
   FormFieldCheckboxSearchSubGroupsProps,
 } from '@common/components/form/FormFieldCheckboxSearchSubGroups';
-import FormCheckboxSelectionCount from '@frontend/prototypes/table-tool/components/FormCheckboxSelectedCount';
+import FormCheckboxSelectionCount from '@frontend/modules/table-tool/components/FormCheckboxSelectedCount';
 import React, { useEffect, useState } from 'react';
 
 const FormFieldCheckboxGroupsMenu = <T extends {}>(

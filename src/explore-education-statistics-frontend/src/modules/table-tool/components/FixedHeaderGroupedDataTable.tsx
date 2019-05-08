@@ -1,8 +1,8 @@
+import DataTableKeys from '@frontend/modules/table-tool/components/DataTableKeys';
+import styles from '@frontend/modules/table-tool/components/FixedHeaderGroupedDataTable.module.scss';
 import classNames from 'classnames';
 import throttle from 'lodash/throttle';
 import React, { Component, createRef, forwardRef, Ref } from 'react';
-import DataTableKeys from './DataTableKeys';
-import styles from './FixedHeaderGroupedDataTable.module.scss';
 
 const dataTableCaption = 'dataTableCaption';
 

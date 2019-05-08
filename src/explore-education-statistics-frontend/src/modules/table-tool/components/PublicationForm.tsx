@@ -11,11 +11,11 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
+import { InjectedWizardProps } from '@frontend/modules/table-tool/components/Wizard';
+import WizardStepHeading from '@frontend/modules/table-tool/components/WizardStepHeading';
 import { Formik, FormikProps } from 'formik';
 import camelCase from 'lodash';
 import React, { useState } from 'react';
-import { InjectedWizardProps } from './Wizard';
-import WizardStepHeading from './WizardStepHeading';
 
 interface FormValues {
   publicationId: string;

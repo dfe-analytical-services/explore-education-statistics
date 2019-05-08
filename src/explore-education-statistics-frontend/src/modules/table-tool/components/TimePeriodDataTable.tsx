@@ -3,12 +3,12 @@ import TimePeriod from '@common/services/types/TimePeriod';
 import FixedHeaderGroupedDataTable, {
   HeaderGroup,
   RowGroup,
-} from '@frontend/prototypes/table-tool/components/FixedHeaderGroupedDataTable';
+} from '@frontend/modules/table-tool/components/FixedHeaderGroupedDataTable';
 import {
   FilterOption,
   IndicatorOption,
-} from '@frontend/prototypes/table-tool/components/meta/initialSpec';
-import TableHeadersForm from '@frontend/prototypes/table-tool/components/TableHeadersForm';
+} from '@frontend/modules/table-tool/components/meta/initialSpec';
+import TableHeadersForm from '@frontend/modules/table-tool/components/TableHeadersForm';
 import React, { memo, useEffect, useRef, useState } from 'react';
 
 interface TableHeaders {

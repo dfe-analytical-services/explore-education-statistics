@@ -1,9 +1,9 @@
 import isComponentType from '@common/lib/type-guards/components/isComponentType';
+import styles from '@frontend/modules/table-tool/components/Wizard.module.scss';
 import WizardStep, {
   WizardStepProps,
-} from '@frontend/prototypes/table-tool/components/WizardStep';
+} from '@frontend/modules/table-tool/components/WizardStep';
 import React, { Children, cloneElement, ReactElement, useState } from 'react';
-import styles from './Wizard.module.scss';
 
 export interface InjectedWizardProps {
   stepNumber: number;
