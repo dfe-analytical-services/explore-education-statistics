@@ -2,6 +2,7 @@ import Button from '@common/components/Button';
 import { Form, FormFieldset, FormGroup } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import Yup from '@common/lib/validation/yup';
 import { Dictionary } from '@common/types/util';
 import { Formik, FormikProps } from 'formik';
 import mapValues from 'lodash/mapValues';
@@ -14,7 +15,9 @@ import { InjectedWizardProps } from './Wizard';
 import WizardStepHeading from './WizardStepHeading';
 
 interface FormValues {
-  [level: string]: string[];
+  locations: {
+    [level: string]: string[];
+  };
 }
 
 interface Props {
@@ -48,12 +51,22 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
         onSubmit(values);
         goToNextStep();
       }}
-      initialValues={Object.keys(locations).reduce((acc, level) => {
-        return {
-          ...acc,
-          [level]: [],
-        };
-      }, {})}
+      initialValues={{
+        locations: Object.keys(locations).reduce((acc, level) => {
+          return {
+            ...acc,
+            [level]: [],
+          };
+        }, {}),
+      }}
+      validationSchema={Yup.object<FormValues>({
+        locations: Yup.mixed().test(
+          'required',
+          'Select at least one option',
+          (value: string) =>
+            Object.values(value).some(options => options.length > 0),
+        ),
+      })}
       render={(form: FormikProps<FormValues>) => {
         return isActive ? (
           <Form {...form} id="locationFiltersForm">
@@ -61,11 +74,16 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
               id="locationFiltersForm-levels"
               legend={stepHeading}
               hint="Select at least one"
+              error={
+                typeof form.errors.locations === 'string'
+                  ? form.errors.locations
+                  : ''
+              }
             >
               {Object.entries(locations).map(([levelKey, level]) => {
                 return (
                   <FormFieldCheckboxMenu
-                    name={levelKey}
+                    name={`locations.${levelKey}`}
                     key={levelKey}
                     options={level.options}
                     id={`locationFiltersForm-levels-${levelKey}`}
