@@ -250,7 +250,7 @@ const PublicationPageExclusions = () => {
 
       <h2 className="govuk-heading-l">Contents</h2>
       <Accordion id="contents-exclusions-sections">
-        <AccordionSection heading="About this release">
+        <AccordionSection heading="About these statistics">
           <p className="govuk-body">
             This National Statistics release reports on permanent and fixed
             period exclusions from state-funded primary, state-funded secondary
