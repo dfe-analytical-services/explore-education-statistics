@@ -6,6 +6,7 @@ import React, { ReactNode } from 'react';
 interface Props {
   children: ReactNode;
   fieldsetHeading?: boolean;
+  size?: 'xl' | 'l' | 'm' | 's';
 }
 
 const WizardStepHeading = ({
@@ -13,6 +14,7 @@ const WizardStepHeading = ({
   currentStep,
   fieldsetHeading = false,
   isActive,
+  size = 'm',
   stepNumber,
   setCurrentStep,
 }: Props & InjectedWizardProps) => {
@@ -22,7 +24,7 @@ const WizardStepHeading = ({
     <>
       {isActive ? (
         <h2
-          className={classNames({
+          className={classNames(`govuk-heading-${size}`, {
             'govuk-fieldset__heading': fieldsetHeading,
           })}
         >
@@ -31,7 +33,7 @@ const WizardStepHeading = ({
         </h2>
       ) : (
         <h2
-          className={classNames({
+          className={classNames(`govuk-heading-${size}`, {
             [styles.stepEnabled]: stepEnabled,
           })}
         >

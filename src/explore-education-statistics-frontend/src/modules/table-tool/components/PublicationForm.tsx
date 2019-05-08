@@ -78,7 +78,6 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                   error={getError('publicationId')}
                   id="publicationForm-publicationId"
                   legend={stepHeading}
-                  legendSize="l"
                 >
                   <FormGroup>
                     <FormTextSearchInput

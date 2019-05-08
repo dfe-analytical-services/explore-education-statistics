@@ -117,11 +117,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
       render={(form: FormikProps<FormValues>) => {
         return isActive ? (
           <Form {...form} id="timePeriodForm">
-            <FormFieldset
-              id="timePeriodForm-timePeriod"
-              legend={stepHeading}
-              legendSize="l"
-            >
+            <FormFieldset id="timePeriodForm-timePeriod" legend={stepHeading}>
               <FormFieldSelect
                 name="start"
                 id="timePeriodForm-timePeriod-start"

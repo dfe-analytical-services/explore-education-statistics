@@ -60,7 +60,6 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
             <FormFieldset
               id="locationFiltersForm-levels"
               legend={stepHeading}
-              legendSize="l"
               hint="Select at least one"
             >
               {Object.entries(locations).map(([levelKey, level]) => {

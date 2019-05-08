@@ -58,7 +58,6 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
             <FormFieldRadioGroup
               name="publicationSubjectId"
               legend={stepHeading}
-              legendSize="l"
               options={options.map(option => ({
                 id: option.value,
                 label: option.label,
