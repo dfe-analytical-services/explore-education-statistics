@@ -35,14 +35,12 @@ export default function HorizontalBarBlock(props: StackedBarHorizontalProps) {
     ...measures,
   }));
 
-  console.log(chartData);
-
   return (
     <ResponsiveContainer width={width || '100%'} height={height || 600}>
       <BarChart
         data={chartData}
         layout="vertical"
-        margin={ChartFunctions.calculateMargins(xAxis, referenceLines)}
+        margin={ChartFunctions.calculateMargins(yAxis, xAxis, referenceLines)}
       >
         {ChartFunctions.calculateYAxis(yAxis, {
           type: 'category',
@@ -64,6 +62,7 @@ export default function HorizontalBarBlock(props: StackedBarHorizontalProps) {
               name={(meta && meta.indicators[dataKey].label) || 'a'}
               fill={colours[index]}
               stackId={stacked ? 'a' : undefined}
+              isAnimationActive={false}
             />
           );
         })}

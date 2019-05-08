@@ -272,15 +272,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                     KeyStatistics = new DataBlock
                     {
 
+                        DataBlockRequest = new DataBlockRequest
+                        {
+                            subjectId= 1,
+                            geographicLevel= "National",
+                            startYear= 2016,
+                            endYear= 2017,
+                            filters= new List<int>{1,2},
+                            indicators= new List<int>{23, 26, 28}
+                        },
 
                         Summary = new Summary
                         {
                             dataKeys = new List<string>
                             {
-                                "sess_overall_percent",
-                                "sess_authorised_percent",
-                                "sess_unauthorised_percent"
-                            },
+                                "23",
+                                "26",
+                                "28"
+                            },                                                        
 
                             description = new MarkDownBlock
                             {
@@ -288,27 +297,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                        " * overall and unauthorised absence rates up on previous year \n" +
                                        " * unauthorised rise due to higher rates of unauthorised holidays \n" +
                                        " * 10% of pupils persistently absent during 2016/17"
-                            }
-                        },
-
-                        Charts = new List<IContentBlockChart>
-                        {
-                            new LineChart
-                            {
-                                XAxis = new Axis
-                                {
-                                    title = "School Year"
-                                },
-                                YAxis = new Axis
-                                {
-                                    title = "Absence Rate"
-                                },
-                                Indicators = new List<string>
-                                {
-                                    "sess_overall_percent",
-                                    "sess_unauthorised_percent",
-                                    "sess_authorised_percent"
-                                },
                             }
                         }
                     },
@@ -344,9 +332,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                     {
                                         subjectId= 1,
                                         geographicLevel= "National",
-                                        startYear= 2014,
-                                        endYear= 2015,
-                                        filters= new List<int>{1},
+                                        startYear= 2012,
+                                        endYear= 2017,
+                                        filters= new List<int>{1,2},
                                         indicators= new List<int>{23, 26, 28}
                                     },
                                     Charts = new List<IContentBlockChart>

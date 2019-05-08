@@ -25,6 +25,7 @@ export interface ChartRendererProps {
   xAxis?: Axis;
   yAxis?: Axis;
   height?: number;
+  width?: number;
   stacked?: boolean;
   geometry?: MapFeature;
   referenceLines?: ReferenceLine[];
@@ -35,6 +36,7 @@ export function ChartRenderer(props: ChartRendererProps) {
     data,
     geometry,
     height,
+    width,
     meta,
     indicators,
     referenceLines,
@@ -68,10 +70,12 @@ export function ChartRenderer(props: ChartRendererProps) {
         <LineChartBlock
           chartDataKeys={indicators}
           data={data}
+          meta={meta}
           labels={labels}
           xAxis={xAxis}
           yAxis={yAxis}
           height={height}
+          width={width}
           referenceLines={referenceLines}
         />
       );
@@ -80,10 +84,12 @@ export function ChartRenderer(props: ChartRendererProps) {
         <VerticalBarBlock
           chartDataKeys={indicators}
           data={data}
+          meta={meta}
           labels={labels}
           xAxis={xAxis}
           yAxis={yAxis}
           height={height}
+          width={width}
           referenceLines={referenceLines}
         />
       );
@@ -92,10 +98,12 @@ export function ChartRenderer(props: ChartRendererProps) {
         <HorizontalBarBlock
           chartDataKeys={indicators}
           data={data}
+          meta={meta}
           labels={labels}
           xAxis={xAxis}
           yAxis={yAxis}
           height={height}
+          width={width}
           stacked={stacked}
           referenceLines={referenceLines}
         />
@@ -105,10 +113,12 @@ export function ChartRenderer(props: ChartRendererProps) {
         <DynamicMapBlock
           chartDataKeys={indicators}
           data={data}
+          meta={meta}
           labels={labels}
           xAxis={xAxis}
           yAxis={yAxis}
           height={height}
+          width={width}
           geometry={geometry}
         />
       );

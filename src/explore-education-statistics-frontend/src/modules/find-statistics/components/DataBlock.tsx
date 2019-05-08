@@ -93,8 +93,13 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       }));
     }
 
-    console.log(newState);
-
+    if (summary) {
+      newState.summary = {
+        ...summary,
+        data: json,
+        meta: jsonMeta,
+      };
+    }
     this.setState(newState);
   }
 
@@ -107,16 +112,15 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
     return (
       <div className="govuk-datablock" data-testid={`DataBlock ${heading}`}>
         <Tabs>
-          {/*
           {summary && (
-            <TabsSection id={`${id}_summary`} title="Summary">
+            <TabsSection id={`datablock_${id}_summary`} title="Summary">
               <h3>{heading}</h3>
               <SummaryRenderer {...summary} />
             </TabsSection>
           )}
 
           {tables && showTables && (
-            <TabsSection id={`${id}0`} title="Data tables">
+            <TabsSection id={`datablock_${id}_tables`} title="Data tables">
               <h3>{heading}</h3>
               {tables.map((table, idx) => {
                 const key = `${id}0_table_${idx}`;
@@ -132,10 +136,13 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
               </Link>
             </TabsSection>
           )}
-*/}
 
           {charts && (
-            <TabsSection id={`${id}1`} title="Charts" lazy={false}>
+            <TabsSection
+              id={`datablock_${id}_charts`}
+              title="Charts"
+              lazy={false}
+            >
               <h3>{heading}</h3>
               {charts.map((chart, idx) => {
                 const key = `${id}_chart_${idx}`;
@@ -152,8 +159,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
             </TabsSection>
           )}
 
-          {/*
-          <TabsSection id={`${id}2`} title="Data downloads">
+          <TabsSection id={`datablock_${id}_downloads`} title="Data downloads">
             <p>
               You can customise and download data as Excel, .csv or .pdf files.
               Our data can also be accessed via an API.
@@ -169,7 +175,6 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
               Explore data
             </Link>
           </TabsSection>
-*/}
         </Tabs>
       </div>
     );

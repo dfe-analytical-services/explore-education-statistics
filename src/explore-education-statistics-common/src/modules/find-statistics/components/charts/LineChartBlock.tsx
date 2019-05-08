@@ -117,6 +117,7 @@ export default class LineChartBlock extends Component<ChartProps> {
                 legendType={symbols[index]}
                 activeDot={{ r: 3 }}
                 dot={props => <Symbols {...props} type={symbols[index]} />}
+                isAnimationActive={false}
               />
             );
           })}

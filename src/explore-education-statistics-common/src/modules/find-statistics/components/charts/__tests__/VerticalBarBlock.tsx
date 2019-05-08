@@ -2,14 +2,14 @@ import React from 'react';
 
 import { render } from 'react-testing-library';
 import domUtil from '@common-test/domUtil';
-import LineChartBlock from '../LineChartBlock';
+import VerticalBarBlock from '../VerticalBarBlock';
 
 import testData from './__data__/testBlockData';
 
-describe('LineChartBlock', () => {
+describe('VerticalBarBlock', () => {
   test('renders with correct output', () => {
     const { container } = render(
-      <LineChartBlock {...testData.AbstractChartProps} />,
+      <VerticalBarBlock {...testData.AbstractChartProps} />,
     );
 
     expect(
@@ -36,9 +36,9 @@ describe('LineChartBlock', () => {
       domUtil.elementContainingText(container, 'text tspan', '2015').length,
     ).toBe(1);
 
-    expect(
-      Array.from(container.querySelectorAll('.recharts-line')).length,
-    ).toBe(3);
+    expect(Array.from(container.querySelectorAll('.recharts-bar')).length).toBe(
+      3,
+    );
 
     expect(container).toMatchSnapshot();
   });

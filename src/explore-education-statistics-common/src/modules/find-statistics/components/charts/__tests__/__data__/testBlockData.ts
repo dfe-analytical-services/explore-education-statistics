@@ -2,6 +2,7 @@
 import {
   DataBlockData,
   DataBlockMetadata,
+  DataBlockResponse,
   GeographicLevel,
 } from '@common/services/dataBlockService';
 import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
@@ -14,7 +15,7 @@ const data: DataBlockData = {
   geographicLevel: GeographicLevel.National,
   result: [
     {
-      filters: [1],
+      filters: [1, 2],
       location: {
         country: {
           country_code: 'E92000001',
@@ -43,7 +44,7 @@ const data: DataBlockData = {
       year: 2014,
     },
     {
-      filters: [1],
+      filters: [1, 2],
       location: {
         country: {
           country_code: 'E92000001',
@@ -86,18 +87,22 @@ const metaData: DataBlockMetadata = {
       label: 'All Schools',
       value: 1,
     },
+    '2': {
+      label: 'All Pupils',
+      value: 1,
+    },
   },
 
   indicators: {
     '23': {
       label: 'Unauthorised absence rate',
       unit: '%',
-      value: 28,
+      value: 23,
     },
     '26': {
       label: 'Overall absence rate',
       unit: '%',
-      value: 28,
+      value: 26,
     },
     '28': {
       label: 'Authorised absence rate',
@@ -127,8 +132,14 @@ const AbstractChartProps: ChartProps = {
   yAxis: { title: 'test y axis' },
 };
 
+const response: DataBlockResponse = {
+  data,
+  metaData,
+};
+
 export default {
   AbstractChartProps,
   testBlockData: data,
   labels,
+  response,
 };

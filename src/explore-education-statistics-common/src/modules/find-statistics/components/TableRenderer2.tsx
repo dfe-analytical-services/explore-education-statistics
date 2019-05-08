@@ -9,6 +9,7 @@ export interface Props {
   meta: DataBlockMetadata;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TableRenderer2 = ({ data, meta }: Props) => {
   return (
     <table>

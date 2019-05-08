@@ -1,5 +1,5 @@
 import { Axis, ReferenceLine } from '@common/services/publicationService';
-import React, { Component, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import {
   Label,
   PositionType,
@@ -48,7 +48,7 @@ const ChartFunctions = {
     return { size, title };
   },
 
-  calculateMargins(xAxis: Axis, referenceLines?: ReferenceLine[]) {
+  calculateMargins(xAxis: Axis, yAxis: Axis, referenceLines?: ReferenceLine[]) {
     const margin = {
       top: 15,
       right: 30,
@@ -64,7 +64,7 @@ const ChartFunctions = {
     }
 
     if (xAxis.title) {
-      // margin.bottom +=25;
+      margin.bottom += 25;
     }
 
     return margin;

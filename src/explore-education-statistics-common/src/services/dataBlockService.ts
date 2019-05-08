@@ -45,7 +45,7 @@ interface DataBlockLocation {
   localAuthorityDistrict: LocalAuthorityDistrict;
 }
 
-interface Result {
+export interface Result {
   filters: number[];
   location: DataBlockLocation;
   measures: {

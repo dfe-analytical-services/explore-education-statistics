@@ -51,6 +51,8 @@ export interface Chart {
   stacked?: boolean;
   geometry?: MapFeature | FeatureCollection;
   referenceLines?: ReferenceLine[];
+  width?: number;
+  height?: number;
 }
 
 export interface Summary {
