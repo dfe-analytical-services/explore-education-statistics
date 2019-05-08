@@ -22,7 +22,7 @@ interface FormValues {
 
 interface Props {
   specification: MetaSpecification;
-  onSubmit: (values: FormValues) => void;
+  onSubmit: (values: FormValues['locations']) => void;
 }
 
 const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
@@ -48,7 +48,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
   return (
     <Formik<FormValues>
       onSubmit={values => {
-        onSubmit(values);
+        onSubmit(values.locations);
         goToNextStep();
       }}
       initialValues={{
