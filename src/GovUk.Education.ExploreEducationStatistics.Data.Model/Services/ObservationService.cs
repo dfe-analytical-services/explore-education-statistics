@@ -1,8 +1,9 @@
-using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
-using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -22,19 +23,78 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             _locationService = locationService;
         }
 
-        public IEnumerable<Observation> FindObservations(Expression<Func<Observation, bool>> findExpression, IEnumerable<long> filters)
-        {            
-            var queryable = DbSet().Where(findExpression)
+        public IEnumerable<Observation> FindObservations(long subjectId,
+            GeographicLevel geographicLevel,
+            IEnumerable<int> years,
+            IEnumerable<string> countries,
+            IEnumerable<string> regions,
+            IEnumerable<string> localAuthorities,
+            IEnumerable<string> localAuthorityDistricts,
+            IEnumerable<long> filters)
+        {
+            var subjectIdParam = new SqlParameter("subjectId", subjectId);
+            var geographicLevelParam = new SqlParameter("geographicLevel", geographicLevel.GetEnumLabel());
+            var yearsListParam = CreateIdListType("yearList", years);
+            var countriesListParam = CreateIdListType("countriesList", countries);
+            var regionsListParam = CreateIdListType("regionsList", regions);
+            var localAuthorityListParam = CreateIdListType("localAuthorityList", localAuthorities);
+            var localAuthorityDistrictListParam =
+                CreateIdListType("localAuthorityDistrictList", localAuthorityDistricts);
+            var filtersListParam = CreateIdListType("filtersList", filters);
+            
+            var inner = _context.Query<IdWrapper>().AsNoTracking()
+                .FromSql("EXEC dbo.FilteredObservations " +
+                         "@subjectId," +
+                         "@geographicLevel," +
+                         "@yearList," +
+                         "@countriesList," +
+                         "@regionsList," +
+                         "@localAuthorityList," +
+                         "@localAuthorityDistrictList," +
+                         "@filtersList",
+                    subjectIdParam,
+                    geographicLevelParam,
+                    yearsListParam,
+                    countriesListParam,
+                    regionsListParam,
+                    localAuthorityListParam,
+                    localAuthorityDistrictListParam,
+                    filtersListParam);
+
+            var ids = inner.Select(obs => obs.Id).ToList();
+
+            var result = DbSet()
+                .Where(observation => ids.Contains(observation.Id))
                 .Include(observation => observation.Subject)
                 .Include(observation => observation.Location)
                 .Include(observation => observation.FilterItems)
                 .ThenInclude(item => item.FilterItem.FilterGroup);
 
-            return
-                from ofi in _context.ObservationFilterItem
-                join o in queryable on ofi.ObservationId equals o.Id
-                where filters.Contains(ofi.FilterItemId)
-                select o;
+            return result;
+        }
+
+        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<int> idList)
+        {
+            return CreateListType(parameterName, idList.AsIdListTable(), "dbo.IdListIntegerType");
+        }
+
+        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<long> idList)
+        {
+            return CreateListType(parameterName, idList.AsIdListTable(), "dbo.IdListIntegerType");
+        }
+
+        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<string> idList)
+        {
+            return CreateListType(parameterName, idList.AsIdListTable(), "dbo.IdListVarcharType");
+        }
+
+        private static SqlParameter CreateListType(string parameterName, object value, string typeName)
+        {
+            return new SqlParameter(parameterName, value)
+            {
+                SqlDbType = SqlDbType.Structured,
+                TypeName = typeName
+            };
         }
 
         public IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(long subjectId)

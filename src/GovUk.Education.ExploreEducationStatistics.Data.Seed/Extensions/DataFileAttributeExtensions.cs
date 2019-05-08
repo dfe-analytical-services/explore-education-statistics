@@ -1,6 +1,5 @@
 using System;
-using System.Linq;
-using System.Reflection;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions
 {
@@ -8,9 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions
     {
         public static DataCsvMetaFilename GetMetaFilename(this Enum enumValue)
         {
-            return typeof(DataCsvFilename).GetMember(enumValue.ToString())
-                .First()
-                .GetCustomAttribute<DataFileAttribute>().MetaFilename;
+            return enumValue.GetEnumAttribute<DataFileAttribute>().MetaFilename;
         }
     }
 }

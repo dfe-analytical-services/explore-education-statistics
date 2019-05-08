@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions
      * Provide extension to filter by primary key generically.
      * https://stackoverflow.com/a/55272426
      */
-    public static class DataServiceExtensions
+    public static class FindExtensions
     {
         public static IQueryable<TEntity> FindByPrimaryKey<TEntity>(this IQueryable<TEntity> queryable,
             DbContext context, object key) where TEntity : class
