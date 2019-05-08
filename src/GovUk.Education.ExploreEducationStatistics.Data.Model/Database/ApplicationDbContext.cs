@@ -36,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureLocalAuthority(modelBuilder);
             ConfigureLocalAuthorityDistrict(modelBuilder);
             ConfigureRegion(modelBuilder);
+            ConfigureAdditionalTypes(modelBuilder);
         }
 
         private static void ConfigureObservationFilterItem(ModelBuilder modelBuilder)
@@ -129,6 +130,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.Region,
                     builder => builder.HasIndex(region => region.Code));
+        }
+
+        private static void ConfigureAdditionalTypes(ModelBuilder modelBuilder)
+        {
+            // Register types used by custom SQL queries
+            modelBuilder.Query<IdWrapper>();
         }
     }
 }

@@ -58,8 +58,8 @@ function HomePage() {
             <Link to="/methodology">Education statistics: methodology</Link>
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">
-            Browse to find out about the methodology behind education statistics
-            and data and how and why they're collected and published.
+            Browse to find out more about the methodology behind education
+            statistics and data and how and why they're collected and published.
           </p>
         </div>
         <div className="govuk-grid-column-one-half">
@@ -76,8 +76,8 @@ function HomePage() {
       <hr />
       <h3 className="govuk-heading-l govuk-!-margin-top-9">Related services</h3>
       <p className="govuk-body">
-        Use these services to specific performance and other information about
-        schools and colleges in England:
+        Use these services to find specific performance and other information
+        about schools and colleges in England:
       </p>
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
         <div className="govuk-grid-column-one-half">
