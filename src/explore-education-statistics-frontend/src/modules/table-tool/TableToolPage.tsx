@@ -22,6 +22,7 @@ import TimePeriodForm from './components/TimePeriodForm';
 import mapOptionValues from './components/utils/mapOptionValues';
 import Wizard from './components/Wizard';
 import WizardStep from './components/WizardStep';
+import WizardStepHeading from './components/WizardStepHeading';
 
 const defaultPublicationOptions = [
   {
@@ -295,29 +296,37 @@ class TableToolPage extends Component<{}, State> {
             )}
           </WizardStep>
           <WizardStep>
-            {tableData.length > 0 && (
-              <TimePeriodDataTable
-                filters={filters}
-                indicators={indicators}
-                timePeriods={timePeriods}
-                results={tableData}
-              />
-            )}
+            {stepProps => (
+              <>
+                <WizardStepHeading {...stepProps}>
+                  Explore {publicationSubjectName} for {publicationName}
+                </WizardStepHeading>
 
-            <ul className="govuk-list">
-              <li>
-                <a href="#download">Download data (.csv)</a>
-              </li>
-              <li>
-                <a href="#api">Access developer API</a>
-              </li>
-              <li>
-                <a href="#methodology">Methodology</a>
-              </li>
-              <li>
-                <a href="#contact">Contact</a>
-              </li>
-            </ul>
+                {tableData.length > 0 && (
+                  <TimePeriodDataTable
+                    filters={filters}
+                    indicators={indicators}
+                    timePeriods={timePeriods}
+                    results={tableData}
+                  />
+                )}
+
+                <ul className="govuk-list">
+                  <li>
+                    <a href="#download">Download data (.csv)</a>
+                  </li>
+                  <li>
+                    <a href="#api">Access developer API</a>
+                  </li>
+                  <li>
+                    <a href="#methodology">Methodology</a>
+                  </li>
+                  <li>
+                    <a href="#contact">Contact</a>
+                  </li>
+                </ul>
+              </>
+            )}
           </WizardStep>
         </Wizard>
       </Page>

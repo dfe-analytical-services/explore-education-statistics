@@ -55,7 +55,7 @@ const TimePeriodDataTable = ({
   const endLabel = timePeriods[timePeriods.length - 1].label;
 
   const caption =
-    startLabel !== endLabel
+    startLabel === endLabel
       ? `Comparing statistics for ${startLabel}`
       : `Comparing statistics between ${startLabel} and ${endLabel}`;
 
