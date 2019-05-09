@@ -23,14 +23,15 @@ const FormFieldCheckboxGroupsMenu = <T extends {}>(
     return options[0].options.length > 1 ? (
       <FormFieldCheckboxSearchGroup
         {...props}
+        hideCount
+        legendHidden
+        selectAll
+        options={options[0].options}
         onAllChange={event => {
           if (onAllChange) {
             onAllChange(event, options[0].options);
           }
         }}
-        hideCount
-        selectAll
-        options={options[0].options}
       />
     ) : (
       <FormFieldCheckboxGroup
