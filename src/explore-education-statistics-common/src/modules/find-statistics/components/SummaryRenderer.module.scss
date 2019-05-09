@@ -8,10 +8,10 @@
 
 .keyStatTile {
   display: flex;
-  flex: 1 0 32%;
+  flex: 1 0 32.3%;
   flex-direction: column;
   margin: 0.5% 0.5% 1.5%;
-  max-width: 32%;
+  max-width: 32.3;
 
   @include govuk-media-query($until: tablet) {
     flex: 0 0 100%;
