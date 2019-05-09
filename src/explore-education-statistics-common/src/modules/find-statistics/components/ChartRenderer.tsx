@@ -31,7 +31,7 @@ export interface ChartRendererProps {
   referenceLines?: ReferenceLine[];
 }
 
-export function ChartRenderer(props: ChartRendererProps) {
+function ChartRenderer(props: ChartRendererProps) {
   const {
     data,
     geometry,
@@ -126,3 +126,5 @@ export function ChartRenderer(props: ChartRendererProps) {
       return <div>[ Unimplemented chart type requested ${type} ]</div>;
   }
 }
+
+export default ChartRenderer;

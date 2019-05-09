@@ -14,15 +14,14 @@ import {
   CharacteristicsData,
   PublicationMeta,
 } from '@common/services/tableBuilderService';
-import Link from '@frontend/components/Link';
-import React, { Component } from 'react';
+
+import React, { Component, ReactNode } from 'react';
 import DataBlockService, {
   DataBlockRequest,
   DataBlockMetadata,
   DataBlockData,
 } from '@common/services/dataBlockService';
-import {
-  ChartRenderer,
+import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/find-statistics/components/ChartRenderer';
 
@@ -36,6 +35,7 @@ export interface DataBlockProps {
   meta?: PublicationMeta;
   height?: number;
   showTables?: boolean;
+  additionalTabContent?: ReactNode;
 }
 
 interface DataBlockState {
@@ -106,7 +106,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
   public render() {
     const id = new Date().getDate();
 
-    const { heading, height, showTables } = this.props;
+    const { heading, height, showTables, additionalTabContent } = this.props;
     const { charts, summary, tables } = this.state;
 
     return (
@@ -127,13 +127,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
                 return <TableRenderer2 key={key} {...table} />;
               })}
-              <h2 className="govuk-heading-m govuk-!-margin-top-9">
-                Explore and edit this data online
-              </h2>
-              <p>Use our table tool to add and remove data for this table.</p>
-              <Link to="/table-tool/" className="govuk-button">
-                Explore data
-              </Link>
+              {additionalTabContent}
             </TabsSection>
           )}
 
@@ -149,13 +143,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
                 return <ChartRenderer key={key} {...chart} height={height} />;
               })}
-              <h2 className="govuk-heading-m govuk-!-margin-top-9">
-                Explore and edit this data online
-              </h2>
-              <p>Use our table tool to add and remove data for this chart.</p>
-              <Link to="/table-tool/" className="govuk-button">
-                Explore chart data
-              </Link>
+              {additionalTabContent}
             </TabsSection>
           )}
 
@@ -167,13 +155,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
             <div className="govuk-inset-text">
               Data downloads have not yet been implemented within the service.
             </div>
-            <h2 className="govuk-heading-m govuk-!-margin-top-9">
-              Explore and edit this data online
-            </h2>
-            <p>Use our table tool to explore this data.</p>
-            <Link to="/table-tool/" className="govuk-button">
-              Explore data
-            </Link>
+            {additionalTabContent}
           </TabsSection>
         </Tabs>
       </div>

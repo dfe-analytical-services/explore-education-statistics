@@ -14,8 +14,8 @@ import SearchForm from '@common/components/SearchForm';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
+import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import ContentBlock from './components/ContentBlock';
-import DataBlock from './components/DataBlock';
 
 interface Props {
   publication: string;
@@ -71,7 +71,7 @@ class PublicationReleasePage extends Component<Props> {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <dl className="dfe-meta-content govuk-!-margin-0">
-              <dt className="govuk-caption-m">Published: </dt>
+              <dt className="govuk-caption-m">Published:</dt>
               <dd>
                 <strong>
                   <FormattedDate>{data.published}</FormattedDate>
