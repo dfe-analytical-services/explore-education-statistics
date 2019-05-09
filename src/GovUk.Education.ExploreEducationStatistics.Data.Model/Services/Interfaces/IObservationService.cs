@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
             IEnumerable<string> localAuthorityDistricts,
             IEnumerable<long> filters);
 
-        Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> GetObservationalUnits(long subjectId);
+        Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(long subjectId);
 
         IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(long subjectId);
     }

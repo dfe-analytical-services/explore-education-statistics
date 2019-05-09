@@ -106,10 +106,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 select (timePeriod.TimeIdentifier, timePeriod.Year);
         }
 
-        public Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> GetObservationalUnits(long subjectId)
+        public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(long subjectId)
         {
             var locations = GetLocations(subjectId);
-            return new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>
+            return new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>
             {
                 {
                     GeographicLevel.National,
@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         }
 
         private static IEnumerable<T> GroupByObservationalUnit<T>(IEnumerable<Location> locations,
-            Func<Location, T> keySelector) where T : ObservationalUnit
+            Func<Location, T> keySelector) where T : IObservationalUnit
         {
             return locations.GroupBy(keySelector)
                 .Where(grouping => grouping.Key != null)
