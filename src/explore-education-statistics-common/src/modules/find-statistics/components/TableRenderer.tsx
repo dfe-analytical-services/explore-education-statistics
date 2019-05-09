@@ -57,7 +57,7 @@ const TableBody = ({ data, meta, indicators }: Props) => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const TableRenderer2 = (props: Props) => {
+const TableRenderer = (props: Props) => {
   return (
     <table className="govuk-table">
       <Caption {...props} />
@@ -67,4 +67,4 @@ const TableRenderer2 = (props: Props) => {
   );
 };
 
-export default TableRenderer2;
+export default TableRenderer;

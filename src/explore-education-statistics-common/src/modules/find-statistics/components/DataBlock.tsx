@@ -5,9 +5,9 @@ import { MapFeature } from '@common/modules/find-statistics/components/charts/Ma
 import SummaryRenderer, {
   SummaryRendererProps,
 } from '@common/modules/find-statistics/components/SummaryRenderer';
-import TableRenderer2, {
+import TableRenderer, {
   Props as TableRendererProps,
-} from '@common/modules/find-statistics/components/TableRenderer2';
+} from '@common/modules/find-statistics/components/TableRenderer';
 import {
   Chart,
   DataQuery,
@@ -137,7 +137,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
               {tables.map((table, idx) => {
                 const key = `${id}0_table_${idx}`;
 
-                return <TableRenderer2 key={key} {...table} />;
+                return <TableRenderer key={key} {...table} />;
               })}
               {additionalTabContent}
             </TabsSection>
