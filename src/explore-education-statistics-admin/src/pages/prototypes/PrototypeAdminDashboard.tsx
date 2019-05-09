@@ -53,17 +53,17 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
           <AdminDashboardInProgress />
         </TabsSection>
         <TabsSection
-          id="task-ready-approval"
+          id="task-ready-approval1"
           title={`Ready for approval ${
             location.search === '?status=readyApproval' ? '(1)' : ''
           }`}
         >
           <AdminDashboardReadyForApproval />
         </TabsSection>
-        <TabsSection id="task-ready-approval" title="Needs work">
+        <TabsSection id="task-ready-approval2" title="Needs work">
           <AdminDashboardNeedsWork />
         </TabsSection>
-        <TabsSection id="task-ready-approval" title="Approved for publication">
+        <TabsSection id="task-ready-approval3" title="Approved for publication">
           <AdminDashboardApprovedForPublication />
         </TabsSection>
       </Tabs>

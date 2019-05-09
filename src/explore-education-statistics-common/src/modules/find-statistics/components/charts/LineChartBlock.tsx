@@ -1,4 +1,5 @@
-import { ChartProps } from '@common/modules/find-statistics/components/charts/AbstractChart';
+import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+
 import React, { Component } from 'react';
 import {
   AxisDomain,
@@ -13,7 +14,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { colours, parseCondensedTimePeriodRange, symbols } from './Charts';
+import { colours, symbols } from './Charts';
 
 const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
   if (active) {
@@ -46,24 +47,17 @@ const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
 
 export default class LineChartBlock extends Component<ChartProps> {
   public render() {
-    const {
-      characteristicsData,
-      chartDataKeys,
-      height,
-      xAxis,
-      yAxis,
-      labels,
-    } = this.props;
+    const { data, chartDataKeys, height, xAxis, yAxis, labels } = this.props;
 
-    const chartData = characteristicsData.result.map(result => {
+    const chartData = data.result.map(result => {
       return chartDataKeys.reduce(
         (v, indicatorName) => {
           return {
             ...v,
-            [indicatorName]: result.indicators[indicatorName],
+            [indicatorName]: result.measures[indicatorName],
           };
         },
-        { name: parseCondensedTimePeriodRange(`${result.timePeriod}`) },
+        { name: `${result.year}` },
       );
     });
 
@@ -123,6 +117,7 @@ export default class LineChartBlock extends Component<ChartProps> {
                 legendType={symbols[index]}
                 activeDot={{ r: 3 }}
                 dot={props => <Symbols {...props} type={symbols[index]} />}
+                isAnimationActive={false}
               />
             );
           })}

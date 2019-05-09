@@ -1,6 +1,5 @@
 import { Axis, ReferenceLine } from '@common/services/publicationService';
-import { CharacteristicsData } from '@common/services/tableBuilderService';
-import React, { Component, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import {
   Label,
   PositionType,
@@ -10,22 +9,25 @@ import {
   YAxis,
   YAxisProps,
 } from 'recharts';
+import {
+  DataBlockData,
+  DataBlockMetadata,
+} from '@common/services/dataBlockService';
 
 export interface ChartProps {
-  characteristicsData: CharacteristicsData;
+  data: DataBlockData;
+  meta?: DataBlockMetadata;
   chartDataKeys: string[];
   labels: { [key: string]: string };
   xAxis: Axis;
   yAxis: Axis;
   height?: number;
+  width?: number;
   referenceLines?: ReferenceLine[];
 }
 
-export class AbstractChart<P extends ChartProps, S = {}> extends Component<
-  P,
-  S
-> {
-  private static calculateAxis(
+const ChartFunctions = {
+  calculateAxis(
     axis: Axis,
     position: PositionType,
     angle: number = 0,
@@ -44,17 +46,15 @@ export class AbstractChart<P extends ChartProps, S = {}> extends Component<
     }
 
     return { size, title };
-  }
+  },
 
-  protected calculateMargins() {
+  calculateMargins(xAxis: Axis, yAxis: Axis, referenceLines?: ReferenceLine[]) {
     const margin = {
       top: 15,
       right: 30,
       left: 60,
       bottom: 25,
     };
-
-    const { xAxis, referenceLines } = this.props;
 
     if (referenceLines && referenceLines.length > 0) {
       referenceLines.forEach(line => {
@@ -64,41 +64,39 @@ export class AbstractChart<P extends ChartProps, S = {}> extends Component<
     }
 
     if (xAxis.title) {
-      // margin.bottom +=25;
+      margin.bottom += 25;
     }
 
     return margin;
-  }
+  },
 
-  protected calculateXAxis(props: XAxisProps): ReactNode {
-    const { xAxis } = this.props;
-    const { size: height, title } = AbstractChart.calculateAxis(
+  calculateXAxis(xAxis: Axis, axisProps: XAxisProps): ReactNode {
+    const { size: height, title } = ChartFunctions.calculateAxis(
       xAxis,
       'insideBottom',
     );
     return (
-      <XAxis {...props} height={height}>
+      <XAxis {...axisProps} height={height}>
         {title}
       </XAxis>
     );
-  }
+  },
 
-  protected calculateYAxis(props: YAxisProps): ReactNode {
-    const { yAxis } = this.props;
-    const { size: width, title } = AbstractChart.calculateAxis(
+  calculateYAxis(yAxis: Axis, axisProps: YAxisProps): ReactNode {
+    const { size: width, title } = ChartFunctions.calculateAxis(
       yAxis,
       'left',
       270,
       90,
     );
     return (
-      <YAxis {...props} width={width}>
+      <YAxis {...axisProps} width={width}>
         {title}
       </YAxis>
     );
-  }
+  },
 
-  protected generateReferenceLines() {
+  generateReferenceLines(referenceLines: ReferenceLine[]): ReactNode {
     const generateReferenceLine = (line: ReferenceLine, idx: number) => {
       const referenceLineProps = {
         key: `ref_${idx}`,
@@ -120,12 +118,8 @@ export class AbstractChart<P extends ChartProps, S = {}> extends Component<
       return <RechartsReferenceLine {...referenceLineProps} />;
     };
 
-    const { referenceLines } = this.props;
+    return referenceLines.map(generateReferenceLine);
+  },
+};
 
-    if (referenceLines && referenceLines.length > 0) {
-      return referenceLines.map(generateReferenceLine);
-    }
-
-    return '';
-  }
-}
+export default ChartFunctions;

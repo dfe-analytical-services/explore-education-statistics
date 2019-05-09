@@ -2,7 +2,7 @@ import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import 'leaflet/dist/leaflet.css';
 import React, { Component } from 'react';
 import { GeoJSON, Map } from 'react-leaflet';
-import { ChartProps } from '@common/modules/find-statistics/components/charts/AbstractChart';
+import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 export type MapFeature = Feature<Geometry, GeoJsonProperties>;
 

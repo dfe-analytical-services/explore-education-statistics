@@ -1,16 +1,38 @@
 import Details from '@common/components/Details';
-import {
-  CharacteristicsData,
-  PublicationMeta,
-} from '@common/services/tableBuilderService';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import {
+  DataBlockData,
+  DataBlockMetadata,
+  Result,
+} from '@common/services/dataBlockService';
 
 export interface SummaryRendererProps {
-  data: CharacteristicsData;
-  meta: PublicationMeta;
+  data: DataBlockData;
+  meta: DataBlockMetadata;
   dataKeys: string[];
   description: { type: string; body: string };
+}
+
+function getLatestMeasures(result: Result[]) {
+  const copiedResult = [...result];
+
+  copiedResult.sort((a, b) => {
+    if (a.year < b.year) {
+      return -1;
+    }
+
+    if (a.year > b.year) {
+      return 1;
+    }
+
+    return 0;
+  });
+
+  const latest = copiedResult[copiedResult.length - 1];
+
+  const { measures } = latest;
+  return measures;
 }
 
 export default function SummaryRenderer({
@@ -19,35 +41,13 @@ export default function SummaryRenderer({
   data,
   dataKeys,
 }: SummaryRendererProps) {
-  let indicators: { [key: string]: string } = {};
-  let indicatorMeta: { [key: string]: { label: string; unit: string } } = {};
+  let measures: { [key: string]: string } = {};
 
   if (data) {
-    const result = [...data.result];
-
-    result.sort((a, b) => {
-      if (a.timePeriod < b.timePeriod) {
-        return -1;
-      }
-
-      if (a.timePeriod > b.timePeriod) {
-        return 1;
-      }
-
-      return 0;
-    });
-
-    const latest = result[result.length - 1];
-
-    // eslint-disable-next-line prefer-destructuring
-    indicators = latest.indicators;
-    indicatorMeta = Array.prototype
-      .concat(...Object.values(meta.indicators))
-      .reduce((allMeta, next) => ({ ...allMeta, [next.name]: next }), {});
+    measures = getLatestMeasures(data.result);
   } else {
     dataKeys.forEach(key => {
-      indicators[key] = '';
-      indicatorMeta[key] = { label: key, unit: '' };
+      measures[key] = '';
     });
   }
 
@@ -60,16 +60,16 @@ export default function SummaryRenderer({
           return (
             <div className="dfe-dash-tiles__tile" key={indicatorKey}>
               <h3 className="govuk-heading-m dfe-dash-tiles__heading">
-                {indicatorMeta[key].label}
+                {meta.indicators[key].label}
               </h3>
               <p
                 className="govuk-heading-xl govuk-!-margin-bottom-2"
-                data-testid={`tile ${indicatorMeta[key].label}`}
+                data-testid={`tile ${meta.indicators[key].label}`}
               >
-                {indicators[key]}
-                {indicatorMeta[key].unit}
+                {measures[key]}
+                {meta.indicators[key].unit}
               </p>
-              <Details summary={`What is ${indicatorMeta[key].label}?`}>
+              <Details summary={`What is ${meta.indicators[key].label}?`}>
                 Overall absence is the adipisicing elit. Dolorum hic nobis
                 voluptas quidem fugiat enim ipsa reprehenderit nulla.
               </Details>

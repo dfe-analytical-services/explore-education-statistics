@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/camelcase,@typescript-eslint/no-unused-vars */
+import React from 'react';
 import { data as OriginalData } from '@common/prototypes/publication/components/PrototypeMapBoundaries';
 import {
   Axis,
@@ -9,7 +11,9 @@ import {
   PublicationMeta,
 } from '@common/services/tableBuilderService';
 import SchoolType from '@common/services/types/SchoolType';
-import { DataBlockProps } from '@frontend/modules/find-statistics/components/DataBlock';
+import { DataBlockProps } from '@common/modules/find-statistics/components/DataBlock';
+import { GeographicLevel } from 'explore-education-statistics-common/src/services/dataBlockService';
+import { ChartProps } from 'explore-education-statistics-common/src/modules/find-statistics/components/charts/ChartFunctions';
 
 function createDataValues(
   indicators: string[],
@@ -121,19 +125,10 @@ function createDataBlockWithChart(
   characteristic: string[] = ['Total'],
 ): DataBlockProps {
   return {
-    charts,
+    showTables: false,
 
     heading,
     type: 'DataBlock',
-
-    ...createDataValues(
-      indicators,
-      labels,
-      schooltype,
-      year,
-      data,
-      characteristic,
-    ),
   };
 }
 
@@ -579,3 +574,121 @@ export const testDistribution = createDataBlockWithChart(
     ),
   ],
 );
+
+export const newApiHorizontalData: ChartProps = {
+  data: {
+    publicationId: 'test',
+    releaseDate: new Date(),
+    releaseId: 1,
+    subjectId: 1,
+    geographicLevel: GeographicLevel.National,
+    result: [
+      {
+        filters: [1],
+        location: {
+          country: {
+            country_code: 'E92000001',
+            country_name: 'England',
+          },
+          region: {
+            region_code: '',
+            region_name: '',
+          },
+          localAuthority: {
+            new_la_code: '',
+            old_la_code: '',
+            la_name: '',
+          },
+          localAuthorityDistrict: {
+            sch_lad_code: '',
+            sch_lad_name: '',
+          },
+        },
+        measures: {
+          '28': '5',
+          '26': '10',
+          '23': '3',
+        },
+        timeIdentifier: 'HT6',
+        year: 2014,
+      },
+      {
+        filters: [1],
+        location: {
+          country: {
+            country_code: 'E92000001',
+            country_name: 'England',
+          },
+          region: {
+            region_code: '',
+            region_name: '',
+          },
+          localAuthority: {
+            new_la_code: '',
+            old_la_code: '',
+            la_name: '',
+          },
+          localAuthorityDistrict: {
+            sch_lad_code: '',
+            sch_lad_name: '',
+          },
+        },
+        measures: {
+          '28': '5',
+          '26': '10',
+          '23': '3',
+        },
+        timeIdentifier: 'HT6',
+        year: 2015,
+      },
+    ],
+  },
+
+  meta: {
+    filters: {
+      '1': {
+        label: 'All Schools',
+        value: 1,
+      },
+    },
+
+    indicators: {
+      '23': {
+        label: 'Unauthorised absence rate',
+        unit: '%',
+        value: 23,
+      },
+      '26': {
+        label: 'Overall absence rate',
+        unit: '%',
+        value: 26,
+      },
+      '28': {
+        label: 'Authorised absence rate',
+        unit: '%',
+        value: 28,
+      },
+    },
+
+    timePeriods: {
+      '2014': {
+        label: '2014',
+        value: 2014,
+      },
+      '2015': {
+        label: '2015',
+        value: 2015,
+      },
+    },
+  },
+
+  labels: {
+    '28': 'Authorised absence rate',
+    '26': 'Overall absence rate',
+    '23': 'Unauthorised absence rate',
+  },
+
+  chartDataKeys: ['23', '26', '28'],
+  xAxis: { title: 'test x axis' },
+  yAxis: { title: 'test y axis' },
+};

@@ -2,7 +2,7 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import Link from '@frontend/components/Link';
-import { DataBlock } from '@frontend/modules/find-statistics/components/DataBlock';
+import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import PrototypePage from '@frontend/prototypes/components/PrototypePage';
 import PrototypeSearchForm from '@frontend/prototypes/components/PrototypeSearchForm';
 import PrototypeDataSampleGCSE from '@frontend/prototypes/publication/components/PrototypeDataSampleGCSE';
@@ -42,7 +42,7 @@ const PublicationPage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <dl className="dfe-meta-content govuk-!-margin-0">
-            <dt className="govuk-caption-m">Published: </dt>
+            <dt className="govuk-caption-m">Published:</dt>
             <dd>
               <strong>22 March 2018</strong>
             </dd>

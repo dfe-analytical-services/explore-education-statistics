@@ -11,6 +11,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models {
 
     }
 
+    public class DataBlockRequest {
+        public int subjectId;
+        public string geographicLevel;
+        public List<int> countries;
+        public List<int> localAuthorities;
+        public List<int> regions;
+        public int startYear;
+        public int endYear;
+        public List<int> filters;
+        public List<int> indicators;
+    }
+
     public class Axis
     {
         public string title;
