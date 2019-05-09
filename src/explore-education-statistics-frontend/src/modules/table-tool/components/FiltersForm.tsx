@@ -1,8 +1,10 @@
 import Button from '@common/components/Button';
-import { Form, FormGroup } from '@common/components/form';
+import { Form, FormFieldset, FormGroup } from '@common/components/form';
+import FormFieldCheckboxSearchSubGroups from '@common/components/form/FormFieldCheckboxSearchSubGroups';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
 import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
+import { Dictionary } from '@common/types/util';
 import { Formik, FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
@@ -44,16 +46,17 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
         indicators: [],
       }}
       validationSchema={Yup.object<FormValues>({
-        filters: Yup.object(
-          mapValues(specification.filters, () =>
-            Yup.array()
-              .of(Yup.string())
-              .required('Select at least one option'),
-          ),
+        filters: Yup.mixed().test(
+          'required',
+          'Must select options from only two categories',
+          (value: Dictionary<string[]>) =>
+            Object.values(value)
+              .map(group => group.length > 0)
+              .filter(Boolean).length === 2,
         ),
         indicators: Yup.array()
           .of(Yup.string())
-          .required('Select at least one option'),
+          .required('Must select at least one indicator'),
       })}
       onSubmit={async (values, actions) => {
         try {
@@ -88,61 +91,69 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
               {stepHeading}
 
               <FormGroup>
-                {Object.entries(specification.filters).map(
-                  ([filterKey, filterGroup]) => {
-                    const filterName = `filters.${filterKey}`;
-
-                    return (
-                      <div className="govuk-grid-row" key={filterKey}>
-                        <div className="govuk-grid-column-one-half-from-desktop">
-                          {Object.keys(filterGroup.options).length === 1 ? (
-                            <FormFieldCheckboxMenu<FormValues>
-                              id={`filtersForm-${camelCase(filterName)}`}
-                              name={filterName}
-                              legend={filterGroup.legend}
-                              hint={filterGroup.hint}
-                              error={getError(filterName)}
-                              selectAll
-                              options={filterGroup.options.Default.options.map(
-                                option => ({
-                                  id: `${filterKey}-${option.value}`,
-                                  label: option.label,
-                                  value: option.value,
-                                }),
-                              )}
-                            />
-                          ) : (
-                            <FormFieldCheckboxGroupsMenu<FormValues>
-                              name={filterName}
-                              id={`filtersForm-${camelCase(filterName)}`}
-                              legend={filterGroup.legend}
-                              hint={filterGroup.hint}
-                              error={getError(filterName)}
-                              selectAll
-                              options={Object.entries(filterGroup.options).map(
-                                ([_, group]) => {
-                                  return {
-                                    legend: group.label,
-                                    options: group.options,
-                                  };
-                                },
-                              )}
-                            />
-                          )}
-                        </div>
-                      </div>
-                    );
-                  },
-                )}
-
                 <div className="govuk-grid-row">
                   <div className="govuk-grid-column-one-half-from-desktop">
-                    <FormFieldCheckboxGroupsMenu<FormValues>
+                    <FormFieldset
+                      id="filtersForm-filters"
+                      legend="Categories"
+                      legendSize="s"
+                      hint="Select options from two categories"
+                      error={getError('filters')}
+                    >
+                      {Object.entries(specification.filters).map(
+                        ([filterKey, filterGroup]) => {
+                          const filterName = `filters.${filterKey}`;
+
+                          return (
+                            <>
+                              {Object.keys(filterGroup.options).length === 1 ? (
+                                <FormFieldCheckboxMenu<FormValues>
+                                  id={`filtersForm-${camelCase(filterName)}`}
+                                  key={filterKey}
+                                  name={filterName}
+                                  legend={filterGroup.legend}
+                                  hint={filterGroup.hint}
+                                  error={getError(filterName)}
+                                  selectAll
+                                  options={filterGroup.options.Default.options.map(
+                                    option => ({
+                                      id: `${filterKey}-${option.value}`,
+                                      label: option.label,
+                                      value: option.value,
+                                    }),
+                                  )}
+                                />
+                              ) : (
+                                <FormFieldCheckboxGroupsMenu<FormValues>
+                                  name={filterName}
+                                  id={`filtersForm-${camelCase(filterName)}`}
+                                  legend={filterGroup.legend}
+                                  hint={filterGroup.hint}
+                                  error={getError(filterName)}
+                                  selectAll
+                                  options={Object.entries(
+                                    filterGroup.options,
+                                  ).map(([_, group]) => {
+                                    return {
+                                      legend: group.label,
+                                      options: group.options,
+                                    };
+                                  })}
+                                />
+                              )}
+                            </>
+                          );
+                        },
+                      )}
+                    </FormFieldset>
+                  </div>
+                  <div className="govuk-grid-column-one-half-from-desktop">
+                    <FormFieldCheckboxSearchSubGroups
                       name="indicators"
                       id="filtersForm-indicators"
                       legend="Indicators"
-                      legendHidden
-                      hint="Select at least 1 indicator"
+                      legendSize="s"
+                      hint="Select at least one indicator"
                       error={getError('indicators')}
                       options={Object.entries(specification.indicators).map(
                         ([_, group]) => {
