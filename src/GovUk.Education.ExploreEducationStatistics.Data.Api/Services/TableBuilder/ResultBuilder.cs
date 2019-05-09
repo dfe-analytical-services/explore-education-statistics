@@ -28,14 +28,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             };
         }
 
-        private static IEnumerable<long> FilterItems(Observation observation)
+        private static IEnumerable<string> FilterItems(Observation observation)
         {
-            return observation.FilterItems.Select(item => item.FilterItemId).OrderBy(l => l);
+            return observation.FilterItems.Select(item => item.FilterItemId).OrderBy(l => l).Select(l => l.ToString());
         }
 
-        private static Dictionary<long, string> Measures(Observation observation, IEnumerable<long> indicators)
+        private static Dictionary<string, string> Measures(Observation observation, IEnumerable<long> indicators)
         {
-            return indicators.Any() ? QueryUtil.FilterMeasures(observation.Measures, indicators) : observation.Measures;
+            var measures = indicators.Any()
+                ? QueryUtil.FilterMeasures(observation.Measures, indicators)
+                : observation.Measures;
+            return measures.ToDictionary(pair => pair.Key.ToString(), pair => pair.Value);
         }
     }
 }
