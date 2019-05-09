@@ -11,27 +11,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
     {
         public MappingProfiles()
         {
-            CreateMap<Country, LabelValueViewModel>()
+            CreateMap<ObservationalUnit, LabelValueViewModel>()
                 .ForMember(dest => dest.Label, opts => { opts.MapFrom(country => country.Name); })
                 .ForMember(dest => dest.Value, opts => { opts.MapFrom(country => country.Code); });
 
             CreateMap<Indicator, IndicatorMetaViewModel>()
                 .ForMember(dest => dest.Value, opts => opts.MapFrom(indicator => indicator.Id))
                 .ForMember(dest => dest.Unit, opts => opts.MapFrom(MapIndicatorUnitExpression()));
-
-            CreateMap<LocalAuthority, LabelValueViewModel>()
-                .ForMember(dest => dest.Label, opts => { opts.MapFrom(localAuthority => localAuthority.Name); })
-                .ForMember(dest => dest.Value, opts => { opts.MapFrom(localAuthority => localAuthority.Code); });
-
-            CreateMap<LocalAuthorityDistrict, LabelValueViewModel>()
-                .ForMember(dest => dest.Label,
-                    opts => { opts.MapFrom(localAuthorityDistrict => localAuthorityDistrict.Name); })
-                .ForMember(dest => dest.Value,
-                    opts => { opts.MapFrom(localAuthorityDistrict => localAuthorityDistrict.Code); });
-
-            CreateMap<Region, LabelValueViewModel>()
-                .ForMember(dest => dest.Label, opts => { opts.MapFrom(region => region.Name); })
-                .ForMember(dest => dest.Value, opts => { opts.MapFrom(region => region.Code); });
 
             CreateMap<Subject, IdLabelViewModel>()
                 .ForMember(dest => dest.Label, opts => opts.MapFrom(subject => subject.Name));
