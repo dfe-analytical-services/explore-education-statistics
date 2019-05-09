@@ -151,25 +151,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                 <Button
                   disabled={form.isSubmitting}
                   id="filtersForm-submit"
-                  onClick={event => {
-                    event.preventDefault();
-
-                    // Manually validate/submit so we can scroll
-                    // back to the top of the form if there are errors
-                    form.validateForm().then(validationErrors => {
-                      form.submitForm();
-
-                      if (
-                        Object.keys(validationErrors).length > 0 &&
-                        ref.current
-                      ) {
-                        ref.current.scrollIntoView({
-                          behavior: 'smooth',
-                          block: 'start',
-                        });
-                      }
-                    });
-                  }}
                   type="submit"
                 >
                   {form.isSubmitting && form.isValid
