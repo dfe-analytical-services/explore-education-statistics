@@ -10,7 +10,6 @@ import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import React, { useRef, useState } from 'react';
 import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
-import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepHeading from './WizardStepHeading';
 
@@ -105,43 +104,23 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                           const filterName = `filters.${filterKey}`;
 
                           return (
-                            <>
-                              {Object.keys(filterGroup.options).length === 1 ? (
-                                <FormFieldCheckboxMenu<FormValues>
-                                  id={`filtersForm-${camelCase(filterName)}`}
-                                  key={filterKey}
-                                  name={filterName}
-                                  legend={filterGroup.legend}
-                                  hint={filterGroup.hint}
-                                  error={getError(filterName)}
-                                  selectAll
-                                  options={filterGroup.options.Default.options.map(
-                                    option => ({
-                                      id: `${filterKey}-${option.value}`,
-                                      label: option.label,
-                                      value: option.value,
-                                    }),
-                                  )}
-                                />
-                              ) : (
-                                <FormFieldCheckboxGroupsMenu<FormValues>
-                                  name={filterName}
-                                  id={`filtersForm-${camelCase(filterName)}`}
-                                  legend={filterGroup.legend}
-                                  hint={filterGroup.hint}
-                                  error={getError(filterName)}
-                                  selectAll
-                                  options={Object.entries(
-                                    filterGroup.options,
-                                  ).map(([_, group]) => {
-                                    return {
-                                      legend: group.label,
-                                      options: group.options,
-                                    };
-                                  })}
-                                />
+                            <FormFieldCheckboxGroupsMenu<FormValues>
+                              key={filterKey}
+                              name={filterName}
+                              id={`filtersForm-${camelCase(filterName)}`}
+                              legend={filterGroup.legend}
+                              hint={filterGroup.hint}
+                              error={getError(filterName)}
+                              selectAll
+                              options={Object.entries(filterGroup.options).map(
+                                ([_, group]) => {
+                                  return {
+                                    legend: group.label,
+                                    options: group.options,
+                                  };
+                                },
                               )}
-                            </>
+                            />
                           );
                         },
                       )}

@@ -1,4 +1,5 @@
 import DetailsMenu from '@common/components/DetailsMenu';
+import { FormFieldCheckboxGroup } from '@common/components/form';
 import FormFieldCheckboxSearchGroup from '@common/components/form/FormFieldCheckboxSearchGroup';
 import FormFieldCheckboxSearchSubGroups, {
   FormFieldCheckboxSearchSubGroupsProps,
@@ -18,6 +19,30 @@ const FormFieldCheckboxGroupsMenu = <T extends {}>(
     }
   }, [error]);
 
+  const renderSingleGroup = () => {
+    return options[0].options.length > 1 ? (
+      <FormFieldCheckboxSearchGroup
+        {...props}
+        onAllChange={event => {
+          if (onAllChange) {
+            onAllChange(event, options[0].options);
+          }
+        }}
+        hideCount
+        selectAll
+        options={options[0].options}
+      />
+    ) : (
+      <FormFieldCheckboxGroup
+        {...props}
+        selectAll
+        small
+        name={name}
+        options={options[0].options}
+      />
+    );
+  };
+
   return (
     <DetailsMenu
       open={open}
@@ -32,19 +57,7 @@ const FormFieldCheckboxGroupsMenu = <T extends {}>(
         <FormFieldCheckboxSearchSubGroups {...props} hideCount legendHidden />
       )}
 
-      {options.length === 1 && (
-        <FormFieldCheckboxSearchGroup
-          {...props}
-          onAllChange={event => {
-            if (onAllChange) {
-              onAllChange(event, options[0].options);
-            }
-          }}
-          hideCount
-          selectAll
-          options={options[0].options}
-        />
-      )}
+      {options.length === 1 && renderSingleGroup()}
     </DetailsMenu>
   );
 };
