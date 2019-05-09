@@ -151,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             Func<Location, T> keySelector) where T : IObservationalUnit
         {
             return locations.GroupBy(keySelector)
-                .Where(grouping => grouping.Key != null)
+                .Where(grouping => grouping.Key.Code != null)
                 .Select(group => group.Key);
         }
     }
