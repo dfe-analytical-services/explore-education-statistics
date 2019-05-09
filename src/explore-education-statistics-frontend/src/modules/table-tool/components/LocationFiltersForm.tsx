@@ -68,7 +68,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
         locations: Yup.mixed().test(
           'required',
           'Select at least one option',
-          (value: string) =>
+          (value: Dictionary<string[]>) =>
             Object.values(value).some(groupOptions => groupOptions.length > 0),
         ),
       })}
@@ -85,40 +85,47 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                   : ''
               }
             >
-              {Object.entries(options).map(([levelKey, level]) => {
-                return (
-                  <FormFieldCheckboxMenu
-                    name={`locations.${levelKey}`}
-                    key={levelKey}
-                    options={level.options}
-                    id={`locationFiltersForm-levels-${levelKey}`}
-                    legend={level.legend}
-                    legendHidden
-                    onAllChange={event => {
-                      updateLocationLevels(draft => {
-                        draft[levelKey] = event.target.checked
-                          ? level.options
-                          : [];
-                      });
-                    }}
-                    onChange={(event, option) => {
-                      updateLocationLevels(draft => {
-                        const matchingOption = locationLevels[levelKey].find(
-                          levelOption => levelOption.value === option.value,
-                        );
+              <div className="govuk-grid-row">
+                <div className="govuk-grid-column-one-half-from-desktop">
+                  {Object.entries(options).map(([levelKey, level]) => {
+                    return (
+                      <FormFieldCheckboxMenu
+                        name={`locations.${levelKey}`}
+                        key={levelKey}
+                        options={level.options}
+                        id={`locationFiltersForm-levels-${levelKey}`}
+                        legend={level.legend}
+                        legendHidden
+                        onAllChange={event => {
+                          updateLocationLevels(draft => {
+                            draft[levelKey] = event.target.checked
+                              ? level.options
+                              : [];
+                          });
+                        }}
+                        onChange={(event, option) => {
+                          updateLocationLevels(draft => {
+                            const matchingOption = locationLevels[
+                              levelKey
+                            ].find(
+                              levelOption => levelOption.value === option.value,
+                            );
 
-                        if (matchingOption) {
-                          draft[levelKey] = locationLevels[levelKey].filter(
-                            levelOption => levelOption.value !== option.value,
-                          );
-                        } else {
-                          draft[levelKey].push(option);
-                        }
-                      });
-                    }}
-                  />
-                );
-              })}
+                            if (matchingOption) {
+                              draft[levelKey] = locationLevels[levelKey].filter(
+                                levelOption =>
+                                  levelOption.value !== option.value,
+                              );
+                            } else {
+                              draft[levelKey].push(option);
+                            }
+                          });
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
             </FormFieldset>
 
             <FormGroup>
