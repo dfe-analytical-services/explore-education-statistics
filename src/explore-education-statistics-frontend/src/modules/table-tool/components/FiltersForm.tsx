@@ -2,13 +2,13 @@ import Button from '@common/components/Button';
 import { Form, FormGroup } from '@common/components/form';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
+import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
 import { Formik, FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import React, { useRef, useState } from 'react';
 import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
 import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
-import { MetaSpecification } from './meta/initialSpec';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepHeading from './WizardStepHeading';
 
@@ -22,7 +22,7 @@ export interface FormValues {
 export type FilterFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
-  specification: MetaSpecification;
+  specification: PublicationSubjectMeta;
   onSubmit: FilterFormSubmitHandler;
 }
 
@@ -103,7 +103,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                               hint={filterGroup.hint}
                               error={getError(filterName)}
                               selectAll
-                              options={filterGroup.options.default.options.map(
+                              options={filterGroup.options.Default.options.map(
                                 option => ({
                                   id: `${filterKey}-${option.value}`,
                                   label: option.label,

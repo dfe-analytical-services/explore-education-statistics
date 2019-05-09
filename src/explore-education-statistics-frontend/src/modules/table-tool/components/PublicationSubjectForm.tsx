@@ -3,31 +3,29 @@ import { Form, FormFieldRadioGroup, FormGroup } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
+import { PublicationSubject } from '@common/services/tableBuilderService';
 import { InjectedWizardProps } from '@frontend/modules/table-tool/components/Wizard';
 import WizardStepHeading from '@frontend/modules/table-tool/components/WizardStepHeading';
 import { Formik, FormikProps } from 'formik';
 import React, { useState } from 'react';
 
-export interface PublicationSubjectMenuOption {
-  value: string;
-  label: string;
+interface FormValues {
+  subjectId: string;
 }
 
-interface FormValues {
-  publicationSubjectId: string;
-}
+export type PublicationSubjectFormSubmitHandler = (values: {
+  subjectId: string;
+  subjectName: string;
+}) => void;
 
 interface Props {
-  onSubmit: (values: {
-    publicationSubjectId: string;
-    publicationSubjectName: string;
-  }) => void;
-  options: PublicationSubjectMenuOption[];
+  onSubmit: PublicationSubjectFormSubmitHandler;
+  options: PublicationSubject[];
 }
 
 const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
   const { isActive, onSubmit, options, goToNextStep, goToPreviousStep } = props;
-  const [publicationSubjectName, setPublicationSubjectName] = useState('');
+  const [subjectName, setSubjectName] = useState('');
 
   const stepHeading = (
     <WizardStepHeading {...props} fieldsetHeading>
@@ -37,35 +35,32 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
 
   return (
     <Formik
-      onSubmit={({ publicationSubjectId }) => {
+      onSubmit={({ subjectId }) => {
         onSubmit({
-          publicationSubjectId,
-          publicationSubjectName,
+          subjectId,
+          subjectName,
         });
         goToNextStep();
       }}
       initialValues={{
-        publicationSubjectId: '',
+        subjectId: '',
       }}
       validationSchema={Yup.object<FormValues>({
-        publicationSubjectId: Yup.string().required(
-          'Choose a publication subject',
-        ),
+        subjectId: Yup.string().required('Choose a publication subject'),
       })}
       render={(form: FormikProps<FormValues>) => {
         return isActive ? (
           <Form {...form} id="publicationSubjectForm">
-            <FormFieldRadioGroup
-              name="publicationSubjectId"
+            <FormFieldRadioGroup<FormValues>
+              name="subjectId"
               legend={stepHeading}
               options={options.map(option => ({
-                id: option.value,
                 label: option.label,
-                value: option.value,
+                value: `${option.id}`,
               }))}
-              id="publicationSubjectForm-publicationSubjectId"
+              id="publicationSubjectForm-subjectId"
               onChange={(event, option) => {
-                setPublicationSubjectName(option.label);
+                setSubjectName(option.label);
               }}
             />
 
@@ -85,9 +80,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
           <>
             {stepHeading}
             <SummaryList noBorder>
-              <SummaryListItem term="Subject">
-                {publicationSubjectName}
-              </SummaryListItem>
+              <SummaryListItem term="Subject">{subjectName}</SummaryListItem>
             </SummaryList>
           </>
         );

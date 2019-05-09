@@ -3,14 +3,13 @@ import { Form, FormFieldset, FormGroup } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
+import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
 import { Formik, FormikProps } from 'formik';
-import mapValues from 'lodash/mapValues';
 import sortBy from 'lodash/sortBy';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useImmer } from 'use-immer';
 import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
-import { MetaSpecification } from './meta/initialSpec';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepHeading from './WizardStepHeading';
 
@@ -20,24 +19,30 @@ interface FormValues {
   };
 }
 
+type LocationFiltersFormSubmitHandler = (
+  values: FormValues['locations'],
+) => void;
+
 interface Props {
-  specification: MetaSpecification;
-  onSubmit: (values: FormValues['locations']) => void;
+  options: PublicationSubjectMeta['locations'];
+  onSubmit: LocationFiltersFormSubmitHandler;
 }
 
 const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
-  const {
-    specification,
-    onSubmit,
-    isActive,
-    goToNextStep,
-    goToPreviousStep,
-  } = props;
-  const { locations } = specification;
+  const { options, onSubmit, isActive, goToNextStep, goToPreviousStep } = props;
 
   const [locationLevels, updateLocationLevels] = useImmer<
     Dictionary<{ label: string; value: string }[]>
-  >(mapValues(specification.locations, () => []));
+  >({});
+
+  useEffect(() => {
+    updateLocationLevels(draft => {
+      Object.keys(options).forEach(key => {
+        draft[key] = [];
+      });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [options]);
 
   const stepHeading = (
     <WizardStepHeading {...props} fieldsetHeading>
@@ -52,7 +57,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
         goToNextStep();
       }}
       initialValues={{
-        locations: Object.keys(locations).reduce((acc, level) => {
+        locations: Object.keys(options).reduce((acc, level) => {
           return {
             ...acc,
             [level]: [],
@@ -64,7 +69,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
           'required',
           'Select at least one option',
           (value: string) =>
-            Object.values(value).some(options => options.length > 0),
+            Object.values(value).some(groupOptions => groupOptions.length > 0),
         ),
       })}
       render={(form: FormikProps<FormValues>) => {
@@ -80,7 +85,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                   : ''
               }
             >
-              {Object.entries(locations).map(([levelKey, level]) => {
+              {Object.entries(options).map(([levelKey, level]) => {
                 return (
                   <FormFieldCheckboxMenu
                     name={`locations.${levelKey}`}
@@ -136,7 +141,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                 .filter(([_, levelOptions]) => levelOptions.length > 0)
                 .map(([levelKey, levelOptions]) => (
                   <SummaryListItem
-                    term={specification.locations[levelKey].legend}
+                    term={options[levelKey].legend}
                     key={levelKey}
                   >
                     {sortBy(levelOptions, ['label']).map(level => (

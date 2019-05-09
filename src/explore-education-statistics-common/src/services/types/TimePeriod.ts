@@ -1,8 +1,8 @@
 import { Comparison } from '@common/types/util';
 
-type TimePeriodCode = 'AY';
+type TimePeriodCode = 'AY' | 'HT6';
 
-const allowedTimePeriodCodes: TimePeriodCode[] = ['AY'];
+const allowedTimePeriodCodes: TimePeriodCode[] = ['AY', 'HT6'];
 
 class TimePeriod {
   public readonly year: number;
@@ -46,7 +46,8 @@ class TimePeriod {
 
   public get label(): string {
     switch (this.code) {
-      case 'AY': {
+      case 'AY':
+      case 'HT6': {
         const yearString = this.year.toString();
         return `${yearString}/${Number(yearString.substring(2, 4)) + 1}`;
       }
@@ -62,6 +63,7 @@ class TimePeriod {
   public previousPeriod(): TimePeriod {
     switch (this.code) {
       case 'AY':
+      case 'HT6':
         return new TimePeriod(this.year - 1, this.code);
       default:
         throw new Error('Could not parse previous time period');
@@ -71,6 +73,7 @@ class TimePeriod {
   public nextPeriod(): TimePeriod {
     switch (this.code) {
       case 'AY':
+      case 'HT6':
         return new TimePeriod(this.year + 1, this.code);
       default:
         throw new Error('Could not parse next time period');

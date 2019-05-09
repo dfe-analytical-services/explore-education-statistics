@@ -1,21 +1,12 @@
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
-import TimePeriod from '@common/services/types/TimePeriod';
 import FormFieldSortableList from '@frontend/modules/table-tool/components/FormFieldSortableList';
 import { SortableOption } from '@frontend/modules/table-tool/components/FormSortableList';
-import {
-  FilterOption,
-  IndicatorOption,
-} from '@frontend/modules/table-tool/components/meta/initialSpec';
 import { Form, Formik } from 'formik';
 import React from 'react';
 
 interface Props {
-  indicators: IndicatorOption[];
-  filters: {
-    [key: string]: FilterOption[];
-  };
-  timePeriods: TimePeriod[];
+  initialValues: FormValues;
   onSubmit: (values: FormValues) => void;
 }
 
@@ -27,7 +18,7 @@ export interface FormValues {
 }
 
 const TableHeadersForm = (props: Props) => {
-  const { filters, onSubmit, indicators, timePeriods } = props;
+  const { onSubmit, initialValues } = props;
 
   return (
     <Details summary="Re-order table headers">
@@ -37,12 +28,7 @@ const TableHeadersForm = (props: Props) => {
 
       <Formik<FormValues>
         enableReinitialize
-        initialValues={{
-          columnGroups: filters.schoolTypes,
-          columns: timePeriods,
-          rowGroups: filters.characteristics,
-          rows: indicators,
-        }}
+        initialValues={initialValues}
         onSubmit={onSubmit}
         render={() => {
           return (

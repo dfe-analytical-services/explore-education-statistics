@@ -1,7 +1,7 @@
 import {
   FilterOption,
   GroupedFilterOptions,
-} from '@frontend/modules/table-tool/components/meta/initialSpec';
+} from '@common/services/tableBuilderService';
 
 export default function mapOptionValues<T extends FilterOption>(
   options: GroupedFilterOptions | FilterOption[],

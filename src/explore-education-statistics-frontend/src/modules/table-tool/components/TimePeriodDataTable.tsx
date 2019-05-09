@@ -1,14 +1,15 @@
-import { DataTableResult } from '@common/services/tableBuilderService';
+import {
+  FilterOption,
+  IndicatorOption,
+  TableData,
+} from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import FixedHeaderGroupedDataTable, {
   HeaderGroup,
   RowGroup,
 } from '@frontend/modules/table-tool/components/FixedHeaderGroupedDataTable';
-import {
-  FilterOption,
-  IndicatorOption,
-} from '@frontend/modules/table-tool/components/meta/initialSpec';
 import TableHeadersForm from '@frontend/modules/table-tool/components/TableHeadersForm';
+import sortBy from 'lodash/sortBy';
 import React, { memo, useEffect, useRef, useState } from 'react';
 
 interface TableHeaders {
@@ -24,7 +25,7 @@ interface Props {
     [key: string]: FilterOption[];
   };
   timePeriods: TimePeriod[];
-  results: DataTableResult[];
+  results: TableData['result'];
 }
 
 const TimePeriodDataTable = ({
@@ -35,21 +36,25 @@ const TimePeriodDataTable = ({
 }: Props) => {
   const dataTableRef = useRef<HTMLTableElement>(null);
 
+  const [columnGroups, rowGroups] = sortBy(Object.values(filters), [
+    options => options.length,
+  ]);
+
   const [tableHeaders, setTableHeaders] = useState<TableHeaders>({
-    columnGroups: filters.schoolTypes,
+    columnGroups,
+    rowGroups,
     columns: timePeriods,
-    rowGroups: filters.characteristics,
     rows: indicators,
   });
 
   useEffect(() => {
     setTableHeaders({
-      columnGroups: filters.schoolTypes,
+      columnGroups,
+      rowGroups,
       columns: timePeriods,
-      rowGroups: filters.characteristics,
       rows: indicators,
     });
-  }, [filters, timePeriods, indicators]);
+  }, [columnGroups, rowGroups, timePeriods, indicators]);
 
   const startLabel = timePeriods[0].label;
   const endLabel = timePeriods[timePeriods.length - 1].label;
@@ -58,12 +63,6 @@ const TimePeriodDataTable = ({
     startLabel === endLabel
       ? `Comparing statistics for ${startLabel}`
       : `Comparing statistics between ${startLabel} and ${endLabel}`;
-
-  // TODO: Remove this when timePeriod API finalised
-  const formatToAcademicYear = (year: number) => {
-    const nextYear = year + 1;
-    return parseInt(`${year}${`${nextYear}`.substring(2, 4)}`, 0);
-  };
 
   const headerRow: HeaderGroup[] = tableHeaders.columnGroups.map(
     columnGroup => {
@@ -76,16 +75,16 @@ const TimePeriodDataTable = ({
 
   const groupedData: RowGroup[] = tableHeaders.rowGroups.map(rowGroup => {
     const rows = tableHeaders.rows.map(row => {
-      const columnGroups = tableHeaders.columnGroups.map(colGroup =>
+      const columnGroupValues = tableHeaders.columnGroups.map(colGroup =>
         tableHeaders.columns.map(column => {
-          // TODO: Figure out how to make filter criteria dynamic
           const matchingResult = results.find(result => {
             return Boolean(
-              result.indicators[row.value] !== undefined &&
-                result.characteristic &&
-                result.characteristic.name === rowGroup.value &&
-                result.timePeriod === formatToAcademicYear(column.year) &&
-                result.schoolType === colGroup.value,
+              result.measures[row.value] !== undefined &&
+                result.filters.every(filter =>
+                  [colGroup.value, rowGroup.value].includes(filter.toString()),
+                ) &&
+                result.timeIdentifier === column.code &&
+                result.year === column.year,
             );
           });
 
@@ -93,7 +92,7 @@ const TimePeriodDataTable = ({
             return 'n/a';
           }
 
-          const rawValue = matchingResult.indicators[row.value];
+          const rawValue = matchingResult.measures[row.value];
           const parsedValue = Number(rawValue);
 
           if (Number.isNaN(parsedValue)) {
@@ -105,7 +104,7 @@ const TimePeriodDataTable = ({
       );
 
       return {
-        columnGroups,
+        columnGroups: columnGroupValues,
         label: row.label,
       };
     });
@@ -119,9 +118,7 @@ const TimePeriodDataTable = ({
   return (
     <div>
       <TableHeadersForm
-        filters={filters}
-        indicators={indicators}
-        timePeriods={timePeriods}
+        initialValues={tableHeaders}
         onSubmit={value => {
           setTableHeaders(value as TableHeaders);
 

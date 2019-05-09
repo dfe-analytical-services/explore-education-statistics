@@ -1,19 +1,16 @@
 /* eslint-disable @typescript-eslint/camelcase,@typescript-eslint/no-unused-vars */
-import React from 'react';
+import { DataBlockProps } from '@common/modules/find-statistics/components/DataBlock';
 import { data as OriginalData } from '@common/prototypes/publication/components/PrototypeMapBoundaries';
 import {
   Axis,
   Chart,
   ReferenceLine,
 } from '@common/services/publicationService';
-import {
-  CharacteristicsData,
-  PublicationMeta,
-} from '@common/services/tableBuilderService';
+import { CharacteristicsData } from '@common/services/tableBuilderService';
 import SchoolType from '@common/services/types/SchoolType';
-import { DataBlockProps } from '@common/modules/find-statistics/components/DataBlock';
-import { GeographicLevel } from 'explore-education-statistics-common/src/services/dataBlockService';
 import { ChartProps } from 'explore-education-statistics-common/src/modules/find-statistics/components/charts/ChartFunctions';
+import { GeographicLevel } from 'explore-education-statistics-common/src/services/dataBlockService';
+import React from 'react';
 
 function createDataValues(
   indicators: string[],
@@ -56,7 +53,7 @@ function createDataValues(
     }),
   };
 
-  const meta: PublicationMeta = {
+  const meta: any = {
     indicators: {
       Test: indicators.map((key: string, index: number) => ({
         label: labels[index],

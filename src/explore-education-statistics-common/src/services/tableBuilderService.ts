@@ -1,26 +1,82 @@
 import { dataApi } from './api';
 
-export interface PublicationMeta {
-  publicationId: string;
-  characteristics: {
-    [group: string]: {
-      name: string;
-      label: string;
-    }[];
-  };
-  indicators: {
-    [group: string]: {
-      name: string;
-      label: string;
-      unit?: string;
-    }[];
+export interface FilterOption {
+  label: string;
+  value: string;
+}
+
+export interface IndicatorOption extends FilterOption {
+  unit: string;
+}
+
+export interface TimePeriodOption {
+  code: string;
+  label: string;
+  year: number;
+}
+
+export interface GroupedFilterOptions {
+  [groupKey: string]: {
+    label: string;
+    options: FilterOption[];
   };
 }
 
-export type CharacteristicsMeta = PublicationMeta['characteristics'];
-export type IndicatorsMeta = PublicationMeta['indicators'];
-export type IndicatorsMetaItem = IndicatorsMeta[0][0];
+export interface PublicationSubject {
+  id: string;
+  label: string;
+}
 
+export interface PublicationMeta {
+  publicationId: string;
+  subjects: PublicationSubject[];
+}
+
+export interface PublicationSubjectMeta {
+  filters: {
+    [key: string]: {
+      legend: string;
+      hint?: string;
+      options: GroupedFilterOptions;
+    };
+  };
+  indicators: {
+    [key: string]: {
+      label: string;
+      options: IndicatorOption[];
+    };
+  };
+  locations: {
+    [key: string]: {
+      legend: string;
+      hint?: string;
+      options: FilterOption[];
+    };
+  };
+  timePeriod: {
+    hint?: string;
+    legend: string;
+    options: TimePeriodOption[];
+  };
+}
+
+export interface TableData {
+  publicationId: string;
+  subjectId: string;
+  releaseId: string;
+  releaseDate: string;
+  geographicLevel: string;
+  result: {
+    year: number;
+    timeIdentifier: string;
+    measures: {
+      [indicator: string]: string;
+    };
+    filters: string[];
+  }[];
+}
+
+// TODO: Remove this
 export interface CharacteristicsData {
   publicationId: string;
   releaseId: string;
@@ -43,19 +99,26 @@ export interface CharacteristicsData {
 export type DataTableResult = CharacteristicsData['result'][0];
 
 export default {
-  getCharacteristicsMeta(publicationUuid: string): Promise<PublicationMeta> {
-    return dataApi.get(
-      `/tablebuilder/meta/CharacteristicDataNational/${publicationUuid}`,
-    );
+  getPublicationMeta(publicationUuid: string): Promise<PublicationMeta> {
+    return dataApi.get(`/meta/publication/${publicationUuid}`);
   },
-  getNationalCharacteristicsData(query: {
-    publicationId: string;
-    characteristics: string[];
+  getPublicationSubjectMeta(
+    subjectId: string,
+  ): Promise<PublicationSubjectMeta> {
+    return dataApi.get(`/meta/subject/${subjectId}`);
+  },
+  getTableData(query: {
+    subjectId: string;
+    filters: string[];
     indicators: string[];
-    schoolTypes: string[];
     startYear: number;
     endYear: number;
-  }): Promise<CharacteristicsData> {
-    return dataApi.post('/tablebuilder/characteristics/national', query);
+    geographicLevel: string;
+    countries?: string[];
+    regions?: string[];
+    localAuthorities?: string[];
+    localAuthorityDistricts?: string[];
+  }): Promise<TableData> {
+    return dataApi.post('/tablebuilder', query);
   },
 };
