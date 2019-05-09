@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/camelcase */
+/* eslint-disable @typescript-eslint/camelcase,@typescript-eslint/no-unused-vars */
 import React from 'react';
 import { data as OriginalData } from '@common/prototypes/publication/components/PrototypeMapBoundaries';
 import {
@@ -14,7 +14,6 @@ import SchoolType from '@common/services/types/SchoolType';
 import { DataBlockProps } from '@common/modules/find-statistics/components/DataBlock';
 import { GeographicLevel } from 'explore-education-statistics-common/src/services/dataBlockService';
 import { ChartProps } from 'explore-education-statistics-common/src/modules/find-statistics/components/charts/ChartFunctions';
-import Link from '@frontend/components/Link';
 
 function createDataValues(
   indicators: string[],
@@ -126,31 +125,10 @@ function createDataBlockWithChart(
   characteristic: string[] = ['Total'],
 ): DataBlockProps {
   return {
-    charts,
+    showTables: false,
 
     heading,
     type: 'DataBlock',
-
-    ...createDataValues(
-      indicators,
-      labels,
-      schooltype,
-      year,
-      data,
-      characteristic,
-    ),
-
-    additionalTabContent: (
-      <>
-        <h2 className="govuk-heading-m govuk-!-margin-top-9">
-          Explore and edit this data online
-        </h2>
-        <p>Use our table tool to explore this data.</p>
-        <Link to="/table-tool/" className="govuk-button">
-          Explore data
-        </Link>
-      </>
-    ),
   };
 }
 

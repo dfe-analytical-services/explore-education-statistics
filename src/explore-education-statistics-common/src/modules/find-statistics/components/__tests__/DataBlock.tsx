@@ -6,7 +6,7 @@ import _dataBlockService, {
 } from '@common/services/dataBlockService';
 import testData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
 import domUtil from '@common-test/domUtil';
-import { Summary } from 'explore-education-statistics-common/src/services/publicationService';
+import { Summary } from '@common/services/publicationService';
 import DataBlock from '../DataBlock';
 
 jest.mock('@common/services/dataBlockService');
