@@ -26,7 +26,7 @@ const TableHeading = ({ data, meta, indicators }: Props) => {
             className="govuk-table__header govuk-table__cell--numeric"
             scope="col"
           >
-            {result.year}
+            {meta.timePeriods[result.year].label}
           </th>
         ))}
       </tr>

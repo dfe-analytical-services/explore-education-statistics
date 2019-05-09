@@ -1,4 +1,5 @@
 import { dataApi } from '@common/services/api';
+import TimePeriod, { TimePeriodCode } from '@common/services/types/TimePeriod';
 
 export enum GeographicLevel {
   Establishment = 'Establishment',
@@ -89,7 +90,7 @@ interface OptionMetadata extends OptionListMetadata<LabelValueMetadata> {
 
 interface TimePeriodOptionMetadata {
   label: string;
-  code: string;
+  code: TimePeriodCode;
   year: number;
 }
 
@@ -124,7 +125,7 @@ interface ResponseMetaData {
 export interface DataBlockMetadata {
   indicators: ObjectMap<LabelValueUnitMetadata>;
   filters: ObjectMap<LabelValueMetadata>;
-  timePeriods: ObjectMap<LabelValueMetadata>;
+  timePeriods: ObjectMap<TimePeriod>;
 }
 
 export interface DataBlockRequest {
@@ -161,7 +162,10 @@ function mapTimePeriodOptions(
 ) {
   return Object.values(options).reduce((results, option) => {
     if (years.includes(option.year)) {
-      return { ...results, [option.year]: option };
+      return {
+        ...results,
+        [option.year]: new TimePeriod(option.year, option.code),
+      };
     }
 
     return results;
@@ -201,7 +205,7 @@ function remapFilters(
 function remapTimePeriod(
   years: number[],
   { timePeriod }: ResponseMetaData,
-): ObjectMap<LabelValueMetadata> {
+): ObjectMap<TimePeriod> {
   return mapTimePeriodOptions(years, timePeriod.options);
 }
 

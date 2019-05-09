@@ -1,6 +1,6 @@
 import { Comparison } from '@common/types/util';
 
-type TimePeriodCode = 'AY' | 'HT6' | 'HT5';
+export type TimePeriodCode = 'AY' | 'HT6' | 'HT5';
 
 const allowedTimePeriodCodes: TimePeriodCode[] = ['AY', 'HT6', 'HT5'];
 

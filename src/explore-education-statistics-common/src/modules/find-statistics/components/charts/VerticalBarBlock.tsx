@@ -23,7 +23,7 @@ export default function VerticalBarBlock({
   meta,
 }: ChartProps) {
   const chartData = data.result.map(({ measures, year }) => ({
-    name: `${year}`,
+    name: `${meta.timePeriods[year].label}`,
     ...measures,
   }));
 

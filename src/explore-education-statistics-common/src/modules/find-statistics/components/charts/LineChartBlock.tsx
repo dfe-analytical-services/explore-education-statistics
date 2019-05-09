@@ -47,7 +47,15 @@ const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
 
 export default class LineChartBlock extends Component<ChartProps> {
   public render() {
-    const { data, chartDataKeys, height, xAxis, yAxis, labels } = this.props;
+    const {
+      data,
+      chartDataKeys,
+      height,
+      xAxis,
+      yAxis,
+      labels,
+      meta,
+    } = this.props;
 
     const chartData = data.result.map(result => {
       return chartDataKeys.reduce(
@@ -57,7 +65,7 @@ export default class LineChartBlock extends Component<ChartProps> {
             [indicatorName]: result.measures[indicatorName],
           };
         },
-        { name: `${result.year}` },
+        { name: `${meta.timePeriods[result.year].label}` },
       );
     });
 
