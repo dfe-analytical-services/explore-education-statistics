@@ -13,9 +13,9 @@ exports[`DataBlock datablock renders downloads only 1`] = `
           role="presentation"
       >
         <a class="govuk-tabs__tab govuk-tabs__tab--selected"
-           href="#datablock_8_downloads"
-           id="datablock_8_downloads-tab"
-           aria-controls="datablock_8_downloads"
+           href="#datablock_9_downloads"
+           id="datablock_9_downloads-tab"
+           aria-controls="datablock_9_downloads"
            aria-selected="true"
            role="tab"
         >
@@ -24,9 +24,9 @@ exports[`DataBlock datablock renders downloads only 1`] = `
       </li>
     </ul>
     <section class="govuk-tabs__panel panel"
-             id="datablock_8_downloads"
+             id="datablock_9_downloads"
              data-testid="Data downloads"
-             aria-labelledby="datablock_8_downloads-tab"
+             aria-labelledby="datablock_9_downloads-tab"
              role="tabpanel"
              tabindex="-1"
     >
@@ -39,17 +39,6 @@ exports[`DataBlock datablock renders downloads only 1`] = `
       <div class="govuk-inset-text">
         Data downloads have not yet been implemented within the service.
       </div>
-      <h2 class="govuk-heading-m govuk-!-margin-top-9">
-        Explore and edit this data online
-      </h2>
-      <p>
-        Use our table tool to explore this data.
-      </p>
-      <a class="govuk-link govuk-button"
-         href="/table-tool/"
-      >
-        Explore data
-      </a>
     </section>
   </div>
 </div>
@@ -68,12 +57,12 @@ exports[`DataBlock datablock renders horizontal chart 1`] = `
       <li class="govuk-tabs__list-item"
           role="presentation"
       >
-        <a aria-controls="datablock_8_charts"
+        <a aria-controls="datablock_9_charts"
            aria-selected="true"
            role="tab"
            class="govuk-tabs__tab govuk-tabs__tab--selected"
-           href="#datablock_8_charts"
-           id="datablock_8_charts-tab"
+           href="#datablock_9_charts"
+           id="datablock_9_charts-tab"
         >
           Charts
         </a>
@@ -82,9 +71,9 @@ exports[`DataBlock datablock renders horizontal chart 1`] = `
           role="presentation"
       >
         <a class="govuk-tabs__tab"
-           href="#datablock_8_downloads"
-           id="datablock_8_downloads-tab"
-           aria-controls="datablock_8_downloads"
+           href="#datablock_9_downloads"
+           id="datablock_9_downloads-tab"
+           aria-controls="datablock_9_downloads"
            aria-selected="false"
            role="tab"
            tabindex="-1"
@@ -94,9 +83,9 @@ exports[`DataBlock datablock renders horizontal chart 1`] = `
       </li>
     </ul>
     <section class="govuk-tabs__panel panel"
-             id="datablock_8_charts"
+             id="datablock_9_charts"
              data-testid="Charts"
-             aria-labelledby="datablock_8_charts-tab"
+             aria-labelledby="datablock_9_charts-tab"
              role="tabpanel"
              tabindex="-1"
     >
@@ -680,22 +669,11 @@ exports[`DataBlock datablock renders horizontal chart 1`] = `
         <div style="position: absolute; width: 0px; height: 0px; visibility: hidden; display: none;">
         </div>
       </div>
-      <h2 class="govuk-heading-m govuk-!-margin-top-9">
-        Explore and edit this data online
-      </h2>
-      <p>
-        Use our table tool to add and remove data for this chart.
-      </p>
-      <a class="govuk-link govuk-button"
-         href="/table-tool/"
-      >
-        Explore chart data
-      </a>
     </section>
     <section class="govuk-tabs__panel panel govuk-tabs__panel--hidden"
-             id="datablock_8_downloads"
+             id="datablock_9_downloads"
              data-testid="Data downloads"
-             aria-labelledby="datablock_8_downloads-tab"
+             aria-labelledby="datablock_9_downloads-tab"
              role="tabpanel"
              tabindex="-1"
     >
@@ -708,17 +686,6 @@ exports[`DataBlock datablock renders horizontal chart 1`] = `
       <div class="govuk-inset-text">
         Data downloads have not yet been implemented within the service.
       </div>
-      <h2 class="govuk-heading-m govuk-!-margin-top-9">
-        Explore and edit this data online
-      </h2>
-      <p>
-        Use our table tool to explore this data.
-      </p>
-      <a class="govuk-link govuk-button"
-         href="/table-tool/"
-      >
-        Explore data
-      </a>
     </section>
   </div>
 </div>
@@ -737,12 +704,12 @@ exports[`DataBlock datablock renders table 1`] = `
       <li class="govuk-tabs__list-item"
           role="presentation"
       >
-        <a aria-controls="datablock_8_tables"
+        <a aria-controls="datablock_9_tables"
            aria-selected="true"
            role="tab"
            class="govuk-tabs__tab govuk-tabs__tab--selected"
-           href="#datablock_8_tables"
-           id="datablock_8_tables-tab"
+           href="#datablock_9_tables"
+           id="datablock_9_tables-tab"
         >
           Data tables
         </a>
@@ -751,9 +718,9 @@ exports[`DataBlock datablock renders table 1`] = `
           role="presentation"
       >
         <a class="govuk-tabs__tab"
-           href="#datablock_8_downloads"
-           id="datablock_8_downloads-tab"
-           aria-controls="datablock_8_downloads"
+           href="#datablock_9_downloads"
+           id="datablock_9_downloads-tab"
+           aria-controls="datablock_9_downloads"
            aria-selected="false"
            role="tab"
            tabindex="-1"
@@ -763,9 +730,9 @@ exports[`DataBlock datablock renders table 1`] = `
       </li>
     </ul>
     <section class="govuk-tabs__panel panel"
-             id="datablock_8_tables"
+             id="datablock_9_tables"
              data-testid="Data tables"
-             aria-labelledby="datablock_8_tables-tab"
+             aria-labelledby="datablock_9_tables-tab"
              role="tabpanel"
              tabindex="-1"
     >
@@ -790,22 +757,11 @@ exports[`DataBlock datablock renders table 1`] = `
           </tr>
         </tbody>
       </table>
-      <h2 class="govuk-heading-m govuk-!-margin-top-9">
-        Explore and edit this data online
-      </h2>
-      <p>
-        Use our table tool to add and remove data for this table.
-      </p>
-      <a class="govuk-link govuk-button"
-         href="/table-tool/"
-      >
-        Explore data
-      </a>
     </section>
     <section class="govuk-tabs__panel panel govuk-tabs__panel--hidden"
-             id="datablock_8_downloads"
+             id="datablock_9_downloads"
              data-testid="Data downloads"
-             aria-labelledby="datablock_8_downloads-tab"
+             aria-labelledby="datablock_9_downloads-tab"
              role="tabpanel"
              tabindex="-1"
     >
@@ -818,17 +774,6 @@ exports[`DataBlock datablock renders table 1`] = `
       <div class="govuk-inset-text">
         Data downloads have not yet been implemented within the service.
       </div>
-      <h2 class="govuk-heading-m govuk-!-margin-top-9">
-        Explore and edit this data online
-      </h2>
-      <p>
-        Use our table tool to explore this data.
-      </p>
-      <a class="govuk-link govuk-button"
-         href="/table-tool/"
-      >
-        Explore data
-      </a>
     </section>
   </div>
 </div>
@@ -847,12 +792,12 @@ exports[`DataBlock datablock renders vertical chart 1`] = `
       <li class="govuk-tabs__list-item"
           role="presentation"
       >
-        <a aria-controls="datablock_8_charts"
+        <a aria-controls="datablock_9_charts"
            aria-selected="true"
            role="tab"
            class="govuk-tabs__tab govuk-tabs__tab--selected"
-           href="#datablock_8_charts"
-           id="datablock_8_charts-tab"
+           href="#datablock_9_charts"
+           id="datablock_9_charts-tab"
         >
           Charts
         </a>
@@ -861,9 +806,9 @@ exports[`DataBlock datablock renders vertical chart 1`] = `
           role="presentation"
       >
         <a class="govuk-tabs__tab"
-           href="#datablock_8_downloads"
-           id="datablock_8_downloads-tab"
-           aria-controls="datablock_8_downloads"
+           href="#datablock_9_downloads"
+           id="datablock_9_downloads-tab"
+           aria-controls="datablock_9_downloads"
            aria-selected="false"
            role="tab"
            tabindex="-1"
@@ -873,9 +818,9 @@ exports[`DataBlock datablock renders vertical chart 1`] = `
       </li>
     </ul>
     <section class="govuk-tabs__panel panel"
-             id="datablock_8_charts"
+             id="datablock_9_charts"
              data-testid="Charts"
-             aria-labelledby="datablock_8_charts-tab"
+             aria-labelledby="datablock_9_charts-tab"
              role="tabpanel"
              tabindex="-1"
     >
@@ -1461,22 +1406,11 @@ exports[`DataBlock datablock renders vertical chart 1`] = `
         <div style="position: absolute; width: 0px; height: 0px; visibility: hidden; display: none;">
         </div>
       </div>
-      <h2 class="govuk-heading-m govuk-!-margin-top-9">
-        Explore and edit this data online
-      </h2>
-      <p>
-        Use our table tool to add and remove data for this chart.
-      </p>
-      <a class="govuk-link govuk-button"
-         href="/table-tool/"
-      >
-        Explore chart data
-      </a>
     </section>
     <section class="govuk-tabs__panel panel govuk-tabs__panel--hidden"
-             id="datablock_8_downloads"
+             id="datablock_9_downloads"
              data-testid="Data downloads"
-             aria-labelledby="datablock_8_downloads-tab"
+             aria-labelledby="datablock_9_downloads-tab"
              role="tabpanel"
              tabindex="-1"
     >
@@ -1489,17 +1423,6 @@ exports[`DataBlock datablock renders vertical chart 1`] = `
       <div class="govuk-inset-text">
         Data downloads have not yet been implemented within the service.
       </div>
-      <h2 class="govuk-heading-m govuk-!-margin-top-9">
-        Explore and edit this data online
-      </h2>
-      <p>
-        Use our table tool to explore this data.
-      </p>
-      <a class="govuk-link govuk-button"
-         href="/table-tool/"
-      >
-        Explore data
-      </a>
     </section>
   </div>
 </div>
@@ -1518,12 +1441,12 @@ exports[`DataBlock datablock renders vertical chart 2`] = `
       <li class="govuk-tabs__list-item"
           role="presentation"
       >
-        <a aria-controls="datablock_8_charts"
+        <a aria-controls="datablock_9_charts"
            aria-selected="true"
            role="tab"
            class="govuk-tabs__tab govuk-tabs__tab--selected"
-           href="#datablock_8_charts"
-           id="datablock_8_charts-tab"
+           href="#datablock_9_charts"
+           id="datablock_9_charts-tab"
         >
           Charts
         </a>
@@ -1532,9 +1455,9 @@ exports[`DataBlock datablock renders vertical chart 2`] = `
           role="presentation"
       >
         <a class="govuk-tabs__tab"
-           href="#datablock_8_downloads"
-           id="datablock_8_downloads-tab"
-           aria-controls="datablock_8_downloads"
+           href="#datablock_9_downloads"
+           id="datablock_9_downloads-tab"
+           aria-controls="datablock_9_downloads"
            aria-selected="false"
            role="tab"
            tabindex="-1"
@@ -1544,9 +1467,9 @@ exports[`DataBlock datablock renders vertical chart 2`] = `
       </li>
     </ul>
     <section class="govuk-tabs__panel panel"
-             id="datablock_8_charts"
+             id="datablock_9_charts"
              data-testid="Charts"
-             aria-labelledby="datablock_8_charts-tab"
+             aria-labelledby="datablock_9_charts-tab"
              role="tabpanel"
              tabindex="-1"
     >
@@ -2132,22 +2055,11 @@ exports[`DataBlock datablock renders vertical chart 2`] = `
         <div style="position: absolute; width: 0px; height: 0px; visibility: hidden; display: none;">
         </div>
       </div>
-      <h2 class="govuk-heading-m govuk-!-margin-top-9">
-        Explore and edit this data online
-      </h2>
-      <p>
-        Use our table tool to add and remove data for this chart.
-      </p>
-      <a class="govuk-link govuk-button"
-         href="/table-tool/"
-      >
-        Explore chart data
-      </a>
     </section>
     <section class="govuk-tabs__panel panel govuk-tabs__panel--hidden"
-             id="datablock_8_downloads"
+             id="datablock_9_downloads"
              data-testid="Data downloads"
-             aria-labelledby="datablock_8_downloads-tab"
+             aria-labelledby="datablock_9_downloads-tab"
              role="tabpanel"
              tabindex="-1"
     >
@@ -2160,17 +2072,6 @@ exports[`DataBlock datablock renders vertical chart 2`] = `
       <div class="govuk-inset-text">
         Data downloads have not yet been implemented within the service.
       </div>
-      <h2 class="govuk-heading-m govuk-!-margin-top-9">
-        Explore and edit this data online
-      </h2>
-      <p>
-        Use our table tool to explore this data.
-      </p>
-      <a class="govuk-link govuk-button"
-         href="/table-tool/"
-      >
-        Explore data
-      </a>
     </section>
   </div>
 </div>

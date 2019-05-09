@@ -252,6 +252,6 @@ describe('DataBlock', () => {
 
     expect(container.querySelector('#datablock_8_summary')).toBeDefined();
 
-    //expect(container.innerHTML).toMatchSnapshot();
+    // expect(container.innerHTML).toMatchSnapshot();
   });
 });
