@@ -78,15 +78,15 @@ Validate Key Statistics data block -- Summary tab
 
 Validate Contents section headings
     [Tags]  HappyPath
-    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader About this release"]
-    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader Absence rates"]
-    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader Persistent absence"]
-    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader Reasons for absence"]
-    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader Distribution of absence"]
-    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader Absence by pupil characteristics"]
-    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader Absence for four year olds"]
-    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader Pupil referral unit absence"]
-    user waits until page contains element  css:[data-testid="contents"]+div [data-testid="SectionHeader Pupil absence by local authority"]
+    user waits until page contains element  css:[data-testid="SectionHeader About this release"]
+    user waits until page contains element  css:[data-testid="SectionHeader Absence rates"]
+    user waits until page contains element  css:[data-testid="SectionHeader Persistent absence"]
+    user waits until page contains element  css:[data-testid="SectionHeader Reasons for absence"]
+    user waits until page contains element  css:[data-testid="SectionHeader Distribution of absence"]
+    user waits until page contains element  css:[data-testid="SectionHeader Absence by pupil characteristics"]
+    user waits until page contains element  css:[data-testid="SectionHeader Absence for four year olds"]
+    user waits until page contains element  css:[data-testid="SectionHeader Pupil referral unit absence"]
+    user waits until page contains element  css:[data-testid="SectionHeader Pupil absence by local authority"]
 
 Validate Extra Information section headings
     [Tags]  HappyPath
