@@ -53,27 +53,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             // TODO check subject exists
             var subject = _subjectService.Find(subjectId);
-
-            var filters = GetFilters(subject.Id);
-            var indicators = GetIndicators(subject.Id);
-            var observationalUnits = _observationService.GetObservationalUnits(subject.Id);
-            var timePeriods = GetTimePeriods(subject.Id);
-
-            var locations = observationalUnits.ToDictionary(
-                pair => pair.Key.ToString().PascalCase(),
-                pair => new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
-                {
-                    Hint = "",
-                    Legend = pair.Key.GetEnumLabel(),
-                    Options = _mapper.Map<IEnumerable<LabelValueViewModel>>(pair.Value)
-                });
-
             return new SubjectMetaViewModel
             {
-                Filters = filters,
-                Indicators = indicators,
-                Locations = locations,
-                TimePeriod = timePeriods
+                Filters = GetFilters(subject.Id),
+                Indicators = GetIndicators(subject.Id),
+                Locations = GetObservationalUnits(subject.Id),
+                TimePeriod = GetTimePeriods(subject.Id)
             };
         }
 
@@ -92,6 +77,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     Year = tuple.Year
                 })
             };
+        }
+
+        private Dictionary<string, LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>> GetObservationalUnits(
+            long subjectId)
+        {
+            return _observationService.GetObservationalUnits(subjectId)
+                .Where(pair => pair.Value.Any())
+                .ToDictionary(
+                    pair => pair.Key.ToString().PascalCase(),
+                    pair => new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                    {
+                        Hint = "",
+                        Legend = pair.Key.GetEnumLabel(),
+                        Options = _mapper.Map<IEnumerable<LabelValueViewModel>>(pair.Value)
+                    });
         }
 
         private Dictionary<string, LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>> GetIndicators(
