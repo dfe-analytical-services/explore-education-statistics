@@ -34,6 +34,9 @@ const PrototypeMethodologySpecific = () => {
                     Find statistics and data
                   </Link>
                 </li>
+                <li>
+                  <Link to="/glossary">Education statistics: glossary</Link>
+                </li>
               </ul>
             </nav>
           </aside>

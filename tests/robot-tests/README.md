@@ -53,7 +53,7 @@ This directory holds the output of a test run, including the test report and log
 This holds the actual robot framework/selenium tests. The tests are themselves organised into different folders. The `libs` folder holds python and robot framework libraries used by the tests themselves.
 
 ### webdriver
-This holds chromedriver, used by selenium to interact with the browser. It is automatically downloaded when the tests are run. If you're having trouble (e.g. browser and chromedriver versions aren't compatible) you can also manually place your chromedriver of choice in this directory.
+This holds chromedriver, used by selenium to interact with the browser. If chromedriver isn't present in this directory, it is automatically downloaded when the tests are run. If you're having trouble (e.g. browser and chromedriver versions aren't compatible) you can also manually place your chromedriver of choice in this directory.
 
 # Guidelines for people writing UI tests
 

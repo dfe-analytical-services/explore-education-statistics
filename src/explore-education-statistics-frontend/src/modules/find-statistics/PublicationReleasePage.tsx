@@ -14,8 +14,8 @@ import SearchForm from '@common/components/SearchForm';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
+import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import ContentBlock from './components/ContentBlock';
-import { DataBlock } from './components/DataBlock';
 
 interface Props {
   publication: string;
@@ -71,7 +71,7 @@ class PublicationReleasePage extends Component<Props> {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <dl className="dfe-meta-content govuk-!-margin-0">
-              <dt className="govuk-caption-m">Published: </dt>
+              <dt className="govuk-caption-m">Published:</dt>
               <dd>
                 <strong>
                   <FormattedDate>{data.published}</FormattedDate>
@@ -244,23 +244,13 @@ class PublicationReleasePage extends Component<Props> {
         {data.keyStatistics && <DataBlock {...data.keyStatistics} />}
 
         {data.content.length > 0 && (
-          <>
-            <h2 className="govuk-heading-l" data-testid="contents">
-              Contents
-            </h2>
-
-            <Accordion id="contents-sections">
-              {data.content.map(({ heading, caption, order, content }) => (
-                <AccordionSection
-                  heading={heading}
-                  caption={caption}
-                  key={order}
-                >
-                  <ContentBlock content={content} />
-                </AccordionSection>
-              ))}
-            </Accordion>
-          </>
+          <Accordion id="contents-sections">
+            {data.content.map(({ heading, caption, order, content }) => (
+              <AccordionSection heading={heading} caption={caption} key={order}>
+                <ContentBlock content={content} />
+              </AccordionSection>
+            ))}
+          </Accordion>
         )}
 
         <h2

@@ -93,6 +93,7 @@
   },
   "scripts": {
     "start": "node server.js",
+    "start:local": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 node server.js",
     "start:prod": "cross-env NODE_ENV=production node server.js",
     "build": "next build ./src",
     "build:dev01": "cross-env BUILD_ENV=dev01 next build ./src",

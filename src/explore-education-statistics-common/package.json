@@ -13,6 +13,7 @@
     "@types/react-dom": "^16.8.4",
     "@types/react-helmet": "^5.0.8",
     "@types/react-leaflet": "^2.2.1",
+    "@types/react-test-renderer": "^16.8.1",
     "@types/recharts": "^1.1.16",
     "@types/yup": "^0.26.11",
     "@typescript-eslint/eslint-plugin": "^1.6.0",
@@ -49,6 +50,7 @@
     "react-helmet": "^5.2.0",
     "react-leaflet": "^2.2.1",
     "react-markdown": "^4.0.7",
+    "react-test-renderer": "latest",
     "react-testing-library": "^6.1.2",
     "recharts": "^1.5.0",
     "stylelint": "^10.0.0",
@@ -84,7 +86,11 @@
     ],
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
-      "<rootDir>/src/**/?(*.)(spec|test).{js,jsx,ts,tsx}"
+      "<rootDir>/src/**/(*.)(spec|test).{js,jsx,ts,tsx}"
+    ],
+    "testPathIgnorePatterns": [
+      "node_modules",
+      "__data__"
     ],
     "testEnvironment": "jsdom",
     "testURL": "http://localhost",

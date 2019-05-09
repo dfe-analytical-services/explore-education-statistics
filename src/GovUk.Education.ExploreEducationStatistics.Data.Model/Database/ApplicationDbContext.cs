@@ -44,6 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureParliamentaryConstituency(modelBuilder);
             ConfigureProvider(modelBuilder);
             ConfigureWard(modelBuilder);
+            ConfigureAdditionalTypes(modelBuilder);
         }
 
         private static void ConfigureObservationFilterItem(ModelBuilder modelBuilder)
@@ -193,6 +194,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.Ward,
                     builder => builder.HasIndex(ward => ward.Code));
+        }
+
+        private static void ConfigureAdditionalTypes(ModelBuilder modelBuilder)
+        {
+            // Register types used by custom SQL queries
+            modelBuilder.Query<IdWrapper>();
         }
     }
 }
