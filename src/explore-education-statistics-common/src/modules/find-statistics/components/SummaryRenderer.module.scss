@@ -1,0 +1,55 @@
+@import '../../../../src/styles/govuk-base';
+
+.keyStatsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.keyStatTile {
+  display: flex;
+  flex: 1 0 32%;
+  flex-direction: column;
+  margin: 0.5% 0.5% 1.5%;
+  max-width: 32%;
+
+  @include govuk-media-query($until: tablet) {
+    flex: 0 0 100%;
+    margin-bottom: 1rem;
+    max-width: 100%;
+  }
+
+  .keyStat {
+    background: $govuk-brand-colour;
+    color: govuk-colour('white');
+    flex-basis: 8rem;
+    padding: 0.7rem 1rem;
+
+    @include govuk-media-query($until: tablet) {
+      flex-basis: auto;
+    }
+  }
+
+  .keyStat :global(.govuk-heading-s) {
+    color: govuk-colour('white');
+    margin: 0;
+    padding: 0;
+  }
+
+  .keyStat :global(.govuk-heading-xl) {
+    color: govuk-colour('white');
+    margin: 0;
+    padding: 0;
+  }
+
+  .keyStat :global(.govuk-body-s) {
+    color: govuk-colour('white');
+    margin: 0 0 0.5rem;
+  }
+
+  details {
+    font-size: 1rem;
+    margin: 0 0.5rem 0 0;
+    padding-top: 0.5rem;
+  }
+}

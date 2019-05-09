@@ -6,6 +6,7 @@ import {
   DataBlockMetadata,
   Result,
 } from '@common/services/dataBlockService';
+import styles from './SummaryRenderer.module.scss';
 
 export interface SummaryRendererProps {
   data: DataBlockData;
@@ -52,23 +53,28 @@ export default function SummaryRenderer({
   }
 
   return (
-    <div>
-      <div className="dfe-dash-tiles dfe-dash-tiles--3-in-row">
+    <>
+      <div className={styles.keyStatsContainer}>
         {dataKeys.map((key, index) => {
           const indicatorKey = `${key}_${index}`;
 
           return (
-            <div className="dfe-dash-tiles__tile" key={indicatorKey}>
-              <h3 className="govuk-heading-m dfe-dash-tiles__heading">
-                {meta.indicators[key].label}
-              </h3>
-              <p
-                className="govuk-heading-xl govuk-!-margin-bottom-2"
-                data-testid={`tile ${meta.indicators[key].label}`}
-              >
-                {measures[key]}
-                {meta.indicators[key].unit}
-              </p>
+            <div className={styles.keyStatTile} key={indicatorKey}>
+              <div className={styles.keyStat}>
+                <h3 className="govuk-heading-s">
+                  {meta.indicators[key].label}
+                </h3>
+                <p
+                  className="govuk-heading-xl"
+                  data-testid={`tile ${meta.indicators[key].label}`}
+                >
+                  {measures[key]}
+                  {meta.indicators[key].unit}
+                </p>
+                <p className="govuk-body-s">
+                  [[ Up / down ]] from [[XX]] in [[year]]
+                </p>
+              </div>
               <Details summary={`What is ${meta.indicators[key].label}?`}>
                 Overall absence is the adipisicing elit. Dolorum hic nobis
                 voluptas quidem fugiat enim ipsa reprehenderit nulla.
@@ -82,6 +88,6 @@ export default function SummaryRenderer({
       ) : (
         ''
       )}
-    </div>
+    </>
   );
 }
