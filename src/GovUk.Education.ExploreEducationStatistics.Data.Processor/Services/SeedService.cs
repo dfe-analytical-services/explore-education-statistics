@@ -1,10 +1,11 @@
+using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
+using Microsoft.Extensions.Logging;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
-    using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
-    using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-    using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
-    using Microsoft.Extensions.Logging;
-
     public class SeedService : ISeedService
     {
         private readonly ILogger _logger;
@@ -36,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        private void SeedSubject(GovUk.Education.ExploreEducationStatistics.Data.Model.Release release, Subject subject)
+        private void SeedSubject(Model.Release release, Subject subject)
         {
             _logger.LogInformation("Seeding Subject for {Publication}, {Subject}", release.PublicationId, subject.Name);
  
@@ -50,16 +51,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _blobService.MoveBlobBetweenContainers(subject.CsvMetaDataBlob, "processed", destFolder);
         }
 
-        private GovUk.Education.ExploreEducationStatistics.Data.Model.Release CreateRelease(Release release)
+        private Model.Release CreateRelease(Release release)
         {
-            var releaseDb = _context.Release.Add(new GovUk.Education.ExploreEducationStatistics.Data.Model.Release(release.ReleaseDate, release.PublicationId)).Entity;
+            var releaseDb = _context.Release.Add(new Model.Release(release.ReleaseDate, release.PublicationId)).Entity;
             _context.SaveChanges();
             return releaseDb;
         }
 
-        private GovUk.Education.ExploreEducationStatistics.Data.Model.Subject CreateSubject(GovUk.Education.ExploreEducationStatistics.Data.Model.Release release, Subject subject)
+        private Model.Subject CreateSubject(Model.Release release, Subject subject)
         {
-            var subjectDb = _context.Subject.Add(new GovUk.Education.ExploreEducationStatistics.Data.Model.Subject(subject.Name, release)).Entity;
+            var subjectDb = _context.Subject.Add(new Model.Subject(subject.Name, release)).Entity;
             _context.SaveChanges();
             return subjectDb;
         }
