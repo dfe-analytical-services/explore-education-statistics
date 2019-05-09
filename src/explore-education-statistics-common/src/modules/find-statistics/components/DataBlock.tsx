@@ -8,12 +8,12 @@ import SummaryRenderer, {
 import TableRenderer2, {
   Props as TableRendererProps,
 } from '@common/modules/find-statistics/components/TableRenderer2';
-import { baseUrl } from '@common/services/api';
-import { Chart, DataQuery, Summary } from '@common/services/publicationService';
 import {
-  CharacteristicsData,
-  PublicationMeta,
-} from '@common/services/tableBuilderService';
+  Chart,
+  DataQuery,
+  Summary,
+  Table,
+} from '@common/services/publicationService';
 
 import React, { Component, ReactNode } from 'react';
 import DataBlockService, {
@@ -30,9 +30,10 @@ export interface DataBlockProps {
   heading?: string;
   dataBlockRequest?: DataBlockRequest;
   charts?: Chart[];
+  tables?: Table[];
+
   summary?: Summary;
-  data?: CharacteristicsData;
-  meta?: PublicationMeta;
+
   height?: number;
   showTables?: boolean;
   additionalTabContent?: ReactNode;
@@ -55,7 +56,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
   private currentDataQuery?: DataQuery = undefined;
 
   public async componentDidMount() {
-    const { dataBlockRequest, data, meta } = this.props;
+    const { dataBlockRequest } = this.props;
 
     if (dataBlockRequest) {
       const result = await DataBlockService.getDataBlockForSubject(
@@ -78,11 +79,22 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
   ): void {
     const newState: DataBlockState = {};
 
-    if (json.result.length > 0) {
-      newState.tables = [{ data: json, meta: jsonMeta }];
-    }
+    const { charts, summary, tables } = this.props;
 
-    const { charts, summary } = this.props;
+    if (json.result.length > 0) {
+      if (tables) {
+        newState.tables = [{ data: json, meta: jsonMeta, ...tables[0] }];
+      } else {
+        //TODO: remove when data is updated
+        newState.tables = [
+          {
+            data: json,
+            meta: jsonMeta,
+            indicators: Object.keys(json.result[0].measures),
+          },
+        ];
+      }
+    }
 
     if (charts) {
       newState.charts = charts.map(chart => ({
