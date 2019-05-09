@@ -29,12 +29,18 @@ interface Props {
 
 const TimePeriodForm = (props: Props & InjectedWizardProps) => {
   const { options, onSubmit, isActive, goToNextStep, goToPreviousStep } = props;
-  const timePeriodOptions: SelectOption[] = options.map(option => {
-    return {
-      label: option.label,
-      value: `${option.year}_${option.code}`,
-    };
-  });
+  const timePeriodOptions: SelectOption[] = [
+    {
+      label: 'Please select',
+      value: '',
+    },
+    ...options.map(option => {
+      return {
+        label: option.label,
+        value: `${option.year}_${option.code}`,
+      };
+    }),
+  ];
 
   const stepHeading = (
     <WizardStepHeading {...props} fieldsetHeading>
@@ -45,7 +51,6 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
   return (
     <Formik<FormValues>
       onSubmit={values => {
-        console.log(values);
         onSubmit(values);
         goToNextStep();
       }}
