@@ -1,8 +1,6 @@
-import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import { Omit } from '@common/types/util';
-import { FieldArray } from 'formik';
-import get from 'lodash/get';
 import React from 'react';
+import FieldCheckboxArray from './FieldCheckboxArray';
 import FormCheckboxSearchGroup, {
   FormCheckboxSearchGroupProps,
 } from './FormCheckboxSearchGroup';
@@ -11,37 +9,39 @@ import { onAllChange, onChange } from './util/checkboxGroupFieldHelpers';
 export type FormFieldCheckboxSearchGroupProps<FormValues> = {
   name: keyof FormValues | string;
   showError?: boolean;
-} & Omit<FormCheckboxSearchGroupProps, 'onChange' | 'onAllChange' | 'value'>;
+} & Omit<FormCheckboxSearchGroupProps, 'value'>;
 
 const FormFieldCheckboxSearchGroup = <T extends {}>(
   props: FormFieldCheckboxSearchGroupProps<T>,
 ) => {
-  const { error, name, options, showError = true } = props;
+  const { options } = props;
 
   return (
-    <FieldArray name={name}>
+    <FieldCheckboxArray {...props}>
       {fieldArrayProps => {
-        const { form } = fieldArrayProps;
-        const { getError } = createErrorHelper(form);
-
-        let errorMessage = error || getError(name);
-
-        if (!showError) {
-          errorMessage = '';
-        }
-
         return (
           <FormCheckboxSearchGroup
             {...props}
-            error={errorMessage}
+            {...fieldArrayProps}
             options={options}
-            value={get(form.values, name)}
-            onAllChange={onAllChange(fieldArrayProps, options)}
-            onChange={onChange(fieldArrayProps)}
+            onAllChange={event => {
+              if (props.onAllChange) {
+                props.onAllChange(event, options);
+              }
+
+              onAllChange(fieldArrayProps, options)(event);
+            }}
+            onChange={(event, option) => {
+              if (props.onChange) {
+                props.onChange(event, option);
+              }
+
+              onChange(fieldArrayProps)(event);
+            }}
           />
         );
       }}
-    </FieldArray>
+    </FieldCheckboxArray>
   );
 };
 

@@ -1,8 +1,6 @@
-import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import { Omit } from '@common/types/util';
-import { FieldArray } from 'formik';
-import get from 'lodash/get';
 import React from 'react';
+import FieldCheckboxArray from './FieldCheckboxArray';
 import FormCheckboxGroup, { FormCheckboxGroupProps } from './FormCheckboxGroup';
 import { onAllChange, onChange } from './util/checkboxGroupFieldHelpers';
 
@@ -12,32 +10,32 @@ type Props<FormValues> = {
 } & Omit<FormCheckboxGroupProps, 'value'>;
 
 const FormFieldCheckboxGroup = <T extends {}>(props: Props<T>) => {
-  const { error, name, options, showError = true } = props;
+  const { options } = props;
 
   return (
-    <FieldArray name={name}>
-      {fieldArrayProps => {
-        const { form } = fieldArrayProps;
-        const { getError } = createErrorHelper(form);
+    <FieldCheckboxArray {...props}>
+      {fieldArrayProps => (
+        <FormCheckboxGroup
+          {...props}
+          {...fieldArrayProps}
+          options={options}
+          onAllChange={event => {
+            if (props.onAllChange) {
+              props.onAllChange(event, options);
+            }
 
-        let errorMessage = error || getError(name);
+            onAllChange(fieldArrayProps, options)(event);
+          }}
+          onChange={(event, option) => {
+            if (props.onChange) {
+              props.onChange(event, option);
+            }
 
-        if (!showError) {
-          errorMessage = '';
-        }
-
-        return (
-          <FormCheckboxGroup
-            {...props}
-            error={errorMessage}
-            options={options}
-            value={get(form.values, name)}
-            onAllChange={onAllChange(fieldArrayProps, options)}
-            onChange={onChange(fieldArrayProps)}
-          />
-        );
-      }}
-    </FieldArray>
+            onChange(fieldArrayProps)(event);
+          }}
+        />
+      )}
+    </FieldCheckboxArray>
   );
 };
 

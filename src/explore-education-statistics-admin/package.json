@@ -24,8 +24,8 @@
     "@types/react-dom": "^16.8.4",
     "@types/react-draft-wysiwyg": "^1.12.2",
     "@types/react-helmet": "^5.0.8",
-    "@types/react-router-dom": "^4.3.2",
     "@types/react-leaflet": "^2.2.1",
+    "@types/react-router-dom": "^4.3.2",
     "@types/recharts": "^1.1.16",
     "@types/yup": "^0.26.12",
     "@typescript-eslint/eslint-plugin": "^1.6.0",
@@ -58,7 +58,7 @@
     "formik": "^1.5.2",
     "fs-extra": "7.0.1",
     "geojson": "^0.5.0",
-    "govuk-frontend": "^2.10.0",
+    "govuk-frontend": "^2.11.0",
     "html-webpack-plugin": "4.0.0-alpha.2",
     "identity-obj-proxy": "3.0.0",
     "jest": "^24.7.1",
@@ -179,6 +179,7 @@
     "last 1 version"
   ],
   "dependencies": {
+    "govuk-frontend": "2.11.0",
     "whatwg-fetch": "^3.0.0"
   }
 }

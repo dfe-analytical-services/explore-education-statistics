@@ -1,8 +1,8 @@
 import { Comparison } from '@common/types/util';
 
-type TimePeriodCode = 'AY';
+type TimePeriodCode = 'AY' | 'HT6' | 'HT5';
 
-const allowedTimePeriodCodes: TimePeriodCode[] = ['AY'];
+const allowedTimePeriodCodes: TimePeriodCode[] = ['AY', 'HT6', 'HT5'];
 
 class TimePeriod {
   public readonly year: number;
@@ -46,7 +46,9 @@ class TimePeriod {
 
   public get label(): string {
     switch (this.code) {
-      case 'AY': {
+      case 'AY':
+      case 'HT6':
+      case 'HT5': {
         const yearString = this.year.toString();
         return `${yearString}/${Number(yearString.substring(2, 4)) + 1}`;
       }
@@ -62,6 +64,8 @@ class TimePeriod {
   public previousPeriod(): TimePeriod {
     switch (this.code) {
       case 'AY':
+      case 'HT6':
+      case 'HT5':
         return new TimePeriod(this.year - 1, this.code);
       default:
         throw new Error('Could not parse previous time period');
@@ -71,6 +75,8 @@ class TimePeriod {
   public nextPeriod(): TimePeriod {
     switch (this.code) {
       case 'AY':
+      case 'HT6':
+      case 'HT5':
         return new TimePeriod(this.year + 1, this.code);
       default:
         throw new Error('Could not parse next time period');
@@ -86,9 +92,14 @@ class TimePeriod {
       return Comparison.LessThan;
     }
 
-    // TODO: Implement logic for other codes
     if (this.code === other.code) {
       return Comparison.EqualTo;
+    }
+
+    if (this.code === 'HT5' || this.code === 'HT6') {
+      if (other.code === 'HT5' || other.code === 'HT6') {
+        return Comparison.EqualTo;
+      }
     }
 
     throw new Error('Could not compare TimePeriods');

@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { ChangeEventHandler, ReactNode } from 'react';
+import React, { ChangeEventHandler, memo, ReactNode } from 'react';
 
 export type RadioChangeEventHandler = ChangeEventHandler<HTMLInputElement>;
 
@@ -69,4 +69,4 @@ const FormRadio = ({
   );
 };
 
-export default FormRadio;
+export default memo(FormRadio);

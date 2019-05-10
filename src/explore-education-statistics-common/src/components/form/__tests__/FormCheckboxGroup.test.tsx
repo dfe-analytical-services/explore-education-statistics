@@ -9,6 +9,7 @@ describe('FormCheckboxGroup', () => {
         id="test-checkboxes"
         name="test-checkboxes"
         legend="Test checkboxes"
+        value={[]}
         options={[
           { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
           { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
@@ -33,12 +34,12 @@ describe('FormCheckboxGroup', () => {
         id="test-checkboxes"
         name="test-checkboxes"
         legend="Test checkboxes"
+        value={['2']}
         options={[
           { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
           { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
           { id: 'checkbox-3', label: 'Test checkbox 3', value: '3' },
         ]}
-        value={['2']}
       />,
     );
 
@@ -58,6 +59,7 @@ describe('FormCheckboxGroup', () => {
         legend="Choose some checkboxes"
         id="test-checkboxes"
         name="test-checkboxes"
+        value={[]}
         options={[{ id: 'checkbox-1', label: 'Test checkbox 1', value: '1' }]}
       />,
     );
@@ -73,6 +75,7 @@ describe('FormCheckboxGroup', () => {
         name="test-checkboxes"
         legend="Test checkboxes"
         small
+        value={[]}
         options={[{ id: 'checkbox-1', label: 'Test checkbox 1', value: '1' }]}
       />,
     );
@@ -128,12 +131,12 @@ describe('FormCheckboxGroup', () => {
   test('renders `Select all` with small variant', () => {
     const { container } = render(
       <FormCheckboxGroup
-        value={[]}
         id="test-checkboxes"
         name="test-checkboxes"
         legend="Test checkboxes"
         selectAll
         small
+        value={[]}
         options={[
           { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
           { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
@@ -148,11 +151,11 @@ describe('FormCheckboxGroup', () => {
   test('does not render checked `Select all` checkbox when checked values do not match options', () => {
     const { getByLabelText } = render(
       <FormCheckboxGroup
-        value={['4', '5', '6']}
         id="test-checkboxes"
         name="test-checkboxes"
         legend="Test checkboxes"
         selectAll
+        value={['4', '5', '6']}
         options={[
           { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
           { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
@@ -169,11 +172,11 @@ describe('FormCheckboxGroup', () => {
   test('does not render `Select all` checkbox when there is only one option', () => {
     const { queryByLabelText } = render(
       <FormCheckboxGroup
-        value={[]}
         id="test-checkboxes"
         name="test-checkboxes"
         legend="Test checkboxes"
         selectAll
+        value={[]}
         options={[{ id: 'checkbox-1', label: 'Test checkbox 1', value: '1' }]}
       />,
     );
@@ -185,10 +188,10 @@ describe('FormCheckboxGroup', () => {
   test('renders option with conditional contents', () => {
     const { container, getByText } = render(
       <FormCheckboxGroup
-        value={['2']}
         id="test-checkboxes"
         name="test-checkboxes"
         legend="Test checkboxes"
+        value={['2']}
         options={[
           {
             id: 'checkbox-1',
@@ -228,6 +231,7 @@ describe('FormCheckboxGroup', () => {
         id="test-checkboxes"
         name="test-checkboxes"
         legend="Test checkboxes"
+        value={[]}
         options={[
           { label: 'Test checkbox 1', value: 'opt1' },
           { label: 'Test checkbox 2', value: 'opt-2' },

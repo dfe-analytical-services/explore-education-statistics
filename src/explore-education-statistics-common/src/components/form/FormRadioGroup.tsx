@@ -1,8 +1,10 @@
 import { Omit, PartialBy } from '@common/types/util';
 import classNames from 'classnames';
 import kebabCase from 'lodash/kebabCase';
-import React, { Component, createRef } from 'react';
-import FormFieldset, { FieldSetProps } from './FormFieldset';
+import sortBy from 'lodash/sortBy';
+import memoize from 'memoizee';
+import React, { ChangeEvent, createRef, PureComponent } from 'react';
+import FormFieldset, { FormFieldsetProps } from './FormFieldset';
 import FormRadio, {
   FormRadioProps,
   RadioChangeEventHandler,
@@ -13,24 +15,45 @@ type RadioOption = PartialBy<
   'id'
 >;
 
+export type RadioGroupChangeEventHandler = (
+  event: ChangeEvent<HTMLInputElement>,
+  option: RadioOption,
+) => void;
+
 export type FormRadioGroupProps = {
   inline?: boolean;
   name: string;
-  onChange?: RadioChangeEventHandler;
+  onChange?: RadioGroupChangeEventHandler;
   options: RadioOption[];
   small?: boolean;
+  sort?: string[] | ((option: RadioOption) => RadioOption[keyof RadioOption])[];
   value: string | null;
-} & FieldSetProps;
+} & FormFieldsetProps;
 
-class FormRadioGroup extends Component<FormRadioGroupProps> {
+class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
   public static defaultProps = {
     inline: false,
     legendSize: 'm',
     small: false,
+    sort: ['label'],
     value: '',
   };
 
   private ref = createRef<HTMLInputElement>();
+
+  private handleChange = memoize(
+    (option: RadioOption): RadioChangeEventHandler => event => {
+      const { onChange } = this.props;
+
+      if (onChange) {
+        onChange(event, option);
+      }
+    },
+    {
+      normalizer: ([option]: [RadioOption]) =>
+        `${option.value}-${option.label}-${option.id}`,
+    },
+  );
 
   public componentDidMount(): void {
     if (this.ref.current) {
@@ -43,7 +66,7 @@ class FormRadioGroup extends Component<FormRadioGroupProps> {
   }
 
   public render() {
-    const { id, inline, name, onChange, options, small, value } = this.props;
+    const { id, inline, name, options, small, sort = [], value } = this.props;
 
     return (
       <FormFieldset {...this.props}>
@@ -54,18 +77,14 @@ class FormRadioGroup extends Component<FormRadioGroupProps> {
           })}
           ref={this.ref}
         >
-          {options.map(option => (
+          {sortBy(options, sort).map(option => (
             <FormRadio
               {...option}
               id={option.id ? option.id : `${id}-${kebabCase(option.value)}`}
               checked={value === option.value}
               key={option.value}
               name={name}
-              onChange={event => {
-                if (onChange) {
-                  onChange(event);
-                }
-              }}
+              onChange={this.handleChange(option)}
             />
           ))}
         </div>
