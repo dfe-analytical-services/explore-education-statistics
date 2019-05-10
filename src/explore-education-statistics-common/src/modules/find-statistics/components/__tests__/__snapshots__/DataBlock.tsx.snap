@@ -13,9 +13,9 @@ exports[`DataBlock datablock renders downloads only 1`] = `
           role="presentation"
       >
         <a class="govuk-tabs__tab govuk-tabs__tab--selected"
-           href="#datablock_9_downloads"
-           id="datablock_9_downloads-tab"
-           aria-controls="datablock_9_downloads"
+           href="#datablock_10_downloads"
+           id="datablock_10_downloads-tab"
+           aria-controls="datablock_10_downloads"
            aria-selected="true"
            role="tab"
         >
@@ -24,9 +24,9 @@ exports[`DataBlock datablock renders downloads only 1`] = `
       </li>
     </ul>
     <section class="govuk-tabs__panel panel"
-             id="datablock_9_downloads"
+             id="datablock_10_downloads"
              data-testid="Data downloads"
-             aria-labelledby="datablock_9_downloads-tab"
+             aria-labelledby="datablock_10_downloads-tab"
              role="tabpanel"
              tabindex="-1"
     >
@@ -57,12 +57,12 @@ exports[`DataBlock datablock renders horizontal chart 1`] = `
       <li class="govuk-tabs__list-item"
           role="presentation"
       >
-        <a aria-controls="datablock_9_charts"
+        <a aria-controls="datablock_10_charts"
            aria-selected="true"
            role="tab"
            class="govuk-tabs__tab govuk-tabs__tab--selected"
-           href="#datablock_9_charts"
-           id="datablock_9_charts-tab"
+           href="#datablock_10_charts"
+           id="datablock_10_charts-tab"
         >
           Charts
         </a>
@@ -71,9 +71,9 @@ exports[`DataBlock datablock renders horizontal chart 1`] = `
           role="presentation"
       >
         <a class="govuk-tabs__tab"
-           href="#datablock_9_downloads"
-           id="datablock_9_downloads-tab"
-           aria-controls="datablock_9_downloads"
+           href="#datablock_10_downloads"
+           id="datablock_10_downloads-tab"
+           aria-controls="datablock_10_downloads"
            aria-selected="false"
            role="tab"
            tabindex="-1"
@@ -83,9 +83,9 @@ exports[`DataBlock datablock renders horizontal chart 1`] = `
       </li>
     </ul>
     <section class="govuk-tabs__panel panel"
-             id="datablock_9_charts"
+             id="datablock_10_charts"
              data-testid="Charts"
-             aria-labelledby="datablock_9_charts-tab"
+             aria-labelledby="datablock_10_charts-tab"
              role="tabpanel"
              tabindex="-1"
     >
@@ -671,9 +671,9 @@ exports[`DataBlock datablock renders horizontal chart 1`] = `
       </div>
     </section>
     <section class="govuk-tabs__panel panel govuk-tabs__panel--hidden"
-             id="datablock_9_downloads"
+             id="datablock_10_downloads"
              data-testid="Data downloads"
-             aria-labelledby="datablock_9_downloads-tab"
+             aria-labelledby="datablock_10_downloads-tab"
              role="tabpanel"
              tabindex="-1"
     >
@@ -704,12 +704,12 @@ exports[`DataBlock datablock renders table 1`] = `
       <li class="govuk-tabs__list-item"
           role="presentation"
       >
-        <a aria-controls="datablock_9_tables"
+        <a aria-controls="datablock_10_tables"
            aria-selected="true"
            role="tab"
            class="govuk-tabs__tab govuk-tabs__tab--selected"
-           href="#datablock_9_tables"
-           id="datablock_9_tables-tab"
+           href="#datablock_10_tables"
+           id="datablock_10_tables-tab"
         >
           Data tables
         </a>
@@ -718,9 +718,9 @@ exports[`DataBlock datablock renders table 1`] = `
           role="presentation"
       >
         <a class="govuk-tabs__tab"
-           href="#datablock_9_downloads"
-           id="datablock_9_downloads-tab"
-           aria-controls="datablock_9_downloads"
+           href="#datablock_10_downloads"
+           id="datablock_10_downloads-tab"
+           aria-controls="datablock_10_downloads"
            aria-selected="false"
            role="tab"
            tabindex="-1"
@@ -730,9 +730,9 @@ exports[`DataBlock datablock renders table 1`] = `
       </li>
     </ul>
     <section class="govuk-tabs__panel panel"
-             id="datablock_9_tables"
+             id="datablock_10_tables"
              data-testid="Data tables"
-             aria-labelledby="datablock_9_tables-tab"
+             aria-labelledby="datablock_10_tables-tab"
              role="tabpanel"
              tabindex="-1"
     >
@@ -759,9 +759,9 @@ exports[`DataBlock datablock renders table 1`] = `
       </table>
     </section>
     <section class="govuk-tabs__panel panel govuk-tabs__panel--hidden"
-             id="datablock_9_downloads"
+             id="datablock_10_downloads"
              data-testid="Data downloads"
-             aria-labelledby="datablock_9_downloads-tab"
+             aria-labelledby="datablock_10_downloads-tab"
              role="tabpanel"
              tabindex="-1"
     >
@@ -792,12 +792,12 @@ exports[`DataBlock datablock renders vertical chart 1`] = `
       <li class="govuk-tabs__list-item"
           role="presentation"
       >
-        <a aria-controls="datablock_9_charts"
+        <a aria-controls="datablock_10_charts"
            aria-selected="true"
            role="tab"
            class="govuk-tabs__tab govuk-tabs__tab--selected"
-           href="#datablock_9_charts"
-           id="datablock_9_charts-tab"
+           href="#datablock_10_charts"
+           id="datablock_10_charts-tab"
         >
           Charts
         </a>
@@ -806,9 +806,9 @@ exports[`DataBlock datablock renders vertical chart 1`] = `
           role="presentation"
       >
         <a class="govuk-tabs__tab"
-           href="#datablock_9_downloads"
-           id="datablock_9_downloads-tab"
-           aria-controls="datablock_9_downloads"
+           href="#datablock_10_downloads"
+           id="datablock_10_downloads-tab"
+           aria-controls="datablock_10_downloads"
            aria-selected="false"
            role="tab"
            tabindex="-1"
@@ -818,9 +818,9 @@ exports[`DataBlock datablock renders vertical chart 1`] = `
       </li>
     </ul>
     <section class="govuk-tabs__panel panel"
-             id="datablock_9_charts"
+             id="datablock_10_charts"
              data-testid="Charts"
-             aria-labelledby="datablock_9_charts-tab"
+             aria-labelledby="datablock_10_charts-tab"
              role="tabpanel"
              tabindex="-1"
     >
@@ -1408,9 +1408,9 @@ exports[`DataBlock datablock renders vertical chart 1`] = `
       </div>
     </section>
     <section class="govuk-tabs__panel panel govuk-tabs__panel--hidden"
-             id="datablock_9_downloads"
+             id="datablock_10_downloads"
              data-testid="Data downloads"
-             aria-labelledby="datablock_9_downloads-tab"
+             aria-labelledby="datablock_10_downloads-tab"
              role="tabpanel"
              tabindex="-1"
     >
@@ -1441,12 +1441,12 @@ exports[`DataBlock datablock renders vertical chart 2`] = `
       <li class="govuk-tabs__list-item"
           role="presentation"
       >
-        <a aria-controls="datablock_9_charts"
+        <a aria-controls="datablock_10_charts"
            aria-selected="true"
            role="tab"
            class="govuk-tabs__tab govuk-tabs__tab--selected"
-           href="#datablock_9_charts"
-           id="datablock_9_charts-tab"
+           href="#datablock_10_charts"
+           id="datablock_10_charts-tab"
         >
           Charts
         </a>
@@ -1455,9 +1455,9 @@ exports[`DataBlock datablock renders vertical chart 2`] = `
           role="presentation"
       >
         <a class="govuk-tabs__tab"
-           href="#datablock_9_downloads"
-           id="datablock_9_downloads-tab"
-           aria-controls="datablock_9_downloads"
+           href="#datablock_10_downloads"
+           id="datablock_10_downloads-tab"
+           aria-controls="datablock_10_downloads"
            aria-selected="false"
            role="tab"
            tabindex="-1"
@@ -1467,9 +1467,9 @@ exports[`DataBlock datablock renders vertical chart 2`] = `
       </li>
     </ul>
     <section class="govuk-tabs__panel panel"
-             id="datablock_9_charts"
+             id="datablock_10_charts"
              data-testid="Charts"
-             aria-labelledby="datablock_9_charts-tab"
+             aria-labelledby="datablock_10_charts-tab"
              role="tabpanel"
              tabindex="-1"
     >
@@ -2057,9 +2057,9 @@ exports[`DataBlock datablock renders vertical chart 2`] = `
       </div>
     </section>
     <section class="govuk-tabs__panel panel govuk-tabs__panel--hidden"
-             id="datablock_9_downloads"
+             id="datablock_10_downloads"
              data-testid="Data downloads"
-             aria-labelledby="datablock_9_downloads-tab"
+             aria-labelledby="datablock_10_downloads-tab"
              role="tabpanel"
              tabindex="-1"
     >
