@@ -62,7 +62,7 @@ class PublicationReleasePage extends Component<Props> {
         ]}
       >
         <div className={styles.releaseHeader}>
-          <PageTitle className="test" title={data.title} />
+          <PageTitle title={data.title} />
 
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
