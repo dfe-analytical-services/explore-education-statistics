@@ -5,6 +5,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
     public interface IFilterService : IDataService<Filter, long>
     {
         IEnumerable<Filter> GetFilters(long subjectId,
-            IEnumerable<int> years = null);
+            IEnumerable<int> years = null,
+            IEnumerable<string> countries = null,
+            IEnumerable<string> regions = null,
+            IEnumerable<string> localAuthorities = null,
+            IEnumerable<string> localAuthorityDistricts = null);
     }
 }

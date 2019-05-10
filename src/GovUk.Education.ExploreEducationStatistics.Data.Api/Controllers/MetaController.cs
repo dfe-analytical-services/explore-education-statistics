@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MetaController
+    public class MetaController : ControllerBase
     {
         private readonly IMetaService _metaService;
 
@@ -20,19 +20,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("publication/{publicationId}")]
         public ActionResult<PublicationMetaViewModel> GetPublicationMeta(Guid publicationId)
         {
-            return _metaService.GetPublicationMeta(publicationId);
+            var viewModel = _metaService.GetPublicationMeta(publicationId);
+            if (viewModel == null)
+            {
+                return NotFound();
+            }
+
+            return viewModel;
         }
 
         [HttpGet("subject/{subjectId}")]
         public ActionResult<SubjectMetaViewModel> GetSubjectMeta(long subjectId)
         {
-            return _metaService.GetSubjectMeta(subjectId);
+            var viewModel = _metaService.GetSubjectMeta(subjectId);
+            if (viewModel == null)
+            {
+                return NotFound();
+            }
+
+            return viewModel;
         }
-        
-        [HttpPost("subject")]
-        public ActionResult<SubjectMetaViewModel> GetSubjectMeta([FromBody] SubjectMetaQueryContext query)
+
+        [HttpPost("subject/{subjectId}")]
+        public ActionResult<SubjectMetaViewModel> GetSubjectMeta(long subjectId,
+            [FromBody] SubjectMetaQueryContext query)
         {
-            return _metaService.GetSubjectMeta(query);
+            var viewModel = _metaService.GetSubjectMeta(subjectId, query);
+            if (viewModel == null)
+            {
+                return NotFound();
+            }
+
+            return viewModel;
         }
     }
 }

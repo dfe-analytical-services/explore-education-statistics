@@ -15,9 +15,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         }
 
         public IEnumerable<IndicatorGroup> GetIndicatorGroups(long subjectId,
-            IEnumerable<int> years = null)
+            IEnumerable<int> years = null,
+            IEnumerable<string> countries = null,
+            IEnumerable<string> regions = null,
+            IEnumerable<string> localAuthorities = null,
+            IEnumerable<string> localAuthorityDistricts = null)
         {
-            // TODO DFE-609 years is ignored
+            // TODO DFE-609 fields are ignored
             
             return FindMany(group => group.SubjectId == subjectId,
                 new List<Expression<Func<IndicatorGroup, object>>> {group => group.Indicators});

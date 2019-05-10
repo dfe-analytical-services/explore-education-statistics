@@ -51,32 +51,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        public SubjectMetaViewModel GetSubjectMeta(long subjectId,
-            IEnumerable<int> years = null)
+        public SubjectMetaViewModel GetSubjectMeta(long subjectId, SubjectMetaQueryContext query = null)
         {
-            // TODO check subject exists
             var subject = _subjectService.Find(subjectId);
-            var yearsList = years?.ToList();
+
+            if (subject == null)
+            {
+                // TODO throw exception
+                return null;
+            }
+            
             return new SubjectMetaViewModel
             {
-                Filters = GetFilters(subject.Id, yearsList),
-                Indicators = GetIndicators(subject.Id, yearsList),
-                Locations = GetObservationalUnits(subject.Id, yearsList),
-                TimePeriod = GetTimePeriods(subject.Id, yearsList)
+                Filters = GetFilters(subject.Id, query),
+                Indicators = GetIndicators(subject.Id, query),
+                Locations = GetObservationalUnits(subject.Id, query),
+                TimePeriod = GetTimePeriods(subject.Id, query)
             };
-        }
-
-        public SubjectMetaViewModel GetSubjectMeta(SubjectMetaQueryContext query)
-        {
-            var years = QueryUtil.YearsQuery(query.Years, query.StartYear, query.EndYear);
-            return GetSubjectMeta(query.SubjectId, years);
         }
 
         private LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>> GetTimePeriods(
             long subjectId,
-            IEnumerable<int> years = null)
+            SubjectMetaQueryContext query = null)
         {
-            var timePeriodsMeta = _observationService.GetTimePeriodsMeta(subjectId, years);
+            var timePeriodsMeta = _observationService.GetTimePeriodsMeta(subjectId,
+                GetYears(query),
+                query?.Countries,
+                query?.Regions,
+                query?.LocalAuthorities,
+                query?.LocalAuthorityDistricts);
+
             return new LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>>
             {
                 Hint = "Filter statistics by a given start and end date",
@@ -93,9 +97,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private Dictionary<string, LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>> GetObservationalUnits(
             long subjectId,
-            IEnumerable<int> years = null)
+            SubjectMetaQueryContext query = null)
         {
-            return _observationService.GetObservationalUnitsMeta(subjectId, years)
+            return _observationService.GetObservationalUnitsMeta(subjectId,
+                    GetYears(query),
+                    query?.Countries,
+                    query?.Regions,
+                    query?.LocalAuthorities,
+                    query?.LocalAuthorityDistricts)
                 .Where(pair => pair.Value.Any())
                 .ToDictionary(
                     pair => pair.Key.ToString().PascalCase(),
@@ -109,9 +118,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private Dictionary<string, LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>> GetIndicators(
             long subjectId,
-            IEnumerable<int> years = null)
+            SubjectMetaQueryContext query = null)
         {
-            return _indicatorGroupService.GetIndicatorGroups(subjectId, years).ToDictionary(
+            return _indicatorGroupService.GetIndicatorGroups(subjectId,
+                GetYears(query),
+                query?.Countries,
+                query?.LocalAuthorities,
+                query?.LocalAuthorityDistricts,
+                query?.Regions).ToDictionary(
                 group => group.Label.PascalCase(),
                 group => new LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>
                 {
@@ -124,9 +138,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private Dictionary<string, LegendOptionsMetaValueModel<Dictionary<string,
             LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>> GetFilters(
             long subjectId,
-            IEnumerable<int> years = null)
+            SubjectMetaQueryContext query = null)
         {
-            return _filterService.GetFilters(subjectId, years).ToDictionary(
+            return _filterService.GetFilters(subjectId,
+                GetYears(query),
+                query?.Countries,
+                query?.LocalAuthorities,
+                query?.LocalAuthorityDistricts,
+                query?.Regions).ToDictionary(
                 filter => filter.Label.PascalCase(),
                 filter => new LegendOptionsMetaValueModel<Dictionary<string,
                     LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>
@@ -145,6 +164,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                             })
                         })
                 });
+        }
+
+        private static IEnumerable<int> GetYears(SubjectMetaQueryContext query)
+        {
+            return query != null
+                ? QueryUtil.YearsQuery(query.Years, query.StartYear, query.EndYear)
+                : new List<int>();
         }
     }
 }

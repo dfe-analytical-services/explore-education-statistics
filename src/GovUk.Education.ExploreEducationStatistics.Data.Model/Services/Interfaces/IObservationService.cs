@@ -14,9 +14,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
             IEnumerable<long> filters);
 
         Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnitsMeta(long subjectId,
-            IEnumerable<int> years = null);
+            IEnumerable<int> years = null,
+            IEnumerable<string> countries = null,
+            IEnumerable<string> regions = null,
+            IEnumerable<string> localAuthorities = null,
+            IEnumerable<string> localAuthorityDistricts = null);
 
         IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(long subjectId,
-            IEnumerable<int> years = null);
+            IEnumerable<int> years = null,
+            IEnumerable<string> countries = null,
+            IEnumerable<string> regions = null,
+            IEnumerable<string> localAuthorities = null,
+            IEnumerable<string> localAuthorityDistricts = null);
     }
 }

@@ -98,14 +98,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         }
 
         public IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(long subjectId,
-            IEnumerable<int> years = null)
+            IEnumerable<int> years = null,
+            IEnumerable<string> countries = null,
+            IEnumerable<string> regions = null,
+            IEnumerable<string> localAuthorities = null,
+            IEnumerable<string> localAuthorityDistricts = null)
         {
             var predicate = PredicateBuilder.True<Observation>()
                 .And(observation => observation.SubjectId == subjectId);
 
             if (years != null && years.Any())
             {
-                predicate = predicate.And(observation => years.Contains(observation.Year));
+                predicate = predicate.And(observation =>
+                    years.Contains(observation.Year));
+            }
+
+            if (countries != null && countries.Any())
+            {
+                predicate = predicate.And(observation =>
+                    countries.Contains(observation.Location.Country.Code));
+            }
+
+            if (regions != null && regions.Any())
+            {
+                predicate = predicate.And(observation =>
+                    regions.Contains(observation.Location.Region.Code));
+            }
+
+            if (localAuthorities != null && localAuthorities.Any())
+            {
+                predicate = predicate.And(observation =>
+                    localAuthorities.Contains(observation.Location.LocalAuthority.Code));
+            }
+
+            if (localAuthorityDistricts != null && localAuthorityDistricts.Any())
+            {
+                predicate = predicate.And(observation =>
+                    localAuthorityDistricts.Contains(observation.Location.LocalAuthorityDistrict.Code));
             }
 
             var timePeriods = (from o in DbSet().AsNoTracking().Where(predicate)
@@ -116,9 +145,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         }
 
         public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnitsMeta(long subjectId,
-            IEnumerable<int> years = null)
+            IEnumerable<int> years = null,
+            IEnumerable<string> countries = null,
+            IEnumerable<string> regions = null,
+            IEnumerable<string> localAuthorities = null,
+            IEnumerable<string> localAuthorityDistricts = null)
         {
-            var locations = GetLocations(subjectId, years);
+            var locations = GetLocations(subjectId,
+                years,
+                countries,
+                regions,
+                localAuthorities,
+                localAuthorityDistricts);
+
             return new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>
             {
                 {
@@ -141,7 +180,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         }
 
         private IEnumerable<Location> GetLocations(long subjectId,
-            IEnumerable<int> years = null)
+            IEnumerable<int> years = null,
+            IEnumerable<string> countries = null,
+            IEnumerable<string> regions = null,
+            IEnumerable<string> localAuthorities = null,
+            IEnumerable<string> localAuthorityDistricts = null)
         {
 //            TODO Ideally want one db query as follows but this is translated into invalid SQL
 //            TODO See https://github.com/aspnet/EntityFrameworkCore/issues/12304
@@ -153,10 +196,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
             var predicate = PredicateBuilder.True<Observation>()
                 .And(observation => observation.SubjectId == subjectId);
-            
+
             if (years != null && years.Any())
             {
-                predicate = predicate.And(observation => years.Contains(observation.Year));
+                predicate = predicate.And(observation =>
+                    years.Contains(observation.Year));
+            }
+
+            if (countries != null && countries.Any())
+            {
+                predicate = predicate.And(observation =>
+                    countries.Contains(observation.Location.Country.Code));
+            }
+
+            if (regions != null && regions.Any())
+            {
+                predicate = predicate.And(observation =>
+                    regions.Contains(observation.Location.Region.Code));
+            }
+
+            if (localAuthorities != null && localAuthorities.Any())
+            {
+                predicate = predicate.And(observation =>
+                    localAuthorities.Contains(observation.Location.LocalAuthority.Code));
+            }
+
+            if (localAuthorityDistricts != null && localAuthorityDistricts.Any())
+            {
+                predicate = predicate.And(observation =>
+                    localAuthorityDistricts.Contains(observation.Location.LocalAuthorityDistrict.Code));
             }
 
             var locationIds = DbSet()
