@@ -97,18 +97,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             };
         }
 
-        public IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(long subjectId)
+        public IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(long subjectId,
+            IEnumerable<int> years = null)
         {
-            var timePeriods = (from o in DbSet().Where(data => data.SubjectId == subjectId)
+            var predicate = PredicateBuilder.True<Observation>()
+                .And(observation => observation.SubjectId == subjectId);
+
+            if (years != null && years.Any())
+            {
+                predicate = predicate.And(observation => years.Contains(observation.Year));
+            }
+
+            var timePeriods = (from o in DbSet().AsNoTracking().Where(predicate)
                 select new {o.TimeIdentifier, o.Year}).Distinct();
 
             return from timePeriod in timePeriods.AsEnumerable()
                 select (timePeriod.TimeIdentifier, timePeriod.Year);
         }
 
-        public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(long subjectId)
+        public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnitsMeta(long subjectId,
+            IEnumerable<int> years = null)
         {
-            var locations = GetLocations(subjectId);
+            var locations = GetLocations(subjectId, years);
             return new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>
             {
                 {
@@ -130,7 +140,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             };
         }
 
-        private IEnumerable<Location> GetLocations(long subjectId)
+        private IEnumerable<Location> GetLocations(long subjectId,
+            IEnumerable<int> years = null)
         {
 //            TODO Ideally want one db query as follows but this is translated into invalid SQL
 //            TODO See https://github.com/aspnet/EntityFrameworkCore/issues/12304
@@ -140,7 +151,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 //                        .GroupBy(data => data.LocationId) on l.Id equals d.Key
 //                select l).ToList();
 
-            var locationIds = DbSet().Where(data => data.SubjectId == subjectId)
+            var predicate = PredicateBuilder.True<Observation>()
+                .And(observation => observation.SubjectId == subjectId);
+            
+            if (years != null && years.Any())
+            {
+                predicate = predicate.And(observation => years.Contains(observation.Year));
+            }
+
+            var locationIds = DbSet()
+                .AsNoTracking()
+                .Where(predicate)
                 .GroupBy(observation => observation.LocationId)
                 .Select(group => group.Key);
 

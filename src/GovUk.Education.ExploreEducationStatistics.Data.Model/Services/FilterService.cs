@@ -14,9 +14,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
         }
 
-        public IEnumerable<Filter> GetFiltersBySubjectId(long subjectId)
+        public IEnumerable<Filter> GetFilters(long subjectId, IEnumerable<int> years = null)
         {
-            return DbSet().Where(filter => filter.SubjectId == subjectId)
+            // TODO DFE-609 years is ignored
+            
+            return DbSet().AsNoTracking().Where(filter => filter.SubjectId == subjectId)
                 .Include(filter => filter.FilterGroups)
                 .ThenInclude(group => group.FilterItems);
         }

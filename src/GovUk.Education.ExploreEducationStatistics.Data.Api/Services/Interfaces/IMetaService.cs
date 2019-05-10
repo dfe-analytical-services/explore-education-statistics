@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces
@@ -7,6 +9,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
     {
         PublicationMetaViewModel GetPublicationMeta(Guid publicationId);
 
-        SubjectMetaViewModel GetSubjectMeta(long subjectId);
+        SubjectMetaViewModel GetSubjectMeta(long subjectId,
+            IEnumerable<int> years = null);
+
+        SubjectMetaViewModel GetSubjectMeta(SubjectMetaQueryContext query);
     }
 }

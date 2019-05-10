@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -49,22 +51,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        public SubjectMetaViewModel GetSubjectMeta(long subjectId)
+        public SubjectMetaViewModel GetSubjectMeta(long subjectId,
+            IEnumerable<int> years = null)
         {
             // TODO check subject exists
             var subject = _subjectService.Find(subjectId);
+            var yearsList = years?.ToList();
             return new SubjectMetaViewModel
             {
-                Filters = GetFilters(subject.Id),
-                Indicators = GetIndicators(subject.Id),
-                Locations = GetObservationalUnits(subject.Id),
-                TimePeriod = GetTimePeriods(subject.Id)
+                Filters = GetFilters(subject.Id, yearsList),
+                Indicators = GetIndicators(subject.Id, yearsList),
+                Locations = GetObservationalUnits(subject.Id, yearsList),
+                TimePeriod = GetTimePeriods(subject.Id, yearsList)
             };
         }
 
-        private LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>> GetTimePeriods(long subjectId)
+        public SubjectMetaViewModel GetSubjectMeta(SubjectMetaQueryContext query)
         {
-            var timePeriodsMeta = _observationService.GetTimePeriodsMeta(subjectId);
+            var years = QueryUtil.YearsQuery(query.Years, query.StartYear, query.EndYear);
+            return GetSubjectMeta(query.SubjectId, years);
+        }
+
+        private LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>> GetTimePeriods(
+            long subjectId,
+            IEnumerable<int> years = null)
+        {
+            var timePeriodsMeta = _observationService.GetTimePeriodsMeta(subjectId, years);
             return new LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>>
             {
                 Hint = "Filter statistics by a given start and end date",
@@ -80,9 +92,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         private Dictionary<string, LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>> GetObservationalUnits(
-            long subjectId)
+            long subjectId,
+            IEnumerable<int> years = null)
         {
-            return _observationService.GetObservationalUnits(subjectId)
+            return _observationService.GetObservationalUnitsMeta(subjectId, years)
                 .Where(pair => pair.Value.Any())
                 .ToDictionary(
                     pair => pair.Key.ToString().PascalCase(),
@@ -95,9 +108,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         private Dictionary<string, LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>> GetIndicators(
-            long subjectId)
+            long subjectId,
+            IEnumerable<int> years = null)
         {
-            return _indicatorGroupService.GetIndicatorGroupsBySubjectId(subjectId).ToDictionary(
+            return _indicatorGroupService.GetIndicatorGroups(subjectId, years).ToDictionary(
                 group => group.Label.PascalCase(),
                 group => new LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>
                 {
@@ -108,9 +122,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         private Dictionary<string, LegendOptionsMetaValueModel<Dictionary<string,
-            LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>> GetFilters(long subjectId)
+            LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>> GetFilters(
+            long subjectId,
+            IEnumerable<int> years = null)
         {
-            return _filterService.GetFiltersBySubjectId(subjectId).ToDictionary(
+            return _filterService.GetFilters(subjectId, years).ToDictionary(
                 filter => filter.Label.PascalCase(),
                 filter => new LegendOptionsMetaValueModel<Dictionary<string,
                     LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>

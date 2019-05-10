@@ -4,6 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 {
     public interface IFilterService : IDataService<Filter, long>
     {
-        IEnumerable<Filter> GetFiltersBySubjectId(long subjectId);
+        IEnumerable<Filter> GetFilters(long subjectId,
+            IEnumerable<int> years = null);
     }
 }
