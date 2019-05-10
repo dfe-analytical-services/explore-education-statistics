@@ -3,7 +3,6 @@ import FormFieldCheckboxSearchSubGroups from '@common/components/form/FormFieldC
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
 import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
-import { Dictionary } from '@common/types/util';
 import { Formik, FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
@@ -40,18 +39,18 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
 
   return (
     <Formik<FormValues>
+      enableReinitialize
       initialValues={{
         filters: mapValues(specification.filters, () => []),
         indicators: [],
       }}
       validationSchema={Yup.object<FormValues>({
-        filters: Yup.mixed().test(
-          'required',
-          'Must select options from only two categories',
-          (value: Dictionary<string[]>) =>
-            Object.values(value)
-              .map(group => group.length > 0)
-              .filter(Boolean).length === 2,
+        filters: Yup.object(
+          mapValues(specification.filters, () =>
+            Yup.array()
+              .of(Yup.string())
+              .min(1, 'Must select at least one option'),
+          ),
         ),
         indicators: Yup.array()
           .of(Yup.string())
@@ -76,7 +75,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       id={`${formId}-filters`}
                       legend="Categories"
                       legendSize="s"
-                      hint="Select options from two categories"
+                      hint="Select at least one option from all categories"
                       error={getError('filters')}
                     >
                       {Object.entries(specification.filters).map(
