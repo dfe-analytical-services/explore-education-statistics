@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreStatistics.Admin
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
-                configuration.RootPath = "../explore-education-statistics-admin/build";
+                configuration.RootPath = "wwwroot";
             });
 
             services.AddTransient<IFileStorageService, FileStorageService>();
@@ -110,12 +110,6 @@ namespace GovUk.Education.ExploreStatistics.Admin
 
             app.UseSpa(spa =>
             {
-//                    spa.Options.DefaultPageStaticFileOptions = new StaticFileOptions
-//                    {
-//                        RequestPath = "/static",
-//                        FileProvider = fileProvider
-//                    };
-
                 if (env.IsDevelopment())
                 {
                     spa.Options.SourcePath = "../explore-education-statistics-admin";
