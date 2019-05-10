@@ -92,9 +92,14 @@ class TimePeriod {
       return Comparison.LessThan;
     }
 
-    // TODO: Implement logic for other codes
     if (this.code === other.code) {
       return Comparison.EqualTo;
+    }
+
+    if (this.code === 'HT5' || this.code === 'HT6') {
+      if (other.code === 'HT5' || other.code === 'HT6') {
+        return Comparison.EqualTo;
+      }
     }
 
     throw new Error('Could not compare TimePeriods');
