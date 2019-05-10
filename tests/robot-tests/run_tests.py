@@ -56,6 +56,11 @@ parser.add_argument("--happypath",
                     dest="happypath",
                     action="store_true",
                     help="only run happy-path tests")
+parser.add_argument("--chromedriver",
+                    dest="chromedriver_version",
+                    default="74.0.3729.6",
+                    metavar="{version}",
+                    help="specify which version of chromedriver to use")
 parser.add_argument("--ci",
                     dest="ci",
                     action="store_true",
@@ -63,7 +68,6 @@ parser.add_argument("--ci",
 args = parser.parse_args()
 
 # Default values
-chromedriver_version = "74.0.3729.6"
 timeout = 10
 implicit_wait = 10
 
@@ -80,7 +84,6 @@ if args.ci:
     robotArgs += ["--xunit", "xunit", "-v", "timeout:" + str(timeout), "-v", "implicit_wait:" + str(implicit_wait)]
     url = os.getenv('publicAppUrl')
     urlAdmin = os.getenv('adminAppUrl')
-    chromedriver_version = "73.0.3683.68"
 else:
     if args.env == 'local':
         url = "http://localhost:3000"
@@ -106,7 +109,7 @@ path = cdi.install(file_directory='./webdriver/',
                    verbose=False,
                    chmod=True,
                    overwrite=False,
-                   version=chromedriver_version)
+                   version=args.chromedriver_version)
 os.environ["PATH"] += os.pathsep + os.getcwd() + os.sep + 'webdriver'
 
 # Run tests

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -5,7 +6,6 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             IEnumerable<long> filters)
         {
             var subjectIdParam = new SqlParameter("subjectId", subjectId);
-            var geographicLevelParam = new SqlParameter("geographicLevel", geographicLevel.GetEnumLabel());
+            var geographicLevelParam = new SqlParameter("geographicLevel", geographicLevel.GetEnumValue());
             var yearsListParam = CreateIdListType("yearList", years);
             var countriesListParam = CreateIdListType("countriesList", countries);
             var regionsListParam = CreateIdListType("regionsList", regions);
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var localAuthorityDistrictListParam =
                 CreateIdListType("localAuthorityDistrictList", localAuthorityDistricts);
             var filtersListParam = CreateIdListType("filtersList", filters);
-            
+
             var inner = _context.Query<IdWrapper>().AsNoTracking()
                 .FromSql("EXEC dbo.FilteredObservations " +
                          "@subjectId," +
@@ -106,23 +106,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 select (timePeriod.TimeIdentifier, timePeriod.Year);
         }
 
-        public LocationMeta GetLocationMeta(long subjectId)
+        public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(long subjectId)
         {
             var locations = GetLocations(subjectId);
-            return new LocationMeta
+            return new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>
             {
-                Country = locations.GroupBy(composite => composite.Country)
-                    .Where(grouping => grouping.Key != null)
-                    .Select(group => group.Key),
-                LocalAuthority = locations.GroupBy(composite => composite.LocalAuthority)
-                    .Where(grouping => grouping.Key.Code != null)
-                    .Select(group => group.Key),
-                LocalAuthorityDistrict = locations.GroupBy(composite => composite.LocalAuthorityDistrict)
-                    .Where(grouping => grouping.Key.Code != null)
-                    .Select(group => group.Key),
-                Region = locations.GroupBy(composite => composite.Region)
-                    .Where(grouping => grouping.Key.Code != null)
-                    .Select(group => group.Key)
+                {
+                    GeographicLevel.National,
+                    GroupByObservationalUnit(locations, location => location.Country)
+                },
+                {
+                    GeographicLevel.Regional,
+                    GroupByObservationalUnit(locations, location => location.Region)
+                },
+                {
+                    GeographicLevel.Local_Authority,
+                    GroupByObservationalUnit(locations, location => location.LocalAuthority)
+                },
+                {
+                    GeographicLevel.Local_Authority_District,
+                    GroupByObservationalUnit(locations, location => location.LocalAuthorityDistrict)
+                }
             };
         }
 
@@ -141,6 +145,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Select(group => group.Key);
 
             return locationIds.Any() ? _locationService.Find(locationIds.ToArray()) : new List<Location>();
+        }
+
+        private static IEnumerable<T> GroupByObservationalUnit<T>(IEnumerable<Location> locations,
+            Func<Location, T> keySelector) where T : IObservationalUnit
+        {
+            return locations.GroupBy(keySelector)
+                .Where(grouping => grouping.Key.Code != null)
+                .Select(group => group.Key);
         }
     }
 }

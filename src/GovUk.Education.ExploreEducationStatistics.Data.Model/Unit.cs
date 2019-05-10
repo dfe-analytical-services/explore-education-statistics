@@ -4,10 +4,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public enum Unit
     {
-        [EnumLabel("")]
+        [EnumLabelValue("", "")]
         Number,
         
-        [EnumLabel("%")]
+        [EnumLabelValue("%", "%")]
         Percent
     }
 }

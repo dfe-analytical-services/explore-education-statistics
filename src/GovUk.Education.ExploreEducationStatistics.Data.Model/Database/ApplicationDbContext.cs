@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         private static void ConfigureUnit(ModelBuilder modelBuilder)
         {
-            var unitConverter = new EnumToLabelConverter<Unit>();
+            var unitConverter = new EnumToEnumValueConverter<Unit>();
 
             modelBuilder.Entity<Indicator>()
                 .Property(indicator => indicator.Unit)
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         private static void ConfigureGeographicLevel(ModelBuilder modelBuilder)
         {
-            var geographicLevelConverter = new EnumToLabelConverter<GeographicLevel>();
+            var geographicLevelConverter = new EnumToEnumValueConverter<GeographicLevel>();
 
             modelBuilder.Entity<Observation>()
                 .Property(observation => observation.GeographicLevel)

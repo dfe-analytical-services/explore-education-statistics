@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
     public partial class AddObservationQuery : Migration
     {
-        private readonly string _migrationsPath = "GovUk.Education.ExploreEducationStatistics.Data.Api/Migrations/";
+        private readonly string _migrationsPath = "Migrations/";
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
         private static void ExecuteFile(MigrationBuilder migrationBuilder, string filename)
         {
-            var file = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, filename);
+            var file = Path.Combine(Directory.GetCurrentDirectory(), filename);
             migrationBuilder.Sql(File.ReadAllText(file));
         }
     }
