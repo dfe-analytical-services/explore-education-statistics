@@ -1,0 +1,15 @@
+@import '~explore-education-statistics-common/src/styles/govuk-base';
+
+.releaseHeader {
+  margin-bottom: 1.5rem;
+
+  :global(.govuk-heading-xl) {
+    margin-bottom: 1.6rem;
+  }
+}
+
+.releaseIntro {
+  :global(.govuk-details) {
+    margin-bottom: 0;
+  }
+}
