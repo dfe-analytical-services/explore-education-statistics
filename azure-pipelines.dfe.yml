@@ -42,6 +42,76 @@ jobs:
         inputs:
           artifactName: 'backend'
           targetPath: '$(Build.ArtifactStagingDirectory)'
+  - job: 'Admin'
+    pool:
+      name: Hosted Windows 2019 with VS2019
+      demands:
+      - npm
+      - azureps
+    steps:
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Restore'
+        inputs:
+          command: 'restore'
+          projects: '**/GovUk.Education.ExploreStatistics.Admin.csproj'
+          feedsToUse: config
+          nugetConfigPath: src/nuget.config
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Build'
+        inputs:
+          projects: '**/GovUk.Education.ExploreStatistics.Admin.csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Test'
+        inputs:
+          command: 'test'
+          projects: '**/GovUk.Education.ExploreStatistics.Admin.Tests.csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+
+      - task: Npm@1
+        displayName: 'npm run ci'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: ci
+      - task: Npm@1
+        displayName: 'npm run bootstrap'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: 'run bootstrap'
+      - task: Npm@1
+        displayName: 'npm run format'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: 'run format'
+      - task: Npm@1
+        displayName: 'npm run build'
+        inputs:
+          command: custom
+          workingDir: 'src/explore-education-statistics-admin'
+          verbose: false
+          customCommand: 'run build'
+
+      - task: CopyFiles@2
+        displayName: 'Copy files to wwwroot'
+        inputs:
+          SourceFolder: 'src/explore-education-statistics-admin/build'
+          TargetFolder: src/GovUk.Education.ExploreStatistics.Admin/wwwroot
+
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreStatistics.Admin.csproj'
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Pipeline Artifact'
+        inputs:
+          artifactName: 'Admin'
+          targetPath: '$(Build.ArtifactStagingDirectory)'
 
   - job: 'Frontend'
     pool:
