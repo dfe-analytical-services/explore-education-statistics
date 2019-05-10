@@ -8,7 +8,7 @@ import { Dictionary } from '@common/types/util';
 import { Formik, FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepHeading from './WizardStepHeading';
@@ -29,8 +29,6 @@ interface Props {
 
 const FiltersForm = (props: Props & InjectedWizardProps) => {
   const { onSubmit, specification, goToNextStep, goToPreviousStep } = props;
-
-  const [submitError, setSubmitError] = useState('');
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -57,36 +55,16 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
           .of(Yup.string())
           .required('Must select at least one indicator'),
       })}
-      onSubmit={async (values, actions) => {
-        try {
-          await onSubmit(values);
-
-          goToNextStep();
-        } catch (error) {
-          setSubmitError('Could not submit filters. Please try again later.');
-        }
-
-        actions.setSubmitting(false);
+      onSubmit={async values => {
+        await onSubmit(values);
+        goToNextStep();
       }}
       render={(form: FormikProps<FormValues>) => {
         const { getError } = createErrorHelper(form);
 
         return (
           <div ref={ref}>
-            <Form
-              {...form}
-              id="filtersForm"
-              otherErrors={
-                submitError !== ''
-                  ? [
-                      {
-                        id: 'filtersForm-submit',
-                        message: submitError,
-                      },
-                    ]
-                  : []
-              }
-            >
+            <Form {...form} id="filtersForm">
               {stepHeading}
 
               <FormGroup>

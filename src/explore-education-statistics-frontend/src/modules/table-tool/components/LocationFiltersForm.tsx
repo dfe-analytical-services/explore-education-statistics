@@ -52,8 +52,8 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
 
   return (
     <Formik<FormValues>
-      onSubmit={values => {
-        onSubmit(values.locations);
+      onSubmit={async values => {
+        await onSubmit(values.locations);
         goToNextStep();
       }}
       initialValues={{

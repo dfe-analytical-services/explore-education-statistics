@@ -50,8 +50,8 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
 
   return (
     <Formik<FormValues>
-      onSubmit={values => {
-        onSubmit(values);
+      onSubmit={async values => {
+        await onSubmit(values);
         goToNextStep();
       }}
       initialValues={{
@@ -116,17 +116,17 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
       })}
       render={(form: FormikProps<FormValues>) => {
         return isActive ? (
-          <Form {...form} id="timePeriodForm">
+          <Form id="timePeriodForm">
             <FormFieldset id="timePeriodForm-timePeriod" legend={stepHeading}>
               <FormFieldSelect
                 name="start"
-                id="timePeriodForm-timePeriod-start"
+                id="timePeriodForm-start"
                 label="Start date"
                 options={timePeriodOptions}
               />
               <FormFieldSelect
                 name="end"
-                id="timePeriodForm-timePeriod-end"
+                id="timePeriodForm-end"
                 label="End date"
                 options={timePeriodOptions}
               />

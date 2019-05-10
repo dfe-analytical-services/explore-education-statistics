@@ -56,8 +56,8 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
       initialValues={{
         publicationId: '',
       }}
-      onSubmit={({ publicationId }) => {
-        onSubmit({
+      onSubmit={async ({ publicationId }) => {
+        await onSubmit({
           publicationId,
           publicationName,
         });
