@@ -6,7 +6,7 @@ function PrototypesIndexPage() {
   return (
     <PrototypePage>
       <h1>Index page for administrative application</h1>
-      
+
       <h3>Prototypes</h3>
       <ul>
         <li>
@@ -19,17 +19,12 @@ function PrototypesIndexPage() {
       <h3>Tools</h3>
       <ul>
         <li>
-          <a href="/tools">
-            Administrive tools
-          </a>
+          <a href="/tools">Administrive tools</a>
         </li>
         <li>
-          <a href="/tools/release/notify">
-            Send a release notification 
-          </a>
+          <a href="/tools/release/notify">Send a release notification</a>
         </li>
       </ul>
-      
     </PrototypePage>
   );
 }
