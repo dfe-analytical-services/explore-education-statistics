@@ -4,19 +4,8 @@ import AccordionSection from '@common/components/AccordionSection';
 import PrototypePage from '@frontend/prototypes/components/PrototypePage';
 import React from 'react';
 import {
-  ks4AverageHeadlineScoresByPupilEthnicity,
-  ks4PerformanceInMatsComparedToNationalAverage,
-  ks4SchoolAverageHeadlineScoresByPupilCharacteristics,
-  kS4SchoolPerformanceDataBlock,
-  ks4SchoolRevisedAttainmentChart,
-  ks4TrendInDisavdantagePuilsAttainmentGapIndex,
-  testChartsVerticalOffset,
-  testChartsVertical,
-  testChartsVerticalWithReferenceLineAndAxisTitles,
-  testTimeSeries,
-  testTimeSeriesWithLine,
-  testDistribution,
   newApiHorizontalData,
+  newApiTest,
 } from '@frontend/prototypes/publication/data/PrototypeDataFactory';
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import HorizontalBarBlock from 'explore-education-statistics-common/src/modules/find-statistics/components/charts/HorizontalBarBlock';
@@ -28,7 +17,7 @@ const GraphsPage = () => {
 
       <Accordion id="graphs">
         <AccordionSection heading="Bar Charts">
-          <DataBlock {...ks4SchoolRevisedAttainmentChart} showTables={false} />
+          <DataBlock {...newApiTest} />
 
           <h3>Horizontal Bars</h3>
           <HorizontalBarBlock {...newApiHorizontalData} stacked />

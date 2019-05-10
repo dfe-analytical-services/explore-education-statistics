@@ -98,17 +98,19 @@ describe('FormFieldCheckboxGroup', () => {
       />,
     );
 
+    const checkbox1 = getByLabelText('Checkbox 1') as HTMLInputElement;
+    const checkbox2 = getByLabelText('Checkbox 2') as HTMLInputElement;
+    const checkbox3 = getByLabelText('Checkbox 3') as HTMLInputElement;
+
+    expect(checkbox1.checked).toBe(false);
+    expect(checkbox2.checked).toBe(false);
+    expect(checkbox3.checked).toBe(false);
+
     fireEvent.click(getByLabelText('Select all'));
 
-    expect((getByLabelText('Checkbox 1') as HTMLInputElement).checked).toBe(
-      true,
-    );
-    expect((getByLabelText('Checkbox 2') as HTMLInputElement).checked).toBe(
-      true,
-    );
-    expect((getByLabelText('Checkbox 3') as HTMLInputElement).checked).toBe(
-      true,
-    );
+    expect(checkbox1.checked).toBe(true);
+    expect(checkbox2.checked).toBe(true);
+    expect(checkbox3.checked).toBe(true);
   });
 
   test('un-checking `Select all` option un-checks all values', () => {

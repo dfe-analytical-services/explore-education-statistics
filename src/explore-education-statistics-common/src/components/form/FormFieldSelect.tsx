@@ -25,7 +25,20 @@ const FormFieldSelect = <T extends {}>(props: Props<T>) => {
 
         return (
           <FormGroup hasError={!!errorMessage}>
-            <FormSelect {...props} {...field} error={errorMessage} />
+            <FormSelect
+              {...props}
+              {...field}
+              error={errorMessage}
+              onChange={event => {
+                if (props.onChange) {
+                  props.onChange(event);
+                }
+
+                if (!event.isDefaultPrevented()) {
+                  field.onChange(event);
+                }
+              }}
+            />
           </FormGroup>
         );
       }}

@@ -108,6 +108,10 @@
       }
     ],
     "no-console": "warn",
+    "no-param-reassign": ["error", {
+      "props": true,
+      "ignorePropertyModificationsFor": ["draft"]
+    }],
     "no-use-before-define": "off",
     "no-useless-constructor": "off",
     "spaced-comment": ["warn", "always", { "markers": ["/"] }]

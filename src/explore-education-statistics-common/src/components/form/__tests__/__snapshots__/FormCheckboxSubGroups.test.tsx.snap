@@ -1,0 +1,203 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormCheckboxSubGroups renders groups of checkboxes in correct order 1`] = `
+
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset"
+            id="test-checkboxes"
+  >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+      Test checkboxes
+    </legend>
+    <div class="govuk-form-group">
+      <fieldset class="govuk-fieldset"
+                id="test-checkboxes-groupA"
+      >
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+          Group A
+        </legend>
+        <div class="govuk-checkboxes">
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input"
+                   id="test-checkboxes-groupA-1"
+                   name="test"
+                   type="checkbox"
+                   value="1"
+            >
+            <label class="govuk-label govuk-checkboxes__label"
+                   for="test-checkboxes-groupA-1"
+            >
+              Checkbox 1
+            </label>
+          </div>
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input"
+                   id="test-checkboxes-groupA-2"
+                   name="test"
+                   type="checkbox"
+                   value="2"
+            >
+            <label class="govuk-label govuk-checkboxes__label"
+                   for="test-checkboxes-groupA-2"
+            >
+              Checkbox 2
+            </label>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+    <div class="govuk-form-group">
+      <fieldset class="govuk-fieldset"
+                id="test-checkboxes-groupB"
+      >
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+          Group B
+        </legend>
+        <div class="govuk-checkboxes">
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input"
+                   id="test-checkboxes-groupB-3"
+                   name="test"
+                   type="checkbox"
+                   value="3"
+            >
+            <label class="govuk-label govuk-checkboxes__label"
+                   for="test-checkboxes-groupB-3"
+            >
+              Checkbox 3
+            </label>
+          </div>
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input"
+                   id="test-checkboxes-groupB-4"
+                   name="test"
+                   type="checkbox"
+                   value="4"
+            >
+            <label class="govuk-label govuk-checkboxes__label"
+                   for="test-checkboxes-groupB-4"
+            >
+              Checkbox 4
+            </label>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </fieldset>
+</div>
+
+`;
+
+exports[`FormCheckboxSubGroups renders unchecked \`Select all\` checkboxes when \`selectAll\` is true 1`] = `
+
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset"
+            id="test-checkboxes"
+  >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+      Test checkboxes
+    </legend>
+    <div class="govuk-form-group">
+      <fieldset class="govuk-fieldset"
+                id="test-checkboxes-groupA"
+      >
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+          Group A
+        </legend>
+        <div class="govuk-checkboxes">
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input"
+                   id="test-checkboxes-groupA-all"
+                   name="test-checkboxes"
+                   type="checkbox"
+                   value="select-all"
+            >
+            <label class="govuk-label govuk-checkboxes__label"
+                   for="test-checkboxes-groupA-all"
+            >
+              Select all
+            </label>
+          </div>
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input"
+                   id="test-checkboxes-groupA-1"
+                   name="test-checkboxes"
+                   type="checkbox"
+                   value="1"
+            >
+            <label class="govuk-label govuk-checkboxes__label"
+                   for="test-checkboxes-groupA-1"
+            >
+              Checkbox 1
+            </label>
+          </div>
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input"
+                   id="test-checkboxes-groupA-2"
+                   name="test-checkboxes"
+                   type="checkbox"
+                   value="2"
+            >
+            <label class="govuk-label govuk-checkboxes__label"
+                   for="test-checkboxes-groupA-2"
+            >
+              Checkbox 2
+            </label>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+    <div class="govuk-form-group">
+      <fieldset class="govuk-fieldset"
+                id="test-checkboxes-groupB"
+      >
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+          Group B
+        </legend>
+        <div class="govuk-checkboxes">
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input"
+                   id="test-checkboxes-groupB-all"
+                   name="test-checkboxes"
+                   type="checkbox"
+                   value="select-all"
+            >
+            <label class="govuk-label govuk-checkboxes__label"
+                   for="test-checkboxes-groupB-all"
+            >
+              Select all
+            </label>
+          </div>
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input"
+                   id="test-checkboxes-groupB-3"
+                   name="test-checkboxes"
+                   type="checkbox"
+                   value="3"
+            >
+            <label class="govuk-label govuk-checkboxes__label"
+                   for="test-checkboxes-groupB-3"
+            >
+              Checkbox 3
+            </label>
+          </div>
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input"
+                   id="test-checkboxes-groupB-4"
+                   name="test-checkboxes"
+                   type="checkbox"
+                   value="4"
+            >
+            <label class="govuk-label govuk-checkboxes__label"
+                   for="test-checkboxes-groupB-4"
+            >
+              Checkbox 4
+            </label>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </fieldset>
+</div>
+
+`;

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 
 namespace GovUk.Education.ExploreStatistics.Admin
 {
@@ -39,13 +40,19 @@ namespace GovUk.Education.ExploreStatistics.Admin
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             services.AddMvc(options =>
+                {
+                    var policy = new AuthorizationPolicyBuilder()
+                        .RequireAuthenticatedUser()
+                        .Build();
+                    options.Filters.Add(new AuthorizeFilter(policy));
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            // In production, the React files will be served from this directory
+            services.AddSpaStaticFiles(configuration =>
             {
-                var policy = new AuthorizationPolicyBuilder()
-                    .RequireAuthenticatedUser()
-                    .Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
-            })
-            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                configuration.RootPath = "wwwroot";
+            });
 
             services.AddTransient<IFileStorageService, FileStorageService>();
             services.AddTransient<INotificationService, NotificationService>();
@@ -62,12 +69,12 @@ namespace GovUk.Education.ExploreStatistics.Admin
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                
+
                 app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
             }
-            
+
             app.UseHttpsRedirection();
-            
+
             // Security Headers
             app.UseXContentTypeOptions();
             app.UseXXssProtection(options => options.EnabledWithBlockMode());
@@ -84,17 +91,30 @@ namespace GovUk.Education.ExploreStatistics.Admin
                 .ScriptSources(s => s.Self())
                 .ScriptSources(s => s.UnsafeInline())
             );
-            
+
             app.UseStaticFiles();
+            app.UseSpaStaticFiles();
             app.UseCookiePolicy();
 
             app.UseAuthentication();
 
-            app.UseMvc(routes =>
+            // adds a application root specific for the serverside admin tools built to aid development
+            app.Map("/tools", adminApp =>
+                adminApp.UseMvc(routes =>
+                {
+                    routes.MapRoute(
+                        name: "default",
+                        template: "{controller=Home}/{action=Index}/{id?}");
+                })
+            );
+
+            app.UseSpa(spa =>
             {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                if (env.IsDevelopment())
+                {
+                    spa.Options.SourcePath = "../explore-education-statistics-admin";
+                    spa.UseReactDevelopmentServer(npmScript: "start");
+                }
             });
         }
     }
