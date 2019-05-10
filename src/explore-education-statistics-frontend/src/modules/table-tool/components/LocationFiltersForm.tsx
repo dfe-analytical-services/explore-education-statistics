@@ -1,10 +1,10 @@
-import Button from '@common/components/Button';
-import { Form, FormFieldset, FormGroup } from '@common/components/form';
+import { Form, FormFieldset } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
+import WizardStepFormActions from '@frontend/modules/table-tool/components/WizardStepFormActions';
 import { Formik, FormikProps } from 'formik';
 import sortBy from 'lodash/sortBy';
 import React, { useEffect } from 'react';
@@ -29,7 +29,9 @@ interface Props {
 }
 
 const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
-  const { options, onSubmit, isActive, goToNextStep, goToPreviousStep } = props;
+  const { options, onSubmit, isActive, goToNextStep } = props;
+
+  const formId = 'locationFiltersForm';
 
   const [locationLevels, updateLocationLevels] = useImmer<
     Dictionary<{ label: string; value: string }[]>
@@ -74,9 +76,9 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
       })}
       render={(form: FormikProps<FormValues>) => {
         return isActive ? (
-          <Form {...form} id="locationFiltersForm">
+          <Form {...form} id={formId}>
             <FormFieldset
-              id="locationFiltersForm-levels"
+              id={`${formId}-levels`}
               legend={stepHeading}
               hint="Select at least one"
               error={
@@ -93,7 +95,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                         name={`locations.${levelKey}`}
                         key={levelKey}
                         options={level.options}
-                        id={`locationFiltersForm-levels-${levelKey}`}
+                        id={`${formId}-levels-${levelKey}`}
                         legend={level.legend}
                         legendHidden
                         onAllChange={event => {
@@ -128,17 +130,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
               </div>
             </FormFieldset>
 
-            <FormGroup>
-              <Button type="submit">Next step</Button>
-
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={goToPreviousStep}
-              >
-                Previous step
-              </Button>
-            </FormGroup>
+            <WizardStepFormActions {...props} form={form} formId={formId} />
           </Form>
         ) : (
           <>

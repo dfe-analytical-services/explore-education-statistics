@@ -1,10 +1,10 @@
-import Button from '@common/components/Button';
 import { Form, FormFieldset, FormGroup } from '@common/components/form';
 import FormFieldCheckboxSearchSubGroups from '@common/components/form/FormFieldCheckboxSearchSubGroups';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
 import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
+import WizardStepFormActions from '@frontend/modules/table-tool/components/WizardStepFormActions';
 import { Formik, FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
@@ -28,9 +28,11 @@ interface Props {
 }
 
 const FiltersForm = (props: Props & InjectedWizardProps) => {
-  const { onSubmit, specification, goToNextStep, goToPreviousStep } = props;
+  const { onSubmit, specification, goToNextStep } = props;
 
   const ref = useRef<HTMLDivElement>(null);
+
+  const formId = 'filtersForm';
 
   const stepHeading = (
     <WizardStepHeading {...props}>Choose your filters</WizardStepHeading>
@@ -64,14 +66,14 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
 
         return (
           <div ref={ref}>
-            <Form {...form} id="filtersForm">
+            <Form {...form} id={formId}>
               {stepHeading}
 
               <FormGroup>
                 <div className="govuk-grid-row">
                   <div className="govuk-grid-column-one-half-from-desktop">
                     <FormFieldset
-                      id="filtersForm-filters"
+                      id={`${formId}-filters`}
                       legend="Categories"
                       legendSize="s"
                       hint="Select options from two categories"
@@ -85,7 +87,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                             <FormFieldCheckboxGroupsMenu<FormValues>
                               key={filterKey}
                               name={filterName}
-                              id={`filtersForm-${camelCase(filterName)}`}
+                              id={`${formId}-${camelCase(filterName)}`}
                               legend={filterGroup.legend}
                               hint={filterGroup.hint}
                               error={getError(filterName)}
@@ -107,7 +109,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                   <div className="govuk-grid-column-one-half-from-desktop">
                     <FormFieldCheckboxSearchSubGroups
                       name="indicators"
-                      id="filtersForm-indicators"
+                      id={`${formId}-indicators`}
                       legend="Indicators"
                       legendSize="s"
                       hint="Select at least one indicator"
@@ -125,27 +127,13 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                 </div>
               </FormGroup>
 
-              <FormGroup>
-                <Button
-                  disabled={form.isSubmitting}
-                  id="filtersForm-submit"
-                  type="submit"
-                >
-                  {form.isSubmitting && form.isValid
-                    ? 'Creating table...'
-                    : 'Create table'}
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    goToPreviousStep();
-                  }}
-                >
-                  Previous step
-                </Button>
-              </FormGroup>
+              <WizardStepFormActions
+                {...props}
+                form={form}
+                formId={formId}
+                submitText="Create table"
+                submittingText="Creating table"
+              />
             </Form>
           </div>
         );

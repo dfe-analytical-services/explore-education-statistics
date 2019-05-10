@@ -1,4 +1,3 @@
-import Button from '@common/components/Button';
 import DetailsMenu from '@common/components/DetailsMenu';
 import {
   FormFieldRadioGroup,
@@ -12,6 +11,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
 import { InjectedWizardProps } from '@frontend/modules/table-tool/components/Wizard';
+import WizardStepFormActions from '@frontend/modules/table-tool/components/WizardStepFormActions';
 import WizardStepHeading from '@frontend/modules/table-tool/components/WizardStepHeading';
 import { Formik, FormikProps } from 'formik';
 import camelCase from 'lodash';
@@ -45,6 +45,8 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
   const [publicationName, setPublicationName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
+  const formId = 'publicationForm';
+
   const stepHeading = (
     <WizardStepHeading {...props} fieldsetHeading>
       Choose a publication
@@ -73,15 +75,15 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
         return (
           <>
             {isActive ? (
-              <Form {...form} id="publicationForm">
+              <Form {...form} id={formId}>
                 <FormFieldset
                   error={getError('publicationId')}
-                  id="publicationForm-publicationId"
+                  id={`${formId}-publicationId`}
                   legend={stepHeading}
                 >
                   <FormGroup>
                     <FormTextSearchInput
-                      id="publicationForm-publicationIdSearch"
+                      id={`${formId}-publicationIdSearch`}
                       label="Search publications"
                       name="publicationSearch"
                       onChange={event => setSearchTerm(event.target.value)}
@@ -145,7 +147,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                                     small
                                     showError={false}
                                     name="publicationId"
-                                    id={`publicationForm-publicationId-${camelCase(
+                                    id={`${formId}-publicationId-${camelCase(
                                       topic.name,
                                     )}`}
                                     onChange={(event, option) => {
@@ -174,9 +176,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                   </FormGroup>
                 </FormFieldset>
 
-                <FormGroup>
-                  <Button type="submit">Next step</Button>
-                </FormGroup>
+                <WizardStepFormActions {...props} form={form} formId={formId} />
               </Form>
             ) : (
               <>
