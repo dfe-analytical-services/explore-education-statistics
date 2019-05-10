@@ -1,5 +1,5 @@
-import { Release } from '@common/services/publicationService';
 import { GeographicLevel } from '@common/services/dataBlockService';
+import { Release } from '@common/services/publicationService';
 
 const LOREM =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec elementum, mauris eget vulputate iaculis, dui orci efficitur mi, at consectetur metus lorem tempor neque. Etiam in eleifend magna. Sed hendrerit vitae ante at semper. Mauris a erat a ex porta mollis. Aliquam quis justo eu lectus luctus porttitor nec at dolor. Nunc interdum, diam sed lobortis porta, massa arcu volutpat nunc, eget scelerisque arcu neque vel tortor. Fusce sit amet mauris augue. Praesent sed urna vel lacus suscipit mollis id quis nulla. Duis porta sapien et arcu ornare, eget mollis justo finibus. Nunc commodo felis justo, at efficitur purus mattis in. Donec nibh quam, mollis at eros ac, fringilla porta mi.';
@@ -375,7 +375,7 @@ export default class PrototypePublicationService {
       ],
       keyStatistics: {
         type: 'DataBlock',
-
+        body: '',
         dataBlockRequest: {
           subjectId: 1,
           filters: [1, 2],

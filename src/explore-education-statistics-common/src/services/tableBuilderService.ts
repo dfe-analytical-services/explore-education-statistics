@@ -76,28 +76,6 @@ export interface TableData {
   }[];
 }
 
-// TODO: Remove this
-export interface CharacteristicsData {
-  publicationId: string;
-  releaseId: string;
-  releaseDate: string;
-  result: {
-    timePeriod: number;
-    schoolType: string;
-    indicators: {
-      [indicator: string]: string;
-    };
-    characteristic: {
-      label: string;
-      name: string;
-      description?: string | null;
-      name2?: string | null;
-    };
-  }[];
-}
-
-export type DataTableResult = CharacteristicsData['result'][0];
-
 export default {
   getPublicationMeta(publicationUuid: string): Promise<PublicationMeta> {
     return dataApi.get(`/meta/publication/${publicationUuid}`);
