@@ -6,10 +6,10 @@ import Yup from '@common/lib/validation/yup';
 import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import { Comparison } from '@common/types/util';
-import WizardStepFormActions from '@frontend/modules/table-tool/components/WizardStepFormActions';
 import { Formik, FormikProps } from 'formik';
 import React from 'react';
 import { InjectedWizardProps } from './Wizard';
+import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
 interface FormValues {

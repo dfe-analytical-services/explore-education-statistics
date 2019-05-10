@@ -4,13 +4,13 @@ import {
   TableData,
 } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
+import sortBy from 'lodash/sortBy';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import FixedHeaderGroupedDataTable, {
   HeaderGroup,
   RowGroup,
-} from '@frontend/modules/table-tool/components/FixedHeaderGroupedDataTable';
-import TableHeadersForm from '@frontend/modules/table-tool/components/TableHeadersForm';
-import sortBy from 'lodash/sortBy';
-import React, { memo, useEffect, useRef, useState } from 'react';
+} from './FixedHeaderGroupedDataTable';
+import TableHeadersForm from './TableHeadersForm';
 
 interface TableHeaders {
   columnGroups: FilterOption[];

@@ -4,13 +4,13 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
-import WizardStepFormActions from '@frontend/modules/table-tool/components/WizardStepFormActions';
 import { Formik, FormikProps } from 'formik';
 import sortBy from 'lodash/sortBy';
 import React, { useEffect } from 'react';
 import { useImmer } from 'use-immer';
 import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
 import { InjectedWizardProps } from './Wizard';
+import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
 interface FormValues {

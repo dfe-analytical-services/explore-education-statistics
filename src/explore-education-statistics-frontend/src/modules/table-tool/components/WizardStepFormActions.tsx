@@ -1,8 +1,8 @@
 import Button from '@common/components/Button';
 import { FormGroup } from '@common/components/form';
-import { InjectedWizardProps } from '@frontend/modules/table-tool/components/Wizard';
 import { FormikProps } from 'formik';
 import React from 'react';
+import { InjectedWizardProps } from './Wizard';
 
 interface Props {
   form: FormikProps<{}>;
