@@ -3,13 +3,15 @@ using System;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 {   
     [AttributeUsage(AttributeTargets.Field)]
-    public class EnumLabelAttribute : Attribute
+    public class EnumLabelValueAttribute : Attribute
     {
         public string Label { get; }
+        public string Value { get; }
 
-        public EnumLabelAttribute(string label)
+        public EnumLabelValueAttribute(string label, string value)
         {
             Label = label;
+            Value = value;
         }
     }
 }

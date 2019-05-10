@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 {
-    public class EnumToLabelConverter<TEnum> : ValueConverter<TEnum, string>
+    public class EnumToEnumValueConverter<TEnum> : ValueConverter<TEnum, string>
     {
-        public EnumToLabelConverter(ConverterMappingHints mappingHints = null) :
+        public EnumToEnumValueConverter(ConverterMappingHints mappingHints = null) :
             base(x => ToProvider(x),
                 x => FromProvider(x),
                 mappingHints)
@@ -17,10 +17,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             var enumType = value.GetType();
             var enumTypeMemberInfo = enumType.GetMember(value.ToString());
-            var enumLabelAttribute = (EnumLabelAttribute) enumTypeMemberInfo[0]
-                .GetCustomAttributes(typeof(EnumLabelAttribute), false)
+            var enumLabelAttribute = (EnumLabelValueAttribute) enumTypeMemberInfo[0]
+                .GetCustomAttributes(typeof(EnumLabelValueAttribute), false)
                 .FirstOrDefault();
-            return enumLabelAttribute.Label;
+            return enumLabelAttribute.Value;
         }
 
         private static TEnum FromProvider(string value)
@@ -29,11 +29,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             foreach (TEnum val in Enum.GetValues(enumType))
             {
                 var enumTypeMemberInfo = enumType.GetMember(val.ToString());
-                var enumLabelAttribute = (EnumLabelAttribute) enumTypeMemberInfo[0]
-                    .GetCustomAttributes(typeof(EnumLabelAttribute), false)
+                var enumLabelAttribute = (EnumLabelValueAttribute) enumTypeMemberInfo[0]
+                    .GetCustomAttributes(typeof(EnumLabelValueAttribute), false)
                     .FirstOrDefault();
 
-                if (enumLabelAttribute.Label == value)
+                if (enumLabelAttribute.Value == value)
                 {
                     return val;
                 }

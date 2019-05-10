@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    public class LocalAuthorityDistrict
+    public class LocalAuthorityDistrict: IObservationalUnit
     {
         [JsonProperty(PropertyName = "sch_lad_code")]
         public string Code { get; set; }
