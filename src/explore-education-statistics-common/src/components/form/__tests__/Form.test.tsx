@@ -146,7 +146,7 @@ describe('Form', () => {
   test('calls onSubmit handler when form is submitted successfully', async () => {
     const handleSubmit = jest.fn();
 
-    const { container, getByText } = render(
+    const { container } = render(
       <Formik
         initialValues={{
           firstName: 'Firstname',

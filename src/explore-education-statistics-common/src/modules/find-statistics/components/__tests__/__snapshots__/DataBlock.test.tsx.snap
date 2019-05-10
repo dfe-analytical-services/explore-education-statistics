@@ -741,18 +741,58 @@ exports[`DataBlock datablock renders table 1`] = `
       </h3>
       <h3>
       </h3>
-      <table>
-        <thead>
+      <table class="govuk-table">
+        <caption class="govuk-heading-s">
+          Table representing
+        </caption>
+        <thead class="govuk-table__head">
           <tr>
-            <th>
-              Heading
+            <th class="govuk-table__header">
+            </th>
+            <th class="govuk-table__header govuk-table__cell--numeric"
+                scope="col"
+            >
+              2014
+            </th>
+            <th class="govuk-table__header govuk-table__cell--numeric"
+                scope="col"
+            >
+              2015
             </th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>
-              Column
+        <tbody class="govuk-table__body">
+          <tr class="govuk-table__row ">
+            <th class="govuk-table__header">
+              Unauthorised absence rate
+            </th>
+            <td class="govuk-table__cell govuk-table__cell--numeric">
+              3
+            </td>
+            <td class="govuk-table__cell govuk-table__cell--numeric">
+              3
+            </td>
+          </tr>
+          <tr class="govuk-table__row ">
+            <th class="govuk-table__header">
+              Overall absence rate
+            </th>
+            <td class="govuk-table__cell govuk-table__cell--numeric">
+              10
+            </td>
+            <td class="govuk-table__cell govuk-table__cell--numeric">
+              10
+            </td>
+          </tr>
+          <tr class="govuk-table__row ">
+            <th class="govuk-table__header">
+              Authorised absence rate
+            </th>
+            <td class="govuk-table__cell govuk-table__cell--numeric">
+              5
+            </td>
+            <td class="govuk-table__cell govuk-table__cell--numeric">
+              5
             </td>
           </tr>
         </tbody>
