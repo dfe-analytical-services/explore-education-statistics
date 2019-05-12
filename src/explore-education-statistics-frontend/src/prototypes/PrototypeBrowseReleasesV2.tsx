@@ -482,122 +482,157 @@ const BrowseReleasesPage = () => {
       <Accordion id="pupils-and-schools">
         <AccordionSection heading="Admission appeals" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Admissions appeals in England</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-admission-appeals#documents">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection heading="Exclusions" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <p className="govuk-body">
-              View statistics, create charts and tables and download data files
-              for fixed-period and permanent exclusion statistics
-            </p>
-            <div className="govuk-!-margin-top-0">
-              <PrototypeDownloadDropdown link="/prototypes/publication-exclusions" />
-            </div>
-          </div>
-        </AccordionSection>
-        <AccordionSection
-          heading="Not in education, employment or training (NEET) and participation"
-          caption=""
-        >
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <p className="govuk-body">
-              View statistics, create charts and tables and download data files
-              for fixed-period and permanent exclusion statistics
-            </p>
-            <div className="govuk-!-margin-top-0">
-              <PrototypeDownloadDropdown link="/prototypes/publication-exclusions" />
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>
+                  Permanent and fixed-period exclusions in England
+                </strong>{' '}
+                - view statistics, create tables and download data files{' '}
+                <div className="govuk-!-margin-top-5">
+                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
+                </div>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection heading="Pupil absence" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <p className="govuk-body">
-              View statistics, create charts and tables and download data files
-              for authorised, overall, persistent and unauthorised absence
-            </p>
-            <div className="govuk-!-margin-top-0">
-              <PrototypeDownloadDropdown />
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Pupil absence in schools in England</strong> - view
+                statistics, create tables and download data files{' '}
+                <div className="govuk-!-margin-top-5">
+                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
+                </div>
+              </li>
+              <li>
+                <strong>
+                  Pupil absence in schools in England: autumn term
+                </strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-pupil-absence#autumn-term-release">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>
+                  Pupil absence in schools in England: autumn and spring
+                </strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-pupil-absence#combined-autumn--and-spring-term-release">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+        <AccordionSection heading="Parental responsibility measures	" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Parental responsibility measures</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/parental-responsibility-measures#official-statistics">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection heading="Pupil projections" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>National pupil projections</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-pupil-projections#documents">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection heading="School and pupil numbers" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Schools, pupils and their characteristics</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-school-and-pupil-numbers#documents">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection heading="School applications" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>
+                  Secondary and primary schools applications and offers
+                </strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-school-applications#documents">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection heading="School capacity" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
-          </div>
-        </AccordionSection>
-        <AccordionSection heading="School workforce" caption="">
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>School capacity</strong> - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-school-capacity#school-capacity-data:-by-academic-year">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection heading="Special educational needs (SEN)" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Special educational needs in England</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#national-statistics-on-special-educational-needs-in-england">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>
+                  Special educational needs: analysis and summary of data
+                  sources
+                </strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#analysis-of-children-with-special-educational-needs">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>Statements on SEN and EHC plans</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#statements-of-special-educational-needs-(sen)-and-education,-health-and-care-(ehc)-plans">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
       </Accordion>
