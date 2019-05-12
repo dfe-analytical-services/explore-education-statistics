@@ -240,21 +240,38 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
       </Accordion>
-
       <h2 className="govuk-heading-l govuk-!-margin-top-9">
         Finance and funding
       </h2>
       <Accordion id="finance-and-funding">
-        <AccordionSection heading="Advanced learner loans" caption="">
+        <AccordionSection
+          heading="Local authority and school finance"
+          caption=""
+        >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Income and expenditure in academies in England</strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-local-authority-school-finance-data#academy-spending">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>LA and school expenditure</strong> - currently available
+                via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-local-authority-school-finance-data#local-authority-and-school-finance">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>Planned LA and school expenditure</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-local-authority-school-finance-data#planned-local-authority-and-school-spending-">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection
