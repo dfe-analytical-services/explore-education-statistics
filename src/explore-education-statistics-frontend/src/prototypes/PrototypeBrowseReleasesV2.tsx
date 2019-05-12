@@ -66,7 +66,7 @@ const BrowseReleasesPage = () => {
       <Accordion id="children-and-early-years">
         <AccordionSection heading="Childcare and early years" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-5">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
               <li>
                 <strong>30 hours free childcare</strong> - currently available
                 via{' '}
@@ -105,7 +105,7 @@ const BrowseReleasesPage = () => {
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-5">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
               <li>
                 <strong>Characteristics of children in need</strong> - currently
                 available via{' '}
@@ -118,7 +118,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="Children's social work workforce" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-5">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
               <li>
                 <strong>Children's social work workforce</strong> - currently
                 available via{' '}
@@ -134,7 +134,7 @@ const BrowseReleasesPage = () => {
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-5">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
               <li>
                 <strong>Early years foundation stage profile results</strong> -
                 currently available via{' '}
@@ -147,7 +147,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="Looked-after children" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-5">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
               <li>
                 <strong>
                   Children looked after in England including adoptions
@@ -169,7 +169,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="Secure children's homes" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-5">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
               <li>
                 <strong>
                   Children accommodated in secure children's homes
@@ -182,19 +182,65 @@ const BrowseReleasesPage = () => {
             </ul>
           </div>
         </AccordionSection>
-        <AccordionSection heading="Special educational needs (SEN)" caption="">
+      </Accordion>
+
+      <h2 className="govuk-heading-l govuk-!-margin-top-9">
+        Destinations of pupils and students - including NEET
+      </h2>
+      <Accordion id="destinations-pupils-and-students">
+        <AccordionSection
+          heading="Destinations of key stage 4 and key stage 5 pupils	"
+          caption=""
+        >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Destinations of KS4 and KS5 pupils</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-destinations#destinations-after-key-stage-4-and-5">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+        <AccordionSection heading="Graduate labour market" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Graduate labour market statistics</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/graduate-labour-market-quarterly-statistics#documents">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+        <AccordionSection heading="NEET and participation" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>
+                  Participation in education, training and employment
+                </strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-neet#participation-in-education,-employment-or-training">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>NEET statistics quarterly brief</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-neet#neet:-2016-to-2017-data-">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
       </Accordion>
+
       <h2 className="govuk-heading-l govuk-!-margin-top-9">
         Finance and funding
       </h2>
@@ -239,6 +285,7 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
       </Accordion>
+
       <h2 className="govuk-heading-l govuk-!-margin-top-9">
         Further education
       </h2>
