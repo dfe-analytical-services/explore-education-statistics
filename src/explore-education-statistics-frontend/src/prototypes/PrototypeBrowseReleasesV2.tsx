@@ -66,14 +66,17 @@ const BrowseReleasesPage = () => {
       <Accordion id="children-and-early-years">
         <AccordionSection heading="Childcare and early years" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-0">
+              <li>
+                30 hours free childcare - Currently available on{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#30-hours-free-childcare">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>Childcare and early years providers survey</li>
+              <li>Childcare and early years survey of parents</li>
+              <li>Education provision: children under 5 years of age</li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection
