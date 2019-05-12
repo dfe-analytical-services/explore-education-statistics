@@ -495,7 +495,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="Exclusions" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-0">
               <li>
                 <strong>
                   Permanent and fixed-period exclusions in England
@@ -636,7 +636,6 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
       </Accordion>
-
       <h2 className="govuk-heading-l govuk-!-margin-top-9">
         School and college performance - including GCSE and key stage results
       </h2>
@@ -802,102 +801,85 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
       </Accordion>
-
       <h2 className="govuk-heading-l govuk-!-margin-top-9">
         Teachers and school workforce
       </h2>
       <Accordion id="teachers-and-workforce">
-        <AccordionSection heading="Children's social work workforce" caption="">
+        <AccordionSection heading="Initial teacher training (ITT)	" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Initial teacher training performance profiles</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-teacher-training#performance-data">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>Initial teacher training: trainee number census</strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-teacher-training#census-data">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>TSM and initial teacher training allocations</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-teacher-training#teacher-supply-model-and-itt-allocations">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
-        <AccordionSection heading="Graduate labour market" caption="">
+        <AccordionSection heading="School workforce	" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
-          </div>
-        </AccordionSection>
-        <AccordionSection
-          heading="Higher education graduate employment and earnings"
-          caption=""
-        >
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
-          </div>
-        </AccordionSection>
-        <AccordionSection heading="Initial teacher training (ITT)" caption="">
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>School workforce in England</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-school-workforce#documents">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection
-          heading="Not in education, employment or training (NEET) and participation"
+          heading="Workforce statistics and analysis or Teacher workforce statistics and analysis	"
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Teachers analysis compendium</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/teacher-workforce-statistics-and-analysis#documents">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
-        <AccordionSection heading="School workforce" caption="">
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
-          </div>
-        </AccordionSection>
+      </Accordion>
+      <h2 className="govuk-heading-l govuk-!-margin-top-9">
+        UK education and training statistics
+      </h2>
+      <Accordion id="uk-statistics">
         <AccordionSection
-          heading="Workforce statistics and analysis"
+          heading="UK education and training statistics"
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Education and training statistics for the UK</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
       </Accordion>
