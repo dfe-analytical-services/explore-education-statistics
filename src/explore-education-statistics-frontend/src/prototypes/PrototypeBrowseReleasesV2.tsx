@@ -66,16 +66,37 @@ const BrowseReleasesPage = () => {
       <Accordion id="children-and-early-years">
         <AccordionSection heading="Childcare and early years" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-0">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-5">
               <li>
-                30 hours free childcare - Currently available on{' '}
+                <strong>30 hours free childcare</strong> - currently available
+                via{' '}
                 <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#30-hours-free-childcare">
                   Statistics at DfE
                 </a>
               </li>
-              <li>Childcare and early years providers survey</li>
-              <li>Childcare and early years survey of parents</li>
-              <li>Education provision: children under 5 years of age</li>
+              <li>
+                <strong>Childcare and early years providers survey</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-providers-survey">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>Childcare and early years survey of parents</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-survey-of-parents">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>
+                  Education provision: children under 5 years of age
+                </strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-survey-of-parents">
+                  Statistics at DfE
+                </a>
+              </li>
             </ul>
           </div>
         </AccordionSection>
@@ -84,14 +105,28 @@ const BrowseReleasesPage = () => {
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-5">
+              <li>
+                <strong>Characteristics of children in need</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#30-hours-free-childcare">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+        <AccordionSection heading="Children's social work workforce" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-5">
+              <li>
+                <strong>Children's social work workforce</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-childrens-social-care-workforce#statutory-collection">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection
@@ -99,38 +134,52 @@ const BrowseReleasesPage = () => {
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-5">
+              <li>
+                <strong>Early years foundation stage profile results</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-early-years-foundation-stage-profile#results-at-national-and-local-authority-level">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection heading="Looked-after children" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-5">
+              <li>
+                <strong>
+                  Children looked after in England including adoptions
+                </strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-looked-after-children#looked-after-children">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>Outcomes for children looked after by LAs</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-looked-after-children#outcomes-for-looked-after-children">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection heading="Secure children's homes" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-5">
+              <li>
+                <strong>
+                  Children accommodated in secure children's homes
+                </strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-secure-children-s-homes">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection heading="Special educational needs (SEN)" caption="">
