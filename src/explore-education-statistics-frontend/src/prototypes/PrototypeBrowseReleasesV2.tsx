@@ -477,164 +477,6 @@ const BrowseReleasesPage = () => {
       </Accordion>
 
       <h2 className="govuk-heading-l govuk-!-margin-top-9">
-        School and college performance - including GCSE and key stage results
-      </h2>
-      <Accordion id="performance">
-        <AccordionSection heading="16 to 19 attainment" caption="">
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
-              <li>
-                <strong>
-                  16 to 18 school and college performance tables or School and
-                  college performance tables in England
-                </strong>{' '}
-                - currently available via{' '}
-                <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#16-to-18-school-and-college-performance-tables">
-                  Statistics at DfE
-                </a>
-              </li>
-              <li>
-                <strong>A levels and other 16 to 18 results</strong> - currently
-                available via{' '}
-                <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#a-levels-and-other-16-to-18-results">
-                  Statistics at DfE
-                </a>
-              </li>
-              <li>
-                <strong>
-                  Level 2 and 3 attainment by young people aged 19
-                </strong>{' '}
-                - currently available via{' '}
-                <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#level-2-and-3-attainment">
-                  Statistics at DfE
-                </a>
-              </li>
-            </ul>
-          </div>
-        </AccordionSection>
-        <AccordionSection heading="GCSEs (key stage 4)	" caption="">
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
-              <li>
-                <strong>GCSE and equivalent results</strong> - View statistics,
-                create tables and download data files{' '}
-                <div className="govuk-!-margin-top-5">
-                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
-                </div>
-              </li>
-              <li>
-                <strong>Multi-academy trust performance measures</strong> -
-                currently available via{' '}
-                <a href="https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#multi-academy-trust-performance-measures">
-                  Statistics at DfE
-                </a>
-              </li>
-              <li>
-                <strong>Revised GCSE and equivalent results in England</strong>{' '}
-                - currently available via{' '}
-                <a href="https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#gcse-and-equivalent-results,-including-pupil-characteristics">
-                  Statistics at DfE
-                </a>
-              </li>
-              <li>
-                <strong>Secondary school performance tables</strong> - currently
-                available via{' '}
-                <a href="https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#secondary-school-performance-tables">
-                  Statistics at DfE
-                </a>
-              </li>
-            </ul>
-          </div>
-        </AccordionSection>
-        <AccordionSection heading="Key stage 1" caption="">
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <p className="govuk-body">
-              View statistics, create charts and tables and download data files
-              for GCSE and equivalent results in England
-            </p>
-            <div className="govuk-!-margin-top-0">
-              <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
-            </div>
-          </div>
-        </AccordionSection>
-        <AccordionSection heading="Key stage 1" caption="">
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
-          </div>
-        </AccordionSection>
-        <AccordionSection heading="Key stage 2" caption="">
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
-          </div>
-        </AccordionSection>
-        <AccordionSection heading="Outcome based success measures" caption="">
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
-          </div>
-        </AccordionSection>
-        <AccordionSection heading="Parental responsibility measures" caption="">
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
-          </div>
-        </AccordionSection>
-        <AccordionSection heading="Performance tables" caption="">
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
-          </div>
-        </AccordionSection>
-        <AccordionSection
-          heading="Widening participation in higher education"
-          caption=""
-        >
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
-          </div>
-        </AccordionSection>
-      </Accordion>
-
-      <h2 className="govuk-heading-l govuk-!-margin-top-9">
         Pupils and schools
       </h2>
       <Accordion id="pupils-and-schools">
@@ -761,7 +603,173 @@ const BrowseReleasesPage = () => {
       </Accordion>
 
       <h2 className="govuk-heading-l govuk-!-margin-top-9">
-        Teaching and workforce
+        School and college performance - including GCSE and key stage results
+      </h2>
+      <Accordion id="performance">
+        <AccordionSection heading="16 to 19 attainment" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>
+                  16 to 18 school and college performance tables or School and
+                  college performance tables in England
+                </strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#16-to-18-school-and-college-performance-tables">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>A levels and other 16 to 18 results</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#a-levels-and-other-16-to-18-results">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>
+                  Level 2 and 3 attainment by young people aged 19
+                </strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#level-2-and-3-attainment">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+        <AccordionSection heading="GCSEs (key stage 4)	" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>GCSE and equivalent results</strong> - view statistics,
+                create tables and download data files{' '}
+                <div className="govuk-!-margin-top-5">
+                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
+                </div>
+              </li>
+              <li>
+                <strong>Multi-academy trust performance measures</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#multi-academy-trust-performance-measures">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>Revised GCSE and equivalent results in England</strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#gcse-and-equivalent-results,-including-pupil-characteristics">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>Secondary school performance tables</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#secondary-school-performance-tables">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+        <AccordionSection heading="Key stage 1" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>
+                  Phonics screening check and key stage 1 assessments
+                </strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-key-stage-1#phonics-screening-check-and-key-stage-1-assessment">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+        <AccordionSection heading="Key stage 2" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>
+                  Key stage 2 national curriculum test: review outcomes
+                </strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-key-stage-2#key-stage-2-national-curriculum-tests:-review-outcomes">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>Multi-academy trust performance measures</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-key-stage-2#pupil-attainment-at-key-stage-2">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>National curriculum assessments at key stage 2</strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-key-stage-2#national-curriculum-assessments-at-key-stage-2">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>Primary school performance tables</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-key-stage-2#primary-school-performance-tables">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+        <AccordionSection heading="Outcome based success measures	" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>
+                  Outcome based success measures or Further education
+                  outcome-based success measures
+                </strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-outcome-based-success-measures#statistics">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+        <AccordionSection heading="Performance tables	" caption="">
+          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Primary school performance tables</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-performance-tables#primary-school-(key-stage-2)">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>School and college performance tables</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-performance-tables#school-and-college:-post-16-(key-stage-5)">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>Secondary school performance tables</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-performance-tables#secondary-school-(key-stage-4)">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
+          </div>
+        </AccordionSection>
+      </Accordion>
+
+      <h2 className="govuk-heading-l govuk-!-margin-top-9">
+        Teachers and school workforce
       </h2>
       <Accordion id="teachers-and-workforce">
         <AccordionSection heading="Children's social work workforce" caption="">
