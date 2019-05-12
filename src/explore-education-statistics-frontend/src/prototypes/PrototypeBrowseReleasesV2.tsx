@@ -516,9 +516,9 @@ const BrowseReleasesPage = () => {
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
               <li>
-                <strong>GCSE and equivalent results</strong> - currently
-                available via{' '}
-                <div className="govuk-!-margin-top-0">
+                <strong>GCSE and equivalent results</strong> - View statistics,
+                create tables and download data files{' '}
+                <div className="govuk-!-margin-top-5">
                   <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
                 </div>
               </li>
