@@ -389,58 +389,57 @@ const BrowseReleasesPage = () => {
 
       <h2 className="govuk-heading-l govuk-!-margin-top-9">Higher education</h2>
       <Accordion id="higher-education">
-        <AccordionSection heading="Education and training" caption="">
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
-          </div>
-        </AccordionSection>
         <AccordionSection
           heading="Higher education graduate employment and earnings"
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Graduate outcomes (LEO)</strong> - currently available
+                via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-higher-education-graduate-employment-and-earnings#documents">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection heading="Higher education statistics" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
-          </div>
-        </AccordionSection>
-        <AccordionSection
-          heading="Not in education, employment or training (NEET) and participation"
-          caption=""
-        >
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Higher education: destinations of leavers</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/official-statistics-releases#destinations-of-higher-education-leavers">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>Higher education enrolments and qualifications</strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/official-statistics-releases#higher-education-enrolments-and-qualifications">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>
+                  Performance indicators in HE or Performance indicators in
+                  higher education or Performance indicators
+                </strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/official-statistics-releases#performance-indicators">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>Staff at higher education providers in the UK</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/official-statistics-releases#staff-at-higher-education">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection
@@ -448,29 +447,31 @@ const BrowseReleasesPage = () => {
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Participation rates in higher education</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-on-higher-education-initial-participation-rates#participation-rates-in-higher-education-for-england">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection
-          heading="Widening participation in higher education"
+          heading="Widening participation in higher education	"
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Widening participation in higher education</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/widening-participation-in-higher-education#documents">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
       </Accordion>
