@@ -274,31 +274,17 @@ const BrowseReleasesPage = () => {
             </ul>
           </div>
         </AccordionSection>
-        <AccordionSection
-          heading="Local authority and school finance"
-          caption=""
-        >
+        <AccordionSection heading="Student loan forecasts	" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
-          </div>
-        </AccordionSection>
-        <AccordionSection heading="Student loan forecasts" caption="">
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Student loan forecasts for England</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-student-loan-forecasts#documents">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
       </Accordion>
