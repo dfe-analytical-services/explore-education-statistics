@@ -477,40 +477,76 @@ const BrowseReleasesPage = () => {
       </Accordion>
 
       <h2 className="govuk-heading-l govuk-!-margin-top-9">
-        Performance - including GCSE and key stage results
+        School and college performance - including GCSE and key stage results
       </h2>
       <Accordion id="performance">
         <AccordionSection heading="16 to 19 attainment" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>
+                  16 to 18 school and college performance tables or School and
+                  college performance tables in England
+                </strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#16-to-18-school-and-college-performance-tables">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>A levels and other 16 to 18 results</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#a-levels-and-other-16-to-18-results">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>
+                  Level 2 and 3 attainment by young people aged 19
+                </strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#level-2-and-3-attainment">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
-        <AccordionSection
-          heading="Destinations of key stage 4 and key stage 5 pupils"
-          caption=""
-        >
+        <AccordionSection heading="GCSEs (key stage 4)	" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>GCSE and equivalent results</strong> - currently
+                available via{' '}
+                <div className="govuk-!-margin-top-0">
+                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
+                </div>
+              </li>
+              <li>
+                <strong>Multi-academy trust performance measures</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#multi-academy-trust-performance-measures">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>Revised GCSE and equivalent results in England</strong>{' '}
+                - currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#gcse-and-equivalent-results,-including-pupil-characteristics">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>Secondary school performance tables</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#secondary-school-performance-tables">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
-        <AccordionSection
-          heading="GCSEs (key stage 4) and equivalent results"
-          caption=""
-        >
+        <AccordionSection heading="Key stage 1" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <p className="govuk-body">
               View statistics, create charts and tables and download data files
