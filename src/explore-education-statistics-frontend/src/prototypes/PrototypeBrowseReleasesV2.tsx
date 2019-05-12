@@ -288,45 +288,68 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
       </Accordion>
-
       <h2 className="govuk-heading-l govuk-!-margin-top-9">
         Further education
       </h2>
       <Accordion id="further-education">
-        <AccordionSection heading="Education and training" caption="">
+        <AccordionSection heading="Advanced learner loans" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Advanced learner loans applications</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/further-education#advanced-learner-loans-applications-2017-to-2018">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection heading="FE Choices" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>FE choices employer satisfaction survey</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/fe-choices#employer-satisfaction-survey-data">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>FE choices learner satisfaction survey</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/fe-choices#learner-satisfaction-survey-data">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection heading="Further education and skills" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Apprenticeship and levy statistics</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#apprenticeships-and-levy---older-data">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>Apprenticeships and traineeships</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#apprenticeships-and-traineeships---older-data">
+                  Statistics at DfE
+                </a>
+              </li>
+              <li>
+                <strong>Further education and skills</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#fe-and-skills---older-data">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
         <AccordionSection
@@ -334,14 +357,15 @@ const BrowseReleasesPage = () => {
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>Further education for benefits claimants</strong> -
+                currently available via{' '}
+                <a href="https://www.gov.uk/government/collections/further-education-for-benefit-claimants#documents">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
 
@@ -350,30 +374,15 @@ const BrowseReleasesPage = () => {
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
-          </div>
-        </AccordionSection>
-
-        <AccordionSection
-          heading="Not in education, employment or training (NEET) and participation"
-          caption=""
-        >
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <div className="govuk-inset-text">
-              These statistics and data are not yet available on the explore
-              education statistics service. To find and download these
-              statistics and data browse{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
-            </div>
+            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <li>
+                <strong>National achievement rates tables</strong> - currently
+                available via{' '}
+                <a href="https://www.gov.uk/government/collections/sfa-national-success-rates-tables#national-achievement-rates-tables">
+                  Statistics at DfE
+                </a>
+              </li>
+            </ul>
           </div>
         </AccordionSection>
       </Accordion>
