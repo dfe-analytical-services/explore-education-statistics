@@ -45,11 +45,7 @@ class Accordion extends Component<AccordionProps, State> {
       let locationHashEl: HTMLElement | null = null;
 
       try {
-        locationHashEl = this.ref.current.querySelector(
-          `.${classes.sectionButton}${window.location.hash},.${
-            classes.sectionContent
-          }${window.location.hash}`,
-        );
+        locationHashEl = this.ref.current.querySelector(window.location.hash);
       } catch (_) {
         return;
       }

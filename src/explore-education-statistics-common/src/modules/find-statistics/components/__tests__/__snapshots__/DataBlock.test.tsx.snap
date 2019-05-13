@@ -3,7 +3,7 @@
 exports[`DataBlock datablock renders downloads only 1`] = `
 
 <div class="govuk-datablock"
-     data-testid="DataBlock undefined"
+     data-testid="DataBlock "
 >
   <div class="govuk-tabs">
     <ul class="govuk-tabs__list"
@@ -48,7 +48,7 @@ exports[`DataBlock datablock renders downloads only 1`] = `
 exports[`DataBlock datablock renders horizontal chart 1`] = `
 
 <div class="govuk-datablock"
-     data-testid="DataBlock undefined"
+     data-testid="DataBlock "
 >
   <div class="govuk-tabs">
     <ul class="govuk-tabs__list"
@@ -695,7 +695,7 @@ exports[`DataBlock datablock renders horizontal chart 1`] = `
 exports[`DataBlock datablock renders table 1`] = `
 
 <div class="govuk-datablock"
-     data-testid="DataBlock undefined"
+     data-testid="DataBlock "
 >
   <div class="govuk-tabs">
     <ul class="govuk-tabs__list"
@@ -823,7 +823,7 @@ exports[`DataBlock datablock renders table 1`] = `
 exports[`DataBlock datablock renders vertical chart 1`] = `
 
 <div class="govuk-datablock"
-     data-testid="DataBlock undefined"
+     data-testid="DataBlock "
 >
   <div class="govuk-tabs">
     <ul class="govuk-tabs__list"
@@ -1472,7 +1472,7 @@ exports[`DataBlock datablock renders vertical chart 1`] = `
 exports[`DataBlock datablock renders vertical chart 2`] = `
 
 <div class="govuk-datablock"
-     data-testid="DataBlock undefined"
+     data-testid="DataBlock "
 >
   <div class="govuk-tabs">
     <ul class="govuk-tabs__list"

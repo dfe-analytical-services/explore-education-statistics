@@ -39,7 +39,11 @@ const Tabs = ({ children }: Props) => {
   const sectionElements: HTMLElement[] = [];
 
   const setSelectedTab = (index: number) => {
-    window.location.hash = sectionElements[index].id;
+    if (window.history.pushState) {
+      window.history.pushState(null, '', `#${sectionElements[index].id}`);
+    } else {
+      window.location.hash = sectionElements[index].id;
+    }
 
     setLoadedSections(loadedSections.add(index));
     setSelectedTabIndex(index);

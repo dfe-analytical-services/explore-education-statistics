@@ -22,6 +22,7 @@ export const classes = {
   section: 'govuk-accordion__section',
   sectionButton: 'govuk-accordion__section-button',
   sectionContent: 'govuk-accordion__section-content',
+  expanded: 'goveuk-accordion__section--expanded',
 };
 
 const AccordionSection = ({
