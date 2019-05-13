@@ -191,6 +191,7 @@ class TableToolPage extends Component<{}, State> {
       indicators,
       timePeriods,
       publication,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       subjectName,
       subjectMeta,
       subjects,
@@ -275,9 +276,7 @@ class TableToolPage extends Component<{}, State> {
             {stepProps => (
               <>
                 <WizardStepHeading {...stepProps}>
-                  {publication && subjectName
-                    ? `Explore ${subjectName} for ${publication.title}`
-                    : 'Explore data'}
+                  Explore data
                 </WizardStepHeading>
 
                 {tableData.length > 0 && (
