@@ -250,12 +250,16 @@ class PublicationReleasePage extends Component<Props> {
         </div>
         <hr />
         <h2>Headline facts and figures - {data.releaseName}</h2>
-        {data.keyStatistics && <DataBlock {...data.keyStatistics} />}
+
+        {data.keyStatistics && (
+          <DataBlock {...data.keyStatistics} id="keystats" />
+        )}
+
         {data.content.length > 0 && (
           <Accordion id="contents-sections">
             {data.content.map(({ heading, caption, order, content }) => (
               <AccordionSection heading={heading} caption={caption} key={order}>
-                <ContentBlock content={content} />
+                <ContentBlock content={content} id={`content_${order}`} />
               </AccordionSection>
             ))}
           </Accordion>

@@ -5,9 +5,9 @@ import { MapFeature } from '@common/modules/find-statistics/components/charts/Ma
 import SummaryRenderer, {
   SummaryRendererProps,
 } from '@common/modules/find-statistics/components/SummaryRenderer';
-import TableRenderer2, {
+import TableRenderer, {
   Props as TableRendererProps,
-} from '@common/modules/find-statistics/components/TableRenderer2';
+} from '@common/modules/find-statistics/components/TableRenderer';
 import {
   Chart,
   DataQuery,
@@ -26,6 +26,7 @@ import ChartRenderer, {
 } from '@common/modules/find-statistics/components/ChartRenderer';
 
 export interface DataBlockProps {
+  id: string;
   type: string;
   heading?: string;
   dataBlockRequest?: DataBlockRequest;
@@ -116,9 +117,13 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
   }
 
   public render() {
-    const id = new Date().getDate();
-
-    const { heading, height, showTables, additionalTabContent } = this.props;
+    const {
+      heading = '',
+      height,
+      showTables,
+      additionalTabContent,
+      id,
+    } = this.props;
     const { charts, summary, tables } = this.state;
 
     return (
@@ -137,7 +142,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
               {tables.map((table, idx) => {
                 const key = `${id}0_table_${idx}`;
 
-                return <TableRenderer2 key={key} {...table} />;
+                return <TableRenderer key={key} {...table} />;
               })}
               {additionalTabContent}
             </TabsSection>

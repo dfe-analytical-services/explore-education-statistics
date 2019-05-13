@@ -19,10 +19,10 @@ describe('DataBlock', () => {
   const dataBlockRequest: DataBlockRequest = {
     subjectId: 1,
     geographicLevel: GeographicLevel.National,
-    startYear: 2014,
-    endYear: 2015,
-    filters: [1, 2],
-    indicators: [23, 26, 28],
+    startYear: '2014',
+    endYear: '2015',
+    filters: ['1', '2'],
+    indicators: ['23', '26', '28'],
   };
 
   const summary: Summary = {
@@ -42,6 +42,7 @@ describe('DataBlock', () => {
 
     const { container } = render(
       <DataBlock
+        id="test"
         type="datablock"
         dataBlockRequest={dataBlockRequest}
         showTables={false}
@@ -69,6 +70,7 @@ describe('DataBlock', () => {
 
     const { container } = render(
       <DataBlock
+        id="test"
         type="datablock"
         dataBlockRequest={dataBlockRequest}
         showTables={false}
@@ -119,6 +121,7 @@ describe('DataBlock', () => {
 
     const { container } = render(
       <DataBlock
+        id="test"
         type="datablock"
         dataBlockRequest={dataBlockRequest}
         showTables={false}
@@ -168,6 +171,7 @@ describe('DataBlock', () => {
 
     const { container } = render(
       <DataBlock
+        id="test"
         type="datablock"
         dataBlockRequest={dataBlockRequest}
         showTables={false}
@@ -217,6 +221,7 @@ describe('DataBlock', () => {
 
     const { container } = render(
       <DataBlock
+        id="test"
         type="datablock"
         dataBlockRequest={dataBlockRequest}
         showTables
@@ -239,7 +244,8 @@ describe('DataBlock', () => {
 
     const { container } = render(
       <DataBlock
-        type="datablock"
+        id="test"
+        type="databock"
         dataBlockRequest={dataBlockRequest}
         showTables={false}
         summary={summary}

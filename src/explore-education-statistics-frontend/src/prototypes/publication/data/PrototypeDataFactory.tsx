@@ -3,9 +3,11 @@ import { DataBlockProps } from '@common/modules/find-statistics/components/DataB
 import { ChartProps } from 'explore-education-statistics-common/src/modules/find-statistics/components/charts/ChartFunctions';
 import { GeographicLevel } from 'explore-education-statistics-common/src/services/dataBlockService';
 import React from 'react';
+import TimePeriod from 'explore-education-statistics-common/src/services/types/TimePeriod';
 
 export const newApiTest: DataBlockProps = {
   type: 'datablock',
+  id: 'test',
   dataBlockRequest: {
     subjectId: 1,
     regions: [],
@@ -13,10 +15,10 @@ export const newApiTest: DataBlockProps = {
     localAuthorities: [],
     countries: [],
     geographicLevel: GeographicLevel.National,
-    startYear: 2014,
-    endYear: 2017,
-    indicators: [23, 26, 28],
-    filters: [1, 2],
+    startYear: '2014',
+    endYear: '2017',
+    indicators: ['23', '26', '28'],
+    filters: ['1', '2'],
   },
 };
 
@@ -93,7 +95,7 @@ export const newApiHorizontalData: ChartProps = {
     filters: {
       '1': {
         label: 'All Schools',
-        value: 1,
+        value: '1',
       },
     },
 
@@ -101,29 +103,23 @@ export const newApiHorizontalData: ChartProps = {
       '23': {
         label: 'Unauthorised absence rate',
         unit: '%',
-        value: 23,
+        value: '23',
       },
       '26': {
         label: 'Overall absence rate',
         unit: '%',
-        value: 26,
+        value: '26',
       },
       '28': {
         label: 'Authorised absence rate',
         unit: '%',
-        value: 28,
+        value: '28',
       },
     },
 
     timePeriods: {
-      '2014': {
-        label: '2014',
-        value: 2014,
-      },
-      '2015': {
-        label: '2015',
-        value: 2015,
-      },
+      '2014': new TimePeriod(2014, 'HT6'),
+      '2015': new TimePeriod(2015, 'HT6'),
     },
   },
 
