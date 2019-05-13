@@ -276,10 +276,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                         {
                             subjectId= 1,
                             geographicLevel= "National",
-                            startYear= 2016,
-                            endYear= 2017,
-                            filters= new List<int>{1,2},
-                            indicators= new List<int>{23, 26, 28}
+                            startYear= "2016",
+                            endYear= "2017",
+                            filters= new List<string>{"1","2"},
+                            indicators= new List<string>{"23", "26", "28"}
                         },
 
                         Summary = new Summary
@@ -332,10 +332,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                     {
                                         subjectId= 1,
                                         geographicLevel= "National",
-                                        startYear= 2012,
-                                        endYear= 2017,
-                                        filters= new List<int>{1,2},
-                                        indicators= new List<int>{23, 26, 28}
+                                        startYear= "2012",
+                                        endYear= "2017",
+                                        filters= new List<string>{"1","2"},
+                                        indicators= new List<string>{"23", "26", "28"}
+                                    },
+                                    Tables = new List<Table> {
+                                        new Table {
+                                            indicators = new List<string> { "23", "26", "28" }
+                                        }
                                     },
                                     Charts = new List<IContentBlockChart>
                                     {

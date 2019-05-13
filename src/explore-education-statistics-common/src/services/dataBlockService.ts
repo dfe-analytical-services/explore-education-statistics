@@ -69,7 +69,7 @@ export interface DataBlockData {
 
 interface LabelValueMetadata {
   label: string;
-  value: number;
+  value: string;
 }
 
 interface LabelValueUnitMetadata extends LabelValueMetadata {
@@ -131,14 +131,14 @@ export interface DataBlockMetadata {
 export interface DataBlockRequest {
   subjectId: number;
   geographicLevel: GeographicLevel;
-  countries?: number[];
-  localAuthorities?: number[];
-  localAuthorityDistricts?: number[];
-  regions?: number[];
-  startYear: number;
-  endYear: number;
-  filters: number[];
-  indicators: number[];
+  countries?: string[];
+  localAuthorities?: string[];
+  localAuthorityDistricts?: string[];
+  regions?: string[];
+  startYear: string;
+  endYear: string;
+  filters: string[];
+  indicators: string[];
 }
 
 export interface DataBlockResponse {
@@ -146,9 +146,9 @@ export interface DataBlockResponse {
   data: DataBlockData;
 }
 
-function mapOptions<T extends LabelValueMetadata>(ids: number[], options: T[]) {
+function mapOptions<T extends LabelValueMetadata>(ids: string[], options: T[]) {
   return Object.values(options).reduce((results, option) => {
-    if (ids.includes(+option.value)) {
+    if (ids.includes(option.value)) {
       return { ...results, [option.value]: option };
     }
 
@@ -175,7 +175,7 @@ function mapTimePeriodOptions(
 function mapOptionsMap<
   R extends LabelValueMetadata,
   T extends OptionListMetadata<R>
->(ids: number[], options: ObjectMap<T>): ObjectMap<R> {
+>(ids: string[], options: ObjectMap<T>): ObjectMap<R> {
   return Object.values(options).reduce(
     (mapped, option) => ({ ...mapped, ...mapOptions(ids, option.options) }),
     {},
@@ -183,14 +183,14 @@ function mapOptionsMap<
 }
 
 function remapIndicators(
-  indicatorIds: number[],
+  indicatorIds: string[],
   { indicators }: ResponseMetaData,
 ): ObjectMap<LabelValueUnitMetadata> {
   return mapOptionsMap(indicatorIds, indicators);
 }
 
 function remapFilters(
-  filterIds: number[],
+  filterIds: string[],
   { filters }: ResponseMetaData,
 ): ObjectMap<LabelValueMetadata> {
   return Object.values(filters).reduce(
