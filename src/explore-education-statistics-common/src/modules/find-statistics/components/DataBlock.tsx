@@ -26,6 +26,7 @@ import ChartRenderer, {
 } from '@common/modules/find-statistics/components/ChartRenderer';
 
 export interface DataBlockProps {
+  id: string;
   type: string;
   heading?: string;
   dataBlockRequest?: DataBlockRequest;
@@ -116,9 +117,13 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
   }
 
   public render() {
-    const id = new Date().getDate();
-
-    const { heading, height, showTables, additionalTabContent } = this.props;
+    const {
+      heading,
+      height,
+      showTables,
+      additionalTabContent,
+      id,
+    } = this.props;
     const { charts, summary, tables } = this.state;
 
     return (

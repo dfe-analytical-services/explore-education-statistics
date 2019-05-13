@@ -16,7 +16,7 @@ interface Props {
 
 class EditableContentSubBlockRenderer extends Component<Props> {
   public render() {
-    const { block, editable, onContentChange } = this.props;
+    const { block, editable, onContentChange, id } = this.props;
 
     switch (block.type) {
       case 'MarkDownBlock':
@@ -52,6 +52,7 @@ class EditableContentSubBlockRenderer extends Component<Props> {
           <div className="dfe-content-overflow">
             <DataBlock
               {...block}
+              id={`${id}_datablock`}
               additionalTabContent={
                 <>
                   <h2 className="govuk-heading-m govuk-!-margin-top-9">
