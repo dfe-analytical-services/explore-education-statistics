@@ -114,6 +114,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       legendSize="s"
                       hint="Select at least one indicator"
                       error={getError('indicators')}
+                      selectAll
                       options={Object.entries(specification.indicators).map(
                         ([_, group]) => {
                           return {
