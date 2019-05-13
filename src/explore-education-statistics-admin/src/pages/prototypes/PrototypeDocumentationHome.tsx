@@ -15,7 +15,9 @@ const BrowseReleasesPage = () => {
             <Link to="/prototypes/documentation/style-guide">Style guide</Link>
           </h4>
           <p className="govuk-caption-m govuk-!-margin-top-1">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.{' '}
+            Browse our A to Z list of style, spelling and grammar conventions
+            for all content published on the explore education statistics
+            service
           </p>
         </div>
         <div className="govuk-grid-column-one-third">
@@ -23,7 +25,8 @@ const BrowseReleasesPage = () => {
             <Link to="/prototypes/documentation/glossary">A-Z Glossary</Link>
           </h4>
           <p className="govuk-caption-m govuk-!-margin-top-1">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.{' '}
+            Browse our A to Z list of definitions for terms used across
+            education statistics and data{' '}
           </p>
         </div>
       </div>
