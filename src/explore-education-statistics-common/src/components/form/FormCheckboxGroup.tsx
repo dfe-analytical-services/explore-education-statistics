@@ -15,6 +15,7 @@ import FormCheckbox, {
   CheckboxChangeEventHandler,
   FormCheckboxProps,
 } from './FormCheckbox';
+import styles from './FormCheckboxGroup.module.scss';
 import FormFieldset, { FormFieldsetProps } from './FormFieldset';
 
 export type CheckboxOption = PartialBy<
@@ -130,7 +131,11 @@ export class BaseFormCheckboxGroup extends PureComponent<
         ref={this.ref}
       >
         {options.length > 1 && selectAll && (
-          <ButtonText id={`${id}-all`} onClick={this.handleAllChange}>
+          <ButtonText
+            id={`${id}-all`}
+            onClick={this.handleAllChange}
+            className={styles.selectAll}
+          >
             {isAllChecked ? 'Unselect' : 'Select'} all {options.length} options
           </ButtonText>
         )}

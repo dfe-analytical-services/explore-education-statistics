@@ -176,6 +176,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
                 options: [
                   { value: '3', label: 'Checkbox 3' },
                   { value: '4', label: 'Checkbox 4' },
+                  { value: '5', label: 'Checkbox 5' },
                 ],
               },
             ]}
