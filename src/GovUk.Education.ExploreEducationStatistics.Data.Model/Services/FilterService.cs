@@ -1,8 +1,5 @@
-using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
@@ -12,20 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         public FilterService(ApplicationDbContext context,
             ILogger<FilterService> logger) : base(context, logger)
         {
-        }
-
-        public IEnumerable<Filter> GetFilters(long subjectId,
-            IEnumerable<int> years = null,
-            IEnumerable<string> countries = null,
-            IEnumerable<string> regions = null,
-            IEnumerable<string> localAuthorities = null,
-            IEnumerable<string> localAuthorityDistricts = null)
-        {
-            // TODO DFE-609 fields are ignored
-
-            return DbSet().AsNoTracking().Where(filter => filter.SubjectId == subjectId)
-                .Include(filter => filter.FilterGroups)
-                .ThenInclude(group => group.FilterItems);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class MetaService : IMetaService
     {
-        private readonly IFilterService _filterService;
+        private readonly IFilterItemService _filterItemService;
         private readonly IIndicatorGroupService _indicatorGroupService;
         private readonly IObservationService _observationService;
         private readonly IReleaseService _releaseService;
@@ -22,14 +22,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly IMapper _mapper;
 
         public MetaService(
-            IFilterService filterService,
+            IFilterItemService filterItemService,
             IIndicatorGroupService indicatorGroupService,
             IObservationService observationService,
             IReleaseService releaseService,
             ISubjectService subjectService,
             IMapper mapper)
         {
-            _filterService = filterService;
+            _filterItemService = filterItemService;
             _indicatorGroupService = indicatorGroupService;
             _observationService = observationService;
             _releaseService = releaseService;
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 // TODO throw exception
                 return null;
             }
-            
+
             return new SubjectMetaViewModel
             {
                 Filters = GetFilters(subject.Id, query),
@@ -134,30 +134,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             long subjectId,
             SubjectMetaQueryContext query = null)
         {
-            return _filterService.GetFilters(subjectId,
+            var filterItems = _filterItemService.GetFilterItems(subjectId,
                 GetYears(query),
                 query?.Countries,
                 query?.LocalAuthorities,
                 query?.LocalAuthorityDistricts,
-                query?.Regions).ToDictionary(
-                filter => filter.Label.PascalCase(),
-                filter => new LegendOptionsMetaValueModel<Dictionary<string,
-                    LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>
-                {
-                    Hint = filter.Hint,
-                    Legend = filter.Label,
-                    Options = filter.FilterGroups.ToDictionary(
-                        group => group.Label.PascalCase(),
-                        group => new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
-                        {
-                            Label = group.Label,
-                            Options = group.FilterItems.Select(item => new LabelValueViewModel
-                            {
-                                Label = item.Label,
-                                Value = item.Id.ToString()
-                            })
-                        })
-                });
+                query?.Regions);
+
+            return filterItems
+                .GroupBy(item => item.FilterGroup.Filter)
+                .ToDictionary(
+                    itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),
+                    itemsGroupedByFilter => new LegendOptionsMetaValueModel<Dictionary<string,
+                        LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>
+                    {
+                        Hint = itemsGroupedByFilter.Key.Hint,
+                        Legend = itemsGroupedByFilter.Key.Label,
+                        Options = itemsGroupedByFilter.GroupBy(item => item.FilterGroup).ToDictionary(
+                            itemsGroupedByFilterGroup => itemsGroupedByFilterGroup.Key.Label.PascalCase(),
+                            itemsGroupedByFilterGroup =>
+                                new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                                {
+                                    Label = itemsGroupedByFilterGroup.Key.Label,
+                                    Options = itemsGroupedByFilterGroup.Select(item => new LabelValueViewModel
+                                    {
+                                        Label = item.Label,
+                                        Value = item.Id.ToString()
+                                    })
+                                })
+                    });
         }
 
         private static IEnumerable<int> GetYears(SubjectMetaQueryContext query)
