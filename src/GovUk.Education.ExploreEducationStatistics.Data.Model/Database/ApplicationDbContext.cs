@@ -144,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.Institution,
-                    builder => builder.HasIndex(institution => institution.Id));
+                    builder => builder.HasIndex(institution => institution.Code));
         }
         
         private static void ConfigureLocalEnterprisePartnership(ModelBuilder modelBuilder)
@@ -158,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.Mat,
-                    builder => builder.HasIndex(mat => mat.Id));
+                    builder => builder.HasIndex(mat => mat.Code));
         }
         
         private static void ConfigureMayoralCombinedAuthority(ModelBuilder modelBuilder)
@@ -186,7 +186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.Provider,
-                    builder => builder.HasIndex(provider => provider.Urn));
+                    builder => builder.HasIndex(provider => provider.Code));
         }
         
         private static void ConfigureWard(ModelBuilder modelBuilder)

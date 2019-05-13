@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    public class ParliamentaryConstituency
+    public class ParliamentaryConstituency : IObservationalUnit
     {
         [JsonProperty(PropertyName = "pcon_code")]
         public string Code { get; set; }

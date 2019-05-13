@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    public class LocalEnterprisePartnership
+    public class LocalEnterprisePartnership : IObservationalUnit
     {
 
         [JsonProperty(PropertyName = "local_enterprise_partnership_code")]

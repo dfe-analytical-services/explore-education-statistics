@@ -2,10 +2,10 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    public class Institution
+    public class Institution : IObservationalUnit
     {
         [JsonProperty(PropertyName = "institution_id")]
-        public string Id { get; set; }
+        public string Code { get; set; }
 
         [JsonProperty(PropertyName = "institution_name")]
         public string Name { get; set; }
@@ -14,9 +14,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         {
         }
 
-        public Institution(string id, string name)
+        public Institution(string code, string name)
         {
-            Id = id;
+            Code = code;
             Name = name;
         }
 
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         protected bool Equals(Institution other)
         {
-            return string.Equals(Id, other.Id);
+            return string.Equals(Code, other.Code);
         }
 
         public override bool Equals(object obj)
@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         public override int GetHashCode()
         {
-            return (Id != null ? Id.GetHashCode() : 0);
+            return (Code != null ? Code.GetHashCode() : 0);
         }
     }
 }

@@ -2,11 +2,11 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    public class Provider
+    public class Provider: IObservationalUnit
     {
 
         [JsonProperty(PropertyName = "provider_urn")]
-        public string Urn { get; set; }
+        public string Code { get; set; }
 
         [JsonProperty(PropertyName = "provider_ukprn")]
         public string Ukprn { get; set; }
@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         public Provider(string urn, string ukprn, string upin, string name)
         {
-            Urn = urn;
+            Code = urn;
             Ukprn = ukprn;
             Upin = upin;
             Name = name;
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         protected bool Equals(Provider other)
         {
-            return string.Equals(Urn, other.Urn);
+            return string.Equals(Code, other.Code);
         }
 
         public override bool Equals(object obj)
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         public override int GetHashCode()
         {
-            return (Urn != null ? Urn.GetHashCode() : 0);
+            return (Code != null ? Code.GetHashCode() : 0);
         }
     }
 }

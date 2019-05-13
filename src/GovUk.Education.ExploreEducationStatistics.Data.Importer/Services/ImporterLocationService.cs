@@ -90,12 +90,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             
             if (institution != null)
             {
-                stringBuilder.Append(separator).Append(institution.Id);
+                stringBuilder.Append(separator).Append(institution.Code);
             }
             
             if (mat != null)
             {
-                stringBuilder.Append(separator).Append(mat.Id);
+                stringBuilder.Append(separator).Append(mat.Code);
             }
             
             if (mayoralCombinedAuthority != null)
@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             
             if (provider != null)
             {
-                stringBuilder.Append(separator).Append(provider.Urn);
+                stringBuilder.Append(separator).Append(provider.Code);
             }
             
             if (ward != null)
@@ -203,13 +203,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             if (institution != null)
             {
                 predicateBuilder = predicateBuilder.And(location =>
-                    location.Institution.Id == institution.Id);
+                    location.Institution.Code == institution.Code);
             }
             
             if (mat != null)
             {
                 predicateBuilder = predicateBuilder.And(location =>
-                    location.Mat.Id == mat.Id);
+                    location.Mat.Code == mat.Code);
             }
             
             if (mayoralCombinedAuthority != null)
@@ -233,7 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             if (provider != null)
             {
                 predicateBuilder = predicateBuilder.And(location =>
-                    location.Provider.Urn == provider.Urn);
+                    location.Provider.Code == provider.Code);
             }
             
             if (ward != null)

@@ -292,13 +292,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                                 .ValueGeneratedOnAdd()
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                            b1.Property<string>("Id");
+                            b1.Property<string>("Code");
 
                             b1.Property<string>("Name");
 
                             b1.HasKey("LocationId");
 
-                            b1.HasIndex("Id");
+                            b1.HasIndex("Code");
 
                             b1.ToTable("Location");
 
@@ -382,13 +382,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                                 .ValueGeneratedOnAdd()
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                            b1.Property<string>("Id");
+                            b1.Property<string>("Code");
 
                             b1.Property<string>("Name");
 
                             b1.HasKey("LocationId");
 
-                            b1.HasIndex("Id");
+                            b1.HasIndex("Code");
 
                             b1.ToTable("Location");
 
@@ -470,17 +470,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                                 .ValueGeneratedOnAdd()
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                            b1.Property<string>("Code");
+
                             b1.Property<string>("Name");
 
                             b1.Property<string>("Ukprn");
 
                             b1.Property<string>("Upin");
 
-                            b1.Property<string>("Urn");
-
                             b1.HasKey("LocationId");
 
-                            b1.HasIndex("Urn");
+                            b1.HasIndex("Code");
 
                             b1.ToTable("Location");
 
