@@ -13,7 +13,9 @@ import mapValues from 'lodash/mapValues';
 import React, { Component } from 'react';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
 import LocationFiltersForm from './components/LocationFiltersForm';
-import PublicationForm from './components/PublicationForm';
+import PublicationForm, {
+  PublicationFormSubmitHandler,
+} from './components/PublicationForm';
 import PublicationSubjectForm, {
   PublicationSubjectFormSubmitHandler,
 } from './components/PublicationSubjectForm';
@@ -24,32 +26,47 @@ import Wizard from './components/Wizard';
 import WizardStep from './components/WizardStep';
 import WizardStepHeading from './components/WizardStepHeading';
 
-const defaultPublicationOptions = [
+export interface PublicationOptions {
+  id: string;
+  title: string;
+  topics: {
+    id: string;
+    title: string;
+    publications: {
+      id: string;
+      title: string;
+      slug: string;
+    }[];
+  }[];
+}
+
+const defaultPublicationOptions: PublicationOptions[] = [
   {
     id: 'early-years-and-schools',
-    name: 'Early years and schools',
+    title: 'Early years and schools',
     topics: [
       {
         id: 'absence-and-exclusions',
-        name: 'Absence and exclusions',
+        title: 'Absence and exclusions',
         publications: [
           {
             id: 'cbbd299f-8297-44bc-92ac-558bcf51f8ad',
-            name: 'Pupil absence',
+            title: 'Pupil absence',
+            slug: '/statistics/pupil-absence-in-schools-in-england',
           },
           // {
           //   id: 'bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9',
-          //   name: 'Exclusions',
+          //   title: 'Exclusions',
           // },
         ],
       },
       {
         id: 'school-and-pupil-numbers',
-        name: 'School and pupil numbers',
+        title: 'School and pupil numbers',
         publications: [
           // {
           //   id: 'a91d9e05-be82-474c-85ae-4913158406d0',
-          //   name: 'Schools, pupils and their characteristics',
+          //   title: 'Schools, pupils and their characteristics',
           // },
         ],
       },
@@ -66,7 +83,7 @@ interface State {
     [key: string]: FilterOption[];
   };
   indicators: IndicatorOption[];
-  publicationName: string;
+  publication?: PublicationOptions['topics'][0]['publications'][0];
   subjects: PublicationSubject[];
   subjectId: string;
   subjectName: string;
@@ -81,7 +98,6 @@ class TableToolPage extends Component<{}, State> {
     // eslint-disable-next-line react/no-unused-state
     locations: {},
     indicators: [],
-    publicationName: '',
     subjectName: '',
     subjectId: '',
     subjectMeta: {
@@ -98,14 +114,15 @@ class TableToolPage extends Component<{}, State> {
     tableData: [],
   };
 
-  private handlePublicationFormSubmit = async ({
+  private handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId,
-    publicationName,
-  }: {
-    publicationId: string;
-    publicationName: string;
   }) => {
-    if (!publicationId) {
+    const publication = defaultPublicationOptions
+      .flatMap(option => option.topics)
+      .flatMap(option => option.publications)
+      .find(option => option.id === publicationId);
+
+    if (!publication) {
       return;
     }
 
@@ -114,9 +131,9 @@ class TableToolPage extends Component<{}, State> {
     );
 
     this.setState({
-      publicationName,
-      subjectName: '',
+      publication,
       subjects,
+      subjectName: '',
       tableData: [],
     });
   };
@@ -173,7 +190,7 @@ class TableToolPage extends Component<{}, State> {
       filters,
       indicators,
       timePeriods,
-      publicationName,
+      publication,
       subjectName,
       subjectMeta,
       subjects,
@@ -258,32 +275,43 @@ class TableToolPage extends Component<{}, State> {
             {stepProps => (
               <>
                 <WizardStepHeading {...stepProps}>
-                  Explore {subjectName} for {publicationName}
+                  {publication && subjectName
+                    ? `Explore ${subjectName} for ${publication.title}`
+                    : 'Explore data'}
                 </WizardStepHeading>
 
                 {tableData.length > 0 && (
-                  <TimePeriodDataTable
-                    filters={filters}
-                    indicators={indicators}
-                    timePeriods={timePeriods}
-                    results={tableData}
-                  />
-                )}
+                  <>
+                    <div className="govuk-!-margin-bottom-2">
+                      <TimePeriodDataTable
+                        filters={filters}
+                        indicators={indicators}
+                        timePeriods={timePeriods}
+                        results={tableData}
+                      />
+                    </div>
 
-                <ul className="govuk-list">
-                  <li>
-                    <a href="#download">Download data (.csv)</a>
-                  </li>
-                  <li>
-                    <a href="#api">Access developer API</a>
-                  </li>
-                  <li>
-                    <a href="#methodology">Methodology</a>
-                  </li>
-                  <li>
-                    <a href="#contact">Contact</a>
-                  </li>
-                </ul>
+                    <ul className="govuk-list">
+                      {publication && (
+                        <li>
+                          <a href={publication.slug}>Go to publication</a>
+                        </li>
+                      )}
+                      <li>
+                        <a href="#download">Download data (.csv)</a>
+                      </li>
+                      <li>
+                        <a href="#api">Access developer API</a>
+                      </li>
+                      <li>
+                        <a href="#methodology">Methodology</a>
+                      </li>
+                      <li>
+                        <a href="#contact">Contact</a>
+                      </li>
+                    </ul>
+                  </>
+                )}
               </>
             )}
           </WizardStep>
