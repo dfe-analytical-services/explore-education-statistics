@@ -77,8 +77,8 @@ describe('FormFieldCheckboxSearchGroup', () => {
     expect(checkbox.checked).toBe(false);
   });
 
-  test('checking `Select all` option checks all values', () => {
-    const { getByLabelText } = render(
+  test('clicking `Select all 3 options` button checks all values', () => {
+    const { getByLabelText, getByText } = render(
       <Formik
         initialValues={{
           test: [],
@@ -100,7 +100,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
       />,
     );
 
-    fireEvent.click(getByLabelText('Select all'));
+    fireEvent.click(getByText('Select all 3 options'));
 
     expect((getByLabelText('Checkbox 1') as HTMLInputElement).checked).toBe(
       true,
@@ -113,8 +113,8 @@ describe('FormFieldCheckboxSearchGroup', () => {
     );
   });
 
-  test('un-checking `Select all` option un-checks all values', () => {
-    const { getByLabelText } = render(
+  test('clicking `Unselect all 3 options` button un-checks all values', () => {
+    const { getByLabelText, getByText } = render(
       <Formik
         initialValues={{
           test: ['1', '2', '3'],
@@ -144,15 +144,15 @@ describe('FormFieldCheckboxSearchGroup', () => {
     expect(checkbox2.checked).toBe(true);
     expect(checkbox3.checked).toBe(true);
 
-    fireEvent.click(getByLabelText('Select all'));
+    fireEvent.click(getByText('Unselect all 3 options'));
 
     expect(checkbox1.checked).toBe(false);
     expect(checkbox2.checked).toBe(false);
     expect(checkbox3.checked).toBe(false);
   });
 
-  test('checking all options checks the `Select all` checkbox', async () => {
-    const { getByLabelText } = render(
+  test('checking all options renders the `Unselect all 3 options` button', async () => {
+    const { getByLabelText, queryByText } = render(
       <Formik
         initialValues={{
           test: [],
@@ -177,10 +177,10 @@ describe('FormFieldCheckboxSearchGroup', () => {
     const checkbox1 = getByLabelText('Checkbox 1') as HTMLInputElement;
     const checkbox2 = getByLabelText('Checkbox 2') as HTMLInputElement;
     const checkbox3 = getByLabelText('Checkbox 3') as HTMLInputElement;
-    const selectAll = getByLabelText('Select all') as HTMLInputElement;
 
     expect(checkbox1.checked).toBe(false);
-    expect(selectAll.checked).toBe(false);
+    expect(queryByText('Select all 3 options')).not.toBeNull();
+    expect(queryByText('Unselect all 3 options')).toBeNull();
 
     fireEvent.click(checkbox1);
     fireEvent.click(checkbox2);
@@ -191,11 +191,13 @@ describe('FormFieldCheckboxSearchGroup', () => {
     expect(checkbox1.checked).toBe(true);
     expect(checkbox2.checked).toBe(true);
     expect(checkbox3.checked).toBe(true);
-    expect(selectAll.checked).toBe(true);
+
+    expect(queryByText('Select all 3 options')).toBeNull();
+    expect(queryByText('Unselect all 3 options')).not.toBeNull();
   });
 
-  test('un-checking any options un-checks the `Select all` checkbox ', async () => {
-    const { getByLabelText } = render(
+  test('un-checking any options renders the `Select all 3 options` button ', async () => {
+    const { getByLabelText, queryByText } = render(
       <Formik
         initialValues={{
           test: ['1', '2', '3'],
@@ -218,17 +220,18 @@ describe('FormFieldCheckboxSearchGroup', () => {
     );
 
     const checkbox = getByLabelText('Checkbox 1') as HTMLInputElement;
-    const selectAll = getByLabelText('Select all') as HTMLInputElement;
 
     expect(checkbox.checked).toBe(true);
-    expect(selectAll.checked).toBe(true);
+    expect(queryByText('Unselect all 3 options')).not.toBeNull();
+    expect(queryByText('Select all 3 options')).toBeNull();
 
     fireEvent.click(checkbox);
 
     await wait();
 
     expect(checkbox.checked).toBe(false);
-    expect(selectAll.checked).toBe(false);
+    expect(queryByText('Unselect all 3 options')).toBeNull();
+    expect(queryByText('Select all 3 options')).not.toBeNull();
   });
 
   describe('error messages', () => {
