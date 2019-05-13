@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return new SubjectMetaViewModel
             {
                 Filters = GetFilters(subject.Id, query),
-                Indicators = GetIndicators(subject.Id, query),
+                Indicators = GetIndicators(subject.Id),
                 Locations = GetObservationalUnits(subject.Id, query),
                 TimePeriod = GetTimePeriods(subject.Id, query)
             };
@@ -117,15 +117,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         private Dictionary<string, LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>> GetIndicators(
-            long subjectId,
-            SubjectMetaQueryContext query = null)
+            long subjectId)
         {
-            return _indicatorGroupService.GetIndicatorGroups(subjectId,
-                GetYears(query),
-                query?.Countries,
-                query?.LocalAuthorities,
-                query?.LocalAuthorityDistricts,
-                query?.Regions).ToDictionary(
+            return _indicatorGroupService.GetIndicatorGroups(subjectId).ToDictionary(
                 group => group.Label.PascalCase(),
                 group => new LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>
                 {
