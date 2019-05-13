@@ -9,7 +9,7 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Go to Table Tool page
     [Tags]  HappyPath
-    user goes to url  ${url}/prototypes/table-tool
+    user goes to url  ${url}/table-tool
     user waits until page contains   Create your own tables online
 
 Select "Pupil absence" publication
@@ -17,12 +17,14 @@ Select "Pupil absence" publication
     user clicks details    css:[data-testid="Early years and schools"]
     user clicks details    css:[data-testid="Absence and exclusions"]
     user clicks element    css:[data-testid="Pupil absence"]
-    user waits until page contains    2. Choose your area of interest
+    user clicks element    css:#publicationForm-submit
+    user waits until page contains    Choose a subject
 
 Select "Geographic levels" area of interest
-    [Tags]  HappyPath  UnderConstruction
-    user clicks element   css:#geoglevels
-    user waits until page contains    3. Choose your filters for 'Pupil absence'
+    [Tags]  HappyPath   UnderConstruction
+    user clicks element   css:[data-testid="Absence by geographic level"]
+    user clicks element   css:#publicationSubjectForm-submit
+    user waits until page contains    Choose locations
 
 Select Location "National"
     [Tags]  HappyPath  UnderConstruction
