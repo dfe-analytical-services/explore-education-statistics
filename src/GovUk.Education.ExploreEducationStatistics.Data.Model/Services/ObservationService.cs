@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -97,66 +98,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             };
         }
 
-        public IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(long subjectId,
-            IEnumerable<int> years = null,
-            IEnumerable<string> countries = null,
-            IEnumerable<string> regions = null,
-            IEnumerable<string> localAuthorities = null,
-            IEnumerable<string> localAuthorityDistricts = null)
+        public IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(SubjectMetaQueryContext query)
         {
-            var predicate = PredicateBuilder.True<Observation>()
-                .And(observation => observation.SubjectId == subjectId);
-
-            if (years != null && years.Any())
-            {
-                predicate = predicate.And(observation =>
-                    years.Contains(observation.Year));
-            }
-
-            if (countries != null && countries.Any())
-            {
-                predicate = predicate.And(observation =>
-                    countries.Contains(observation.Location.Country.Code));
-            }
-
-            if (regions != null && regions.Any())
-            {
-                predicate = predicate.And(observation =>
-                    regions.Contains(observation.Location.Region.Code));
-            }
-
-            if (localAuthorities != null && localAuthorities.Any())
-            {
-                predicate = predicate.And(observation =>
-                    localAuthorities.Contains(observation.Location.LocalAuthority.Code));
-            }
-
-            if (localAuthorityDistricts != null && localAuthorityDistricts.Any())
-            {
-                predicate = predicate.And(observation =>
-                    localAuthorityDistricts.Contains(observation.Location.LocalAuthorityDistrict.Code));
-            }
-
-            var timePeriods = (from o in DbSet().AsNoTracking().Where(predicate)
+            var timePeriods = (from o in DbSet().AsNoTracking().Where(query.ObservationPredicate())
                 select new {o.TimeIdentifier, o.Year}).Distinct();
 
             return from timePeriod in timePeriods.AsEnumerable()
                 select (timePeriod.TimeIdentifier, timePeriod.Year);
         }
 
-        public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnitsMeta(long subjectId,
-            IEnumerable<int> years = null,
-            IEnumerable<string> countries = null,
-            IEnumerable<string> regions = null,
-            IEnumerable<string> localAuthorities = null,
-            IEnumerable<string> localAuthorityDistricts = null)
+        public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnitsMeta(
+            SubjectMetaQueryContext query)
         {
-            var locations = GetLocations(subjectId,
-                years,
-                countries,
-                regions,
-                localAuthorities,
-                localAuthorityDistricts);
+            var locations = GetLocations(query);
 
             return new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>
             {
@@ -179,57 +133,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             };
         }
 
-        private IEnumerable<Location> GetLocations(long subjectId,
-            IEnumerable<int> years = null,
-            IEnumerable<string> countries = null,
-            IEnumerable<string> regions = null,
-            IEnumerable<string> localAuthorities = null,
-            IEnumerable<string> localAuthorityDistricts = null)
+        private IEnumerable<Location> GetLocations(SubjectMetaQueryContext query)
         {
-//            TODO Ideally want one db query as follows but this is translated into invalid SQL
-//            TODO See https://github.com/aspnet/EntityFrameworkCore/issues/12304
-//            return (from l in _context.Set<Location>()
-//                join
-//                    d in _context.Observation.Where(data => data.SubjectId == subjectId)
-//                        .GroupBy(data => data.LocationId) on l.Id equals d.Key
-//                select l).ToList();
-
-            var predicate = PredicateBuilder.True<Observation>()
-                .And(observation => observation.SubjectId == subjectId);
-
-            if (years != null && years.Any())
-            {
-                predicate = predicate.And(observation =>
-                    years.Contains(observation.Year));
-            }
-
-            if (countries != null && countries.Any())
-            {
-                predicate = predicate.And(observation =>
-                    countries.Contains(observation.Location.Country.Code));
-            }
-
-            if (regions != null && regions.Any())
-            {
-                predicate = predicate.And(observation =>
-                    regions.Contains(observation.Location.Region.Code));
-            }
-
-            if (localAuthorities != null && localAuthorities.Any())
-            {
-                predicate = predicate.And(observation =>
-                    localAuthorities.Contains(observation.Location.LocalAuthority.Code));
-            }
-
-            if (localAuthorityDistricts != null && localAuthorityDistricts.Any())
-            {
-                predicate = predicate.And(observation =>
-                    localAuthorityDistricts.Contains(observation.Location.LocalAuthorityDistrict.Code));
-            }
-
             var locationIds = DbSet()
                 .AsNoTracking()
-                .Where(predicate)
+                .Where(query.ObservationPredicate())
                 .GroupBy(observation => observation.LocationId)
                 .Select(group => group.Key);
 

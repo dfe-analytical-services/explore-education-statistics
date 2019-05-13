@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
@@ -51,9 +50,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        public SubjectMetaViewModel GetSubjectMeta(long subjectId, SubjectMetaQueryContext query = null)
+        public SubjectMetaViewModel GetSubjectMeta(SubjectMetaQueryContext query)
         {
-            var subject = _subjectService.Find(subjectId);
+            var subject = _subjectService.Find(query.SubjectId);
 
             if (subject == null)
             {
@@ -63,23 +62,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             return new SubjectMetaViewModel
             {
-                Filters = GetFilters(subject.Id, query),
+                Filters = GetFilters(query),
                 Indicators = GetIndicators(subject.Id),
-                Locations = GetObservationalUnits(subject.Id, query),
-                TimePeriod = GetTimePeriods(subject.Id, query)
+                Locations = GetObservationalUnits(query),
+                TimePeriod = GetTimePeriods(query)
             };
         }
 
         private LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>> GetTimePeriods(
-            long subjectId,
-            SubjectMetaQueryContext query = null)
+            SubjectMetaQueryContext query)
         {
-            var timePeriodsMeta = _observationService.GetTimePeriodsMeta(subjectId,
-                GetYears(query),
-                query?.Countries,
-                query?.Regions,
-                query?.LocalAuthorities,
-                query?.LocalAuthorityDistricts);
+            var timePeriodsMeta = _observationService.GetTimePeriodsMeta(query);
 
             return new LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>>
             {
@@ -96,15 +89,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         private Dictionary<string, LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>> GetObservationalUnits(
-            long subjectId,
-            SubjectMetaQueryContext query = null)
+            SubjectMetaQueryContext query)
         {
-            return _observationService.GetObservationalUnitsMeta(subjectId,
-                    GetYears(query),
-                    query?.Countries,
-                    query?.Regions,
-                    query?.LocalAuthorities,
-                    query?.LocalAuthorityDistricts)
+            return _observationService.GetObservationalUnitsMeta(query)
                 .Where(pair => pair.Value.Any())
                 .ToDictionary(
                     pair => pair.Key.ToString().PascalCase(),
@@ -131,17 +118,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private Dictionary<string, LegendOptionsMetaValueModel<Dictionary<string,
             LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>> GetFilters(
-            long subjectId,
-            SubjectMetaQueryContext query = null)
+            SubjectMetaQueryContext query)
         {
-            var filterItems = _filterItemService.GetFilterItems(subjectId,
-                GetYears(query),
-                query?.Countries,
-                query?.LocalAuthorities,
-                query?.LocalAuthorityDistricts,
-                query?.Regions);
-
-            return filterItems
+            return _filterItemService.GetFilterItems(query)
                 .GroupBy(item => item.FilterGroup.Filter)
                 .ToDictionary(
                     itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),
@@ -163,13 +142,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                                     })
                                 })
                     });
-        }
-
-        private static IEnumerable<int> GetYears(SubjectMetaQueryContext query)
-        {
-            return query != null
-                ? QueryUtil.YearsQuery(query.Years, query.StartYear, query.EndYear)
-                : new List<int>();
         }
     }
 }

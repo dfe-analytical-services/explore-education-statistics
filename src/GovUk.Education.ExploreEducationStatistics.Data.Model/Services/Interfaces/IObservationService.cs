@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces
 {
@@ -13,18 +14,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
             IEnumerable<string> localAuthorityDistricts,
             IEnumerable<long> filters);
 
-        Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnitsMeta(long subjectId,
-            IEnumerable<int> years = null,
-            IEnumerable<string> countries = null,
-            IEnumerable<string> regions = null,
-            IEnumerable<string> localAuthorities = null,
-            IEnumerable<string> localAuthorityDistricts = null);
+        Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnitsMeta(
+            SubjectMetaQueryContext query);
 
-        IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(long subjectId,
-            IEnumerable<int> years = null,
-            IEnumerable<string> countries = null,
-            IEnumerable<string> regions = null,
-            IEnumerable<string> localAuthorities = null,
-            IEnumerable<string> localAuthorityDistricts = null);
+        IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(SubjectMetaQueryContext query);
     }
 }

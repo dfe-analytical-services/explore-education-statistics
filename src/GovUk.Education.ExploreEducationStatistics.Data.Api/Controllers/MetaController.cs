@@ -1,7 +1,7 @@
 using System;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
@@ -32,7 +32,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("subject/{subjectId}")]
         public ActionResult<SubjectMetaViewModel> GetSubjectMeta(long subjectId)
         {
-            var viewModel = _metaService.GetSubjectMeta(subjectId);
+            var viewModel = _metaService.GetSubjectMeta(new SubjectMetaQueryContext
+            {
+                SubjectId = subjectId
+            });
+
             if (viewModel == null)
             {
                 return NotFound();
@@ -41,11 +45,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return viewModel;
         }
 
-        [HttpPost("subject/{subjectId}")]
-        public ActionResult<SubjectMetaViewModel> GetSubjectMeta(long subjectId,
-            [FromBody] SubjectMetaQueryContext query)
+        [HttpPost("subject")]
+        public ActionResult<SubjectMetaViewModel> GetSubjectMeta([FromBody] SubjectMetaQueryContext query)
         {
-            var viewModel = _metaService.GetSubjectMeta(subjectId, query);
+            var viewModel = _metaService.GetSubjectMeta(query);
             if (viewModel == null)
             {
                 return NotFound();
