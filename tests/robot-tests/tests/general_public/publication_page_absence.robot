@@ -96,6 +96,7 @@ Validate Extra Information section headings
 
 Clicking "Go to top" move user to the top of the page
     [Tags]  HappyPath
+    user clicks element  css:[data-testid="SectionHeader Contact us"]
     scroll element into view  link:Go to top
     user clicks element  link:Go to top
     user should be at top of page
