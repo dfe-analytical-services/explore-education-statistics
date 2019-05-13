@@ -3,7 +3,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import classNames from 'classnames';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
-import GoToTopLink from '@common/components/GoToTopLink';
+import PrintThisPage from '@common/components/PrintThisPage';
 import { baseUrl } from '@common/services/api';
 import publicationService, {
   Release,
@@ -80,7 +80,6 @@ class PublicationReleasePage extends Component<Props> {
             </div>
           </div>
         </div>
-
         <div className={classNames('govuk-grid-row', styles.releaseIntro)}>
           <div className="govuk-grid-column-two-thirds">
             <div className="govuk-grid-row">
@@ -249,13 +248,9 @@ class PublicationReleasePage extends Component<Props> {
             </aside>
           </div>
         </div>
-
         <hr />
-
         <h2>Headline facts and figures - {data.releaseName}</h2>
-
         {data.keyStatistics && <DataBlock {...data.keyStatistics} />}
-
         {data.content.length > 0 && (
           <Accordion id="contents-sections">
             {data.content.map(({ heading, caption, order, content }) => (
@@ -265,14 +260,12 @@ class PublicationReleasePage extends Component<Props> {
             ))}
           </Accordion>
         )}
-
         <h2
           className="govuk-heading-m govuk-!-margin-top-9"
           data-testid="extra-information"
         >
           Help and support
         </h2>
-
         <Accordion id="extra-information-sections">
           <AccordionSection
             heading="Where does this data come from"
@@ -371,16 +364,13 @@ class PublicationReleasePage extends Component<Props> {
             </p>
           </AccordionSection>
         </Accordion>
-
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Create your own tables online
         </h2>
-
         <p>
           Use our tool to build tables using our range of national and regional
           data.
         </p>
-
         <Link
           to={`/table-tool/${data.publication.slug}`}
           className="govuk-button"
@@ -388,7 +378,7 @@ class PublicationReleasePage extends Component<Props> {
           Create tables
         </Link>
 
-        <GoToTopLink />
+        <PrintThisPage />
       </Page>
     );
   }
