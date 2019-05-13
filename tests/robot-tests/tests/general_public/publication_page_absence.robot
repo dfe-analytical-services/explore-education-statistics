@@ -66,7 +66,7 @@ Validate "About these statistics" -- "Last updated"
     element attribute value should be  css:[data-testid="See all 2 updates"] summary   aria-expanded   false
 
 Validate Key Statistics data block -- Summary tab
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     user checks element contains  css:[data-testid="tile Overall absence rate       4.7%
     user checks element contains  css:[data-testid="tile Authorised absence rate    3.4%
     user checks element contains  css:[data-testid="tile Unauthorised absence rate  1.3%

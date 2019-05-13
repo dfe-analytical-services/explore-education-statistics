@@ -15,13 +15,12 @@ const DocumentationGlossary = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <div className="app-content__header">
-            <span className="govuk-caption-xl">Style Guide</span>
-            <h1 className="govuk-heading-xl">Style guide</h1>
+            <span className="govuk-caption-xl">Glossary</span>
+            <h1 className="govuk-heading-xl">Glossary</h1>
           </div>
           <p>
-            The Government Digital Service style guide covers style, spelling
-            and grammar conventions for all content published on GOV.UK,
-            arranged alphabetically.
+            Browse our A to Z list of definitions for terms used across
+            education statistics and data.
           </p>
 
           <Accordion id="a-z">
