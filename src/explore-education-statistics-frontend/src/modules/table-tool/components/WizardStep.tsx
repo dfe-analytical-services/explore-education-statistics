@@ -1,6 +1,6 @@
-import { InjectedWizardProps } from '@frontend/modules/table-tool/components/Wizard';
 import classNames from 'classnames';
 import React, { ReactNode, useEffect, useRef } from 'react';
+import { InjectedWizardProps } from './Wizard';
 import styles from './WizardStep.module.scss';
 
 export interface WizardStepProps {

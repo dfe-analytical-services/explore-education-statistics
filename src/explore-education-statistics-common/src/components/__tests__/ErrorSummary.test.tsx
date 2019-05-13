@@ -20,6 +20,58 @@ describe('ErrorSummary', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
+  test('gains focus and scrolls into view when there are errors', () => {
+    const { container } = render(
+      <ErrorSummary
+        id="test-errors"
+        errors={[
+          { id: 'test-error-1', message: 'Something went wrong 1' },
+          { id: 'test-error-2', message: 'Something went wrong 2' },
+        ]}
+      />,
+    );
+
+    const summary = container.querySelector(
+      '.govuk-error-summary',
+    ) as HTMLElement;
+
+    expect(summary).toHaveFocus();
+    expect(summary.scrollIntoView).toHaveBeenCalled();
+  });
+
+  test('re-rendering with new errors does not gain focus or scroll into view', () => {
+    const { container, getByText, rerender } = render(
+      <ErrorSummary
+        id="test-errors"
+        errors={[
+          { id: 'test-error-1', message: 'Something went wrong 1' },
+          { id: 'test-error-2', message: 'Something went wrong 2' },
+        ]}
+      />,
+    );
+
+    const summary = container.querySelector(
+      '.govuk-error-summary',
+    ) as HTMLElement;
+
+    // Focus something else to prove summary does not re-gain focus
+    getByText('Something went wrong 1').focus();
+
+    rerender(
+      <ErrorSummary
+        id="test-errors"
+        errors={[
+          { id: 'test-error-1', message: 'Something went wrong 1' },
+          { id: 'test-error-2', message: 'Something went wrong 2' },
+          { id: 'test-error-3', message: 'Something went wrong 3' },
+        ]}
+      />,
+    );
+
+    expect(summary).not.toHaveFocus();
+    expect(summary.scrollIntoView).toHaveBeenCalledTimes(1);
+  });
+
   test('does not render when there are no errors', () => {
     const { container } = render(<ErrorSummary id="test-errors" errors={[]} />);
 

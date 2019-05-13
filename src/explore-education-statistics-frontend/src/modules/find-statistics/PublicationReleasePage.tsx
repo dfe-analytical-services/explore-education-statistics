@@ -1,5 +1,6 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import classNames from 'classnames';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import GoToTopLink from '@common/components/GoToTopLink';
@@ -16,6 +17,7 @@ import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import ContentBlock from './components/ContentBlock';
+import styles from './PublicationReleasePage.module.scss';
 
 interface Props {
   publication: string;
@@ -59,37 +61,36 @@ class PublicationReleasePage extends Component<Props> {
           { name: data.title },
         ]}
       >
-        {!release && (
-          <strong className="govuk-tag govuk-!-margin-bottom-2">
-            {' '}
-            This is the latest data{' '}
-          </strong>
-        )}
+        <div className={styles.releaseHeader}>
+          <PageTitle title={data.title} />
 
-        <PageTitle title={data.title} />
-
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-two-thirds">
-            <dl className="dfe-meta-content govuk-!-margin-0">
-              <dt className="govuk-caption-m">Published:</dt>
-              <dd>
-                <strong>
-                  <FormattedDate>{data.published}</FormattedDate>
-                </strong>
-              </dd>
-            </dl>
-          </div>
-          <div className="govuk-grid-column-one-third">
-            <SearchForm />
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-two-thirds">
+              <dl className="dfe-meta-content govuk-!-margin-0">
+                <dt className="govuk-caption-m">Published: </dt>
+                <dd>
+                  <strong>
+                    <FormattedDate>{data.published}</FormattedDate>
+                  </strong>
+                </dd>
+              </dl>
+            </div>
+            <div className="govuk-grid-column-one-third">
+              <SearchForm />
+            </div>
           </div>
         </div>
 
-        <hr />
-
-        <div className="govuk-grid-row">
+        <div className={classNames('govuk-grid-row', styles.releaseIntro)}>
           <div className="govuk-grid-column-two-thirds">
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-three-quarters">
+                {!release && (
+                  <strong className="govuk-tag">
+                    {' '}
+                    This is the latest data{' '}
+                  </strong>
+                )}
                 <ReactMarkdown className="govuk-body" source={data.summary} />
               </div>
               <div className="govuk-grid-column-one-quarter">
@@ -159,66 +160,78 @@ class PublicationReleasePage extends Component<Props> {
             <aside className="app-related-items">
               <h3 id="subsection-title">About these statistics</h3>
 
-              <h4 data-testid="release-period">
-                <span className="govuk-caption-m">For school year: </span>
-                {data.releaseName} {!release && <span>(latest data)</span>}
-                <Details summary={`See previous ${releaseCount} releases`}>
-                  <ul
-                    className="govuk-list"
-                    data-testid="previous-releases-list"
-                  >
-                    {data.publication.releases
-                      .slice(1)
-                      .map(({ id, slug, releaseName }) => (
-                        <li key={id} data-testid="item-internal">
-                          <Link
-                            to={`/statistics/${data.publication.slug}/${slug}`}
-                          >
-                            {releaseName}
-                          </Link>
-                        </li>
-                      ))}
-                    {data.publication.legacyReleases.map(
-                      ({ id, description, url }) => (
-                        <li key={id} data-testid="item-external">
-                          <a href={url}>{description}</a>
-                        </li>
-                      ),
-                    )}
-                  </ul>
-                </Details>
-              </h4>
+              <dl className="dfe-meta-content" data-testid="release-period">
+                <dt className="govuk-caption-m">For school year: </dt>
+                <dd>
+                  <strong>{data.releaseName}</strong>
+                </dd>
+                <dd>
+                  <Details summary={`See previous ${releaseCount} releases`}>
+                    <ul
+                      className="govuk-list"
+                      data-testid="previous-releases-list"
+                    >
+                      {data.publication.releases
+                        .slice(1)
+                        .map(({ id, slug, releaseName }) => (
+                          <li key={id} data-testid="item-internal">
+                            <Link
+                              to={`/statistics/${
+                                data.publication.slug
+                              }/${slug}`}
+                            >
+                              {releaseName}
+                            </Link>
+                          </li>
+                        ))}
+                      {data.publication.legacyReleases.map(
+                        ({ id, description, url }) => (
+                          <li key={id} data-testid="item-external">
+                            <a href={url}>{description}</a>
+                          </li>
+                        ),
+                      )}
+                    </ul>
+                  </Details>
+                </dd>
+              </dl>
 
-              <h4 data-testid="last-updated">
-                <span className="govuk-caption-m">Last updated: </span>
-                <FormattedDate>{data.updates[0].on}</FormattedDate>
+              <dl className="dfe-meta-content" data-testid="last-updated">
+                <dt className="govuk-caption-m">Last updated: </dt>
+                <dd>
+                  <strong>
+                    <FormattedDate>{data.updates[0].on}</FormattedDate>
+                  </strong>
+                  <Details summary={`See all ${data.updates.length} updates`}>
+                    {data.updates.map(elem => (
+                      <div data-testid="last-updated-element" key={elem.on}>
+                        <FormattedDate className="govuk-body govuk-!-font-weight-bold">
+                          {elem.on}
+                        </FormattedDate>
+                        <p>{elem.reason}</p>
+                      </div>
+                    ))}
+                  </Details>
+                </dd>
+              </dl>
 
-                <Details summary={`See all ${data.updates.length} updates`}>
-                  {data.updates.map(elem => (
-                    <div data-testid="last-updated-element" key={elem.on}>
-                      <FormattedDate className="govuk-body govuk-!-font-weight-bold">
-                        {elem.on}
-                      </FormattedDate>
-                      <p>{elem.reason}</p>
-                    </div>
-                  ))}
-                </Details>
-              </h4>
-
-              <h4 data-testid="next-update">
-                <span className="govuk-caption-m">Next update:</span>
-                <FormattedDate>{data.publication.nextUpdate}</FormattedDate>
-
-                <span className="govuk-caption-m">
-                  <Link
-                    unvisited
-                    to={`/subscriptions?slug=${data.publication.slug}`}
-                    data-testid={`subsciption-${data.publication.slug}`}
-                  >
-                    Notify me
-                  </Link>
-                </span>
-              </h4>
+              <dl className="dfe-meta-content" data-testid="next-update">
+                <dt className="govuk-caption-m">Next update:</dt>
+                <dd>
+                  <strong>
+                    <FormattedDate>{data.publication.nextUpdate}</FormattedDate>
+                  </strong>
+                  <div>
+                    <Link
+                      unvisited
+                      to={`/subscriptions?slug=${data.publication.slug}`}
+                      data-testid={`subsciption-${data.publication.slug}`}
+                    >
+                      Notify me
+                    </Link>
+                  </div>
+                </dd>
+              </dl>
 
               {/* <h2
                 className="govuk-heading-m govuk-!-margin-top-6"
@@ -320,39 +333,42 @@ class PublicationReleasePage extends Component<Props> {
             </ul>
           </AccordionSection>
           <AccordionSection heading="Contact us" headingTag="h3">
-            <h4>Media enquiries</h4>
-            <address className="govuk-body dfe-font-style-normal">
-              Press Office News Desk
-              <br />
-              Department for Education <br />
-              Sanctuary Buildings <br />
-              Great Smith Street <br />
-              London
-              <br />
-              SW1P 3BT <br />
-              Telephone: 020 7783 8300
-            </address>
-
-            <h4>Other enquiries</h4>
-            <address className="govuk-body dfe-font-style-normal">
-              Data Insight and Statistics Division
-              <br />
-              Level 1<br />
-              Department for Education
-              <br />
-              Sanctuary Buildings <br />
-              Great Smith Street
-              <br />
-              London
-              <br />
-              SW1P 3BT <br />
-              Telephone: 020 7783 8300
-              <br />
-              Email:{' '}
-              <a href="mailto:Schools.statistics@education.co.uk">
-                Schools.statistics@education.gov.uk
+            <p>
+              If you have a specific enquiry about [[ THEME ]] statistics and
+              data:
+            </p>
+            <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+              [[ TEAM NAME ]]
+            </h4>
+            <p className="govuk-!-margin-top-0">
+              Email <br />
+              <a href="mailto:schools.statistics@education.gov.uk">
+                [[ TEAM EMAIL ADDRESS ]]
               </a>
-            </address>
+            </p>
+            <p>
+              Telephone: [[ LEAD STATISTICIAN NAME ]] <br /> [[ LEAD
+              STATISTICIAN TEL. NO.]]
+            </p>
+            <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+              Press office
+            </h4>
+            <p className="govuk-!-margin-top-0">If you have a media enquiry:</p>
+            <p>
+              Telephone <br />
+              020 7925 6789
+            </p>
+            <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+              Public enquiries
+            </h4>
+            <p className="govuk-!-margin-top-0">
+              If you have a general enquiry about the Department for Education
+              (DfE) or education:
+            </p>
+            <p>
+              Telephone <br />
+              037 0000 2288
+            </p>
           </AccordionSection>
         </Accordion>
 

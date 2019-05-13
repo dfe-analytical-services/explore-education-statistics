@@ -1,9 +1,9 @@
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
-import FormFieldSortableList from '@frontend/modules/table-tool/components/FormFieldSortableList';
-import { SortableOption } from '@frontend/modules/table-tool/components/FormSortableList';
 import { Form, Formik } from 'formik';
 import React from 'react';
+import FormFieldSortableList from './FormFieldSortableList';
+import { SortableOption } from './FormSortableList';
 
 interface Props {
   initialValues: FormValues;

@@ -1,13 +1,13 @@
-import Button from '@common/components/Button';
-import { Form, FormFieldRadioGroup, FormGroup } from '@common/components/form';
+import { Form, FormFieldRadioGroup } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { PublicationSubject } from '@common/services/tableBuilderService';
-import { InjectedWizardProps } from '@frontend/modules/table-tool/components/Wizard';
-import WizardStepHeading from '@frontend/modules/table-tool/components/WizardStepHeading';
 import { Formik, FormikProps } from 'formik';
 import React, { useState } from 'react';
+import { InjectedWizardProps } from './Wizard';
+import WizardStepFormActions from './WizardStepFormActions';
+import WizardStepHeading from './WizardStepHeading';
 
 interface FormValues {
   subjectId: string;
@@ -24,8 +24,10 @@ interface Props {
 }
 
 const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
-  const { isActive, onSubmit, options, goToNextStep, goToPreviousStep } = props;
+  const { isActive, onSubmit, options, goToNextStep } = props;
   const [subjectName, setSubjectName] = useState('');
+
+  const formId = 'publicationSubjectForm';
 
   const stepHeading = (
     <WizardStepHeading {...props} fieldsetHeading>
@@ -35,8 +37,8 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
 
   return (
     <Formik
-      onSubmit={({ subjectId }) => {
-        onSubmit({
+      onSubmit={async ({ subjectId }) => {
+        await onSubmit({
           subjectId,
           subjectName,
         });
@@ -50,7 +52,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
       })}
       render={(form: FormikProps<FormValues>) => {
         return isActive ? (
-          <Form {...form} id="publicationSubjectForm">
+          <Form {...form} id={formId}>
             <FormFieldRadioGroup<FormValues>
               name="subjectId"
               legend={stepHeading}
@@ -58,23 +60,13 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
                 label: option.label,
                 value: `${option.id}`,
               }))}
-              id="publicationSubjectForm-subjectId"
+              id={`${formId}-subjectId`}
               onChange={(event, option) => {
                 setSubjectName(option.label);
               }}
             />
 
-            <FormGroup>
-              <Button type="submit">Next step</Button>
-
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={goToPreviousStep}
-              >
-                Previous step
-              </Button>
-            </FormGroup>
+            <WizardStepFormActions {...props} form={form} formId={formId} />
           </Form>
         ) : (
           <>

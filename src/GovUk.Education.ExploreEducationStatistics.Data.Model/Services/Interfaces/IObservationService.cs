@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces
 {
@@ -14,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
             IEnumerable<string> localAuthorityDistricts,
             IEnumerable<long> filters);
 
-        LocationMeta GetLocationMeta(long subjectId);
+        Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(long subjectId);
 
         IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(long subjectId);
     }

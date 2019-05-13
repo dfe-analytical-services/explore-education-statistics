@@ -1,15 +1,16 @@
-import Button from '@common/components/Button';
-import { Form, FormGroup } from '@common/components/form';
+import { Form, FormFieldset, FormGroup } from '@common/components/form';
+import FormFieldCheckboxSearchSubGroups from '@common/components/form/FormFieldCheckboxSearchSubGroups';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
 import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
+import { Dictionary } from '@common/types/util';
 import { Formik, FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
-import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
 import { InjectedWizardProps } from './Wizard';
+import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
 export interface FormValues {
@@ -27,11 +28,11 @@ interface Props {
 }
 
 const FiltersForm = (props: Props & InjectedWizardProps) => {
-  const { onSubmit, specification, goToNextStep, goToPreviousStep } = props;
-
-  const [submitError, setSubmitError] = useState('');
+  const { onSubmit, specification, goToNextStep } = props;
 
   const ref = useRef<HTMLDivElement>(null);
+
+  const formId = 'filtersForm';
 
   const stepHeading = (
     <WizardStepHeading {...props}>Choose your filters</WizardStepHeading>
@@ -44,77 +45,49 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
         indicators: [],
       }}
       validationSchema={Yup.object<FormValues>({
-        filters: Yup.object(
-          mapValues(specification.filters, () =>
-            Yup.array()
-              .of(Yup.string())
-              .required('Select at least one option'),
-          ),
+        filters: Yup.mixed().test(
+          'required',
+          'Must select options from only two categories',
+          (value: Dictionary<string[]>) =>
+            Object.values(value)
+              .map(group => group.length > 0)
+              .filter(Boolean).length === 2,
         ),
         indicators: Yup.array()
           .of(Yup.string())
-          .required('Select at least one option'),
+          .required('Must select at least one indicator'),
       })}
-      onSubmit={async (values, actions) => {
-        try {
-          await onSubmit(values);
-
-          goToNextStep();
-        } catch (error) {
-          setSubmitError('Could not submit filters. Please try again later.');
-        }
-
-        actions.setSubmitting(false);
+      onSubmit={async values => {
+        await onSubmit(values);
+        goToNextStep();
       }}
       render={(form: FormikProps<FormValues>) => {
         const { getError } = createErrorHelper(form);
 
         return (
           <div ref={ref}>
-            <Form
-              {...form}
-              id="filtersForm"
-              otherErrors={
-                submitError !== ''
-                  ? [
-                      {
-                        id: 'filtersForm-submit',
-                        message: submitError,
-                      },
-                    ]
-                  : []
-              }
-            >
+            <Form {...form} id={formId}>
               {stepHeading}
 
               <FormGroup>
-                {Object.entries(specification.filters).map(
-                  ([filterKey, filterGroup]) => {
-                    const filterName = `filters.${filterKey}`;
+                <div className="govuk-grid-row">
+                  <div className="govuk-grid-column-one-half-from-desktop">
+                    <FormFieldset
+                      id={`${formId}-filters`}
+                      legend="Categories"
+                      legendSize="s"
+                      hint="Select options from two categories"
+                      error={getError('filters')}
+                    >
+                      {Object.entries(specification.filters).map(
+                        ([filterKey, filterGroup]) => {
+                          const filterName = `filters.${filterKey}`;
 
-                    return (
-                      <div className="govuk-grid-row" key={filterKey}>
-                        <div className="govuk-grid-column-one-half-from-desktop">
-                          {Object.keys(filterGroup.options).length === 1 ? (
-                            <FormFieldCheckboxMenu<FormValues>
-                              id={`filtersForm-${camelCase(filterName)}`}
-                              name={filterName}
-                              legend={filterGroup.legend}
-                              hint={filterGroup.hint}
-                              error={getError(filterName)}
-                              selectAll
-                              options={filterGroup.options.Default.options.map(
-                                option => ({
-                                  id: `${filterKey}-${option.value}`,
-                                  label: option.label,
-                                  value: option.value,
-                                }),
-                              )}
-                            />
-                          ) : (
+                          return (
                             <FormFieldCheckboxGroupsMenu<FormValues>
+                              key={filterKey}
                               name={filterName}
-                              id={`filtersForm-${camelCase(filterName)}`}
+                              id={`${formId}-${camelCase(filterName)}`}
                               legend={filterGroup.legend}
                               hint={filterGroup.hint}
                               error={getError(filterName)}
@@ -128,21 +101,18 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                                 },
                               )}
                             />
-                          )}
-                        </div>
-                      </div>
-                    );
-                  },
-                )}
-
-                <div className="govuk-grid-row">
+                          );
+                        },
+                      )}
+                    </FormFieldset>
+                  </div>
                   <div className="govuk-grid-column-one-half-from-desktop">
-                    <FormFieldCheckboxGroupsMenu<FormValues>
+                    <FormFieldCheckboxSearchSubGroups
                       name="indicators"
-                      id="filtersForm-indicators"
+                      id={`${formId}-indicators`}
                       legend="Indicators"
-                      legendHidden
-                      hint="Select at least 1 indicator"
+                      legendSize="s"
+                      hint="Select at least one indicator"
                       error={getError('indicators')}
                       options={Object.entries(specification.indicators).map(
                         ([_, group]) => {
@@ -157,46 +127,13 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                 </div>
               </FormGroup>
 
-              <FormGroup>
-                <Button
-                  disabled={form.isSubmitting}
-                  id="filtersForm-submit"
-                  onClick={event => {
-                    event.preventDefault();
-
-                    // Manually validate/submit so we can scroll
-                    // back to the top of the form if there are errors
-                    form.validateForm().then(validationErrors => {
-                      form.submitForm();
-
-                      if (
-                        Object.keys(validationErrors).length > 0 &&
-                        ref.current
-                      ) {
-                        ref.current.scrollIntoView({
-                          behavior: 'smooth',
-                          block: 'start',
-                        });
-                      }
-                    });
-                  }}
-                  type="submit"
-                >
-                  {form.isSubmitting && form.isValid
-                    ? 'Creating table...'
-                    : 'Create table'}
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    goToPreviousStep();
-                  }}
-                >
-                  Previous step
-                </Button>
-              </FormGroup>
+              <WizardStepFormActions
+                {...props}
+                form={form}
+                formId={formId}
+                submitText="Create table"
+                submittingText="Creating table"
+              />
             </Form>
           </div>
         );

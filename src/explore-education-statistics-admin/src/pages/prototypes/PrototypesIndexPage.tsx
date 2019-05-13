@@ -5,13 +5,24 @@ import PrototypePage from './components/PrototypePage';
 function PrototypesIndexPage() {
   return (
     <PrototypePage>
-      <h1>Prototype index page for administrators</h1>
+      <h1>Index page for administrative application</h1>
 
+      <h3>Prototypes</h3>
       <ul>
         <li>
           <Link to="/prototypes/admin-dashboard">
             Administrators dashboard page
           </Link>
+        </li>
+      </ul>
+
+      <h3>Tools</h3>
+      <ul>
+        <li>
+          <a href="/tools">Administrive tools</a>
+        </li>
+        <li>
+          <a href="/tools/release/notify">Send a release notification</a>
         </li>
       </ul>
     </PrototypePage>

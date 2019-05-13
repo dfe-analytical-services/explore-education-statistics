@@ -1,8 +1,8 @@
-import styles from '@frontend/modules/table-tool/components/FormCheckboxSelectedCount.module.scss';
 import classNames from 'classnames';
 import { connect, FormikContext, FormikValues } from 'formik';
 import get from 'lodash/get';
 import React from 'react';
+import styles from './FormCheckboxSelectedCount.module.scss';
 
 interface Props {
   name: string;

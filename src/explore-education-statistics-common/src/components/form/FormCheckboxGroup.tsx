@@ -142,6 +142,8 @@ export class BaseFormCheckboxGroup extends PureComponent<
             onChange={this.handleChange(option)}
           />
         ))}
+
+        {options.length === 0 && <p>No options available.</p>}
       </div>
     );
   }

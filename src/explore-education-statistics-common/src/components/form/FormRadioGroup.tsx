@@ -41,7 +41,6 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
 
   private ref = createRef<HTMLInputElement>();
 
-  // eslint-disable-next-line react/sort-comp
   private handleChange = memoize(
     (option: RadioOption): RadioChangeEventHandler => event => {
       const { onChange } = this.props;
@@ -56,7 +55,6 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
     },
   );
 
-  // eslint-disable-next-line react/sort-comp
   public componentDidMount(): void {
     if (this.ref.current) {
       import('govuk-frontend/components/radios/radios').then(

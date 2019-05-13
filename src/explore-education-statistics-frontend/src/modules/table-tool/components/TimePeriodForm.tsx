@@ -1,10 +1,4 @@
-import Button from '@common/components/Button';
-import {
-  Form,
-  FormFieldSelect,
-  FormFieldset,
-  FormGroup,
-} from '@common/components/form';
+import { Form, FormFieldSelect, FormFieldset } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -15,6 +9,7 @@ import { Comparison } from '@common/types/util';
 import { Formik, FormikProps } from 'formik';
 import React from 'react';
 import { InjectedWizardProps } from './Wizard';
+import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
 interface FormValues {
@@ -28,13 +23,22 @@ interface Props {
 }
 
 const TimePeriodForm = (props: Props & InjectedWizardProps) => {
-  const { options, onSubmit, isActive, goToNextStep, goToPreviousStep } = props;
-  const timePeriodOptions: SelectOption[] = options.map(option => {
-    return {
-      label: option.label,
-      value: `${option.year}_${option.code}`,
-    };
-  });
+  const { options, onSubmit, isActive, goToNextStep } = props;
+
+  const formId = 'timePeriodForm';
+
+  const timePeriodOptions: SelectOption[] = [
+    {
+      label: 'Please select',
+      value: '',
+    },
+    ...options.map(option => {
+      return {
+        label: option.label,
+        value: `${option.year}_${option.code}`,
+      };
+    }),
+  ];
 
   const stepHeading = (
     <WizardStepHeading {...props} fieldsetHeading>
@@ -44,9 +48,8 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
 
   return (
     <Formik<FormValues>
-      onSubmit={values => {
-        console.log(values);
-        onSubmit(values);
+      onSubmit={async values => {
+        await onSubmit(values);
         goToNextStep();
       }}
       initialValues={{
@@ -111,33 +114,23 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
       })}
       render={(form: FormikProps<FormValues>) => {
         return isActive ? (
-          <Form {...form} id="timePeriodForm">
-            <FormFieldset id="timePeriodForm-timePeriod" legend={stepHeading}>
+          <Form id={formId}>
+            <FormFieldset id={`${formId}-timePeriod`} legend={stepHeading}>
               <FormFieldSelect
                 name="start"
-                id="timePeriodForm-timePeriod-start"
+                id={`${formId}-start`}
                 label="Start date"
                 options={timePeriodOptions}
               />
               <FormFieldSelect
                 name="end"
-                id="timePeriodForm-timePeriod-end"
+                id={`${formId}-end`}
                 label="End date"
                 options={timePeriodOptions}
               />
             </FormFieldset>
 
-            <FormGroup>
-              <Button type="submit">Next step</Button>
-
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={goToPreviousStep}
-              >
-                Previous step
-              </Button>
-            </FormGroup>
+            <WizardStepFormActions {...props} form={form} formId={formId} />
           </Form>
         ) : (
           <>

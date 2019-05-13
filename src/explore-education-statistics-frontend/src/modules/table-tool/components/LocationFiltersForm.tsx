@@ -1,5 +1,4 @@
-import Button from '@common/components/Button';
-import { Form, FormFieldset, FormGroup } from '@common/components/form';
+import { Form, FormFieldset } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
@@ -11,6 +10,7 @@ import React, { useEffect } from 'react';
 import { useImmer } from 'use-immer';
 import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
 import { InjectedWizardProps } from './Wizard';
+import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
 interface FormValues {
@@ -29,7 +29,9 @@ interface Props {
 }
 
 const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
-  const { options, onSubmit, isActive, goToNextStep, goToPreviousStep } = props;
+  const { options, onSubmit, isActive, goToNextStep } = props;
+
+  const formId = 'locationFiltersForm';
 
   const [locationLevels, updateLocationLevels] = useImmer<
     Dictionary<{ label: string; value: string }[]>
@@ -52,8 +54,8 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
 
   return (
     <Formik<FormValues>
-      onSubmit={values => {
-        onSubmit(values.locations);
+      onSubmit={async values => {
+        await onSubmit(values.locations);
         goToNextStep();
       }}
       initialValues={{
@@ -68,15 +70,15 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
         locations: Yup.mixed().test(
           'required',
           'Select at least one option',
-          (value: string) =>
+          (value: Dictionary<string[]>) =>
             Object.values(value).some(groupOptions => groupOptions.length > 0),
         ),
       })}
       render={(form: FormikProps<FormValues>) => {
         return isActive ? (
-          <Form {...form} id="locationFiltersForm">
+          <Form {...form} id={formId}>
             <FormFieldset
-              id="locationFiltersForm-levels"
+              id={`${formId}-levels`}
               legend={stepHeading}
               hint="Select at least one"
               error={
@@ -85,53 +87,50 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                   : ''
               }
             >
-              {Object.entries(options).map(([levelKey, level]) => {
-                return (
-                  <FormFieldCheckboxMenu
-                    name={`locations.${levelKey}`}
-                    key={levelKey}
-                    options={level.options}
-                    id={`locationFiltersForm-levels-${levelKey}`}
-                    legend={level.legend}
-                    legendHidden
-                    onAllChange={event => {
-                      updateLocationLevels(draft => {
-                        draft[levelKey] = event.target.checked
-                          ? level.options
-                          : [];
-                      });
-                    }}
-                    onChange={(event, option) => {
-                      updateLocationLevels(draft => {
-                        const matchingOption = locationLevels[levelKey].find(
-                          levelOption => levelOption.value === option.value,
-                        );
+              <div className="govuk-grid-row">
+                <div className="govuk-grid-column-one-half-from-desktop">
+                  {Object.entries(options).map(([levelKey, level]) => {
+                    return (
+                      <FormFieldCheckboxMenu
+                        name={`locations.${levelKey}`}
+                        key={levelKey}
+                        options={level.options}
+                        id={`${formId}-levels-${levelKey}`}
+                        legend={level.legend}
+                        legendHidden
+                        onAllChange={event => {
+                          updateLocationLevels(draft => {
+                            draft[levelKey] = event.target.checked
+                              ? level.options
+                              : [];
+                          });
+                        }}
+                        onChange={(event, option) => {
+                          updateLocationLevels(draft => {
+                            const matchingOption = locationLevels[
+                              levelKey
+                            ].find(
+                              levelOption => levelOption.value === option.value,
+                            );
 
-                        if (matchingOption) {
-                          draft[levelKey] = locationLevels[levelKey].filter(
-                            levelOption => levelOption.value !== option.value,
-                          );
-                        } else {
-                          draft[levelKey].push(option);
-                        }
-                      });
-                    }}
-                  />
-                );
-              })}
+                            if (matchingOption) {
+                              draft[levelKey] = locationLevels[levelKey].filter(
+                                levelOption =>
+                                  levelOption.value !== option.value,
+                              );
+                            } else {
+                              draft[levelKey].push(option);
+                            }
+                          });
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
             </FormFieldset>
 
-            <FormGroup>
-              <Button type="submit">Next step</Button>
-
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={goToPreviousStep}
-              >
-                Previous step
-              </Button>
-            </FormGroup>
+            <WizardStepFormActions {...props} form={form} formId={formId} />
           </Form>
         ) : (
           <>
