@@ -17,7 +17,7 @@ const BrowseReleasesPage = () => {
           <p className="govuk-caption-m govuk-!-margin-top-1">
             Browse our A to Z list of style, spelling and grammar conventions
             for all content published on the explore education statistics
-            service
+            service{' '}
           </p>
         </div>
         <div className="govuk-grid-column-one-third">
