@@ -118,7 +118,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
   public render() {
     const {
-      heading,
+      heading = '',
       height,
       showTables,
       additionalTabContent,
