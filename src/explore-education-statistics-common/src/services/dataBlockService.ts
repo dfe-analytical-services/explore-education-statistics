@@ -1,5 +1,6 @@
 import { dataApi } from '@common/services/api';
 import TimePeriod, { TimePeriodCode } from '@common/services/types/TimePeriod';
+import { Dictionary } from '@common/types/util';
 
 export enum GeographicLevel {
   Establishment = 'Establishment',
@@ -76,10 +77,6 @@ interface LabelValueUnitMetadata extends LabelValueMetadata {
   unit: string;
 }
 
-interface ObjectMap<T> {
-  [name: string]: T;
-}
-
 interface OptionListMetadata<T extends LabelValueMetadata> {
   options: T[];
 }
@@ -97,7 +94,7 @@ interface TimePeriodOptionMetadata {
 interface FilterMetadata {
   hint: string;
   legend: string;
-  options: ObjectMap<OptionMetadata>;
+  options: Dictionary<OptionMetadata>;
 }
 
 interface TimePeriodMetadata {
@@ -115,17 +112,17 @@ interface ResponseMetaData {
     id: number;
     label: string;
   };
-  filters: ObjectMap<FilterMetadata>;
-  indicators: ObjectMap<IndicatorMetadata>;
+  filters: Dictionary<FilterMetadata>;
+  indicators: Dictionary<IndicatorMetadata>;
   timePeriod: TimePeriodMetadata;
 }
 
 // ------------------------------------------
 
 export interface DataBlockMetadata {
-  indicators: ObjectMap<LabelValueUnitMetadata>;
-  filters: ObjectMap<LabelValueMetadata>;
-  timePeriods: ObjectMap<TimePeriod>;
+  indicators: Dictionary<LabelValueUnitMetadata>;
+  filters: Dictionary<LabelValueMetadata>;
+  timePeriods: Dictionary<TimePeriod>;
 }
 
 export interface DataBlockRequest {
@@ -175,7 +172,7 @@ function mapTimePeriodOptions(
 function mapOptionsMap<
   R extends LabelValueMetadata,
   T extends OptionListMetadata<R>
->(ids: string[], options: ObjectMap<T>): ObjectMap<R> {
+>(ids: string[], options: Dictionary<T>): Dictionary<R> {
   return Object.values(options).reduce(
     (mapped, option) => ({ ...mapped, ...mapOptions(ids, option.options) }),
     {},
@@ -185,14 +182,14 @@ function mapOptionsMap<
 function remapIndicators(
   indicatorIds: string[],
   { indicators }: ResponseMetaData,
-): ObjectMap<LabelValueUnitMetadata> {
+): Dictionary<LabelValueUnitMetadata> {
   return mapOptionsMap(indicatorIds, indicators);
 }
 
 function remapFilters(
   filterIds: string[],
   { filters }: ResponseMetaData,
-): ObjectMap<LabelValueMetadata> {
+): Dictionary<LabelValueMetadata> {
   return Object.values(filters).reduce(
     (mapped, filter) => ({
       ...mapped,
@@ -205,7 +202,7 @@ function remapFilters(
 function remapTimePeriod(
   years: number[],
   { timePeriod }: ResponseMetaData,
-): ObjectMap<TimePeriod> {
+): Dictionary<TimePeriod> {
   return mapTimePeriodOptions(years, timePeriod.options);
 }
 
