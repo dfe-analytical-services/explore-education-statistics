@@ -7,6 +7,7 @@ import TimePeriod from 'explore-education-statistics-common/src/services/types/T
 
 export const newApiTest: DataBlockProps = {
   type: 'datablock',
+  id: 'test',
   dataBlockRequest: {
     subjectId: 1,
     regions: [],
