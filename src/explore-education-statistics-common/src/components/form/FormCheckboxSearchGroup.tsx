@@ -1,7 +1,12 @@
+import { FormFieldsetProps } from '@common/components/form/FormFieldset';
 import FormTextSearchInput from '@common/components/form/FormTextSearchInput';
+import { FormFieldset } from '@common/components/form/index';
 import useMounted from '@common/hooks/useMounted';
 import React, { useState } from 'react';
-import FormCheckboxGroup, { FormCheckboxGroupProps } from './FormCheckboxGroup';
+import FormCheckboxGroup, {
+  BaseFormCheckboxGroup,
+  FormCheckboxGroupProps,
+} from './FormCheckboxGroup';
 import styles from './FormCheckboxSearchGroup.module.scss';
 
 export interface FormCheckboxSearchGroupProps extends FormCheckboxGroupProps {
@@ -12,9 +17,22 @@ export interface FormCheckboxSearchGroupProps extends FormCheckboxGroupProps {
 const FormCheckboxSearchGroup = ({
   hideCount = false,
   searchLabel = 'Search options',
+  legend,
+  legendSize,
+  legendHidden,
+  hint,
+  error,
   ...props
 }: FormCheckboxSearchGroupProps) => {
   const { id, name, options, value = [] } = props;
+  const fieldsetProps: FormFieldsetProps = {
+    id,
+    legend,
+    legendSize,
+    legendHidden,
+    hint,
+    error,
+  };
 
   const [searchTerm, setSearchTerm] = useState('');
   const { isMounted } = useMounted();
@@ -37,7 +55,7 @@ const FormCheckboxSearchGroup = ({
   return (
     <>
       {isMounted ? (
-        <div>
+        <FormFieldset {...fieldsetProps}>
           <div className={styles.inputContainer}>
             <FormTextSearchInput
               id={`${id}-search`}
@@ -55,11 +73,11 @@ const FormCheckboxSearchGroup = ({
           </div>
 
           <div className={styles.optionsContainer}>
-            <FormCheckboxGroup {...props} options={filteredOptions} small />
+            <BaseFormCheckboxGroup {...props} options={filteredOptions} small />
           </div>
-        </div>
+        </FormFieldset>
       ) : (
-        <FormCheckboxGroup {...props} />
+        <FormCheckboxGroup {...props} {...fieldsetProps} />
       )}
     </>
   );

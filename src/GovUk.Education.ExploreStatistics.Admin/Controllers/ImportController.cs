@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using GovUk.Education.ExploreStatistics.Admin.Models;
 using GovUk.Education.ExploreStatistics.Admin.Services.Interfaces;
@@ -10,40 +13,21 @@ namespace GovUk.Education.ExploreStatistics.Admin.Controllers
     public class ImportController : Controller
     {
         private IImportService _importService;
-
+        private IFileStorageService _fileStorageService;
         private readonly ILogger _logger;
 
-        private List<ImportViewModel> _publications;
-
-        public ImportController(ILogger<FileController> logger,  IImportService importService)
+        public ImportController(ILogger<FileController> logger,  IImportService importService, IFileStorageService fileStorageService)
         {
             _logger = logger;
-            _importService = importService;  
-                
-            _publications = new List<ImportViewModel>
-            {
-                new ImportViewModel
-                {
-                    PublicationId = "ab4f45fa-20ac-44ac-894f-5513f6b6232d",
-                    PublicationName = "Pupil absence in schools in England",
-                    ReleaseName = "2018/2019",
-                    ReleaseDate = "2018-12-02"
-                },
-                new ImportViewModel
-                {
-                    PublicationId = "ab4f45fa-20ac-44ac-894f-6613f6b6232d",
-                    PublicationName = "Some dummy",
-                    ReleaseName = "2018/2019",
-                    ReleaseDate = "2018-12-02"
-                }
-            };
+            _importService = importService;
+            _fileStorageService = fileStorageService;
         }
         
         public ActionResult Import()
         {
             var model = new CreatePublicationModel
             {
-                PublicationsToImport = _publications
+                PublicationsToImport = GetAvailableReleases()
             };
 
             return View(model);
@@ -52,7 +36,7 @@ namespace GovUk.Education.ExploreStatistics.Admin.Controllers
         [HttpPost]
         public IActionResult Import(CreatePublicationModel model)
         {
-            var publication = _publications.FirstOrDefault(p => p.PublicationId == model.Id);
+            var publication = GetAvailableReleases().FirstOrDefault(p => p.PublicationId == model.Id);
             if (publication == null)
             {
                 return new NotFoundResult();
@@ -70,6 +54,39 @@ namespace GovUk.Education.ExploreStatistics.Admin.Controllers
         public IActionResult ImportNotificationSent(ImportViewModel model)
         {
             return View(model);
+        }
+        
+        private List<ImportViewModel> GetAvailableReleases()
+        {
+            var publications = new List<ImportViewModel>();
+            var publicationIds = new HashSet<string>();
+            var files = _fileStorageService.ListFiles("releases").Where(f => f.EndsWith("csv"));
+            
+            // Just get the generated Guids that were generated from the upload
+            foreach (var file in files)
+            {
+                var str = file.Split('/');
+                var fName = str.Last();
+                var uploadId = str.SkipLast(1).Last();
+                fName = Path.GetFileNameWithoutExtension(fName).Replace("_", " ");
+                
+                if (!fName.StartsWith("meta") && !publicationIds.Contains(uploadId))
+                {
+                    publicationIds.Add(uploadId);
+                    {
+                        publications.Add(
+                            new ImportViewModel
+                            {
+                                PublicationId = uploadId,
+                                PublicationName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(fName.ToLower()),
+                                ReleaseName = "2018/2019",
+                                ReleaseDate = DateTime.Now.ToString("MM/dd/yyyy")
+                            }
+                        );
+                    }
+                }
+            }
+            return publications;
         }
     }
 }

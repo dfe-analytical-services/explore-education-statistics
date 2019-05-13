@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreStatistics.Admin.Controllers
         {
             return View();
         }
-
+        
         public async Task<IActionResult> Privacy()
         {
             return View();

@@ -401,12 +401,8 @@ describe('FormFieldCheckboxSearchGroup', () => {
 
     jest.runAllTimers();
 
-    const checkboxes = getAllByLabelText(/Checkbox/);
-
-    expect(checkboxes).toHaveLength(2);
-    expect(checkboxes[0]).toHaveAttribute('value', '1');
-    expect(checkboxes[0]).toHaveAttribute('checked');
-    expect(checkboxes[1]).toHaveAttribute('value', '2');
-    expect(checkboxes[1]).not.toHaveAttribute('checked');
+    expect(getAllByLabelText(/Checkbox/)).toHaveLength(2);
+    expect(getByLabelText('Checkbox 1')).toHaveAttribute('checked');
+    expect(getByLabelText('Checkbox 2')).not.toHaveAttribute('checked');
   });
 });

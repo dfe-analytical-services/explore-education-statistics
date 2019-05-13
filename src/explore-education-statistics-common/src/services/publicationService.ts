@@ -55,6 +55,10 @@ export interface Chart {
   height?: number;
 }
 
+export interface Table {
+  indicators: string[];
+}
+
 export interface Summary {
   dataKeys: string[];
   description: { type: string; body: string };
@@ -66,6 +70,8 @@ export interface ContentBlock {
   heading?: string;
   dataBlockRequest?: DataBlockRequest;
   charts?: Chart[];
+  tables?: Table[];
+  summary?: Summary;
 }
 
 export interface Release {

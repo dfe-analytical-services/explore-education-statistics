@@ -1,0 +1,44 @@
+@import '~explore-education-statistics-common/src/styles/govuk-base';
+
+$circle-size: 40px;
+$circle-border-size: 4px;
+$step-padding-top: govuk-spacing(6);
+
+.stepButton {
+  @include govuk-typography-common;
+
+  background: none;
+  border: 0;
+  cursor: text;
+  font-weight: $govuk-font-weight-bold;
+  margin: 0;
+  outline: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.toggleText {
+  @include govuk-link-common;
+
+  color: $govuk-link-colour;
+  cursor: pointer;
+  display: block;
+  font-size: 1.1rem;
+  font-weight: $govuk-font-weight-regular;
+}
+
+.stepEnabled {
+  .stepButton {
+    @include govuk-focusable;
+
+    cursor: pointer;
+  }
+
+  .stepButton:hover {
+    color: $govuk-link-hover-colour;
+  }
+
+  .stepButton:hover .toggleText {
+    text-decoration: underline;
+  }
+}

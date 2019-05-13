@@ -5,7 +5,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
@@ -53,66 +53,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             // TODO check subject exists
             var subject = _subjectService.Find(subjectId);
-
-            var filters = GetFilters(subject.Id);
-            var indicators = GetIndicators(subject.Id);
-            var locationMeta = _observationService.GetLocationMeta(subject.Id);
-            var timePeriods = GetTimePeriods(subject.Id);
-
-            var national = _mapper.Map<IEnumerable<LabelValueViewModel>>(locationMeta.Country);
-
-            var localAuthority = _mapper.Map<IEnumerable<LabelValueViewModel>>(locationMeta.LocalAuthority);
-
-            var localAuthorityDistrict =
-                _mapper.Map<IEnumerable<LabelValueViewModel>>(locationMeta.LocalAuthorityDistrict);
-
-            var region = _mapper.Map<IEnumerable<LabelValueViewModel>>(locationMeta.Region);
-
             return new SubjectMetaViewModel
             {
-                Filters = filters,
-                Indicators = indicators,
-                Locations =
-                    new Dictionary<string, LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>
-                    {
-                        {
-                            GeographicLevel.Local_Authority.ToString().PascalCase(),
-                            new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
-                            {
-                                Hint = "",
-                                Legend = "Local Authority",
-                                Options = localAuthority
-                            }
-                        },
-                        {
-                            GeographicLevel.Local_Authority_District.ToString().PascalCase(),
-                            new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
-                            {
-                                Hint = "",
-                                Legend = "Local Authority District",
-                                Options = localAuthorityDistrict
-                            }
-                        },
-                        {
-                            GeographicLevel.National.ToString().PascalCase(),
-                            new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
-                            {
-                                Hint = "",
-                                Legend = "National",
-                                Options = national
-                            }
-                        },
-                        {
-                            GeographicLevel.Regional.ToString().PascalCase(),
-                            new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
-                            {
-                                Hint = "",
-                                Legend = "Region",
-                                Options = region
-                            }
-                        }
-                    },
-                TimePeriod = timePeriods
+                Filters = GetFilters(subject.Id),
+                Indicators = GetIndicators(subject.Id),
+                Locations = GetObservationalUnits(subject.Id),
+                TimePeriod = GetTimePeriods(subject.Id)
             };
         }
 
@@ -131,6 +77,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     Year = tuple.Year
                 })
             };
+        }
+
+        private Dictionary<string, LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>> GetObservationalUnits(
+            long subjectId)
+        {
+            return _observationService.GetObservationalUnits(subjectId)
+                .Where(pair => pair.Value.Any())
+                .ToDictionary(
+                    pair => pair.Key.ToString().PascalCase(),
+                    pair => new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                    {
+                        Hint = "",
+                        Legend = pair.Key.GetEnumLabel(),
+                        Options = _mapper.Map<IEnumerable<LabelValueViewModel>>(pair.Value)
+                    });
         }
 
         private Dictionary<string, LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>> GetIndicators(

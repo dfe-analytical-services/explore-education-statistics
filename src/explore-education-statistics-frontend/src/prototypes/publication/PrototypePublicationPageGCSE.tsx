@@ -2,24 +2,11 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import Link from '@frontend/components/Link';
-import DataBlock from '@common/modules/find-statistics/components/DataBlock';
+
 import PrototypePage from '@frontend/prototypes/components/PrototypePage';
 import PrototypeSearchForm from '@frontend/prototypes/components/PrototypeSearchForm';
 import PrototypeDataSampleGCSE from '@frontend/prototypes/publication/components/PrototypeDataSampleGCSE';
-import {
-  ks4AverageAttainment8ScorePerPupilByLocalAuthority,
-  ks4AverageHeadlineScoresByPupilEthnicity,
-  ks4PerformanceInMatsComparedToNationalAverage,
-  ks4RevisedAttainmentData,
-  ks4SchoolAverageHeadlineScoresByPupilCharacteristics,
-  kS4SchoolPerformanceDataBlock,
-  ks4SchoolRevisedAttainmentChart,
-  ks4StateFundedSchoolsPerformance,
-  ks4TrendInDisavdantagePuilsAttainmentGapIndex,
-} from '@frontend/prototypes/publication/data/PrototypeDataFactory';
 import React from 'react';
-
-import styles from './prototype.module.scss';
 
 const PublicationPage = () => {
   return (
@@ -295,8 +282,6 @@ const PublicationPage = () => {
         </AccordionSection>
 
         <AccordionSection heading="School performance">
-          <DataBlock {...kS4SchoolPerformanceDataBlock} />
-
           <p>
             Results for 2018 show an increases across all headline measures
             compared to 2017.{' '}
@@ -365,9 +350,6 @@ const PublicationPage = () => {
               coasting and floor standard by region
             </strong>
           </p>
-          <div className={styles['hide-dates-from-datablock']}>
-            <DataBlock {...ks4SchoolRevisedAttainmentChart} />
-          </div>
           <p>
             The floor and coasting standards give measures of whether schools
             are helping pupils to fulfil their potential based on progress
@@ -397,9 +379,6 @@ const PublicationPage = () => {
           </ul>
         </AccordionSection>
         <AccordionSection heading="Pupil characteristics">
-          <DataBlock
-            {...ks4SchoolAverageHeadlineScoresByPupilCharacteristics}
-          />
           <p>
             Breakdowns by pupil characteristics show that across all headline
             measures:
@@ -431,16 +410,8 @@ const PublicationPage = () => {
             remained broadly stable, widening by 0.6% in 2018, and narrowing by
             9.5% since 2011.
           </p>
-          <DataBlock
-            height={600}
-            {...ks4TrendInDisavdantagePuilsAttainmentGapIndex}
-          />
         </AccordionSection>
         <AccordionSection heading="Headline performance">
-          <DataBlock
-            height={400}
-            {...ks4AverageHeadlineScoresByPupilEthnicity}
-          />
           <p>
             Results across headline measures differ by ethnicity with Chinese
             pupils in particular achieving scores above the national average.
@@ -474,15 +445,8 @@ const PublicationPage = () => {
             pupil show that. This is similar to patterns seen in recent years
             and against other performance measures.{' '}
           </p>
-          <DataBlock
-            {...ks4AverageAttainment8ScorePerPupilByLocalAuthority}
-            height={400}
-          />
         </AccordionSection>
         <AccordionSection heading="Pupil subject areas">
-          <div className={styles['hide-dates-from-datablock']}>
-            <DataBlock {...ks4RevisedAttainmentData} />
-          </div>
           <p>
             It is compulsory for pupils to study English and Maths at key stage
             4 in state-funded schools.{' '}
@@ -539,7 +503,6 @@ const PublicationPage = () => {
           </p>
         </AccordionSection>
         <AccordionSection heading="Schools performance">
-          <DataBlock {...ks4StateFundedSchoolsPerformance} />
           [TABLE - Key stage 4 revised attainment data ]
           <p>
             Schools in England can be divided into state-funded and independent
@@ -586,10 +549,6 @@ const PublicationPage = () => {
             increased from 62 in 2017 to 85 in 2018. This is an increase from
             384 to 494 schools, and from 54,356 to 69,169 pupils.{' '}
           </p>
-          <DataBlock
-            height={300}
-            {...ks4PerformanceInMatsComparedToNationalAverage}
-          />
           <p>
             On Progress8 measures, in 2018, 32.9% of MATs were below the
             national average and 7.1% well below average. 29.4% were not above
@@ -687,29 +646,40 @@ const PublicationPage = () => {
             If you have a specific enquiry about absence and exclusion
             statistics and data:
           </p>
-          <p>
-            <strong>Attainment statistics team</strong>
-          </p>
-          <p>Email</p>
-          <p>
+          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+            Attainment statistics team
+          </h4>
+          <p className="govuk-!-margin-top-0">
+            Email
+            <br />
             <a href="mailto:attainment.statistics@education.gov.uk">
               attainment.statistics@education.gov.uk
             </a>
           </p>
-          <p>Telephone: Kathryn Kenney</p>
-          <p>01325 340 620</p>
-
-          <h4>Press office</h4>
-          <p>If you have a media enquiry:</p>
-          <p>Telephone</p>
-          <p>020 7925 6789 </p>
-          <h4>Public enquiries</h4>
           <p>
+            Telephone: Kathryn Kenney <br />
+            01325 340 620
+          </p>
+
+          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+            Press office
+          </h4>
+          <p className="govuk-!-margin-top-0">If you have a media enquiry:</p>
+          <p>
+            Telephone <br />
+            020 7925 6789
+          </p>
+          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+            Public enquiries
+          </h4>
+          <p className="govuk-!-margin-top-0">
             If you have a general enquiry about the Department for Education
             (DfE) or education:
           </p>
-          <p>Telephone</p>
-          <p>037 0000 2288</p>
+          <p>
+            Telephone <br />
+            037 0000 2288
+          </p>
         </AccordionSection>
       </Accordion>
       <h2 className="govuk-heading-m govuk-!-margin-top-9">

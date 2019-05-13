@@ -47,12 +47,6 @@ function PrototypesIndexPage() {
 
       <ul>
         <li>
-          <Link to="/prototypes/table-tool">Table tool page</Link>
-        </li>
-      </ul>
-
-      <ul>
-        <li>
           <a href="https://eesadminprototype.z33.web.core.windows.net/prototypes/">
             Administrator Prototype Index
           </a>

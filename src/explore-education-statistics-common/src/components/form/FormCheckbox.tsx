@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { ChangeEventHandler, ReactNode } from 'react';
+import React, { ChangeEventHandler, memo, ReactNode } from 'react';
 
 export type CheckboxChangeEventHandler = ChangeEventHandler<HTMLInputElement>;
 
@@ -62,4 +62,4 @@ const FormCheckbox = ({
   );
 };
 
-export default FormCheckbox;
+export default memo(FormCheckbox);

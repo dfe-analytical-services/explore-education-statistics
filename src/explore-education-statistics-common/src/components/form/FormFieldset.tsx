@@ -4,7 +4,7 @@ import ErrorMessage from '../ErrorMessage';
 import FormGroup from './FormGroup';
 import createDescribedBy from './util/createDescribedBy';
 
-export interface FieldSetProps {
+export interface FormFieldsetProps {
   children?: ReactNode;
   error?: string;
   hint?: string;
@@ -22,7 +22,7 @@ const FormFieldset = ({
   legend,
   legendSize = 'm',
   legendHidden = false,
-}: FieldSetProps) => {
+}: FormFieldsetProps) => {
   return (
     <FormGroup hasError={!!error}>
       <fieldset

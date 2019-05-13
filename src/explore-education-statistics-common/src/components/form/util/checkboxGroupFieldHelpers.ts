@@ -9,6 +9,10 @@ export const onAllChange = (
   options: CheckboxOption[],
 ) => {
   return (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.isDefaultPrevented()) {
+      return;
+    }
+
     const currentValues = get(form.values, name);
 
     const allOptionValues = options.map(option => option.value);
@@ -24,6 +28,10 @@ export const onAllChange = (
 
 export const onChange = ({ form, name, ...helpers }: FieldArrayRenderProps) => {
   return (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.isDefaultPrevented()) {
+      return;
+    }
+
     const currentValues = get(form.values, name);
 
     if (event.target.checked) {

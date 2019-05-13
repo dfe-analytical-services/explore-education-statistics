@@ -1,0 +1,80 @@
+@import '~explore-education-statistics-common/src/styles/govuk-base';
+
+$circle-size: 40px;
+$circle-border-size: 4px;
+$step-padding-top: govuk-spacing(6);
+
+.step {
+  align-items: flex-start;
+  display: none;
+  padding-left: govuk-spacing(8);
+  position: relative;
+
+  &.stepActive,
+  &.stepEnabled {
+    display: flex;
+  }
+
+  &::before {
+    border-left: $circle-border-size solid $govuk-border-colour;
+    content: '';
+    height: 100%;
+    left: ($circle-size / 2) - ($circle-border-size / 2);
+    position: absolute;
+    top: $circle-size - (2 * $circle-border-size);
+    z-index: 2;
+  }
+
+  &:last-child::after {
+    border-bottom: $circle-border-size solid $govuk-border-colour;
+    bottom: -($circle-size - (2 * $circle-border-size));
+    content: '';
+    left: 0;
+    position: absolute;
+    width: $circle-size;
+    z-index: 3;
+  }
+
+  &:focus {
+    outline: 0;
+  }
+}
+
+.stepActive {
+  &::before,
+  &:last-child::after {
+    border-color: govuk-colour('black');
+  }
+
+  .number {
+    border-color: govuk-colour('black');
+  }
+}
+
+.number {
+  align-items: center;
+  background: #fff;
+  border: $circle-border-size solid $govuk-border-colour;
+  border-radius: 50%;
+  display: inline-flex;
+  height: $circle-size;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  top: $step-padding-top;
+  width: $circle-size;
+  z-index: 3;
+}
+
+.numberInner {
+  font-size: 1rem;
+  font-weight: $govuk-font-weight-bold;
+}
+
+.content {
+  border-top: 2px solid govuk-colour('grey-3');
+  display: block;
+  margin-left: govuk-spacing(6);
+  padding-top: $step-padding-top;
+  width: 100%;
+}
