@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 FilterItems = GetFilterItems(line, headers, subjectMeta.Filters),
                 GeographicLevel = GetGeographicLevel(line, headers),
-                Location = GetLocation(line, headers),
+                LocationId = GetLocationId(line, headers),
                 Measures = GetMeasures(line, headers, subjectMeta.Indicators),
                 School = GetSchool(line, headers),
                 Subject = subject,
@@ -172,13 +172,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return GeographicLevels.EnumFromStringForImport(CsvUtil.Value(line, headers, "geographic_level"));
         }
 
-        private Location GetLocation(IReadOnlyList<string> line, List<string> headers)
+        private long GetLocationId(IReadOnlyList<string> line, List<string> headers)
         {
             return _importerLocationService.Find(
                 GetCountry(line, headers),
                 GetRegion(line, headers),
                 GetLocalAuthority(line, headers),
-                GetLocalAuthorityDistrict(line, headers));
+                GetLocalAuthorityDistrict(line, headers)).Id;
         }
 
         private static School GetSchool(IReadOnlyList<string> line, List<string> headers)
