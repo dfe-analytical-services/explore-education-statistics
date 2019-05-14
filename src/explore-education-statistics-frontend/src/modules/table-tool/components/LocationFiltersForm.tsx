@@ -19,9 +19,7 @@ interface FormValues {
   };
 }
 
-type LocationFiltersFormSubmitHandler = (
-  values: FormValues['locations'],
-) => void;
+export type LocationFiltersFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
   options: PublicationSubjectMeta['locations'];
@@ -56,7 +54,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
     <Formik<FormValues>
       enableReinitialize
       onSubmit={async values => {
-        await onSubmit(values.locations);
+        await onSubmit(values);
         goToNextStep();
       }}
       initialValues={{
