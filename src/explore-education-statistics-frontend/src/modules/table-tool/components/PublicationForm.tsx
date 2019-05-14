@@ -44,6 +44,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
 
   return (
     <Formik<FormValues>
+      enableReinitialize
       initialValues={{
         publicationId: '',
       }}

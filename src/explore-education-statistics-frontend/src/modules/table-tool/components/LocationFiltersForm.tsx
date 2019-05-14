@@ -54,6 +54,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
 
   return (
     <Formik<FormValues>
+      enableReinitialize
       onSubmit={async values => {
         await onSubmit(values.locations);
         goToNextStep();
