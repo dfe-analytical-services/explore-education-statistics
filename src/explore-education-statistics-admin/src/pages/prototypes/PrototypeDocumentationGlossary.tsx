@@ -15,12 +15,13 @@ const DocumentationGlossary = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <div className="app-content__header">
-            <span className="govuk-caption-xl">Glossary</span>
-            <h1 className="govuk-heading-xl">Glossary</h1>
+            <span className="govuk-caption-xl">Style guidance</span>
+            <h1 className="govuk-heading-xl">Style guide</h1>
           </div>
           <p>
-            Browse our A to Z list of definitions for terms used across
-            education statistics and data.
+            Browse our A to Z list of style, spelling and grammar conventions
+            for all content published on the explore education statistics
+            service.
           </p>
 
           <Accordion id="a-z">
@@ -66,28 +67,6 @@ const DocumentationGlossary = () => {
               <p>Lower case.</p>
               <h3 id="academy-trust">academy trust</h3>
               <p>Lower case.</p>
-              <h3 id="access-to-work">Access to Work</h3>
-              <p>
-                Upper case when referring directly to the actual programme,
-                otherwise use lower case.
-              </p>
-              <h3 id="accountancy-service-provider">
-                accountancy service provider
-              </h3>
-              <p>
-                Upper case when referring to the business area covered by Money
-                Laundering Regulations. Do not use the acronym.
-              </p>
-              <h3 id="accounts-office">Accounts Office</h3>
-              <p>Upper case.</p>
-              <h3 id="activation-pin">Activation PIN</h3>
-              <p>
-                Upper case. Activation PIN has been changed to Activation Code
-                on outgoing correspondence from the Government Gateway. Until
-                all hard-coded instances of Activation PIN have been removed
-                from the Online Services pages, use ‘Activation Code (also known
-                as Activation PIN)’.
-              </p>
               <h3 id="act-act-of-parliament">act, act of Parliament</h3>
               <p>
                 Lower case. Only use upper case when using the full title:
@@ -105,19 +84,6 @@ const DocumentationGlossary = () => {
                 involved or take action: ‘You can contact HMRC by phone and
                 email’ or ‘Pay your car tax’, for example.
               </p>
-              <h3 id="adoption-register">Adoption Register</h3>
-              <p>
-                Upper case when referring to the national Adoption Register.
-              </p>
-              <p>
-                Lower case in subsequent mentions that do not use the full term:
-                the register.
-              </p>
-              <h3 id="adviser">adviser</h3>
-              <p>
-                For example, special adviser. Not advisor, but advisory is the
-                correct adjective.
-              </p>
               <h3 id="ages">ages</h3>
               <p>
                 Do not use hyphens in ages unless to avoid confusion, although
@@ -126,107 +92,29 @@ const DocumentationGlossary = () => {
                 course’ can be written as ‘15 students aged 16 took the A level
                 course’.
               </p>
-              <h3 id="agile">agile</h3>
-              <p>
-                Upper case when referring to the Agile Manifesto and principles
-                and processes, otherwise use lower case.
-              </p>
-              <h3 id="al-qaida">al-Qa’ida</h3>
-              <p>Not al-Qaeda’ or ‘al-Qaida.</p>
-              <h3 id="alternative-provision">alternative provision</h3>
-              <p>Lower case.</p>
-              <h3 id="americanisms">Americanisms</h3>
-              <p>
-                Do not use Americanisms. You fill in a form, not fill out a
-                form.
-              </p>
-              <p>
-                Exceptions include where it’s part of a specific name: 4th
-                Mechanized Brigade, for example.
-              </p>
-              <p>
-                Use the -ise rather than -ize suffix: organise not organize, for
-                example (this is not actually an Americanism but is often seen
-                as such).
-              </p>
               <h3 id="ampersand">Ampersand</h3>
               <p>
-                Use and rather than &amp;, unless it’s a department’s logo image
-                or a company’s name as it appears on the{' '}
+                Use 'and' rather than &amp;, unless it’s a department’s logo
+                image or a company’s name as it appears on the{' '}
                 <a rel="external" href="https://beta.companieshouse.gov.uk/">
                   Companies House
                 </a>{' '}
                 register.
               </p>
-              <h3 id="animal-health">animal health</h3>
-              <p>Lower case.</p>
-              <h3 id="antisocial">antisocial</h3>
-              <p>No hyphen.</p>
               <h3 id="applied-general-qualifications">
                 applied general qualifications
               </h3>
               <p>Lower case.</p>
               <h3 id="apprenticeship-programme">apprenticeship programme</h3>
               <p>Lower case.</p>
-              <h3 id="a-road">A-road</h3>
-              <p>Hyphenated.</p>
-              <h3 id="armed-forces">armed forces</h3>
-              <p>Lower case.</p>
-              <h3 id="arms-length-body">arm’s length body</h3>
-              <p>Apostrophe, no hyphen.</p>
-              <h3 id="assembly-ministers">assembly ministers</h3>
-              <p>Lower case.</p>
-              <h3 id="attendance-allowance">Attendance Allowance</h3>
-              <p>Upper case.</p>
             </AccordionSection>
             <AccordionSection heading="B">
-              <h3 id="bacs-bankers-automated-clearing-system">
-                Bacs (Bankers Automated Clearing System)
-              </h3>
-              <p>
-                Acronym should come first as it’s more widely known than the
-                full name. Please note that the acronym has changed to Bacs.
-              </p>
-              <h3 id="backend">backend</h3>
-              <p>Used in a technical context, not “back-end” or “back end”.</p>
-              <h3 id="bank-details">Bank details</h3>
-              <p>
-                When adding bank details in content about paying a government
-                body:
-              </p>
-              <ul>
-                <li>
-                  use spaces rather than hyphens in sort codes - 60 70 80 (not
-                  60-70-80)
-                </li>
-                <li>do not use spaces in account numbers - 10025634</li>
-              </ul>
               <h3 id="banned-words">Banned words</h3>
               <p>
                 See <a href="#words-to-avoid">Words to avoid</a>
               </p>
               <h3 id="baseline">baseline</h3>
               <p>One word, lower case.</p>
-              <h3 id="behavioural-insights-team">Behavioural Insights team</h3>
-              <p>
-                Upper case if it’s a specific, named team. Always lower case for
-                team and generic names like research team, youth offending team.
-              </p>
-              <h3 id="bereavement-payment">Bereavement Payment</h3>
-              <p>Upper case.</p>
-              <h3 id="blind-persons-allowance">Blind Person’s Allowance</h3>
-              <p>Upper case.</p>
-              <h3 id="blog-post">blog post</h3>
-              <p>
-                Use 2 words when referring to an article published on a blog. A
-                ‘blog’ is the site on which a blog post is published.
-              </p>
-              <h3 id="board">board</h3>
-              <p>
-                Always lower case unless it’s part of a proper title: so upper
-                case for the Judicial Executive Board, but lower case for the
-                DFT’s management board.
-              </p>
               <h3 id="bold">bold</h3>
               <p>
                 Only use bold to refer to text from interfaces in technical
@@ -321,366 +209,227 @@ const DocumentationGlossary = () => {
                 ) in steps. Steps end in a full stop because each should be a
                 complete sentence.
               </p>
-              <h3 id="business-continuity-management">
-                business continuity management
-              </h3>
-              <p>Lower case.</p>
-              <h3 id="business-plan">business plan</h3>
-              <p>
-                Lower case. Do not use upper case even in the title of a
-                business plan publication.
-              </p>
-              <h3 id="business-statement">business statement</h3>
-              <p>Lower case.</p>
             </AccordionSection>
             <AccordionSection heading="C">
-              <div>
-                <h3 id="c-of-e">C of E</h3>
-                <p>For Church of England when referring to school names.</p>
-                <h3 id="cabinet">cabinet</h3>
-                <p>The cabinet is lower case.</p>
-                <h3 id="capital-gains-tax">Capital Gains Tax</h3>
-                <p>Upper case.</p>
-                <h3 id="capitalisation">Capitalisation</h3>
-                <p>
-                  DO NOT USE BLOCK CAPITALS FOR LARGE AMOUNTS OF TEXT AS IT’S
-                  QUITE HARD TO READ.
-                </p>
-                <p>
-                  Always use lower case, even in page titles. The exceptions to
-                  this are proper nouns, and:
-                </p>
-                <ul>
-                  <li>
-                    departments (specific government departments - see below)
-                  </li>
-                  <li>the Civil Service, with lower case for ‘the’</li>
-                  <li>
-                    job titles, ministers’ role titles: Minister for Housing,
-                    Home Secretary
-                  </li>
-                  <li>
-                    titles like Mr, Mrs, Dr, the Duke of Cambridge (the duke at
-                    second mention); Pope Francis, but the pope
-                  </li>
-                  <li>Rt Hon (no full stops)</li>
-                  <li>buildings</li>
-                  <li>place names</li>
-                  <li>brand names</li>
-                  <li>faculties, departments, institutes and schools</li>
-                  <li>
-                    names of groups, directorates and organisations: Knowledge
-                    and Innovation Group
-                  </li>
-                  <li>Parliament, the House</li>
-                  <li>
-                    titles of specific acts or bills: Housing Reform Bill (but
-                    use ‘the act’ or ‘the bill’ after the first time you use the
-                    full act or bill title)
-                  </li>
-                  <li>
-                    names of specific, named government schemes known to people
-                    outside government: Right to Buy, Queen’s Awards for
-                    Enterprise
-                  </li>
-                  <li>
-                    specific select committees: Public Administration Select
-                    Committee
-                  </li>
-                  <li>header cells in tables: Annual profits</li>
-                  <li>
-                    titles of books (and within single quotes), for example,
-                    ‘The Study Skills Handbook’
-                  </li>
-                  <li>World War 1 and World War 2 (note caps and numbers)</li>
-                </ul>
-                <p>Do not capitalise:</p>
-                <ul>
-                  <li>
-                    government - see{' '}
-                    <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#government">
-                      government
-                    </a>
-                  </li>
-                  <li>
-                    minister, never Minister, unless part of a specific job
-                    title, like Minister for the Cabinet Office
-                  </li>
-                  <li>
-                    department or ministry - never Department or Ministry,
-                    unless referring to a specific one: Ministry of Justice, for
-                    example
-                  </li>
-                  <li>
-                    white paper, green paper, command paper, House of Commons
-                    paper
-                  </li>
-                  <li>
-                    budget, autumn statement, spring statement, unless referring
-                    to and using the full name of a specific statement - for
-                    example, “2016 Budget”
-                  </li>
-                  <li>
-                    sections or schedules within specific named acts,
-                    regulations or orders
-                  </li>
-                  <li>
-                    director general (no hyphen), deputy director, director,
-                    unless in a specific job title
-                  </li>
-                  <li>
-                    group and directorate, unless referring to a specific group
-                    or directorate: the Commercial Directorate, for example
-                  </li>
-                  <li>departmental board, executive board, the board</li>
-                  <li>
-                    policy themes like sustainable communities, promoting
-                    economic growth, local enterprise zones
-                  </li>
-                  <li>
-                    general mention of select committees (but do cap specific
-                    ones - see above)
-                  </li>
-                  <li>the military</li>
-                </ul>
-                <h4 id="capitals-for-government-departments">
-                  Capitals for government departments
-                </h4>
-                <p>
-                  Use the following conventions for government departments. A
-                  department using an ampersand in its logo image is fine but
-                  use ‘and’ when writing in full text.
-                </p>
-                <ul>
-                  <li>Attorney General’s Office (AGO)</li>
-                  <li>Cabinet Office (CO)</li>
-                  <li>
-                    Department for Business, Energy and Industrial Strategy
-                    (BEIS)
-                  </li>
-                  <li>
-                    Department for Digital, Culture, Media and Sport (DCMS)
-                  </li>
-                  <li>Department for Education (DfE)</li>
-                  <li>
-                    Department for Environment, Food and Rural Affairs (Defra)
-                  </li>
-                  <li>Department for Exiting the European Union (DExEU)</li>
-                  <li>Department for International Development (DFID)</li>
-                  <li>Department for International Trade (DIT)</li>
-                  <li>Department for Transport (DfT)</li>
-                  <li>Department for Work and Pensions (DWP)</li>
-                  <li>Department of Health and Social Care (DHSC)</li>
-                  <li>Foreign and Commonwealth Office (FCO)</li>
-                  <li>HM Treasury (HMT)</li>
-                  <li>Home Office (HO)</li>
-                  <li>Ministry of Defence (MOD)</li>
-                  <li>
-                    Ministry of Housing, Communities and Local Government
-                    (MHCLG)
-                  </li>
-                  <li>Ministry of Justice (MOJ)</li>
-                </ul>
-                <h3 id="care-worker">care worker</h3>
-                <p>Two words. Lower case.</p>
-                <h3 id="chair-of-governors">chair of governors</h3>
-                <p>Lower case.</p>
-                <h3 id="chairman-chairwoman-chairperson">
-                  chairman, chairwoman, chairperson
-                </h3>
-                <p>
-                  Lower case in text. Upper case in titles: Spencer Tracy,
-                  Chairman, GDS.
-                </p>
-                <h3 id="change-notes">Change notes</h3>
-                <p>
-                  See{' '}
-                  <a href="/guidance/content-design/writing-for-gov-uk#change-notes">
-                    change notes
-                  </a>{' '}
-                  in the content design manual.
-                </p>
-                <h3 id="changelog">changelog</h3>
-                <p>Not “change log”.</p>
-                <h3 id="chaps-clearing-house-automated-payment-system">
-                  CHAPS (Clearing House Automated Payment System)
-                </h3>
-                <p>
-                  The acronym should come first as it’s more widely known than
-                  the full name.
-                </p>
-                <h3 id="checkbox">checkbox</h3>
-                <p>Not “check box”.</p>
-                <h3 id="chemical-biological-radiological-or-nuclear-cbrn-materials">
-                  chemical, biological, radiological or nuclear (CBRN)
-                  materials.
-                </h3>
-                <p>Lower case. Use upper case for the acronym.</p>
-                <h3 id="chief-constable">chief constable</h3>
-                <p>
-                  Lower case except where it’s a title with the holder’s name,
-                  like Chief Constable Andrew Trotter.
-                </p>
-                <h3 id="child-benefit">Child Benefit</h3>
-                <p>Upper case.</p>
-                <h3 id="child-tax-credit">Child Tax Credit</h3>
-                <p>
-                  Upper case, but generic references to tax credits are lower
-                  case.
-                </p>
-                <h3 id="childcare">childcare</h3>
-                <p>Lower case.</p>
-                <h3 id="childcare-grant">Childcare Grant</h3>
-                <p>Upper case.</p>
-                <h3 id="childminder-childminding">childminder, childminding</h3>
-                <p>One word.</p>
-                <h3 id="children-in-need">Children in Need</h3>
-                <p>
-                  Upper case for the BBC fundraising event, lower case for
-                  children in need census.
-                </p>
-                <h3 id="civil-contingencies-secretariat">
-                  Civil Contingencies Secretariat
-                </h3>
-                <p>Upper case because it’s the name of an organisation.</p>
-                <h3 id="civil-service">Civil Service</h3>
-                <p>Upper case.</p>
-                <h3 id="civil-servants">civil servants</h3>
-                <p>Lower case.</p>
-                <h3 id="classwork">classwork</h3>
-                <p>One word.</p>
-                <h3 id="click">click</h3>
-                <p>
-                  Don’t use “click” when talking about user interfaces because
-                  not all users click. Use “select”.
-                </p>
-                <h3 id="coalition">coalition</h3>
-                <p>Lower case in all instances, including ‘the coalition’.</p>
-                <h3 id="co2">CO2</h3>
-                <p>Use capital letters and a regular 2.</p>
-                <h3 id="coastguard">coastguard</h3>
-                <p>Lower case.</p>
-                <h3 id="code-of-practice">code of practice</h3>
-                <p>Lower case.</p>
-                <h3 id="command-paper">command paper</h3>
-                <p>Lower case.</p>
-                <h3 id="commercial-software">commercial software</h3>
-                <p>
-                  Not “third-party software”. Also use “commercial” for types of
-                  software, for example “commercial word processor”.
-                </p>
-                <h3 id="community-care-grant">Community Care Grant</h3>
-                <p>Upper case.</p>
-                <h3 id="community-resilience">community resilience</h3>
-                <p>Lower case.</p>
-                <h3 id="community-voluntary-and-foundation-schools">
-                  community, voluntary and foundation schools
-                </h3>
-                <p>Lower case.</p>
-                <h3 id="competence-order">competence order</h3>
-                <p>
-                  Lower case unless used in the full title, like the National
-                  Assembly for Wales (Legislative Competence) (Social Welfare)
-                  Order 2008.
-                </p>
-                <h3 id="conduct-of-business-rules">
-                  conduct of business rules
-                </h3>
-                <p>Lower case.</p>
-                <h3 id="construction-industry-scheme">
-                  Construction Industry Scheme
-                </h3>
-                <p>
-                  Use upper case when referring to the actual Construction
-                  Industry Scheme (CIS, not the CIS).
-                </p>
-                <h3 id="construction-industry-scheme-onlinecis-online">
-                  Construction Industry Scheme Online/CIS Online
-                </h3>
-                <p>Upper case.</p>
-                <h3 id="consultation-responses">consultation responses</h3>
-                <p>Lower case.</p>
-                <h3 id="continuous-improvement">continuous improvement</h3>
-                <p>Lower case.</p>
-                <h3 id="contractions">Contractions</h3>
-                <p>Use contractions like you’re and we’ll.</p>
-                <p>Avoid:</p>
-                <ul>
-                  <li>
-                    negative contractions like can’t and don’t - many users find
-                    them harder to read, or misread them as the opposite of what
-                    they say
-                  </li>
-                  <li>
-                    should’ve, could’ve, would’ve, they’ve - these can be hard
-                    to read
-                  </li>
-                </ul>
-                <p>
-                  <a href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#contractions">
-                    Read more about contractions
+              <h3 id="c-of-e">C of E</h3>
+              <p>For Church of England when referring to school names.</p>
+              <h3 id="capitalisation">Capitalisation</h3>
+              <p>
+                DO NOT USE BLOCK CAPITALS FOR LARGE AMOUNTS OF TEXT AS IT’S
+                QUITE HARD TO READ.
+              </p>
+              <p>
+                Always use lower case, even in page titles. The exceptions to
+                this are proper nouns, and:
+              </p>
+              <ul>
+                <li>
+                  departments (specific government departments - see below)
+                </li>
+                <li>the Civil Service, with lower case for ‘the’</li>
+                <li>
+                  job titles, ministers’ role titles: Minister for Housing, Home
+                  Secretary
+                </li>
+                <li>
+                  titles like Mr, Mrs, Dr, the Duke of Cambridge (the duke at
+                  second mention); Pope Francis, but the pope
+                </li>
+                <li>Rt Hon (no full stops)</li>
+                <li>buildings</li>
+                <li>place names</li>
+                <li>brand names</li>
+                <li>faculties, departments, institutes and schools</li>
+                <li>
+                  names of groups, directorates and organisations: Knowledge and
+                  Innovation Group
+                </li>
+                <li>Parliament, the House</li>
+                <li>
+                  titles of specific acts or bills: Housing Reform Bill (but use
+                  ‘the act’ or ‘the bill’ after the first time you use the full
+                  act or bill title)
+                </li>
+                <li>
+                  names of specific, named government schemes known to people
+                  outside government: Right to Buy, Queen’s Awards for
+                  Enterprise
+                </li>
+                <li>
+                  specific select committees: Public Administration Select
+                  Committee
+                </li>
+                <li>header cells in tables: Annual profits</li>
+                <li>
+                  titles of books (and within single quotes), for example, ‘The
+                  Study Skills Handbook’
+                </li>
+                <li>World War 1 and World War 2 (note caps and numbers)</li>
+              </ul>
+              <p>Do not capitalise:</p>
+              <ul>
+                <li>
+                  government - see{' '}
+                  <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#government">
+                    government
                   </a>
-                  .
-                </p>
-                <h3 id="co-operation">co-operation</h3>
-                <p>Hyphenated.</p>
-                <h3 id="core-standards">core standards</h3>
-                <p>Lower case.</p>
-                <h3 id="corporation-tax">Corporation Tax</h3>
-                <p>Upper case.</p>
-                <h3 id="corporation-tax-for-agents-online-service">
-                  Corporation Tax for Agents online service
-                </h3>
-                <p>Upper case.</p>
-                <h3 id="corporation-tax-online">Corporation Tax Online</h3>
-                <p>
-                  Use upper case Online if referring to the actual service, not
-                  if you’re describing using the service: ‘you can pay your
-                  Corporation Tax online or at the Post Office.’
-                </p>
-                <h3 id="cots">COTS</h3>
-                <p>
-                  Meaning “commercial-off-the-shelf software”. Not “cots” or
-                  “Cots”. Explain the acronym at first use.
-                </p>
-                <h3 id="council">council</h3>
-                <p>Lower case even in a name: Wandsworth council.</p>
-                <h3 id="council-tax">Council Tax</h3>
-                <p>Upper case.</p>
-                <h3 id="countries-and-territories">
-                  countries and territories
-                </h3>
-                <p>
-                  When referring to a country or territory, use the names listed
-                  in the{' '}
-                  <a rel="external" href="https://country.register.gov.uk/">
-                    country register
-                  </a>{' '}
-                  or{' '}
-                  <a rel="external" href="https://territory.register.gov.uk/">
-                    territory register
-                  </a>
-                  .
-                </p>
-                <h3 id="coursework">coursework</h3>
-                <p>One word.</p>
-                <h3 id="credit-unions">credit unions</h3>
-                <p>Lower case.</p>
-                <h3 id="critical-national-infrastructure">
-                  critical national infrastructure
-                </h3>
-                <p>Lower case.</p>
-                <h3 id="cross-curricular-learning">
-                  cross-curricular learning
-                </h3>
-                <p>Hyphenated.</p>
-                <h3 id="curriculums">curriculums</h3>
-                <p>Not curricula.</p>
-                <h3 id="customs-duty">Customs Duty</h3>
-                <p>Upper case.</p>
-                <h3 id="cyber-bullying">cyber bullying</h3>
-                <p>Two words. Lower case.</p>
-              </div>
+                </li>
+                <li>
+                  minister, never Minister, unless part of a specific job title,
+                  like Minister for the Cabinet Office
+                </li>
+                <li>
+                  department or ministry - never Department or Ministry, unless
+                  referring to a specific one: Ministry of Justice, for example
+                </li>
+                <li>
+                  white paper, green paper, command paper, House of Commons
+                  paper
+                </li>
+                <li>
+                  budget, autumn statement, spring statement, unless referring
+                  to and using the full name of a specific statement - for
+                  example, “2016 Budget”
+                </li>
+                <li>
+                  sections or schedules within specific named acts, regulations
+                  or orders
+                </li>
+                <li>
+                  director general (no hyphen), deputy director, director,
+                  unless in a specific job title
+                </li>
+                <li>
+                  group and directorate, unless referring to a specific group or
+                  directorate: the Commercial Directorate, for example
+                </li>
+                <li>departmental board, executive board, the board</li>
+                <li>
+                  policy themes like sustainable communities, promoting economic
+                  growth, local enterprise zones
+                </li>
+                <li>
+                  general mention of select committees (but do cap specific ones
+                  - see above)
+                </li>
+                <li>the military</li>
+              </ul>
+              <h4 id="capitals-for-government-departments">
+                Capitals for government departments
+              </h4>
+              <p>
+                Use the following conventions for government departments. A
+                department using an ampersand in its logo image is fine but use
+                ‘and’ when writing in full text.
+              </p>
+              <ul>
+                <li>Attorney General’s Office (AGO)</li>
+                <li>Cabinet Office (CO)</li>
+                <li>
+                  Department for Business, Energy and Industrial Strategy (BEIS)
+                </li>
+                <li>Department for Digital, Culture, Media and Sport (DCMS)</li>
+                <li>Department for Education (DfE)</li>
+                <li>
+                  Department for Environment, Food and Rural Affairs (Defra)
+                </li>
+                <li>Department for Exiting the European Union (DExEU)</li>
+                <li>Department for International Development (DFID)</li>
+                <li>Department for International Trade (DIT)</li>
+                <li>Department for Transport (DfT)</li>
+                <li>Department for Work and Pensions (DWP)</li>
+                <li>Department of Health and Social Care (DHSC)</li>
+                <li>Foreign and Commonwealth Office (FCO)</li>
+                <li>HM Treasury (HMT)</li>
+                <li>Home Office (HO)</li>
+                <li>Ministry of Defence (MOD)</li>
+                <li>
+                  Ministry of Housing, Communities and Local Government (MHCLG)
+                </li>
+                <li>Ministry of Justice (MOJ)</li>
+              </ul>
+              <h3 id="care-worker">care worker</h3>
+              <p>Two words. Lower case.</p>
+              <h3 id="chair-of-governors">chair of governors</h3>
+              <p>Lower case.</p>
+              <h3 id="chairman-chairwoman-chairperson">
+                chairman, chairwoman, chairperson
+              </h3>
+              <p>
+                Lower case in text. Upper case in titles: Spencer Tracy,
+                Chairman, GDS.
+              </p>
+              <h3 id="childcare">childcare</h3>
+              <p>Lower case.</p>
+              <h3 id="children-in-need">Children in Need</h3>
+              <p>
+                Upper case for the BBC fundraising event, lower case for
+                children in need census.
+              </p>
+              <h3 id="civil-service">Civil Service</h3>
+              <p>Upper case.</p>
+              <h3 id="civil-servants">civil servants</h3>
+              <p>Lower case.</p>
+              <h3 id="classwork">classwork</h3>
+              <p>One word.</p>
+              <h3 id="click">click</h3>
+              <p>
+                Don’t use “click” when talking about user interfaces because not
+                all users click. Use “select”.
+              </p>
+              <h3 id="code-of-practice">code of practice</h3>
+              <p>Lower case.</p>
+              <h3 id="community-voluntary-and-foundation-schools">
+                community, voluntary and foundation schools
+              </h3>
+              <p>Lower case.</p>
+              <h3 id="contractions">Contractions</h3>
+              <p>Use contractions like you’re and we’ll.</p>
+              <p>Avoid:</p>
+              <ul>
+                <li>
+                  negative contractions like can’t and don’t - many users find
+                  them harder to read, or misread them as the opposite of what
+                  they say
+                </li>
+                <li>
+                  should’ve, could’ve, would’ve, they’ve - these can be hard to
+                  read
+                </li>
+              </ul>
+              <p>
+                <a href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#contractions">
+                  Read more about contractions
+                </a>
+                .
+              </p>
+              <h3 id="co-operation">co-operation</h3>
+              <p>Hyphenated.</p>
+              <h3 id="core-standards">core standards</h3>
+              <p>Lower case.</p>
+              <h3 id="council">council</h3>
+              <p>Lower case even in a name: Wandsworth council.</p>
+              <h3 id="council-tax">Council Tax</h3>
+              <p>Upper case.</p>
+              <h3 id="countries-and-territories">countries and territories</h3>
+              <p>
+                When referring to a country or territory, use the names listed
+                in the{' '}
+                <a rel="external" href="https://country.register.gov.uk/">
+                  country register
+                </a>{' '}
+                or{' '}
+                <a rel="external" href="https://territory.register.gov.uk/">
+                  territory register
+                </a>
+                .
+              </p>
+              <h3 id="coursework">coursework</h3>
+              <p>One word.</p>
+              <h3 id="cross-curricular-learning">cross-curricular learning</h3>
+              <p>Hyphenated.</p>
+              <h3 id="curriculums">curriculums</h3>
+              <p>Not curricula.</p>
             </AccordionSection>
             <AccordionSection heading="D">
               <h3 id="data">data</h3>
@@ -734,29 +483,15 @@ const DocumentationGlossary = () => {
               <p>Two words. Upper case.</p>
               <h3 id="dedicated-schools-grant">dedicated schools grant</h3>
               <p>Lower case.</p>
-              <h3 id="defence">defence</h3>
-              <p>
-                Lower case even when referring to the defence team at the MOD.
-              </p>
-              <h3 id="defence-team">defence team</h3>
-              <p>Lower case.</p>
               <h3 id="department">department</h3>
               <p>
                 Lower case except when in the title: the Department of Health
                 and Social Care.
               </p>
-              <h3 id="devolved-administrations">devolved administrations</h3>
-              <p>Lower case.</p>
-              <h3 id="devops">DevOps</h3>
-              <p>Similarly, use “WebOps”.</p>
               <h3 id="diploma">diploma</h3>
               <p>
                 Lower case unless part of a title like Edexcel L2 Diploma in IT.
               </p>
-              <h3 id="direct-debit">Direct Debit</h3>
-              <p>Upper case.</p>
-              <h3 id="direct-debit-instruction">Direct Debit Instruction</h3>
-              <p>Upper case.</p>
               <h3 id="director">director</h3>
               <p>
                 Lower case in text. Upper case in titles: Spencer Tracy,
@@ -764,22 +499,8 @@ const DocumentationGlossary = () => {
               </p>
               <h3 id="director-general">director general</h3>
               <p>Lower case. No hyphen.</p>
-              <h3 id="disability-living-allowance">
-                Disability Living Allowance
-              </h3>
-              <p>Upper case.</p>
-              <h3 id="dispensation">dispensation</h3>
-              <p>Lower case.</p>
-              <h3 id="discretionary-housing-payment">
-                Discretionary Housing Payment
-              </h3>
-              <p>Upper case.</p>
               <h3 id="district-council">district council</h3>
               <p>Lower case even in a name, like Warwick district council.</p>
-              <h3 id="duty-deferment-electronic-statements-ddes">
-                Duty Deferment Electronic Statements (DDES)
-              </h3>
-              <p>Upper case.</p>
             </AccordionSection>
             <AccordionSection heading="E">
               <h3 id="early-years">early years</h3>
@@ -798,23 +519,10 @@ const DocumentationGlossary = () => {
                 early years teacher status
               </h3>
               <p>Lower case.</p>
-              <h3 id="the-earth">the Earth</h3>
-              <p>
-                Upper case for the Earth, Planet Earth and Earth sciences, with
-                lower case for ‘the’.
-              </p>
-              <h3 id="east-end-london">East End (London)</h3>
-              <p>Upper case.</p>
               <h3 id="ebacc">EBacc</h3>
               <p>A performance measure linked to GCSEs. Upper case E and B.</p>
-              <h3 id="ec-sales-list-esl">EC Sales List (ESL)</h3>
-              <p>The acronym is ESL, not ECSL.</p>
               <h3 id="eco-schools">eco-schools</h3>
               <p>Hyphenated.</p>
-              <h3 id="education-health-and-care-plan">
-                education, health and care plan
-              </h3>
-              <p>Lower case.</p>
               <h3 id="eg-etc-and-ie">eg, etc and ie</h3>
               <p>
                 eg can sometimes be read aloud as ‘egg’ by screen reading
@@ -832,10 +540,6 @@ const DocumentationGlossary = () => {
                 is not possible, use an alternative such as ‘meaning’ or ‘that
                 is’.
               </p>
-              <h3 id="eg-etc-ie">
-                electronic Binding Tariff Information (eBTI)
-              </h3>
-              <p>Upper case, but note the lower case ‘e’.</p>
               <h3 id="email">email</h3>
               <p>One word.</p>
               <h3 id="email-addresses">Email addresses</h3>
@@ -843,18 +547,12 @@ const DocumentationGlossary = () => {
                 Write email addresses in full, in lower case and as active
                 links. Do not include any other words in the link text.
               </p>
-              <h3 id="emergency-plan">emergency plan</h3>
-              <p>Lower case.</p>
-              <h3 id="endpoint">endpoint</h3>
-              <p>Not “end point” in the context of APIs.</p>
               <h3 id="enrol">enrol</h3>
               <p>Lower case.</p>
               <h3 id="enrolling">enrolling</h3>
               <p>Lower case.</p>
               <h3 id="enrolment">enrolment</h3>
               <p>Lower case.</p>
-              <h3 id="eu-exit">EU Exit</h3>
-              <p>Upper case.</p>
               <h3 id="european-commission">European Commission</h3>
               <p>
                 Leave unabbreviated to distinguish from the European Community.
@@ -882,10 +580,6 @@ const DocumentationGlossary = () => {
                 Lower case in text. Upper case in titles: Spencer Tracy,
                 Executive Director, GDS.
               </p>
-              <h3 id="extended-project-qualification">
-                Extended Project Qualification
-              </h3>
-              <p>Upper case.</p>
               <h3 id="extra-curricular">extra-curricular</h3>
               <p>Hyphenated</p>
             </AccordionSection>
@@ -894,8 +588,8 @@ const DocumentationGlossary = () => {
                 FAQs (frequently asked questions)
               </h3>
               <p>
-                Do not use FAQs on GOV.UK. If you write content by starting with
-                user needs, you will not need to use FAQs.
+                Do not use FAQs. If you write content by starting with user
+                needs, you will not need to use FAQs.
               </p>
               <p>
                 <a href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#dont-use-faqs">
@@ -918,12 +612,8 @@ const DocumentationGlossary = () => {
                 Describe what the user might need to do, rather than what
                 government calls a thing.
               </p>
-              <h3 id="fire-and-rescue-service">fire and rescue service</h3>
-              <p>Lower case.</p>
               <h3 id="fixed-period-exclusions">fixed-period exclusions</h3>
               <p>Hyphenated.</p>
-              <h3 id="foot-and-mouth-disease">foot and mouth disease</h3>
-              <p>Lower case.</p>
               <h3 id="foundation-degrees">foundation degrees</h3>
               <p>Lower case.</p>
               <h3 id="foundation-schools">foundation schools</h3>
@@ -950,10 +640,6 @@ const DocumentationGlossary = () => {
                 You can make a Freedom of Information (FOI) request, but not a
                 request under the FOI Act.
               </p>
-              <h3 id="frontend">frontend</h3>
-              <p>Not “front-end” or “front end”.</p>
-              <h3 id="full-payment-submission">Full Payment Submission</h3>
-              <p>Upper case.</p>
               <h3 id="funding-agreement">funding agreement</h3>
               <p>Lower case.</p>
               <h3 id="further-education-fe">further education (FE)</h3>
@@ -990,8 +676,6 @@ const DocumentationGlossary = () => {
                 specific area or region if it’s commonly known by that name,
                 like the Pole for the North Pole.
               </p>
-              <h3 id="ghz">GHz</h3>
-              <p>Not “Ghz”.</p>
               <h3 id="governing-body">governing body</h3>
               <p>Singular noun.</p>
               <p>
@@ -1006,10 +690,6 @@ const DocumentationGlossary = () => {
               </p>
               <p>Also ‘Welsh Government’, as it’s the full title.</p>
               <h3 id="government-offices">government offices</h3>
-              <p>Lower case.</p>
-              <h3 id="government-procurement-card">
-                government procurement card
-              </h3>
               <p>Lower case.</p>
               <h3 id="governor">governor</h3>
               <p>Lower case.</p>
@@ -1033,12 +713,6 @@ const DocumentationGlossary = () => {
                 (UK business, UK foreign policy, ambassador and high
                 commissioner). But British embassy, not UK embassy.
               </p>
-              <h3 id="green-deal">Green Deal</h3>
-              <p>
-                Upper case because it’s the name of a programme, but note that
-                it’s Green Deal programme, Green Deal team, Green Deal
-                assessment.
-              </p>
               <h3 id="green-paper">green paper</h3>
               <p>Lower case.</p>
               <h3 id="group">Group</h3>
@@ -1050,8 +724,6 @@ const DocumentationGlossary = () => {
                 Lower case when a group has a very generic title like working
                 group or research team.
               </p>
-              <h3 id="guardians-allowance">Guardian’s Allowance</h3>
-              <p>Upper case.</p>
               <h3 id="guidance">guidance</h3>
               <p>Lower case: national recovery guidance.</p>
               <h3 id="gypsies">Gypsies</h3>
@@ -1061,17 +733,6 @@ const DocumentationGlossary = () => {
               </p>
             </AccordionSection>
             <AccordionSection heading="H">
-              <h3 id="harbour-authority">harbour authority</h3>
-              <p>
-                Lower case unless part of a proper noun: Cardiff Harbour
-                Authority.
-              </p>
-              <h3 id="harbour-master">harbour master</h3>
-              <p>Lower case.</p>
-              <h3 id="hazardous-waste-registration">
-                hazardous waste registration
-              </h3>
-              <p>Lower case.</p>
               <h3 id="headteacher">headteacher</h3>
               <p>One word. You can use head if the context is clear.</p>
               <h3 id="health-protection-unit">health protection unit</h3>
@@ -1085,24 +746,8 @@ const DocumentationGlossary = () => {
               <p>Hyphenated.</p>
               <h3 id="higher-education-he">higher education (HE)</h3>
               <p>Lower case.</p>
-              <h3 id="holocaust">Holocaust</h3>
-              <p>Upper case.</p>
               <h3 id="home-school-agreement">home-school agreement</h3>
               <p>Hyphenated.</p>
-              <h3 id="homepage">homepage</h3>
-              <p>Lower case.</p>
-              <h3 id="https">HTTPS</h3>
-              <p>
-                Upper case. No need to explain the acronym if it’s used in
-                content for a technical audience.
-              </p>
-              <h3 id="human-resources">human resources</h3>
-              <p>Lower case.</p>
-              <h3 id="hurricane">Hurricane</h3>
-              <p>
-                Upper case for named hurricanes: Hurricane Katrina, Hurricane
-                Sandy.
-              </p>
               <h3 id="hyphenation">Hyphenation</h3>
               <p>Hyphenate:</p>
               <ul>
@@ -1143,71 +788,31 @@ const DocumentationGlossary = () => {
               </p>
             </AccordionSection>
             <AccordionSection heading="I">
-              <div>
-                <h3 id="iaas">IaaS</h3>
-                <p>
-                  Stands for “Infrastructure as a Service”. Explain the acronym
-                  at first use.
-                </p>
-                <h3 id="id">ID</h3>
-                <p>
-                  In technical writing, don’t write ‘identification’ or
-                  ‘identifier’, unless it’s part of a standard abbreviation. For
-                  example, ‘unique identifier (UID)’.
-                </p>
-                <h3 id="ie">ie</h3>
-                <p>
-                  See <a href="#eg-etc-and-ie">eg, etc and ie</a>
-                </p>
-                <h3 id="import-control-system">Import Control System</h3>
-                <p>Upper case.</p>
-                <h3 id="inclusion-statement">inclusion statement</h3>
-                <p>Lower case.</p>
-                <h3 id="income-support">Income Support</h3>
-                <p>All names of benefits are upper case.</p>
-                <h3 id="income-tax">Income Tax</h3>
-                <p>Names of taxes are upper case, except input tax.</p>
-                <h3 id="independent-schools-adjudicator">
-                  independent schools adjudicator
-                </h3>
-                <p>Lower case.</p>
-                <h3 id="individual-education-plan">
-                  individual education plan
-                </h3>
-                <p>Lower case.</p>
-                <h3 id="individual-schools-budget">
-                  individual schools budget
-                </h3>
-                <p>Lower case.</p>
-                <h3 id="initial-teacher-training">initial teacher training</h3>
-                <p>Lower case.</p>
-                <h3 id="input-tax">input tax</h3>
-                <p>Lower case.</p>
-                <h3 id="inset-day">inset day</h3>
-                <p>Lower case.</p>
-                <h3 id="instrument-of-government">instrument of government</h3>
-                <p>Lower case.</p>
-                <h3 id="international-baccalaureate">
-                  International Baccalaureate
-                </h3>
-                <p>Upper case.</p>
-                <h3 id="internet">internet</h3>
-                <p>Lower case.</p>
-                <h3 id="intrastat-supplementary-declaration">
-                  Intrastat Supplementary Declaration
-                </h3>
-                <p>Upper case.</p>
-                <h3 id="ip">IP</h3>
-                <p>
-                  When used in the technical context (for example ‘internet
-                  protocol’), there’s no need to explain the acronym.
-                </p>
-                <h3 id="italics">Italics</h3>
-                <p>
-                  Do not use italics. Use ‘single quotation marks’ if referring
-                  to a document, scheme or initiative.
-                </p>
-              </div>
+              <h3 id="ie">ie</h3>
+              <p>
+                See <a href="#eg-etc-and-ie">eg, etc and ie</a>
+              </p>
+              <h3 id="independent-schools-adjudicator">
+                independent schools adjudicator
+              </h3>
+              <p>Lower case.</p>
+              <h3 id="individual-education-plan">individual education plan</h3>
+              <p>Lower case.</p>
+              <h3 id="individual-schools-budget">individual schools budget</h3>
+              <p>Lower case.</p>
+              <h3 id="initial-teacher-training">initial teacher training</h3>
+              <p>Lower case.</p>
+              <h3 id="inset-day">inset day</h3>
+              <p>Lower case.</p>
+              <h3 id="international-baccalaureate">
+                International Baccalaureate
+              </h3>
+              <p>Upper case.</p>
+              <h3 id="italics">Italics</h3>
+              <p>
+                Do not use italics. Use ‘single quotation marks’ if referring to
+                a document, scheme or initiative.
+              </p>
             </AccordionSection>
             <AccordionSection heading="J">
               <h3 id="job-titles">Job titles</h3>
@@ -1222,8 +827,6 @@ const DocumentationGlossary = () => {
               <p>
                 See also <a href="#shadow-job-titles">Shadow job titles</a>
               </p>
-              <h3 id="jobseekers-allowance">Jobseeker’s Allowance</h3>
-              <p>Upper case.</p>
             </AccordionSection>
             <AccordionSection heading="K">
               <div>
@@ -1320,18 +923,8 @@ const DocumentationGlossary = () => {
               </p>
               <h3 id="looked-after-children">looked-after children</h3>
               <p>Hyphenated.</p>
-              <h3 id="lottery">lottery</h3>
-              <p>Always use the National Lottery if that’s what you mean.</p>
-              <h3 id="lunchtime">lunchtime</h3>
-              <p>One word.</p>
             </AccordionSection>
             <AccordionSection heading="M">
-              <h3 id="machine-games-duty-mgd">Machine Games Duty (MGD)</h3>
-              <p>Upper case.</p>
-              <h3 id="machine-games-duty-for-agents-online-service">
-                Machine Games Duty for Agents online service
-              </h3>
-              <p>Upper case.</p>
               <h3 id="mainstream-schools">mainstream schools</h3>
               <p>Lower case.</p>
               <h3 id="maintained-schools-maintained-nursery-schools">
@@ -1357,11 +950,6 @@ const DocumentationGlossary = () => {
                 Write out decimal fractions as numerals. Use the same number
                 format for a sequence: 0.75 and 0.45
               </p>
-              <h3 id="md5">MD5</h3>
-              <p>
-                Used in a technical context there’s no need to explain the
-                acronym.
-              </p>
               <h3 id="measurements">Measurements</h3>
               <p>Use numerals and spell out measurements at first mention.</p>
               <p>
@@ -1369,7 +957,7 @@ const DocumentationGlossary = () => {
                 measurement: 3,500kg not 3,500 kg.
               </p>
               <p>
-                <a href="/contact/govuk">Contact us</a> if you need to follow
+                <a href="#">Contact the BAU team</a> if you need to follow
                 different conventions, for example you’re writing just for
                 scientists or engineers.
               </p>
@@ -1383,35 +971,12 @@ const DocumentationGlossary = () => {
                 abbreviation. From then on, abbreviate. If it’s only mentioned
                 once, do not abbreviate.
               </p>
-              <p>Use Celsius for temperature: 37°C</p>
-              <h3 id="member-states-of-the-eu">member states of the EU</h3>
-              <p>Lower case.</p>
-              <h3 id="memorandum-of-understanding">
-                memorandum of understanding
-              </h3>
-              <p>Lower case.</p>
               <h3 id="metadata">metadata</h3>
               <p>Not “meta data”.</p>
               <h3 id="metaphors">metaphors</h3>
               <p>
                 See <a href="#words-to-avoid">words to avoid</a>
               </p>
-              <h3 id="mhz">MHz</h3>
-              <p>Not “Mhz”.</p>
-              <h3 id="middle-east">Middle East</h3>
-              <p>Upper case.</p>
-              <h3 id="middle-deemed-primary-school-middle-deemed-secondary-school">
-                middle-deemed primary school, middle-deemed secondary school
-              </h3>
-              <p>Hyphenated.</p>
-              <h3 id="migrate">migrate</h3>
-              <p>When talking about software, not “migrate over”.</p>
-              <h3 id="mileage-allowance-payments">
-                Mileage Allowance Payments
-              </h3>
-              <p>Upper case.</p>
-              <h3 id="military">military</h3>
-              <p>Lower case.</p>
               <h3 id="millions">Millions</h3>
               <p>Always use million in money (and billion): £138 million.</p>
               <p>Use millions in phrases: millions of people.</p>
@@ -1429,8 +994,6 @@ const DocumentationGlossary = () => {
                 When used without the name, shortened titles are lower case: The
                 health minister welcomed the research team.
               </p>
-              <h3 id="mit-license">MIT License</h3>
-              <p>Note the spelling.</p>
               <h3 id="mixed-age-class">mixed-age class</h3>
               <p>Hyphenated.</p>
               <h3 id="mixed-sex-schools">mixed-sex schools</h3>
@@ -1451,10 +1014,6 @@ const DocumentationGlossary = () => {
                 a landline.
               </p>
               <p>Currencies are lower case.</p>
-              <h3 id="money-laundering">money laundering</h3>
-              <p>
-                Lower case when referring to the activity not the regulation.
-              </p>
               <h3 id="months">Months</h3>
               <p>
                 See <a href="#dates">Dates</a>.
@@ -1475,23 +1034,10 @@ const DocumentationGlossary = () => {
             <AccordionSection heading="N">
               <h3 id="na">N/A</h3>
               <p>Separate with a slash. Only use in tables.</p>
-              <h3 id="national-assembly">National Assembly</h3>
-              <p>
-                Upper case. Subsequent references would be the assembly. Lower
-                case is also used for the second assembly, the third assembly.
-              </p>
               <h3 id="national-curriculum">national curriculum</h3>
               <p>Lower case.</p>
               <h3 id="national-curriculum-tests">national curriculum tests</h3>
               <p>Do not call them SATs.</p>
-              <h3 id="national-insurance-card">National Insurance card</h3>
-              <p>Upper case.</p>
-              <h3 id="national-insurance-contributions">
-                National Insurance contributions
-              </h3>
-              <p>Upper case.</p>
-              <h3 id="national-insurance-number">National Insurance number</h3>
-              <p>Upper case. Not NINO.</p>
               <h3 id="national-living-wage">National Living Wage</h3>
               <p>Upper case.</p>
               <h3 id="national-minimum-wage">National Minimum Wage</h3>
@@ -1504,37 +1050,16 @@ const DocumentationGlossary = () => {
               <p>Lower case.</p>
               <h3 id="national-scholarship-fund">national scholarship fund</h3>
               <p>Lower case.</p>
-              <h3 id="net">.NET</h3>
-              <p>For the programming language, not “.net” or “.Net”.</p>
-              <h3 id="new-computerised-transit-system-ncts">
-                New Computerised Transit System (NCTS)
-              </h3>
-              <p>Upper case.</p>
-              <h3 id="new-export-system-nes">New Export System (NES)</h3>
-              <p>Upper case.</p>
               <h3 id="newly-qualified-teacher">newly qualified teacher</h3>
               <p>Lower case.</p>
-              <h3 id="non-executive-director">non-executive director</h3>
-              <p>
-                Lower case in text, upper case in titles: Spencer Tracy,
-                Non-executive Director, GDS.
-              </p>
               <h3 id="the-north-the-north-of-england">
                 the north, the north of England
               </h3>
               <p>Lower case.</p>
               <h3 id="north-east-north-west">north-east, north-west</h3>
               <p>Lower case, hyphenated.</p>
-              <h3 id="northern-ireland-civil-service">
-                Northern Ireland Civil Service
-              </h3>
-              <p>Upper case.</p>
               <h3 id="north-wales">north Wales</h3>
               <p>Not a specific region of the UK.</p>
-              <h3 id="nuclear-decommissioning-authority">
-                Nuclear Decommissioning Authority
-              </h3>
-              <p>Upper case.</p>
               <h3 id="numbers">Numbers</h3>
               <p>
                 Use ‘one’ unless you’re talking about a step, a point in a list
@@ -1580,12 +1105,6 @@ const DocumentationGlossary = () => {
               <p>Lower case.</p>
             </AccordionSection>
             <AccordionSection heading="O">
-              <h3 id="occupational-pension">occupational pension</h3>
-              <p>
-                Lower case. This term covers both company and public sector
-                pension schemes. Only use this term if explaining tax rules that
-                are specific to occupational pension schemes.
-              </p>
               <h3 id="ofsted-judgements">Ofsted judgements</h3>
               <p>
                 Lower case and not in inverted commas: Westminster School was
@@ -1602,35 +1121,11 @@ const DocumentationGlossary = () => {
               <p>If used adjectivally, hyphenate and use one rather than 1.</p>
               <h3 id="online">online</h3>
               <p>One word.</p>
-              <h3 id="online-services">online services</h3>
-              <p>
-                Lower case if the service name starts with a verb - write the
-                sentence so the user knows what action they can take. For
-                example: You can{' '}
-                <a href="https://www.gov.uk/prison-visits">
-                  visit someone in prison
-                </a>{' '}
-                by booking online.
-              </p>
-              <p>
-                Only use upper case if the name of the service you’re referring
-                to contains named thing. For example:{' '}
-                <a href="https://www.gov.uk/apply-marriage-allowance">
-                  You can apply for Marriage Allowance
-                </a>
-                .
-              </p>
-              <h3 id="open-source-software">open source software</h3>
-              <p>Not “Open Source software” or “OS software”.</p>
-              <h3 id="opposition">opposition</h3>
-              <p>Lower case even for the opposition and opposition leader.</p>
               <h3 id="or">or</h3>
               <p>
                 Do not use slashes instead of “or”. For example, “Do this 3/4
                 times”.
               </p>
-              <h3 id="order">order</h3>
-              <p>Lower case unless used as the full title: Standing Order 22</p>
               <h3 id="organisations">Organisations</h3>
               <p>
                 All organisations are singular: The government has decided to
@@ -1653,50 +1148,16 @@ const DocumentationGlossary = () => {
               <p>Lower case. Hyphenated.</p>
             </AccordionSection>
             <AccordionSection heading="P">
-              <h3 id="paas">PaaS</h3>
-              <p>
-                Stands for “Platform as a Service”. Explain the acronym at first
-                use.
-              </p>
               <h3 id="paper-b">Paper B</h3>
               <p>In national curriculum tests.</p>
-              <h3 id="parish-council">parish council</h3>
-              <p>
-                Lower case even when naming a specific council: Bloxham parish
-                council.
-              </p>
               <h3 id="parliament">Parliament</h3>
               <p>Upper case.</p>
               <h3 id="parliamentary-committees">Parliamentary committees</h3>
               <p>
                 Parliamentary is upper case and committees is in lower case.
               </p>
-              <h3 id="patent-box">Patent Box</h3>
-              <p>
-                When referring to the product/relief/regime, then say the Patent
-                Box. Occasionally the definite article will be dropped, for
-                example in calculations, where we use ‘Patent Box deduction’ and
-                when using phrases like ‘Answers to your Patent Box questions’.
-              </p>
               <h3 id="pathfinder">pathfinder</h3>
               <p>Lower case.</p>
-              <h3 id="payroll">payroll</h3>
-              <p>Lower case.</p>
-              <h3 id="payecis-for-agents-online-service">
-                PAYE/CIS for Agents online service
-              </h3>
-              <p>Upper case.</p>
-              <h3 id="paye-coding-notice">PAYE Coding Notice</h3>
-              <p>Upper case.</p>
-              <h3 id="paye-online-for-employers">PAYE Online for employers</h3>
-              <p>
-                This can be abbreviated to PAYE Online within the PAYE Online
-                for employers area of the website.
-              </p>
-              <h3 id="paye-settlement-agreements-psas">
-                PAYE Settlement Agreements (PSAs)
-              </h3>
-              <p>Upper case.</p>
               <h3 id="pdf">PDF</h3>
               <p>Upper case. No need to explain the acronym.</p>
               <h3 id="penalty">penalty</h3>
@@ -1707,16 +1168,6 @@ const DocumentationGlossary = () => {
                 </a>
                 .
               </p>
-              <h3 id="pension-provider">pension provider</h3>
-              <p>Lower case. Not pension payer.</p>
-              <h3 id="pension-schemes-for-administrators">
-                Pension Schemes for administrators
-              </h3>
-              <p>Lower case on administrators.</p>
-              <h3 id="pension-schemes-for-practitioners">
-                Pension Schemes for practitioners
-              </h3>
-              <p>Lower case on practitioners.</p>
               <h3 id="per-cent">Per cent</h3>
               <p>
                 Use per cent not percent. Percentage is one word. Always use %
@@ -1726,12 +1177,6 @@ const DocumentationGlossary = () => {
               <p>Lower case.</p>
               <h3 id="performance-tables">performance tables</h3>
               <p>Lower case.</p>
-              <h3 id="performance-related-pay">performance-related pay</h3>
-              <p>Hyphenated.</p>
-              <h3 id="personal-independence-payment">
-                Personal Independence Payment
-              </h3>
-              <p>Upper case</p>
               <h3 id="physical-education-or-pe">physical education or PE</h3>
               <p>You can write in full or use the initials.</p>
               <h3 id="plain-english">plain English</h3>
@@ -1740,7 +1185,8 @@ const DocumentationGlossary = () => {
                 Plain English Campaign.
               </p>
               <p>
-                All content on GOV.UK should be written in{' '}
+                All content on explore ediucation statistics should be written
+                in{' '}
                 <a href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#plain-english">
                   plain English
                 </a>
@@ -1751,12 +1197,6 @@ const DocumentationGlossary = () => {
                 </a>
                 .
               </p>
-              <h3 id="planet-earth">Planet Earth</h3>
-              <p>Upper case.</p>
-              <h3 id="police">police</h3>
-              <p>Lower case, even when referring to ‘the police’.</p>
-              <h3 id="police-service">police service</h3>
-              <p>Lower case. Note that police force is usually avoided.</p>
               <h3 id="policy-note">policy note</h3>
               <p>Lower case.</p>
               <h3 id="policy-statement">policy statement</h3>
@@ -1765,26 +1205,8 @@ const DocumentationGlossary = () => {
               <p>Upper case because PowerPoint is a brand name.</p>
               <h3 id="pre-school">pre-school</h3>
               <p>Hyphenated.</p>
-              <h3 id="primary-care-trust-pct">Primary Care Trust (PCT)</h3>
-              <p>Upper case because it’s the name of an organisation.</p>
               <h3 id="prime-minister">Prime Minister</h3>
               <p>Use Prime Minister Theresa May and the Prime Minister.</p>
-              <h3 id="priority-school-building-programme">
-                priority school building programme
-              </h3>
-              <p>Lower case.</p>
-              <h3 id="private-members-bill">Private Member’s Bill</h3>
-              <p>Upper case.</p>
-              <h3 id="probategrant-of-probate">probate/grant of probate</h3>
-              <p>Lower case.</p>
-              <h3 id="probation-trust">probation trust</h3>
-              <p>Lower case unless in a title: Hampshire Probation Trust.</p>
-              <h3 id="proforma">Proforma</h3>
-              <p>
-                Do not use proforma - say what it is in plain English: a
-                template or form, for example. Be specific about what to do with
-                it.
-              </p>
               <h3 id="programme">programme</h3>
               <p>
                 Lower case: Troubled Families programme, Sure Start programme.
@@ -1795,11 +1217,6 @@ const DocumentationGlossary = () => {
               <p>Lower case.</p>
               <h3 id="public-sector">public sector</h3>
               <p>Lower case.</p>
-              <h3 id="pull-request">pull request</h3>
-              <p>
-                Lowercase, the same as GitHub does in its documentation. GitLab
-                uses the term “merge request”.
-              </p>
               <h3 id="pupil-premium">pupil premium</h3>
               <p>Lower case.</p>
               <h3 id="pupil-referral-unit">pupil referral unit</h3>
@@ -1808,8 +1225,6 @@ const DocumentationGlossary = () => {
             <AccordionSection heading="Q">
               <h3 id="qualified-teacher-status">qualified teacher status</h3>
               <p>Lower case.</p>
-              <h3 id="the-queen">The Queen</h3>
-              <p>Upper case.</p>
               <h3 id="quotes-speech-marks">Quotes and speech marks</h3>
               <p>
                 In long passages of speech, open quotes for every new paragraph,
@@ -1838,11 +1253,6 @@ const DocumentationGlossary = () => {
               </p>
             </AccordionSection>
             <AccordionSection heading="S">
-              <h3 id="saas">SaaS</h3>
-              <p>
-                Stands for “Software as a Service”. Explain the acronym at first
-                use.
-              </p>
               <h3 id="same-sex-schools">same-sex schools</h3>
               <p>Hyphenated.</p>
               <h3 id="sat-nav">sat nav</h3>
@@ -1880,11 +1290,6 @@ const DocumentationGlossary = () => {
                 Capitalise the first letter of the first part of the scientific
                 name. Do not use italics.
               </p>
-              <h3 id="scrum">Scrum</h3>
-              <p>
-                Upper case when referring to the framework and method for
-                developing products, otherwise use lower case.
-              </p>
               <h3 id="seasons">seasons</h3>
               <p>spring, summer, autumn, winter are lower case.</p>
               <h3 id="secretary-of-state-for-xxx">
@@ -1899,46 +1304,11 @@ const DocumentationGlossary = () => {
               </p>
               <h3 id="section-2">section 2</h3>
               <p>As in part of an act or a strategy.</p>
-              <h3 id="sector-resilience-plans">sector resilience plans</h3>
-              <p>Lower case.</p>
-              <h3 id="security-classifications">Security classifications</h3>
-              <p>Official, Secret, Top Secret</p>
-              <p>
-                Upper case when referring to government security
-                classifications, otherwise lower case.
-              </p>
-              <p>
-                If it’s not clear from the context, you may need to clarify that
-                it’s a classification not a general description: ‘information
-                classified as Official’ rather than ‘Official information’.
-              </p>
               <h3 id="self-assessment">self-assessment</h3>
               <p>
                 This compound noun should be hyphenated, unless it’s an HMRC
                 title.
               </p>
-              <h3 id="self-assessment-for-agents-online-service">
-                Self Assessment for Agents online service
-              </h3>
-              <p>Upper case.</p>
-              <h3 id="self-assessment-online">Self Assessment Online</h3>
-              <p>Upper case.</p>
-              <h3 id="self-assessment-online-for-partnerships">
-                Self Assessment Online for partnerships
-              </h3>
-              <p>Upper case.</p>
-              <h3 id="self-assessment-online-for-trusts">
-                Self Assessment Online for trusts
-              </h3>
-              <p>Upper case.</p>
-              <h3 id="self-assessment-tax-return">
-                Self Assessment tax return
-              </h3>
-              <p>
-                See <a href="#tax-returns">tax returns</a>.
-              </p>
-              <h3 id="self-employment">self-employment</h3>
-              <p>Hyphenate this noun.</p>
               <h3 id="semicolons">semicolons</h3>
               <p>
                 Do not use semicolons as they are often mis-read. Long sentences
@@ -1956,32 +1326,6 @@ const DocumentationGlossary = () => {
                 </a>
                 .
               </p>
-              <h3 id="serious-case-review">serious case review</h3>
-              <p>Lower case when written in full.</p>
-              <h3 id="service-children">service children</h3>
-              <p>
-                Recognised term for children whose parents serve in the armed
-                forces.
-              </p>
-              <h3 id="services">services</h3>
-              <p>
-                Lower case, even when referring to the armed forces services or
-                the services.
-              </p>
-              <h3 id="settlor">settlor</h3>
-              <p>A settler of trusts.</p>
-              <h3 id="shadow-job-titles">Shadow job titles</h3>
-              <p>
-                The Shadow Secretary of State for XXX is upper case whether or
-                not it’s used with the holder’s name because there is only one.
-                Use common sense to capitalise shortened versions of the
-                Secretary of State titles: the Shadow Health Secretary.
-              </p>
-              <p>
-                See also <a href="#job-titles">Job titles</a>
-              </p>
-              <h3 id="shadow-cabinet">Shadow Cabinet</h3>
-              <p>Upper case.</p>
               <h3 id="sign-in-or-log-in">sign in or log in</h3>
               <p>
                 Use sign in rather than log in (verb) for calls-to-action where
@@ -2038,20 +1382,8 @@ const DocumentationGlossary = () => {
                 plans. Lower case in other contexts: we are conducting a
                 spending review.
               </p>
-              <h3 id="stamp-taxes-for-agents-online-service">
-                Stamp Taxes for Agents online service
-              </h3>
-              <p>Upper case.</p>
-              <h3 id="stamp-taxes-online">Stamp Taxes Online</h3>
-              <p>Upper case.</p>
               <h3 id="standards-of-conduct">standards of conduct</h3>
               <p>Lower case.</p>
-              <h3 id="standing-order">standing order</h3>
-              <p>
-                Lower case unless used as the full title: Standing Order 22.
-              </p>
-              <h3 id="state-pension">State Pension</h3>
-              <p>Upper case.</p>
               <h3 id="statement-of-send">statement of SEND</h3>
               <p>Lower case.</p>
               <h3 id="statistical-first-release">statistical first release</h3>
@@ -2071,12 +1403,6 @@ const DocumentationGlossary = () => {
                 quality mark. Lower case for anything else, including statistics
                 that are national in scope.
               </p>
-              <h3 id="statutory-adoption-pay">Statutory Adoption Pay</h3>
-              <p>Upper case.</p>
-              <h3 id="statutory-maternity-pay">Statutory Maternity Pay</h3>
-              <p>Upper case.</p>
-              <h3 id="statutory-sick-pay">Statutory Sick Pay</h3>
-              <p>Upper case.</p>
               <h3 id="steps-1">steps</h3>
               <p>
                 See <a href="#bullet-points-steps">Bullet points and steps</a>
@@ -2096,8 +1422,6 @@ const DocumentationGlossary = () => {
               <p>Lower case.</p>
               <h3 id="study-programme">study programme</h3>
               <p>Lower case.</p>
-              <h3 id="subdomain">subdomain</h3>
-              <p>Not “sub domain” or “sub-domain”.</p>
               <h3 id="summaries">Summaries</h3>
               <p>Summaries should:</p>
               <ul>
@@ -2125,27 +1449,6 @@ const DocumentationGlossary = () => {
               <p>
                 Lower case and plural. Working Tax Credit and Child Tax Credit
                 are specific benefits, so are upper case and singular.
-              </p>
-              <h3 id="tax-returns">tax returns</h3>
-              <p>
-                Upper case when referring to proper titles for the first time:
-                Company Tax Return, Partnership Tax Return, Employer Annual
-                Return.
-              </p>
-              <p>
-                Use Self Assessment tax return at first mention, as it’s not a
-                proper title.
-              </p>
-              <p>
-                After that refer to them in full, or if it’s clear what you’re
-                referring to, simply as a return. General references to tax
-                returns are lower case.
-              </p>
-              <p>
-                When referring to the legal requirement we use deliver or file
-                the return. Online, we say submit the return. For Self
-                Assessment (paper or online) use send or file the return. Send
-                is better.
               </p>
               <h3 id="the-teachers-standards">the teachers’ standards</h3>
               <p>Lower case.</p>
@@ -2196,8 +1499,6 @@ const DocumentationGlossary = () => {
                 When a number is memorable, group the numbers into easily
                 remembered units: 0800 80 70 60.
               </p>
-              <h3 id="temperature">Temperature</h3>
-              <p>Use Celsius: 37°C</p>
               <h3 id="threshold-assessment">threshold assessment</h3>
               <p>Lower case.</p>
               <h3 id="times">Times</h3>
@@ -2222,8 +1523,6 @@ const DocumentationGlossary = () => {
                 Tuesday 14 June” can be read in two ways (the end of Monday 13,
                 or end of Tuesday 14).
               </p>
-              <h3 id="tied-oils-enquiry-service">Tied Oils Enquiry Service</h3>
-              <p>Upper case.</p>
               <h3 id="titles">Titles</h3>
               <p>Page titles should:</p>
               <ul>
@@ -2237,14 +1536,6 @@ const DocumentationGlossary = () => {
               </ul>
               <h3 id="town-council">town council</h3>
               <p>Lower case, even when part of a name: Swanage town council.</p>
-              <h3 id="trade-marks">Trade marks</h3>
-              <p>
-                Avoid using trademarked names where possible - so tablet not
-                iPAD.
-              </p>
-              <p>Trade mark is 2 words but trademarked is one word.</p>
-              <h3 id="trading-standards">Trading Standards</h3>
-              <p>Upper case.</p>
               <h3 id="training-schools">training schools</h3>
               <p>Lower case.</p>
               <h3 id="travellers">Travellers</h3>
@@ -2253,133 +1544,36 @@ const DocumentationGlossary = () => {
                 group under the Race Relations Act. New age travellers is lower
                 case.
               </p>
-              <h3 id="trust-or-company-service-provider">
-                Trust or Company Service Provider
-              </h3>
-              <p>
-                When used to refer to the business area covered by Money
-                Laundering Regulations.
-              </p>
               <h3 id="trust-school">trust school</h3>
               <p>Lower case.</p>
-              <h3 id="twitter-account">Twitter account</h3>
-              <p>Upper case. Twitter is a trademarked name.</p>
-              <h3 id="two-factor-authentication">two-factor authentication</h3>
-              <p>
-                Shorten as “2FA”. Do not confuse with “multi-factor
-                authentication”.
-              </p>
             </AccordionSection>
             <AccordionSection heading="U">
-              <div>
-                <h3 id="uk-government">UK government</h3>
-                <p>Never HM government.</p>
-                <h3 id="umbrella-trust">umbrella trust</h3>
-                <p>Lower case.</p>
-                <h3 id="underachiever">underachiever</h3>
-                <p>One word.</p>
-                <h3 id="underperforming">underperforming</h3>
-                <p>One word.</p>
-                <h3 id="under-declared">under-declared</h3>
-                <p>Hyphenated.</p>
-                <h3 id="unique-pupil-number">unique pupil number</h3>
-                <p>Lower case.</p>
-                <h3 id="universal-credit">Universal Credit</h3>
-                <p>Upper case.</p>
-                <h3 id="university-technical-college">
-                  university technical college
-                </h3>
-                <p>Lower case.</p>
-                <h3 id="url">URL</h3>
-                <p>Upper case. No need to explain the acronym.</p>
-                <h3 id="user-id">user ID</h3>
-                <p>Lower case ‘user’.</p>
-                <h3 id="username">username</h3>
-                <p>Not “user name”.</p>
-              </div>
-            </AccordionSection>
-            <AccordionSection heading="V">
-              <h3 id="vat-for-agents-online-service">
-                VAT for Agents online service
-              </h3>
-              <h3 id="vat-ec-sales-list-ecsl">VAT EC Sales List (ECSL)</h3>
-              <h3 id="vat-eu-refunds">VAT EU Refunds</h3>
-              <h3 id="vat-eu-refunds-for-agents-online-service">
-                VAT EU Refunds for Agents online service
-              </h3>
-              <h3 id="vat-on-e-services">VAT on e-Services</h3>
-              <h3 id="vat-online">VAT Online</h3>
-              <h3 id="vat-online-services">VAT online services</h3>
-              <p>Used when referring to all the online services for VAT.</p>
-              <h3 id="vat-registered">VAT-registered</h3>
-              <p>
-                Hyphenated when used as a compound adjective: VAT-registered
-                business.
-              </p>
-              <h3 id="vat-registration-number">VAT registration number</h3>
-              <p>Lower case, except when it refers to a field within a form.</p>
-              <h3 id="vat-registration-online">VAT Registration Online</h3>
-              <p>Upper case.</p>
-              <h3 id="vat-registration-threshold">
-                VAT registration threshold
+              <h3 id="uk-government">UK government</h3>
+              <p>Never HM government.</p>
+              <h3 id="underachiever">underachiever</h3>
+              <p>One word.</p>
+              <h3 id="underperforming">underperforming</h3>
+              <p>One word.</p>
+              <h3 id="unique-pupil-number">unique pupil number</h3>
+              <p>Lower case.</p>
+              <h3 id="university-technical-college">
+                university technical college
               </h3>
               <p>Lower case.</p>
-              <h3 id="vat-return">VAT Return</h3>
-              <p>
-                Always use VAT Return unless it’s very clear from the context
-                which return you’re referring to (as in ‘How to submit your
-                return’ within a guide on VAT Returns).
-              </p>
-              <h3 id="vat-reverse-charge-sales-list-rcsl">
-                VAT Reverse Charge Sales List (RCSL)
-              </h3>
-              <p>Upper case.</p>
+            </AccordionSection>
+            <AccordionSection heading="V">
               <h3 id="voluntary-aided-schools-voluntary-controlled-schools">
                 voluntary-aided schools, voluntary-controlled schools
               </h3>
               <p>Hyphenated. Lower case.</p>
-              <h3 id="vpn">VPN</h3>
-              <p>
-                Upper case. No need to explain the acronym. When describing a
-                VPN that is always on, write it like this: ‘always-on’ VPN. Note
-                the single quotes and hyphen.
-              </p>
             </AccordionSection>
             <AccordionSection heading="W">
-              <h3 id="walkaround">walkaround</h3>
-              <p>
-                When it’s the daily check that lorry and bus drivers do, it’s
-                one word - a vehicle walkaround.
-              </p>
-              <h3 id="webchat">webchat</h3>
-              <p>One word. Not ‘web chat’.</p>
-              <h3 id="webpage">webpage</h3>
-              <p>One word.</p>
-              <h3 id="web-server">web server</h3>
-              <p>Not “webserver”.</p>
-              <h3 id="welsh-assembly">Welsh Assembly</h3>
-              <p>
-                Subsequent references would be the assembly. Lower case is also
-                used for the second assembly, the third assembly.
-              </p>
-              <h3 id="welsh-government">Welsh Government</h3>
-              <p>Title case because it’s the full, official title.</p>
-              <h3 id="welsh-exotic-animal-disease-contingency-plan">
-                Welsh exotic animal disease contingency plan
-              </h3>
-              <p>Lower case. This is not a proper title.</p>
               <h3 id="the-west-western-europe">the west, western Europe</h3>
               <p>Lower case.</p>
               <h3 id="west-end-london">West End (London)</h3>
               <p>Upper case.</p>
               <h3 id="white-paper">white paper</h3>
               <p>Lower case.</p>
-              <h3 id="widowed-parents-allowance">Widowed Parent’s Allowance</h3>
-              <p>Upper case.</p>
-              <h3 id="wifi">wifi</h3>
-              <p>Lower case, no hyphen.</p>
-              <h3 id="word-document">Word document</h3>
-              <p>Upper case, because it’s a brand name.</p>
               <h3 id="words-to-avoid">Words to avoid</h3>
               <p>
                 Plain English is mandatory for all of GOV.UK so please avoid
@@ -2471,13 +1665,6 @@ const DocumentationGlossary = () => {
                 </a>
                 .
               </p>
-              <h3 id="working-tax-credit">Working Tax Credit</h3>
-              <p>
-                Upper case, but generic references to tax credits are lower
-                case.
-              </p>
-              <h3 id="world-war-1-world-war-2">World War 1, World War 2</h3>
-              <p>Upper case and numbers.</p>
               <h3 id="written-ministerial-statement-written-statement">
                 written ministerial statement, written statement
               </h3>
@@ -2487,12 +1674,7 @@ const DocumentationGlossary = () => {
               <h3 id="year-1-year-2">year 1, year 2</h3>
               <p>Lower case.</p>
             </AccordionSection>
-            <AccordionSection heading="Z">
-              <div>
-                <h3 id="zero-hours-contract">zero-hours contract</h3>
-                <p>Not “zero-hour contract” or “zero hours contract”.</p>
-              </div>
-            </AccordionSection>
+            <AccordionSection heading="Z" />
           </Accordion>
         </div>
       </div>
