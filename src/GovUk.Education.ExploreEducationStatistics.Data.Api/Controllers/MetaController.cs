@@ -1,13 +1,14 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MetaController
+    public class MetaController : ControllerBase
     {
         private readonly IMetaService _metaService;
 
@@ -19,13 +20,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("publication/{publicationId}")]
         public ActionResult<PublicationMetaViewModel> GetPublicationMeta(Guid publicationId)
         {
-            return _metaService.GetPublicationMeta(publicationId);
+            var viewModel = _metaService.GetPublicationMeta(publicationId);
+            if (viewModel == null)
+            {
+                return NotFound();
+            }
+
+            return viewModel;
         }
 
         [HttpGet("subject/{subjectId}")]
         public ActionResult<SubjectMetaViewModel> GetSubjectMeta(long subjectId)
         {
-            return _metaService.GetSubjectMeta(subjectId);
+            var viewModel = _metaService.GetSubjectMeta(new SubjectMetaQueryContext
+            {
+                SubjectId = subjectId
+            });
+
+            if (viewModel == null)
+            {
+                return NotFound();
+            }
+
+            return viewModel;
+        }
+
+        [HttpPost("subject")]
+        public ActionResult<SubjectMetaViewModel> GetSubjectMeta([FromBody] SubjectMetaQueryContext query)
+        {
+            var viewModel = _metaService.GetSubjectMeta(query);
+            if (viewModel == null)
+            {
+                return NotFound();
+            }
+
+            return viewModel;
         }
     }
 }
