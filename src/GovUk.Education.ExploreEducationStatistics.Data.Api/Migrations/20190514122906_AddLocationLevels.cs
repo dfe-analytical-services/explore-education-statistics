@@ -1,9 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System.IO;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
     public partial class AddLocationLevels : Migration
     {
+        private readonly string _migrationsPath = "Migrations/";
+        
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
@@ -135,6 +138,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 name: "IX_Location_Ward_Code",
                 table: "Location",
                 column: "Ward_Code");
+            
+            // Add this version of the stored proc
+            migrationBuilder.Sql("DROP PROCEDURE dbo.FilteredObservations");
+            ExecuteFile(migrationBuilder, _migrationsPath + "20190514122906_FilteredObservations.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -242,6 +249,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
             migrationBuilder.DropColumn(
                 name: "Ward_Name",
                 table: "Location");
+            
+            // Revert to the previous version of the stored proc
+            migrationBuilder.Sql("DROP PROCEDURE dbo.FilteredObservations");
+            ExecuteFile(migrationBuilder, _migrationsPath + "20190507122936_FilteredObservations.sql");
+        }
+        
+        private static void ExecuteFile(MigrationBuilder migrationBuilder, string filename)
+        {
+            var file = Path.Combine(Directory.GetCurrentDirectory(), filename);
+            migrationBuilder.Sql(File.ReadAllText(file));
         }
     }
 }

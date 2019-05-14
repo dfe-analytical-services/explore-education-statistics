@@ -16,6 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         [EnumLabelValue("Local Enterprise Partnerships", "LEP")]
         Local_Enterprise_Partnerships,
 
+        [EnumLabelValue("Institution", "INS")]
+        Institution,
+        
         [EnumLabelValue("MAT Or Sponsor", "MATS")]
         MAT_Or_Sponsor,
 
