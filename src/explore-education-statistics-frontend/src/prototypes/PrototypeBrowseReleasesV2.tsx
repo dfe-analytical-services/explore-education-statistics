@@ -421,11 +421,8 @@ const BrowseReleasesPage = () => {
                 </a>
               </li>
               <li>
-                <strong>
-                  Performance indicators in HE or Performance indicators in
-                  higher education or Performance indicators
-                </strong>{' '}
-                - currently available via{' '}
+                <strong>Performance indicators in higher education</strong> -
+                currently available via{' '}
                 <a href="https://www.gov.uk/government/collections/official-statistics-releases#performance-indicators">
                   Statistics at DfE
                 </a>

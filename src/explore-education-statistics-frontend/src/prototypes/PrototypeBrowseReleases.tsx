@@ -630,20 +630,69 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Higher education statistics
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Higher education: destinations of leavers</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/official-statistics-releases#destinations-of-higher-education-leavers">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>
+                    Higher education enrolments and qualifications
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/official-statistics-releases#higher-education-enrolments-and-qualifications">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Performance indicators in higher education</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/official-statistics-releases#performance-indicators">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Staff at higher education providers in the UK</strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/official-statistics-releases#staff-at-higher-education">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Initial teacher training (ITT)
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Initial teacher training performance profiles</strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-teacher-training#performance-data">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>
+                    Initial teacher training: trainee number census
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-teacher-training#census-data">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>TSM and initial teacher training allocations</strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-teacher-training#teacher-supply-model-and-itt-allocations">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Performance tables
@@ -712,7 +761,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-student-loan-forecasts#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -732,11 +781,39 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Higher education statistics
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Higher education: destinations of leavers</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/official-statistics-releases#destinations-of-higher-education-leavers">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>
+                    Higher education enrolments and qualifications
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/official-statistics-releases#higher-education-enrolments-and-qualifications">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Performance indicators in higher education</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/official-statistics-releases#performance-indicators">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Staff at higher education providers in the UK</strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/official-statistics-releases#staff-at-higher-education">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </AccordionSection>
@@ -778,27 +855,62 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Initial teacher training (ITT)
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Initial teacher training performance profiles</strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-teacher-training#performance-data">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>
+                    Initial teacher training: trainee number census
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-teacher-training#census-data">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>TSM and initial teacher training allocations</strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-teacher-training#teacher-supply-model-and-itt-allocations">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Not in education, employment or training (NEET) and participation
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>
+                    Participation in education, training and employment
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-neet#participation-in-education,-employment-or-training">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>NEET statistics quarterly brief</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-neet#neet:-2016-to-2017-data-">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Participation rates in higher education
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-on-higher-education-initial-participation-rates#participation-rates-in-higher-education-for-england">
                 Statistics at DfE
               </a>
             </div>
@@ -816,13 +928,41 @@ const BrowseReleasesPage = () => {
         <AccordionSection heading="Workforce" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-              Higher education
+              Higher education statistics
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Higher education: destinations of leavers</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/official-statistics-releases#destinations-of-higher-education-leavers">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>
+                    Higher education enrolments and qualifications
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/official-statistics-releases#higher-education-enrolments-and-qualifications">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Performance indicators in higher education</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/official-statistics-releases#performance-indicators">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Staff at higher education providers in the UK</strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/official-statistics-releases#staff-at-higher-education">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </AccordionSection>
@@ -868,7 +1008,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-destinations#destinations-after-key-stage-4-and-5">
                 Statistics at DfE
               </a>
             </div>
@@ -891,8 +1031,11 @@ const BrowseReleasesPage = () => {
               Key stage 1
             </h4>
             <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <strong>
+                Phonics screening check and key stage 1 assessments
+              </strong>{' '}
+              - currently available via{' '}
+              <a href="https://www.gov.uk/government/collections/statistics-key-stage-1#phonics-screening-check-and-key-stage-1-assessment">
                 Statistics at DfE
               </a>
             </div>
@@ -1140,11 +1283,25 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Not in education, employment or training (NEET) and participation
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+                <li>
+                  <strong>
+                    Participation in education, training and employment
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-neet#participation-in-education,-employment-or-training">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>NEET statistics quarterly brief</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-neet#neet:-2016-to-2017-data-">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Parental responsibility measures
@@ -1227,11 +1384,32 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Initial teacher training (ITT)
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Initial teacher training performance profiles</strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-teacher-training#performance-data">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>
+                    Initial teacher training: trainee number census
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-teacher-training#census-data">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>TSM and initial teacher training allocations</strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-teacher-training#teacher-supply-model-and-itt-allocations">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               School workforce
