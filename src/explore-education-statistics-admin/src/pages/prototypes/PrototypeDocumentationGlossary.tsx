@@ -1674,7 +1674,6 @@ const DocumentationGlossary = () => {
               <h3 id="year-1-year-2">year 1, year 2</h3>
               <p>Lower case.</p>
             </AccordionSection>
-            <AccordionSection heading="Z" />
           </Accordion>
         </div>
       </div>
