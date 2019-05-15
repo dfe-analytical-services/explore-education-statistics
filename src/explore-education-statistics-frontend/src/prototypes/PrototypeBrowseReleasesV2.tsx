@@ -834,7 +834,7 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
         <AccordionSection
-          heading="Workforce statistics and analysis or Teacher workforce statistics and analysis	"
+          heading="Teacher workforce statistics and analysis	"
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
