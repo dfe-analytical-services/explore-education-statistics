@@ -97,11 +97,13 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                         id={`${formId}-levels-${levelKey}`}
                         legend={level.legend}
                         legendHidden
-                        onAllChange={event => {
+                        selectAll={false}
+                        onAllChange={() => {
                           updateLocationLevels(draft => {
-                            draft[levelKey] = event.target.checked
-                              ? level.options
-                              : [];
+                            draft[levelKey] =
+                              draft[levelKey].length < level.options.length
+                                ? level.options
+                                : [];
                           });
                         }}
                         onChange={(event, option) => {

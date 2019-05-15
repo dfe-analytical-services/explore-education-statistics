@@ -1,13 +1,21 @@
+import ButtonText from '@common/components/ButtonText';
 import { Omit, PartialBy } from '@common/types/util';
 import classNames from 'classnames';
 import kebabCase from 'lodash/kebabCase';
 import sortBy from 'lodash/sortBy';
 import memoize from 'memoizee';
-import React, { ChangeEvent, createRef, PureComponent } from 'react';
+import React, {
+  ChangeEvent,
+  createRef,
+  MouseEvent,
+  MouseEventHandler,
+  PureComponent,
+} from 'react';
 import FormCheckbox, {
   CheckboxChangeEventHandler,
   FormCheckboxProps,
 } from './FormCheckbox';
+import styles from './FormCheckboxGroup.module.scss';
 import FormFieldset, { FormFieldsetProps } from './FormFieldset';
 
 export type CheckboxOption = PartialBy<
@@ -15,8 +23,9 @@ export type CheckboxOption = PartialBy<
   'id'
 >;
 
+export type CheckboxGroupAllChangeEvent = MouseEvent<HTMLButtonElement>;
 export type CheckboxGroupAllChangeEventHandler = (
-  event: ChangeEvent<HTMLInputElement>,
+  event: CheckboxGroupAllChangeEvent,
   options: CheckboxOption[],
 ) => void;
 
@@ -76,7 +85,7 @@ export class BaseFormCheckboxGroup extends PureComponent<
     }
   }
 
-  private handleAllChange: CheckboxChangeEventHandler = event => {
+  private handleAllChange: MouseEventHandler<HTMLButtonElement> = event => {
     const { onAllChange, options } = this.props;
 
     if (onAllChange) {
@@ -122,14 +131,13 @@ export class BaseFormCheckboxGroup extends PureComponent<
         ref={this.ref}
       >
         {options.length > 1 && selectAll && (
-          <FormCheckbox
+          <ButtonText
             id={`${id}-all`}
-            label="Select all"
-            name={name}
-            value="select-all"
-            checked={isAllChecked}
-            onChange={this.handleAllChange}
-          />
+            onClick={this.handleAllChange}
+            className={styles.selectAll}
+          >
+            {isAllChecked ? 'Unselect' : 'Select'} all {options.length} options
+          </ButtonText>
         )}
 
         {sortBy(options, sort).map(option => (
