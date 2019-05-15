@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/camelcase,@typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/camelcase */
 import { DataBlockProps } from '@common/modules/find-statistics/components/DataBlock';
 import { ChartProps } from 'explore-education-statistics-common/src/modules/find-statistics/components/charts/ChartFunctions';
 import { GeographicLevel } from 'explore-education-statistics-common/src/services/dataBlockService';
@@ -129,7 +129,7 @@ export const newApiHorizontalData: ChartProps = {
     '23': 'Unauthorised absence rate',
   },
 
-  chartDataKeys: ['23', '26', '28'],
+  indicators: ['23', '26', '28'],
   xAxis: { title: 'test x axis' },
   yAxis: { title: 'test y axis' },
 };
