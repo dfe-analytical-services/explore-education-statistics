@@ -103,6 +103,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 stringBuilder.Append(separator).Append(mayoralCombinedAuthority.Code);
             }
             
+            if (parliamentaryConstituency != null)
+            {
+                stringBuilder.Append(separator).Append(parliamentaryConstituency.Code);
+            }
+            
             if (opportunityArea != null)
             {
                 stringBuilder.Append(separator).Append(opportunityArea.Code);
@@ -133,7 +138,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             Provider provider = null,
             Ward ward = null)
         {
-            var location = Lookup(country, region, localAuthority, localAuthorityDistrict);
+            var location = Lookup(
+                country,
+                region,
+                localAuthority,
+                localAuthorityDistrict,
+                localEnterprisePartnership,
+                institution,
+                mat,
+                mayoralCombinedAuthority,
+                opportunityArea,
+                parliamentaryConstituency,
+                provider,
+                ward);
 
             if (location == null)
             {
