@@ -1,6 +1,7 @@
 variables:
   BuildConfiguration: 'Release'
 
+trigger: none
 pr: [ 'master' ]
 
 jobs:
