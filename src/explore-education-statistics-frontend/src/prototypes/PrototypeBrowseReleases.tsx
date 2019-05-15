@@ -105,7 +105,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-early-years-foundation-stage-profile#results-at-national-and-local-authority-level">
                 Statistics at DfE
               </a>
             </div>
@@ -114,7 +114,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -123,18 +123,40 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/parental-responsibility-measures#official-statistics">
                 Statistics at DfE
               </a>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Special educational needs (SEN)
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Special educational needs in England</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#national-statistics-on-special-educational-needs-in-england">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>
+                    Special educational needs: analysis and summary of data
+                    sources
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#analysis-of-children-with-special-educational-needs">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Statements on SEN and EHC plans</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#statements-of-special-educational-needs-(sen)-and-education,-health-and-care-(ehc)-plans">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </AccordionSection>
@@ -145,7 +167,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -156,18 +178,46 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Childcare and early years
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>30 hours free childcare</strong> - currently available
+                  via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#30-hours-free-childcare">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Childcare and early years providers survey</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-providers-survey">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Childcare and early years survey of parents</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-survey-of-parents">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>
+                    Education provision: children under 5 years of age
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-survey-of-parents">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Education and training
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -181,18 +231,46 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Childcare and early years
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>30 hours free childcare</strong> - currently available
+                  via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#30-hours-free-childcare">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Childcare and early years providers survey</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-providers-survey">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Childcare and early years survey of parents</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-survey-of-parents">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>
+                    Education provision: children under 5 years of age
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-survey-of-parents">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Education and training
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -201,7 +279,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/parental-responsibility-measures#official-statistics">
                 Statistics at DfE
               </a>
             </div>
@@ -217,11 +295,33 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Special educational needs (SEN)
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Special educational needs in England</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#national-statistics-on-special-educational-needs-in-england">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>
+                    Special educational needs: analysis and summary of data
+                    sources
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#analysis-of-children-with-special-educational-needs">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Statements on SEN and EHC plans</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#statements-of-special-educational-needs-(sen)-and-education,-health-and-care-(ehc)-plans">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </AccordionSection>
@@ -235,36 +335,78 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               16 to 19 attainment
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>
+                    16 to 18 school and college performance tables
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#16-to-18-school-and-college-performance-tables">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>A levels and other 16 to 18 results</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#a-levels-and-other-16-to-18-results">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>
+                    Level 2 and 3 attainment by young people aged 19
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#level-2-and-3-attainment">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Education and training
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
                 Statistics at DfE
               </a>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Further education and skills
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Apprenticeship and levy statistics</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#apprenticeships-and-levy---older-data">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Apprenticeships and traineeships</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#apprenticeships-and-traineeships---older-data">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Further education and skills</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#fe-and-skills---older-data">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Further education for benefits claimants
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/further-education-for-benefit-claimants#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -273,7 +415,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/sfa-national-success-rates-tables#national-achievement-rates-tables">
                 Statistics at DfE
               </a>
             </div>
@@ -282,18 +424,37 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-outcome-based-success-measures#statistics">
                 Statistics at DfE
               </a>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Performance tables
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Primary school performance tables</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-performance-tables#primary-school-(key-stage-2)">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>School and college performance tables</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-performance-tables#school-and-college:-post-16-(key-stage-5)">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Secondary school performance tables</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-performance-tables#secondary-school-(key-stage-4)">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </AccordionSection>
@@ -313,18 +474,37 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
                 Statistics at DfE
               </a>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Further education and skills
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Apprenticeship and levy statistics</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#apprenticeships-and-levy---older-data">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Apprenticeships and traineeships</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#apprenticeships-and-traineeships---older-data">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Further education and skills</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#fe-and-skills---older-data">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </AccordionSection>
@@ -335,7 +515,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -351,7 +531,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -367,18 +547,37 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Further education and skills
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Apprenticeship and levy statistics</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#apprenticeships-and-levy---older-data">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Apprenticeships and traineeships</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#apprenticeships-and-traineeships---older-data">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Further education and skills</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#fe-and-skills---older-data">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Further education for benefits claimants
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/further-education-for-benefit-claimants#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -403,7 +602,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -419,11 +618,16 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Higher education graduate employment and earnings
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Graduate outcomes (LEO)</strong> - currently available
+                  via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-higher-education-graduate-employment-and-earnings#documents">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Higher education statistics
@@ -446,18 +650,37 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Performance tables
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Primary school performance tables</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-performance-tables#primary-school-(key-stage-2)">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>School and college performance tables</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-performance-tables#school-and-college:-post-16-(key-stage-5)">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Secondary school performance tables</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-performance-tables#secondary-school-(key-stage-4)">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Widening participation in higher education
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/widening-participation-in-higher-education#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -470,18 +693,23 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
                 Statistics at DfE
               </a>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Higher education graduate employment and earnings
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Graduate outcomes (LEO)</strong> - currently available
+                  via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-higher-education-graduate-employment-and-earnings#documents">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Student loan forecasts
@@ -501,7 +729,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -526,18 +754,21 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
                 Statistics at DfE
               </a>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Higher education graduate employment and earnings
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <div className="govuk-inset-text">
+                <strong>Graduate outcomes (LEO)</strong> - currently available
+                via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-higher-education-graduate-employment-and-earnings#documents">
+                  Statistics at DfE
+                </a>
+              </div>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Higher education
@@ -580,7 +811,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/widening-participation-in-higher-education#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -607,11 +838,34 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               16 to 19 attainment
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>
+                    16 to 18 school and college performance tables
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#16-to-18-school-and-college-performance-tables">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>A levels and other 16 to 18 results</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#a-levels-and-other-16-to-18-results">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>
+                    Level 2 and 3 attainment by young people aged 19
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#level-2-and-3-attainment">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Destinations of key stage 4 and key stage 5 pupils
@@ -627,7 +881,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -660,27 +914,68 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/parental-responsibility-measures#official-statistics">
                 Statistics at DfE
               </a>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Performance tables
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Primary school performance tables</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-performance-tables#primary-school-(key-stage-2)">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>School and college performance tables</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-performance-tables#school-and-college:-post-16-(key-stage-5)">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Secondary school performance tables</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-performance-tables#secondary-school-(key-stage-4)">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Special educational needs (SEN)
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Special educational needs in England</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#national-statistics-on-special-educational-needs-in-england">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>
+                    Special educational needs: analysis and summary of data
+                    sources
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#analysis-of-children-with-special-educational-needs">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Statements on SEN and EHC plans</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#statements-of-special-educational-needs-(sen)-and-education,-health-and-care-(ehc)-plans">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </AccordionSection>
@@ -691,7 +986,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -723,7 +1018,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -784,11 +1079,34 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               16 to 19 attainment
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>
+                    16 to 18 school and college performance tables
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#16-to-18-school-and-college-performance-tables">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>A levels and other 16 to 18 results</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#a-levels-and-other-16-to-18-results">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>
+                    Level 2 and 3 attainment by young people aged 19
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#level-2-and-3-attainment">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Admission appeals
@@ -819,7 +1137,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -837,7 +1155,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/parental-responsibility-measures#official-statistics">
                 Statistics at DfE
               </a>
             </div>
@@ -877,11 +1195,33 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Special educational needs (SEN)
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>Special educational needs in England</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#national-statistics-on-special-educational-needs-in-england">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>
+                    Special educational needs: analysis and summary of data
+                    sources
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#analysis-of-children-with-special-educational-needs">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Statements on SEN and EHC plans</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#statements-of-special-educational-needs-(sen)-and-education,-health-and-care-(ehc)-plans">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </AccordionSection>

@@ -640,10 +640,7 @@ const BrowseReleasesPage = () => {
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
               <li>
-                <strong>
-                  16 to 18 school and college performance tables or School and
-                  college performance tables in England
-                </strong>{' '}
+                <strong>16 to 18 school and college performance tables</strong>{' '}
                 - currently available via{' '}
                 <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#16-to-18-school-and-college-performance-tables">
                   Statistics at DfE
@@ -757,8 +754,7 @@ const BrowseReleasesPage = () => {
             <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
               <li>
                 <strong>
-                  Outcome based success measures or Further education
-                  outcome-based success measures
+                  Further education outcome-based success measures
                 </strong>{' '}
                 - currently available via{' '}
                 <a href="https://www.gov.uk/government/collections/statistics-outcome-based-success-measures#statistics">
