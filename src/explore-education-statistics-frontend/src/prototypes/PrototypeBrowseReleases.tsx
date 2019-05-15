@@ -12,9 +12,7 @@ const BrowseReleasesPage = () => {
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">
-            Find statistics and download data
-          </h1>
+          <h1 className="govuk-heading-xl">Find statistics and data</h1>
           <p className="govuk-body-l">
             Browse to find the statistics and data you’re looking for and open
             the section to get links to:
@@ -33,8 +31,8 @@ const BrowseReleasesPage = () => {
               range of national and regional data
             </li>
             <li>
-              links to underlying data so you can download files and carry out
-              your own statistical analysis
+              underlying data so you can download files and carry out your own
+              statistical analysis
             </li>
           </ul>
         </div>
@@ -71,9 +69,7 @@ const BrowseReleasesPage = () => {
                   Childcare and early years
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -84,9 +80,7 @@ const BrowseReleasesPage = () => {
                   Early years foundation stage profile
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -97,9 +91,7 @@ const BrowseReleasesPage = () => {
                   Education and training
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -110,9 +102,7 @@ const BrowseReleasesPage = () => {
                   Parental responsibility measures
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -123,9 +113,7 @@ const BrowseReleasesPage = () => {
                   Special educational needs (SEN)
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -143,9 +131,7 @@ const BrowseReleasesPage = () => {
                   Education and training
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -163,9 +149,7 @@ const BrowseReleasesPage = () => {
                   Childcare and early years
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -177,9 +161,7 @@ const BrowseReleasesPage = () => {
                   Education and training
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -200,9 +182,7 @@ const BrowseReleasesPage = () => {
                   Childcare and early years
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -213,9 +193,7 @@ const BrowseReleasesPage = () => {
                   Education and training
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -226,9 +204,7 @@ const BrowseReleasesPage = () => {
                   Parental responsibility measures
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -239,9 +215,7 @@ const BrowseReleasesPage = () => {
                   Pupil projections
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -252,9 +226,7 @@ const BrowseReleasesPage = () => {
                   Special educational needs (SEN)
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -277,9 +249,7 @@ const BrowseReleasesPage = () => {
                   16 to 19 attainment
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -290,9 +260,7 @@ const BrowseReleasesPage = () => {
                   Education and training
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -303,9 +271,7 @@ const BrowseReleasesPage = () => {
                   Further education and skills
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -316,9 +282,7 @@ const BrowseReleasesPage = () => {
                   Further education for benefits claimants
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -329,9 +293,7 @@ const BrowseReleasesPage = () => {
                   National achievement rates tables
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -342,9 +304,7 @@ const BrowseReleasesPage = () => {
                   Outcome based success measures
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -355,9 +315,7 @@ const BrowseReleasesPage = () => {
                   Performance tables
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -375,9 +333,7 @@ const BrowseReleasesPage = () => {
                   Advance learner loans
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -388,9 +344,7 @@ const BrowseReleasesPage = () => {
                   Education and training
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -401,9 +355,7 @@ const BrowseReleasesPage = () => {
                   Further education and skills
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -420,9 +372,7 @@ const BrowseReleasesPage = () => {
                   Education and training
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -443,9 +393,7 @@ const BrowseReleasesPage = () => {
                   Education and training
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -456,9 +404,7 @@ const BrowseReleasesPage = () => {
                   FE Choices
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -469,9 +415,7 @@ const BrowseReleasesPage = () => {
                   Further education and skills
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -482,9 +426,7 @@ const BrowseReleasesPage = () => {
                   Further education for benefits claimants
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -496,9 +438,7 @@ const BrowseReleasesPage = () => {
                   participation
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -519,9 +459,7 @@ const BrowseReleasesPage = () => {
                   Education and training
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -532,9 +470,7 @@ const BrowseReleasesPage = () => {
                   Graduate labour market
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -545,9 +481,7 @@ const BrowseReleasesPage = () => {
                   Higher education graduate employment and earnings
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -558,9 +492,7 @@ const BrowseReleasesPage = () => {
                   Higher education statistics
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -571,9 +503,7 @@ const BrowseReleasesPage = () => {
                   Initial teacher training (ITT)
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -584,9 +514,7 @@ const BrowseReleasesPage = () => {
                   Performance tables
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -597,9 +525,7 @@ const BrowseReleasesPage = () => {
                   Widening participation in higher education
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -618,9 +544,7 @@ const BrowseReleasesPage = () => {
                   Education and training
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -631,9 +555,7 @@ const BrowseReleasesPage = () => {
                   Higher education graduate employment and earnings
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -644,9 +566,7 @@ const BrowseReleasesPage = () => {
                   Student loan forecasts
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -665,9 +585,7 @@ const BrowseReleasesPage = () => {
                   Education and training
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -678,9 +596,7 @@ const BrowseReleasesPage = () => {
                   Higher education statistics
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -702,9 +618,7 @@ const BrowseReleasesPage = () => {
                   Education and training
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -715,9 +629,7 @@ const BrowseReleasesPage = () => {
                   Higher education graduate employment and earnings
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -728,9 +640,7 @@ const BrowseReleasesPage = () => {
                   Higher education
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -741,9 +651,7 @@ const BrowseReleasesPage = () => {
                   Initial teacher training (ITT)
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -755,9 +663,7 @@ const BrowseReleasesPage = () => {
                   participation
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -768,9 +674,7 @@ const BrowseReleasesPage = () => {
                   Participation rates in higher education
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -781,9 +685,7 @@ const BrowseReleasesPage = () => {
                   Widening participation in higher education
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -802,9 +704,7 @@ const BrowseReleasesPage = () => {
                   Higher education
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -826,9 +726,7 @@ const BrowseReleasesPage = () => {
                   16 to 19 attainment
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -840,9 +738,7 @@ const BrowseReleasesPage = () => {
                   Destinations of key stage 4 and key stage 5 pupils
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -854,9 +750,7 @@ const BrowseReleasesPage = () => {
                   Education and training
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -867,11 +761,7 @@ const BrowseReleasesPage = () => {
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
                   GCSEs (key stage 4) and equivalent results
                 </h4>
-                <p className="govuk-body">
-                  View statistics, create charts and tables and download data
-                  files for GCSE and equivalent results in England
-                </p>
-                <div className="govuk-!-margin-top-0">
+                <div className="govuk-inset-text">
                   <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
                 </div>
               </li>
@@ -880,9 +770,7 @@ const BrowseReleasesPage = () => {
                   Key stage 1
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -893,9 +781,7 @@ const BrowseReleasesPage = () => {
                   Key stage 2
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -906,9 +792,7 @@ const BrowseReleasesPage = () => {
                   Parental responsibility measures
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -919,9 +803,7 @@ const BrowseReleasesPage = () => {
                   Performance tables
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -932,9 +814,7 @@ const BrowseReleasesPage = () => {
                   Special educational needs (SEN)
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -953,9 +833,7 @@ const BrowseReleasesPage = () => {
                   Education and training
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -966,9 +844,7 @@ const BrowseReleasesPage = () => {
                   Local authority and school finance
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -987,9 +863,7 @@ const BrowseReleasesPage = () => {
                   Admission appeals
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1000,9 +874,7 @@ const BrowseReleasesPage = () => {
                   Education and training
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1026,9 +898,7 @@ const BrowseReleasesPage = () => {
                   School applications
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1039,9 +909,7 @@ const BrowseReleasesPage = () => {
                   School capacity
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1052,9 +920,7 @@ const BrowseReleasesPage = () => {
                   School and pupil numbers
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1065,9 +931,7 @@ const BrowseReleasesPage = () => {
                   Workforce statistics and analysis
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1089,9 +953,7 @@ const BrowseReleasesPage = () => {
                   16 to 19 attainment
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1103,9 +965,7 @@ const BrowseReleasesPage = () => {
                   Admission appeals
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1117,9 +977,7 @@ const BrowseReleasesPage = () => {
                   Destinations of key stage 4 and key stage 5 pupils
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1129,11 +987,7 @@ const BrowseReleasesPage = () => {
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
                   Exclusions
                 </h4>
-                <p className="govuk-body">
-                  View statistics, create charts and tables and download data
-                  files for fixed-period and permanent exclusion statistics
-                </p>
-                <div className="govuk-!-margin-top-0">
+                <div className="govuk-inset-text">
                   <PrototypeDownloadDropdown link="/prototypes/publication-exclusions" />
                 </div>
               </li>
@@ -1143,9 +997,7 @@ const BrowseReleasesPage = () => {
                   Education and training
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1157,9 +1009,7 @@ const BrowseReleasesPage = () => {
                   participation
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1170,9 +1020,7 @@ const BrowseReleasesPage = () => {
                   Parental responsibility measures
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1183,12 +1031,7 @@ const BrowseReleasesPage = () => {
                 <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
                   Pupil absence
                 </h4>
-                <p className="govuk-body">
-                  View statistics, create charts and tables and download data
-                  files for authorised, overall, persistent and unauthorised
-                  absence
-                </p>
-                <div className="govuk-!-margin-top-0">
+                <div className="govuk-inset-text">
                   <PrototypeDownloadDropdown />
                 </div>
               </li>
@@ -1197,9 +1040,7 @@ const BrowseReleasesPage = () => {
                   Pupil projections
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1210,9 +1051,7 @@ const BrowseReleasesPage = () => {
                   School and pupil numbers
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1223,9 +1062,7 @@ const BrowseReleasesPage = () => {
                   School applications
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1236,9 +1073,7 @@ const BrowseReleasesPage = () => {
                   Special educational needs (SEN)
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1257,9 +1092,7 @@ const BrowseReleasesPage = () => {
                   Initial teacher training (ITT)
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1270,9 +1103,7 @@ const BrowseReleasesPage = () => {
                   School workforce
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1283,9 +1114,7 @@ const BrowseReleasesPage = () => {
                   Workforce statistics and analysis
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1306,9 +1135,7 @@ const BrowseReleasesPage = () => {
                   Children in need and child protection
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1319,9 +1146,7 @@ const BrowseReleasesPage = () => {
                   Looked-after children
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1332,9 +1157,7 @@ const BrowseReleasesPage = () => {
                   Secure children’s homes
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1352,9 +1175,7 @@ const BrowseReleasesPage = () => {
                   Secure children’s homes
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>
@@ -1372,9 +1193,7 @@ const BrowseReleasesPage = () => {
                   Children's social work workforce
                 </h4>
                 <div className="govuk-inset-text">
-                  These statistics and data are not yet available on the explore
-                  education statistics service. To find and download these
-                  statistics and data browse{' '}
+                  Currently available via{' '}
                   <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
                     Statistics at DfE
                   </a>

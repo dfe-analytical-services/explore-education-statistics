@@ -12,9 +12,7 @@ const BrowseReleasesPage = () => {
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">
-            Find statistics and download data
-          </h1>
+          <h1 className="govuk-heading-xl">Find statistics and data</h1>
           <p className="govuk-body-l">
             Browse to find the statistics and data you’re looking for and open
             the section to get links to:
@@ -33,8 +31,8 @@ const BrowseReleasesPage = () => {
               range of national and regional data
             </li>
             <li>
-              links to underlying data so you can download files and carry out
-              your own statistical analysis
+              underlying data so you can download files and carry out your own
+              statistical analysis
             </li>
           </ul>
         </div>
@@ -500,7 +498,6 @@ const BrowseReleasesPage = () => {
                 <strong>
                   Permanent and fixed-period exclusions in England
                 </strong>{' '}
-                - view statistics, create tables and download data files{' '}
                 <div className="govuk-!-margin-top-5">
                   <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
                 </div>
@@ -512,8 +509,7 @@ const BrowseReleasesPage = () => {
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
               <li>
-                <strong>Pupil absence in schools in England</strong> - view
-                statistics, create tables and download data files{' '}
+                <strong>Pupil absence in schools in England</strong>{' '}
                 <div className="govuk-!-margin-top-5">
                   <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
                 </div>
@@ -676,8 +672,7 @@ const BrowseReleasesPage = () => {
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
               <li>
-                <strong>GCSE and equivalent results</strong> - view statistics,
-                create tables and download data files{' '}
+                <strong>GCSE and equivalent results</strong>{' '}
                 <div className="govuk-!-margin-top-5">
                   <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
                 </div>
