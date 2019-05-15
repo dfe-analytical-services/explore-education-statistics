@@ -1,8 +1,6 @@
-import classNames from 'classnames';
 import { connect, FormikContext, FormikValues } from 'formik';
 import get from 'lodash/get';
 import React from 'react';
-import styles from './FormCheckboxSelectedCount.module.scss';
 
 interface Props {
   name: string;
@@ -22,7 +20,7 @@ const FormCheckboxSelectedCount = ({
   return (
     <>
       {count > 0 ? (
-        <span className={classNames('govuk-tag', styles.selectionCount)}>
+        <span className="govuk-tag govuk-!-margin-left-2 govuk-!-font-size-14">
           {count} selected
         </span>
       ) : null}
