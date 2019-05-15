@@ -1561,7 +1561,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-childrens-social-care-workforce#statutory-collection">
                 Statistics at DfE
               </a>
             </div>
