@@ -6,7 +6,7 @@ import useMounted from '@common/hooks/useMounted';
 import camelCase from 'lodash/camelCase';
 import sum from 'lodash/sum';
 import React, { useState } from 'react';
-import styles from './FormCheckboxSearchGroup.module.scss';
+import styles from './FormCheckboxSearchSubGroups.module.scss';
 import FormCheckboxSubGroups, {
   FormCheckboxSubGroupsProps,
 } from './FormCheckboxSubGroups';

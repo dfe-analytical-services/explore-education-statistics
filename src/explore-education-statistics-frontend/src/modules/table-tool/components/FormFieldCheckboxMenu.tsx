@@ -31,17 +31,17 @@ const FormFieldCheckboxMenu = <T extends {}>(
     >
       {options.length > 1 ? (
         <FormFieldCheckboxSearchGroup
-          {...props}
+          selectAll
           hideCount
           legendHidden
-          selectAll
+          {...props}
           name={name}
           options={options}
         />
       ) : (
         <FormFieldCheckboxGroup
-          {...props}
           selectAll
+          {...props}
           name={name}
           options={options}
         />

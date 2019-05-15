@@ -75,7 +75,6 @@ const withSassModules = createPlugin((config, options) => {
         },
       ],
       cssLoaderOptions: {
-        importLoaders: 1,
         localIdentName: 'dfe-[name]__[local]--[hash:base64:5]',
       },
     });

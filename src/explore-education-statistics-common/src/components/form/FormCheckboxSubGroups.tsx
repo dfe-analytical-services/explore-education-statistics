@@ -1,7 +1,8 @@
 import { Overwrite } from '@common/types/util';
 import camelCase from 'lodash/camelCase';
-import React, { ChangeEvent } from 'react';
+import React from 'react';
 import FormCheckboxGroup, {
+  CheckboxGroupAllChangeEvent,
   CheckboxOption,
   FormCheckboxGroupProps,
 } from './FormCheckboxGroup';
@@ -16,7 +17,7 @@ export type FormCheckboxSubGroupsProps = Overwrite<
       options: CheckboxOption[];
     }[];
     onAllChange?: (
-      event: ChangeEvent<HTMLInputElement>,
+      event: CheckboxGroupAllChangeEvent,
       options: CheckboxOption[],
     ) => void;
   }
