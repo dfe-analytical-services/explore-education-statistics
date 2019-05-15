@@ -62,64 +62,52 @@ const BrowseReleasesPage = () => {
       <Accordion id="early-years">
         <AccordionSection heading="Attainment and outcomes" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-list-bullet">
-              <li>
-                {' '}
-                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Childcare and early years
-                </h4>
-                <div className="govuk-inset-text">
-                  Currently available via{' '}
-                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                    Statistics at DfE
-                  </a>
-                </div>
-              </li>
-              <li className="govuk-!-margin-top-6">
-                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Early years foundation stage profile
-                </h4>
-                <div className="govuk-inset-text">
-                  Currently available via{' '}
-                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                    Statistics at DfE
-                  </a>
-                </div>
-              </li>
-              <li className="govuk-!-margin-top-6">
-                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training
-                </h4>
-                <div className="govuk-inset-text">
-                  Currently available via{' '}
-                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                    Statistics at DfE
-                  </a>
-                </div>
-              </li>
-              <li className="govuk-!-margin-top-6">
-                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Parental responsibility measures
-                </h4>
-                <div className="govuk-inset-text">
-                  Currently available via{' '}
-                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                    Statistics at DfE
-                  </a>
-                </div>
-              </li>
-              <li className="govuk-!-margin-top-6">
-                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Special educational needs (SEN)
-                </h4>
-                <div className="govuk-inset-text">
-                  Currently available via{' '}
-                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                    Statistics at DfE
-                  </a>
-                </div>
-              </li>
-            </ul>
+            {' '}
+            <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+              Childcare and early years
+            </h4>
+            <div className="govuk-inset-text">
+              Currently available via{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics at DfE
+              </a>
+            </div>
+            <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+              Early years foundation stage profile
+            </h4>
+            <div className="govuk-inset-text">
+              Currently available via{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics at DfE
+              </a>
+            </div>
+            <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+              Education and training
+            </h4>
+            <div className="govuk-inset-text">
+              Currently available via{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics at DfE
+              </a>
+            </div>
+            <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+              Parental responsibility measures
+            </h4>
+            <div className="govuk-inset-text">
+              Currently available via{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics at DfE
+              </a>
+            </div>
+            <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+              Special educational needs (SEN)
+            </h4>
+            <div className="govuk-inset-text">
+              Currently available via{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics at DfE
+              </a>
+            </div>
           </div>
         </AccordionSection>
         <AccordionSection heading="Finance" caption="">
