@@ -47,18 +47,10 @@ const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
 
 export default class LineChartBlock extends Component<ChartProps> {
   public render() {
-    const {
-      data,
-      chartDataKeys,
-      height,
-      xAxis,
-      yAxis,
-      labels,
-      meta,
-    } = this.props;
+    const { data, indicators, height, xAxis, yAxis, labels, meta } = this.props;
 
     const chartData = data.result.map(result => {
-      return chartDataKeys.reduce(
+      return indicators.reduce(
         (v, indicatorName) => {
           return {
             ...v,
@@ -82,7 +74,7 @@ export default class LineChartBlock extends Component<ChartProps> {
           margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
         >
           <Tooltip content={CustomToolTip} />
-          {chartDataKeys.length > 1 ? (
+          {indicators.length > 1 ? (
             <Legend verticalAlign="top" height={36} />
           ) : (
             ''
@@ -109,7 +101,7 @@ export default class LineChartBlock extends Component<ChartProps> {
             unit="%"
             domain={yAxisDomain}
           />
-          {chartDataKeys.map((dataKey, index) => {
+          {indicators.map((dataKey, index) => {
             const key = index;
 
             return (

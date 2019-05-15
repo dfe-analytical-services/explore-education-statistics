@@ -17,7 +17,7 @@ import {
 export interface ChartProps {
   data: DataBlockData;
   meta: DataBlockMetadata;
-  chartDataKeys: string[];
+  indicators: string[];
   labels: { [key: string]: string };
   xAxis: Axis;
   yAxis: Axis;

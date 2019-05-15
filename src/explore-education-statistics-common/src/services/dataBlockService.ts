@@ -1,6 +1,9 @@
 import { dataApi } from '@common/services/api';
 import TimePeriod, { TimePeriodCode } from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
+import { Feature, Geometry } from 'geojson';
+
+import LocationService from './temporaryLocationService';
 
 export enum GeographicLevel {
   Establishment = 'Establishment',
@@ -40,7 +43,7 @@ interface LocalAuthorityDistrict {
   sch_lad_name: string;
 }
 
-interface DataBlockLocation {
+export interface DataBlockLocation {
   country: Country;
   region: Region;
   localAuthority: LocalAuthority;
@@ -103,11 +106,17 @@ interface TimePeriodMetadata {
   options: TimePeriodOptionMetadata[];
 }
 
+interface LocationOptionsMetaData {
+  hint: string;
+  legend: string;
+  options: LabelValueMetadata[];
+}
+
 interface IndicatorMetadata extends OptionListMetadata<LabelValueUnitMetadata> {
   label: string;
 }
 
-interface ResponseMetaData {
+export interface ResponseMetaData {
   subject: {
     id: number;
     label: string;
@@ -115,6 +124,37 @@ interface ResponseMetaData {
   filters: Dictionary<FilterMetadata>;
   indicators: Dictionary<IndicatorMetadata>;
   timePeriod: TimePeriodMetadata;
+  locations: {
+    LocalAuthority: LocationOptionsMetaData;
+    LocalAuthorityDistrict: LocationOptionsMetaData;
+    Regional: LocationOptionsMetaData;
+    National: LocationOptionsMetaData;
+  };
+}
+
+export interface DataBlockGeoJsonProperties {
+  objectid: number;
+  ctry17cd: string | null;
+  ctry17nm: string | null;
+  ctry17nmw: string | null;
+  lad17cd: string | null;
+  lad17nm: string | null;
+  lad17nmw: string | null;
+  bng_e: number;
+  bng_n: number;
+  long: number;
+  lat: number;
+  st_areasha: number;
+  st_lengths: number;
+  [name: string]: any;
+}
+
+export type DataBlockGeoJSON = Feature<Geometry, DataBlockGeoJsonProperties>;
+
+interface DataBlockLocationMetadata {
+  code: string;
+  label: string;
+  geoJson?: DataBlockGeoJSON;
 }
 
 // ------------------------------------------
@@ -123,6 +163,7 @@ export interface DataBlockMetadata {
   indicators: Dictionary<LabelValueUnitMetadata>;
   filters: Dictionary<LabelValueMetadata>;
   timePeriods: Dictionary<TimePeriod>;
+  locations: Dictionary<DataBlockLocationMetadata>;
 }
 
 export interface DataBlockRequest {
@@ -214,6 +255,30 @@ function getUsedTimeIdentifiers(data: DataBlockData) {
   );
 }
 
+function getUsedLocations(
+  data: DataBlockData,
+): Dictionary<DataBlockLocationMetadata> {
+  return data.result.reduce(
+    (locations: Dictionary<DataBlockLocationMetadata>, result) => {
+      const geoJson = LocationService.getGeoJSONForLocation(result.location);
+
+      if (geoJson) {
+        const code = geoJson.properties.lad17cd || geoJson.properties.ctry17cd;
+        const label = geoJson.properties.lad17nm || geoJson.properties.ctry17nm;
+
+        if (code && label) {
+          const dbm: DataBlockLocationMetadata = { code, label, geoJson };
+
+          return { ...locations, [code]: dbm };
+        }
+      }
+
+      return locations;
+    },
+    {},
+  );
+}
+
 const DataBlockService = {
   async getDataBlockForSubject(request: DataBlockRequest) {
     // TODO: move all this into the API
@@ -225,15 +290,16 @@ const DataBlockService = {
 
     const usedIndicators = remapIndicators(request.indicators, metaData);
     const usedFilters = remapFilters(request.filters, metaData);
-
     const times = getUsedTimeIdentifiers(data);
-
     const usedTimeIdentifiers = remapTimePeriod(times, metaData);
+
+    const usedLocations = getUsedLocations(data);
 
     const usedMetadata: DataBlockMetadata = {
       indicators: usedIndicators,
       filters: usedFilters,
       timePeriods: usedTimeIdentifiers,
+      locations: usedLocations,
     };
 
     const response: DataBlockResponse = {

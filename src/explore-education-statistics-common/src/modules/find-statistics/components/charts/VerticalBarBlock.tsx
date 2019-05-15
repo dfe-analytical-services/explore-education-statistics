@@ -15,7 +15,7 @@ import { colours } from './Charts';
 
 export default function VerticalBarBlock({
   data,
-  chartDataKeys,
+  indicators,
   height,
   xAxis,
   yAxis,
@@ -46,7 +46,7 @@ export default function VerticalBarBlock({
         <Tooltip />
         <Legend />
 
-        {chartDataKeys.map((dataKey, index) => {
+        {indicators.map((dataKey, index) => {
           return (
             <Bar
               key={dataKey}

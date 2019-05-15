@@ -99,7 +99,11 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
     if (charts) {
       newState.charts = charts.map(chart => ({
+        xAxis: { title: '' },
+        yAxis: { title: '' },
+
         ...chart,
+
         geometry: chart.geometry as MapFeature,
         data: json,
         meta: jsonMeta,

@@ -22,13 +22,14 @@ export interface ChartRendererProps {
   indicators: string[];
   data: DataBlockData;
   meta: DataBlockMetadata;
-  xAxis?: Axis;
-  yAxis?: Axis;
+  xAxis: Axis;
+  yAxis: Axis;
   height?: number;
   width?: number;
   stacked?: boolean;
-  geometry?: MapFeature;
   referenceLines?: ReferenceLine[];
+
+  geometry?: MapFeature;
 }
 
 function ChartRenderer(props: ChartRendererProps) {
@@ -68,7 +69,7 @@ function ChartRenderer(props: ChartRendererProps) {
     case 'line':
       return (
         <LineChartBlock
-          chartDataKeys={indicators}
+          indicators={indicators}
           data={data}
           meta={meta}
           labels={labels}
@@ -82,7 +83,7 @@ function ChartRenderer(props: ChartRendererProps) {
     case 'verticalbar':
       return (
         <VerticalBarBlock
-          chartDataKeys={indicators}
+          indicators={indicators}
           data={data}
           meta={meta}
           labels={labels}
@@ -96,7 +97,7 @@ function ChartRenderer(props: ChartRendererProps) {
     case 'horizontalbar':
       return (
         <HorizontalBarBlock
-          chartDataKeys={indicators}
+          indicators={indicators}
           data={data}
           meta={meta}
           labels={labels}
@@ -111,7 +112,7 @@ function ChartRenderer(props: ChartRendererProps) {
     case 'map':
       return (
         <DynamicMapBlock
-          chartDataKeys={indicators}
+          indicators={indicators}
           data={data}
           meta={meta}
           labels={labels}
