@@ -1506,20 +1506,35 @@ const BrowseReleasesPage = () => {
               </a>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-              Looked-after children
+              Looked after children
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>
+                    Children looked after in England including adoptions
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-looked-after-children#looked-after-children">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Outcomes for children looked after by LAs</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-looked-after-children#outcomes-for-looked-after-children">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Secure children’s homes
             </h4>
             <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <strong>Children accommodated in secure children's homes</strong>{' '}
+              - currently available via{' '}
+              <a href="https://www.gov.uk/government/collections/statistics-secure-children-s-homes">
                 Statistics at DfE
               </a>
             </div>
@@ -1531,8 +1546,9 @@ const BrowseReleasesPage = () => {
               Secure children’s homes
             </h4>
             <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <strong>Children accommodated in secure children's homes</strong>{' '}
+              - currently available via{' '}
+              <a href="https://www.gov.uk/government/collections/statistics-secure-children-s-homes">
                 Statistics at DfE
               </a>
             </div>
