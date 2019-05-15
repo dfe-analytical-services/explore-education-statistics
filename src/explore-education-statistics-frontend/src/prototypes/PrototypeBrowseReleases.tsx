@@ -619,15 +619,13 @@ const BrowseReleasesPage = () => {
               Higher education graduate employment and earnings
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
-                <li>
-                  <strong>Graduate outcomes (LEO)</strong> - currently available
-                  via{' '}
-                  <a href="https://www.gov.uk/government/collections/statistics-higher-education-graduate-employment-and-earnings#documents">
-                    Statistics at DfE
-                  </a>
-                </li>
-              </ul>
+              <div className="govuk-inset-text">
+                <strong>Graduate outcomes (LEO)</strong> - currently available
+                via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-higher-education-graduate-employment-and-earnings#documents">
+                  Statistics at DfE
+                </a>
+              </div>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Higher education statistics
@@ -701,15 +699,13 @@ const BrowseReleasesPage = () => {
               Higher education graduate employment and earnings
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
-                <li>
-                  <strong>Graduate outcomes (LEO)</strong> - currently available
-                  via{' '}
-                  <a href="https://www.gov.uk/government/collections/statistics-higher-education-graduate-employment-and-earnings#documents">
-                    Statistics at DfE
-                  </a>
-                </li>
-              </ul>
+              <div className="govuk-inset-text">
+                <strong>Graduate outcomes (LEO)</strong> - currently available
+                via{' '}
+                <a href="https://www.gov.uk/government/collections/statistics-higher-education-graduate-employment-and-earnings#documents">
+                  Statistics at DfE
+                </a>
+              </div>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Student loan forecasts
