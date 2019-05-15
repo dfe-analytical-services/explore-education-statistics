@@ -1042,11 +1042,41 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Key stage 2
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>
+                    Key stage 2 national curriculum test: review outcomes
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-key-stage-2#key-stage-2-national-curriculum-tests:-review-outcomes">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Multi-academy trust performance measures</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-key-stage-2#pupil-attainment-at-key-stage-2">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>
+                    National curriculum assessments at key stage 2
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-key-stage-2#national-curriculum-assessments-at-key-stage-2">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Primary school performance tables</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-key-stage-2#primary-school-performance-tables">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Parental responsibility measures
@@ -1132,11 +1162,32 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Local authority and school finance
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>
+                    Income and expenditure in academies in England
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-local-authority-school-finance-data#academy-spending">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>LA and school expenditure</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-local-authority-school-finance-data#local-authority-and-school-finance">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Planned LA and school expenditure</strong> - currently
+                  available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-local-authority-school-finance-data#planned-local-authority-and-school-spending-">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </AccordionSection>
@@ -1148,7 +1199,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-admission-appeals#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -1164,19 +1215,18 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               GCSEs (key stage 4) and equivalent results
             </h4>
-            <p className="govuk-body">
-              View statistics, create charts and tables and download data files
-              for GCSE and equivalent results in England
-            </p>
-            <div className="govuk-!-margin-top-0">
+            <div className="govuk-inset-text">
               <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               School applications
             </h4>
             <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <strong>
+                Secondary and primary schools applications and offers
+              </strong>{' '}
+              - currently available via{' '}
+              <a href="https://www.gov.uk/government/collections/statistics-school-applications#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -1252,7 +1302,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-admission-appeals#documents">
                 Statistics at DfE
               </a>
             </div>
