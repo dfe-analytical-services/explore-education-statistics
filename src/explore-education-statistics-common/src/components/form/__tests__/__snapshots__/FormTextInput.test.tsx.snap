@@ -12,12 +12,11 @@ exports[`FormTextInput renders correctly with error 1`] = `
 >
   Field is required
 </span>
-<input aria-describedby="test-input-error"
-       type="text"
+<input name="testInput"
+       aria-describedby="test-input-error"
        class="govuk-input"
        id="test-input"
-       name="testInput"
-       value
+       type="text"
 >
 
 `;
@@ -34,12 +33,11 @@ exports[`FormTextInput renders correctly with hint 1`] = `
 >
   Fill me in
 </span>
-<input aria-describedby="test-input-hint"
-       type="text"
+<input name="testInput"
+       aria-describedby="test-input-hint"
        class="govuk-input"
        id="test-input"
-       name="testInput"
-       value
+       type="text"
 >
 
 `;
@@ -51,11 +49,10 @@ exports[`FormTextInput renders correctly with required props 1`] = `
 >
   Test input
 </label>
-<input type="text"
+<input name="testInput"
        class="govuk-input"
        id="test-input"
-       name="testInput"
-       value
+       type="text"
 >
 
 `;
@@ -72,12 +69,11 @@ exports[`FormTextInput renders with a specific width class 1`] = `
 >
   Fill me in
 </span>
-<input aria-describedby="test-input-hint"
-       type="text"
+<input name="testInput"
+       aria-describedby="test-input-hint"
        class="govuk-input govuk-input--width-20"
        id="test-input"
-       name="testInput"
-       value
+       type="text"
 >
 
 `;

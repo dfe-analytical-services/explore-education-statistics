@@ -85,6 +85,11 @@ const FormCheckboxSearchSubGroups = ({
             id={`${id}-search`}
             name={`${name}-search`}
             onChange={event => setSearchTerm(event.target.value)}
+            onKeyPress={event => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+              }
+            }}
             label={searchLabel}
             width={20}
           />
