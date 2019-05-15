@@ -287,8 +287,9 @@ const BrowseReleasesPage = () => {
               Pupil projections
             </h4>
             <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <strong>National pupil projections</strong> - currently available
+              via{' '}
+              <a href="https://www.gov.uk/government/collections/statistics-pupil-projections#documents">
                 Statistics at DfE
               </a>
             </div>
@@ -1336,7 +1337,7 @@ const BrowseReleasesPage = () => {
               Not in education, employment or training (NEET) and participation
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
                 <li>
                   <strong>
                     Participation in education, training and employment
@@ -1374,8 +1375,9 @@ const BrowseReleasesPage = () => {
               Pupil projections
             </h4>
             <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <strong>National pupil projections</strong> - currently available
+              via{' '}
+              <a href="https://www.gov.uk/government/collections/statistics-pupil-projections#documents">
                 Statistics at DfE
               </a>
             </div>
