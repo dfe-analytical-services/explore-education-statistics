@@ -37,6 +37,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
 
   return (
     <Formik
+      enableReinitialize
       onSubmit={async ({ subjectId }) => {
         await onSubmit({
           subjectId,

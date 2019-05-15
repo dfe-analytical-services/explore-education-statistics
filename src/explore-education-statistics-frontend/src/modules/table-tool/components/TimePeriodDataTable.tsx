@@ -81,7 +81,7 @@ const TimePeriodDataTable = ({
             return Boolean(
               result.measures[row.value] !== undefined &&
                 result.filters.every(filter =>
-                  [colGroup.value, rowGroup.value].includes(filter.toString()),
+                  [colGroup.value, rowGroup.value].includes(filter),
                 ) &&
                 result.timeIdentifier === column.code &&
                 result.year === column.year,

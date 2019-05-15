@@ -57,6 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
         public List<IContentBlockChart> Charts { get; set; }
 
         public Summary Summary { get; set; }
+        
+        public List<Table> Tables { get; set; }
 
     }
 
@@ -66,5 +68,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
 
         public MarkDownBlock description { get; set; }
         
+    }
+
+    public class Table 
+    {
+        public List<string> indicators { get; set; }    
     }
 }

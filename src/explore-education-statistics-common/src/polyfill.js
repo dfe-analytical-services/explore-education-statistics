@@ -19,6 +19,10 @@ if (
   require('core-js');
 }
 
+if (!('repeat' in String.prototype)) {
+  require('core-js/fn/string/repeat');
+}
+
 // NodeList.forEach
 if (window.NodeList && !NodeList.prototype.forEach) {
   NodeList.prototype.forEach = Array.prototype.forEach;
@@ -33,4 +37,24 @@ if (
     MediaQueryList.prototype.addListener;
   MediaQueryList.prototype.removeEventListener =
     MediaQueryList.prototype.removeListener;
+}
+
+// For IE11
+
+if (!Element.prototype.matches) {
+  Element.prototype.matches =
+    Element.prototype.msMatchesSelector ||
+    Element.prototype.webkitMatchesSelector;
+}
+
+if (!Element.prototype.closest) {
+  Element.prototype.closest = s => {
+    let el = this;
+
+    do {
+      if (el.matches(s)) return el;
+      el = el.parentElement || el.parentNode;
+    } while (el !== null && el.nodeType === 1);
+    return null;
+  };
 }

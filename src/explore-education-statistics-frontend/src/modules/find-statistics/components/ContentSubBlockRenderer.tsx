@@ -6,9 +6,10 @@ import Link from '@frontend/components/Link';
 
 interface Props {
   block: ContentBlock;
+  id: string;
 }
 
-const ContentSubBlockRenderer = ({ block }: Props) => {
+const ContentSubBlockRenderer = ({ block, id }: Props) => {
   switch (block.type) {
     case 'MarkDownBlock':
       return <ReactMarkdown className="govuk-body" source={block.body} />;
@@ -27,6 +28,7 @@ const ContentSubBlockRenderer = ({ block }: Props) => {
         <div className="dfe-content-overflow">
           <DataBlock
             {...block}
+            id={`${id}_datablock`}
             additionalTabContent={
               <>
                 <h2 className="govuk-heading-m govuk-!-margin-top-9">

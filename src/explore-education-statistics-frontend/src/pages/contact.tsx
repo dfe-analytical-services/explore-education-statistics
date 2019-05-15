@@ -8,7 +8,7 @@ function ContactPage() {
       <PageTitle title="Contact explore education statistics" />
       <p>
         If you need help and support or have a question about education
-        statistics:
+        statistics and data contact:
       </p>
 
       <p>

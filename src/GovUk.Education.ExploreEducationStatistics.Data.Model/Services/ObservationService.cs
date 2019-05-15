@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -137,18 +138,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             };
         }
 
-        public IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(long subjectId)
+        public IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(SubjectMetaQueryContext query)
         {
-            var timePeriods = (from o in DbSet().Where(data => data.SubjectId == subjectId)
+            var timePeriods = (from o in DbSet().AsNoTracking().Where(query.ObservationPredicate())
                 select new {o.TimeIdentifier, o.Year}).Distinct();
 
             return from timePeriod in timePeriods.AsEnumerable()
                 select (timePeriod.TimeIdentifier, timePeriod.Year);
         }
 
-        public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(long subjectId)
+        public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnitsMeta(
+            SubjectMetaQueryContext query)
         {
-            var locations = GetLocations(subjectId);
+            var locations = GetLocations(query);
+
             return new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>
             {
                 {
@@ -202,17 +205,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             };
         }
 
-        private IEnumerable<Location> GetLocations(long subjectId)
+        private IEnumerable<Location> GetLocations(SubjectMetaQueryContext query)
         {
-//            TODO Ideally want one db query as follows but this is translated into invalid SQL
-//            TODO See https://github.com/aspnet/EntityFrameworkCore/issues/12304
-//            return (from l in _context.Set<Location>()
-//                join
-//                    d in _context.Observation.Where(data => data.SubjectId == subjectId)
-//                        .GroupBy(data => data.LocationId) on l.Id equals d.Key
-//                select l).ToList();
-
-            var locationIds = DbSet().Where(data => data.SubjectId == subjectId)
+            var locationIds = DbSet()
+                .AsNoTracking()
+                .Where(query.ObservationPredicate())
                 .GroupBy(observation => observation.LocationId)
                 .Select(group => group.Key);
 

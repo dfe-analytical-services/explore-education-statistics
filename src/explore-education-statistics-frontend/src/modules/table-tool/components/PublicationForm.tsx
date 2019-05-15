@@ -13,6 +13,7 @@ import Yup from '@common/lib/validation/yup';
 import { Formik, FormikProps } from 'formik';
 import camelCase from 'lodash';
 import React, { useState } from 'react';
+import { PublicationOptions } from '../TableToolPage';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
@@ -21,23 +22,11 @@ interface FormValues {
   publicationId: string;
 }
 
+export type PublicationFormSubmitHandler = (values: FormValues) => void;
+
 interface Props {
-  onSubmit: (values: {
-    publicationId: string;
-    publicationName: string;
-  }) => void;
-  options: {
-    id: string;
-    name: string;
-    topics: {
-      id: string;
-      name: string;
-      publications: {
-        id: string;
-        name: string;
-      }[];
-    }[];
-  }[];
+  onSubmit: PublicationFormSubmitHandler;
+  options: PublicationOptions[];
 }
 
 const PublicationForm = (props: Props & InjectedWizardProps) => {
@@ -55,13 +44,13 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
 
   return (
     <Formik<FormValues>
+      enableReinitialize
       initialValues={{
         publicationId: '',
       }}
       onSubmit={async ({ publicationId }) => {
         await onSubmit({
           publicationId,
-          publicationName,
         });
         goToNextStep();
       }}
@@ -98,7 +87,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                           topic.publications.some(
                             publication =>
                               publication.id === values.publicationId ||
-                              publication.name.search(
+                              publication.title.search(
                                 new RegExp(searchTerm, 'i'),
                               ) > -1,
                           ),
@@ -107,7 +96,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                       .map(group => {
                         return (
                           <DetailsMenu
-                            summary={group.name}
+                            summary={group.title}
                             key={group.id}
                             open={
                               searchTerm !== '' ||
@@ -124,14 +113,14 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                                 return topic.publications.find(
                                   publication =>
                                     publication.id === values.publicationId ||
-                                    publication.name.search(
+                                    publication.title.search(
                                       new RegExp(searchTerm, 'i'),
                                     ) > -1,
                                 );
                               })
                               .map(topic => (
                                 <DetailsMenu
-                                  summary={topic.name}
+                                  summary={topic.title}
                                   key={topic.id}
                                   open={
                                     searchTerm !== '' ||
@@ -142,13 +131,13 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                                   }
                                 >
                                   <FormFieldRadioGroup
-                                    legend={`Choose option from ${topic.name}`}
+                                    legend={`Choose option from ${topic.title}`}
                                     legendHidden
                                     small
                                     showError={false}
                                     name="publicationId"
                                     id={`${formId}-publicationId-${camelCase(
-                                      topic.name,
+                                      topic.title,
                                     )}`}
                                     onChange={(event, option) => {
                                       setPublicationName(option.label);
@@ -158,13 +147,13 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                                         publication =>
                                           publication.id ===
                                             values.publicationId ||
-                                          publication.name.search(
+                                          publication.title.search(
                                             new RegExp(searchTerm, 'i'),
                                           ) > -1,
                                       )
                                       .map(publication => ({
                                         id: publication.id,
-                                        label: publication.name,
+                                        label: publication.title,
                                         value: publication.id,
                                       }))}
                                   />

@@ -1,4 +1,6 @@
 import { dataApi } from '@common/services/api';
+import TimePeriod, { TimePeriodCode } from '@common/services/types/TimePeriod';
+import { Dictionary } from '@common/types/util';
 
 export enum GeographicLevel {
   Establishment = 'Establishment',
@@ -68,15 +70,11 @@ export interface DataBlockData {
 
 interface LabelValueMetadata {
   label: string;
-  value: number;
+  value: string;
 }
 
 interface LabelValueUnitMetadata extends LabelValueMetadata {
   unit: string;
-}
-
-interface ObjectMap<T> {
-  [name: string]: T;
 }
 
 interface OptionListMetadata<T extends LabelValueMetadata> {
@@ -89,14 +87,14 @@ interface OptionMetadata extends OptionListMetadata<LabelValueMetadata> {
 
 interface TimePeriodOptionMetadata {
   label: string;
-  code: string;
+  code: TimePeriodCode;
   year: number;
 }
 
 interface FilterMetadata {
   hint: string;
   legend: string;
-  options: ObjectMap<OptionMetadata>;
+  options: Dictionary<OptionMetadata>;
 }
 
 interface TimePeriodMetadata {
@@ -114,30 +112,30 @@ interface ResponseMetaData {
     id: number;
     label: string;
   };
-  filters: ObjectMap<FilterMetadata>;
-  indicators: ObjectMap<IndicatorMetadata>;
+  filters: Dictionary<FilterMetadata>;
+  indicators: Dictionary<IndicatorMetadata>;
   timePeriod: TimePeriodMetadata;
 }
 
 // ------------------------------------------
 
 export interface DataBlockMetadata {
-  indicators: ObjectMap<LabelValueUnitMetadata>;
-  filters: ObjectMap<LabelValueMetadata>;
-  timePeriods: ObjectMap<LabelValueMetadata>;
+  indicators: Dictionary<LabelValueUnitMetadata>;
+  filters: Dictionary<LabelValueMetadata>;
+  timePeriods: Dictionary<TimePeriod>;
 }
 
 export interface DataBlockRequest {
   subjectId: number;
   geographicLevel: GeographicLevel;
-  countries?: number[];
-  localAuthorities?: number[];
-  localAuthorityDistricts?: number[];
-  regions?: number[];
-  startYear: number;
-  endYear: number;
-  filters: number[];
-  indicators: number[];
+  countries?: string[];
+  localAuthorities?: string[];
+  localAuthorityDistricts?: string[];
+  regions?: string[];
+  startYear: string;
+  endYear: string;
+  filters: string[];
+  indicators: string[];
 }
 
 export interface DataBlockResponse {
@@ -145,9 +143,9 @@ export interface DataBlockResponse {
   data: DataBlockData;
 }
 
-function mapOptions<T extends LabelValueMetadata>(ids: number[], options: T[]) {
+function mapOptions<T extends LabelValueMetadata>(ids: string[], options: T[]) {
   return Object.values(options).reduce((results, option) => {
-    if (ids.includes(+option.value)) {
+    if (ids.includes(option.value)) {
       return { ...results, [option.value]: option };
     }
 
@@ -161,7 +159,10 @@ function mapTimePeriodOptions(
 ) {
   return Object.values(options).reduce((results, option) => {
     if (years.includes(option.year)) {
-      return { ...results, [option.year]: option };
+      return {
+        ...results,
+        [option.year]: new TimePeriod(option.year, option.code),
+      };
     }
 
     return results;
@@ -171,7 +172,7 @@ function mapTimePeriodOptions(
 function mapOptionsMap<
   R extends LabelValueMetadata,
   T extends OptionListMetadata<R>
->(ids: number[], options: ObjectMap<T>): ObjectMap<R> {
+>(ids: string[], options: Dictionary<T>): Dictionary<R> {
   return Object.values(options).reduce(
     (mapped, option) => ({ ...mapped, ...mapOptions(ids, option.options) }),
     {},
@@ -179,16 +180,16 @@ function mapOptionsMap<
 }
 
 function remapIndicators(
-  indicatorIds: number[],
+  indicatorIds: string[],
   { indicators }: ResponseMetaData,
-): ObjectMap<LabelValueUnitMetadata> {
+): Dictionary<LabelValueUnitMetadata> {
   return mapOptionsMap(indicatorIds, indicators);
 }
 
 function remapFilters(
-  filterIds: number[],
+  filterIds: string[],
   { filters }: ResponseMetaData,
-): ObjectMap<LabelValueMetadata> {
+): Dictionary<LabelValueMetadata> {
   return Object.values(filters).reduce(
     (mapped, filter) => ({
       ...mapped,
@@ -201,7 +202,7 @@ function remapFilters(
 function remapTimePeriod(
   years: number[],
   { timePeriod }: ResponseMetaData,
-): ObjectMap<LabelValueMetadata> {
+): Dictionary<TimePeriod> {
   return mapTimePeriodOptions(years, timePeriod.options);
 }
 

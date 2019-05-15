@@ -6,13 +6,14 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class MetaService : IMetaService
     {
-        private readonly IFilterService _filterService;
+        private readonly IFilterItemService _filterItemService;
         private readonly IIndicatorGroupService _indicatorGroupService;
         private readonly IObservationService _observationService;
         private readonly IReleaseService _releaseService;
@@ -20,14 +21,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly IMapper _mapper;
 
         public MetaService(
-            IFilterService filterService,
+            IFilterItemService filterItemService,
             IIndicatorGroupService indicatorGroupService,
             IObservationService observationService,
             IReleaseService releaseService,
             ISubjectService subjectService,
             IMapper mapper)
         {
-            _filterService = filterService;
+            _filterItemService = filterItemService;
             _indicatorGroupService = indicatorGroupService;
             _observationService = observationService;
             _releaseService = releaseService;
@@ -49,22 +50,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        public SubjectMetaViewModel GetSubjectMeta(long subjectId)
+        public SubjectMetaViewModel GetSubjectMeta(SubjectMetaQueryContext query)
         {
-            // TODO check subject exists
-            var subject = _subjectService.Find(subjectId);
+            var subject = _subjectService.Find(query.SubjectId);
+
+            if (subject == null)
+            {
+                // TODO throw exception
+                return null;
+            }
+
             return new SubjectMetaViewModel
             {
-                Filters = GetFilters(subject.Id),
+                Filters = GetFilters(query),
                 Indicators = GetIndicators(subject.Id),
-                Locations = GetObservationalUnits(subject.Id),
-                TimePeriod = GetTimePeriods(subject.Id)
+                Locations = GetObservationalUnits(query),
+                TimePeriod = GetTimePeriods(query)
             };
         }
 
-        private LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>> GetTimePeriods(long subjectId)
+        private LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>> GetTimePeriods(
+            SubjectMetaQueryContext query)
         {
-            var timePeriodsMeta = _observationService.GetTimePeriodsMeta(subjectId);
+            var timePeriodsMeta = _observationService.GetTimePeriodsMeta(query);
+
             return new LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>>
             {
                 Hint = "Filter statistics by a given start and end date",
@@ -80,9 +89,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         private Dictionary<string, LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>> GetObservationalUnits(
-            long subjectId)
+            SubjectMetaQueryContext query)
         {
-            return _observationService.GetObservationalUnits(subjectId)
+            return _observationService.GetObservationalUnitsMeta(query)
                 .Where(pair => pair.Value.Any())
                 .ToDictionary(
                     pair => pair.Key.ToString().PascalCase(),
@@ -97,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private Dictionary<string, LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>> GetIndicators(
             long subjectId)
         {
-            return _indicatorGroupService.GetIndicatorGroupsBySubjectId(subjectId).ToDictionary(
+            return _indicatorGroupService.GetIndicatorGroups(subjectId).ToDictionary(
                 group => group.Label.PascalCase(),
                 group => new LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>
                 {
@@ -108,27 +117,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         private Dictionary<string, LegendOptionsMetaValueModel<Dictionary<string,
-            LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>> GetFilters(long subjectId)
+            LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>> GetFilters(
+            SubjectMetaQueryContext query)
         {
-            return _filterService.GetFiltersBySubjectId(subjectId).ToDictionary(
-                filter => filter.Label.PascalCase(),
-                filter => new LegendOptionsMetaValueModel<Dictionary<string,
-                    LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>
-                {
-                    Hint = filter.Hint,
-                    Legend = filter.Label,
-                    Options = filter.FilterGroups.ToDictionary(
-                        group => group.Label.PascalCase(),
-                        group => new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
-                        {
-                            Label = group.Label,
-                            Options = group.FilterItems.Select(item => new LabelValueViewModel
-                            {
-                                Label = item.Label,
-                                Value = item.Id.ToString()
-                            })
-                        })
-                });
+            return _filterItemService.GetFilterItems(query)
+                .GroupBy(item => item.FilterGroup.Filter)
+                .ToDictionary(
+                    itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),
+                    itemsGroupedByFilter => new LegendOptionsMetaValueModel<Dictionary<string,
+                        LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>
+                    {
+                        Hint = itemsGroupedByFilter.Key.Hint,
+                        Legend = itemsGroupedByFilter.Key.Label,
+                        Options = itemsGroupedByFilter.GroupBy(item => item.FilterGroup).ToDictionary(
+                            itemsGroupedByFilterGroup => itemsGroupedByFilterGroup.Key.Label.PascalCase(),
+                            itemsGroupedByFilterGroup =>
+                                new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                                {
+                                    Label = itemsGroupedByFilterGroup.Key.Label,
+                                    Options = itemsGroupedByFilterGroup.Select(item => new LabelValueViewModel
+                                    {
+                                        Label = item.Label,
+                                        Value = item.Id.ToString()
+                                    })
+                                })
+                    });
         }
     }
 }

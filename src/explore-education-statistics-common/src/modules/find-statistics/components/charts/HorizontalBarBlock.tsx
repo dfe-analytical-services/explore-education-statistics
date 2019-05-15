@@ -31,7 +31,7 @@ export default function HorizontalBarBlock(props: StackedBarHorizontalProps) {
   } = props;
 
   const chartData = data.result.map(({ measures, year }) => ({
-    name: `${year}`,
+    name: `${meta.timePeriods[year].label}`,
     ...measures,
   }));
 

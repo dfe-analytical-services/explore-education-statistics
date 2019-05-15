@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder
@@ -56,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 
             return _observationService.FindObservations(queryContext.SubjectId,
                 queryContext.GeographicLevel,
-                QueryUtil.YearsQuery(queryContext.Years, queryContext.StartYear, queryContext.EndYear),
+                TimePeriodUtil.YearsRange(queryContext.Years, queryContext.StartYear, queryContext.EndYear),
                 queryContext.Countries,
                 queryContext.Regions,
                 queryContext.LocalAuthorities,
