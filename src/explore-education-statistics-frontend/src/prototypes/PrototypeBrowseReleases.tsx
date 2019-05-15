@@ -1479,7 +1479,7 @@ const BrowseReleasesPage = () => {
               </a>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-              Workforce statistics and analysis
+              Teacher workforce statistics and analysis
             </h4>
             <div className="govuk-inset-text">
               <strong>Teachers analysis compendium</strong> - currently
@@ -1499,8 +1499,9 @@ const BrowseReleasesPage = () => {
               Children in need and child protection
             </h4>
             <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <strong>Characteristics of children in need</strong> - currently
+              available via{' '}
+              <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#30-hours-free-childcare">
                 Statistics at DfE
               </a>
             </div>
