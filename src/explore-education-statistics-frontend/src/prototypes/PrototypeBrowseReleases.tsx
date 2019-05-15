@@ -1482,8 +1482,9 @@ const BrowseReleasesPage = () => {
               Workforce statistics and analysis
             </h4>
             <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <strong>Teachers analysis compendium</strong> - currently
+              available via{' '}
+              <a href="https://www.gov.uk/government/collections/teacher-workforce-statistics-and-analysis#documents">
                 Statistics at DfE
               </a>
             </div>
