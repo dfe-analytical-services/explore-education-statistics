@@ -66,11 +66,39 @@ const BrowseReleasesPage = () => {
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Childcare and early years
             </h4>
-            <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                Statistics at DfE
-              </a>
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+                <li>
+                  <strong>30 hours free childcare</strong> - currently available
+                  via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#30-hours-free-childcare">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Childcare and early years providers survey</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-providers-survey">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>Childcare and early years survey of parents</strong> -
+                  currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-survey-of-parents">
+                    Statistics at DfE
+                  </a>
+                </li>
+                <li>
+                  <strong>
+                    Education provision: children under 5 years of age
+                  </strong>{' '}
+                  - currently available via{' '}
+                  <a href="https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-survey-of-parents">
+                    Statistics at DfE
+                  </a>
+                </li>
+              </ul>
             </div>
             <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
               Early years foundation stage profile
@@ -112,20 +140,15 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="Finance" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-list-bullet">
-              <li>
-                {' '}
-                <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
-                  Education and training
-                </h4>
-                <div className="govuk-inset-text">
-                  Currently available via{' '}
-                  <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-                    Statistics at DfE
-                  </a>
-                </div>
-              </li>
-            </ul>
+            <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
+              Education and training
+            </h4>
+            <div className="govuk-inset-text">
+              Currently available via{' '}
+              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+                Statistics at DfE
+              </a>
+            </div>
           </div>
         </AccordionSection>
         <AccordionSection heading="Institutions" caption="">
