@@ -1235,7 +1235,7 @@ const BrowseReleasesPage = () => {
             </h4>
             <div className="govuk-inset-text">
               Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <a href="https://www.gov.uk/government/collections/statistics-school-capacity#school-capacity-data:-by-academic-year">
                 Statistics at DfE
               </a>
             </div>
@@ -1243,8 +1243,9 @@ const BrowseReleasesPage = () => {
               School and pupil numbers
             </h4>
             <div className="govuk-inset-text">
-              Currently available via{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
+              <strong>Schools, pupils and their characteristics</strong> -
+              currently available via{' '}
+              <a href="https://www.gov.uk/government/collections/statistics-school-and-pupil-numbers#documents">
                 Statistics at DfE
               </a>
             </div>
