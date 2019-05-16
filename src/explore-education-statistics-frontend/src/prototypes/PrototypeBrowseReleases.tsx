@@ -67,7 +67,7 @@ const BrowseReleasesPage = () => {
               Childcare and early years
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>30 hours free childcare</strong> - currently available
                   via{' '}
@@ -131,7 +131,7 @@ const BrowseReleasesPage = () => {
               Special educational needs (SEN)
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>Special educational needs in England</strong> -
                   currently available via{' '}
@@ -179,7 +179,7 @@ const BrowseReleasesPage = () => {
               Childcare and early years
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>30 hours free childcare</strong> - currently available
                   via{' '}
@@ -232,7 +232,7 @@ const BrowseReleasesPage = () => {
               Childcare and early years
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>30 hours free childcare</strong> - currently available
                   via{' '}
@@ -297,7 +297,7 @@ const BrowseReleasesPage = () => {
               Special educational needs (SEN)
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>Special educational needs in England</strong> -
                   currently available via{' '}
@@ -337,7 +337,7 @@ const BrowseReleasesPage = () => {
               16 to 19 attainment
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>
                     16 to 18 school and college performance tables
@@ -378,7 +378,7 @@ const BrowseReleasesPage = () => {
               Further education and skills
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>Apprenticeship and levy statistics</strong> -
                   currently available via{' '}
@@ -433,7 +433,7 @@ const BrowseReleasesPage = () => {
               Performance tables
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>Primary school performance tables</strong> - currently
                   available via{' '}
@@ -483,7 +483,7 @@ const BrowseReleasesPage = () => {
               Further education and skills
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>Apprenticeship and levy statistics</strong> -
                   currently available via{' '}
@@ -549,7 +549,7 @@ const BrowseReleasesPage = () => {
               Further education and skills
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>Apprenticeship and levy statistics</strong> -
                   currently available via{' '}
@@ -632,7 +632,7 @@ const BrowseReleasesPage = () => {
               Higher education statistics
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>Higher education: destinations of leavers</strong> -
                   currently available via{' '}
@@ -669,7 +669,7 @@ const BrowseReleasesPage = () => {
               Initial teacher training (ITT)
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>Initial teacher training performance profiles</strong>{' '}
                   - currently available via{' '}
@@ -699,7 +699,7 @@ const BrowseReleasesPage = () => {
               Performance tables
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>Primary school performance tables</strong> - currently
                   available via{' '}
@@ -783,7 +783,7 @@ const BrowseReleasesPage = () => {
               Higher education statistics
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>Higher education: destinations of leavers</strong> -
                   currently available via{' '}
@@ -857,7 +857,7 @@ const BrowseReleasesPage = () => {
               Initial teacher training (ITT)
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>Initial teacher training performance profiles</strong>{' '}
                   - currently available via{' '}
@@ -887,7 +887,7 @@ const BrowseReleasesPage = () => {
               Not in education, employment or training (NEET) and participation
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>
                     Participation in education, training and employment
@@ -932,7 +932,7 @@ const BrowseReleasesPage = () => {
               Higher education statistics
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>Higher education: destinations of leavers</strong> -
                   currently available via{' '}
@@ -976,7 +976,7 @@ const BrowseReleasesPage = () => {
               16 to 19 attainment
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>
                     16 to 18 school and college performance tables
@@ -1044,7 +1044,7 @@ const BrowseReleasesPage = () => {
               Key stage 2
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>
                     Key stage 2 national curriculum test: review outcomes
@@ -1092,7 +1092,7 @@ const BrowseReleasesPage = () => {
               Performance tables
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>Primary school performance tables</strong> - currently
                   available via{' '}
@@ -1120,7 +1120,7 @@ const BrowseReleasesPage = () => {
               Special educational needs (SEN)
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>Special educational needs in England</strong> -
                   currently available via{' '}
@@ -1164,7 +1164,7 @@ const BrowseReleasesPage = () => {
               Local authority and school finance
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>
                     Income and expenditure in academies in England
@@ -1272,7 +1272,7 @@ const BrowseReleasesPage = () => {
               16 to 19 attainment
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>
                     16 to 18 school and college performance tables
@@ -1337,7 +1337,7 @@ const BrowseReleasesPage = () => {
               Not in education, employment or training (NEET) and participation
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>
                     Participation in education, training and employment
@@ -1407,7 +1407,7 @@ const BrowseReleasesPage = () => {
               Special educational needs (SEN)
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>Special educational needs in England</strong> -
                   currently available via{' '}
@@ -1443,7 +1443,7 @@ const BrowseReleasesPage = () => {
               Initial teacher training (ITT)
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>Initial teacher training performance profiles</strong>{' '}
                   - currently available via{' '}
@@ -1509,7 +1509,7 @@ const BrowseReleasesPage = () => {
               Looked after children
             </h4>
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-              <ul className="govuk-bulllet-list govuk-!-margin-bottom-">
+              <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
                   <strong>
                     Children looked after in England including adoptions

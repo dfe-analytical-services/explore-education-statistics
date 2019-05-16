@@ -25,3 +25,13 @@
     top: 0;
   }
 }
+
+.dfe-contents-list {
+  li {
+    margin-left: 2rem;
+  }
+  li::before {
+    content: '\2014 ';
+    margin-left: -2rem;
+  }
+}
