@@ -16,5 +16,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public IEnumerable<string> LocalAuthorityDistricts { get; set; }
         public IEnumerable<string> Regions { get; set; }
         public IEnumerable<int> Years { get; set; }
+        public IEnumerable<string> LocalEnterprisePartnerships { get; set; }
+        public IEnumerable<string> Institutions { get; set; }
+        public IEnumerable<string> Mats { get; set; }
+        public IEnumerable<string> MayoralCombinedAuthorities { get; set; }
+        public IEnumerable<string> OpportunityAreas { get; set; }
+        public IEnumerable<string> ParliamentaryConstituencies { get; set; }
+        public IEnumerable<string> Providers { get; set; }
+        public IEnumerable<string> Wards { get; set; }
     }
 }

@@ -62,6 +62,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
                 queryContext.Regions,
                 queryContext.LocalAuthorities,
                 queryContext.LocalAuthorityDistricts,
+                queryContext.LocalEnterprisePartnerships,
+                queryContext.Institutions,
+                queryContext.Mats,
+                queryContext.MayoralCombinedAuthorities,
+                queryContext.OpportunityAreas,
+                queryContext.ParliamentaryConstituencies,
+                queryContext.Providers,
+                queryContext.Wards,
                 queryContext.Filters);
         }
     }
