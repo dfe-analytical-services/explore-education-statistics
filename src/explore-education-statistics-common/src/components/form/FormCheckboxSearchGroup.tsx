@@ -56,21 +56,24 @@ const FormCheckboxSearchGroup = ({
     <>
       {isMounted ? (
         <FormFieldset {...fieldsetProps}>
-          <div className={styles.inputContainer}>
-            <FormTextSearchInput
-              id={`${id}-search`}
-              name={`${name}-search`}
-              onChange={event => setSearchTerm(event.target.value)}
-              label={searchLabel}
-              width={20}
-            />
+          {selectedCount > 0 && !hideCount && (
+            <div className="govuk-!-margin-bottom-2">
+              <span className="govuk-tag govuk-!-font-size-14">{`${selectedCount} selected`}</span>
+            </div>
+          )}
 
-            {selectedCount > 0 && !hideCount && (
-              <div className="govuk-!-margin-top-2">
-                <span className="govuk-tag">{`${selectedCount} selected`}</span>
-              </div>
-            )}
-          </div>
+          <FormTextSearchInput
+            id={`${id}-search`}
+            name={`${name}-search`}
+            onChange={event => setSearchTerm(event.target.value)}
+            onKeyPress={event => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+              }
+            }}
+            label={searchLabel}
+            width={20}
+          />
 
           <div className={styles.optionsContainer}>
             <BaseFormCheckboxGroup {...props} options={filteredOptions} small />
