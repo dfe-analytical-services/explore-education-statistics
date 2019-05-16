@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "764ebfdb-a2b1-4792-9205-fab8a2165c70",
+		"_postman_id": "9fc72945-ba02-484c-8848-16a2e2c58f76",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -23,6 +23,23 @@
 												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
 												"exec": [
 													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -61,6 +78,23 @@
 												],
 												"type": "text/javascript"
 											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "57af4ba4-ee78-438f-a4df-b8d1926dc80c",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
 										}
 									],
 									"request": {
@@ -93,6 +127,23 @@
 												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
 												"exec": [
 													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "a523c41a-6b1e-4a9b-9f93-32dd1af9874b",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -131,6 +182,23 @@
 												],
 												"type": "text/javascript"
 											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "e2295ce7-38c1-45c6-996b-4ce026c97c1a",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
 										}
 									],
 									"request": {
@@ -163,6 +231,23 @@
 												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
 												"exec": [
 													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "1fad1b97-df53-4082-87b4-986fad0ba79f",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -201,6 +286,23 @@
 												],
 												"type": "text/javascript"
 											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "4b0060fe-f9a2-459c-b9b9-eab8c748eb49",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
 										}
 									],
 									"request": {
@@ -236,6 +338,23 @@
 												],
 												"type": "text/javascript"
 											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
 										}
 									],
 									"request": {
@@ -254,6 +373,51 @@
 												"meta",
 												"subject",
 												"7"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Subject Meta - Invalid Subject",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"exec": [
+													"// pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject/8",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject",
+												"8"
 											]
 										}
 									},
@@ -280,12 +444,7 @@
 								"id": "f42619e7-fe77-47ac-a97a-0b143cf1d4eb",
 								"type": "text/javascript",
 								"exec": [
-									"pm.test(\"Fields are present\", function () {",
-									"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
-									"});"
+									""
 								]
 							}
 						}
@@ -446,6 +605,58 @@
 									"response": []
 								},
 								{
+									"name": "Absence by characteristic - National - * - Male, Female AND Primary, Secondary",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"exec": [
+													"respJson = pm.response.json()",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
+													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
+													"});",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    pm.expect(respJson.geographicLevel).to.equal(\"National\");",
+													"})",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { ",
+													"    pm.expect(respJson.result.length).to.equal(4); ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        3, 4, 72, 73\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/tablebuilder",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"tablebuilder"
+											]
+										}
+									},
+									"response": []
+								},
+								{
 									"name": "Absence by characteristic - National - England",
 									"event": [
 										{
@@ -453,8 +664,11 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(16); });"
+													"respJson = pm.response.json()",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(16); });"
 												],
 												"type": "text/javascript"
 											}
@@ -495,6 +709,7 @@
 												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
 												"exec": [
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(2412); });"
 												],
 												"type": "text/javascript"
@@ -535,7 +750,10 @@
 											"script": {
 												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
 												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(16); });"
 												],
 												"type": "text/javascript"
@@ -577,6 +795,8 @@
 												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
 												"exec": [
 													"respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
 													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
@@ -624,7 +844,10 @@
 											"script": {
 												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
 												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(11); });"
 												],
 												"type": "text/javascript"
@@ -675,7 +898,20 @@
 										"id": "9b07e3a7-08a0-4256-ab4a-53508f6331c5",
 										"type": "text/javascript",
 										"exec": [
-											""
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"pm.test(\"Compulsory fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+											"});",
+											"",
+											"pm.test(\"Release date is not empty\", function () {",
+											"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+											"});"
 										]
 									}
 								}
@@ -693,7 +929,23 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Compulsory fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Release date is not empty\", function () {",
+													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+													"});",
+													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(33); });"
 												],
 												"type": "text/javascript"
@@ -712,7 +964,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2006,\n    \"endYear\": 2016,\n    \"filters\" : [\n        214, 215, 216\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2006,\n    \"endYear\": 2016,\n    \"filters\" : [\n        214, 215, 216\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -734,7 +986,23 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Compulsory fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Release date is not empty\", function () {",
+													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+													"});",
+													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(451); });"
 												],
 												"type": "text/javascript"
@@ -753,7 +1021,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Local_Authority\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        214, 215, 216\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Local_Authority\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        214, 215, 216\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -775,7 +1043,23 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Compulsory fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Release date is not empty\", function () {",
+													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+													"});",
+													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(30); });"
 												],
 												"type": "text/javascript"
@@ -794,7 +1078,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Regional\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        214, 215, 216\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Regional\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        214, 215, 216\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -816,7 +1100,23 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Compulsory fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Release date is not empty\", function () {",
+													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+													"});",
+													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(33); });"
 												],
 												"type": "text/javascript"
@@ -835,7 +1135,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Regional\",\n    \"regions\": [\n\t\t\"E13000001\"\n\t],\n    \"startYear\": 2006,\n    \"endYear\": 2016,\n    \"filters\" : [\n        214, 215, 216\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Regional\",\n    \"regions\": [\n\t\t\"E13000001\"\n\t],\n    \"startYear\": 2006,\n    \"endYear\": 2016,\n    \"filters\" : [\n        214, 215, 216\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -857,7 +1157,23 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Compulsory fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Release date is not empty\", function () {",
+													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+													"});",
+													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(938); });"
 												],
 												"type": "text/javascript"
@@ -876,7 +1192,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"regions\": [ \"E13000001\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        214, 215, 216\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"regions\": [ \"E13000001\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        214, 215, 216\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -898,7 +1214,23 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Compulsory fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Release date is not empty\", function () {",
+													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+													"});",
+													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(60); });"
 												],
 												"type": "text/javascript"
@@ -917,7 +1249,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"localAuthorities\": [ \"301\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        214, 215, 216\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"localAuthorities\": [ \"301\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        214, 215, 216\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -930,6 +1262,182 @@
 										}
 									},
 									"response": []
+								},
+								{
+									"name": "Absence by geographic level - School - * - Primary, Special AND Secondary Free School",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"exec": [
+													"pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        214, 215, 141\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/tablebuilder",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"tablebuilder"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Absence by geographic level - School - * - Primary, Special AND Primary Free School, Special Free School, Secondary Free School",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Compulsory fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Release date is not empty\", function () {",
+													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+													"});",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(144); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        214, 215, 197, 212, 141\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/tablebuilder",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"tablebuilder"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Absence by geographic level - School - Region Inner London - All Schools, Primary AND Academies Pri Sponsor, Not specified, Pri Free, Sec Sponsor, Special Free",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Compulsory fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Release date is not empty\", function () {",
+													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+													"});",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(673); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"regions\": [ \"E13000001\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        81, 214, 119, 82, 212, 125, 197\n    ],\n    \"indicators\": [\n        42, 61, 57, 59, 66, 111212\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/tablebuilder",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"tablebuilder"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "6354b6c5-34ad-43c1-b2d7-45f006621e28",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "a06c2178-26b4-4c5d-966b-2bc10331373a",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
 								}
 							],
 							"_postman_isSubFolder": true
@@ -946,6 +1454,7 @@
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(36); });"
 												],
 												"type": "text/javascript"
@@ -964,7 +1473,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2014,\n    \"endYear\": 2016,\n    \"filters\" : [\n        258, 259, 260\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2014,\n    \"endYear\": 2016,\n    \"filters\" : [\n        258, 259, 260\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -987,6 +1496,7 @@
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(8); });"
 												],
 												"type": "text/javascript"
@@ -1005,7 +1515,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"National\",\n    \"countries\": [ \"E92000001\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        258, 259\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"National\",\n    \"countries\": [ \"E92000001\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        258, 259\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1028,6 +1538,7 @@
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(12); });"
 												],
 												"type": "text/javascript"
@@ -1046,7 +1557,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Local_Authority\",\n    \"countries\": [ \"E92000001\" ],\n    \"regions\": [ \"E13000001\", \"E13000002\" ],\n    \"localAuthorities\": [ \"201\", \"301\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        258, 259\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Local_Authority\",\n    \"countries\": [ \"E92000001\" ],\n    \"regions\": [ \"E13000001\", \"E13000002\" ],\n    \"localAuthorities\": [ \"201\", \"301\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        258, 259\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1069,6 +1580,7 @@
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(16); });"
 												],
 												"type": "text/javascript"
@@ -1087,7 +1599,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"National\",\n    \"years\": [ 2012, 2016 ],\n    \"filters\" : [\n        258, 259\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"National\",\n    \"years\": [ 2012, 2016 ],\n    \"filters\" : [\n        258, 259\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1100,6 +1612,41 @@
 										}
 									},
 									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "f28d57d5-c4a2-4c3c-a90c-e672993bec6d",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "f54a546f-c365-4bfc-831e-2e3cbfdef1d6",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"pm.test(\"Compulsory fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+											"});",
+											"",
+											"pm.test(\"Release date is not empty\", function () {",
+											"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+											"});"
+										]
+									}
 								}
 							],
 							"_postman_isSubFolder": true
@@ -1116,6 +1663,7 @@
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(8); });"
 												],
 												"type": "text/javascript"
@@ -1134,7 +1682,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 4,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2013,\n    \"endYear\": 2016,\n    \"filters\" : [\n        378, 379\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 4,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2013,\n    \"endYear\": 2016,\n    \"filters\" : [\n        378, 379\n    ],\n    \"indicators\": [\n        95, 94\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1157,6 +1705,7 @@
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(538); });"
 												],
 												"type": "text/javascript"
@@ -1175,7 +1724,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 4,\n    \"geographicLevel\": \"School\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        378\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 4,\n    \"geographicLevel\": \"School\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        378\n    ],\n    \"indicators\": [\n        95, 94\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1188,6 +1737,41 @@
 										}
 									},
 									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "2cb67ee0-9a6d-4616-8d92-02a3aa5184e4",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "540c3551-b43a-4768-a64e-bcdd881d9a7b",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"pm.test(\"Compulsory fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+											"});",
+											"",
+											"pm.test(\"Release date is not empty\", function () {",
+											"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+											"});"
+										]
+									}
 								}
 							],
 							"_postman_isSubFolder": true
@@ -1204,6 +1788,7 @@
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(142); });"
 												],
 												"type": "text/javascript"
@@ -1222,7 +1807,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 5,\n    \"geographicLevel\": \"Local_Authority\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        403\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 5,\n    \"geographicLevel\": \"Local_Authority\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        403\n    ],\n    \"indicators\": [\n        113, 114, 115\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1245,6 +1830,7 @@
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(10); });"
 												],
 												"type": "text/javascript"
@@ -1263,7 +1849,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 5,\n    \"geographicLevel\": \"Regional\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        403\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 5,\n    \"geographicLevel\": \"Regional\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        403\n    ],\n    \"indicators\": [\n        113, 114, 115\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1276,6 +1862,41 @@
 										}
 									},
 									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "52135f05-03ae-4080-bbbb-dddcd7ee3e42",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "6dbbadee-c752-4d88-b613-f2953c175a62",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"pm.test(\"Compulsory fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+											"});",
+											"",
+											"pm.test(\"Release date is not empty\", function () {",
+											"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+											"});"
+										]
+									}
 								}
 							],
 							"_postman_isSubFolder": true
@@ -1292,6 +1913,7 @@
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(2255); });"
 												],
 												"type": "text/javascript"
@@ -1333,6 +1955,7 @@
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(150); });"
 												],
 												"type": "text/javascript"
@@ -1366,6 +1989,41 @@
 									"response": []
 								}
 							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "e04223f2-1e08-4ff6-9984-732c655dbcdf",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "368397eb-8cbb-4195-ac61-415b8c3abe28",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"pm.test(\"Compulsory fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+											"});",
+											"",
+											"pm.test(\"Release date is not empty\", function () {",
+											"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+											"});"
+										]
+									}
+								}
+							],
 							"_postman_isSubFolder": true
 						},
 						{
@@ -1380,6 +2038,7 @@
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(306); });"
 												],
 												"type": "text/javascript"
@@ -1413,6 +2072,41 @@
 									"response": []
 								}
 							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "49522da0-95a0-4ddf-9a8a-9ca103db1df2",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "ca434135-2e41-4ff4-806d-48a458f28b61",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"pm.test(\"Compulsory fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+											"});",
+											"",
+											"pm.test(\"Release date is not empty\", function () {",
+											"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+											"});"
+										]
+									}
+								}
+							],
 							"_postman_isSubFolder": true
 						}
 					],
@@ -1436,18 +2130,7 @@
 						"id": "8141f36f-4bf9-49a4-822c-0c6087cadbbe",
 						"type": "text/javascript",
 						"exec": [
-							"pm.test(\"Compulsory fields are present\", function () {",
-							"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-							"});",
-							"",
-							"pm.test(\"Release date is not empty\", function () {",
-							"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
-							"});"
+							""
 						]
 					}
 				}
@@ -1536,7 +2219,6 @@
 				"id": "9279878e-d394-4bcd-a0d0-a638c88016dc",
 				"type": "text/javascript",
 				"exec": [
-					"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 					""
 				]
 			}
