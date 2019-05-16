@@ -1,0 +1,173 @@
+variables:
+  BuildConfiguration: 'Release'
+
+trigger: none
+pr: [ 'master' ]
+
+jobs:
+  - job: 'Backend'
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Restore'
+        inputs:
+          command: 'restore'
+          projects: '**/GovUk.*/*csproj'
+          feedsToUse: config
+          nugetConfigPath: src/nuget.config
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Build'
+        inputs:
+          projects: '**/GovUk.*/*csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Test'
+        inputs:
+          command: 'test'
+          projects: '**/GovUk.*[Tt]ests/*.csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.*/*.csproj'
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+          zipAfterPublish: True
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Pipeline Artifact'
+        inputs:
+          artifactName: 'backend'
+          targetPath: '$(Build.ArtifactStagingDirectory)'
+  - job: 'Admin'
+    pool:
+      name: Hosted Windows 2019 with VS2019
+      demands:
+      - npm
+      - azureps
+    steps:
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Restore'
+        inputs:
+          command: 'restore'
+          projects: '**/GovUk.Education.ExploreStatistics.Admin.csproj'
+          feedsToUse: config
+          nugetConfigPath: src/nuget.config
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Build'
+        inputs:
+          projects: '**/GovUk.Education.ExploreStatistics.Admin.csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Test'
+        inputs:
+          command: 'test'
+          projects: '**/GovUk.Education.ExploreStatistics.Admin.Tests.csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+
+      - task: Npm@1
+        displayName: 'npm run ci'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: ci
+      - task: Npm@1
+        displayName: 'npm run bootstrap'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: 'run bootstrap'
+      - task: Npm@1
+        displayName: 'npm run format'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: 'run format'
+      - task: Npm@1
+        displayName: 'npm run build'
+        inputs:
+          command: custom
+          workingDir: 'src/explore-education-statistics-admin'
+          verbose: false
+          customCommand: 'run build'
+
+      - task: CopyFiles@2
+        displayName: 'Copy files to wwwroot'
+        inputs:
+          SourceFolder: 'src/explore-education-statistics-admin/build'
+          TargetFolder: src/GovUk.Education.ExploreStatistics.Admin/wwwroot
+
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreStatistics.Admin.csproj'
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Pipeline Artifact'
+        inputs:
+          artifactName: 'Admin'
+          targetPath: '$(Build.ArtifactStagingDirectory)'
+
+  - job: 'Frontend'
+    pool:
+      vmImage: 'ubuntu-16.04'
+      demands: 'npm'
+    steps:
+      - task: 'Npm@1'
+        displayName: 'npm run ci'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'ci'
+      - task: 'Npm@1'
+        displayName: 'npm run bootstrap'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run bootstrap'
+      - script: 'npm audit --json >> audit.json'
+        workingDirectory: 'src/explore-education-statistics-frontend'
+        displayName: 'Run npm audit'
+        continueOnError: true
+        enabled: false
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish Pipeline Artifact audit_results'
+        inputs:
+          artifactName: 'audit_results'
+          targetPath: 'src/explore-education-statistics-frontend/audit.json'
+        continueOnError: true
+        enabled: false
+      - task: 'Npm@1'
+        displayName: 'npm run lint'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run lint'
+      - task: 'Npm@1'
+        displayName: 'npm run format:check'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run format:check'
+      - task: 'Npm@1'
+        displayName: 'npm run test:ci'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run test:ci'
+      - task: 'PublishTestResults@2'
+        displayName: 'Publish frontend test results'
+        inputs:
+          testResultsFormat: 'JUnit'
+          testResultsFiles: '**/junit.xml'
+          searchFolder: './src'
+          testRunTitle: 'Frontend Jest tests'
