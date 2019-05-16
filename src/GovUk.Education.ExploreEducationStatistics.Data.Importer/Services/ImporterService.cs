@@ -229,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         private static LocalAuthority GetLocalAuthority(IReadOnlyList<string> line, List<string> headers)
         {
-            var columns = new[] {"old_la_code", "new_la_code", "la_name"};
+            var columns = new[] {"new_la_code", "old_la_code", "la_name"};
             return CsvUtil.BuildType(line, headers, columns, values =>
                 new LocalAuthority(values[0], values[1], values[2]));
         }
