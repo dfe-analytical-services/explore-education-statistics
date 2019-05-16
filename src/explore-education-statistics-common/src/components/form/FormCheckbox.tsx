@@ -5,6 +5,7 @@ export type CheckboxChangeEventHandler = ChangeEventHandler<HTMLInputElement>;
 
 export interface FormCheckboxProps {
   checked?: boolean;
+  className?: string;
   conditional?: ReactNode;
   id: string;
   hint?: string;
@@ -16,6 +17,7 @@ export interface FormCheckboxProps {
 
 const FormCheckbox = ({
   checked,
+  className,
   conditional,
   id,
   hint,
@@ -26,7 +28,7 @@ const FormCheckbox = ({
 }: FormCheckboxProps) => {
   return (
     <>
-      <div className="govuk-checkboxes__item">
+      <div className={classNames('govuk-checkboxes__item', className)}>
         <input
           aria-describedby={hint ? `${id}-item-hint` : undefined}
           className="govuk-checkboxes__input"

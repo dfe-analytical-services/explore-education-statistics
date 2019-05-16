@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import orderBy from 'lodash/orderBy';
 import React, { ChangeEventHandler, FocusEventHandler, ReactNode } from 'react';
 import ErrorMessage from '../ErrorMessage';
 import styles from './FormSelect.module.scss';
@@ -18,6 +19,10 @@ export interface FormSelectProps {
   onBlur?: FocusEventHandler;
   onChange?: SelectChangeEventHandler;
   options: SelectOption[];
+  order?:
+    | (keyof SelectOption)[]
+    | ((option: SelectOption) => SelectOption[keyof SelectOption])[];
+  orderDirection?: ('asc' | 'desc')[];
   value?: string | number;
 }
 
@@ -29,6 +34,8 @@ const FormSelect = ({
   onBlur,
   onChange,
   options,
+  order = ['label'],
+  orderDirection = ['asc'],
   value,
 }: FormSelectProps) => {
   return (
@@ -47,7 +54,7 @@ const FormSelect = ({
         onChange={onChange}
         value={value}
       >
-        {options.map(option => (
+        {orderBy(options, order, orderDirection).map(option => (
           <option value={option.value} key={`${option.value}-${option.label}`}>
             {option.label}
           </option>

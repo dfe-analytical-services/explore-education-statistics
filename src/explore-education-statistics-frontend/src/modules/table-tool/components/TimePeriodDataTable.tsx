@@ -1,9 +1,11 @@
+import commaList from '@common/lib/utils/string/commaList';
 import {
   FilterOption,
   IndicatorOption,
   TableData,
 } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
+import { Dictionary } from '@common/types/util';
 import sortBy from 'lodash/sortBy';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import FixedHeaderGroupedDataTable, {
@@ -21,10 +23,11 @@ interface TableHeaders {
 
 interface Props {
   indicators: IndicatorOption[];
-  filters: {
-    [key: string]: FilterOption[];
-  };
+  filters: Dictionary<FilterOption[]>;
   timePeriods: TimePeriod[];
+  publicationName: string;
+  subjectName: string;
+  locations: Dictionary<FilterOption[]>;
   results: TableData['result'];
 }
 
@@ -32,6 +35,9 @@ const TimePeriodDataTable = ({
   filters,
   timePeriods,
   indicators,
+  publicationName,
+  subjectName,
+  locations,
   results,
 }: Props) => {
   const dataTableRef = useRef<HTMLTableElement>(null);
@@ -59,10 +65,18 @@ const TimePeriodDataTable = ({
   const startLabel = timePeriods[0].label;
   const endLabel = timePeriods[timePeriods.length - 1].label;
 
-  const caption =
+  const locationLabels = Object.values(locations).flatMap(locationOptions =>
+    locationOptions.map(location => location.label),
+  );
+
+  const timePeriodString =
     startLabel === endLabel
-      ? `Comparing statistics for ${startLabel}`
-      : `Comparing statistics between ${startLabel} and ${endLabel}`;
+      ? ` for ${startLabel}`
+      : ` between ${startLabel} and ${endLabel}`;
+
+  const caption = `Table showing '${subjectName}' from '${publicationName}' in ${commaList(
+    locationLabels,
+  )} ${timePeriodString}`;
 
   const headerRow: HeaderGroup[] = tableHeaders.columnGroups.map(
     columnGroup => {
@@ -81,7 +95,7 @@ const TimePeriodDataTable = ({
             return Boolean(
               result.measures[row.value] !== undefined &&
                 result.filters.every(filter =>
-                  [colGroup.value, rowGroup.value].includes(filter.toString()),
+                  [colGroup.value, rowGroup.value].includes(filter),
                 ) &&
                 result.timeIdentifier === column.code &&
                 result.year === column.year,

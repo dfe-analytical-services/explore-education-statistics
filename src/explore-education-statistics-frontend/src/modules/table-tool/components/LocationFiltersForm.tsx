@@ -19,9 +19,7 @@ interface FormValues {
   };
 }
 
-type LocationFiltersFormSubmitHandler = (
-  values: FormValues['locations'],
-) => void;
+export type LocationFiltersFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
   options: PublicationSubjectMeta['locations'];
@@ -56,7 +54,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
     <Formik<FormValues>
       enableReinitialize
       onSubmit={async values => {
-        await onSubmit(values.locations);
+        await onSubmit(values);
         goToNextStep();
       }}
       initialValues={{
@@ -99,11 +97,13 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                         id={`${formId}-levels-${levelKey}`}
                         legend={level.legend}
                         legendHidden
-                        onAllChange={event => {
+                        selectAll={false}
+                        onAllChange={() => {
                           updateLocationLevels(draft => {
-                            draft[levelKey] = event.target.checked
-                              ? level.options
-                              : [];
+                            draft[levelKey] =
+                              draft[levelKey].length < level.options.length
+                                ? level.options
+                                : [];
                           });
                         }}
                         onChange={(event, option) => {

@@ -44,8 +44,8 @@ describe('FormCheckboxSubGroups', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('renders unchecked `Select all` checkboxes when `selectAll` is true', () => {
-    const { container, getAllByLabelText } = render(
+  test('renders `Unselect all options` buttons when `selectAll` is true', () => {
+    const { container, getAllByText } = render(
       <FormCheckboxSubGroups
         value={[]}
         id="test-checkboxes"
@@ -65,26 +65,27 @@ describe('FormCheckboxSubGroups', () => {
             options: [
               { label: 'Checkbox 3', value: '3' },
               { label: 'Checkbox 4', value: '4' },
+              { label: 'Checkbox 5', value: '5' },
             ],
           },
         ]}
       />,
     );
 
-    const selectAllCheckboxes = getAllByLabelText(
-      'Select all',
-    ) as HTMLInputElement[];
+    const selectAllCheckboxes = getAllByText(
+      /Select all/,
+    ) as HTMLButtonElement[];
 
-    expect(selectAllCheckboxes[0].checked).toBe(false);
-    expect(selectAllCheckboxes[1].checked).toBe(false);
+    expect(selectAllCheckboxes[0]).toHaveTextContent('Select all 2 options');
+    expect(selectAllCheckboxes[1]).toHaveTextContent('Select all 3 options');
 
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('renders checked `Select all` checkboxes when all options are pre-checked', () => {
-    const { getAllByLabelText } = render(
+  test('renders `Unselect all options` buttons when all options are pre-checked', () => {
+    const { getAllByText } = render(
       <FormCheckboxSubGroups
-        value={['1', '2', '3', '4']}
+        value={['1', '2', '3', '4', '5']}
         id="test-checkboxes"
         name="test-checkboxes"
         legend="Test checkboxes"
@@ -102,21 +103,22 @@ describe('FormCheckboxSubGroups', () => {
             options: [
               { label: 'Checkbox 3', value: '3' },
               { label: 'Checkbox 4', value: '4' },
+              { label: 'Checkbox 5', value: '5' },
             ],
           },
         ]}
       />,
     );
 
-    const selectAllCheckboxes = getAllByLabelText(
-      'Select all',
+    const selectAllCheckboxes = getAllByText(
+      /Unselect all/,
     ) as HTMLInputElement[];
 
-    expect(selectAllCheckboxes[0].checked).toBe(true);
-    expect(selectAllCheckboxes[1].checked).toBe(true);
+    expect(selectAllCheckboxes[0]).toHaveTextContent('Unselect all 2 options');
+    expect(selectAllCheckboxes[1]).toHaveTextContent('Unselect all 3 options');
   });
 
-  test('does not render `Select all` checkboxes when there is only one option', () => {
+  test('does not render `Select all options`  when there is only one option', () => {
     const { queryAllByLabelText } = render(
       <FormCheckboxSubGroups
         id="test-checkboxes"
@@ -137,7 +139,7 @@ describe('FormCheckboxSubGroups', () => {
       />,
     );
 
-    expect(queryAllByLabelText('Select all')).toHaveLength(0);
+    expect(queryAllByLabelText(/Select all/)).toHaveLength(0);
   });
 
   test('generates group IDs from group legends if none provided', () => {

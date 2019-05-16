@@ -17,6 +17,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
         public IEnumerable<string> LocalAuthorities { get; set; }
         public IEnumerable<string> LocalAuthorityDistricts { get; set; }
         public IEnumerable<string> Regions { get; set; }
+        public IEnumerable<string> LocalEnterprisePartnerships { get; set; }
+        public IEnumerable<string> Institutions { get; set; }
+        public IEnumerable<string> Mats { get; set; }
+        public IEnumerable<string> MayoralCombinedAuthorities { get; set; }
+        public IEnumerable<string> OpportunityAreas { get; set; }
+        public IEnumerable<string> ParliamentaryConstituencies { get; set; }
+        public IEnumerable<string> Providers { get; set; }
+        public IEnumerable<string> Wards { get; set; }
 
         public Expression<Func<Observation, bool>> ObservationPredicate()
         {
@@ -53,7 +61,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
                 predicate = predicate.And(observation =>
                     LocalAuthorityDistricts.Contains(observation.Location.LocalAuthorityDistrict.Code));
             }
+            
+            if (LocalEnterprisePartnerships != null && LocalEnterprisePartnerships.Any())
+            {
+                predicate = predicate.And(observation =>
+                    LocalEnterprisePartnerships.Contains(observation.Location.LocalEnterprisePartnership.Code));
+            }
 
+            if (Institutions != null && Institutions.Any())
+            {
+                predicate = predicate.And(observation =>
+                    Institutions.Contains(observation.Location.Institution.Code));
+            }
+            
+            if (Mats != null && Mats.Any())
+            {
+                predicate = predicate.And(observation =>
+                    Mats.Contains(observation.Location.Mat.Code));
+            }
+                        
+            if (MayoralCombinedAuthorities != null && MayoralCombinedAuthorities.Any())
+            {
+                predicate = predicate.And(observation =>
+                    MayoralCombinedAuthorities.Contains(observation.Location.MayoralCombinedAuthority.Code));
+            }
+            
+            if (OpportunityAreas != null && OpportunityAreas.Any())
+            {
+                predicate = predicate.And(observation =>
+                    OpportunityAreas.Contains(observation.Location.OpportunityArea.Code));
+            }
+                        
+            if (ParliamentaryConstituencies != null && ParliamentaryConstituencies.Any())
+            {
+                predicate = predicate.And(observation =>
+                    ParliamentaryConstituencies.Contains(observation.Location.ParliamentaryConstituency.Code));
+            }
+                                    
+            if (Providers != null && Providers.Any())
+            {
+                predicate = predicate.And(observation =>
+                    Providers.Contains(observation.Location.Provider.Code));
+            }
+                                                
+            if (Wards != null && Wards.Any())
+            {
+                predicate = predicate.And(observation =>
+                    Wards.Contains(observation.Location.Ward.Code));
+            }
+            
             return predicate;
         }
     }

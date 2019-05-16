@@ -30,6 +30,55 @@ describe('FormRadioGroup', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
+  test('renders list of radios in reverse order', () => {
+    const { getAllByLabelText } = render(
+      <FormRadioGroup
+        value={null}
+        id="test-radios"
+        name="test-radios"
+        legend="Test radios"
+        orderDirection={['desc']}
+        options={[
+          { id: 'radio-1', label: 'Test radio 1', value: '1' },
+          { id: 'radio-2', label: 'Test radio 2', value: '2' },
+          { id: 'radio-3', label: 'Test radio 3', value: '3' },
+        ]}
+      />,
+    );
+
+    const radios = getAllByLabelText(/Test radio/);
+
+    expect(radios).toHaveLength(3);
+    expect(radios[0]).toHaveAttribute('value', '3');
+    expect(radios[1]).toHaveAttribute('value', '2');
+    expect(radios[2]).toHaveAttribute('value', '1');
+  });
+
+  test('renders list of radios in custom order', () => {
+    const { getAllByLabelText } = render(
+      <FormRadioGroup
+        value={null}
+        id="test-radios"
+        name="test-radios"
+        legend="Test radios"
+        order={['value']}
+        orderDirection={['desc']}
+        options={[
+          { id: 'radio-1', label: 'Test radio 1', value: '2' },
+          { id: 'radio-2', label: 'Test radio 2', value: '3' },
+          { id: 'radio-3', label: 'Test radio 3', value: '1' },
+        ]}
+      />,
+    );
+
+    const radios = getAllByLabelText(/Test radio/);
+
+    expect(radios).toHaveLength(3);
+    expect(radios[0]).toHaveAttribute('value', '3');
+    expect(radios[1]).toHaveAttribute('value', '2');
+    expect(radios[2]).toHaveAttribute('value', '1');
+  });
+
   test('clicking a radio checks it', () => {
     class RadioWrapper extends Component {
       public state = {

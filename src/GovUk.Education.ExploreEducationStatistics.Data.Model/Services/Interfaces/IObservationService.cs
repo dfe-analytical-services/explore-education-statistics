@@ -12,6 +12,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
             IEnumerable<string> regions,
             IEnumerable<string> localAuthorities,
             IEnumerable<string> localAuthorityDistricts,
+            IEnumerable<string> localEnterprisePartnerships,
+            IEnumerable<string> institutions,
+            IEnumerable<string> mats,
+            IEnumerable<string> mayoralCombinedAuthorities,
+            IEnumerable<string> opportunityAreas,
+            IEnumerable<string> parliamentaryConstituencies,
+            IEnumerable<string> providers,
+            IEnumerable<string> wards,
             IEnumerable<long> filters);
 
         Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnitsMeta(
