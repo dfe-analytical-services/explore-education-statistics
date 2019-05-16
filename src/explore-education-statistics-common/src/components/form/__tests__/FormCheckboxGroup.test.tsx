@@ -28,6 +28,55 @@ describe('FormCheckboxGroup', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
+  test('renders list of checkboxes in reverse order', () => {
+    const { getAllByLabelText } = render(
+      <FormCheckboxGroup
+        id="test-checkboxes"
+        name="test-checkboxes"
+        legend="Test checkboxes"
+        value={[]}
+        orderDirection={['desc']}
+        options={[
+          { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
+          { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
+          { id: 'checkbox-3', label: 'Test checkbox 3', value: '3' },
+        ]}
+      />,
+    );
+
+    const checkboxes = getAllByLabelText(/Test checkbox/);
+
+    expect(checkboxes).toHaveLength(3);
+    expect(checkboxes[0]).toHaveAttribute('value', '3');
+    expect(checkboxes[1]).toHaveAttribute('value', '2');
+    expect(checkboxes[2]).toHaveAttribute('value', '1');
+  });
+
+  test('renders list of checkboxes in custom order', () => {
+    const { getAllByLabelText } = render(
+      <FormCheckboxGroup
+        id="test-checkboxes"
+        name="test-checkboxes"
+        legend="Test checkboxes"
+        value={[]}
+        order={['value']}
+        orderDirection={['desc']}
+        options={[
+          { id: 'checkbox-1', label: 'Test checkbox 1', value: '2' },
+          { id: 'checkbox-2', label: 'Test checkbox 2', value: '3' },
+          { id: 'checkbox-3', label: 'Test checkbox 3', value: '1' },
+        ]}
+      />,
+    );
+
+    const radios = getAllByLabelText(/Test checkbox/);
+
+    expect(radios).toHaveLength(3);
+    expect(radios[0]).toHaveAttribute('value', '3');
+    expect(radios[1]).toHaveAttribute('value', '2');
+    expect(radios[2]).toHaveAttribute('value', '1');
+  });
+
   test('renders checkboxes with some pre-checked', () => {
     const { container, getAllByLabelText } = render(
       <FormCheckboxGroup
