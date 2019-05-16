@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreStatistics.Admin.Controllers
                                 PublicationId = uploadId,
                                 PublicationName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(fName.ToLower()),
                                 ReleaseName = "2018/2019",
-                                ReleaseDate = DateTime.Now.ToString("MM/dd/yyyy")
+                                ReleaseDate = DateTime.Now.ToString("dd/MM/yyyy")
                             }
                         );
                     }

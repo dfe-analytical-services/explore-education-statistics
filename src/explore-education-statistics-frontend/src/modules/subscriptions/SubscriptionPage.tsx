@@ -87,7 +87,7 @@ class SubscriptionPage extends Component<Props> {
         breadcrumbs={[
           { name: 'Find statistics and data', link: '/statistics' },
           { name: data.title, link: `/statistics/${slug}` },
-          { name: 'subscribe' },
+          { name: 'Notify me' },
         ]}
       >
         <PageTitle title={`${data.title}`} caption="Notify me" />

@@ -2,7 +2,7 @@ import ButtonText from '@common/components/ButtonText';
 import { Omit, PartialBy } from '@common/types/util';
 import classNames from 'classnames';
 import kebabCase from 'lodash/kebabCase';
-import sortBy from 'lodash/sortBy';
+import orderBy from 'lodash/orderBy';
 import memoize from 'memoizee';
 import React, {
   ChangeEvent,
@@ -42,9 +42,10 @@ interface BaseFormCheckboxGroupProps {
   options: CheckboxOption[];
   selectAll?: boolean;
   small?: boolean;
-  sort?:
-    | string[]
+  order?:
+    | (keyof CheckboxOption)[]
     | ((option: CheckboxOption) => CheckboxOption[keyof CheckboxOption])[];
+  orderDirection?: ('asc' | 'desc')[];
   value: string[];
 }
 
@@ -67,7 +68,8 @@ export class BaseFormCheckboxGroup extends PureComponent<
     legendSize: 'm',
     selectAll: false,
     small: false,
-    sort: ['label'],
+    order: ['label'],
+    orderDirection: ['asc'],
     value: [],
   };
 
@@ -115,7 +117,8 @@ export class BaseFormCheckboxGroup extends PureComponent<
       id,
       options,
       selectAll,
-      sort = [],
+      order,
+      orderDirection,
       small,
     } = this.props;
 
@@ -140,7 +143,7 @@ export class BaseFormCheckboxGroup extends PureComponent<
           </ButtonText>
         )}
 
-        {sortBy(options, sort).map(option => (
+        {orderBy(options, order, orderDirection).map(option => (
           <FormCheckbox
             {...option}
             id={option.id ? option.id : `${id}-${kebabCase(option.value)}`}
