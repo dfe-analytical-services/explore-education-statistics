@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             return new ParliamentaryConstituency(null, null);
         }
 
-        protected bool Equals(OpportunityArea other)
+        protected bool Equals(ParliamentaryConstituency other)
         {
             return string.Equals(Code, other.Code);
         }
