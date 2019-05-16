@@ -12,9 +12,7 @@ const BrowseReleasesPage = () => {
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">
-            Find statistics and download data
-          </h1>
+          <h1 className="govuk-heading-xl">Find statistics and data</h1>
           <p className="govuk-body-l">
             Browse to find the statistics and data you’re looking for and open
             the section to get links to:
@@ -33,8 +31,8 @@ const BrowseReleasesPage = () => {
               range of national and regional data
             </li>
             <li>
-              links to underlying data so you can download files and carry out
-              your own statistical analysis
+              underlying data so you can download files and carry out your own
+              statistical analysis
             </li>
           </ul>
         </div>
@@ -423,11 +421,8 @@ const BrowseReleasesPage = () => {
                 </a>
               </li>
               <li>
-                <strong>
-                  Performance indicators in HE or Performance indicators in
-                  higher education or Performance indicators
-                </strong>{' '}
-                - currently available via{' '}
+                <strong>Performance indicators in higher education</strong> -
+                currently available via{' '}
                 <a href="https://www.gov.uk/government/collections/official-statistics-releases#performance-indicators">
                   Statistics at DfE
                 </a>
@@ -500,7 +495,6 @@ const BrowseReleasesPage = () => {
                 <strong>
                   Permanent and fixed-period exclusions in England
                 </strong>{' '}
-                - view statistics, create tables and download data files{' '}
                 <div className="govuk-!-margin-top-5">
                   <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
                 </div>
@@ -512,8 +506,7 @@ const BrowseReleasesPage = () => {
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
               <li>
-                <strong>Pupil absence in schools in England</strong> - view
-                statistics, create tables and download data files{' '}
+                <strong>Pupil absence in schools in England</strong>{' '}
                 <div className="govuk-!-margin-top-5">
                   <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
                 </div>
@@ -644,10 +637,7 @@ const BrowseReleasesPage = () => {
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
               <li>
-                <strong>
-                  16 to 18 school and college performance tables or School and
-                  college performance tables in England
-                </strong>{' '}
+                <strong>16 to 18 school and college performance tables</strong>{' '}
                 - currently available via{' '}
                 <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#16-to-18-school-and-college-performance-tables">
                   Statistics at DfE
@@ -676,8 +666,7 @@ const BrowseReleasesPage = () => {
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
             <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
               <li>
-                <strong>GCSE and equivalent results</strong> - view statistics,
-                create tables and download data files{' '}
+                <strong>GCSE and equivalent results</strong>{' '}
                 <div className="govuk-!-margin-top-5">
                   <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
                 </div>
@@ -762,8 +751,7 @@ const BrowseReleasesPage = () => {
             <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
               <li>
                 <strong>
-                  Outcome based success measures or Further education
-                  outcome-based success measures
+                  Further education outcome-based success measures
                 </strong>{' '}
                 - currently available via{' '}
                 <a href="https://www.gov.uk/government/collections/statistics-outcome-based-success-measures#statistics">
@@ -846,7 +834,7 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
         <AccordionSection
-          heading="Workforce statistics and analysis or Teacher workforce statistics and analysis	"
+          heading="Teacher workforce statistics and analysis	"
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">

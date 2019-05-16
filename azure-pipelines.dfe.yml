@@ -3,7 +3,7 @@ variables:
   CI: true
 
 trigger: [ 'master' ]
-pr: [ 'master' ]
+pr: none
 
 jobs:
   - job: 'Backend'

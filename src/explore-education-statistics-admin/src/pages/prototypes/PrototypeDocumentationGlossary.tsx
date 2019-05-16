@@ -19,9 +19,9 @@ const DocumentationGlossary = () => {
             <h1 className="govuk-heading-xl">Style guide</h1>
           </div>
           <p>
-            Browse our A to Z list of style, spelling and grammar conventions
-            for all content published on the explore education statistics
-            service.
+            Browse TEST our A to Z list of style, spelling and grammar
+            conventions for all content published on the explore education
+            statistics service.
           </p>
 
           <Accordion id="a-z">
