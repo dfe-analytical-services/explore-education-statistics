@@ -1,4 +1,6 @@
+/* eslint-disable prefer-destructuring */
 import dataBlockService, {
+  DataBlockGeoJSON,
   DataBlockRequest,
   GeographicLevel,
 } from '@common/services/dataBlockService';
@@ -59,5 +61,13 @@ describe('dataBlockService', () => {
     expect(result.metaData.locations).not.toBeUndefined();
 
     expect(result.metaData.locations.E92000001).not.toBeUndefined();
+
+    // @ts-ignore
+    const geoJson: DataBlockGeoJSON =
+      result.metaData.locations.E92000001.geoJson;
+
+    expect(geoJson.geometry).not.toBeUndefined();
+
+    expect(geoJson.properties).not.toBeUndefined();
   });
 });
