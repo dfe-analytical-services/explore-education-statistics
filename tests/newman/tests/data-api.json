@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9fc72945-ba02-484c-8848-16a2e2c58f76",
+		"_postman_id": "c56c5bdf-9026-4a8d-9b42-5b4cd9ee7958",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1347,63 +1347,6 @@
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        214, 215, 197, 212, 141\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/tablebuilder",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"tablebuilder"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Absence by geographic level - School - Region Inner London - All Schools, Primary AND Academies Pri Sponsor, Not specified, Pri Free, Sec Sponsor, Special Free",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Compulsory fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Release date is not empty\", function () {",
-													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
-													"});",
-													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(673); });"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"regions\": [ \"E13000001\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        81, 214, 119, 82, 212, 125, 197\n    ],\n    \"indicators\": [\n        42, 61, 57, 59, 66, 111212\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
