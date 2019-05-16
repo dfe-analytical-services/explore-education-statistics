@@ -121,6 +121,8 @@ export const newApiHorizontalData: ChartProps = {
       '2014': new TimePeriod(2014, 'HT6'),
       '2015': new TimePeriod(2015, 'HT6'),
     },
+
+    locations: {},
   },
 
   labels: {

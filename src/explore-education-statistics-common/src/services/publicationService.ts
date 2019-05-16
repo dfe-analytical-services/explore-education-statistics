@@ -49,7 +49,6 @@ export interface Chart {
   xAxis?: Axis;
   yAxis?: Axis;
   stacked?: boolean;
-  geometry?: MapFeature | FeatureCollection;
   referenceLines?: ReferenceLine[];
   width?: number;
   height?: number;

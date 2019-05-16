@@ -9,6 +9,8 @@ import {
 import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import TimePeriod from '@common/services/types/TimePeriod';
 
+import Features from './testLocationData';
+
 const data: DataBlockData = {
   publicationId: 'test',
   releaseDate: new Date(),
@@ -118,7 +120,13 @@ const metaData: DataBlockMetadata = {
     '2015': new TimePeriod(2015, 'HT6'),
   },
 
-  locations: {},
+  locations: {
+    E92000001: {
+      code: 'E92000001',
+      label: 'England',
+      geoJson: Features.E92000001,
+    },
+  },
 };
 
 const responseMetadata: ResponseMetaData = {

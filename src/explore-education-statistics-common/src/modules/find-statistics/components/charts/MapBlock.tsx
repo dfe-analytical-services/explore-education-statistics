@@ -1,91 +1,73 @@
-import { Feature, GeoJsonProperties, Geometry } from 'geojson';
+import {
+  Feature,
+  FeatureCollection,
+  GeoJsonProperties,
+  Geometry,
+} from 'geojson';
 import 'leaflet/dist/leaflet.css';
-import React, { Component } from 'react';
-import { GeoJSON, Map } from 'react-leaflet';
+import React from 'react';
+import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
 import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { Layer } from 'leaflet';
+import { DataBlockGeoJSON } from '@common/services/dataBlockService';
 
 export type MapFeature = Feature<Geometry, GeoJsonProperties>;
 
-interface MapState {
-  position: { lat: number; lng: number };
-  // maxBounds: LatLngBounds;
-  geometry?: MapFeature;
-}
-
 interface MapProps extends ChartProps {
-  geometry?: MapFeature;
+  position?: { lat: number; lng: number };
+  maxBounds?: LatLngBounds;
 }
 
-class MapBlock extends Component<MapProps, MapState> {
-  protected mapRef: Map | null = null;
+function MapBlock(props: MapProps) {
+  const {
+    position = { lat: 53.00986, lng: -3.2524038 },
+    width = 200,
+    height = 200,
+    meta,
+  } = props;
 
-  public state = {
-    // maxBounds: new LatLngBounds({ lat: 48, lng: -6.5 }, { lat: 60, lng: 2 }),
-    position: {
-      lat: 53.009865,
-      lng: -3.2524038,
-    },
-    // eslint-disable-next-line react/destructuring-assignment
-    geometry: this.props.geometry,
+  const mapRef = React.createRef<Map>();
+
+  const geometry: FeatureCollection<Geometry, GeoJsonProperties> = {
+    type: 'FeatureCollection',
+    features: Object.values(meta.locations).map(
+      metadata => metadata.geoJson as DataBlockGeoJSON,
+    ),
   };
 
-  public componentDidMount() {
-    // force a refresh to fix a bug
-    requestAnimationFrame(() => this.refresh());
-  }
+  requestAnimationFrame(() => {
+    if (mapRef.current) {
+      mapRef.current.leafletElement.invalidateSize();
+    }
+  });
 
-  public componentDidUpdate() {
-    requestAnimationFrame(() => this.refresh());
-  }
+  const onEachFeature = (feature: MapFeature, layer: Layer) => {
+    console.log(feature.properties);
+  };
 
-  public refresh() {
-    requestAnimationFrame(() => {
-      if (this.mapRef) {
-        this.mapRef.leafletElement.invalidateSize();
-      }
-    });
-  }
-
-  private renderGeoJson() {
-    const { geometry } = this.state;
-
-    if (geometry === undefined) return '';
-
-    return (
-      <GeoJSON
-        data={geometry}
-        // onEachFeature={this.onEachFeature}
-        // style={this.styleFeature}
-        // onClick={this.handleClick}
-      />
-    );
-  }
-
-  public render() {
-    const { geometry, position } = this.state;
-    const { height } = this.props;
-
-    return (
-      <div>
-        {geometry && (
-          <Map
-            style={{ height: `${height || 200}px` }}
-            ref={el => {
-              this.mapRef = el;
-            }}
-            center={position}
-            // className={styles.map}
-            zoom={6.5}
-            // minZoom={6.5}
-            // zoomSnap={0.5}
-            // maxBounds={this.state.maxBounds}
-          >
-            {this.renderGeoJson()}
-          </Map>
-        )}
-      </div>
-    );
-  }
+  return (
+    <div>
+      {geometry && (
+        <Map
+          style={{ width: `${width}px`, height: `${height}px` }}
+          ref={mapRef}
+          center={position}
+          // className={styles.map}
+          zoom={6.5}
+          // minZoom={6.5}
+          // zoomSnap={0.5}
+          // maxBounds={this.state.maxBounds}
+        >
+          <GeoJSON
+            data={geometry}
+            onEachFeature={onEachFeature}
+            // style={this.styleFeature}
+            // onClick={this.handleClick}
+          />
+        </Map>
+      )}
+    </div>
+  );
 }
 
 export default MapBlock;

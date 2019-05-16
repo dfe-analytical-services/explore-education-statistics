@@ -13227,11 +13227,13 @@ Object {
           "properties": Object {
             "bng_e": 394881,
             "bng_n": 370341,
+            "code": "E92000001",
             "ctry17cd": "E92000001",
             "ctry17nm": "England",
             "ctry17nmw": "Lloegr",
             "lat": 53.230099,
             "long": -2.07813,
+            "name": "England",
             "objectid": 1,
             "st_areasha": 130714112659.38902,
             "st_lengths": 4534777.695717,

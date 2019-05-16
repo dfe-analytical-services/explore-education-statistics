@@ -104,7 +104,6 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
         ...chart,
 
-        geometry: chart.geometry as MapFeature,
         data: json,
         meta: jsonMeta,
       }));

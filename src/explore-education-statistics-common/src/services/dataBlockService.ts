@@ -133,20 +133,20 @@ export interface ResponseMetaData {
 }
 
 export interface DataBlockGeoJsonProperties {
-  objectid: number;
-  ctry17cd: string | null;
-  ctry17nm: string | null;
-  ctry17nmw: string | null;
-  lad17cd: string | null;
-  lad17nm: string | null;
-  lad17nmw: string | null;
-  bng_e: number;
-  bng_n: number;
+  // these are what is required
+  code: string;
+  name: string;
   long: number;
   lat: number;
-  st_areasha: number;
-  st_lengths: number;
-  [name: string]: any;
+
+  // the following are just named here for easier finding in code completion and not required
+  objectid: number;
+  ctry17cd?: string | null;
+  ctry17nm?: string | null;
+  lad17cd?: string | null;
+  lad17nm?: string | null;
+  // allow anything to come through from the API, but very probably ignored
+  [name: string]: unknown;
 }
 
 export type DataBlockGeoJSON = Feature<Geometry, DataBlockGeoJsonProperties>;

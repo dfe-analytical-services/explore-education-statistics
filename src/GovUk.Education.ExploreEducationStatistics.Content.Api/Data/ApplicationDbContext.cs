@@ -396,6 +396,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
                                 {
                                     Body =
                                         "Nearly half of all pupils (48.9 per cent) were absent for five days or fewer across state-funded primary, secondary and special schools in 2016/17, down from 49.1 per cent in 2015/16.\n\n4.3 per cent of pupil enrolments had more than 25 days of absence in 2016/17 (the same as in 2015/16). These pupil enrolments accounted for 23.5 per cent of days missed. 8.2 per cent of pupil enrolments had no absence during 2016/17.\n\nPer pupil enrolment, the average total absence in primary schools was 7.2 days, compared to 16.9 days in special schools and 9.3 days in secondary schools.\n\nWhen looking at absence rates across terms for primary, secondary and special schools, the overall absence rate is lowest in the autumn term and highest in the summer term. The authorised rate is highest in the spring term and lowest in the summer term, and the unauthorised rate is highest in the summer term."
+                                },
+                                new DataBlock
+                                {
+                                    Heading = null,
+                                    DataBlockRequest = new DataBlockRequest
+                                    {
+                                        subjectId= 1,
+                                        geographicLevel= "National",
+                                        startYear= "2012",
+                                        endYear= "2017",
+                                        filters= new List<string>{"1","2"},
+                                        indicators= new List<string>{"23", "26", "28"}
+                                    },
+                                    Charts = new List<IContentBlockChart>
+                                    {
+                                        new MapChart
+                                        {
+                                            Indicators = new List<string>
+                                            {
+                                                "23","26","28"
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         },

@@ -28,14 +28,11 @@ export interface ChartRendererProps {
   width?: number;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
-
-  geometry?: MapFeature;
 }
 
 function ChartRenderer(props: ChartRendererProps) {
   const {
     data,
-    geometry,
     height,
     width,
     meta,
@@ -120,7 +117,6 @@ function ChartRenderer(props: ChartRendererProps) {
           yAxis={yAxis}
           height={height}
           width={width}
-          geometry={geometry}
         />
       );
     default:
