@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Region) obj);
+            return Equals((ParliamentaryConstituency) obj);
         }
 
         public override int GetHashCode()

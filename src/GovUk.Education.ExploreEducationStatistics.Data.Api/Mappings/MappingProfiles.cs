@@ -12,8 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
         public MappingProfiles()
         {
             CreateMap<IObservationalUnit, LabelValueViewModel>()
-                .ForMember(dest => dest.Label, opts => { opts.MapFrom(country => country.Name); })
-                .ForMember(dest => dest.Value, opts => { opts.MapFrom(country => country.Code); });
+                .ForMember(dest => dest.Label, opts => { opts.MapFrom(unit => unit.Name); })
+                .ForMember(dest => dest.Value, opts => { opts.MapFrom(unit => unit.Code); });
 
             CreateMap<Indicator, IndicatorMetaViewModel>()
                 .ForMember(dest => dest.Value, opts => opts.MapFrom(indicator => indicator.Id))
