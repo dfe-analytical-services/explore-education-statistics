@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 FilterItems = GetFilterItems(line, headers, subjectMeta.Filters),
                 GeographicLevel = GetGeographicLevel(line, headers),
-                Location = GetLocation(line, headers),
+                LocationId = GetLocationId(line, headers),
                 Measures = GetMeasures(line, headers, subjectMeta.Indicators),
                 School = GetSchool(line, headers),
                 Subject = subject,
@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return GeographicLevels.EnumFromStringForImport(CsvUtil.Value(line, headers, "geographic_level"));
         }
 
-        private Location GetLocation(IReadOnlyList<string> line, List<string> headers)
+        private long GetLocationId(IReadOnlyList<string> line, List<string> headers)
         {
             return _importerLocationService.Find(
                 GetCountry(line, headers),
@@ -187,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 GetParliamentaryConstituency(line, headers),
                 GetProvider(line, headers),
                 GetWard(line, headers)
-                );
+                ).Id;
         }
 
         private static School GetSchool(IReadOnlyList<string> line, List<string> headers)
@@ -229,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         private static LocalAuthority GetLocalAuthority(IReadOnlyList<string> line, List<string> headers)
         {
-            var columns = new[] {"old_la_code", "new_la_code", "la_name"};
+            var columns = new[] {"new_la_code", "old_la_code", "la_name"};
             return CsvUtil.BuildType(line, headers, columns, values =>
                 new LocalAuthority(values[0], values[1], values[2]));
         }

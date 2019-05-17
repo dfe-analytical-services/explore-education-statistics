@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder
@@ -28,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 
         public TableBuilderResultViewModel Query(ObservationQueryContext queryContext)
         {
-            var observations = GetObservations(queryContext);
+            var observations = GetObservations(queryContext).ToList();
             if (!observations.Any())
             {
                 return new TableBuilderResultViewModel();
@@ -55,22 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
                 return new List<Observation>();
             }
 
-            return _observationService.FindObservations(queryContext.SubjectId,
-                queryContext.GeographicLevel,
-                TimePeriodUtil.YearsRange(queryContext.Years, queryContext.StartYear, queryContext.EndYear),
-                queryContext.Countries,
-                queryContext.Regions,
-                queryContext.LocalAuthorities,
-                queryContext.LocalAuthorityDistricts,
-                queryContext.LocalEnterprisePartnerships,
-                queryContext.Institutions,
-                queryContext.Mats,
-                queryContext.MayoralCombinedAuthorities,
-                queryContext.OpportunityAreas,
-                queryContext.ParliamentaryConstituencies,
-                queryContext.Providers,
-                queryContext.Wards,
-                queryContext.Filters);
+            return _observationService.FindObservations(queryContext);
         }
     }
 }

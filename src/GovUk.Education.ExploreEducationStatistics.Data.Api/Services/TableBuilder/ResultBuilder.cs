@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
 
         private static Dictionary<string, string> Measures(Observation observation, IEnumerable<long> indicators)
         {
-            var measures = indicators.Any()
+            var measures = indicators != null && indicators.Any()
                 ? QueryUtil.FilterMeasures(observation.Measures, indicators)
                 : observation.Measures;
             return measures.ToDictionary(pair => pair.Key.ToString(), pair => pair.Value);

@@ -10,7 +10,7 @@ interface Props {
 const PrototypeDownloadDropdown = ({ link }: Props) => {
   return (
     <>
-      <div className="govuk-grid-row">
+      <div className="govuk-grid-row govuk-!-margin-bottom-4">
         <div className="govuk-grid-column-one-third">
           <Link
             className="govuk-link govuk-!-margin-right-9 "
@@ -20,10 +20,7 @@ const PrototypeDownloadDropdown = ({ link }: Props) => {
           </Link>
         </div>
         <div className="govuk-grid-column-one-third">
-          <Link
-            className="govuk-link govuk-!-margin-right-9 "
-            to="/prototypes/table-tool"
-          >
+          <Link className="govuk-link" to="/prototypes/table-tool">
             Create your own tables online
           </Link>
         </div>
