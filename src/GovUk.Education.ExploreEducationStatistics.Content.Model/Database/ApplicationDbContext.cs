@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Data
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 {
     public class ApplicationDbContext : DbContext
     {

@@ -1,14 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Converters;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
 using Newtonsoft.Json;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
     public class ContentSection
     {

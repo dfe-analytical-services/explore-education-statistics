@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Data;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
