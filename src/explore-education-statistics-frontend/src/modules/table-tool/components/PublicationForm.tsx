@@ -76,6 +76,11 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                       label="Search publications"
                       name="publicationSearch"
                       onChange={event => setSearchTerm(event.target.value)}
+                      onKeyPress={event => {
+                        if (event.key === 'Enter') {
+                          event.preventDefault();
+                        }
+                      }}
                       width={20}
                     />
                   </FormGroup>

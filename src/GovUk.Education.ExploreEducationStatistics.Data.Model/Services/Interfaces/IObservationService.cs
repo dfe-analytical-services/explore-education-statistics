@@ -5,22 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 {
     public interface IObservationService : IDataService<Observation, long>
     {
-        IEnumerable<Observation> FindObservations(long subjectId,
-            GeographicLevel geographicLevel,
-            IEnumerable<int> years,
-            IEnumerable<string> countries,
-            IEnumerable<string> regions,
-            IEnumerable<string> localAuthorities,
-            IEnumerable<string> localAuthorityDistricts,
-            IEnumerable<string> localEnterprisePartnerships,
-            IEnumerable<string> institutions,
-            IEnumerable<string> mats,
-            IEnumerable<string> mayoralCombinedAuthorities,
-            IEnumerable<string> opportunityAreas,
-            IEnumerable<string> parliamentaryConstituencies,
-            IEnumerable<string> providers,
-            IEnumerable<string> wards,
-            IEnumerable<long> filters);
+        IEnumerable<Observation> FindObservations(ObservationQueryContext query);
 
         Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnitsMeta(
             SubjectMetaQueryContext query);

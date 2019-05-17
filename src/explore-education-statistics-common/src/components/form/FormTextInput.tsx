@@ -1,5 +1,9 @@
 import classNames from 'classnames';
-import React, { ChangeEventHandler, ReactNode } from 'react';
+import React, {
+  ChangeEventHandler,
+  KeyboardEventHandler,
+  ReactNode,
+} from 'react';
 import ErrorMessage from '../ErrorMessage';
 import createDescribedBy from './util/createDescribedBy';
 
@@ -10,6 +14,7 @@ export interface FormTextInputProps {
   label: ReactNode | string;
   name: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
+  onKeyPress?: KeyboardEventHandler<HTMLInputElement>;
   width?: 20 | 10 | 5 | 4 | 3 | 2;
   value?: string;
 }
@@ -19,10 +24,8 @@ const FormTextInput = ({
   hint,
   id,
   label,
-  name,
-  onChange,
   width,
-  value,
+  ...props
 }: FormTextInputProps) => {
   return (
     <>
@@ -36,23 +39,17 @@ const FormTextInput = ({
       )}
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
       <input
+        {...props}
         aria-describedby={createDescribedBy({
           id,
           error: !!error,
           hint: !!hint,
         })}
-        type="text"
         className={classNames('govuk-input', {
           [`govuk-input--width-${width}`]: width !== undefined,
         })}
         id={id}
-        name={name}
-        onChange={event => {
-          if (onChange) {
-            onChange(event);
-          }
-        }}
-        value={value}
+        type="text"
       />
     </>
   );
