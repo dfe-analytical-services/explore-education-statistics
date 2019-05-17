@@ -1,5 +1,3 @@
-import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
-import { FeatureCollection } from 'geojson';
 import { DataBlockRequest } from '@common/services/dataBlockService';
 import { contentApi } from './api';
 
@@ -43,9 +41,16 @@ export interface Axis {
   size?: number;
 }
 
+export interface ChartDataGroup {
+  filters?: string[];
+  location?: string[];
+  timePeriod?: boolean;
+}
+
 export interface Chart {
   type: string;
   indicators: string[];
+  dataGroupings?: ChartDataGroup[];
   xAxis?: Axis;
   yAxis?: Axis;
   stacked?: boolean;

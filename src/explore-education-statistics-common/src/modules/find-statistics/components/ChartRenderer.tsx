@@ -1,8 +1,11 @@
 import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
-import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
-import { Axis, ReferenceLine } from '@common/services/publicationService';
+import {
+  Axis,
+  ChartDataGroup,
+  ReferenceLine,
+} from '@common/services/publicationService';
 import dynamic from 'next-server/dynamic';
 import React from 'react';
 import {
@@ -28,6 +31,7 @@ export interface ChartRendererProps {
   width?: number;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
+  dataGroupings?: ChartDataGroup[];
 }
 
 function ChartRenderer(props: ChartRendererProps) {
@@ -42,6 +46,7 @@ function ChartRenderer(props: ChartRendererProps) {
     type,
     xAxis = { title: '' },
     yAxis = { title: '' },
+    dataGroupings,
   } = props;
 
   const labels = Object.entries(meta.indicators).reduce(
@@ -117,6 +122,7 @@ function ChartRenderer(props: ChartRendererProps) {
           yAxis={yAxis}
           height={height}
           width={width}
+          dataGroupings={dataGroupings}
         />
       );
     default:

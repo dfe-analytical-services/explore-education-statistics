@@ -5,16 +5,9 @@ const E92000001: DataBlockGeoJSON = {
   properties: {
     code: 'E92000001',
     name: 'England',
-    ctry17cd: 'E92000001',
-    ctry17nm: 'England',
-    ctry17nmw: 'Lloegr',
-    bng_e: 394881,
-    bng_n: 370341,
     long: -2.07813,
     lat: 53.230099,
     objectid: 1,
-    st_lengths: 4534777.695717,
-    st_areasha: 130714112659.389023,
   },
   geometry: {
     type: 'MultiPolygon',

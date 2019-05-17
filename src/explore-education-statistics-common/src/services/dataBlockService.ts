@@ -56,7 +56,7 @@ export interface Result {
   measures: {
     [key: string]: string;
   };
-  timeIdentifier: string;
+  timeIdentifier: TimePeriodCode;
   year: number;
 }
 
@@ -154,7 +154,7 @@ export type DataBlockGeoJSON = Feature<Geometry, DataBlockGeoJsonProperties>;
 interface DataBlockLocationMetadata {
   code: string;
   label: string;
-  geoJson?: DataBlockGeoJSON;
+  geoJson: DataBlockGeoJSON;
 }
 
 // ------------------------------------------
@@ -256,15 +256,19 @@ function getUsedTimeIdentifiers(data: DataBlockData) {
 }
 
 function getUsedLocations(
+  request: DataBlockRequest,
   data: DataBlockData,
 ): Dictionary<DataBlockLocationMetadata> {
   return data.result.reduce(
     (locations: Dictionary<DataBlockLocationMetadata>, result) => {
-      const geoJson = LocationService.getGeoJSONForLocation(result.location);
+      const geoJson = LocationService.getGeoJSONForLocation(
+        request.geographicLevel,
+        result.location,
+      );
 
       if (geoJson) {
-        const code = geoJson.properties.lad17cd || geoJson.properties.ctry17cd;
-        const label = geoJson.properties.lad17nm || geoJson.properties.ctry17nm;
+        const { code } = geoJson.properties;
+        const label = geoJson.properties.name;
 
         if (code && label) {
           const dbm: DataBlockLocationMetadata = { code, label, geoJson };
@@ -293,7 +297,7 @@ const DataBlockService = {
     const times = getUsedTimeIdentifiers(data);
     const usedTimeIdentifiers = remapTimePeriod(times, metaData);
 
-    const usedLocations = getUsedLocations(data);
+    const usedLocations = getUsedLocations(request, data);
 
     const usedMetadata: DataBlockMetadata = {
       indicators: usedIndicators,

@@ -26,6 +26,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Converters
                 case "line":
                     contentBlock = new LineChart();
                     break;
+                case "horizontalbar":
+                    contentBlock = new HorizontalBarChart();
+                    break;
+                case "verticalbar":
+                    contentBlock = new VerticalBarChart();
+                    break;
+                case "map":
+                    contentBlock = new MapChart();
+                    break;
             }
             serializer.Populate(jsonObject.CreateReader(), contentBlock);
             return contentBlock;

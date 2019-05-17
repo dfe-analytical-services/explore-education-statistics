@@ -4,6 +4,7 @@ import {
   DataBlockGeoJSON,
   DataBlockGeoJsonProperties,
   DataBlockLocation,
+  GeographicLevel,
 } from '@common/services/dataBlockService';
 import locationDataImport from './temporaryLocationData.json';
 
@@ -19,23 +20,31 @@ locationData.features = locationData.features.map(feature => {
     properties: {
       ...feature.properties,
       code:
-        feature.properties.lad17cd || feature.properties.ctry17cd || 'unknown',
+        feature.properties.code ||
+        feature.properties.lad17cd ||
+        feature.properties.ctry17cd ||
+        'unknown',
       name:
-        feature.properties.lad17nm || feature.properties.ctry17nm || 'unknown',
+        feature.properties.name ||
+        feature.properties.lad17nm ||
+        feature.properties.ctry17nm ||
+        'unknown',
     },
   };
 });
 
 function getGeoJSONForLocation(
+  level: GeographicLevel,
   location: DataBlockLocation,
 ): DataBlockGeoJSON | undefined {
   const result = locationData.features.filter(feature => {
-    return (
-      (location.country.country_code &&
-        feature.properties.code === location.country.country_code) ||
-      (location.region.region_code &&
-        feature.properties.code === location.region.region_code)
-    );
+    let expectedCode;
+    if (level === GeographicLevel.National)
+      expectedCode = location.country.country_code;
+    if (level === GeographicLevel.LocalAuthority)
+      expectedCode = location.localAuthority.old_la_code;
+
+    return expectedCode && expectedCode === feature.properties.code;
   });
 
   return (result.length && result[0]) || undefined;
