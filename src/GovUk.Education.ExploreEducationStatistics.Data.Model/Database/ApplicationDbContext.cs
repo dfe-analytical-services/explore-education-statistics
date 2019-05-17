@@ -12,6 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             Database.SetCommandTimeout(int.MaxValue);
         }
 
+        public DbQuery<GeoJson> GeoJson { get; set; }
         public DbSet<Filter> Filter { get; set; }
         public DbSet<FilterItem> FilterItem { get; set; }
         public DbSet<FilterGroup> FilterGroup { get; set; }
@@ -26,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            ConfigureGeoJson(modelBuilder);
             ConfigureObservationFilterItem(modelBuilder);
             ConfigureUnit(modelBuilder);
             ConfigurePublication(modelBuilder);
@@ -139,61 +141,70 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .OwnsOne(level => level.Region,
                     builder => builder.HasIndex(region => region.Code));
         }
-        
+
         private static void ConfigureInstitution(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.Institution,
                     builder => builder.HasIndex(institution => institution.Code));
         }
-        
+
         private static void ConfigureLocalEnterprisePartnership(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.LocalEnterprisePartnership,
                     builder => builder.HasIndex(localEnterprisePartnership => localEnterprisePartnership.Code));
         }
-        
+
         private static void ConfigureMat(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.Mat,
                     builder => builder.HasIndex(mat => mat.Code));
         }
-        
+
         private static void ConfigureMayoralCombinedAuthority(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.MayoralCombinedAuthority,
                     builder => builder.HasIndex(mca => mca.Code));
         }
-        
+
         private static void ConfigureOpportunityArea(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.OpportunityArea,
                     builder => builder.HasIndex(opportunityArea => opportunityArea.Code));
         }
-        
+
         private static void ConfigureParliamentaryConstituency(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.ParliamentaryConstituency,
                     builder => builder.HasIndex(parliamentaryConstituency => parliamentaryConstituency.Code));
         }
-        
+
         private static void ConfigureProvider(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.Provider,
                     builder => builder.HasIndex(provider => provider.Code));
         }
-        
+
         private static void ConfigureWard(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.Ward,
                     builder => builder.HasIndex(ward => ward.Code));
+        }
+
+        private static void ConfigureGeoJson(ModelBuilder modelBuilder)
+        {
+            var geographicLevelConverter = new EnumToEnumValueConverter<GeographicLevel>();
+
+            modelBuilder.Query<GeoJson>().ToView("geojson")
+                .Property(geoJson => geoJson.GeographicLevel)
+                .HasConversion(geographicLevelConverter);
         }
 
         private static void ConfigureAdditionalTypes(ModelBuilder modelBuilder)
