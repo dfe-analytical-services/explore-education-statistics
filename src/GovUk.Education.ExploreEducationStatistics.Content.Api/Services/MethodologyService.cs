@@ -10,7 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
     {
         private readonly ApplicationDbContext _context;
 
-        public MethodologyService(ApplicationDbContext context)
+        public MethodologyService(
+            ApplicationDbContext context)
         {
             _context = context;
         }

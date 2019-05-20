@@ -1,48 +1,52 @@
 using System;
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Controllers
+namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Services
 {
-    public class ReleaseControllerTests
+    public class ReleaseServiceTests
     {
         [Fact]
-        public void Get_ReturnsAActionResult_WithAListOfThemes()
+        public void GetLatest_ReturnsAActionResult_WithARelease()
         {
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            builder.UseInMemoryDatabase(databaseName: "ListReleases");
+            builder.UseInMemoryDatabase(databaseName: "FindLatestPublication");
             var options = builder.Options;
 
             using (var context = new ApplicationDbContext(options))
             {
+                var publications = new List<Publication>
+                {
+                    new Publication { Id = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Title = "Publication A"},
+                    new Publication {Id = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"), Title = "Publication B"},
+                };
+                
                 var releases = new List<Release>
                 {
-                    new Release {Title = "Release A"},
-                    new Release {Title = "Release B"},
+                    new Release {Id = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), PublicationId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Title = "Release A"},
+                    new Release {Id = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"), PublicationId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Title = "Release B"},
                 };
-
+                
+                context.AddRange(publications);
                 context.AddRange(releases);
                 context.SaveChanges();
             }
 
             using (var context = new ApplicationDbContext(options))
             {
-                var controller = new ReleaseController(context);
+                var service = new ReleaseService(context);
 
-                var result = controller.Get();
+                var result = service.GetLatestRelease("1003fa5c-b60a-4036-a178-e3a69a81b852");
 
-                var actionResult = Assert.IsType<ActionResult<List<Release>>>(result);
-                var model = Assert.IsAssignableFrom<List<Release>>(actionResult.Value);
-
-                Assert.Equal(2, model.Count);
+                Assert.IsType<ActionResult<Release>>(result);
             }
         }
-
+        
         [Fact]
         public void GetId_ReturnsAActionResult_WithATheme()
         {
@@ -70,9 +74,9 @@ namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Controllers
 
             using (var context = new ApplicationDbContext(options))
             {
-                var controller = new ReleaseController(context);
+                var service = new ReleaseService(context);
 
-                var result = controller.Get("1003fa5c-b60a-4036-a178-e3a69a81b852");
+                var result = service.GetRelease("1003fa5c-b60a-4036-a178-e3a69a81b852");
 
                 var actionResult = Assert.IsType<ActionResult<Release>>(result);
 
