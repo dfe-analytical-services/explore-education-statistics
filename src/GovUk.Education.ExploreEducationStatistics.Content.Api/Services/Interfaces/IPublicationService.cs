@@ -5,8 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interf
 {
     public interface IPublicationService
     {
-        ActionResult<Publication> GetPublication(string id);
-        
-        
+        Publication GetPublication(string id);
     }
 }

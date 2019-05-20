@@ -42,21 +42,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [HttpGet("publication/{id}")]
         public ActionResult<Publication> GetPublication(string id)
         {
-            return _publicationService.GetPublication(id);
+            var publication = _publicationService.GetPublication(id);
+            
+            if (publication != null)
+            {
+                return publication;
+            }
+            return NotFound();
         }
 
         // GET api/publication/5/latest
         [HttpGet("publication/{id}/latest")]
         public ActionResult<Release> GetLatestRelease(string id)
         {
-            return _releaseService.GetLatestRelease(id);
+            var release = _releaseService.GetLatestRelease(id);
+
+            if (release != null)
+            {
+                return release;
+            }
+            return NotFound();
+
         }
 
         // GET api/release/5
         [HttpGet("release/{id}")]
         public ActionResult<Release> GetRelease(string id)
         {
-            return _releaseService.GetRelease(id);
+            var release = _releaseService.GetRelease(id);
+            
+            if (release != null)
+            {
+                return release;
+            }
+            return NotFound();
         }
     }
 }

@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             _context = context;
         }
 
-        public ActionResult<Publication> GetPublication(string id)
+        public Publication GetPublication(string id)
         {
             return Guid.TryParse(id, out var newGuid)
                 ? _context.Publications.Include(x => x.Releases).Include(x => x.LegacyReleases)

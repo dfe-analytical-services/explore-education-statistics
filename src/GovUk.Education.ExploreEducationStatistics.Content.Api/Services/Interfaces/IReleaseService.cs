@@ -5,8 +5,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interf
 {
     public interface IReleaseService
     {
-        ActionResult<Release> GetRelease(string id);
+        Release GetRelease(string id);
         
-        ActionResult<Release> GetLatestRelease(string id);
+        Release GetLatestRelease(string id);
     }
 }

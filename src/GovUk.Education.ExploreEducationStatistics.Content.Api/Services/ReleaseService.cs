@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             _context = context;
         }
 
-        public ActionResult<Release> GetRelease(string id)
+        public Release GetRelease(string id)
         {
             var release = Guid.TryParse(id, out var newGuid)
                 ? _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             return release;
         } 
          
-        public ActionResult<Release> GetLatestRelease(string id)
+        public Release GetLatestRelease(string id)
         {
             Release release;
 
