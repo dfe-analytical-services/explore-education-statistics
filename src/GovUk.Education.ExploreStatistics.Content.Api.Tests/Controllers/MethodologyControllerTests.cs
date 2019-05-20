@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Controllers
     public class MethodologyControllerTests
     {
         [Fact]
-        public void Get_Tree_Returns_Ok()
+        public void Get_MethodologyTree_Returns_Ok()
         {
             var service = new Mock<IMethodologyService>();
 
@@ -29,11 +29,11 @@ namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Controllers
 
             var result = controller.GetMethedologyTree();
 
-            var actionResult = Assert.IsAssignableFrom<OkResult>(result);
+            Assert.IsAssignableFrom<OkResult>(result);
         }
 
         [Fact]
-        public void Get_Tree_Returns_NoContent()
+        public void Get_MethodologyTree_Returns_NoContent()
         {
             var service = new Mock<IMethodologyService>();
 
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Controllers
 
             var result = controller.GetMethedologyTree();
 
-            var actionResult = Assert.IsAssignableFrom<NoContentResult>(result);
+            Assert.IsAssignableFrom<NoContentResult>(result);
         }
     }
 }
