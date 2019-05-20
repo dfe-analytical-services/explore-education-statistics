@@ -40,11 +40,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             if (string.IsNullOrWhiteSpace(connectionString))
             {
                 const string connection = "Data Source=dfe-meta.db";
-                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connection));
+                
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options
+                        .UseSqlite(connection,
+                            builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
+                        .EnableSensitiveDataLogging()
+                );
             }
             else
             {
-                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options
+                        .UseSqlServer(connectionString,
+                            builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName)));
             }
 
             // Adds Brotli and Gzip compressing
