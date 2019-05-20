@@ -31,21 +31,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         // GET api/publication/5
-        [HttpGet("{id}")]
+        [HttpGet("publication/{id}")]
         public ActionResult<Publication> GetPublication(string id)
         {
             return _publicationService.GetPublication(id);
         }
 
         // GET api/publication/5/latest
-        [HttpGet("{id}/latest")]
+        [HttpGet("publication/{id}/latest")]
         public ActionResult<Release> GetLatestRelease(string id)
         {
             return _releaseService.GetLatestRelease(id);
         }
 
         // GET api/release/5
-        [HttpGet("{id}")]
+        [HttpGet("release/{id}")]
         public ActionResult<Release> GetRelease(string id)
         {
             return _releaseService.GetRelease(id);
