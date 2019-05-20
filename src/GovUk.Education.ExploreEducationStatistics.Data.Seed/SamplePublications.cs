@@ -63,6 +63,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                 }
             },
             {
+                "early_years_foundation_stage_profile_data", new Publication
+                {
+                    PublicationId = new Guid("fcda2962-82a6-4052-afa2-ea398c53c85f"),
+                    Name = "Early years foundation stage profile data",
+                    Releases = new[]
+                    {
+                        new Release
+                        {
+                            PublicationId = new Guid("fcda2962-82a6-4052-afa2-ea398c53c85f"),
+                            ReleaseDate = new DateTime(2019, 5, 20),
+                            Name = "2017/18",
+                            Subjects = new[]
+                            {
+                                new Subject
+                                {
+                                    Filename = DataCsvFilename.EYFSP_ELG_underlying_data_2013_2018,
+                                    Name = "ELG underlying data 2013 - 2018"
+                                },
+                                new Subject
+                                {
+                                    Filename = DataCsvFilename.EYFSP_areas_of_learning_underlying_data_2013_2018,
+                                    Name = "Areas of learning underlying data 2013 - 2018"
+                                },
+                                new Subject
+                                {
+                                    Filename = DataCsvFilename.EYFSP_APS_GLD_ELG_underlying_data_2013_2018,
+                                    Name = "APS GLD ELG underlying data 2013 - 2018"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {
                 "exclusions", new Publication
                 {
                     PublicationId = new Guid("8345e27a-7a32-4b20-a056-309163bdf9c4"),
@@ -71,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                     {
                         new Release
                         {
-                            PublicationId = new Guid("22ca9a1e-4b6c-496f-b025-edd2dcf49e7a"),
+                            PublicationId = new Guid("8345e27a-7a32-4b20-a056-309163bdf9c4"),
                             ReleaseDate = new DateTime(2018, 7, 19),
                             Name = "2016/17",
                             Subjects = new[]
@@ -105,6 +139,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                 {
                                     Filename = DataCsvFilename.exclusions_total_days_missed_fixed_exclusions,
                                     Name = "Total days missed due to fixed period exclusions"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "school_applications_and_offers", new Publication
+                {
+                    PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
+                    Name = "School applications and offers",
+                    Releases = new[]
+                    {
+                        new Release
+                        {
+                            PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
+                            ReleaseDate = new DateTime(2019, 4, 29),
+                            Name = "2018",
+                            Subjects = new[]
+                            {
+                                new Subject
+                                {
+                                    Filename = DataCsvFilename.school_applications_and_offers,
+                                    Name = "Applications and offers by school phase"
                                 }
                             }
                         }
