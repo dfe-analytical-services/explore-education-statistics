@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
             services.AddLogging(builder => builder.AddConsole().AddConfiguration(configuration.GetSection("Logging")))
                 .AddDbContext<ApplicationDbContext>(options =>
                     options
-                        .UseSqlServer("Server=db;Database=master;User=SA;Password=Your_Password123;")
+                        .UseSqlServer("Server=localhost;Database=master;User=SA;Password=Your_Password123;")
                         .EnableSensitiveDataLogging()
                 )
                 .AddTransient<ImporterFilterService>()

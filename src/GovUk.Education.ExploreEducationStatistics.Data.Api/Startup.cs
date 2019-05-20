@@ -55,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             });
 
             services.AddTransient<IResultBuilder<Observation, TableBuilderObservationViewModel>, ResultBuilder>();
+            services.AddTransient<ICombinedService, CombinedService>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
             services.AddTransient<IMetaService, MetaService>();
 
