@@ -1,9 +1,21 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
     public class Methodology
     {
-        public Guid Id { get; set; }
+        [Key] [Required] public Guid Id { get; set; }
+
+        [Required] public string Title { get; set; }
+        
+        public string Summary { get; set; }
+        
+        public DateTime? Published { get; set; }
+ 
+        public List<ContentSection> Content { get; set; }
+        
+        public List<ContentSection> Annexes { get; set; }
     }
 }
