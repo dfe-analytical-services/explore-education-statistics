@@ -20,7 +20,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [HttpGet("tree")]
         public ActionResult GetMethedologyTree()
         {
-            return new OkResult();
+            var tree = _service.GetTree();
+
+            if (tree.Any())
+            {
+                return new OkResult();
+            }
+
+            return new NoContentResult();
         }
     }
 }

@@ -16,6 +16,28 @@ namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Controllers
             var service = new Mock<IMethodologyService>();
 
             service.Setup(s => s.GetTree()).Returns(
+                new List<ThemeTree>
+                {
+                    new ThemeTree
+                    {
+                        Title = "Theme A"
+                    }
+                }
+            );
+
+            var controller = new MethodologyController(service.Object);
+
+            var result = controller.GetMethedologyTree();
+
+            var actionResult = Assert.IsAssignableFrom<OkResult>(result);
+        }
+
+        [Fact]
+        public void Get_Tree_Returns_NoContent()
+        {
+            var service = new Mock<IMethodologyService>();
+
+            service.Setup(s => s.GetTree()).Returns(
                 new List<ThemeTree>()
                 );
 
@@ -24,7 +46,7 @@ namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Controllers
 
             var result = controller.GetMethedologyTree();
 
-            var actionResult = Assert.IsAssignableFrom<ActionResult>(result);
+            var actionResult = Assert.IsAssignableFrom<NoContentResult>(result);
         }
     }
 }
