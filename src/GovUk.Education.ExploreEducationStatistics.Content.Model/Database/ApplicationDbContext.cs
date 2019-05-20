@@ -16,6 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         {
         }
 
+        public DbSet<Methodology> Methodologies { get; set; }        
         public DbSet<Theme> Themes { get; set; }
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Publication> Publications { get; set; }
@@ -23,6 +24,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Methodology>()
+                .Property(b => b.Content)
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
+            modelBuilder.Entity<Methodology>()
+                .Property(b => b.Annexes)
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
+            
             modelBuilder.Entity<Release>()
                 .Property(b => b.Content)
                 .HasConversion(
@@ -187,9 +199,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 },
                 new Publication
                 {
-                    Id = new Guid("bfdcaae1-ce6b-4f63-9b2b-0a1f3942887f"), 
+                    Id = new Guid("bfdcaae1-ce6b-4f63-9b2b-0a1f3942887f"),
                     Title = "GCSE and equivalent results in England",
-                    Summary = "View statistics, create charts and tables and download data files for GCSE and equivalent results in England", 
+                    Summary =
+                        "View statistics, create charts and tables and download data files for GCSE and equivalent results in England",
                     TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"),
                     Slug = "gcse-and-equivalent-results-in-england"
                 },
@@ -266,19 +279,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Published = new DateTime(2017, 3, 22),
                     Slug = "2016-17",
-                    Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas. \n\n",
+                    Summary =
+                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas. \n\n",
 
                     KeyStatistics = new DataBlock
                     {
-
                         DataBlockRequest = new DataBlockRequest
                         {
-                            subjectId= 1,
-                            geographicLevel= "National",
-                            startYear= "2016",
-                            endYear= "2017",
-                            filters= new List<string>{"1","2"},
-                            indicators= new List<string>{"23", "26", "28"}
+                            subjectId = 1,
+                            geographicLevel = "National",
+                            startYear = "2016",
+                            endYear = "2017",
+                            filters = new List<string> {"1", "2"},
+                            indicators = new List<string> {"23", "26", "28"}
                         },
 
                         Summary = new Summary
@@ -288,7 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 "23",
                                 "26",
                                 "28"
-                            },                                                        
+                            },
 
                             description = new MarkDownBlock
                             {
@@ -329,16 +342,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     Heading = null,
                                     DataBlockRequest = new DataBlockRequest
                                     {
-                                        subjectId= 1,
-                                        geographicLevel= "National",
-                                        startYear= "2012",
-                                        endYear= "2017",
-                                        filters= new List<string>{"1","2"},
-                                        indicators= new List<string>{"23", "26", "28"}
+                                        subjectId = 1,
+                                        geographicLevel = "National",
+                                        startYear = "2012",
+                                        endYear = "2017",
+                                        filters = new List<string> {"1", "2"},
+                                        indicators = new List<string> {"23", "26", "28"}
                                     },
-                                    Tables = new List<Table> {
-                                        new Table {
-                                            indicators = new List<string> { "23", "26", "28" }
+                                    Tables = new List<Table>
+                                    {
+                                        new Table
+                                        {
+                                            indicators = new List<string> {"23", "26", "28"}
                                         }
                                     },
                                     Charts = new List<IContentBlockChart>
@@ -355,7 +370,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             },
                                             Indicators = new List<string>
                                             {
-                                                "23","26","28"
+                                                "23", "26", "28"
                                             },
                                         }
                                     }
@@ -456,7 +471,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Published = new DateTime(2016, 3, 25),
                     Slug = "2015-16",
-                    Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
+                    Summary =
+                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
 
                     KeyStatistics = new DataBlock
                     {
@@ -497,11 +513,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Published = new DateTime(2018, 7, 19),
                     Slug = "2016-17",
-                    Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of permanent and fixed-period exclusion subject areas. \n\n" +
-                              "You can also view a regional breakdown of statistics and data within the [local authorities section](#contents-sections-heading-9)",
+                    Summary =
+                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of permanent and fixed-period exclusion subject areas. \n\n" +
+                        "You can also view a regional breakdown of statistics and data within the [local authorities section](#contents-sections-heading-9)",
                     KeyStatistics = new DataBlock
                     {
-                        
                         Summary = new Summary
                         {
                             dataKeys = new List<string>
@@ -513,10 +529,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
                             description = new MarkDownBlock
                             {
-                                Body = " * overall rate of permanent exclusions has increased from 0.08 per cent of pupil enrolments in 2015/16 to 0.10 per cent in 2016/17 \n" +
-                                       " * number of exclusions has also increased, from 6,685 to 7,720 \n" +
-                                       " * overall rate of fixed period exclusions increased, from 4.29 per cent of pupil enrolments in 2015/16 to 4.76 per cent in 2016/17 \n" +
-                                       " * number of exclusions has also increased, from 339,360 to 381,865. \n"
+                                Body =
+                                    " * overall rate of permanent exclusions has increased from 0.08 per cent of pupil enrolments in 2015/16 to 0.10 per cent in 2016/17 \n" +
+                                    " * number of exclusions has also increased, from 6,685 to 7,720 \n" +
+                                    " * overall rate of fixed period exclusions increased, from 4.29 per cent of pupil enrolments in 2015/16 to 4.76 per cent in 2016/17 \n" +
+                                    " * number of exclusions has also increased, from 339,360 to 381,865. \n"
                             }
                         }
                     },
@@ -715,9 +732,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     PublicationId = new Guid("bfdcaae1-ce6b-4f63-9b2b-0a1f3942887f"),
                     Published = new DateTime(2018, 6, 20),
                     Slug = "2016-17",
-                    Summary = "This statistical first release (SFR) provides information on the achievements in GCSE examinations and other qualifications of young people in academic year 2016 to 2017. This typically covers those starting the academic year aged 15. \n\n" +
-                              "You can also view a regional breakdown of statistics and data within the [local authorities section](#contents-sections-content-6) \n\n" +
-                              "[Find out more about our GCSE and equivalent results methodology and terminology](#extra-information-sections-heading-1)",
+                    Summary =
+                        "This statistical first release (SFR) provides information on the achievements in GCSE examinations and other qualifications of young people in academic year 2016 to 2017. This typically covers those starting the academic year aged 15. \n\n" +
+                        "You can also view a regional breakdown of statistics and data within the [local authorities section](#contents-sections-content-6) \n\n" +
+                        "[Find out more about our GCSE and equivalent results methodology and terminology](#extra-information-sections-heading-1)",
                     KeyStatistics = new DataBlock
                     {
                         Heading = "Latest headline facts and figures - 2016 to 2017",
@@ -747,24 +765,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new ContentSection
                         {
-                            Order = 1, 
-                            Heading = "About this release", 
+                            Order = 1,
+                            Heading = "About this release",
                             Caption = "",
                             Content = new List<IContentBlock>
                             {
                                 new MarkDownBlock
                                 {
-                                    Body ="This release shows results for GCSE and equivalent Key Stage 4 (KS4) qualifications in 2018 across a range of measures, broken down by pupil characteristics and education institutions. Results are also provided on schools below the floor standards and meeting the coasting definition.  \n\n" +
-                                          "This is an update to Provisional figures released in October 2018. Users should be careful when comparing headline measures to results in previous years given recent methodological changes \n\n" +
-                                          "Figures are available at national, regional, local authority, and school level. Figures held in this release are used for policy development and count towards the secondary performance tables. Schools and local authorities also use the statistics to compare their local performance to regional and national averages for different pupil groups."
+                                    Body =
+                                        "This release shows results for GCSE and equivalent Key Stage 4 (KS4) qualifications in 2018 across a range of measures, broken down by pupil characteristics and education institutions. Results are also provided on schools below the floor standards and meeting the coasting definition.  \n\n" +
+                                        "This is an update to Provisional figures released in October 2018. Users should be careful when comparing headline measures to results in previous years given recent methodological changes \n\n" +
+                                        "Figures are available at national, regional, local authority, and school level. Figures held in this release are used for policy development and count towards the secondary performance tables. Schools and local authorities also use the statistics to compare their local performance to regional and national averages for different pupil groups."
                                 }
                             }
                         },
                         new ContentSection
                         {
-                            Order = 2, 
+                            Order = 2,
                             Heading = "School performance for 2018",
-                            Caption = "School performance for 2018 shows small increases across all headline measures compared to 2017",
+                            Caption =
+                                "School performance for 2018 shows small increases across all headline measures compared to 2017",
                             Content = new List<IContentBlock>
                             {
                                 new DataBlock
@@ -773,43 +793,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 },
                                 new MarkDownBlock
                                 {
-                                    Body = "Results for 2018 show an increases across all headline measures compared to 2017. **When drawing comparison over time, however, it is very important to note any changes to methodology or data changes underpinning these measures**. For example, changes in Attainment 8 may have been affected by the introduction of further reformed GCSEs graded on the 9-1 scale which have a higher maximum score than unreformed GCSEs. Similarly, in 2016 there were significant changes to the Attainment in English and Maths measure. \n\n" +
-                                           "These results cover state-funded schools but results for all schools are available in the supporting tables and show slightly lower performance across all headline measures on average. Differences between the figures for all schools and state-funded schools are primarily due to the impact of unapproved and unregulated qualifications such as international GCSEs taken more commonly in independent schools. These qualification are not included in school performance tables. \n\n" +
-                                           "There are five primary headline measures used throughout this report: \n" +
-                                           " * **Attainment8** - measures the average achievement of pupils in up to 8 qualifications (including English and Maths). \n" +
-                                           " * **Attainment in English & Maths (9-5)** - measures the percentage of pupils achieving a grade 5 or above in both English and maths.\n" +
-                                           " * **EBacc Entries** – measure the percentage of pupils reaching the English Baccalaureate (EBacc) attainment threshold in core academic subjects at key stage 4. The EBacc is made up of English, maths, science, a language, and history or geography. \n" +
-                                           " * **EBacc Average Point Score (APS)** – measures pupils’ point scores across the five pillars of the EBacc, ensuring the attainment of all pupils is recognised. New measure from 2018, replacing the previous threshold EBacc attainment measure. \n" +
-                                           " * **Progress** - measures the progress a pupil makes from the end of key stage 2 to the end of key stage 4. It compares pupils’ Attainment 8 score with the average for all pupils nationally who had a similar starting point. Progress 8 is a relative measure, therefore the national average Progress 8 score for mainstream schools is very close to zero. "
+                                    Body =
+                                        "Results for 2018 show an increases across all headline measures compared to 2017. **When drawing comparison over time, however, it is very important to note any changes to methodology or data changes underpinning these measures**. For example, changes in Attainment 8 may have been affected by the introduction of further reformed GCSEs graded on the 9-1 scale which have a higher maximum score than unreformed GCSEs. Similarly, in 2016 there were significant changes to the Attainment in English and Maths measure. \n\n" +
+                                        "These results cover state-funded schools but results for all schools are available in the supporting tables and show slightly lower performance across all headline measures on average. Differences between the figures for all schools and state-funded schools are primarily due to the impact of unapproved and unregulated qualifications such as international GCSEs taken more commonly in independent schools. These qualification are not included in school performance tables. \n\n" +
+                                        "There are five primary headline measures used throughout this report: \n" +
+                                        " * **Attainment8** - measures the average achievement of pupils in up to 8 qualifications (including English and Maths). \n" +
+                                        " * **Attainment in English & Maths (9-5)** - measures the percentage of pupils achieving a grade 5 or above in both English and maths.\n" +
+                                        " * **EBacc Entries** – measure the percentage of pupils reaching the English Baccalaureate (EBacc) attainment threshold in core academic subjects at key stage 4. The EBacc is made up of English, maths, science, a language, and history or geography. \n" +
+                                        " * **EBacc Average Point Score (APS)** – measures pupils’ point scores across the five pillars of the EBacc, ensuring the attainment of all pupils is recognised. New measure from 2018, replacing the previous threshold EBacc attainment measure. \n" +
+                                        " * **Progress** - measures the progress a pupil makes from the end of key stage 2 to the end of key stage 4. It compares pupils’ Attainment 8 score with the average for all pupils nationally who had a similar starting point. Progress 8 is a relative measure, therefore the national average Progress 8 score for mainstream schools is very close to zero. "
                                 }
                             }
                         },
                         new ContentSection
                         {
-                            Order = 3, 
+                            Order = 3,
                             Heading = "Schools meeting the coasting and floor standard",
                             Caption = "Over 250 schools failed to support pupils to fulfil their potential in 2018",
                             Content = new List<IContentBlock>
                             {
                                 new DataBlock
                                 {
-                                    Heading = "There is wide variation in the percentage of schools meeting the coasting and floor standard by region"
+                                    Heading =
+                                        "There is wide variation in the percentage of schools meeting the coasting and floor standard by region"
                                 },
                                 new MarkDownBlock
                                 {
-                                    Body ="The floor and coasting standards give measures of whether schools are helping pupils to fulfil their potential based on progress measures. The floor standard is based on results in the most recent year, whereas the Coasting definition looks at slightly different measures over the past three years. Only state-funded mainstream schools are covered by these measures, subject to certain eligibility criteria. \n" +
-                                          "* **11.6%** of eligible schools were below the floor standard in 2018. This represents 346 schools\n" +
-                                          "* **9.2%** of eligible schools met the coasting definition in 2018. This represents 257 schools \n" +
-                                          "* **161** schools were both coating and below the floor standard \n" +
-                                          "* due to methodological changes no directly comparable measures exist for previous years \n"
+                                    Body =
+                                        "The floor and coasting standards give measures of whether schools are helping pupils to fulfil their potential based on progress measures. The floor standard is based on results in the most recent year, whereas the Coasting definition looks at slightly different measures over the past three years. Only state-funded mainstream schools are covered by these measures, subject to certain eligibility criteria. \n" +
+                                        "* **11.6%** of eligible schools were below the floor standard in 2018. This represents 346 schools\n" +
+                                        "* **9.2%** of eligible schools met the coasting definition in 2018. This represents 257 schools \n" +
+                                        "* **161** schools were both coating and below the floor standard \n" +
+                                        "* due to methodological changes no directly comparable measures exist for previous years \n"
                                 }
                             }
                         },
                         new ContentSection
                         {
-                            Order = 4, 
+                            Order = 4,
                             Heading = "Pupil characteristics",
-                            Caption = "Disadvantaged pupils and those with Special Education Needs continue to do less well than their peers",
+                            Caption =
+                                "Disadvantaged pupils and those with Special Education Needs continue to do less well than their peers",
                             Content = new List<IContentBlock>
                             {
                                 new DataBlock
@@ -818,12 +842,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 },
                                 new MarkDownBlock
                                 {
-                                    Body = "Breakdowns by pupil characteristics show that across all headline measures: \n" +
-                                           "* girls continue to do better than boys \n" +
-                                           "* non-disadvantaged pupils continue to do better than disadvantaged pupils \n" +
-                                           "* pupils with no identified Special Educational Needs (SEN) continue to do better perform than SEN pupils \n" +
-                                           "In general the pattern of attainment gaps for Attainment 8 in 2018 remained the same as in 2017 although differences in Attainment 8 scores widened slightly across all groups. This is to be expected due to changes to reformed GCSEs in 2018, meaning more points are available for higher scores.  \n\n" +
-                                           "Due to changes in performance measures over time, comparability over time is complicated. As such, for disadvantaged pupils is recommended to use to disadvantage gap index instead with is more resilient to changes in grading systems over time. The gap between disadvantaged pupils and others, measured using the gap index, has remained broadly stable, widening by 0.6% in 2018, and narrowing by 9.5% since 2011." 
+                                    Body =
+                                        "Breakdowns by pupil characteristics show that across all headline measures: \n" +
+                                        "* girls continue to do better than boys \n" +
+                                        "* non-disadvantaged pupils continue to do better than disadvantaged pupils \n" +
+                                        "* pupils with no identified Special Educational Needs (SEN) continue to do better perform than SEN pupils \n" +
+                                        "In general the pattern of attainment gaps for Attainment 8 in 2018 remained the same as in 2017 although differences in Attainment 8 scores widened slightly across all groups. This is to be expected due to changes to reformed GCSEs in 2018, meaning more points are available for higher scores.  \n\n" +
+                                        "Due to changes in performance measures over time, comparability over time is complicated. As such, for disadvantaged pupils is recommended to use to disadvantage gap index instead with is more resilient to changes in grading systems over time. The gap between disadvantaged pupils and others, measured using the gap index, has remained broadly stable, widening by 0.6% in 2018, and narrowing by 9.5% since 2011."
                                 },
                                 new DataBlock
                                 {
@@ -833,7 +858,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
-                            Order = 5, 
+                            Order = 5,
                             Heading = "Headline performance",
                             Caption = "Results across headline performance measures vary by ethnicity",
                             Content = new List<IContentBlock>
@@ -844,83 +869,93 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 },
                                 new MarkDownBlock
                                 {
-                                    Body = "Results across headline measures differ by ethnicity with Chinese pupils in particular achieving scores above the national average. \n\n" +
-                                           "Performance across headline measures increased for all major ethnic groups from 2017 to 2018, with the exception of EBacc entries for white pupils were there was a small decrease. \n\n" +
-                                           "Within the more detailed ethnic groupings, pupils from an Indian background are the highest performing group in key stage 4 headline measures other than Chinese pupils. Gypsy/Roma pupils and traveller of Irish heritage pupils are the lowest performing groups. \n\n" +
-                                           "For context, White pupils made up 75.8% of pupils at the end of key stage 4 in 2018, 10.6% were Asian, 5.5% were black, 4.7% were mixed, 0.4% were Chinese. The remainder are in smaller breakdowns or unclassified."
+                                    Body =
+                                        "Results across headline measures differ by ethnicity with Chinese pupils in particular achieving scores above the national average. \n\n" +
+                                        "Performance across headline measures increased for all major ethnic groups from 2017 to 2018, with the exception of EBacc entries for white pupils were there was a small decrease. \n\n" +
+                                        "Within the more detailed ethnic groupings, pupils from an Indian background are the highest performing group in key stage 4 headline measures other than Chinese pupils. Gypsy/Roma pupils and traveller of Irish heritage pupils are the lowest performing groups. \n\n" +
+                                        "For context, White pupils made up 75.8% of pupils at the end of key stage 4 in 2018, 10.6% were Asian, 5.5% were black, 4.7% were mixed, 0.4% were Chinese. The remainder are in smaller breakdowns or unclassified."
                                 }
                             }
                         },
                         new ContentSection
                         {
-                            Order = 6, 
+                            Order = 6,
                             Heading = "Local authority",
                             Caption = "Performance by local authority varies considerably ",
                             Content = new List<IContentBlock>
                             {
                                 new MarkDownBlock
                                 {
-                                    Body ="Performance varies considerably across the country – for Attainment 8 score per pupil there is nearly a 23 point gap between the poorest and highest performing areas. The highest performing local authorities are concentrated in London and the south with the majority of the lowest performing local authorities are located in the northern and midland regions with average Attainment 8 score per pupil show that. This is similar to patterns seen in recent years and against other performance measures. "
+                                    Body =
+                                        "Performance varies considerably across the country – for Attainment 8 score per pupil there is nearly a 23 point gap between the poorest and highest performing areas. The highest performing local authorities are concentrated in London and the south with the majority of the lowest performing local authorities are located in the northern and midland regions with average Attainment 8 score per pupil show that. This is similar to patterns seen in recent years and against other performance measures. "
                                 }
                             }
                         },
                         new ContentSection
                         {
-                            Order = 7, 
+                            Order = 7,
                             Heading = "Pupil subject areas",
-                            Caption = "Pupil subject entries are highest for science and humanities and continue to increase",
+                            Caption =
+                                "Pupil subject entries are highest for science and humanities and continue to increase",
                             Content = new List<IContentBlock>
                             {
                                 new DataBlock
                                 {
-                                    Heading = "Pupil subject entries are highest for science and humanities and continue to increase"
+                                    Heading =
+                                        "Pupil subject entries are highest for science and humanities and continue to increase"
                                 },
                                 new MarkDownBlock
                                 {
-                                    Body ="It is compulsory for pupils to study English and Maths at key stage 4 in state-funded schools.  \n " +
-                                          "### Science\n" +
-                                          "It is compulsory for schools to teach Science at Key Stage 4. For these subjects, the proportion of pupils entering continues to increase.  \n\n " +
-                                          "In 2018, 68.0% of the cohort entered the new combined science pathway rather than the individual science subjects like Chemistry, Biology, Physics or Computer Science. The general pattern is for pupils with higher prior attainment tend to take single sciences; those with lower prior attainment to opt for the combined science pathway; and those with the lowest prior attainment to take no science qualifications. \n " +
-                                          "### Humanities \n" +
-                                          "The proportion of pupils entering EBacc humanities continued to increase in 2018, to 78.3% in state-funded schools, a rise of 1.5 percentage points since 2017. This was driven by small increases in entries across the majority of prior attainment groups for geography, and small increases in entries for pupils with low and average prior attainment for history. In history, the slight increase in entries from pupils with low and average prior attainment groups was counter-balanced by continued decreases in proportion of entries for high prior attainers. This trend has continued since 2016. \n " +
-                                          "### Languages \n " +
-                                          "Entries to EBacc languages continued to decrease in 2018 to 46.1%, a fall of 1.3 percentage points compared to 2017. This was the fourth year in a row that entries have fallen. There were decreases across the majority of prior attainment bands but the largest drop occurred for pupils with higher prior attainment.. This decrease in entries for pupils with high prior attainment between 2018 and 2017 is much smaller than the drop that occurred between 2016 and 2017. Some of this drop can be explained by pupils who entered a language qualification early in a subject that was subsequently reformed in 2018. This was the case for over 3,500 pupils, whose language result did not count in 2018 performance tables.  \n " +
-                                          "### Art and design subjects \n " +
-                                          "The percentage of pupils entering at least one arts subject decreased in 2018, by 2.2 percentage points compared to equivalent data in 2017. 44.3% of pupils in state-funded schools entered at least one arts subject. This is the third consecutive year that a fall in entries has occurred. "
+                                    Body =
+                                        "It is compulsory for pupils to study English and Maths at key stage 4 in state-funded schools.  \n " +
+                                        "### Science\n" +
+                                        "It is compulsory for schools to teach Science at Key Stage 4. For these subjects, the proportion of pupils entering continues to increase.  \n\n " +
+                                        "In 2018, 68.0% of the cohort entered the new combined science pathway rather than the individual science subjects like Chemistry, Biology, Physics or Computer Science. The general pattern is for pupils with higher prior attainment tend to take single sciences; those with lower prior attainment to opt for the combined science pathway; and those with the lowest prior attainment to take no science qualifications. \n " +
+                                        "### Humanities \n" +
+                                        "The proportion of pupils entering EBacc humanities continued to increase in 2018, to 78.3% in state-funded schools, a rise of 1.5 percentage points since 2017. This was driven by small increases in entries across the majority of prior attainment groups for geography, and small increases in entries for pupils with low and average prior attainment for history. In history, the slight increase in entries from pupils with low and average prior attainment groups was counter-balanced by continued decreases in proportion of entries for high prior attainers. This trend has continued since 2016. \n " +
+                                        "### Languages \n " +
+                                        "Entries to EBacc languages continued to decrease in 2018 to 46.1%, a fall of 1.3 percentage points compared to 2017. This was the fourth year in a row that entries have fallen. There were decreases across the majority of prior attainment bands but the largest drop occurred for pupils with higher prior attainment.. This decrease in entries for pupils with high prior attainment between 2018 and 2017 is much smaller than the drop that occurred between 2016 and 2017. Some of this drop can be explained by pupils who entered a language qualification early in a subject that was subsequently reformed in 2018. This was the case for over 3,500 pupils, whose language result did not count in 2018 performance tables.  \n " +
+                                        "### Art and design subjects \n " +
+                                        "The percentage of pupils entering at least one arts subject decreased in 2018, by 2.2 percentage points compared to equivalent data in 2017. 44.3% of pupils in state-funded schools entered at least one arts subject. This is the third consecutive year that a fall in entries has occurred. "
                                 }
                             }
                         },
                         new ContentSection
                         {
-                            Order = 8, 
+                            Order = 8,
                             Heading = "Schools performance",
-                            Caption = "Across state-funded schools performance is typically higher in converter academies, the most common school type",
+                            Caption =
+                                "Across state-funded schools performance is typically higher in converter academies, the most common school type",
                             Content = new List<IContentBlock>
                             {
                                 new DataBlock
                                 {
-                                    Heading = "Across state-funded schools performance is typically higher in converter academies, the most common school type"
+                                    Heading =
+                                        "Across state-funded schools performance is typically higher in converter academies, the most common school type"
                                 },
                                 new MarkDownBlock
                                 {
-                                    Body ="Schools in England can be divided into state-funded and independent schools (funded by fees paid by attendees). Independent schools are considered separately, because the department holds state-funded schools accountable for their performance.  \n\n " +
-                                          "The vast majority of pupils in state-funded schools are in either academies (68%) or LA maintained schools (29%). *Converter academies* were high performing schools that chose to convert to academies and have on average higher attainment across the headline measures. *Sponsored academies* were schools that were low performing prior to conversion and tend to perform below the average for state-funded schools.  \n\n " +
-                                          "Between 2017 and 2018 EBacc entry remained stable for sponsored academies, with an increase of 0.1 percentage points to 30.1%. EBacc entry fell marginally for converter academies by 0.3 percentage points (from 44.2% to 43.8%). Over the same period, EBacc entry in local authority maintained schools increased by 0.2 percentage points to 37.0%."
+                                    Body =
+                                        "Schools in England can be divided into state-funded and independent schools (funded by fees paid by attendees). Independent schools are considered separately, because the department holds state-funded schools accountable for their performance.  \n\n " +
+                                        "The vast majority of pupils in state-funded schools are in either academies (68%) or LA maintained schools (29%). *Converter academies* were high performing schools that chose to convert to academies and have on average higher attainment across the headline measures. *Sponsored academies* were schools that were low performing prior to conversion and tend to perform below the average for state-funded schools.  \n\n " +
+                                        "Between 2017 and 2018 EBacc entry remained stable for sponsored academies, with an increase of 0.1 percentage points to 30.1%. EBacc entry fell marginally for converter academies by 0.3 percentage points (from 44.2% to 43.8%). Over the same period, EBacc entry in local authority maintained schools increased by 0.2 percentage points to 37.0%."
                                 }
                             }
                         },
                         new ContentSection
                         {
-                            Order = 9, 
+                            Order = 9,
                             Heading = "Attainment",
-                            Caption = "Multi-academy trust schools generally perform below national averages, but typically face greater challenges.",
+                            Caption =
+                                "Multi-academy trust schools generally perform below national averages, but typically face greater challenges.",
                             Content = new List<IContentBlock>
                             {
                                 new MarkDownBlock
                                 {
-                                    Body ="Academies are state schools directly funded by the government, each belonging to a trust. Multi-Academy Trusts (MATs) can be responsible for a group of academies and cover around 13.6% of state-funded mainstream pupils. Most MATs are responsible for between 3 and 5 schools but just over 10% cover 11 or more schools.  \n\n" +
-                                          "Generally speaking MATs are typically more likely to cover previously poor-performing schools and pupils are more likely to have lower prior attainment, be disadvantaged, have special educational needs (SEN) or have English as an additional language (EAL) than the national average. \n\n" +
-                                          "The number of eligible MATs included in Key Stage 4 measures increased from 62 in 2017 to 85 in 2018. This is an increase from 384 to 494 schools, and from 54,356 to 69,169 pupils. "
+                                    Body =
+                                        "Academies are state schools directly funded by the government, each belonging to a trust. Multi-Academy Trusts (MATs) can be responsible for a group of academies and cover around 13.6% of state-funded mainstream pupils. Most MATs are responsible for between 3 and 5 schools but just over 10% cover 11 or more schools.  \n\n" +
+                                        "Generally speaking MATs are typically more likely to cover previously poor-performing schools and pupils are more likely to have lower prior attainment, be disadvantaged, have special educational needs (SEN) or have English as an additional language (EAL) than the national average. \n\n" +
+                                        "The number of eligible MATs included in Key Stage 4 measures increased from 62 in 2017 to 85 in 2018. This is an increase from 384 to 494 schools, and from 54,356 to 69,169 pupils. "
                                 },
                                 new DataBlock
                                 {
@@ -928,9 +963,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 },
                                 new MarkDownBlock
                                 {
-                                    Body ="On Progress8 measures, in 2018, 32.9% of MATs were below the national average and 7.1% well below average. 29.4% were not above or below the national average by a statistically significant amount. \n\n" +
-                                          "Entry rate in EBacc is lower in MATs compared to the national average – in 2018 43.5% of MATs had an entry rate higher than the national average of 39.1%. The EBacc average point score is also lower in MATs – 32.9% of MATs had an APS higher than the national average. \n\n" +
-                                          "Analysis by characteristics shows that in 2018 disadvantaged pupils in MATs made more progress than the national average for disadvantaged. However, non-disadvantaged pupils, SEN and non-SEN pupils, pupils with English as a first language and high prior attainment pupils made less progress than the national average for their respective group."
+                                    Body =
+                                        "On Progress8 measures, in 2018, 32.9% of MATs were below the national average and 7.1% well below average. 29.4% were not above or below the national average by a statistically significant amount. \n\n" +
+                                        "Entry rate in EBacc is lower in MATs compared to the national average – in 2018 43.5% of MATs had an entry rate higher than the national average of 39.1%. The EBacc average point score is also lower in MATs – 32.9% of MATs had an APS higher than the national average. \n\n" +
+                                        "Analysis by characteristics shows that in 2018 disadvantaged pupils in MATs made more progress than the national average for disadvantaged. However, non-disadvantaged pupils, SEN and non-SEN pupils, pupils with English as a first language and high prior attainment pupils made less progress than the national average for their respective group."
                                 }
                             }
                         },
@@ -1192,6 +1228,114 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Description = "January 2010",
                     Url =
                         "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2010"
+                }
+            );
+
+            modelBuilder.Entity<Methodology>().HasData(
+                new Methodology
+                {
+                    Id = new Guid("caa8e56f-41d2-4129-a5c3-53b051134bd7"),
+                    Title = "Pupil absence statistics: methodology",
+                    Published = new DateTime(2018, 3, 22),
+                    Summary = "Find out about the methodology behind pupil absence statistics and data and how and why they're collected and published.",
+                    PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+                    Content = new List<ContentSection>
+                    {
+                        new ContentSection
+                        {
+                            Heading = "1. Overview of absence statistics",
+                            Caption = "",
+                            Order = 1,
+                            Content = new List<IContentBlock>()
+                        },
+                        new ContentSection
+                        {
+                            Heading = "2. National Statistics badging",
+                            Caption = "",
+                            Order = 2,
+                            Content = new List<IContentBlock>()
+                        },
+                        new ContentSection
+                        {
+                            Heading = "3. Methodology",
+                            Caption = "",
+                            Order = 3,
+                            Content = new List<IContentBlock>()
+                        },
+                        new ContentSection
+                        {
+                            Heading = "4. Data collection",
+                            Caption = "",
+                            Order = 4,
+                            Content = new List<IContentBlock>()
+                        },
+                        new ContentSection
+                        {
+                            Heading = "5. Data processing",
+                            Caption = "",
+                            Order = 5,
+                            Content = new List<IContentBlock>()
+                        },
+                        new ContentSection
+                        {
+                            Heading = "6. Data quality",
+                            Caption = "",
+                            Order = 6,
+                            Content = new List<IContentBlock>()
+                        },
+                        new ContentSection
+                        {
+                            Heading = "7. Contacts",
+                            Caption = "",
+                            Order = 7,
+                            Content = new List<IContentBlock>()
+                        }
+                    },
+                    Annexes = new List<ContentSection>
+                    {
+                        new ContentSection
+                        {
+                            Heading = "Annex A - Glossary",
+                            Caption = "",
+                            Order = 1,
+                            Content = new List<IContentBlock>()
+                        },
+                        new ContentSection
+                        {
+                            Heading = "Annex B - Calculations",
+                            Caption = "",
+                            Order = 2,
+                            Content = new List<IContentBlock>()
+                        },
+                        new ContentSection
+                        {
+                            Heading = "Annex C - School attendance codes",
+                            Caption = "",
+                            Order = 3,
+                            Content = new List<IContentBlock>()
+                        },
+                        new ContentSection
+                        {
+                            Heading = "Annex D - Links to pupil absence national statistics and data",
+                            Caption = "",
+                            Order = 4,
+                            Content = new List<IContentBlock>()
+                        },
+                        new ContentSection
+                        {
+                            Heading = "Annex E - Standard breakdowns",
+                            Caption = "",
+                            Order = 5,
+                            Content = new List<IContentBlock>()
+                        },
+                        new ContentSection
+                        {
+                            Heading = "Annex F - Timeline",
+                            Caption = "",
+                            Order = 6,
+                            Content = new List<IContentBlock>()
+                        }
+                    },
                 }
             );
         }

@@ -3,14 +3,16 @@ using System;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190520161407_MethodologyModel")]
+    partial class MethodologyModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -213,18 +215,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                     b.HasIndex("PublicationId");
 
                     b.ToTable("Methodologies");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("caa8e56f-41d2-4129-a5c3-53b051134bd7"),
-                            Annexes = "[{\"Order\":1,\"Heading\":\"Annex A - Glossary\",\"Caption\":\"\",\"Content\":[]},{\"Order\":2,\"Heading\":\"Annex B - Calculations\",\"Caption\":\"\",\"Content\":[]},{\"Order\":3,\"Heading\":\"Annex C - School attendance codes\",\"Caption\":\"\",\"Content\":[]},{\"Order\":4,\"Heading\":\"Annex D - Links to pupil absence national statistics and data\",\"Caption\":\"\",\"Content\":[]},{\"Order\":5,\"Heading\":\"Annex E - Standard breakdowns\",\"Caption\":\"\",\"Content\":[]},{\"Order\":6,\"Heading\":\"Annex F - Timeline\",\"Caption\":\"\",\"Content\":[]}]",
-                            Content = "[{\"Order\":1,\"Heading\":\"1. Overview of absence statistics\",\"Caption\":\"\",\"Content\":[]},{\"Order\":2,\"Heading\":\"2. National Statistics badging\",\"Caption\":\"\",\"Content\":[]},{\"Order\":3,\"Heading\":\"3. Methodology\",\"Caption\":\"\",\"Content\":[]},{\"Order\":4,\"Heading\":\"4. Data collection\",\"Caption\":\"\",\"Content\":[]},{\"Order\":5,\"Heading\":\"5. Data processing\",\"Caption\":\"\",\"Content\":[]},{\"Order\":6,\"Heading\":\"6. Data quality\",\"Caption\":\"\",\"Content\":[]},{\"Order\":7,\"Heading\":\"7. Contacts\",\"Caption\":\"\",\"Content\":[]}]",
-                            PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                            Published = new DateTime(2018, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Summary = "Find out about the methodology behind pupil absence statistics and data and how and why they're collected and published.",
-                            Title = "Pupil absence statistics: methodology"
-                        });
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", b =>
