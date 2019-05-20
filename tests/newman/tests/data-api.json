@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "3acda884-fdd5-4112-8e19-7f5023fb72ca",
+		"_postman_id": "f437045e-4906-4b7f-aeba-65d21ca057fc",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -48,6 +48,10 @@
 									"request": {
 										"method": "GET",
 										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject/1",
 											"host": [
@@ -96,6 +100,10 @@
 									"request": {
 										"method": "GET",
 										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject/2",
 											"host": [
@@ -144,6 +152,10 @@
 									"request": {
 										"method": "GET",
 										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject/3",
 											"host": [
@@ -192,6 +204,10 @@
 									"request": {
 										"method": "GET",
 										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject/4",
 											"host": [
@@ -240,6 +256,10 @@
 									"request": {
 										"method": "GET",
 										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject/5",
 											"host": [
@@ -288,6 +308,10 @@
 									"request": {
 										"method": "GET",
 										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject/6",
 											"host": [
@@ -336,6 +360,10 @@
 									"request": {
 										"method": "GET",
 										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject/7",
 											"host": [
@@ -377,6 +405,10 @@
 									"request": {
 										"method": "GET",
 										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject/8",
 											"host": [
@@ -828,6 +860,10 @@
 							"request": {
 								"method": "GET",
 								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{data_api_url}}/meta/publication/{{publication_id}}",
 									"host": [
@@ -2516,7 +2552,7 @@
 									"});",
 									"",
 									"pm.test(\"Location count matches the expected count\", function () {",
-									"    pm.expect(pm.response.json().locationCount).to.equal(520);",
+									"    pm.expect(pm.response.json().locationCount).to.equal(530);",
 									"});",
 									"",
 									"pm.test(\"Observation count matches the expected count\", function () {",
@@ -2542,6 +2578,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{data_api_url}}/debug/report",
 							"host": [
