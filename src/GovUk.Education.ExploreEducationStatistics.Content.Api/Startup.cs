@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
+﻿using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -67,10 +68,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             services.AddCors();
-
+            services.AddAutoMapper();
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IMethodologyService, MethodologyService>();
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
