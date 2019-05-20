@@ -1,6 +1,7 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
@@ -14,6 +15,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             _context = context;
         }
 
+        public Methodology Get(string slug)
+        {
+            return null;
+        }
+        
         public List<ThemeTree> GetTree()
         {
             var tree = _context.Themes.Select(t => new ThemeTree
