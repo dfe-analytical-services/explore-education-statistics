@@ -60,6 +60,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddCors();
 
             services.AddTransient<IContentService, ContentService>();
+            services.AddTransient<IMethedologyService, MethedologyService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
