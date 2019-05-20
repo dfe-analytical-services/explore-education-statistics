@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9a45862c-b949-4bf8-9015-7cd0ade5b641",
+		"_postman_id": "3acda884-fdd5-4112-8e19-7f5023fb72ca",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -676,7 +676,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tSubjectId: 2,\n\tStartYear: 2014,\n\tEndYear: 2014,\n\tLocalAuthorities: [\"201\"]\n}"
+											"raw": "{\n\tSubjectId: 2,\n\tStartYear: 2014,\n\tEndYear: 2014,\n\tLocalAuthorities: [\"E09000001\"]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -734,20 +734,19 @@
 													"",
 													"pm.test(\"Number of location options should be correct\", function() {",
 													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations.Regional.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations.LocalAuthority.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations).to.not.have.property(\"Regional\");",
+													"    pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthority\");",
 													"    pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthorityDistrict\");",
 													"});",
 													"",
 													"pm.test(\"Expect indicators to have correct properties\", function () {",
-													"    pm.expect(pm.response.json().indicators).to.have.property(\"AbsenceFields\");",
-													"    pm.expect(pm.response.json().indicators.AbsenceFields.options.length).to.equal(11);",
+													"    pm.expect(Object.keys(pm.response.json().indicators).length).to.equal(1);",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"EnrolmentsByAbsencePercentageBand\");",
+													"    pm.expect(pm.response.json().indicators.EnrolmentsByAbsencePercentageBand.options.length).to.equal(6);",
 													"    ",
-													"    pm.expect(pm.response.json().indicators).to.have.property(\"AbsenceByReason\");",
-													"    pm.expect(pm.response.json().indicators.AbsenceByReason.options.length).to.equal(16);",
-													"    ",
-													"    pm.expect(pm.response.json().indicators).to.have.property(\"AbsenceForPersistentAbsentees\");",
-													"    pm.expect(pm.response.json().indicators.AbsenceForPersistentAbsentees.options.length).to.equal(7);",
+													"    pm.expect(pm.response.json().indicators).to.not.have.property(\"AbsenceFields\");",
+													"    pm.expect(pm.response.json().indicators).to.not.have.property(\"AbsenceByReason\");",
+													"    pm.expect(pm.response.json().indicators).to.not.have.property(\"AbsenceForPersistentAbsentees\");",
 													"});"
 												],
 												"type": "text/javascript"
@@ -1126,7 +1125,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"localAuthorities\": [\n    \t\"212\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        3, 4\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"localAuthorities\": [\n    \t\"E09000032\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        3, 4\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1603,7 +1602,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"localAuthorities\": [ \"301\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        214, 215, 216\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"localAuthorities\": [ \"E09000002\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        214, 215, 216\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1918,7 +1917,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Local_Authority\",\n    \"countries\": [ \"E92000001\" ],\n    \"regions\": [ \"E13000001\", \"E13000002\" ],\n    \"localAuthorities\": [ \"201\", \"301\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        258, 259\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Local_Authority\",\n    \"countries\": [ \"E92000001\" ],\n    \"regions\": [ \"E13000001\", \"E13000002\" ],\n    \"localAuthorities\": [ \"E09000001\", \"E09000002\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        258, 259\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2509,31 +2508,31 @@
 								"id": "90830933-d7da-4502-b316-ed7887c913cf",
 								"exec": [
 									"pm.test(\"Filter count matches the expected count\", function () {",
-									"    pm.expect(pm.response.json().filterCount).to.equal(15);",
+									"    pm.expect(pm.response.json().filterCount).to.equal(32);",
 									"});",
 									"",
 									"pm.test(\"Indicator count matches the expected count\", function () {",
-									"    pm.expect(pm.response.json().indicatorCount).to.equal(145);",
+									"    pm.expect(pm.response.json().indicatorCount).to.equal(225);",
 									"});",
 									"",
 									"pm.test(\"Location count matches the expected count\", function () {",
-									"    pm.expect(pm.response.json().locationCount).to.equal(492);",
+									"    pm.expect(pm.response.json().locationCount).to.equal(520);",
 									"});",
 									"",
 									"pm.test(\"Observation count matches the expected count\", function () {",
-									"    pm.expect(pm.response.json().observationCount).to.equal(648919);",
+									"    pm.expect(pm.response.json().observationCount).to.equal(1183284);",
 									"});",
 									"",
 									"pm.test(\"Release count matches the expected count\", function () {",
-									"    pm.expect(pm.response.json().releaseCount).to.equal(1);",
+									"    pm.expect(pm.response.json().releaseCount).to.equal(4);",
 									"});",
 									"",
 									"pm.test(\"School count matches the expected count\", function () {",
-									"    pm.expect(pm.response.json().schoolCount).to.equal(25144);",
+									"    pm.expect(pm.response.json().schoolCount).to.equal(25216);",
 									"});",
 									"",
 									"pm.test(\"Subject count matches the expected count\", function () {",
-									"    pm.expect(pm.response.json().subjectCount).to.equal(7);",
+									"    pm.expect(pm.response.json().subjectCount).to.equal(17);",
 									"});"
 								],
 								"type": "text/javascript"
