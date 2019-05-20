@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             var indicatorRows = metaRows.Where(row => row.ColumnType == ColumnType.Indicator).ToList();
             
-            indicatorRows.ToList().ForEach(row =>
+            indicatorRows.ForEach(row =>
             {
                 if (string.IsNullOrWhiteSpace(row.IndicatorGrouping))
                 {
