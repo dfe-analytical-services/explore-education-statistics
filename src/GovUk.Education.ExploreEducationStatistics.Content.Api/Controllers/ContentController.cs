@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
     [Route("api/[controller]")]
-    public class ContentController : Controller
+    public class ContentController : ControllerBase
     {
         private readonly IContentService _contentService;
         private readonly IPublicationService _publicationService;
@@ -27,7 +28,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [HttpGet("tree")]
         public ActionResult<List<ThemeTree>> GetContentTree()
         {
-            return _contentService.GetContentTree();
+            var tree = _contentService.GetContentTree();
+            
+            if (tree.Any())
+            {
+                return tree;
+            }
+
+            return NoContent();
         }
 
         // GET api/publication/5
