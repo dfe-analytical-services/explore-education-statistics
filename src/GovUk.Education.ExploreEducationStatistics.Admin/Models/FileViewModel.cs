@@ -1,4 +1,4 @@
-namespace GovUk.Education.ExploreStatistics.Admin.Models
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 {
     public class FileViewModel
     {

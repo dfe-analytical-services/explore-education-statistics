@@ -4,8 +4,6 @@
         <TargetFramework>netcoreapp2.2</TargetFramework>
 
         <IsPackable>false</IsPackable>
-
-        <RootNamespace>GovUk.Education.ExploreStatistics.Content.Api.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

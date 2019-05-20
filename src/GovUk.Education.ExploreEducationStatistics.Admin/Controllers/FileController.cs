@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreStatistics.Admin.Models;
-using GovUk.Education.ExploreStatistics.Admin.Services;
-using GovUk.Education.ExploreStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreStatistics.Admin.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 {
     [Authorize]
     public class FileController : Controller

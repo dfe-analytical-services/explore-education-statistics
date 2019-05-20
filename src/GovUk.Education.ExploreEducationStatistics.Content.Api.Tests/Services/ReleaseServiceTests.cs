@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 {
     public class ReleaseServiceTests
     {

@@ -1,12 +1,12 @@
-﻿using GovUk.Education.ExploreStatistics.Admin.Controllers;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers;
 using Xunit;
 
-namespace GovUk.Education.ExploreStatistics.Admin.Tests.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 {
     public class HomeControllerTests
     {

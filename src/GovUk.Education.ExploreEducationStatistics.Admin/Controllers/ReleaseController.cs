@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreStatistics.Admin.Models;
-using GovUk.Education.ExploreStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreStatistics.Admin.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 {
     public class ReleaseController : Controller
     {

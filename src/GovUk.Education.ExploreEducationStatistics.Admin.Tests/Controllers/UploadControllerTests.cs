@@ -1,6 +1,4 @@
-﻿using GovUk.Education.ExploreStatistics.Admin.Controllers;
-using GovUk.Education.ExploreStatistics.Admin.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -11,10 +9,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using Xunit;
 
-namespace GovUk.Education.ExploreStatistics.Admin.Tests.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 {
     public class UploadControllerTests
     {

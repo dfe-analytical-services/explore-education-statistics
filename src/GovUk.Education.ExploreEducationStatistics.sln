@@ -9,9 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEduc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreStatistics.Data.Api.Tests", "GovUk.Education.ExploreStatistics.Data.Api.Tests\GovUk.Education.ExploreStatistics.Data.Api.Tests.csproj", "{C6673886-11C0-49AA-A29A-1EA960D9F09C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreStatistics.Admin", "GovUk.Education.ExploreStatistics.Admin\GovUk.Education.ExploreStatistics.Admin.csproj", "{334F4A60-04CF-4A6B-9AA2-FF991682FCBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Admin", "GovUk.Education.ExploreEducationStatistics.Admin\GovUk.Education.ExploreEducationStatistics.Admin.csproj", "{334F4A60-04CF-4A6B-9AA2-FF991682FCBA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreStatistics.Admin.Tests", "GovUk.Education.ExploreStatistics.Admin.Tests\GovUk.Education.ExploreStatistics.Admin.Tests.csproj", "{3D3C5420-6BC2-42C2-82BC-5953493C9827}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Admin.Tests", "GovUk.Education.ExploreEducationStatistics.Admin.Tests\GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj", "{3D3C5420-6BC2-42C2-82BC-5953493C9827}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Content.Api.Tests", "GovUk.Education.ExploreEducationStatistics.Content.Api.Tests\GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.csproj", "{D9CB3DDD-2A72-435F-A7F9-8CA1FB612F3F}"
 EndProject

@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GovUk.Education.ExploreStatistics.Admin\GovUk.Education.ExploreStatistics.Admin.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Admin\GovUk.Education.ExploreEducationStatistics.Admin.csproj" />
   </ItemGroup>
 
 </Project>

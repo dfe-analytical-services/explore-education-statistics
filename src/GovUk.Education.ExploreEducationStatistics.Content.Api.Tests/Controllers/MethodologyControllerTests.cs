@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 
-namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
     public class MethodologyControllerTests
     {

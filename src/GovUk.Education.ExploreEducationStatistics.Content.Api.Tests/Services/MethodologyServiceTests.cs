@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Xunit;
 
-namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 {
     public class MethodologyServiceTests
     {

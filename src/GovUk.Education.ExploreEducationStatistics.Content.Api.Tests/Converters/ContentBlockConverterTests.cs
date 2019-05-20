@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Converters
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Converters
 {
     public class ContentBlockConverterTests
     {

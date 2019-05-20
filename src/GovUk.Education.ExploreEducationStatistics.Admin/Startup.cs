@@ -1,5 +1,5 @@
-﻿using GovUk.Education.ExploreStatistics.Admin.Services;
-using GovUk.Education.ExploreStatistics.Admin.Services.Interfaces;
+﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authorization;
@@ -13,7 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 
-namespace GovUk.Education.ExploreStatistics.Admin
+namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
     public class Startup
     {

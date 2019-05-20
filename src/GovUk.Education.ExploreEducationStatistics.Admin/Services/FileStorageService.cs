@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.Extensions.Configuration;
-using GovUk.Education.ExploreStatistics.Admin.Services.Interfaces;
 
-namespace GovUk.Education.ExploreStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class FileStorageService : IFileStorageService
     {

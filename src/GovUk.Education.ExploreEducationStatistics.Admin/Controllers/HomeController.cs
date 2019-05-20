@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using GovUk.Education.ExploreStatistics.Admin.Models;
 
-namespace GovUk.Education.ExploreStatistics.Admin.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 {
     [Authorize]
     public class HomeController : Controller
