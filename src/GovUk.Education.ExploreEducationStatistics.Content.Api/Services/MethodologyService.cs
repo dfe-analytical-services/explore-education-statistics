@@ -1,9 +1,7 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Data;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
-using System;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {
