@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces
 {
-    public interface IMethedologyService
+    public interface IMethodologyService
     {
+        List<ThemeTree> GetTree();
     }
 }

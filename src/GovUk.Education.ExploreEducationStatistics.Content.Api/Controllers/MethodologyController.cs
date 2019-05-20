@@ -8,17 +8,17 @@ using Microsoft.AspNetCore.Mvc;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
     [Route("api/[controller]")]
-    public class MethedologyController : Controller
+    public class MethodologyController : ControllerBase
     {
-        private readonly IMethedologyService _service;
-        public MethedologyController(IMethedologyService service)
+        private readonly IMethodologyService _service;
+        public MethodologyController(IMethodologyService service)
         {
             _service = service;
         }
 
         // GET
         [HttpGet("tree")]
-        public IActionResult GetMethedologyTree()
+        public ActionResult GetMethedologyTree()
         {
             return new OkResult();
         }

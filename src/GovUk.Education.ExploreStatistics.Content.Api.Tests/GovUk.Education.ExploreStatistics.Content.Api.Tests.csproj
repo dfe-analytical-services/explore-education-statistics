@@ -19,4 +19,8 @@
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Api\GovUk.Education.ExploreEducationStatistics.Content.Api.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Services\" />
+    </ItemGroup>
+
 </Project>

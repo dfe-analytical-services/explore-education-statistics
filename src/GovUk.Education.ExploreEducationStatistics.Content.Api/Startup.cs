@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddCors();
 
             services.AddTransient<IContentService, ContentService>();
-            services.AddTransient<IMethedologyService, MethedologyService>();
+            services.AddTransient<IMethodologyService, MethodologyService>();
 
         }
 
