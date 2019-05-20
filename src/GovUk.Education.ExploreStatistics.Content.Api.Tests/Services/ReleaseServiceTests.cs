@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Services
     public class ReleaseServiceTests
     {
         [Fact]
-        public void GetLatest_ReturnsAActionResult_WithARelease()
+        public void GetLatest_ReturnsA_WithARelease()
         {
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
             builder.UseInMemoryDatabase(databaseName: "FindLatestPublication");
@@ -43,12 +43,12 @@ namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Services
 
                 var result = service.GetLatestRelease("1003fa5c-b60a-4036-a178-e3a69a81b852");
 
-                Assert.IsType<ActionResult<Release>>(result);
+                Assert.IsType<Release>(result);
             }
         }
         
         [Fact]
-        public void GetId_ReturnsAActionResult_WithATheme()
+        public void GetId_ReturnsA_WithATheme()
         {
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
             builder.UseInMemoryDatabase(databaseName: "ReleaseTheme");
@@ -78,9 +78,7 @@ namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Services
 
                 var result = service.GetRelease("1003fa5c-b60a-4036-a178-e3a69a81b852");
 
-                var actionResult = Assert.IsType<ActionResult<Release>>(result);
-
-                Assert.Equal("Release A", actionResult.Value.Title);
+                Assert.Equal("Release A", result.Title);
             }
         }
     }

@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Services
     public class PublicationServiceTests
     {
         [Fact]
-        public void GetId_ReturnsAActionResult_WithAPublication()
+        public void GetId_ReturnsA_Publication()
         {
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
             builder.UseInMemoryDatabase(databaseName: "FindPublication");
@@ -36,9 +36,7 @@ namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Services
                 
                 var result = service.GetPublication("1003fa5c-b60a-4036-a178-e3a69a81b852");
 
-                var actionResult = Assert.IsType<ActionResult<Publication>>(result);
-                
-                Assert.Equal("Publication A", actionResult.Value.Title);
+                Assert.Equal("Publication A", result.Title);
             }
         }
     }
