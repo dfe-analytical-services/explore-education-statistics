@@ -87,10 +87,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private static IEnumerable<(Indicator Indicator, string Column)> GetIndicators(IEnumerable<MetaRow> metaRows,
             Subject subject)
         {
-            var indicatorRows = metaRows.Where(row => row.ColumnType == ColumnType.Indicator);
-
-            // TODO need to handle no group scenario creating the Default Group
-
+            var indicatorRows = metaRows.Where(row => row.ColumnType == ColumnType.Indicator).ToList();
+            
+            indicatorRows.ForEach(row =>
+            {
+                if (string.IsNullOrWhiteSpace(row.IndicatorGrouping))
+                {
+                    row.IndicatorGrouping = "Default";
+                }
+            });
+            
             var indicatorGroups = indicatorRows
                 .GroupBy(row => row.IndicatorGrouping)
                 .ToDictionary(rows => rows.Key, rows => new IndicatorGroup(rows.Key, subject));
