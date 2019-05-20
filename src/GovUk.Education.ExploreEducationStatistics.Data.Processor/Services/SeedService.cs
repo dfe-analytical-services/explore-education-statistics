@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
  
             var subjectDb = CreateSubject(release, subject);
             var sSubject = subjectDb.Name.Split("_");
-            var destFolder = sSubject[0] + "/" + release.PublicationId.ToString();
+            var destFolder = sSubject[0] + "/" + release.PublicationId;
 
             _importerService.Import(subject.GetCsvLines(), subject.GetMetaLines(), subjectDb);
 

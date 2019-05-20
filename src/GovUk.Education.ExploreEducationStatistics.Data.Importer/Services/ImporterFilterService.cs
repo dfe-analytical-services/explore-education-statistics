@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         private FilterGroup LookupOrCreateFilterGroup(Filter filter, string label)
         {
-            if (label == null)
+            if (string.IsNullOrWhiteSpace(label))
             {
                 label = "Default";
             }
