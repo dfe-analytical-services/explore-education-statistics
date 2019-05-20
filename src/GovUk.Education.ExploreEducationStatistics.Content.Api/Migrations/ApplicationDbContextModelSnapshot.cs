@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.2.3-servicing-35854");
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Link", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Link", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         });
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Publication", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -365,7 +365,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         });
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Release", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -464,7 +464,7 @@ You can also view a regional breakdown of statistics and data within the [local 
                         });
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Theme", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Theme", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -504,7 +504,7 @@ You can also view a regional breakdown of statistics and data within the [local 
                         });
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Topic", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -609,7 +609,7 @@ You can also view a regional breakdown of statistics and data within the [local 
                         });
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Update", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Update", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -707,41 +707,41 @@ You can also view a regional breakdown of statistics and data within the [local 
                         });
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Link", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Link", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Publication")
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication")
                         .WithMany("LegacyReleases")
                         .HasForeignKey("PublicationId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Publication", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Topic", "Topic")
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", "Topic")
                         .WithMany("Publications")
                         .HasForeignKey("TopicId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Release", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Publication", "Publication")
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", "Publication")
                         .WithMany("Releases")
                         .HasForeignKey("PublicationId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Topic", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Theme", "Theme")
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Theme", "Theme")
                         .WithMany("Topics")
                         .HasForeignKey("ThemeId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Update", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Update", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Api.Models.Release", "Release")
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
                         .WithMany("Updates")
                         .HasForeignKey("ReleaseId")
                         .OnDelete(DeleteBehavior.Cascade);

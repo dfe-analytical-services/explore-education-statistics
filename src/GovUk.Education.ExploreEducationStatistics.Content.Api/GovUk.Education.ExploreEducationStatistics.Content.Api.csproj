@@ -7,8 +7,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="ViewModels" />
+        <Folder Include="Migrations" />
         <Folder Include="wwwroot\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="Migrations\*.sql">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
