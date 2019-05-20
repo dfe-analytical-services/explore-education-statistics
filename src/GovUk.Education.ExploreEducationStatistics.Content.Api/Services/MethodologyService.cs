@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public Methodology Get(string slug)
         {
-            return null;
+            return _context.Methodologies.FirstOrDefault(x => x.Publication.Slug == slug);
         }
         
         public List<ThemeTree> GetTree()

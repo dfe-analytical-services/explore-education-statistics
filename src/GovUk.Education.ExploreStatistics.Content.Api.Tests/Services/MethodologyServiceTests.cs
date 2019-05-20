@@ -14,16 +14,92 @@ namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Services
         [Fact]
         public void MethodologyService_Get_Methodology_By_Slug()
         {
+            var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            builder.UseInMemoryDatabase(databaseName: "GetBySlug");
+            var options = builder.Options;
+
+            using (var context = new ApplicationDbContext(options))
+            {
+                var publications = new List<Publication>
+                {
+                    
+                };
+
+                var methodologies = new List<Methodology>
+                {
+                    new Methodology
+                    {
+                        Id = new Guid("0144e3f2-41e1-4aec-9c55-2671f454c85f"), 
+                        Title = "Methodology A",
+                        PublicationId = new Guid("ed70afba-f7e1-4ab3-bded-74d078b6fca0"),
+                        Publication = new Publication
+                        {
+                            Id = new Guid("ed70afba-f7e1-4ab3-bded-74d078b6fca0"), 
+                            Title = "Publication A",
+                            Slug = "publication-a-slug"
+                        },
+                    }
+                };
+
+                context.AddRange(publications);
+                context.AddRange(methodologies);
+                context.SaveChanges();
+            }
             
+            using (var context = new ApplicationDbContext(options))
+            {
+                var service = new MethodologyService(context);
+
+                var result = service.Get("publication-a-slug");
+
+                Assert.True(result != null);
+                Assert.Equal("Methodology A", result.Title);
+            }
         }
         
         [Fact]
         public void MethodologyService_Get_Methodology_By_Slug_Not_Found()
         {
+            var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            builder.UseInMemoryDatabase(databaseName: "GetBySlug_Fail");
+            var options = builder.Options;
+
+            using (var context = new ApplicationDbContext(options))
+            {
+                var publications = new List<Publication>
+                {
+                    new Publication
+                    {
+                        Id = new Guid("ed70afba-f7e1-4ab3-bded-74d078b6fca0"), 
+                        Title = "Publication A",
+                        Slug = "publication-a-slug"
+                    },
+                };
+
+                var methodologies = new List<Methodology>
+                {
+                    new Methodology
+                    {
+                        Id = new Guid("0144e3f2-41e1-4aec-9c55-2671f454c85f"), 
+                        Title = "Methodology A",
+                        PublicationId = new Guid("ed70afba-f7e1-4ab3-bded-74d078b6fca0")
+                    }
+                };
+
+                context.AddRange(publications);
+                context.AddRange(methodologies);
+                context.SaveChanges();
+            }
             
+            using (var context = new ApplicationDbContext(options))
+            {
+                var service = new MethodologyService(context);
+
+                var result = service.Get("publication-a-slug-error");
+
+                Assert.True(result == null);
+            }
         }
-
-
 
         [Fact]
         public void MethodologyService_GetTree()
