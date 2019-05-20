@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "53fab9f0-5534-4006-9a86-4b749eeecb16",
+		"_postman_id": "9a45862c-b949-4bf8-9015-7cd0ade5b641",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -48,10 +48,6 @@
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject/1",
 											"host": [
@@ -100,10 +96,6 @@
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject/2",
 											"host": [
@@ -152,10 +144,6 @@
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject/3",
 											"host": [
@@ -204,10 +192,6 @@
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject/4",
 											"host": [
@@ -256,10 +240,6 @@
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject/5",
 											"host": [
@@ -308,10 +288,6 @@
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject/6",
 											"host": [
@@ -360,10 +336,6 @@
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject/7",
 											"host": [
@@ -405,10 +377,6 @@
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject/8",
 											"host": [
@@ -418,6 +386,396 @@
 												"meta",
 												"subject",
 												"8"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Subject Meta - Filter SubjectId 1",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"exec": [
+													"console.log(pm.response.json());",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});",
+													"",
+													"pm.test(\"Number of characteristic options should be correct\", function () { ",
+													"    pm.expect(Object.keys(pm.response.json().filters.Characteristic.options).length).to.equal(10);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.AllPupils.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.Gender.options.length).to.equal(2);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMajor.options.length).to.equal(8);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMinor.options.length).to.equal(19);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.NCYear.options.length).to.equal(14);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.FSM.options.length).to.equal(3);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.FSMEver6.options.length).to.equal(3);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.SENProvision.options.length).to.equal(8);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.SENPrimaryNeed.options.length).to.equal(14);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.FirstLanguage.options.length).to.equal(4);",
+													"});",
+													"",
+													"pm.test(\"Number of school type default options should be correct\", function () { ",
+													"    pm.expect(Object.keys(pm.response.json().filters.SchoolType.options.Default.options).length).to.equal(4);",
+													"});",
+													"",
+													"pm.test(\"Number of time periods options should be correct\", function() {",
+													"    pm.expect(pm.response.json().timePeriod.options.length).to.equal(5); ",
+													"});",
+													"",
+													"pm.test(\"Number of location options should be correct\", function() {",
+													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.Regional.options.length).to.equal(10);",
+													"    pm.expect(pm.response.json().locations.LocalAuthority.options.length).to.equal(152);",
+													"    pm.expect(pm.response.json().locations.LocalAuthorityDistrict.options.length).to.equal(326);",
+													"});",
+													"",
+													"pm.test(\"Expect indicators to have correct properties\", function () {",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"AbsenceFields\");",
+													"    pm.expect(pm.response.json().indicators.AbsenceFields.options.length).to.equal(10);",
+													"    ",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"AbsenceByReason\");",
+													"    pm.expect(pm.response.json().indicators.AbsenceByReason.options.length).to.equal(16);",
+													"    ",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"AbsenceForPersistentAbsentees\");",
+													"    pm.expect(pm.response.json().indicators.AbsenceForPersistentAbsentees.options.length).to.equal(7);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\tSubjectId: 1\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Subject Meta - Filter SubjectId 1, Start/End date 2016",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"exec": [
+													"console.log(pm.response.json());",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});",
+													"",
+													"pm.test(\"Number of characteristic options should be correct\", function () { ",
+													"    pm.expect(Object.keys(pm.response.json().filters.Characteristic.options).length).to.equal(10);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.AllPupils.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.Gender.options.length).to.equal(2);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMajor.options.length).to.equal(8);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMinor.options.length).to.equal(16);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.NCYear.options.length).to.equal(13);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.FSM.options.length).to.equal(3);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.FSMEver6.options.length).to.equal(3);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.SENProvision.options.length).to.equal(4);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.SENPrimaryNeed.options.length).to.equal(14);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.FirstLanguage.options.length).to.equal(3);",
+													"});",
+													"",
+													"pm.test(\"Number of school type default options should be correct\", function () { ",
+													"    pm.expect(Object.keys(pm.response.json().filters.SchoolType.options.Default.options).length).to.equal(4);",
+													"});",
+													"",
+													"pm.test(\"Number of time periods options should be correct\", function() {",
+													"    pm.expect(pm.response.json().timePeriod.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().timePeriod.options[0].year).to.equal(2016);",
+													"});",
+													"",
+													"pm.test(\"Number of location options should be correct\", function() {",
+													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.Regional.options.length).to.equal(10);",
+													"    pm.expect(pm.response.json().locations.LocalAuthority.options.length).to.equal(152);",
+													"    pm.expect(pm.response.json().locations.LocalAuthorityDistrict.options.length).to.equal(326);",
+													"});",
+													"",
+													"pm.test(\"Expect indicators to have correct properties\", function () {",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"AbsenceFields\");",
+													"    pm.expect(pm.response.json().indicators.AbsenceFields.options.length).to.equal(10);",
+													"    ",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"AbsenceByReason\");",
+													"    pm.expect(pm.response.json().indicators.AbsenceByReason.options.length).to.equal(16);",
+													"    ",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"AbsenceForPersistentAbsentees\");",
+													"    pm.expect(pm.response.json().indicators.AbsenceForPersistentAbsentees.options.length).to.equal(7);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\tSubjectId: 1,\n\tStartYear: 2016,\n\tEndYear: 2016\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Subject Meta - Filter SubjectId 2, Start/End date 2014, LA City of London",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"exec": [
+													"console.log(pm.response.json());",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});",
+													"",
+													"pm.test(\"Characteristics property shouldn't exist\", function () {",
+													"    pm.expect(pm.response.json()).to.not.have.property(\"Characteristic\");",
+													"});",
+													"",
+													"pm.test(\"Number of academy type options should be correct\", function () { ",
+													"    pm.expect(pm.response.json().filters.AcademyType.options.Default.options.length).to.equal(1);",
+													"});",
+													"",
+													"pm.test(\"Number of school type default options should be correct\", function () { ",
+													"    pm.expect(pm.response.json().filters.SchoolType.options.Default.options.length).to.equal(2);",
+													"});",
+													"",
+													"pm.test(\"Number of AllThroughSchoolFlag default options should be correct\", function () {",
+													"    pm.expect(pm.response.json().filters.AllThroughSchoolFlag.options.Default.options.length).to.equal(1); ",
+													"});",
+													"",
+													"pm.test(\"Time periods options should be correct\", function() {",
+													"    pm.expect(pm.response.json().timePeriod.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().timePeriod.options[0].year).to.equal(2014);",
+													"});",
+													"",
+													"pm.test(\"Number of location options should be correct\", function() {",
+													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.Regional.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.LocalAuthority.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthorityDistrict\");",
+													"});",
+													"",
+													"pm.test(\"Expect indicators to have correct properties\", function () {",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"AbsenceFields\");",
+													"    pm.expect(pm.response.json().indicators.AbsenceFields.options.length).to.equal(11);",
+													"    ",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"AbsenceByReason\");",
+													"    pm.expect(pm.response.json().indicators.AbsenceByReason.options.length).to.equal(16);",
+													"    ",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"AbsenceForPersistentAbsentees\");",
+													"    pm.expect(pm.response.json().indicators.AbsenceForPersistentAbsentees.options.length).to.equal(7);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\tSubjectId: 2,\n\tStartYear: 2014,\n\tEndYear: 2014,\n\tLocalAuthorities: [\"201\"]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Subject Meta - Filter SubjectId 7, Start/End date 2012-2014",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"exec": [
+													"console.log(pm.response.json());",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});",
+													"",
+													"pm.test(\"Number of school type default options should be correct\", function () { ",
+													"    pm.expect(pm.response.json().filters.SchoolType.options.Default.options.length).to.equal(4);",
+													"});",
+													"",
+													"pm.test(\"Number of AbsencePercentageBand options should be correct\", function () { ",
+													"    pm.expect(pm.response.json().filters.AbsencePercentageBand.options.Default.options.length).to.equal(102);",
+													"});",
+													"",
+													"pm.test(\"Time periods options should be correct\", function() {",
+													"    pm.expect(pm.response.json().timePeriod.options.length).to.equal(3);",
+													"});",
+													"",
+													"pm.test(\"Number of location options should be correct\", function() {",
+													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.Regional.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.LocalAuthority.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthorityDistrict\");",
+													"});",
+													"",
+													"pm.test(\"Expect indicators to have correct properties\", function () {",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"AbsenceFields\");",
+													"    pm.expect(pm.response.json().indicators.AbsenceFields.options.length).to.equal(11);",
+													"    ",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"AbsenceByReason\");",
+													"    pm.expect(pm.response.json().indicators.AbsenceByReason.options.length).to.equal(16);",
+													"    ",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"AbsenceForPersistentAbsentees\");",
+													"    pm.expect(pm.response.json().indicators.AbsenceForPersistentAbsentees.options.length).to.equal(7);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\tSubjectId: 7,\n\tStartYear: 2012,\n\tEndYear: 2014\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject"
 											]
 										}
 									},
@@ -471,10 +829,6 @@
 							"request": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{data_api_url}}/meta/publication/{{publication_id}}",
 									"host": [
@@ -1359,6 +1713,70 @@
 										}
 									},
 									"response": []
+								},
+								{
+									"name": "Absence by geographic level - School - Region Inner London - All Schools, Primary, And Academies Pri Sponsor, Not specified, Pri Free, Sec Sponsor, Special Free",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "6ef52a6e-a307-4849-b277-6f929e629b1c",
+												"exec": [
+													"/* ",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Compulsory fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Release date is not empty\", function () {",
+													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+													"});",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(673); });",
+													"",
+													"pm.test(\"Response time is less than 200ms\", function () {",
+													"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+													"});",
+													"",
+													"*/"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"subjectId\": 2,\n\t\"geographicLevel\": \"School\",\n\t\"regions\": [ \"E13000001\" ],\n\t\"startYear\": 2016,\n\t\"endYear\": 2016,\n\t\"filters\" : [\n\t\t81, 214, 119, 82, 212, 125, 197\n\t],\n\t\"indicators\": [\n\t\t42, 61, 57, 59, 66, 111212\n\t]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/tablebuilder",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"tablebuilder"
+											]
+										}
+									},
+									"response": []
 								}
 							],
 							"event": [
@@ -2091,31 +2509,31 @@
 								"id": "90830933-d7da-4502-b316-ed7887c913cf",
 								"exec": [
 									"pm.test(\"Filter count matches the expected count\", function () {",
-									"    pm.expect(pm.response.json().filterCount).to.equal(32);",
+									"    pm.expect(pm.response.json().filterCount).to.equal(15);",
 									"});",
 									"",
 									"pm.test(\"Indicator count matches the expected count\", function () {",
-									"    pm.expect(pm.response.json().indicatorCount).to.equal(225);",
+									"    pm.expect(pm.response.json().indicatorCount).to.equal(145);",
 									"});",
 									"",
 									"pm.test(\"Location count matches the expected count\", function () {",
-									"    pm.expect(pm.response.json().locationCount).to.equal(520);",
+									"    pm.expect(pm.response.json().locationCount).to.equal(492);",
 									"});",
 									"",
 									"pm.test(\"Observation count matches the expected count\", function () {",
-									"    pm.expect(pm.response.json().observationCount).to.equal(1183284);",
+									"    pm.expect(pm.response.json().observationCount).to.equal(648919);",
 									"});",
 									"",
 									"pm.test(\"Release count matches the expected count\", function () {",
-									"    pm.expect(pm.response.json().releaseCount).to.equal(4);",
+									"    pm.expect(pm.response.json().releaseCount).to.equal(1);",
 									"});",
 									"",
 									"pm.test(\"School count matches the expected count\", function () {",
-									"    pm.expect(pm.response.json().schoolCount).to.equal(25216);",
+									"    pm.expect(pm.response.json().schoolCount).to.equal(25144);",
 									"});",
 									"",
 									"pm.test(\"Subject count matches the expected count\", function () {",
-									"    pm.expect(pm.response.json().subjectCount).to.equal(17);",
+									"    pm.expect(pm.response.json().subjectCount).to.equal(7);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2125,10 +2543,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{data_api_url}}/debug/report",
 							"host": [
