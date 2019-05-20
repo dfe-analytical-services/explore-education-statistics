@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Controllers
 
             var result = controller.GetMethedologyTree();
 
-            Assert.IsAssignableFrom<OkResult>(result);
+            Assert.IsAssignableFrom<List<ThemeTree>>(result.Value);
         }
 
         [Fact]
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Controllers
 
             var result = controller.GetMethedologyTree();
 
-            Assert.IsAssignableFrom<NoContentResult>(result);
+            Assert.IsAssignableFrom<NoContentResult>(result.Result);
         }
     }
 }
