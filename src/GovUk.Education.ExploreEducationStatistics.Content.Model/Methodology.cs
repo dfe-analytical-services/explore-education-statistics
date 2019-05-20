@@ -17,5 +17,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public List<ContentSection> Content { get; set; }
         
         public List<ContentSection> Annexes { get; set; }
+        
+        public Guid PublicationId { get; set; }
+
+        public Publication Publication { get; set; }
     }
 }

@@ -21,6 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public DateTime? NextUpdate { get; set; }
 
         public List<Release> Releases { get; set; }
+        
+        public List<Methodology> Methodologies { get; set; }
 
         public List<Link> LegacyReleases { get; set; }
 
