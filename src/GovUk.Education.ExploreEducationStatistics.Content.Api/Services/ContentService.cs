@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Newtonsoft.Json.Serialization;
 
@@ -38,31 +39,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
             return tree;
         }
-    }
-
-    public class ThemeTree
-    {
-        public Guid Id { get; set; }
-        public string Title { get; set; }
-
-        public List<TopicTree> Topics { get; set; }
-    }
-
-    public class TopicTree
-    {
-        public Guid Id { get; set; }
-        public string Title { get; set; }
-        public string Summary { get; set; }
-
-        public List<PublicationTree> Publications { get; set; }
-    }
-
-    public class PublicationTree
-
-    {
-        public Guid Id { get; set; }
-        public string Title { get; set; }
-        public string Slug { get; set; }
-        public string Summary { get; set; }
     }
 }
