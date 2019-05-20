@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                     {
                         new Release
                         {
-                            PublicationId = new Guid("22ca9a1e-4b6c-496f-b025-edd2dcf49e7a"),
+                            PublicationId = new Guid("8345e27a-7a32-4b20-a056-309163bdf9c4"),
                             ReleaseDate = new DateTime(2018, 7, 19),
                             Name = "2016/17",
                             Subjects = new[]
@@ -105,6 +105,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                 {
                                     Filename = DataCsvFilename.exclusions_total_days_missed_fixed_exclusions,
                                     Name = "Total days missed due to fixed period exclusions"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "school_applications_and_offers", new Publication
+                {
+                    PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
+                    Name = "School applications and offers",
+                    Releases = new[]
+                    {
+                        new Release
+                        {
+                            PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
+                            ReleaseDate = new DateTime(2019, 4, 29),
+                            Name = "2018",
+                            Subjects = new[]
+                            {
+                                new Subject
+                                {
+                                    Filename = DataCsvFilename.school_applications_and_offers,
+                                    Name = "Applications and offers by school phase"
                                 }
                             }
                         }
