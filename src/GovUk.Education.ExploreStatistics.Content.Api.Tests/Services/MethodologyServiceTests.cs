@@ -12,6 +12,20 @@ namespace GovUk.Education.ExploreStatistics.Content.Api.Tests.Services
     public class MethodologyServiceTests
     {
         [Fact]
+        public void MethodologyService_Get_Methodology_By_Slug()
+        {
+            
+        }
+        
+        [Fact]
+        public void MethodologyService_Get_Methodology_By_Slug_Not_Found()
+        {
+            
+        }
+
+
+
+        [Fact]
         public void MethodologyService_GetTree()
         {
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();

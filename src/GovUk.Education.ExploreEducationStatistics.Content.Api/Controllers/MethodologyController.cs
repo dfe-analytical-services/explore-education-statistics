@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
@@ -19,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 
         // GET
         [HttpGet("tree")]
-        public ActionResult<List<ThemeTree>> GetMethedologyTree()
+        public ActionResult<List<ThemeTree>> GetMethodologyTree()
         {
             var tree = _service.GetTree();
 
@@ -29,6 +30,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             }
 
             return NoContent();
+        }
+        
+        // GET api/methodology/name-of-content
+        [HttpGet("{slug}")]
+        public ActionResult<Methodology> Get(string slug)
+        {
+            var methodology = _service.Get(slug);
+
+            if (methodology != null)
+            {
+                return methodology;
+            }
+            
+            return NotFound();
         }
     }
 }
