@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                         {
                             PublicationId = new Guid("fcda2962-82a6-4052-afa2-ea398c53c85f"),
                             ReleaseDate = new DateTime(2019, 5, 20),
-                            Name = "2018",
+                            Name = "2017/18",
                             Subjects = new[]
                             {
                                 new Subject
