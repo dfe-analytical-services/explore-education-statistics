@@ -1,28 +1,26 @@
-using System;
 using System.Linq;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {
     public class PublicationService : IPublicationService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public PublicationService(ApplicationDbContext context)
+        public PublicationService(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public Publication GetPublication(string id)
+        public PublicationViewModel GetPublication(string slug)
         {
-            return Guid.TryParse(id, out var newGuid)
-                ? _context.Publications.Include(x => x.Releases).Include(x => x.LegacyReleases)
-                    .FirstOrDefault(t => t.Id == newGuid)
-                : _context.Publications.Include(x => x.Releases).Include(x => x.LegacyReleases)
-                    .FirstOrDefault(t => t.Slug == id);
+
+            return _mapper.Map<PublicationViewModel>(_context.Publications.FirstOrDefault(t => t.Slug == slug));
         }
     }
 }
