@@ -33,16 +33,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             Provider provider = null,
             Ward ward = null)
         {
-            var cacheKey = GetCacheKey(country, region, localAuthority, localAuthorityDistrict, localEnterprisePartnership,
-                institution, mat, mayoralCombinedAuthority, opportunityArea, parliamentaryConstituency, provider, ward);
+            var cacheKey = GetCacheKey(country, region, localAuthority, localAuthorityDistrict,
+                localEnterprisePartnership, institution, mat, mayoralCombinedAuthority, opportunityArea,
+                parliamentaryConstituency, provider, ward);
 
             if (_cache.TryGetValue(cacheKey, out Location location))
             {
                 return location;
             }
 
-            location = LookupOrCreate(country, region, localAuthority, localAuthorityDistrict, localEnterprisePartnership,
-                institution, mat, mayoralCombinedAuthority, opportunityArea, parliamentaryConstituency, provider, ward);
+            location = LookupOrCreate(country, region, localAuthority, localAuthorityDistrict,
+                localEnterprisePartnership, institution, mat, mayoralCombinedAuthority, opportunityArea,
+                parliamentaryConstituency, provider, ward);
             _cache.Set(cacheKey, location,
                 new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
 
@@ -87,41 +89,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 stringBuilder.Append(separator).Append(localEnterprisePartnership.Code);
             }
-            
+
             if (institution != null)
             {
                 stringBuilder.Append(separator).Append(institution.Code);
             }
-            
+
             if (mat != null)
             {
                 stringBuilder.Append(separator).Append(mat.Code);
             }
-            
+
             if (mayoralCombinedAuthority != null)
             {
                 stringBuilder.Append(separator).Append(mayoralCombinedAuthority.Code);
             }
-            
+
             if (parliamentaryConstituency != null)
             {
                 stringBuilder.Append(separator).Append(parliamentaryConstituency.Code);
             }
-            
+
             if (opportunityArea != null)
             {
                 stringBuilder.Append(separator).Append(opportunityArea.Code);
             }
-            
+
             if (provider != null)
             {
                 stringBuilder.Append(separator).Append(provider.Code);
             }
-            
+
             if (ward != null)
             {
                 stringBuilder.Append(separator).Append(ward.Code);
             }
+
             return stringBuilder.ToString();
         }
 
@@ -193,71 +196,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             var predicateBuilder = PredicateBuilder.True<Location>()
                 .And(location => location.Country.Code == country.Code);
 
-            if (region != null)
-            {
-                predicateBuilder = predicateBuilder.And(location =>
-                    location.Region.Code == region.Code);
-            }
+            predicateBuilder = predicateBuilder.And(location =>
+                location.Region.Code ==
+                (region != null ? region.Code : null));
 
-            if (localAuthority != null)
-            {
-                predicateBuilder = predicateBuilder.And(location =>
-                    location.LocalAuthority.Code == localAuthority.Code);
-            }
+            predicateBuilder = predicateBuilder.And(location =>
+                location.LocalAuthority.Code ==
+                (localAuthority != null ? localAuthority.Code : null));
 
-            if (localAuthorityDistrict != null)
-            {
-                predicateBuilder = predicateBuilder.And(location =>
-                    location.LocalAuthorityDistrict.Code == localAuthorityDistrict.Code);
-            }
+            predicateBuilder = predicateBuilder.And(location =>
+                location.LocalAuthorityDistrict.Code ==
+                (localAuthorityDistrict != null ? localAuthorityDistrict.Code : null));
 
-            if (localEnterprisePartnership != null)
-            {
-                predicateBuilder = predicateBuilder.And(location =>
-                    location.LocalEnterprisePartnership.Code == localEnterprisePartnership.Code);
-            }
-            
-            if (institution != null)
-            {
-                predicateBuilder = predicateBuilder.And(location =>
-                    location.Institution.Code == institution.Code);
-            }
-            
-            if (mat != null)
-            {
-                predicateBuilder = predicateBuilder.And(location =>
-                    location.Mat.Code == mat.Code);
-            }
-            
-            if (mayoralCombinedAuthority != null)
-            {
-                predicateBuilder = predicateBuilder.And(location =>
-                    location.MayoralCombinedAuthority.Code == mayoralCombinedAuthority.Code);
-            }
-            
-            if (opportunityArea != null)
-            {
-                predicateBuilder = predicateBuilder.And(location =>
-                    location.OpportunityArea.Code == opportunityArea.Code);
-            }
-            
-            if (parliamentaryConstituency != null)
-            {
-                predicateBuilder = predicateBuilder.And(location =>
-                    location.ParliamentaryConstituency.Code == parliamentaryConstituency.Code);
-            }
-            
-            if (provider != null)
-            {
-                predicateBuilder = predicateBuilder.And(location =>
-                    location.Provider.Code == provider.Code);
-            }
-            
-            if (ward != null)
-            {
-                predicateBuilder = predicateBuilder.And(location =>
-                    location.Ward.Code == ward.Code);
-            }
+            predicateBuilder = predicateBuilder.And(location =>
+                location.LocalEnterprisePartnership.Code ==
+                (localEnterprisePartnership != null ? localEnterprisePartnership.Code : null));
+
+            predicateBuilder = predicateBuilder.And(location =>
+                location.Institution.Code ==
+                (institution != null ? institution.Code : null));
+
+            predicateBuilder = predicateBuilder.And(location =>
+                location.Mat.Code ==
+                (mat != null ? mat.Code : null));
+
+            predicateBuilder = predicateBuilder.And(location =>
+                location.MayoralCombinedAuthority.Code ==
+                (mayoralCombinedAuthority != null ? mayoralCombinedAuthority.Code : null));
+
+            predicateBuilder = predicateBuilder.And(location =>
+                location.OpportunityArea.Code ==
+                (opportunityArea != null ? opportunityArea.Code : null));
+
+            predicateBuilder = predicateBuilder.And(location =>
+                location.ParliamentaryConstituency.Code ==
+                (parliamentaryConstituency != null ? parliamentaryConstituency.Code : null));
+
+            predicateBuilder = predicateBuilder.And(location =>
+                location.Provider.Code ==
+                (provider != null ? provider.Code : null));
+
+            predicateBuilder = predicateBuilder.And(location =>
+                location.Ward.Code ==
+                (ward != null ? ward.Code : null));
+
             return _context.Location.AsNoTracking().FirstOrDefault(predicateBuilder);
         }
     }
