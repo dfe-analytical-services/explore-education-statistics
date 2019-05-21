@@ -4,7 +4,6 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
@@ -30,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             {
                 var releases = _context.Releases.Where(x => x.Publication.Id == release.Publication.Id).ToList();
                 release.Publication.Releases = new List<Release>();
-                releases.ForEach(r => release.Publication.Releases.Add(new Release()
+                releases.ForEach(r => release.Publication.Releases.Add(new Release
                 {
                     Id = r.Id,
                     Title = r.Title,
@@ -68,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             {
                 var releases = _context.Releases.Where(x => x.Publication.Id == release.Publication.Id).ToList();
                 release.Publication.Releases = new List<Release>();
-                releases.ForEach(r => release.Publication.Releases.Add(new Release()
+                releases.ForEach(r => release.Publication.Releases.Add(new Release
                 {
                     Id = r.Id,
                     Title = r.Title,
