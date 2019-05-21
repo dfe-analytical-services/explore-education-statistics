@@ -31,10 +31,4 @@
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Reference Include="AutoMapper, Version=8.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005">
-        <HintPath>..\..\..\..\..\.nuget\packages\automapper\8.0.0\lib\netstandard2.0\AutoMapper.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
 </Project>
