@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             _releaseService = releaseService;
         }
         
-        // GET
+        // GET api/content/tree
         [HttpGet("tree")]
         public ActionResult<List<ThemeTree>> GetContentTree()
         {
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             return NoContent();
         }
 
-        // GET api/publication/5
+        // GET api/content/publication/5
         [HttpGet("publication/{id}")]
         public ActionResult<Publication> GetPublication(string id)
         {
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             return NotFound();
         }
 
-        // GET api/publication/5/latest
+        // GET api/content/publication/5/latest
         [HttpGet("publication/{id}/latest")]
         public ActionResult<Release> GetLatestRelease(string id)
         {
@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 
         }
 
-        // GET api/release/5
+        // GET api/content/release/5
         [HttpGet("release/{id}")]
         public ActionResult<Release> GetRelease(string id)
         {
