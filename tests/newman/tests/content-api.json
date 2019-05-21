@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "28478d7c-8bbb-4f82-ae2a-015c856d2cc6",
+		"_postman_id": "faa4cc80-ed1e-40c4-85b7-59da8657c39e",
 		"name": "Dfe Content API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -9,43 +9,6 @@
 			"name": "Publication",
 			"item": [
 				{
-					"name": "Get Publications",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-									"",
-									"pm.test(\"Should return some results\", function () {",
-									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{content_api_url}}/Publication",
-							"host": [
-								"{{content_api_url}}"
-							],
-							"path": [
-								"Publication"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Get Specific Publication",
 					"event": [
 						{
@@ -53,7 +16,7 @@
 							"script": {
 								"id": "ff0279ab-8825-4c10-b5eb-e5628eb8905b",
 								"exec": [
-									"pm.variables.set('publication_id', 'cbbd299f-8297-44bc-92ac-558bcf51f8ad')"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -65,7 +28,7 @@
 								"exec": [
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
-									"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().id).to.equal(pm.variables.get(\"publication_id\")); });"
+									"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().id).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });"
 								],
 								"type": "text/javascript"
 							}
@@ -74,18 +37,15 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
-							"raw": "{{content_api_url}}/Publication/{{publication_id}}",
+							"raw": "{{content_api_url}}/content/publication/pupil-absence-in-schools-in-england",
 							"host": [
 								"{{content_api_url}}"
 							],
 							"path": [
-								"Publication",
-								"{{publication_id}}"
+								"content",
+								"publication",
+								"pupil-absence-in-schools-in-england"
 							]
 						}
 					},
@@ -99,7 +59,7 @@
 							"script": {
 								"id": "ff0279ab-8825-4c10-b5eb-e5628eb8905b",
 								"exec": [
-									"pm.variables.set('publication_id', 'cbbd299f-8297-44bc-92ac-558bcf51f8ad')"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -109,9 +69,17 @@
 							"script": {
 								"id": "8c0b7ff3-a619-44f3-b2fb-60d5342f69aa",
 								"exec": [
-									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"pm.test(\"Status code is 200\", function () { ",
+									"    pm.response.to.have.status(200); ",
+									"});",
 									"",
-									"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().publicationId).to.equal(pm.variables.get(\"publication_id\")); });"
+									"pm.test(\"Should be latest publication\", function () {",
+									"   pm.expect(pm.response.json().slug).to.equal(\"2016-17\"); ",
+									"});",
+									"",
+									"pm.test(\"Publication slug matches the publication requested\", function () { ",
+									"    pm.expect(pm.response.json().publication.slug).to.equal(\"pupil-absence-in-schools-in-england\");",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -120,18 +88,15 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
-							"raw": "{{content_api_url}}/Publication/{{publication_id}}/latest",
+							"raw": "{{content_api_url}}/content/publication/pupil-absence-in-schools-in-england/latest",
 							"host": [
 								"{{content_api_url}}"
 							],
 							"path": [
-								"Publication",
-								"{{publication_id}}",
+								"content",
+								"publication",
+								"pupil-absence-in-schools-in-england",
 								"latest"
 							]
 						}
@@ -144,43 +109,6 @@
 			"name": "Release",
 			"item": [
 				{
-					"name": "Get Releases",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-									"",
-									"pm.test(\"Should return some results\", function () {",
-									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{content_api_url}}/Release",
-							"host": [
-								"{{content_api_url}}"
-							],
-							"path": [
-								"Release"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Get Specific Release",
 					"event": [
 						{
@@ -190,7 +118,7 @@
 								"exec": [
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
-									"pm.test(\"Release id matches the release requested\", function () { pm.expect(pm.response.json().id).to.equal(pm.variables.get(\"release_id\")); });"
+									"pm.test(\"Release id matches the release requested\", function () { pm.expect(pm.response.json().id).to.equal(\"4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5\"); });"
 								],
 								"type": "text/javascript"
 							}
@@ -200,7 +128,7 @@
 							"script": {
 								"id": "e95e89f8-249c-43ca-bb24-d7cb82df7e26",
 								"exec": [
-									"pm.variables.set('release_id', '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5')"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -209,194 +137,15 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
-							"raw": "{{content_api_url}}/Release/{{release_id}}",
+							"raw": "{{content_api_url}}/content/release/4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
 							"host": [
 								"{{content_api_url}}"
 							],
 							"path": [
-								"Release",
-								"{{release_id}}"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Theme",
-			"item": [
-				{
-					"name": "Get Themes",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-									"",
-									"pm.test(\"Should return some results\", function () {",
-									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{content_api_url}}/Theme",
-							"host": [
-								"{{content_api_url}}"
-							],
-							"path": [
-								"Theme"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Specific Theme",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-									"",
-									"pm.test(\"Theme id matches the theme requested\", function () { pm.expect(pm.response.json().id).to.equal(pm.variables.get(\"theme_id\")); });"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "e95e89f8-249c-43ca-bb24-d7cb82df7e26",
-								"exec": [
-									"pm.variables.set('theme_id', 'bc08839f-2970-4f34-af2d-29608a48082f')"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{content_api_url}}/Theme/{{theme_id}}",
-							"host": [
-								"{{content_api_url}}"
-							],
-							"path": [
-								"Theme",
-								"{{theme_id}}"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Topic",
-			"item": [
-				{
-					"name": "Get Topics",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-									"",
-									"pm.test(\"Should return some results\", function () {",
-									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{content_api_url}}/Topic",
-							"host": [
-								"{{content_api_url}}"
-							],
-							"path": [
-								"Topic"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Specific Theme Copy",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-									"",
-									"pm.test(\"Topic id matches the topic requested\", function () { pm.expect(pm.response.json().id).to.equal(pm.variables.get(\"topic_id\")); });"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "e95e89f8-249c-43ca-bb24-d7cb82df7e26",
-								"exec": [
-									"pm.variables.set('topic_id', '66ff5e67-36cf-4210-9ad2-632baeb4eca7')"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{content_api_url}}/Topic/{{topic_id}}",
-							"host": [
-								"{{content_api_url}}"
-							],
-							"path": [
-								"Topic",
-								"{{topic_id}}"
+								"content",
+								"release",
+								"4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"
 							]
 						}
 					},
@@ -430,18 +179,93 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
-							"raw": "{{content_api_url}}/Content/tree",
+							"raw": "{{content_api_url}}/content/tree",
 							"host": [
 								"{{content_api_url}}"
 							],
 							"path": [
-								"Content",
+								"content",
 								"tree"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Methodology",
+			"item": [
+				{
+					"name": "Get Methodology tree",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "624b2fa9-0137-4a78-a16c-03da80c0a000",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+									"});",
+									"",
+									"pm.test(\"Returned array should be correct length\", function () { pm.expect(pm.response.json().length).to.equal(3); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{content_api_url}}/methodology/tree",
+							"host": [
+								"{{content_api_url}}"
+							],
+							"path": [
+								"methodology",
+								"tree"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Methodology for Pupil absence",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "624b2fa9-0137-4a78-a16c-03da80c0a000",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Title should be correct\", function () {",
+									"    pm.expect(pm.response.json().title).to.equal(\"Pupil absence statistics: methodology\"); ",
+									"});",
+									"",
+									"pm.test(\"PublicationId should be correct\", function () {",
+									"pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{content_api_url}}/methodology/pupil-absence-in-schools-in-england",
+							"host": [
+								"{{content_api_url}}"
+							],
+							"path": [
+								"methodology",
+								"pupil-absence-in-schools-in-england"
 							]
 						}
 					},
