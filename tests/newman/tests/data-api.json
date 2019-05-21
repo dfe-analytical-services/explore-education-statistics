@@ -943,7 +943,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        3, 4\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -995,7 +995,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        3, 4, 72, 73\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}, {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1039,7 +1039,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"National\",\n    \"countries\": [\n    \t\"E92000001\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        3, 4\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"National\",\n    \"countries\": [\n    \t\"E92000001\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1081,7 +1081,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        3, 4\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1125,7 +1125,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"localAuthorities\": [\n    \t\"E09000032\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        3, 4\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"localAuthorities\": [\n    \t\"E09000032\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1175,7 +1175,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        42, 43, 44\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1219,7 +1219,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"localAuthorityDistricts\": [\n    \t\"E07000223\"\n    ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        42, 43, 44\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"localAuthorityDistricts\": [\n    \t\"E07000223\"\n    ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1241,7 +1241,13 @@
 										"id": "1b454eae-43c4-4e92-a06e-1a803aa8858b",
 										"type": "text/javascript",
 										"exec": [
-											""
+											"pm.globals.set(\"FILT_GenderMale\", \"3\");",
+											"pm.globals.set(\"FILT_GenderFemale\", \"4\");",
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"72\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"73\");",
+											"pm.globals.set(\"FILT_FSMEligible\", \"42\");",
+											"pm.globals.set(\"FILT_FSMNotEligible\", \"43\");",
+											"pm.globals.set(\"FILT_FSMUnclassified\", \"44\");"
 										]
 									}
 								},
@@ -1317,7 +1323,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2006,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t85, 86, 87\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2006,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1374,7 +1380,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Local_Authority\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t85, 86, 87\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Local_Authority\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1431,7 +1437,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Regional\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t85, 86, 87\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Regional\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1488,7 +1494,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Regional\",\n    \"regions\": [\n\t\t\"E13000001\"\n\t],\n    \"startYear\": 2006,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t85, 86, 87\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Regional\",\n    \"regions\": [\n\t\t\"E13000001\"\n\t],\n    \"startYear\": 2006,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1545,7 +1551,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"regions\": [ \"E13000001\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t85, 86, 87\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"regions\": [ \"E13000001\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1602,7 +1608,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"localAuthorities\": [ \"E09000002\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t85, 86, 87\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"localAuthorities\": [ \"E09000002\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1642,7 +1648,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        85, 87, 100\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_Special}}, {{FILT_SecondaryFreeSchool}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1699,7 +1705,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n\n        85, 87, 121, 179, 100\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_Special}}, {{FILT_PrimaryFreeSchool}}, {{FILT_SpecialFreeSchool}}, {{FILT_SecondaryFreeSchool}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1721,6 +1727,7 @@
 											"script": {
 												"id": "6ef52a6e-a307-4849-b277-6f929e629b1c",
 												"exec": [
+													"/*",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Compulsory fields are present\", function () {",
@@ -1742,7 +1749,8 @@
 													"",
 													"pm.test(\"Response time is less than 200ms\", function () {",
 													"    pm.expect(pm.response.responseTime).to.be.below(5000);",
-													"});"
+													"});",
+													"*/"
 												],
 												"type": "text/javascript"
 											}
@@ -1760,7 +1768,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"subjectId\": 2,\n\t\"geographicLevel\": \"School\",\n\t\"regions\": [ \"E13000001\" ],\n\t\"startYear\": 2016,\n\t\"endYear\": 2016,\n\t\"filters\" : [\n\t\t81, 85, 125, 82, 121, 140, 179\n\t],\n\t\"indicators\": [\n\t\t42, 61, 57, 59, 66, 111212\n\t]\n}"
+											"raw": "{\n\t\"subjectId\": 2,\n\t\"geographicLevel\": \"School\",\n\t\"regions\": [ \"E13000001\" ],\n\t\"startYear\": 2016,\n\t\"endYear\": 2016,\n\t\"filters\" : [\n\t\t{{FILT_AllSchools}}, {{FILT_StateFundedPrimary}}, {{FILT_PrimarySponsorLedAcademy}}, {{FILT_AcademyTypeNotSpecified}}, {{FILT_PrimaryFreeSchool}}, {{FILT_SecondarySponsorLedAcademy}}, {{FILT_SpecialFreeSchool}}\n\t],\n\t\"indicators\": [\n\t\t42, 61, 57, 59, 66, 111212\n\t]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1782,7 +1790,16 @@
 										"id": "6354b6c5-34ad-43c1-b2d7-45f006621e28",
 										"type": "text/javascript",
 										"exec": [
-											""
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"85\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"86\");",
+											"pm.globals.set(\"FILT_Special\", \"87\");",
+											"pm.globals.set(\"FILT_AcademyTypeNotSpecified\", \"82\");",
+											"pm.globals.set(\"FILT_AllSchools\", \"81\");",
+											"pm.globals.set(\"FILT_PrimaryFreeSchool\", \"121\");",
+											"pm.globals.set(\"FILT_SecondaryFreeSchool\", \"100\");",
+											"pm.globals.set(\"FILT_SpecialFreeSchool\", \"179\");",
+											"pm.globals.set(\"FILT_PrimarySponsorLedAcademy\", \"125\");",
+											"pm.globals.set(\"FILT_SecondarySponsorLedAcademy\", \"140\");"
 										]
 									}
 								},
@@ -1830,7 +1847,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2014,\n    \"endYear\": 2016,\n    \"filters\" : [\n        258, 259, 260\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2014,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1872,7 +1889,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"National\",\n    \"countries\": [ \"E92000001\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        258, 259\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"National\",\n    \"countries\": [ \"E92000001\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1914,7 +1931,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Local_Authority\",\n    \"countries\": [ \"E92000001\" ],\n    \"regions\": [ \"E13000001\", \"E13000002\" ],\n    \"localAuthorities\": [ \"E09000001\", \"E09000002\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        258, 259\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Local_Authority\",\n    \"countries\": [ \"E92000001\" ],\n    \"regions\": [ \"E13000001\", \"E13000002\" ],\n    \"localAuthorities\": [ \"E09000001\", \"E09000002\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1956,7 +1973,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"National\",\n    \"years\": [ 2012, 2016 ],\n    \"filters\" : [\n        258, 259\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"National\",\n    \"years\": [ 2012, 2016 ],\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -1978,7 +1995,9 @@
 										"id": "f28d57d5-c4a2-4c3c-a90c-e672993bec6d",
 										"type": "text/javascript",
 										"exec": [
-											""
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"258\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"259\");",
+											"pm.globals.set(\"FILT_Special\", \"260\");"
 										]
 									}
 								},
@@ -2039,7 +2058,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 4,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2013,\n    \"endYear\": 2016,\n    \"filters\" : [\n        378, 379\n    ],\n    \"indicators\": [\n        95, 94\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 4,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2013,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_Special}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        95, 94\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2081,7 +2100,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 4,\n    \"geographicLevel\": \"School\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        378\n    ],\n    \"indicators\": [\n        95, 94\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 4,\n    \"geographicLevel\": \"School\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_Special}}\n    ],\n    \"indicators\": [\n        95, 94\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2103,7 +2122,8 @@
 										"id": "2cb67ee0-9a6d-4616-8d92-02a3aa5184e4",
 										"type": "text/javascript",
 										"exec": [
-											""
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"379\");",
+											"pm.globals.set(\"FILT_Special\", \"378\");"
 										]
 									}
 								},
@@ -2164,7 +2184,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 5,\n    \"geographicLevel\": \"Local_Authority\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        403\n    ],\n    \"indicators\": [\n        113, 114, 115\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 5,\n    \"geographicLevel\": \"Local_Authority\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_PupilReferralUnit}}\n    ],\n    \"indicators\": [\n        113, 114, 115\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2206,7 +2226,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 5,\n    \"geographicLevel\": \"Regional\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        403\n    ],\n    \"indicators\": [\n        113, 114, 115\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 5,\n    \"geographicLevel\": \"Regional\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_PupilReferralUnit}}\n    ],\n    \"indicators\": [\n        113, 114, 115\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2228,7 +2248,7 @@
 										"id": "52135f05-03ae-4080-bbbb-dddcd7ee3e42",
 										"type": "text/javascript",
 										"exec": [
-											""
+											"pm.globals.set(\"FILT_PupilReferralUnit\", \"403\");"
 										]
 									}
 								},
@@ -2289,7 +2309,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 6,\n    \"geographicLevel\": \"Local_Authority\",\n    \"startYear\": 2012,\n    \"endYear\": 2016,\n    \"filters\" : [\n        405, 406, 407\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 6,\n    \"geographicLevel\": \"Local_Authority\",\n    \"startYear\": 2012,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2331,7 +2351,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 6,\n    \"geographicLevel\": \"Regional\",\n    \"startYear\": 2012,\n    \"endYear\": 2016,\n    \"filters\" : [\n        405, 406, 407\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 6,\n    \"geographicLevel\": \"Regional\",\n    \"startYear\": 2012,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2353,7 +2373,9 @@
 										"id": "e04223f2-1e08-4ff6-9984-732c655dbcdf",
 										"type": "text/javascript",
 										"exec": [
-											""
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"405\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"406\");",
+											"pm.globals.set(\"FILT_Special\", \"407\");"
 										]
 									}
 								},
@@ -2414,7 +2436,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 7,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        456, 457, 458\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 7,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_Special}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2436,7 +2458,9 @@
 										"id": "49522da0-95a0-4ddf-9a8a-9ca103db1df2",
 										"type": "text/javascript",
 										"exec": [
-											""
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"456\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"458\");",
+											"pm.globals.set(\"FILT_Special\", \"457\");"
 										]
 									}
 								},
