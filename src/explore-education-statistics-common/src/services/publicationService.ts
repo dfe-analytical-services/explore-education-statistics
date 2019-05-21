@@ -100,12 +100,12 @@ export interface Release {
 
 export default {
   getPublication(publicationSlug: string): Promise<Release> {
-    return contentApi.get(`publication/${publicationSlug}`);
+    return contentApi.get(`content/publication/${publicationSlug}`);
   },
   getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
-    return contentApi.get(`publication/${publicationSlug}/latest`);
+    return contentApi.get(`content/publication/${publicationSlug}/latest`);
   },
   getPublicationRelease(releaseId: string): Promise<Release> {
-    return contentApi.get(`release/${releaseId}`);
+    return contentApi.get(`content/release/${releaseId}`);
   },
 };
