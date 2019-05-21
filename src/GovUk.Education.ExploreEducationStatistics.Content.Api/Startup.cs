@@ -72,6 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddCors();
             services.AddAutoMapper();
             services.AddTransient<IContentService, ContentService>();
+            services.AddTransient<IReleaseService, ReleaseService>();
+            services.AddTransient<IPublicationService, PublicationService>();
             services.AddTransient<IMethodologyService, MethodologyService>();
         }
 
