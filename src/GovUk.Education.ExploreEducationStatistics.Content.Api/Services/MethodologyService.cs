@@ -1,9 +1,9 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Data;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
-using System;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {
@@ -11,11 +11,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
     {
         private readonly ApplicationDbContext _context;
 
-        public MethodologyService(ApplicationDbContext context)
+        public MethodologyService(
+            ApplicationDbContext context)
         {
             _context = context;
         }
 
+        public Methodology Get(string slug)
+        {
+            return _context.Methodologies.FirstOrDefault(x => x.Publication.Slug == slug);
+        }
+        
         public List<ThemeTree> GetTree()
         {
             var tree = _context.Themes.Select(t => new ThemeTree

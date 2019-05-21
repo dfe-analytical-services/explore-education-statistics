@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 
-namespace GovUk.Education.ExploreStatistics.Data.Api.Tests.Controller
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
 {
     public class TableBuilderControllerTests
     {
