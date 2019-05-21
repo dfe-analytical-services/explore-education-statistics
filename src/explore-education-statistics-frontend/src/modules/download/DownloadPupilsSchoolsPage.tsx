@@ -1,5 +1,6 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import Details from '@common/components/Details';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
@@ -74,30 +75,74 @@ function DownloadIndexPage() {
           </div>
         </AccordionSection>
         <AccordionSection heading="Exclusions" caption="">
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0 govuk-!-margin-bottom-9">
-            <ul className="govuk-bulllet-list govuk-!-margin-top-0 ">
-              <li>
-                <p className="govuk-!-margin-top-0">
-                  <Link to="#">
-                    Download permanent and fixed-period exclusions in England
-                  </Link>{' '}
-                  <strong>(.csv, 55mb)</strong>
-                </p>
-              </li>
-            </ul>
-          </div>
+          <Details summary="Permanent and fixed-period exclusions in England">
+            <h3 className="govuk-heading-s">Download data files</h3>
+            <p>
+              <a href="#">Exclusions by characteristic</a> (csv, 100MB)
+            </p>
+            <p>
+              <a href="#">Exclusions by geographic level</a> (csv, 20MB)
+            </p>
+            <p>
+              <a href="#">Exclusions by reason</a> (csv, 30MB)
+            </p>
+            <p>
+              <a href="#">Duration of fixed exclusions</a> (csv, 5MB)
+            </p>
+            <p>
+              <a href="#">Number of fixed exclusions</a> (csv, 40MB)
+            </p>
+            <p>
+              <a href="#">Total days missed due to fixed period exclusions</a>{' '}
+              (csv, 10MB)
+            </p>
+            <p>
+              <a href="#">
+                All data for permanent and fixed-period exclusions in England
+              </a>{' '}
+              (csv, 205MB)
+            </p>
+          </Details>
         </AccordionSection>
         <AccordionSection heading="Pupil absence" caption="">
-          <div className="govuk-!-margin-top-0 govuk-!-padding-top-0 govuk-!-margin-bottom-9">
+          <>
+            <Details summary="Pupil absence for schools in England">
+              <h3 className="govuk-heading-s">Download data</h3>
+              <p>
+                <a href="#">Absence by characteristic</a> (csv, 100MB)
+              </p>
+              <p>
+                <a href="#">Absence by geographic level</a> (csv, 10MB)
+              </p>
+              <p>
+                <a href="#">Absence by term</a> (csv, 25MB)
+              </p>
+              <p>
+                <a href="#">Absence for four year olds</a> (csv, 5MB)
+              </p>
+              <p>
+                <a href="#">Absence in prus</a> (csv, 10MB)
+              </p>
+              <p>
+                <a href="#">
+                  Absence number missing at least one session by reason
+                </a>{' '}
+                (csv, 20MB)
+              </p>
+              <p>
+                <a href="#">Absence rate percent bands</a> (csv, 5MB)
+              </p>
+              <p>
+                <a href="#">
+                  All data for pupil absence for schools in England
+                </a>{' '}
+                (csv, 175MB)
+              </p>
+            </Details>
+          </>
+
+          <div className="govuk-!-margin-top-6 govuk-!-padding-top-0 govuk-!-margin-bottom-9">
             <ul className="govuk-bullet-list govuk-!-margin-top-0">
-              <li>
-                <p className="govuk-!-margin-top-0">
-                  <Link to="#">
-                    Download pupil absence in schools in England
-                  </Link>{' '}
-                  <strong>(.csv, 55mb)</strong>
-                </p>
-              </li>
               <li className="govuk-!-margin-top-3">
                 <p>
                   Pupil absence in schools in England: autumn term - currently
