@@ -23,40 +23,17 @@ function DownloadIndexPage() {
       <PageTitle title="Download data files for school and college performance - including GCSE and key stage results" />
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <p className="govuk-body-l">
-            Browse topics and download data files. Files are currently available
-            to download in .csv format.
-          </p>
+          <Link className="govuk-body" to="/download">
+            {' '}
+            Change theme
+          </Link>
         </div>
         <div className="govuk-grid-column-one-third">
-          <aside className="app-related-items">
-            <h2 className="govuk-heading-m" id="releated-content">
-              Related content
-            </h2>
-            <nav role="navigation" aria-labelledby="subsection-title">
-              <ul className="govuk-list">
-                <li>
-                  <Link to="/statistics">Find statistics and data</Link>
-                </li>
-                <li>
-                  <Link to="/glossary">Education statistics: glossary</Link>
-                </li>
-              </ul>
-            </nav>
-          </aside>
-          <div className="govuk-!-margin-top-9 govuk-!-margin-bottom-9">
+          <div className="govuk-!-margin-bottom-6">
             <PrototypeSearchForm />
           </div>
         </div>
       </div>
-
-      <h2 className="govuk-heading-l">
-        Browse topics{' '}
-        <Link className="govuk-body govuk-!-margin-left-2" to="/download">
-          {' '}
-          Change theme
-        </Link>
-      </h2>
 
       <Accordion id="performance">
         <AccordionSection heading="16 to 19 attainment" caption="">
