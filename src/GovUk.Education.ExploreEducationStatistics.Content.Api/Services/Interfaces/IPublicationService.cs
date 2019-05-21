@@ -1,9 +1,9 @@
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces
 {
     public interface IPublicationService
     {
-        Publication GetPublication(string id);
+        PublicationViewModel GetPublication(string slug);
     }
 }

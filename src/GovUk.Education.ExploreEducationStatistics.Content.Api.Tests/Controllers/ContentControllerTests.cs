@@ -1,7 +1,6 @@
-
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -68,10 +67,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             contentService.Setup(s => s.GetContentTree());
             publicationService.Setup(s => s.GetPublication("publication-a")).Returns(
-                new Publication
+                new PublicationViewModel
                 {
-                    Title = "Publication A",
-                    Slug = "publication-a"
+                    Id = new Guid("a7772148-fbbd-4c85-8530-f33c9ef25488"),
+                    Title = "Publication A"
                 });
             releaseService.Setup(s => s.GetRelease("test"));
 
@@ -80,7 +79,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             var result = controller.GetPublication("publication-a");
 
-            Assert.IsAssignableFrom<Publication>(result.Value);
+            Assert.IsAssignableFrom<PublicationViewModel>(result.Value);
+            Assert.Equal("a7772148-fbbd-4c85-8530-f33c9ef25488", result.Value.Id.ToString());
             Assert.Equal("Publication A", result.Value.Title);
         }
 
@@ -93,10 +93,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             contentService.Setup(s => s.GetContentTree());
             publicationService.Setup(s => s.GetPublication("test-publication")).Returns(
-                new Publication
+                new PublicationViewModel
                 {
-                    Title = "Publication A",
-                    Slug = "publication-a"
+                    Id = new Guid("a7772148-fbbd-4c85-8530-f33c9ef25488"),
+                    Title = "Publication A"
                 });
             releaseService.Setup(s => s.GetRelease("test"));
 
