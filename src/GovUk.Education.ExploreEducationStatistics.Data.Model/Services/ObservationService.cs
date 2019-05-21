@@ -98,6 +98,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Include(observation => observation.FilterItems)
                 .ThenInclude(item => item.FilterItem.FilterGroup);
 
+            result.ToList().ForEach(observation => ReplaceEmptyOwnedTypeValuesWithNull(observation.Location));
+
             return result;
         }
 
@@ -198,16 +200,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .AsNoTracking()
                 .Where(query.ObservationPredicate())
                 .GroupBy(observation => observation.LocationId)
-                .Select(group => group.Key);
+                .Select(group => group.Key).ToArray();
 
-            return locationIds.Any() ? _locationService.Find(locationIds.ToArray()) : new List<Location>();
+            if (locationIds.Any())
+            {
+                var locations = _locationService.Find(locationIds).ToList();
+                locations.ForEach(ReplaceEmptyOwnedTypeValuesWithNull);
+                return locations;
+            }
+
+            return new List<Location>();
+        }
+
+        /**
+         * Owned Types that are mapped with the owner in the same table provide no support for optional (i.e. nullable).
+         * See this discussion https://github.com/aspnet/EntityFramework.Docs/issues/466
+         * This method replaces empty Owned Types values that are ObservationalUnit properties of Location with null.
+         * We do this so that they are not projected as empty values by AutoMapper.
+         */
+        private static void ReplaceEmptyOwnedTypeValuesWithNull(Location location)
+        {
+            var observationalUnitType = typeof(IObservationalUnit);
+            var observationalUnitProperties = from p in typeof(Location).GetProperties()
+                where observationalUnitType.IsAssignableFrom(p.PropertyType)
+                select p;
+
+            foreach (var property in observationalUnitProperties)
+            {
+                var x = (IObservationalUnit) property.GetValue(location);
+                if (x.Code == null)
+                {
+                    property.SetValue(location, null);
+                }
+            }
         }
 
         private static IEnumerable<T> GroupByObservationalUnit<T>(IEnumerable<Location> locations,
             Func<Location, T> keySelector) where T : IObservationalUnit
         {
             return locations.GroupBy(keySelector)
-                .Where(grouping => grouping.Key.Code != null)
+                .Where(grouping => grouping.Key != null)
                 .Select(group => group.Key);
         }
     }
