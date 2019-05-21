@@ -38,11 +38,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             return NoContent();
         }
 
-        // GET api/content/publication/5
-        [HttpGet("publication/{id}")]
-        public ActionResult<Publication> GetPublication(string id)
+        // GET api/content/publication/pupil-absence-in-schools-in-england
+        [HttpGet("publication/{slug}")]
+        public ActionResult<PublicationViewModel> GetPublication(string slug)
         {
-            var publication = _publicationService.GetPublication(id);
+            var publication = _publicationService.GetPublication(slug);
             
             if (publication != null)
             {
