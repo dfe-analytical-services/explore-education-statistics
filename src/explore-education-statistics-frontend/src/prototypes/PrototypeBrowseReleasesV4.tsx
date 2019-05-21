@@ -465,7 +465,7 @@ const BrowseReleasesPage = () => {
                   <strong>
                     Permanent and fixed-period exclusions in England
                   </strong>{' '}
-                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
+                  <PrototypeDownloadDropdown link="/prototypes/publication-exclusions" />
                 </li>
               </ul>
             </div>
@@ -475,7 +475,7 @@ const BrowseReleasesPage = () => {
               <ul className="govuk-bullet-list govuk-!-margin-top-0">
                 <li>
                   <strong>Pupil absence in schools in England</strong>{' '}
-                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
+                  <PrototypeDownloadDropdown link="/prototypes/publication" />
                 </li>
                 <li>
                   <strong>
