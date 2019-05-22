@@ -92,13 +92,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var ids = inner.Select(obs => obs.Id).ToList();
 
             var result = DbSet()
+                .AsNoTracking()
                 .Where(observation => ids.Contains(observation.Id))
                 .Include(observation => observation.Subject)
+                .ThenInclude(subject => subject.Release)
                 .Include(observation => observation.Location)
                 .Include(observation => observation.FilterItems)
-                .ThenInclude(item => item.FilterItem.FilterGroup);
+                .ThenInclude(item => item.FilterItem.FilterGroup).ToList();
 
-            result.ToList().ForEach(observation => ReplaceEmptyOwnedTypeValuesWithNull(observation.Location));
+            result.Select(observation => observation.Location)
+                .Distinct()
+                .ToList()
+                .ForEach(ReplaceEmptyOwnedTypeValuesWithNull);
 
             return result;
         }
