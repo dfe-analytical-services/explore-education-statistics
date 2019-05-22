@@ -1,9 +1,9 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Data;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
-using System;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {
@@ -11,11 +11,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
     {
         private readonly ApplicationDbContext _context;
 
-        public MethodologyService(ApplicationDbContext context)
+        public MethodologyService(
+            ApplicationDbContext context)
         {
             _context = context;
         }
 
+        public Methodology Get(string slug)
+        {
+            return _context.Methodologies.FirstOrDefault(x => x.Publication.Slug == slug);
+        }
+        
         public List<ThemeTree> GetTree()
         {
             var tree = _context.Themes.Select(t => new ThemeTree
@@ -27,9 +33,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                     Id = x.Id,
                     Title = x.Title,
                     Summary = x.Summary,
-                    Publications = x.Publications
+                    Publications = x.Publications.Where(p => p.Methodologies.Any())
                         .Select(p => new PublicationTree
-                        { Id = p.Id, Title = p.Title, Summary = p.Summary, Slug = p.Slug }).OrderBy(publication => publication.Title).ToList()
+                        { Id = p.Methodologies.FirstOrDefault().Id, Title = p.Methodologies.FirstOrDefault().Title, Summary = p.Methodologies.FirstOrDefault().Summary, Slug = p.Slug }).OrderBy(publication => publication.Title).ToList()
                 }).OrderBy(topic => topic.Title).ToList()
             }).OrderBy(theme => theme.Title).ToList();
 

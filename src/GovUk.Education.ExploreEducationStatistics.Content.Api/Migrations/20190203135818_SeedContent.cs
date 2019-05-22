@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 {
+    
+    [ExcludeFromCodeCoverage]
     public partial class SeedContent : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

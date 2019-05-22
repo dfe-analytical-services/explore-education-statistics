@@ -15,9 +15,11 @@ services:
     - db
   content-api:
     container_name: ees-content
-    build: GovUk.Education.ExploreEducationStatistics.Content.Api
+    build: 
+      context: .
+      dockerfile: Dockerfile-Content-Api
     ports:
-    - "5010:5000"
+    - "5010:5010"
     - "5011:5011"
 #  frontend:
 #    container_name: ees-frontend

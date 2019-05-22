@@ -9,11 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEduc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreStatistics.Data.Api.Tests", "GovUk.Education.ExploreStatistics.Data.Api.Tests\GovUk.Education.ExploreStatistics.Data.Api.Tests.csproj", "{C6673886-11C0-49AA-A29A-1EA960D9F09C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreStatistics.Admin", "GovUk.Education.ExploreStatistics.Admin\GovUk.Education.ExploreStatistics.Admin.csproj", "{334F4A60-04CF-4A6B-9AA2-FF991682FCBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Admin", "GovUk.Education.ExploreEducationStatistics.Admin\GovUk.Education.ExploreEducationStatistics.Admin.csproj", "{334F4A60-04CF-4A6B-9AA2-FF991682FCBA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreStatistics.Admin.Tests", "GovUk.Education.ExploreStatistics.Admin.Tests\GovUk.Education.ExploreStatistics.Admin.Tests.csproj", "{3D3C5420-6BC2-42C2-82BC-5953493C9827}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Admin.Tests", "GovUk.Education.ExploreEducationStatistics.Admin.Tests\GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj", "{3D3C5420-6BC2-42C2-82BC-5953493C9827}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreStatistics.Content.Api.Tests", "GovUk.Education.ExploreStatistics.Content.Api.Tests\GovUk.Education.ExploreStatistics.Content.Api.Tests.csproj", "{D9CB3DDD-2A72-435F-A7F9-8CA1FB612F3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Content.Api.Tests", "GovUk.Education.ExploreEducationStatistics.Content.Api.Tests\GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.csproj", "{D9CB3DDD-2A72-435F-A7F9-8CA1FB612F3F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Data.Seed", "GovUk.Education.ExploreEducationStatistics.Data.Seed\GovUk.Education.ExploreEducationStatistics.Data.Seed.csproj", "{0F49B58C-E614-4F53-B845-A97CF4DE2EFC}"
 EndProject
@@ -24,6 +24,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Notifier", "GovUk.Education.ExploreEducationStatistics.Notifier\GovUk.Education.ExploreEducationStatistics.Notifier.csproj", "{2D23B0C4-2B0B-451A-966E-F2EBCA515D44}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Data.Processor", "GovUk.Education.ExploreEducationStatistics.Data.Processor\GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj", "{A2C4B1D6-AF13-4AF2-A292-8FE1E9E027A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Content.Model", "GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj", "{C49AB169-1552-4AD4-AA30-3FF6A966D8D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -167,6 +169,18 @@ Global
 		{A2C4B1D6-AF13-4AF2-A292-8FE1E9E027A9}.Release|x64.Build.0 = Release|Any CPU
 		{A2C4B1D6-AF13-4AF2-A292-8FE1E9E027A9}.Release|x86.ActiveCfg = Release|Any CPU
 		{A2C4B1D6-AF13-4AF2-A292-8FE1E9E027A9}.Release|x86.Build.0 = Release|Any CPU
+		{C49AB169-1552-4AD4-AA30-3FF6A966D8D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C49AB169-1552-4AD4-AA30-3FF6A966D8D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C49AB169-1552-4AD4-AA30-3FF6A966D8D1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C49AB169-1552-4AD4-AA30-3FF6A966D8D1}.Debug|x64.Build.0 = Debug|Any CPU
+		{C49AB169-1552-4AD4-AA30-3FF6A966D8D1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C49AB169-1552-4AD4-AA30-3FF6A966D8D1}.Debug|x86.Build.0 = Debug|Any CPU
+		{C49AB169-1552-4AD4-AA30-3FF6A966D8D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C49AB169-1552-4AD4-AA30-3FF6A966D8D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C49AB169-1552-4AD4-AA30-3FF6A966D8D1}.Release|x64.ActiveCfg = Release|Any CPU
+		{C49AB169-1552-4AD4-AA30-3FF6A966D8D1}.Release|x64.Build.0 = Release|Any CPU
+		{C49AB169-1552-4AD4-AA30-3FF6A966D8D1}.Release|x86.ActiveCfg = Release|Any CPU
+		{C49AB169-1552-4AD4-AA30-3FF6A966D8D1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
