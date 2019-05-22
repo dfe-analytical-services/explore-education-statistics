@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -10,14 +9,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
     public class ContentService : IContentService
     {
         private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper;
         
         public ContentService(
-            ApplicationDbContext context,
-            IMapper _mapper)
+            ApplicationDbContext context)
         {
             _context = context;
-            _mapper = _mapper;
         }
 
         public List<ThemeTree> GetContentTree()
