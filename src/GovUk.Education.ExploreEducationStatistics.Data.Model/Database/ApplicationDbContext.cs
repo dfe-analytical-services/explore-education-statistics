@@ -94,7 +94,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
             modelBuilder.Entity<Observation>()
                 .Property(observation => observation.TimeIdentifier)
-                .HasConversion(timeIdentifierConverter);
+                .HasConversion(timeIdentifierConverter)
+                .HasMaxLength(6);
 
             modelBuilder.Entity<Observation>()
                 .HasIndex(observation => observation.Year);
@@ -109,7 +110,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
             modelBuilder.Entity<Observation>()
                 .Property(observation => observation.GeographicLevel)
-                .HasConversion(geographicLevelConverter);
+                .HasConversion(geographicLevelConverter)
+                .HasMaxLength(6);
+            
+            modelBuilder.Entity<Observation>()
+                .HasIndex(observation => observation.GeographicLevel);
         }
 
         private static void ConfigureCountry(ModelBuilder modelBuilder)
