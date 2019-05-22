@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api
@@ -73,6 +74,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<ISchoolService, SchoolService>();
             services.AddTransient<ISubjectService, SubjectService>();
 
+            services.AddMvc()
+                .AddJsonOptions(options => {
+                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                });
+            
             services.AddCors();
             services.AddAutoMapper();
         }
