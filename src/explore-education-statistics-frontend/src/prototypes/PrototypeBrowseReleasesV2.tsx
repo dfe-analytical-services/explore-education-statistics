@@ -10,16 +10,14 @@ const BrowseReleasesPage = () => {
     <PrototypePage
       breadcrumbs={[{ text: 'Find statistics and download data' }]}
     >
+      <h1 className="govuk-heading-xl">Find statistics and data</h1>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">
-            Find statistics and download data
-          </h1>
-          <p className="govuk-body-l">
+          <p className="govuk-body">
             Browse to find the statistics and data you’re looking for and open
             the section to get links to:
           </p>
-          <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+          <ul className="govuk-bulllet-list govuk-!-margin-bottom-6">
             <li>
               up-to-date national statistical headlines, breakdowns and
               explanations
@@ -33,8 +31,45 @@ const BrowseReleasesPage = () => {
               range of national and regional data
             </li>
             <li>
-              links to underlying data so you can download files and carry out
-              your own statistical analysis
+              underlying data so you can download files and carry out your own
+              statistical analysis
+            </li>
+          </ul>
+          <h4 className="govuk-heading-s">Contents</h4>
+          <ul className="govuk-list dfe-contents-list">
+            <li>
+              <a href="#section-1">
+                Children and early years - including social care
+              </a>
+            </li>
+            <li>
+              <a href="#section-2">
+                Destinations of pupils and students - including NEET
+              </a>
+            </li>
+            <li>
+              <a href="#section-3">Finance and funding</a>
+            </li>
+            <li>
+              <a href="#section-4">Further education</a>
+            </li>
+            <li>
+              <a href="#section-5">Higher education</a>
+            </li>
+            <li>
+              <a href="#section-6">Pupils and schools</a>
+            </li>
+            <li>
+              <a href="#section-7">
+                School and college performance - including GCSE and key stage
+                results
+              </a>
+            </li>
+            <li>
+              <a href="#section-8">Teachers and school workforce</a>
+            </li>
+            <li>
+              <a href="#section-9">UK education and training statistics</a>
             </li>
           </ul>
         </div>
@@ -60,13 +95,14 @@ const BrowseReleasesPage = () => {
           </aside>
         </div>
       </div>
-      <h2 className="govuk-heading-l">
+      <hr />
+      <h2 className="govuk-heading-l" id="section-1">
         Children and early years - including social care
       </h2>
       <Accordion id="children-and-early-years">
         <AccordionSection heading="Childcare and early years" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>30 hours free childcare</strong> - currently available
                 via{' '}
@@ -105,7 +141,7 @@ const BrowseReleasesPage = () => {
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>Characteristics of children in need</strong> - currently
                 available via{' '}
@@ -184,7 +220,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
       </Accordion>
 
-      <h2 className="govuk-heading-l govuk-!-margin-top-9">
+      <h2 className="govuk-heading-l govuk-!-margin-top-9" id="section-2">
         Destinations of pupils and students - including NEET
       </h2>
       <Accordion id="destinations-pupils-and-students">
@@ -240,7 +276,7 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
       </Accordion>
-      <h2 className="govuk-heading-l govuk-!-margin-top-9">
+      <h2 className="govuk-heading-l govuk-!-margin-top-9" id="section-3">
         Finance and funding
       </h2>
       <Accordion id="finance-and-funding">
@@ -288,7 +324,7 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
       </Accordion>
-      <h2 className="govuk-heading-l govuk-!-margin-top-9">
+      <h2 className="govuk-heading-l govuk-!-margin-top-9" id="section-4">
         Further education
       </h2>
       <Accordion id="further-education">
@@ -387,14 +423,16 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
       </Accordion>
 
-      <h2 className="govuk-heading-l govuk-!-margin-top-9">Higher education</h2>
+      <h2 className="govuk-heading-l govuk-!-margin-top-9" id="section-5">
+        Higher education
+      </h2>
       <Accordion id="higher-education">
         <AccordionSection
           heading="Higher education graduate employment and earnings"
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>Graduate outcomes (LEO)</strong> - currently available
                 via{' '}
@@ -407,7 +445,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="Higher education statistics" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>Higher education: destinations of leavers</strong> -
                 currently available via{' '}
@@ -423,11 +461,8 @@ const BrowseReleasesPage = () => {
                 </a>
               </li>
               <li>
-                <strong>
-                  Performance indicators in HE or Performance indicators in
-                  higher education or Performance indicators
-                </strong>{' '}
-                - currently available via{' '}
+                <strong>Performance indicators in higher education</strong> -
+                currently available via{' '}
                 <a href="https://www.gov.uk/government/collections/official-statistics-releases#performance-indicators">
                   Statistics at DfE
                 </a>
@@ -447,7 +482,7 @@ const BrowseReleasesPage = () => {
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>Participation rates in higher education</strong> -
                 currently available via{' '}
@@ -463,7 +498,7 @@ const BrowseReleasesPage = () => {
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>Widening participation in higher education</strong> -
                 currently available via{' '}
@@ -476,13 +511,13 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
       </Accordion>
 
-      <h2 className="govuk-heading-l govuk-!-margin-top-9">
+      <h2 className="govuk-heading-l govuk-!-margin-top-9" id="section-6">
         Pupils and schools
       </h2>
       <Accordion id="pupils-and-schools">
         <AccordionSection heading="Admission appeals" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>Admissions appeals in England</strong> - currently
                 available via{' '}
@@ -495,28 +530,22 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="Exclusions" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-0">
+            <ul className="govuk-bulllet-list govuk-!-margin-top-0">
               <li>
                 <strong>
                   Permanent and fixed-period exclusions in England
                 </strong>{' '}
-                - view statistics, create tables and download data files{' '}
-                <div className="govuk-!-margin-top-5">
-                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
-                </div>
+                <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
               </li>
             </ul>
           </div>
         </AccordionSection>
         <AccordionSection heading="Pupil absence" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
-                <strong>Pupil absence in schools in England</strong> - view
-                statistics, create tables and download data files{' '}
-                <div className="govuk-!-margin-top-5">
-                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
-                </div>
+                <strong>Pupil absence in schools in England</strong>{' '}
+                <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
               </li>
               <li>
                 <strong>
@@ -541,7 +570,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="Parental responsibility measures	" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>Parental responsibility measures</strong> - currently
                 available via{' '}
@@ -554,7 +583,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="Pupil projections" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>National pupil projections</strong> - currently
                 available via{' '}
@@ -567,7 +596,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="School and pupil numbers" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>Schools, pupils and their characteristics</strong> -
                 currently available via{' '}
@@ -580,7 +609,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="School applications" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>
                   Secondary and primary schools applications and offers
@@ -595,7 +624,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="School capacity" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>School capacity</strong> - currently available via{' '}
                 <a href="https://www.gov.uk/government/collections/statistics-school-capacity#school-capacity-data:-by-academic-year">
@@ -607,7 +636,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="Special educational needs (SEN)" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>Special educational needs in England</strong> -
                 currently available via{' '}
@@ -636,18 +665,15 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
       </Accordion>
-      <h2 className="govuk-heading-l govuk-!-margin-top-9">
+      <h2 className="govuk-heading-l govuk-!-margin-top-9" id="section-7">
         School and college performance - including GCSE and key stage results
       </h2>
       <Accordion id="performance">
         <AccordionSection heading="16 to 19 attainment" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
-                <strong>
-                  16 to 18 school and college performance tables or School and
-                  college performance tables in England
-                </strong>{' '}
+                <strong>16 to 18 school and college performance tables</strong>{' '}
                 - currently available via{' '}
                 <a href="https://www.gov.uk/government/collections/statistics-attainment-at-19-years#16-to-18-school-and-college-performance-tables">
                   Statistics at DfE
@@ -674,13 +700,12 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="GCSEs (key stage 4)	" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
-                <strong>GCSE and equivalent results</strong> - view statistics,
-                create tables and download data files{' '}
-                <div className="govuk-!-margin-top-5">
-                  <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
-                </div>
+                <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+                  GCSE and equivalent results
+                </h3>{' '}
+                <PrototypeDownloadDropdown link="/prototypes/publication-gcse" />
               </li>
               <li>
                 <strong>Multi-academy trust performance measures</strong> -
@@ -708,7 +733,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="Key stage 1" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>
                   Phonics screening check and key stage 1 assessments
@@ -723,7 +748,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="Key stage 2" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>
                   Key stage 2 national curriculum test: review outcomes
@@ -759,11 +784,10 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="Outcome based success measures	" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>
-                  Outcome based success measures or Further education
-                  outcome-based success measures
+                  Further education outcome-based success measures
                 </strong>{' '}
                 - currently available via{' '}
                 <a href="https://www.gov.uk/government/collections/statistics-outcome-based-success-measures#statistics">
@@ -775,7 +799,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="Performance tables	" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>Primary school performance tables</strong> - currently
                 available via{' '}
@@ -801,13 +825,13 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
       </Accordion>
-      <h2 className="govuk-heading-l govuk-!-margin-top-9">
+      <h2 className="govuk-heading-l govuk-!-margin-top-9" id="section-8">
         Teachers and school workforce
       </h2>
       <Accordion id="teachers-and-workforce">
         <AccordionSection heading="Initial teacher training (ITT)	" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>Initial teacher training performance profiles</strong> -
                 currently available via{' '}
@@ -834,7 +858,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection heading="School workforce	" caption="">
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>School workforce in England</strong> - currently
                 available via{' '}
@@ -846,11 +870,11 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
         <AccordionSection
-          heading="Workforce statistics and analysis or Teacher workforce statistics and analysis	"
+          heading="Teacher workforce statistics and analysis	"
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>Teachers analysis compendium</strong> - currently
                 available via{' '}
@@ -862,7 +886,7 @@ const BrowseReleasesPage = () => {
           </div>
         </AccordionSection>
       </Accordion>
-      <h2 className="govuk-heading-l govuk-!-margin-top-9">
+      <h2 className="govuk-heading-l govuk-!-margin-top-9" id="section-9">
         UK education and training statistics
       </h2>
       <Accordion id="uk-statistics">
@@ -871,7 +895,7 @@ const BrowseReleasesPage = () => {
           caption=""
         >
           <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-            <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+            <ul className="govuk-bullet-list govuk-!-margin-top-0">
               <li>
                 <strong>Education and training statistics for the UK</strong> -
                 currently available via{' '}

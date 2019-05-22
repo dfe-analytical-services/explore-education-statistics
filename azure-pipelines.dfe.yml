@@ -3,7 +3,7 @@ variables:
   CI: true
 
 trigger: [ 'master' ]
-pr: [ 'master' ]
+pr: none
 
 jobs:
   - job: 'Backend'
@@ -53,19 +53,19 @@ jobs:
         displayName: 'Restore'
         inputs:
           command: 'restore'
-          projects: '**/GovUk.Education.ExploreStatistics.Admin.csproj'
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
           feedsToUse: config
           nugetConfigPath: src/nuget.config
       - task: 'DotNetCoreCLI@2'
         displayName: 'Build'
         inputs:
-          projects: '**/GovUk.Education.ExploreStatistics.Admin.csproj'
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
           arguments: '--configuration $(BuildConfiguration)'
       - task: 'DotNetCoreCLI@2'
         displayName: 'Test'
         inputs:
           command: 'test'
-          projects: '**/GovUk.Education.ExploreStatistics.Admin.Tests.csproj'
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
           arguments: '--configuration $(BuildConfiguration)'
 
       - task: Npm@1
@@ -98,14 +98,14 @@ jobs:
         displayName: 'Copy files to wwwroot'
         inputs:
           SourceFolder: 'src/explore-education-statistics-admin/build'
-          TargetFolder: src/GovUk.Education.ExploreStatistics.Admin/wwwroot
+          TargetFolder: src/GovUk.Education.ExploreEducationStatistics.Admin/wwwroot
 
       - task: 'DotNetCoreCLI@2'
         displayName: 'Publish'
         inputs:
           command: 'publish'
           publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreStatistics.Admin.csproj'
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
           arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'

@@ -24,24 +24,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             _locationService = locationService;
         }
 
-        public IEnumerable<Observation> FindObservations(long subjectId,
-            GeographicLevel geographicLevel,
-            IEnumerable<int> years,
-            IEnumerable<string> countries,
-            IEnumerable<string> regions,
-            IEnumerable<string> localAuthorities,
-            IEnumerable<string> localAuthorityDistricts,
-            IEnumerable<long> filters)
+        public IEnumerable<Observation> FindObservations(ObservationQueryContext query)
         {
-            var subjectIdParam = new SqlParameter("subjectId", subjectId);
-            var geographicLevelParam = new SqlParameter("geographicLevel", geographicLevel.GetEnumValue());
-            var yearsListParam = CreateIdListType("yearList", years);
-            var countriesListParam = CreateIdListType("countriesList", countries);
-            var regionsListParam = CreateIdListType("regionsList", regions);
-            var localAuthorityListParam = CreateIdListType("localAuthorityList", localAuthorities);
+            var yearsRange = TimePeriodUtil.YearsRange(query.Years, query.StartYear, query.EndYear);
+
+            var subjectIdParam = new SqlParameter("subjectId", query.SubjectId);
+            var geographicLevelParam = new SqlParameter("geographicLevel", query.GeographicLevel.GetEnumValue());
+            var yearsListParam = CreateIdListType("yearList", yearsRange);
+            var countriesListParam = CreateIdListType("countriesList", query.Countries);
+            var regionsListParam = CreateIdListType("regionsList", query.Regions);
+            var localAuthorityListParam = CreateIdListType("localAuthorityList", query.LocalAuthorities);
             var localAuthorityDistrictListParam =
-                CreateIdListType("localAuthorityDistrictList", localAuthorityDistricts);
-            var filtersListParam = CreateIdListType("filtersList", filters);
+                CreateIdListType("localAuthorityDistrictList", query.LocalAuthorityDistricts);
+            var localEnterprisePartnershipListParam =
+                CreateIdListType("localEnterprisePartnershipList", query.LocalEnterprisePartnerships);
+            var institutionListParam =
+                CreateIdListType("institutionList", query.Institutions);
+            var matListParam =
+                CreateIdListType("matList", query.Mats);
+            var mayoralCombinedAuthorityListParam =
+                CreateIdListType("mayoralCombinedAuthorityList", query.MayoralCombinedAuthorities);
+            var opportunityAreaListParam =
+                CreateIdListType("opportunityAreaList", query.OpportunityAreas);
+            var parliamentaryConstituencyListParam =
+                CreateIdListType("parliamentaryConstituencyList", query.ParliamentaryConstituencies);
+            var providerListParam =
+                CreateIdListType("providerList", query.Providers);
+            var wardListParam =
+                CreateIdListType("wardList", query.Wards);
+            var filtersListParam = CreateIdListType("filtersList", query.Filters);
 
             var inner = _context.Query<IdWrapper>().AsNoTracking()
                 .FromSql("EXEC dbo.FilteredObservations " +
@@ -52,6 +63,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                          "@regionsList," +
                          "@localAuthorityList," +
                          "@localAuthorityDistrictList," +
+                         "@localEnterprisePartnershipList," +
+                         "@institutionList," +
+                         "@matList," +
+                         "@mayoralCombinedAuthorityList," +
+                         "@opportunityAreaList," +
+                         "@parliamentaryConstituencyList," +
+                         "@providerList," +
+                         "@wardList," +
                          "@filtersList",
                     subjectIdParam,
                     geographicLevelParam,
@@ -60,6 +79,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                     regionsListParam,
                     localAuthorityListParam,
                     localAuthorityDistrictListParam,
+                    localEnterprisePartnershipListParam,
+                    institutionListParam,
+                    matListParam,
+                    mayoralCombinedAuthorityListParam,
+                    opportunityAreaListParam,
+                    parliamentaryConstituencyListParam,
+                    providerListParam,
+                    wardListParam,
                     filtersListParam);
 
             var ids = inner.Select(obs => obs.Id).ToList();
@@ -129,6 +156,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 {
                     GeographicLevel.Local_Authority_District,
                     GroupByObservationalUnit(locations, location => location.LocalAuthorityDistrict)
+                },
+                {
+                    GeographicLevel.Local_Enterprise_Partnerships,
+                    GroupByObservationalUnit(locations, location => location.LocalEnterprisePartnership)
+                },
+                {
+                    GeographicLevel.Institution,
+                    GroupByObservationalUnit(locations, location => location.Institution)
+                },
+                {
+                    GeographicLevel.MAT_Or_Sponsor,
+                    GroupByObservationalUnit(locations, location => location.Mat)
+                },
+                {
+                    GeographicLevel.Mayoral_Combined_Authorities,
+                    GroupByObservationalUnit(locations, location => location.MayoralCombinedAuthority)
+                },
+                {
+                    GeographicLevel.Opportunity_Areas,
+                    GroupByObservationalUnit(locations, location => location.OpportunityArea)
+                },
+                {
+                    GeographicLevel.Parliamentary_Constituency,
+                    GroupByObservationalUnit(locations, location => location.ParliamentaryConstituency)
+                },
+                {
+                    GeographicLevel.Provider,
+                    GroupByObservationalUnit(locations, location => location.Provider)
+                },
+                {
+                    GeographicLevel.Ward,
+                    GroupByObservationalUnit(locations, location => location.Ward)
                 }
             };
         }

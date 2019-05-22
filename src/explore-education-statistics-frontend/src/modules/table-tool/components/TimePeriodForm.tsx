@@ -64,13 +64,13 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
             'Must be after or same as start date',
             function moreThanOrEqual(value: string) {
               if (!value) {
-                return false;
+                return true;
               }
 
               const start: string = this.resolve(Yup.ref('start'));
 
               if (!start) {
-                return false;
+                return true;
               }
 
               const endTime = TimePeriod.fromString(value);
@@ -91,13 +91,13 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
             'Must be before or same as end date',
             function lessThanOrEqual(value: string) {
               if (!value) {
-                return false;
+                return true;
               }
 
               const end: string = this.resolve(Yup.ref('end'));
 
               if (!end) {
-                return false;
+                return true;
               }
 
               const startTime = TimePeriod.fromString(value);

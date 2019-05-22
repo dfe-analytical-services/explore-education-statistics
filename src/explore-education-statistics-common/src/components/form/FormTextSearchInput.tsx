@@ -18,9 +18,9 @@ const FormTextSearchInput = ({
   id,
   label,
   labelHidden,
-  name,
   onChange,
   width,
+  ...props
 }: Props) => {
   const handleChange = debounce((event: ChangeEvent<HTMLInputElement>) => {
     if (onChange) {
@@ -45,17 +45,17 @@ const FormTextSearchInput = ({
       )}
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
       <input
+        {...props}
         aria-describedby={createDescribedBy({
           id,
           error: !!error,
           hint: !!hint,
         })}
-        type="text"
         className={classNames('govuk-input', styles.searchInput, {
           [`govuk-input--width-${width}`]: width !== undefined,
         })}
         id={id}
-        name={name}
+        type="text"
         onChange={event => {
           event.persist();
           handleChange(event);

@@ -28,6 +28,55 @@ describe('FormCheckboxGroup', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
+  test('renders list of checkboxes in reverse order', () => {
+    const { getAllByLabelText } = render(
+      <FormCheckboxGroup
+        id="test-checkboxes"
+        name="test-checkboxes"
+        legend="Test checkboxes"
+        value={[]}
+        orderDirection={['desc']}
+        options={[
+          { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
+          { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
+          { id: 'checkbox-3', label: 'Test checkbox 3', value: '3' },
+        ]}
+      />,
+    );
+
+    const checkboxes = getAllByLabelText(/Test checkbox/);
+
+    expect(checkboxes).toHaveLength(3);
+    expect(checkboxes[0]).toHaveAttribute('value', '3');
+    expect(checkboxes[1]).toHaveAttribute('value', '2');
+    expect(checkboxes[2]).toHaveAttribute('value', '1');
+  });
+
+  test('renders list of checkboxes in custom order', () => {
+    const { getAllByLabelText } = render(
+      <FormCheckboxGroup
+        id="test-checkboxes"
+        name="test-checkboxes"
+        legend="Test checkboxes"
+        value={[]}
+        order={['value']}
+        orderDirection={['desc']}
+        options={[
+          { id: 'checkbox-1', label: 'Test checkbox 1', value: '2' },
+          { id: 'checkbox-2', label: 'Test checkbox 2', value: '3' },
+          { id: 'checkbox-3', label: 'Test checkbox 3', value: '1' },
+        ]}
+      />,
+    );
+
+    const radios = getAllByLabelText(/Test checkbox/);
+
+    expect(radios).toHaveLength(3);
+    expect(radios[0]).toHaveAttribute('value', '3');
+    expect(radios[1]).toHaveAttribute('value', '2');
+    expect(radios[2]).toHaveAttribute('value', '1');
+  });
+
   test('renders checkboxes with some pre-checked', () => {
     const { container, getAllByLabelText } = render(
       <FormCheckboxGroup
@@ -84,8 +133,8 @@ describe('FormCheckboxGroup', () => {
     expect(container).toMatchSnapshot();
   });
 
-  test('renders unchecked `Select all` option when `selectAll` is true', () => {
-    const { container, getByLabelText } = render(
+  test('renders `Select all 3 options` button when `selectAll` is true', () => {
+    const { container, queryByText } = render(
       <FormCheckboxGroup
         value={[]}
         id="test-checkboxes"
@@ -100,15 +149,14 @@ describe('FormCheckboxGroup', () => {
       />,
     );
 
-    const selectAllCheckbox = getByLabelText('Select all') as HTMLInputElement;
-
-    expect(selectAllCheckbox.checked).toBe(false);
+    expect(queryByText('Select all 3 options')).not.toBeNull();
+    expect(queryByText('Unselect all 3 options')).toBeNull();
 
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('renders checked `Select all` checkbox when all options are pre-checked', () => {
-    const { getByLabelText } = render(
+  test('renders `Unselect all 3 options` button when all options are pre-checked', () => {
+    const { queryByText } = render(
       <FormCheckboxGroup
         value={['1', '2', '3']}
         id="test-checkboxes"
@@ -123,33 +171,12 @@ describe('FormCheckboxGroup', () => {
       />,
     );
 
-    const selectAllCheckbox = getByLabelText('Select all') as HTMLInputElement;
-
-    expect(selectAllCheckbox.checked).toBe(true);
+    expect(queryByText('Unselect all 3 options')).not.toBeNull();
+    expect(queryByText('Select all 3 options')).toBeNull();
   });
 
-  test('renders `Select all` with small variant', () => {
-    const { container } = render(
-      <FormCheckboxGroup
-        id="test-checkboxes"
-        name="test-checkboxes"
-        legend="Test checkboxes"
-        selectAll
-        small
-        value={[]}
-        options={[
-          { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
-          { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
-          { id: 'checkbox-3', label: 'Test checkbox 3', value: '3' },
-        ]}
-      />,
-    );
-
-    expect(container.querySelector('.govuk-checkboxes--small')).not.toBeNull();
-  });
-
-  test('does not render checked `Select all` checkbox when checked values do not match options', () => {
-    const { getByLabelText } = render(
+  test('does not render `Unselect all 3 options` button when checked values do not match options', () => {
+    const { queryByText } = render(
       <FormCheckboxGroup
         id="test-checkboxes"
         name="test-checkboxes"
@@ -164,12 +191,11 @@ describe('FormCheckboxGroup', () => {
       />,
     );
 
-    const selectAllCheckbox = getByLabelText('Select all') as HTMLInputElement;
-
-    expect(selectAllCheckbox.checked).toBe(false);
+    expect(queryByText('Unselect all 3 options')).toBeNull();
+    expect(queryByText('Select all 3 options')).not.toBeNull();
   });
 
-  test('does not render `Select all` checkbox when there is only one option', () => {
+  test('does not render `Select all 3 options` button when there is only one option', () => {
     const { queryByLabelText } = render(
       <FormCheckboxGroup
         id="test-checkboxes"
@@ -181,7 +207,8 @@ describe('FormCheckboxGroup', () => {
       />,
     );
 
-    expect(queryByLabelText('Select all')).toBeNull();
+    expect(queryByLabelText('Select all 3 options')).toBeNull();
+    expect(queryByLabelText('Unselect all 3 options')).toBeNull();
     expect(queryByLabelText('Test checkbox 1')).not.toBeNull();
   });
 

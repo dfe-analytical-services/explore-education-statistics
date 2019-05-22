@@ -1,7 +1,7 @@
 import { Omit, PartialBy } from '@common/types/util';
 import classNames from 'classnames';
 import kebabCase from 'lodash/kebabCase';
-import sortBy from 'lodash/sortBy';
+import orderBy from 'lodash/orderBy';
 import memoize from 'memoizee';
 import React, { ChangeEvent, createRef, PureComponent } from 'react';
 import FormFieldset, { FormFieldsetProps } from './FormFieldset';
@@ -26,7 +26,10 @@ export type FormRadioGroupProps = {
   onChange?: RadioGroupChangeEventHandler;
   options: RadioOption[];
   small?: boolean;
-  sort?: string[] | ((option: RadioOption) => RadioOption[keyof RadioOption])[];
+  order?:
+    | (keyof RadioOption)[]
+    | ((option: RadioOption) => RadioOption[keyof RadioOption])[];
+  orderDirection?: ('asc' | 'desc')[];
   value: string | null;
 } & FormFieldsetProps;
 
@@ -35,7 +38,8 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
     inline: false,
     legendSize: 'm',
     small: false,
-    sort: ['label'],
+    order: ['label'],
+    orderDirection: ['asc'],
     value: '',
   };
 
@@ -66,7 +70,16 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
   }
 
   public render() {
-    const { id, inline, name, options, small, sort = [], value } = this.props;
+    const {
+      id,
+      inline,
+      name,
+      options,
+      small,
+      order,
+      orderDirection,
+      value,
+    } = this.props;
 
     return (
       <FormFieldset {...this.props}>
@@ -77,7 +90,7 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
           })}
           ref={this.ref}
         >
-          {sortBy(options, sort).map(option => (
+          {orderBy(options, order, orderDirection).map(option => (
             <FormRadio
               {...option}
               id={option.id ? option.id : `${id}-${kebabCase(option.value)}`}

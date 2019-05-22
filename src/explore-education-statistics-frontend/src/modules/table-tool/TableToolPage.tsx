@@ -7,12 +7,15 @@ import tableBuilderService, {
   TableData,
 } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
+import { Dictionary } from '@common/types/util';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
 import mapValues from 'lodash/mapValues';
 import React, { Component } from 'react';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
-import LocationFiltersForm from './components/LocationFiltersForm';
+import LocationFiltersForm, {
+  LocationFiltersFormSubmitHandler,
+} from './components/LocationFiltersForm';
 import PublicationForm, {
   PublicationFormSubmitHandler,
 } from './components/PublicationForm';
@@ -76,12 +79,8 @@ const defaultPublicationOptions: PublicationOptions[] = [
 
 interface State {
   timePeriods: TimePeriod[];
-  locations: {
-    [key: string]: string[];
-  };
-  filters: {
-    [key: string]: FilterOption[];
-  };
+  locations: Dictionary<FilterOption[]>;
+  filters: Dictionary<FilterOption[]>;
   indicators: IndicatorOption[];
   publication?: PublicationOptions['topics'][0]['publications'][0];
   subjects: PublicationSubject[];
@@ -95,7 +94,6 @@ class TableToolPage extends Component<{}, State> {
   public state: State = {
     filters: {},
     timePeriods: [],
-    // eslint-disable-next-line react/no-unused-state
     locations: {},
     indicators: [],
     subjectName: '',
@@ -153,6 +151,23 @@ class TableToolPage extends Component<{}, State> {
     });
   };
 
+  private handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = values => {
+    const { subjectMeta } = this.state;
+
+    this.setState({
+      locations: mapValuesWithKeys(
+        values.locations,
+        ([locationLevel, locations]) =>
+          locations.map(
+            location =>
+              subjectMeta.locations[locationLevel].options.find(
+                option => option.value === location,
+              ) as FilterOption,
+          ),
+      ),
+    });
+  };
+
   private handleFiltersFormSubmit: FilterFormSubmitHandler = async ({
     filters,
     indicators,
@@ -189,9 +204,9 @@ class TableToolPage extends Component<{}, State> {
     const {
       filters,
       indicators,
+      locations,
       timePeriods,
       publication,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       subjectName,
       subjectMeta,
       subjects,
@@ -236,14 +251,7 @@ class TableToolPage extends Component<{}, State> {
               <LocationFiltersForm
                 {...stepProps}
                 options={subjectMeta.locations}
-                onSubmit={values => {
-                  this.setState({
-                    // eslint-disable-next-line react/no-unused-state
-                    locations: {
-                      ...values,
-                    },
-                  });
-                }}
+                onSubmit={this.handleLocationFiltersFormSubmit}
               />
             )}
           </WizardStep>
@@ -285,6 +293,9 @@ class TableToolPage extends Component<{}, State> {
                       <TimePeriodDataTable
                         filters={filters}
                         indicators={indicators}
+                        publicationName={publication ? publication.title : ''}
+                        subjectName={subjectName}
+                        locations={locations}
                         timePeriods={timePeriods}
                         results={tableData}
                       />

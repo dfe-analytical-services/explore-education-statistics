@@ -1,17 +1,17 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Data;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
-using Newtonsoft.Json.Serialization;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {
     public class ContentService : IContentService
     {
         private readonly ApplicationDbContext _context;
-
-        public ContentService(ApplicationDbContext context)
+        
+        public ContentService(
+            ApplicationDbContext context)
         {
             _context = context;
         }
@@ -33,31 +33,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
             return tree;
         }
-    }
-
-    public class ThemeTree
-    {
-        public Guid Id { get; set; }
-        public string Title { get; set; }
-
-        public List<TopicTree> Topics { get; set; }
-    }
-
-    public class TopicTree
-    {
-        public Guid Id { get; set; }
-        public string Title { get; set; }
-        public string Summary { get; set; }
-
-        public List<PublicationTree> Publications { get; set; }
-    }
-
-    public class PublicationTree
-
-    {
-        public Guid Id { get; set; }
-        public string Title { get; set; }
-        public string Slug { get; set; }
-        public string Summary { get; set; }
     }
 }

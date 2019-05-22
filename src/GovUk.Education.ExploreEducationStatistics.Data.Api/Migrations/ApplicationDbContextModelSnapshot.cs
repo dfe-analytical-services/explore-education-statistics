@@ -286,6 +286,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                                 .OnDelete(DeleteBehavior.Cascade);
                         });
 
+                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Institution", "Institution", b1 =>
+                        {
+                            b1.Property<long>("LocationId")
+                                .ValueGeneratedOnAdd()
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<string>("Code");
+
+                            b1.Property<string>("Name");
+
+                            b1.HasKey("LocationId");
+
+                            b1.HasIndex("Code");
+
+                            b1.ToTable("Location");
+
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("Institution")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.Institution", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
+
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.LocalAuthority", "LocalAuthority", b1 =>
                         {
                             b1.Property<long>("LocationId")
@@ -332,6 +354,142 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                                 .OnDelete(DeleteBehavior.Cascade);
                         });
 
+                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.LocalEnterprisePartnership", "LocalEnterprisePartnership", b1 =>
+                        {
+                            b1.Property<long>("LocationId")
+                                .ValueGeneratedOnAdd()
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<string>("Code");
+
+                            b1.Property<string>("Name");
+
+                            b1.HasKey("LocationId");
+
+                            b1.HasIndex("Code");
+
+                            b1.ToTable("Location");
+
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("LocalEnterprisePartnership")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.LocalEnterprisePartnership", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
+
+                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Mat", "Mat", b1 =>
+                        {
+                            b1.Property<long>("LocationId")
+                                .ValueGeneratedOnAdd()
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<string>("Code");
+
+                            b1.Property<string>("Name");
+
+                            b1.HasKey("LocationId");
+
+                            b1.HasIndex("Code");
+
+                            b1.ToTable("Location");
+
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("Mat")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.Mat", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
+
+                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.MayoralCombinedAuthority", "MayoralCombinedAuthority", b1 =>
+                        {
+                            b1.Property<long>("LocationId")
+                                .ValueGeneratedOnAdd()
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<string>("Code");
+
+                            b1.Property<string>("Name");
+
+                            b1.HasKey("LocationId");
+
+                            b1.HasIndex("Code");
+
+                            b1.ToTable("Location");
+
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("MayoralCombinedAuthority")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.MayoralCombinedAuthority", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
+
+                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.OpportunityArea", "OpportunityArea", b1 =>
+                        {
+                            b1.Property<long>("LocationId")
+                                .ValueGeneratedOnAdd()
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<string>("Code");
+
+                            b1.Property<string>("Name");
+
+                            b1.HasKey("LocationId");
+
+                            b1.HasIndex("Code");
+
+                            b1.ToTable("Location");
+
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("OpportunityArea")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.OpportunityArea", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
+
+                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.ParliamentaryConstituency", "ParliamentaryConstituency", b1 =>
+                        {
+                            b1.Property<long>("LocationId")
+                                .ValueGeneratedOnAdd()
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<string>("Code");
+
+                            b1.Property<string>("Name");
+
+                            b1.HasKey("LocationId");
+
+                            b1.HasIndex("Code");
+
+                            b1.ToTable("Location");
+
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("ParliamentaryConstituency")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.ParliamentaryConstituency", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
+
+                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Provider", "Provider", b1 =>
+                        {
+                            b1.Property<long>("LocationId")
+                                .ValueGeneratedOnAdd()
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<string>("Code");
+
+                            b1.Property<string>("Name");
+
+                            b1.Property<string>("Ukprn");
+
+                            b1.Property<string>("Upin");
+
+                            b1.HasKey("LocationId");
+
+                            b1.HasIndex("Code");
+
+                            b1.ToTable("Location");
+
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("Provider")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.Provider", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
+
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Region", "Region", b1 =>
                         {
                             b1.Property<long>("LocationId")
@@ -351,6 +509,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                             b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
                                 .WithOne("Region")
                                 .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.Region", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
+
+                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Ward", "Ward", b1 =>
+                        {
+                            b1.Property<long>("LocationId")
+                                .ValueGeneratedOnAdd()
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<string>("Code");
+
+                            b1.Property<string>("Name");
+
+                            b1.HasKey("LocationId");
+
+                            b1.HasIndex("Code");
+
+                            b1.ToTable("Location");
+
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("Ward")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.Ward", "LocationId")
                                 .OnDelete(DeleteBehavior.Cascade);
                         });
                 });

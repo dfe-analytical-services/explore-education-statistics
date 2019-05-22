@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions
 
         public static IEnumerable<string> GetMetaLines(this Subject subject)
         {
-            return ReadAllLines(subject.GetMetaFilename().ToString());
+            return ReadAllLines(subject.Filename + ".meta");
         }
 
         private static IEnumerable<string> ReadAllLines(string filename)

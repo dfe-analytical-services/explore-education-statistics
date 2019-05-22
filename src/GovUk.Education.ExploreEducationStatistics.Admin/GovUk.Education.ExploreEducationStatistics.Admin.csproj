@@ -1,0 +1,88 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <UserSecretsId>aspnet-GovUk.Education.ExploreEducationStatistics.Admin-27177B65-FE3A-416B-97FE-420DF4EFF8BF</UserSecretsId>
+    <WebProject_DirectoryAccessLevelKey>0</WebProject_DirectoryAccessLevelKey>
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
+    <AspNetCoreModuleName>AspNetCoreModule</AspNetCoreModuleName>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.6.1" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.AzureAD.UI" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="9.4.2" />
+    <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="9.4.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
+    <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="2.0.0" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\css\site.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap.css.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap.min.css.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\LICENSE" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation-unobtrusive\LICENSE.txt" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\dist\additional-methods.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\dist\additional-methods.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\dist\jquery.validate.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\dist\jquery.validate.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\LICENSE.md" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery\dist\jquery.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery\dist\jquery.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery\dist\jquery.min.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery\LICENSE.txt" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\bold-a2452cb66f-v1.woff2" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\bold-f38c792ac2-v1.woff" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\bold-fb2676462a-v1.eot" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\bold-tabular-357fdfbcc3-v1.eot" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\bold-tabular-784c21afb8-v1.woff" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\bold-tabular-b89238d840-v1.woff2" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\light-2c037cf7e1-v1.eot" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\light-458f8ea81c-v1.woff" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\light-f38ad40456-v1.woff2" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\light-tabular-498ea8ffe2-v1.eot" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\light-tabular-62cc6f0a28-v1.woff" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\light-tabular-851b10ccdd-v1.woff2" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\favicon.ico" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-apple-touch-icon-152x152.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-apple-touch-icon-167x167.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-apple-touch-icon-180x180.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-apple-touch-icon.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-crest-2x.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-crest.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-logotype-crown.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-mask-icon.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-opengraph-image.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-arrow-left.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-important.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-pointer-2x.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-pointer.png" />
+  </ItemGroup>
+
+</Project>
