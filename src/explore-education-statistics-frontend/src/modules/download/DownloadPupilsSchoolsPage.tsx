@@ -61,7 +61,10 @@ function DownloadIndexPage() {
               <a href="#">Exclusions by geographic level</a> (csv, 20MB)
             </p>
             <p>
-              <a href="#">Exclusions by reason</a> (csv, 30MB)
+              <a href="/static/downloads/exclusions_by_reason.csv">
+                Exclusions by reason
+              </a>{' '}
+              (csv, 30MB)
             </p>
             <p>
               <a href="#">Duration of fixed exclusions</a> (csv, 5MB)
