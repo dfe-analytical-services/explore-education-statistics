@@ -3,10 +3,12 @@ import React from 'react';
 import Link from '@admin/components/Link';
 import { format } from 'date-fns';
 import { User } from '@admin/services/PrototypeLoginService';
+import Details from '@common/components/Details';
 
 interface Props {
-  title: string;
+  title?: string;
   isNew?: boolean;
+  isLatest?: boolean;
   editing?: boolean;
   years: string;
   lastEdited: Date;
@@ -16,15 +18,19 @@ interface Props {
 const DashboardRelease = ({
   title,
   isNew,
+  isLatest,
   editing,
   years,
   lastEdited,
   lastEditor,
 }: Props) => {
   return (
-    <>
-      <h3 className="govuk-heading-m govuk-!-margin-bottom-0">{title}</h3>
-      <dl className="govuk-summary-list govuk-!-margin-bottom-9">
+    <Details
+      summary={`${title} ${years} ${
+        isLatest ? '(Latest release)' : '(Archived)'
+      }`}
+    >
+      <dl className="govuk-summary-list">
         <div className="govuk-summary-list__row">
           <dt className="govuk-summary-list__key">Current status</dt>
           {isNew && (
@@ -45,7 +51,8 @@ const DashboardRelease = ({
                 {editing && (
                   <span className="govuk-tag">Editing in progress</span>
                 )}{' '}
-                Live (latest release)
+                Live {isLatest && <>(latest release)</>}
+                {!isLatest && <>(archived release)</>}
               </dd>
               <dd className="govuk-summary-list__actions" />
             </React.Fragment>
@@ -88,7 +95,28 @@ const DashboardRelease = ({
           </dd>
         </div>
       </dl>
-    </>
+      {!editing && (
+        <Link
+          to="/prototypes/publication-edit"
+          className="govuk-button govuk-button--secondary"
+        >
+          Edit this release
+        </Link>
+      )}
+      {editing && (
+        <Link
+          to="/prototypes/publication-create-new-absence-config"
+          className="govuk-button govuk-button--secondary"
+        >
+          View / edit this draft
+        </Link>
+      )}
+      {!isNew && editing && (
+        <Link to="#" className="govuk-button govuk-button--secondary">
+          Edit a previous release
+        </Link>
+      )}
+    </Details>
   );
 };
 

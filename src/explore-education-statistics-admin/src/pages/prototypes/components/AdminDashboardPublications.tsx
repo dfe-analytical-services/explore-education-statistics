@@ -1,5 +1,6 @@
 import DashboardRelease from '@admin/pages/prototypes/components/DashboardRelease';
 import React from 'react';
+import Details from '@common/components/Details';
 
 const AdminDashboardPublications = () => {
   return (
@@ -11,6 +12,44 @@ const AdminDashboardPublications = () => {
         Edit an existing release or create a new release for current
         publications.
       </p>
+
+      <h2 className="govuk-heading-m">
+        Pupil absense statistics and data for schools in England
+      </h2>
+      <ul className="govuk-list dfe-admin">
+        <li>
+          <DashboardRelease
+            title="Academic year,"
+            years="2017 to 2018"
+            isLatest
+            editing={window.location.search === '?status=editLiveRelease'}
+            lastEdited={new Date('2019-03-20 17:37')}
+            lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+          />
+        </li>
+        <li>
+          <DashboardRelease
+            title="Academic year,"
+            years="2016 to 2017"
+            editing={window.location.search === '?status=editLiveRelease'}
+            lastEdited={new Date('2018-03-20 14:23')}
+            lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+          />
+        </li>
+        <li>
+          <DashboardRelease
+            years="2015 to 2016"
+            editing={window.location.search === '?status=editLiveRelease'}
+            lastEdited={new Date('2017-03-20 16:15')}
+            lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+          />
+        </li>
+      </ul>
+      <a href="#" className="govuk-button">
+        Create new release
+      </a>
+
+      <hr />
 
       <ul className="govuk-list govuk-list--bullet">
         <li>
