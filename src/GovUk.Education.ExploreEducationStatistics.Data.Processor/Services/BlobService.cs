@@ -1,8 +1,8 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
-{
-    using System.IO;
-    using Microsoft.WindowsAzure.Storage.Blob;
+﻿using System.IO;
+using Microsoft.WindowsAzure.Storage.Blob;
 
+namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
+{
     public class BlobService : IBlobService
     {
         public void MoveBlobBetweenContainers(CloudBlockBlob srcBlob, string destContainerName, string destFolder)

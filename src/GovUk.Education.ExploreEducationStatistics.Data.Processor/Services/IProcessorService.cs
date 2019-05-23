@@ -1,9 +1,5 @@
 ﻿namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-
     public interface IProcessorService
     {
         void ProcessFiles(
