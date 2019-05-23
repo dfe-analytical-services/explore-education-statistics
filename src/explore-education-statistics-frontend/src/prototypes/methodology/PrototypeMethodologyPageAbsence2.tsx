@@ -34,7 +34,7 @@ const PublicationPage = () => {
       ]}
     >
       <h1 className="govuk-heading-xl">
-      Exclusions statistics: methodology
+        Pupil absence statistics: methodology
       </h1>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
