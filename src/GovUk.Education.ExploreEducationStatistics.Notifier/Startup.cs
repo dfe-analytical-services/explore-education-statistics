@@ -1,43 +1,19 @@
-﻿using System;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
-using GovUk.Education.ExploreEducationStatistics.Notifier;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Hosting;
-using Microsoft.Azure.WebJobs.Logging;
+﻿using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Willezone.Azure.WebJobs.Extensions.DependencyInjection;
 
-[assembly: WebJobsStartup(typeof(Startup))]
+[assembly: FunctionsStartup(typeof(GovUk.Education.ExploreEducationStatistics.Notifier.Startup))]
+
 namespace GovUk.Education.ExploreEducationStatistics.Notifier
 {
-    internal class Startup : IWebJobsStartup
+    public class Startup : FunctionsStartup
     {
-        public void Configure(IWebJobsBuilder builder) =>
-            builder.AddDependencyInjection<ServiceProviderBuilder>();
-    }
-
-    internal class ServiceProviderBuilder : IServiceProviderBuilder
-    {
-        private readonly ILoggerFactory _loggerFactory;
-
-        public ServiceProviderBuilder(ILoggerFactory loggerFactory) =>
-            _loggerFactory = loggerFactory;
-
-        public IServiceProvider Build()
+        public override void Configure(IFunctionsHostBuilder builder)
         {
-
-            var services = new ServiceCollection();
-
-            return services
-
+            builder.Services
             .AddTransient<IEmailService, EmailService>()
             .AddTransient<IStorageTableService, StorageTableService>()
-            .AddTransient<ITokenService, TokenService>()
-
-            // Important: We need to call CreateFunctionUserCategory, otherwise our log entries might be filtered out.
-            .AddSingleton<ILogger>(_ => _loggerFactory.CreateLogger(LogCategories.CreateFunctionUserCategory("Common")))
-            .BuildServiceProvider();
+            .AddTransient<ITokenService, TokenService>();
         }
     }
 }
