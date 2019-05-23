@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
     public class Processor
     {
-        private const string StorageConnectionName = "AzureStorage";
+        private const string StorageConnectionName = "TableStorageConnString";
         private const string ContainerName = "releases";
         private const string UploadsDir = "admin-file-uploads";
 
