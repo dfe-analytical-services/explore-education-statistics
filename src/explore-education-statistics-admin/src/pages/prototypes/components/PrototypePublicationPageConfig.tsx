@@ -289,6 +289,19 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
             ]}
           />
         </FormGroup>
+        <FormGroup>
+          <FormFieldset id="lead-statisician" legend="Lead statistician">
+            <FormSelect
+              id="select-lead-statisician"
+              label="Select lead statistician"
+              name="select-lead-statisician"
+              options={[
+                { label: 'Mark Pearson', value: 'mark-pearson' },
+                { label: 'Alex Miller', value: 'alex-miller' },
+              ]}
+            />
+          </FormFieldset>
+        </FormGroup>
 
         {!sectionId && (
           <>
@@ -349,7 +362,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
             </div>
 
             <button type="submit" className="govuk-button">
-              Create new release
+              Create new publication
             </button>
           </>
         )}

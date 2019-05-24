@@ -11,10 +11,10 @@ const PublicationPage = () => {
           link: '/prototypes/admin-dashboard',
           text: 'Administrator dashboard',
         },
-        { text: 'Create new publication', link: '#' },
+        { text: 'Create new release', link: '#' },
       ]}
     >
-      <h1 className="govuk-heading-xl">Create new publication</h1>
+      <h1 className="govuk-heading-xl">Create new release</h1>
       <PrototypePublicationConfig />
     </PrototypePage>
   );

@@ -55,7 +55,7 @@ const DashboardRelease = ({
           )}
           {!isNew && (
             <React.Fragment>
-              <dt className="govuk-summary-list__key">Pubished</dt>
+              <dt className="govuk-summary-list__key">Published to live</dt>
               <dd className="govuk-summary-list__value">
                 {format(published, 'd MMMM yyyy')}
               </dd>
@@ -79,30 +79,18 @@ const DashboardRelease = ({
             {' at '}
             {format(lastEdited, 'HH:mm')} by <a href="#">{lastEditor.name}</a>
           </dd>
-          <dd className="govuk-summary-list__actions" />
+          <dd className="govuk-summary-list__actions">
+            {!editing && (
+              <Link to="/prototypes/publication-edit">Edit this release</Link>
+            )}
+            {editing && (
+              <Link to="/prototypes/publication-create-new-absence-config">
+                View / edit this draft
+              </Link>
+            )}
+          </dd>
         </div>
       </dl>
-      {!editing && (
-        <Link
-          to="/prototypes/publication-edit"
-          className="govuk-button govuk-button--secondary"
-        >
-          Edit this release
-        </Link>
-      )}
-      {editing && (
-        <Link
-          to="/prototypes/publication-create-new-absence-config"
-          className="govuk-button govuk-button--secondary"
-        >
-          View / edit this draft
-        </Link>
-      )}
-      {!isNew && editing && (
-        <Link to="#" className="govuk-button govuk-button--secondary">
-          Edit a previous release
-        </Link>
-      )}
     </Details>
   );
 };
