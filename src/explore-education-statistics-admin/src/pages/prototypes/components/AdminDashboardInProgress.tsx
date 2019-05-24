@@ -16,6 +16,7 @@ const AdminDashboardInProgress = () => {
                 isNew
                 lastEdited={new Date('2019-03-20 17:37')}
                 lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+                published={new Date('2019-03-20 09:30')}
               />
             </li>
           </ul>
@@ -30,6 +31,7 @@ const AdminDashboardInProgress = () => {
             editing
             lastEdited={new Date('2019-03-20 17:37')}
             lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+            published={new Date('2019-03-20 09:30')}
           />
         </li>
       </ul>

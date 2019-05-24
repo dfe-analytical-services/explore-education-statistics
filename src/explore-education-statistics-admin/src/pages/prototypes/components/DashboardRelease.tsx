@@ -7,36 +7,44 @@ import Details from '@common/components/Details';
 
 interface Props {
   title?: string;
+  tag?: string;
+  lead?: string;
   isNew?: boolean;
   isLatest?: boolean;
   editing?: boolean;
   years: string;
   lastEdited: Date;
   lastEditor: User;
+  published: Date;
 }
 
 const DashboardRelease = ({
   title,
+  tag,
+  lead,
   isNew,
   isLatest,
   editing,
   years,
   lastEdited,
   lastEditor,
+  published,
 }: Props) => {
   return (
     <Details
-      summary={`${title} ${years} ${
-        isLatest ? '(Latest release)' : '(Archived)'
-      }`}
+      className="govuk-!-margin-bottom-0"
+      summary={`${title} ${years} ${isLatest ? '(Latest release)' : ''}`}
+      tag={tag}
     >
-      <dl className="govuk-summary-list">
+      <dl className="govuk-summary-list govuk-!-margin-bottom-3">
         <div className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">Current status</dt>
           {isNew && (
             <React.Fragment>
+              <dt className="govuk-summary-list__key">
+                Scheduled publish date
+              </dt>
               <dd className="govuk-summary-list__value">
-                <span className="govuk-tag">New release in progress</span>
+                {format(published, 'd MMMM yyyy')}
               </dd>
               <dd className="govuk-summary-list__actions">
                 <Link to="/prototypes/publication-create-new-absence-status">
@@ -47,37 +55,21 @@ const DashboardRelease = ({
           )}
           {!isNew && (
             <React.Fragment>
+              <dt className="govuk-summary-list__key">Pubished</dt>
               <dd className="govuk-summary-list__value">
-                {editing && (
-                  <span className="govuk-tag">Editing in progress</span>
-                )}{' '}
-                Live {isLatest && <>(latest release)</>}
-                {!isLatest && <>(archived release)</>}
+                {format(published, 'd MMMM yyyy')}
               </dd>
               <dd className="govuk-summary-list__actions" />
             </React.Fragment>
           )}
         </div>
         <div className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">Release for academic year</dt>
+          <dt className="govuk-summary-list__key">Lead statistician</dt>
           <dd className="govuk-summary-list__value">
-            {years}
-            {!isNew && editing && (
-              <Link to="#" className="govuk-!-margin-left-3">
-                Edit a previous release
-              </Link>
-            )}
+            {lead && <span>{lead}</span>}
+            {!lead && <span>John Smith</span>}
           </dd>
-          <dd className="govuk-summary-list__actions">
-            {!editing && (
-              <Link to="/prototypes/publication-edit">Edit this release</Link>
-            )}
-            {editing && (
-              <Link to="/prototypes/publication-create-new-absence-config">
-                View / edit this draft
-              </Link>
-            )}
-          </dd>
+          <dd className="govuk-summary-list__actions" />
         </div>
         <div className="govuk-summary-list__row">
           <dt className="govuk-summary-list__key">Last edited</dt>
@@ -87,12 +79,7 @@ const DashboardRelease = ({
             {' at '}
             {format(lastEdited, 'HH:mm')} by <a href="#">{lastEditor.name}</a>
           </dd>
-          <dd className="govuk-summary-list__actions">
-            {' '}
-            <Link to="/prototypes/publication-create-new">
-              Create new release
-            </Link>
-          </dd>
+          <dd className="govuk-summary-list__actions" />
         </div>
       </dl>
       {!editing && (
