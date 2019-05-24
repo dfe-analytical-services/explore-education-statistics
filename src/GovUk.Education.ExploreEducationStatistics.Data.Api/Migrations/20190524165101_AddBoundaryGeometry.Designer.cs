@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190517163442_AddGeoJson")]
-    partial class AddGeoJson
+    [Migration("20190524165101_AddBoundaryGeometry")]
+    partial class AddBoundaryGeometry
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -129,7 +129,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("GeographicLevel")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(6);
 
                     b.Property<long>("LocationId");
 
@@ -140,11 +141,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.Property<long>("SubjectId");
 
                     b.Property<string>("TimeIdentifier")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(6);
 
                     b.Property<int>("Year");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GeographicLevel");
 
                     b.HasIndex("LocationId");
 
