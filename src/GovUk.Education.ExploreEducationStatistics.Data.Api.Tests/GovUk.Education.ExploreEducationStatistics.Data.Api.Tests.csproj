@@ -5,9 +5,7 @@
 
         <IsPackable>false</IsPackable>
 
-        <AssemblyName>GovUk.Education.ExploreStatistics.Data.Api.Tests</AssemblyName>
-
-        <RootNamespace>GovUk.Education.ExploreStatistics.Data.Api.Tests</RootNamespace>
+        <RootNamespace>GovUk.Education.ExploreEducationStatistics.Data.Api.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

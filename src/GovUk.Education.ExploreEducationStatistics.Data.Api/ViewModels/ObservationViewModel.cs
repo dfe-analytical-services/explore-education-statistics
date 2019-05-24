@@ -3,9 +3,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.TableBuilder
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 {
-    public class TableBuilderObservationViewModel
+    public class ObservationViewModel
     {
         public IEnumerable<string> Filters { get; set; }
         

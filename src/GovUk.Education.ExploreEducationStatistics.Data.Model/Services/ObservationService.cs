@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -12,16 +11,12 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class ObservationService : AbstractDataService<Observation, long>, IObservationService
+    public class ObservationService : AbstractRepository<Observation, long>, IObservationService
     {
-        private readonly ILocationService _locationService;
-
         public ObservationService(
             ApplicationDbContext context,
-            ILocationService locationService,
             ILogger<ObservationService> logger) : base(context, logger)
         {
-            _locationService = locationService;
         }
 
         public IEnumerable<Observation> FindObservations(ObservationQueryContext query)
@@ -103,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             result.Select(observation => observation.Location)
                 .Distinct()
                 .ToList()
-                .ForEach(ReplaceEmptyOwnedTypeValuesWithNull);
+                .ForEach(location => location.ReplaceEmptyOwnedTypeValuesWithNull());
 
             return result;
         }
@@ -139,113 +134,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
             return from timePeriod in timePeriods.AsEnumerable()
                 select (timePeriod.TimeIdentifier, timePeriod.Year);
-        }
-
-        public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnitsMeta(
-            SubjectMetaQueryContext query)
-        {
-            var locations = GetLocations(query);
-
-            return new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>
-            {
-                {
-                    GeographicLevel.National,
-                    GroupByObservationalUnit(locations, location => location.Country)
-                },
-                {
-                    GeographicLevel.Regional,
-                    GroupByObservationalUnit(locations, location => location.Region)
-                },
-                {
-                    GeographicLevel.Local_Authority,
-                    GroupByObservationalUnit(locations, location => location.LocalAuthority)
-                },
-                {
-                    GeographicLevel.Local_Authority_District,
-                    GroupByObservationalUnit(locations, location => location.LocalAuthorityDistrict)
-                },
-                {
-                    GeographicLevel.Local_Enterprise_Partnerships,
-                    GroupByObservationalUnit(locations, location => location.LocalEnterprisePartnership)
-                },
-                {
-                    GeographicLevel.Institution,
-                    GroupByObservationalUnit(locations, location => location.Institution)
-                },
-                {
-                    GeographicLevel.MAT_Or_Sponsor,
-                    GroupByObservationalUnit(locations, location => location.Mat)
-                },
-                {
-                    GeographicLevel.Mayoral_Combined_Authorities,
-                    GroupByObservationalUnit(locations, location => location.MayoralCombinedAuthority)
-                },
-                {
-                    GeographicLevel.Opportunity_Areas,
-                    GroupByObservationalUnit(locations, location => location.OpportunityArea)
-                },
-                {
-                    GeographicLevel.Parliamentary_Constituency,
-                    GroupByObservationalUnit(locations, location => location.ParliamentaryConstituency)
-                },
-                {
-                    GeographicLevel.Provider,
-                    GroupByObservationalUnit(locations, location => location.Provider)
-                },
-                {
-                    GeographicLevel.Ward,
-                    GroupByObservationalUnit(locations, location => location.Ward)
-                }
-            };
-        }
-
-        private IEnumerable<Location> GetLocations(SubjectMetaQueryContext query)
-        {
-            var locationIds = DbSet()
-                .AsNoTracking()
-                .Where(query.ObservationPredicate())
-                .GroupBy(observation => observation.LocationId)
-                .Select(group => group.Key).ToArray();
-
-            if (locationIds.Any())
-            {
-                var locations = _locationService.Find(locationIds).ToList();
-                locations.ForEach(ReplaceEmptyOwnedTypeValuesWithNull);
-                return locations;
-            }
-
-            return new List<Location>();
-        }
-
-        /**
-         * Owned Types that are mapped with the owner in the same table provide no support for optional (i.e. nullable).
-         * See this discussion https://github.com/aspnet/EntityFramework.Docs/issues/466
-         * This method replaces empty Owned Types values that are ObservationalUnit properties of Location with null.
-         * We do this so that they are not projected as empty values by AutoMapper.
-         */
-        private static void ReplaceEmptyOwnedTypeValuesWithNull(Location location)
-        {
-            var observationalUnitType = typeof(IObservationalUnit);
-            var observationalUnitProperties = from p in typeof(Location).GetProperties()
-                where observationalUnitType.IsAssignableFrom(p.PropertyType)
-                select p;
-
-            foreach (var property in observationalUnitProperties)
-            {
-                var x = (IObservationalUnit) property.GetValue(location);
-                if (x.Code == null)
-                {
-                    property.SetValue(location, null);
-                }
-            }
-        }
-
-        private static IEnumerable<T> GroupByObservationalUnit<T>(IEnumerable<Location> locations,
-            Func<Location, T> keySelector) where T : IObservationalUnit
-        {
-            return locations.GroupBy(keySelector)
-                .Where(grouping => grouping.Key != null)
-                .Select(group => group.Key);
         }
     }
 }

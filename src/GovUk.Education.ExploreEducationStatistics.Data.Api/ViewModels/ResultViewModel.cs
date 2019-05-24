@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -18,13 +16,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
         [JsonConverter(typeof(StringEnumConverter))]
         public GeographicLevel GeographicLevel { get; set; }
 
-        public IEnumerable<TableBuilderObservationViewModel> Result { get; set; }
-        
-        public SubjectMetaViewModel MetaData { get; set; }  
+        public IEnumerable<ObservationViewModel> Result { get; set; }
 
         public ResultViewModel()
         {
-            Result = new List<TableBuilderObservationViewModel>();
+            Result = new List<ObservationViewModel>();
         }
     }
 }
