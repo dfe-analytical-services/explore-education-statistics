@@ -52,6 +52,10 @@
       }
     },
 
+    "publicAppBasicAuth": {
+      "type": "string",
+      "defaultValue": "true"
+    },
     "publicAppBasicAuthUsername": {
       "type": "string"
     },
@@ -452,7 +456,7 @@
             },
             {
               "name": "BASIC_AUTH",
-              "value": "true"
+              "value": "[parameters('publicAppBasicAuth')]"
             },
             {
               "name": "BASIC_AUTH_USERNAME",
