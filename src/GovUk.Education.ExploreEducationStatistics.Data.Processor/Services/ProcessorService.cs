@@ -1,25 +1,20 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
-{
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.WindowsAzure.Storage;
-    using Microsoft.WindowsAzure.Storage.Blob;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 
+namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
+{
     public class ProcessorService : IProcessorService
     {
-        private readonly ILogger _logger;
         private readonly ISeedService _seedService;
 
-        public ProcessorService(
-            ILogger logger,
-            ISeedService seedService)
+        public ProcessorService(ISeedService seedService)
         {
-            _logger = logger;
             _seedService = seedService;
         }
 
@@ -40,8 +35,7 @@
                     {
                         var subjects = GetSubjects(
                             blobContainer,
-                            uploadsDir + "/" + processorNotification.PublicationId,
-                            _logger).Result;
+                            uploadsDir + "/" + processorNotification.PublicationId).Result;
 
                         var release = CreateRelease(processorNotification, subjects);
 
@@ -50,7 +44,6 @@
                 }
                 catch (StorageException ex)
                 {
-                    _logger.LogError("Error returned from the service: {0}", ex.Message);
                 }
             }
         }
@@ -68,7 +61,7 @@
             };
         }
 
-        private static async Task<Subject[]> GetSubjects(CloudBlobContainer blobContainer, string directory, ILogger logger)
+        private static async Task<Subject[]> GetSubjects(CloudBlobContainer blobContainer, string directory)
         {
             var publicationUploadDir = blobContainer.GetDirectoryReference(directory);
             List<Subject> list = new List<Subject>();
@@ -87,7 +80,7 @@
                 {
                     var sName = GetSubjectName(item);
 
-                    logger.LogInformation($"adding subject {sName} to release for import process");
+                    //logger.LogInformation($"adding subject {sName} to release for import process");
 
                     list.Add(new Subject()
                     {
