@@ -4,6 +4,7 @@ import Router from 'next/router';
 import React from 'react';
 import Helmet from 'react-helmet';
 import './_app.scss';
+import { initHotJar } from '@frontend/services/hotjarService';
 
 class App extends BaseApp {
   public static async getInitialProps({ Component, ctx }: NextAppContext) {
@@ -18,6 +19,7 @@ class App extends BaseApp {
 
   public componentDidMount() {
     logPageView();
+    initHotJar();
 
     if (Router.router !== null) {
       Router.router.events.on('routeChangeComplete', logPageView);
