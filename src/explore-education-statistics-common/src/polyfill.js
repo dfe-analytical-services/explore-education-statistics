@@ -11,16 +11,16 @@ if (typeof Promise === 'undefined') {
 // This probably shouldn't be needed as long
 // as babel-preset-env is working correctly.
 if (
-  !('startsWith' in String.prototype) ||
-  !('endsWith' in String.prototype) ||
-  !('includes' in Array.prototype) ||
-  !('assign' in Object) ||
-  !('keys' in Object)
+  !String.prototype.startsWith ||
+  !String.prototype.endsWith ||
+  !Array.prototype.includes ||
+  !Object.assign ||
+  !Object.keys
 ) {
   require('core-js');
 }
 
-if (!('repeat' in String.prototype)) {
+if (!String.prototype.repeat) {
   require('core-js/fn/string/repeat');
 }
 
