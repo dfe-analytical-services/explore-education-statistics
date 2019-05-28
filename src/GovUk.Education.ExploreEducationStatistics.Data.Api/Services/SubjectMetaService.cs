@@ -99,7 +99,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private dynamic GetGeoJsonForObservationalUnit(IObservationalUnit observationalUnit)
         {
-            return JsonConvert.DeserializeObject(_geoJsonService.Find(observationalUnit.Code).Value);
+            var geoJson = _geoJsonService.Find(observationalUnit.Code);
+            return geoJson != null ? JsonConvert.DeserializeObject(geoJson.Value) : null;
         }
     }
 }
