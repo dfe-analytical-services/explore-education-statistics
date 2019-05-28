@@ -9,6 +9,7 @@ import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentatio
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
 
 import PublicationCreateNew from './pages/prototypes/PrototypePublicationPageCreateNew';
+import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
 
 import PublicationEditPage from './pages/prototypes/PrototypePublicationPageEditAbsence';
 import PublicationCreateNewAbsence from './pages/prototypes/PrototypePublicationPageNewAbsence';
@@ -44,6 +45,11 @@ function App() {
           exact
           path="/prototypes/publication-create-new"
           component={PublicationCreateNew}
+        />
+        <Route
+          exact
+          path="/prototypes/release-create-new"
+          component={ReleaseCreateNew}
         />
         <Route
           exact

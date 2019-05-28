@@ -21,7 +21,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
       {sectionId === 'setup' && (
         <h2 className="govuk-heading-m">Edit release setup</h2>
       )}
-      <form action="/prototypes/publication-create-new-absence-config">
+      <form action="/prototypes/admin-dashboard" method="get">
         <div className="govuk-form-group">
           <label htmlFor="title" className="govuk-label govuk-label--s">
             Publication title
@@ -360,6 +360,8 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                 </div>
               </fieldset>
             </div>
+
+            <input type="hidden" name="status" value="newPublication" />
 
             <button type="submit" className="govuk-button">
               Create new publication

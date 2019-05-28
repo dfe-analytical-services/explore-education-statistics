@@ -71,10 +71,7 @@ const AdminDashboardPublications = () => {
               />
             </li>
           </ul>
-          <Link
-            to="/prototypes/publication-create-new"
-            className="govuk-button"
-          >
+          <Link to="/prototypes/release-create-new" className="govuk-button">
             Create new release
           </Link>
         </AccordionSection>
@@ -108,10 +105,7 @@ const AdminDashboardPublications = () => {
               />
             </li>
           </ul>
-          <Link
-            to="/prototypes/publication-create-new"
-            className="govuk-button"
-          >
+          <Link to="/prototypes/release-create-new" className="govuk-button">
             Create new release
           </Link>
         </AccordionSection>
@@ -146,10 +140,7 @@ const AdminDashboardPublications = () => {
               />
             </li>
           </ul>
-          <Link
-            to="/prototypes/publication-create-new"
-            className="govuk-button"
-          >
+          <Link to="/prototypes/release-create-new" className="govuk-button">
             Create new release
           </Link>
         </AccordionSection>

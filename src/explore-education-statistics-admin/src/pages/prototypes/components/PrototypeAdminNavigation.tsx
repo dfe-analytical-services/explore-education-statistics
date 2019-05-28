@@ -53,7 +53,7 @@ const PrototypeAdminNavigation = ({ sectionId, task }: Props) => {
               Preview / edit content
             </Link>
           </li>
-          <li
+          {/* <li
             className={
               sectionId === 'schedule'
                 ? 'app-navigation--current-page'
@@ -66,7 +66,7 @@ const PrototypeAdminNavigation = ({ sectionId, task }: Props) => {
             >
               Schedule publish date
             </Link>
-          </li>
+          </li> */}
           <li
             className={
               sectionId === 'status'

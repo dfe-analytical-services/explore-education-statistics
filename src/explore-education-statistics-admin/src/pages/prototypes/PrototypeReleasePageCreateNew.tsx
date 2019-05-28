@@ -1,6 +1,6 @@
 import React from 'react';
 import PrototypePage from './components/PrototypePage';
-import PrototypePublicationConfig from './components/PrototypePublicationPageConfig';
+import PrototypeReleaseConfig from './components/PrototypeReleasePageConfig';
 
 const PublicationPage = () => {
   return (
@@ -15,7 +15,7 @@ const PublicationPage = () => {
       ]}
     >
       <h1 className="govuk-heading-xl">Create new release</h1>
-      <PrototypePublicationConfig />
+      <PrototypeReleaseConfig />
     </PrototypePage>
   );
 };
