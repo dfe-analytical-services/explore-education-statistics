@@ -10,3 +10,5 @@ CREATE TABLE dbo.geometry_columns
     constraint geometry_columns_pk
         primary key (f_table_catalog, f_table_schema, f_table_name, f_geometry_column)
 );
+
+INSERT INTO dbo.geometry_columns (f_table_catalog, f_table_schema, f_table_name, f_geometry_column, coord_dimension, srid, geometry_type) VALUES ('master', 'dbo', 'geometry', 'ogr_geometry', 2, 4326, 'POLYGON');

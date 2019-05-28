@@ -10,4 +10,6 @@ CREATE TABLE dbo.geometry
     long            float
 );
 
--- CREATE INDEX ogr_dbo_geometry_ogr_geometry_sidx ON geometry (ogr_geometry);
+CREATE SPATIAL INDEX ogr_dbo_geometry_ogr_geometry_sidx ON dbo.geometry (ogr_geometry)
+USING GEOMETRY_GRID
+WITH ( BOUNDING_BOX =(-8.6453507402877,49.8823462377178,1.76291602644957,60.860573773178) );
