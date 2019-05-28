@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public static class QueryUtil
     {

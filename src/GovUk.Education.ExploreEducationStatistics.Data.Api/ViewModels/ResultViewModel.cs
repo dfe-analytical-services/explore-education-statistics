@@ -4,9 +4,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.TableBuilder
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 {
-    public class TableBuilderResultViewModel
+    public class ResultViewModel
     {
         public Guid PublicationId { get; set; }
         public long ReleaseId { get; set; }
@@ -16,11 +16,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.TableBu
         [JsonConverter(typeof(StringEnumConverter))]
         public GeographicLevel GeographicLevel { get; set; }
 
-        public IEnumerable<TableBuilderObservationViewModel> Result { get; set; }
+        public IEnumerable<ObservationViewModel> Result { get; set; }
 
-        public TableBuilderResultViewModel()
+        public ResultViewModel()
         {
-            Result = new List<TableBuilderObservationViewModel>();
+            Result = new List<ObservationViewModel>();
         }
     }
 }

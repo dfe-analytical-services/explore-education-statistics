@@ -8,17 +8,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TableBuilderController : ControllerBase
+    public class DataController : ControllerBase
     {
-        private readonly IDataService<ResultViewModel> _dataService;
+        private readonly IDataService<ResultWithMetaViewModel> _dataService;
 
-        public TableBuilderController(IDataService<ResultViewModel> dataService)
+        public DataController(IDataService<ResultWithMetaViewModel> dataService)
         {
             _dataService = dataService;
         }
 
         [HttpPost]
-        public ActionResult<ResultViewModel> Query([FromBody] ObservationQueryContext query)
+        public ActionResult<ResultWithMetaViewModel> Query([FromBody] ObservationQueryContext query)
         {
             var result = _dataService.Query(query);
             if (result.Result.Any())

@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
-    public class ResultBuilder : IResultBuilder<Observation, TableBuilderObservationViewModel>
+    public class ResultBuilder : IResultBuilder<Observation, ObservationViewModel>
     {
         private readonly IMapper _mapper;
 
@@ -16,9 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuil
             _mapper = mapper;
         }
 
-        public TableBuilderObservationViewModel BuildResult(Observation observation, IEnumerable<long> indicators)
+        public ObservationViewModel BuildResult(Observation observation, IEnumerable<long> indicators)
         {
-            return new TableBuilderObservationViewModel
+            return new ObservationViewModel
             {
                 Filters = FilterItems(observation),
                 Location = _mapper.Map<LocationViewModel>(observation.Location),

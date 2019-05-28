@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class ReleaseService : AbstractDataService<Release, long>, IReleaseService
+    public class ReleaseService : AbstractRepository<Release, long>, IReleaseService
     {
         public ReleaseService(ApplicationDbContext context, ILogger<ReleaseService> logger) :
             base(context, logger)

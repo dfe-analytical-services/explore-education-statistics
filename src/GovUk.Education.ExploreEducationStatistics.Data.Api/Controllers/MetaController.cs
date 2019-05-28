@@ -1,7 +1,6 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
@@ -10,45 +9,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     [ApiController]
     public class MetaController : ControllerBase
     {
-        private readonly IMetaService _metaService;
+        private readonly IPublicationMetaService _publicationMetaService;
 
-        public MetaController(IMetaService metaService)
+        public MetaController(IPublicationMetaService publicationMetaService)
         {
-            _metaService = metaService;
+            _publicationMetaService = publicationMetaService;
         }
 
         [HttpGet("publication/{publicationId}")]
         public ActionResult<PublicationMetaViewModel> GetPublicationMeta(Guid publicationId)
         {
-            var viewModel = _metaService.GetPublicationMeta(publicationId);
-            if (viewModel == null)
-            {
-                return NotFound();
-            }
-
-            return viewModel;
-        }
-
-        [HttpGet("subject/{subjectId}")]
-        public ActionResult<SubjectMetaViewModel> GetSubjectMeta(long subjectId)
-        {
-            var viewModel = _metaService.GetSubjectMeta(new SubjectMetaQueryContext
-            {
-                SubjectId = subjectId
-            });
-
-            if (viewModel == null)
-            {
-                return NotFound();
-            }
-
-            return viewModel;
-        }
-
-        [HttpPost("subject")]
-        public ActionResult<SubjectMetaViewModel> GetSubjectMeta([FromBody] SubjectMetaQueryContext query)
-        {
-            var viewModel = _metaService.GetSubjectMeta(query);
+            var viewModel = _publicationMetaService.GetPublicationMeta(publicationId);
             if (viewModel == null)
             {
                 return NotFound();

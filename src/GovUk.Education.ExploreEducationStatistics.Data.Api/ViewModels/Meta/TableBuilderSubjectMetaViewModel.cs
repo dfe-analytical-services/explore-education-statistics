@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
 {
-    public class SubjectMetaViewModel
+    public class TableBuilderSubjectMetaViewModel
     {
         public Dictionary<string,
             LegendOptionsMetaValueModel<Dictionary<string,
@@ -11,11 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
         public Dictionary<string,
             LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>> Indicators { get; set; }
 
-        public Dictionary<string, LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>> Locations
-        {
-            get;
-            set;
-        }
+        public Dictionary<string, LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>> Locations { get; set; }
 
         public LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>> TimePeriod { get; set; }
     }

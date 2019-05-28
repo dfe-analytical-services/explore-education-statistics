@@ -7,6 +7,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
 {
+    /**
+     * AutoMapper Profile which is configured by AutoMapper.Extensions.Microsoft.DependencyInjection.
+     */
     public class MappingProfiles : Profile
     {
         public MappingProfiles()

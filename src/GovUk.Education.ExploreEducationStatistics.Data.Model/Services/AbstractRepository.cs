@@ -11,13 +11,13 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public abstract class AbstractDataService<TEntity, TKey> : IDataService<TEntity, TKey> where TEntity : class
+    public abstract class AbstractRepository<TEntity, TKey> : IRepository<TEntity, TKey> where TEntity : class
     {
         protected readonly ApplicationDbContext _context;
 
         private readonly ILogger _logger;
 
-        protected AbstractDataService(ApplicationDbContext context, ILogger logger)
+        protected AbstractRepository(ApplicationDbContext context, ILogger logger)
         {
             _context = context;
             _logger = logger;

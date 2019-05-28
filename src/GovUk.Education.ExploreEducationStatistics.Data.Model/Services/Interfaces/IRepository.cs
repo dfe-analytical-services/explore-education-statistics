@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces
 {
-    public interface IDataService<TEntity, in TKey> where TEntity : class
+    public interface IRepository<TEntity, in TKey> where TEntity : class
     {
         Task<int> Count();
 
