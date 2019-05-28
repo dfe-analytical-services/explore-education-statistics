@@ -36,17 +36,6 @@ if (window.NodeList && !NodeList.prototype.forEach) {
   NodeList.prototype.forEach = Array.prototype.forEach;
 }
 
-// Alias addListener/removeListener (as these are deprecated)
-if (
-  typeof MediaQueryList.prototype.addEventListener === 'undefined' ||
-  typeof MediaQueryList.prototype.removeEventListener === 'undefined'
-) {
-  MediaQueryList.prototype.addEventListener =
-    MediaQueryList.prototype.addListener;
-  MediaQueryList.prototype.removeEventListener =
-    MediaQueryList.prototype.removeListener;
-}
-
 // For IE11
 
 if (!Element.prototype.matches) {
