@@ -1,4 +1,5 @@
 import 'cross-fetch/polyfill';
+import 'core-js/fn/array/virtual/flatten';
 import 'core-js/fn/array/virtual/flat-map';
 
 if (typeof Promise === 'undefined') {
@@ -21,6 +22,13 @@ if (
 
 if (!('repeat' in String.prototype)) {
   require('core-js/fn/string/repeat');
+}
+
+// Alias Array.flat to Array.flatten as
+// core-js@2 uses the older proposal
+if (!Array.prototype.flat) {
+  // eslint-disable-next-line no-extend-native
+  Array.prototype.flat = Array.prototype.flatten;
 }
 
 // NodeList.forEach
