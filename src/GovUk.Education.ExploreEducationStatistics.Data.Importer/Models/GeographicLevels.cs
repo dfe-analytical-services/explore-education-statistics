@@ -9,7 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Models
     {
         private static readonly Dictionary<GeographicLevel, string[]> values = new Dictionary<GeographicLevel, string[]>
         {
-            {GeographicLevel.Establishment, new[] {"establishment"}},
             {GeographicLevel.Local_Authority, new[] {"local authority"}},
             {GeographicLevel.Local_Authority_District, new[] {"local authority district"}},
             {GeographicLevel.Local_Enterprise_Partnerships, new[] {"local enterprise partnerships"}},

@@ -4,9 +4,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public enum GeographicLevel
     {
-        [EnumLabelValue("Establishment", "EST")]
-        Establishment,
-
         [EnumLabelValue("Local Authority", "LA")]
         Local_Authority,
 
@@ -16,17 +13,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         [EnumLabelValue("Local Enterprise Partnerships", "LEP")]
         Local_Enterprise_Partnerships,
 
-        [EnumLabelValue("Institution", "INS")]
-        Institution,
-        
+        [EnumLabelValue("Institution", "INS")] Institution,
+
         [EnumLabelValue("MAT Or Sponsor", "MATS")]
         MAT_Or_Sponsor,
 
         [EnumLabelValue("Mayoral Combined Authorities", "MCA")]
         Mayoral_Combined_Authorities,
 
-        [EnumLabelValue("National", "NAT")]
-        National,
+        [EnumLabelValue("National", "NAT")] National,
 
         [EnumLabelValue("Opportunity Areas", "OA")]
         Opportunity_Areas,
@@ -34,19 +29,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         [EnumLabelValue("Parliamentary Constituency", "PC")]
         Parliamentary_Constituency,
 
-        [EnumLabelValue("Provider", "PRO")]
-        Provider,
+        [EnumLabelValue("Provider", "PRO")] Provider,
 
-        [EnumLabelValue("Regional", "REG")]
-        Regional,
+        [EnumLabelValue("Regional", "REG")] Regional,
 
-        [EnumLabelValue("RSC Region", "RSCR")]
-        RSC_Region,
+        [EnumLabelValue("RSC Region", "RSCR")] RSC_Region,
 
-        [EnumLabelValue("School", "SCH")]
-        School,
+        [EnumLabelValue("School", "SCH")] School,
 
-        [EnumLabelValue("Ward", "WAR")]
-        Ward
+        [EnumLabelValue("Ward", "WAR")] Ward
     }
 }
