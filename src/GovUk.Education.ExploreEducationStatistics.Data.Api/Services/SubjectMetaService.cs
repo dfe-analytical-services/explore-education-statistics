@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
@@ -96,9 +97,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 });
         }
 
-        private string GetGeoJsonForObservationalUnit(IObservationalUnit observationalUnit)
+        private dynamic GetGeoJsonForObservationalUnit(IObservationalUnit observationalUnit)
         {
-            return _geoJsonService.Find(observationalUnit.Code).Value;
+            var geoJson = _geoJsonService.Find(observationalUnit.Code);
+            return geoJson != null ? JsonConvert.DeserializeObject(geoJson.Value) : null;
         }
     }
 }
