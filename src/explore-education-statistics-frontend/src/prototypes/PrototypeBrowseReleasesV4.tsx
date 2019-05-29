@@ -16,7 +16,7 @@ const BrowseReleasesPage = () => {
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body">
             Browse to find the statistics and data you’re looking for and open
-            the section to get links to:
+            the section to view:
           </p>
           <ul className="govuk-bulllet-list govuk-!-margin-bottom-6">
             <li>
@@ -24,16 +24,8 @@ const BrowseReleasesPage = () => {
               explanations
             </li>
             <li>
-              charts and tables to help you compare, contrast and view national
-              and regional statistical data and trends
-            </li>
-            <li>
-              our table tool to build your own tables online and explore our
-              range of national and regional data
-            </li>
-            <li>
-              underlying data so you can download files and carry out your own
-              statistical analysis
+              charts and tables to help you compare and contrast national and
+              regional statistical data and trends
             </li>
           </ul>
         </div>
