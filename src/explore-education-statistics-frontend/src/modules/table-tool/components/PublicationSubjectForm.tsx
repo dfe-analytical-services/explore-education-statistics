@@ -35,6 +35,10 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
     </WizardStepHeading>
   );
 
+  const initialValues = {
+    subjectId: '',
+  };
+
   return (
     <Formik
       enableReinitialize
@@ -45,9 +49,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
         });
         goToNextStep();
       }}
-      initialValues={{
-        subjectId: '',
-      }}
+      initialValues={initialValues}
       validationSchema={Yup.object<FormValues>({
         subjectId: Yup.string().required('Choose a publication subject'),
       })}
@@ -67,7 +69,15 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
               }}
             />
 
-            <WizardStepFormActions {...props} form={form} formId={formId} />
+            <WizardStepFormActions
+              {...props}
+              form={form}
+              formId={formId}
+              onPreviousStep={() => {
+                form.resetForm(initialValues);
+                setSubjectName('');
+              }}
+            />
           </Form>
         ) : (
           <>

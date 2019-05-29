@@ -51,16 +51,18 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
     </WizardStepHeading>
   );
 
+  const initialValues = {
+    start: '',
+    end: '',
+  };
+
   return (
     <Formik<FormValues>
       onSubmit={async values => {
         await onSubmit(values);
         goToNextStep();
       }}
-      initialValues={{
-        start: '',
-        end: '',
-      }}
+      initialValues={initialValues}
       validationSchema={Yup.object<FormValues>({
         end: Yup.string()
           .required('End date is required')
@@ -135,7 +137,14 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
               />
             </FormFieldset>
 
-            <WizardStepFormActions {...props} form={form} formId={formId} />
+            <WizardStepFormActions
+              {...props}
+              form={form}
+              formId={formId}
+              onPreviousStep={() => {
+                form.resetForm(initialValues);
+              }}
+            />
           </Form>
         ) : (
           <>

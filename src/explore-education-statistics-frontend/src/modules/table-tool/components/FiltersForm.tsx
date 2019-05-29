@@ -42,13 +42,15 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     <WizardStepHeading {...props}>Choose your filters</WizardStepHeading>
   );
 
+  const initialValues = {
+    filters: mapValues(specification.filters, () => []),
+    indicators: [],
+  };
+
   return (
     <Formik<FormValues>
       enableReinitialize
-      initialValues={{
-        filters: mapValues(specification.filters, () => []),
-        indicators: [],
-      }}
+      initialValues={initialValues}
       validationSchema={Yup.object<FormValues>({
         filters: Yup.object(
           mapValues(specification.filters, () =>
@@ -138,6 +140,12 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                 formId={formId}
                 submitText="Create table"
                 submittingText="Creating table"
+                onPreviousStep={() => {
+                  form.resetForm({
+                    filters: mapValues(specification.filters, () => []),
+                    indicators: [],
+                  });
+                }}
               />
             </Form>
           </div>
