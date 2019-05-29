@@ -3,7 +3,7 @@ import PrototypePage from './components/PrototypePage';
 import PrototypePublicationConfig from './components/PrototypePublicationPageConfig';
 
 const PublicationPage = () => {
-  const sectionId = 'newPublication';
+  const sectionId = 'editPublication';
   return (
     <PrototypePage
       wide

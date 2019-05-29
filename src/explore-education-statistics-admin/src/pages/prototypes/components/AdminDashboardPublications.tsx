@@ -144,6 +144,16 @@ const AdminDashboardPublications = () => {
             Create new release
           </Link>
         </AccordionSection>
+        {window.location.search === '?status=newPublication' && (
+          <AccordionSection
+            heading="Pupil absense statistics and data for schools in England: summer term"
+            caption="New publication, requires release adding"
+          >
+            <Link to="/prototypes/release-create-new" className="govuk-button">
+              Create new release
+            </Link>
+          </AccordionSection>
+        )}
       </Accordion>
 
       <Link

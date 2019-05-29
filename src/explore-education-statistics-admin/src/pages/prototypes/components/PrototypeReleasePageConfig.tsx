@@ -22,20 +22,10 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
       {sectionId === 'setup' && (
         <h2 className="govuk-heading-m">Edit release setup</h2>
       )}
+      <h3 className="govuk-heading-l">
+        Pupil absence statistics and data for schools in England
+      </h3>
       <form action="/prototypes/publication-create-new-absence-config">
-        <div className="govuk-form-group">
-          <label htmlFor="title" className="govuk-label govuk-label--s">
-            Publication title
-          </label>
-          <input
-            className="govuk-input"
-            id="title"
-            name="title"
-            type="text"
-            defaultValue="Pupil absence statistics and data for schools in England"
-          />
-        </div>
-
         <FormFieldset id="test" legend="Academic year">
           <FormGroup>
             <FormTextInput
@@ -45,9 +35,10 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
               value="2018"
               width={4}
             />
+            <span className="govuk-hint govuk-!-margin-top-1">
+              Academic year 2018 to 2019
+            </span>
           </FormGroup>
-
-          <span className="govuk-hint">Academic year 2018/19</span>
 
           <FormGroup>
             <FormSelect
@@ -96,6 +87,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                   name="schedule-day"
                   type="number"
                   pattern="[0-9]*"
+                  value="20"
                 />
               </div>
             </div>
@@ -113,6 +105,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                   name="schedule-month"
                   type="number"
                   pattern="[0-9]*"
+                  value="09"
                 />
               </div>
             </div>
@@ -130,6 +123,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                   name="schedule-year"
                   type="number"
                   pattern="[0-9]*"
+                  value="2019"
                 />
               </div>
             </div>

@@ -86,17 +86,13 @@ const PrototypeAdminNavigation = ({ sectionId, task }: Props) => {
 
       {task !== 'editRelease' && (
         <>
-          <span className="govuk-tag">New release in progress</span>
-          <span className="govuk-caption-l">Academic year 2018 to 2019</span>
+          <span className="govuk-caption-l">
+            <span className="govuk-tag">New release in progress</span>Academic
+            year 2018 to 2019
+          </span>
           <h1 className="govuk-heading-l">
             Pupil absence statistics and data for schools in England
           </h1>
-          <dl className="dfe-meta-content">
-            <dt className="govuk-caption-m">Scheduled publish date: </dt>
-            <dd>
-              <strong>To be set</strong>
-            </dd>
-          </dl>
         </>
       )}
     </>
