@@ -1,9 +1,14 @@
-import { Form, FormFieldset, FormGroup } from '@common/components/form';
-import FormFieldCheckboxSearchSubGroups from '@common/components/form/FormFieldCheckboxSearchSubGroups';
+import {
+  Form,
+  FormFieldCheckboxSearchSubGroups,
+  FormFieldset,
+  FormGroup,
+  Formik,
+} from '@common/components/form';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
 import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
-import { Formik, FormikProps } from 'formik';
+import { FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import React, { useRef } from 'react';

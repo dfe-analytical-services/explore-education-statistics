@@ -1,11 +1,11 @@
 import Button from '@common/components/Button';
 import { FormGroup } from '@common/components/form';
-import { FormikProps } from 'formik';
+import { FormikState } from 'formik';
 import React, { MouseEventHandler } from 'react';
 import { InjectedWizardProps } from './Wizard';
 
 interface Props {
-  form: FormikProps<{}>;
+  form: FormikState<{}>;
   formId: string;
   goToPreviousStep: InjectedWizardProps['goToPreviousStep'];
   onPreviousStep?: MouseEventHandler;
