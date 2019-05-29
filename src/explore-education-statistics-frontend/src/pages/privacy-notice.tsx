@@ -77,7 +77,6 @@ function PrivacyNoticePage() {
           the Cabinet Office) so we can send you email notifications about this
           service.
         </p>
-        s
       </div>
       <div>
         <h3>Where your data is stored</h3>
