@@ -7,6 +7,8 @@ s2l = BuiltIn().get_library_instance('SeleniumLibrary')
 def cookie_names_should_be_on_page():
   cookies = s2l.driver.get_cookies()
   for cookie in cookies:
+    if cookie['name'] == '_hjIncludedInSample':
+      continue
     s2l.page_should_contain(cookie['name'])
 
 def user_should_be_at_top_of_page():
