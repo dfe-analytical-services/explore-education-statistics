@@ -1,10 +1,10 @@
-import { Form, FormFieldset } from '@common/components/form';
+import { Form, FormFieldset, Formik } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
-import { Formik, FormikProps } from 'formik';
+import { FormikProps } from 'formik';
 import sortBy from 'lodash/sortBy';
 import React, { useEffect } from 'react';
 import { useImmer } from 'use-immer';
@@ -50,6 +50,15 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
     </WizardStepHeading>
   );
 
+  const initialValues = {
+    locations: Object.keys(options).reduce((acc, level) => {
+      return {
+        ...acc,
+        [level]: [],
+      };
+    }, {}),
+  };
+
   return (
     <Formik<FormValues>
       enableReinitialize
@@ -57,14 +66,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
         await onSubmit(values);
         goToNextStep();
       }}
-      initialValues={{
-        locations: Object.keys(options).reduce((acc, level) => {
-          return {
-            ...acc,
-            [level]: [],
-          };
-        }, {}),
-      }}
+      initialValues={initialValues}
       validationSchema={Yup.object<FormValues>({
         locations: Yup.mixed().test(
           'required',
@@ -131,7 +133,17 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
               </div>
             </FormFieldset>
 
-            <WizardStepFormActions {...props} form={form} formId={formId} />
+            <WizardStepFormActions
+              {...props}
+              form={form}
+              formId={formId}
+              onPreviousStep={() => {
+                form.resetForm(initialValues);
+                updateLocationLevels(() => {
+                  return {};
+                });
+              }}
+            />
           </Form>
         ) : (
           <>

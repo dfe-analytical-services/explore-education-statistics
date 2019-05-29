@@ -1,16 +1,17 @@
 import DetailsMenu from '@common/components/DetailsMenu';
 import {
+  Form,
   FormFieldRadioGroup,
   FormFieldset,
   FormGroup,
+  Formik,
+  FormTextSearchInput,
 } from '@common/components/form';
-import Form from '@common/components/form/Form';
-import FormTextSearchInput from '@common/components/form/FormTextSearchInput';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
-import { Formik, FormikProps } from 'formik';
+import { FormikProps } from 'formik';
 import camelCase from 'lodash';
 import React, { useState } from 'react';
 import { PublicationOptions } from '../TableToolPage';
