@@ -24,6 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         public List<Methodology> Methodologies { get; set; }
 
+        public Uri LegacyPublicationUrl { get; set; }
+
         public List<Link> LegacyReleases { get; set; }
 
         public Guid TopicId { get; set; }
