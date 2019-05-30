@@ -431,7 +431,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
       modelBuilder.Entity<Publication>().HasData(
         new Publication
         {
-          Id = new Guid("e64c4fdc-6067-49f4-a698-347484eaf360"),
+          Id = new Guid("d63daa75-5c3e-48bf-a232-f232e0d13898"),
           Title = "30 hours free childcare",
           Summary = "",
           TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"),
@@ -479,7 +479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         },
         new Publication
         {
-          Id = new Guid("f00aa2c8-f642-475f-8f0e-f469aa975b3f"),
+          Id = new Guid("fcda2962-82a6-4052-afa2-ea398c53c85f"),
           Title = "Early years foundation stage profile results",
           Summary = "",
           TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"),
@@ -703,7 +703,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         },
         new Publication
         {
-          Id = new Guid("2ebe01c0-1a87-43bc-8191-feb1fff3ce1e"),
+          Id = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
           Title = "Permanent and fixed-period exclusions in England",
           Summary = "",
           TopicId = new Guid("77941b7d-bbd6-4069-9107-565af89e2dec"),
@@ -711,7 +711,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         },
         new Publication
         {
-          Id = new Guid("6a8551af-a700-4c45-a8ac-aa2269f961f8"),
+          Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
           Title = "Pupil absence in schools in England",
           Summary = "",
           TopicId = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460"),
@@ -754,7 +754,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         },
         new Publication
         {
-          Id = new Guid("cdc016da-04d0-4571-a1d9-61fdb01037bb"),
+          Id = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
           Title = "School and pupils and their characteristics",
           Summary = "",
           TopicId = new Guid("e50ba9fd-9f19-458c-aceb-4422f0c7d1ba"),
@@ -762,7 +762,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         },
         new Publication
         {
-          Id = new Guid("91fdcf75-4814-4077-b7ca-7e07f415fa30"),
+          Id = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
           Title = "Secondary and primary schools applications and offers",
           Summary = "",
           TopicId = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
@@ -826,7 +826,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         },
         new Publication
         {
-          Id = new Guid("3a9b9782-64e9-4c47-8996-0d6503fac26b"),
+          Id = new Guid("bfdcaae1-ce6b-4f63-9b2b-0a1f3942887f"),
           Title = "GCSE and equivalent results",
           Summary = "",
           TopicId = new Guid("1e763f55-bf09-4497-b838-7c5b054ba87b"),
@@ -982,10 +982,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
           //absence
           new Release
           {
-            Id = new Guid("c5ca8fa6-8cbb-4126-ae83-c6e2c1babcfc"),
+            Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
             Title = "Pupil absence data and statistics for schools in England",
             ReleaseName = "2016 to 2017",
-            PublicationId = new Guid("6a8551af-a700-4c45-a8ac-aa2269f961f8"),
+            PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
             Published = new DateTime(2017, 3, 22),
             Slug = "2016-17",
             Summary =
@@ -1174,10 +1174,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
           },
           new Release
           {
-            Id = new Guid("2bb3a68d-330c-4cc4-a584-797e30f1288f"),
+            Id = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"),
             Title = "Pupil absence data and statistics for schools in England",
             ReleaseName = "2015 to 2016",
-            PublicationId = new Guid("6a8551af-a700-4c45-a8ac-aa2269f961f8"),
+            PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
             Published = new DateTime(2016, 3, 25),
             Slug = "2015-16",
             Summary =
@@ -1216,10 +1216,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
           // exclusions
           new Release
           {
-            Id = new Guid("74e93f2c-e009-490b-9467-3c48429dab9f"),
+            Id = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
             Title = "Permanent and fixed period exclusions",
             ReleaseName = "2016 to 2017",
-            PublicationId = new Guid("2ebe01c0-1a87-43bc-8191-feb1fff3ce1e"),
+            PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
             Published = new DateTime(2018, 7, 19),
             Slug = "2016-17",
             Summary =
@@ -1388,10 +1388,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
           // // school pupil numbers
           new Release
           {
-            Id = new Guid("9c0637ec-db61-46ee-9b63-86349c19a24e"),
+            Id = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
             Title = "Schools, pupils and their characteristics: January 2018",
             ReleaseName = "January 2018",
-            PublicationId = new Guid("cdc016da-04d0-4571-a1d9-61fdb01037bb"),
+            PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
             Published = new DateTime(2018, 5, 28),
             Slug = "january-2018",
             Summary =
@@ -1435,10 +1435,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
           // // GCSE / KS4
           new Release
           {
-            Id = new Guid("254688cb-ebd8-4b4c-9ec0-8efa67e164ee"),
+            Id = new Guid("e7ae88fb-afaf-4d51-a78a-bbb2de671daf"),
             Title = "GCSE and equivalent results in England, 2016 to 2017",
             ReleaseName = "2016 to 2017",
-            PublicationId = new Guid("3a9b9782-64e9-4c47-8996-0d6503fac26b"),
+            PublicationId = new Guid("bfdcaae1-ce6b-4f63-9b2b-0a1f3942887f"),
             Published = new DateTime(2018, 6, 20),
             Slug = "2016-17",
             Summary =
@@ -1686,76 +1686,76 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
       modelBuilder.Entity<Update>().HasData(
           new Update
           {
-            Id = new Guid("5614a5ff-2507-4a7d-b99f-3328dd9c4068"),
-            ReleaseId = new Guid("c5ca8fa6-8cbb-4126-ae83-c6e2c1babcfc"),
+            Id = new Guid("9c0f0139-7f88-4750-afe0-1c85cdf1d047"),
+            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
             On = new DateTime(2017, 4, 19),
             Reason =
                   "Underlying data file updated to include absence data by pupil residency and school location, and updated metadata document."
           },
           new Update
           {
-            Id = new Guid("eea2b9a1-8944-4638-b7d1-4f94d89c8594"),
-            ReleaseId = new Guid("c5ca8fa6-8cbb-4126-ae83-c6e2c1babcfc"),
+            Id = new Guid("18e0d40e-bdf7-4c84-99dd-732e72e9c9a5"),
+            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
             On = new DateTime(2017, 3, 22),
             Reason = "First published."
           },
           new Update
           {
-            Id = new Guid("e0231ff8-5160-485d-85e6-9cbd29695327"),
-            ReleaseId = new Guid("2bb3a68d-330c-4cc4-a584-797e30f1288f"),
+            Id = new Guid("51bd1e2f-2669-4708-b300-799b6be9ec9a"),
+            ReleaseId = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"),
             On = new DateTime(2016, 3, 25),
             Reason = "First published."
           },
           new Update
           {
-            Id = new Guid("420c8ba4-af05-465c-a8eb-abce0a369fca"),
-            ReleaseId = new Guid("74e93f2c-e009-490b-9467-3c48429dab9f"),
+            Id = new Guid("4fca874d-98b8-4c79-ad20-d698fb0af7dc"),
+            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
             On = new DateTime(2018, 7, 19),
             Reason = "First published."
           },
           new Update
           {
-            Id = new Guid("18b4a3e4-bacc-4ace-9e43-7caa90b006ea"),
-            ReleaseId = new Guid("74e93f2c-e009-490b-9467-3c48429dab9f"),
+            Id = new Guid("33ff3f17-0671-41e9-b404-5661ab8a9476"),
+            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
             On = new DateTime(2018, 8, 25),
             Reason =
                   "Updated exclusion rates for Gypsy/Roma pupils, to include extended ethnicity categories within the headcount (Gypsy, Roma and other Gypsy/Roma)."
           },
           new Update
           {
-            Id = new Guid("77c3370c-71ef-4b5c-958d-135982eeb5ad"),
-            ReleaseId = new Guid("9c0637ec-db61-46ee-9b63-86349c19a24e"),
+            Id = new Guid("aa4c0f33-cdf4-4df9-9540-18472d46a301"),
+            ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
             On = new DateTime(2018, 6, 13),
             Reason =
                   "Amended title of table 8e in attachment 'Schools pupils and their characteristics 2018 - LA tables'."
           },
           new Update
           {
-            Id = new Guid("5a24198d-ab19-47c6-96f2-6faca416cbb7"),
-            ReleaseId = new Guid("9c0637ec-db61-46ee-9b63-86349c19a24e"),
+            Id = new Guid("4bd0f73b-ef2b-4901-839a-80cbf8c0871f"),
+            ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
             On = new DateTime(2018, 7, 23),
             Reason =
                   "Removed unrelated extra material from table 7c in attachment 'Schools pupils and their characteristics 2018 - LA tables'."
           },
           new Update
           {
-            Id = new Guid("24b9005b-ed8a-4f48-8a6f-55fa23882832"),
-            ReleaseId = new Guid("9c0637ec-db61-46ee-9b63-86349c19a24e"),
+            Id = new Guid("7f911a4e-7a56-4f6f-92a6-bd556a9bcfd3"),
+            ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
             On = new DateTime(2018, 9, 5),
             Reason = "Added cross-border movement local authority level and underlying data tables."
           },
           new Update
           {
-            Id = new Guid("226bac6d-e6ae-4f0b-9dbf-a4d0e97a20fb"),
-            ReleaseId = new Guid("9c0637ec-db61-46ee-9b63-86349c19a24e"),
+            Id = new Guid("d008b331-af29-4c7e-bb8a-5a2005aa0131"),
+            ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
             On = new DateTime(2018, 9, 11),
             Reason =
                   "Added open document version of 'Schools pupils and their characteristics 2018 - Cross-border movement local authority tables'."
           },
           new Update
           {
-            Id = new Guid("ad285753-cdd4-42fc-9b4b-165fd9f07185"),
-            ReleaseId = new Guid("254688cb-ebd8-4b4c-9ec0-8efa67e164ee"),
+            Id = new Guid("8900bab9-74ec-4b5d-8be1-648ff4870167"),
+            ReleaseId = new Guid("e7ae88fb-afaf-4d51-a78a-bbb2de671daf"),
             On = new DateTime(2018, 6, 20),
             Reason = "First published."
           }
@@ -1764,155 +1764,155 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
       modelBuilder.Entity<Link>().HasData(
         new Link
         {
-          PublicationId = new Guid("2ebe01c0-1a87-43bc-8191-feb1fff3ce1e"),
-          Id = new Guid("fedc1701-9b9f-421d-b549-0443922dcbd4"),
+          PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+          Id = new Guid("08134c1d-8a58-49a4-8d8b-22e586ffd5ae"),
           Description = "2008 to 2009",
           Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-academic-year-2008-to-2009",
         },
         new Link
         {
-          PublicationId = new Guid("2ebe01c0-1a87-43bc-8191-feb1fff3ce1e"),
-          Id = new Guid("54b9cff3-1c83-4c56-83d3-83213c6d34c1"),
+          PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+          Id = new Guid("250bace6-aeb9-4fe9-8de2-3a25e0dc717f"),
           Description = "2009 to 2010",
           Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2009-to-2010",
         },
         new Link
         {
-          PublicationId = new Guid("2ebe01c0-1a87-43bc-8191-feb1fff3ce1e"),
-          Id = new Guid("2b4e08a5-cef0-4d79-a1a9-8412b6a4ed02"),
+          PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+          Id = new Guid("a319e4ef-b957-40fb-8a47-b1a97814b220"),
           Description = "2010 to 2011",
           Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2010-to-2011",
         },
         new Link
         {
-          PublicationId = new Guid("2ebe01c0-1a87-43bc-8191-feb1fff3ce1e"),
-          Id = new Guid("83f1a9ea-3f7c-4184-ab5a-f8dc22078b17"),
+          PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+          Id = new Guid("13acf54a-8016-49ff-9050-c61ebe7acad2"),
           Description = "2011 to 2012",
           Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-2011-to-2012-academic-year",
         },
         new Link
         {
-          PublicationId = new Guid("2ebe01c0-1a87-43bc-8191-feb1fff3ce1e"),
-          Id = new Guid("8b6c8afa-0a90-4998-b157-81a7a52103d1"),
+          PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+          Id = new Guid("45bd7f62-2018-4a5c-9b93-ccece8e89c46"),
           Description = "2012 to 2013",
           Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2012-to-2013",
         },
         new Link
         {
-          PublicationId = new Guid("2ebe01c0-1a87-43bc-8191-feb1fff3ce1e"),
-          Id = new Guid("bfaed167-e8db-4db8-b7f5-b00635f47ffa"),
+          PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+          Id = new Guid("f1225f98-40d5-494c-90f9-99f9fb59ac9d"),
           Description = "2013 to 2014",
           Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2013-to-2014",
         },
         new Link
         {
-          PublicationId = new Guid("2ebe01c0-1a87-43bc-8191-feb1fff3ce1e"),
-          Id = new Guid("bf1047be-eae0-4bed-8cd0-83f562c77cdf"),
+          PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+          Id = new Guid("78239816-507d-42b7-98fd-4a71d0d4eb1f"),
           Description = "2014 to 2015",
           Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2014-to-2015",
         },
         new Link
         {
-          PublicationId = new Guid("2ebe01c0-1a87-43bc-8191-feb1fff3ce1e"),
-          Id = new Guid("c4578279-63b4-466d-8e60-e26e15948ed2"),
+          PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+          Id = new Guid("564dacdc-f58e-4aa0-8dbd-d8368b4fb6ba"),
           Description = "2015 to 2016",
           Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2015-to-2016",
         },
         new Link
         {
-          PublicationId = new Guid("6a8551af-a700-4c45-a8ac-aa2269f961f8"),
-          Id = new Guid("78a28be8-17c0-461e-baad-603d825e13de"),
+          PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+          Id = new Guid("89c02688-646d-45b5-8919-9a3fafcfe0e9"),
           Description = "2009 to 2010",
           Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010",
         },
         new Link
         {
-          PublicationId = new Guid("6a8551af-a700-4c45-a8ac-aa2269f961f8"),
-          Id = new Guid("a9ce8158-d0f0-4123-afe2-109789c3982b"),
+          PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+          Id = new Guid("81d91c86-9bf2-496c-b026-9dc255c35635"),
           Description = "2010 to 2011",
           Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011",
         },
         new Link
         {
-          PublicationId = new Guid("6a8551af-a700-4c45-a8ac-aa2269f961f8"),
-          Id = new Guid("f48cce88-af53-4b1a-aac2-cc2269d80801"),
+          PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+          Id = new Guid("e20141d0-d894-4b8d-a78f-e41c23500786"),
           Description = "2011 to 2012",
           Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics",
         },
         new Link
         {
-          PublicationId = new Guid("6a8551af-a700-4c45-a8ac-aa2269f961f8"),
-          Id = new Guid("1511d1f6-7b6e-4c8e-9002-9d3fe65e33f1"),
+          PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+          Id = new Guid("ce15f487-87b0-4c07-98f1-6c6732196be7"),
           Description = "2012 to 2013",
           Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013",
         },
         new Link
         {
-          PublicationId = new Guid("6a8551af-a700-4c45-a8ac-aa2269f961f8"),
-          Id = new Guid("11d0111b-cf26-416d-98c3-168bb8401fdd"),
+          PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+          Id = new Guid("75991639-ad77-4ba6-91fc-ac08c00a4ce8"),
           Description = "2013 to 2014",
           Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014",
         },
         new Link
         {
-          PublicationId = new Guid("6a8551af-a700-4c45-a8ac-aa2269f961f8"),
-          Id = new Guid("bf39fc39-fb96-4704-b6fe-d7f7568588bf"),
+          PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+          Id = new Guid("28e53936-5a52-44be-a7a6-d2f14a426d28"),
           Description = "2014 to 2015",
           Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015",
         },
         new Link
         {
-          PublicationId = new Guid("cdc016da-04d0-4571-a1d9-61fdb01037bb"),
-          Id = new Guid("943f1242-992a-4e58-9a7a-531336d20b7c"),
+          PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+          Id = new Guid("dc8b0d8c-08bb-47cc-b3a1-9e6ac9c2c268"),
           Description = "January 2010",
           Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2010",
         },
         new Link
         {
-          PublicationId = new Guid("cdc016da-04d0-4571-a1d9-61fdb01037bb"),
-          Id = new Guid("2c06838d-342e-419e-ab90-91b965e1e382"),
+          PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+          Id = new Guid("b086ba70-703c-40dd-aaef-d2e19335188e"),
           Description = "January 2011",
           Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2011",
         },
         new Link
         {
-          PublicationId = new Guid("cdc016da-04d0-4571-a1d9-61fdb01037bb"),
-          Id = new Guid("48fe71bd-74a1-41e8-a02a-52bec450596c"),
+          PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+          Id = new Guid("181ec43e-cf22-4cab-a128-0a5702468566"),
           Description = "January 2012",
           Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2012",
         },
         new Link
         {
-          PublicationId = new Guid("cdc016da-04d0-4571-a1d9-61fdb01037bb"),
-          Id = new Guid("0b81528a-200c-499b-a542-3b7462966c26"),
+          PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+          Id = new Guid("e6b36ee8-ef66-4864-a4b3-9047ee3da338"),
           Description = "January 2013",
           Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2013",
         },
         new Link
         {
-          PublicationId = new Guid("cdc016da-04d0-4571-a1d9-61fdb01037bb"),
-          Id = new Guid("37ba6d3f-2c5e-48cc-9ec9-596140159937"),
+          PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+          Id = new Guid("398ba8c6-3ea0-49da-8645-ceb3c7fb9860"),
           Description = "January 2014",
           Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2014",
         },
         new Link
         {
-          PublicationId = new Guid("cdc016da-04d0-4571-a1d9-61fdb01037bb"),
-          Id = new Guid("5a1850d4-140f-4db3-af5e-e6d0ce3727e7"),
+          PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+          Id = new Guid("5e244416-6f2a-4d22-bea4-c22a229befef"),
           Description = "January 2015",
           Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2015",
         },
         new Link
         {
-          PublicationId = new Guid("cdc016da-04d0-4571-a1d9-61fdb01037bb"),
-          Id = new Guid("3cc8cc9a-319b-425a-aca1-16624bda7968"),
+          PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+          Id = new Guid("e3c1db23-8a8f-47fe-b2cd-8e677db700a2"),
           Description = "January 2016",
           Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2016",
         },
         new Link
         {
-          PublicationId = new Guid("cdc016da-04d0-4571-a1d9-61fdb01037bb"),
-          Id = new Guid("18af7ad3-6dc2-4dec-b438-e451ab7e1cab"),
+          PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+          Id = new Guid("313435b3-fe56-4b92-8e13-670dbf510062"),
           Description = "January 2017",
           Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2017",
         }
@@ -1921,11 +1921,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
       modelBuilder.Entity<Methodology>().HasData(
           new Methodology
           {
-            Id = new Guid("ba24b6e8-900a-4d7a-925a-c9138cf112b3"),
+            Id = new Guid("caa8e56f-41d2-4129-a5c3-53b051134bd7"),
             Title = "Pupil absence statistics: methodology",
             Published = new DateTime(2018, 3, 22),
             Summary = "Find out about the methodology behind pupil absence statistics and data and how and why they're collected and published.",
-            PublicationId = new Guid("6a8551af-a700-4c45-a8ac-aa2269f961f8"),
+            PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
             Content = new List<ContentSection>
               {
                         new ContentSection
