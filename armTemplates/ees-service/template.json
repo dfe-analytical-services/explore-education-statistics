@@ -595,9 +595,9 @@
       }
     },
     {
-      "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('publicStorageAccountName')]",
-      "apiVersion": "2018-07-01",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2019-04-01",
       "location": "[resourceGroup().location]",
       "kind": "StorageV2",
       "sku": {
@@ -607,8 +607,8 @@
       "resources": [
         {
             "name": "downloads",
-            "type": "blobServices/containers",
-            "apiVersion": "2018-07-01",
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-04-01",
             "dependsOn": [
                 "[variables('publicStorageAccountName')]"
             ]
