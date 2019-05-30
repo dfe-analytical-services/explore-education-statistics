@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
 
             var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference("test");
+            var blobContainer = blobClient.GetContainerReference("downloads");
             var blockBlobReference = blobContainer.GetBlockBlobReference($"{publication}/{release}/{filename}");
 
             return blockBlobReference.Exists();
@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
 
             var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference("test");
+            var blobContainer = blobClient.GetContainerReference("downloads");
             var blockBlobReference = blobContainer.GetBlockBlobReference($"{publication}/{release}/{filename}");
 
             if (!blockBlobReference.Exists())
