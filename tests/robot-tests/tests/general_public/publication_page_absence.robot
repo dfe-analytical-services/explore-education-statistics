@@ -13,8 +13,8 @@ Navigate to Absence publication
     user clicks link  Find statistics and data
     user waits until page contains  Browse to find the statistics and data you’re looking for
 
-    user clicks element   css:[data-testid="SectionHeader Absence and exclusions"] button
-    element attribute value should be  css:[data-testid="SectionHeader Absence and exclusions"] button   aria-expanded   true
+    user clicks element   css:[data-testid="SectionHeader Pupil absence"] button
+    element attribute value should be  css:[data-testid="SectionHeader Pupil absence"] button   aria-expanded   true
 
     user clicks element   css:[data-testid="view-stats-pupil-absence-in-schools-in-england"]
     user waits until page contains  Pupil absence data and statistics for schools in England
