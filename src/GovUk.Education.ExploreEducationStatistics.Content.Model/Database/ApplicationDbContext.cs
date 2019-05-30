@@ -5,316 +5,1025 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 {
-    public class ApplicationDbContext : DbContext
+  public class ApplicationDbContext : DbContext
+  {
+    public ApplicationDbContext()
     {
-        public ApplicationDbContext()
+    }
+
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
+    {
+    }
+
+    public DbSet<Methodology> Methodologies { get; set; }
+    public DbSet<Theme> Themes { get; set; }
+    public DbSet<Topic> Topics { get; set; }
+    public DbSet<Publication> Publications { get; set; }
+    public DbSet<Release> Releases { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+      modelBuilder.Entity<Methodology>()
+          .Property(b => b.Content)
+          .HasConversion(
+              v => JsonConvert.SerializeObject(v),
+              v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
+      modelBuilder.Entity<Methodology>()
+          .Property(b => b.Annexes)
+          .HasConversion(
+              v => JsonConvert.SerializeObject(v),
+              v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
+
+      modelBuilder.Entity<Release>()
+          .Property(b => b.Content)
+          .HasConversion(
+              v => JsonConvert.SerializeObject(v),
+              v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
+
+      modelBuilder.Entity<Release>()
+          .Property(b => b.KeyStatistics)
+          .HasConversion(
+              v => JsonConvert.SerializeObject(v),
+              v => JsonConvert.DeserializeObject<DataBlock>(v));
+
+      modelBuilder.Entity<Theme>().HasData(
+        new Theme
         {
+          Id = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"),
+          Title = "Children and early years - including social care",
+          Summary = "",
+          Slug = "children-and-early-years"
+        },
+        new Theme
+        {
+          Id = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"),
+          Title = "Destination of pupils and students - including NEET",
+          Summary = "",
+          Slug = "destination-of-pupils-and-students"
+        },
+        new Theme
+        {
+          Id = new Guid("bc08839f-2970-4f34-af2d-29608a48082f"),
+          Title = "Finance and funding",
+          Summary = "",
+          Slug = "finance-and-funding"
+        },
+        new Theme
+        {
+          Id = new Guid("92c5df93-c4da-4629-ab25-51bd2920cdca"),
+          Title = "Further education",
+          Summary = "",
+          Slug = "further-education"
+        },
+        new Theme
+        {
+          Id = new Guid("2ca22e34-b87a-4281-a0eb-b80f4f8dd374"),
+          Title = "Higher education",
+          Summary = "",
+          Slug = "higher-education"
+        },
+        new Theme
+        {
+          Id = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
+          Title = "Pupils and schools",
+          Summary = "",
+          Slug = "pupils-and-schools"
+        },
+        new Theme
+        {
+          Id = new Guid("74648781-85a9-4233-8be3-fe6f137165f4"),
+          Title = "School and college performance - include GCSE and key stage results",
+          Summary = "",
+          Slug = "school-and-college-performance"
+        },
+        new Theme
+        {
+          Id = new Guid("b601b9ea-b1c7-4970-b354-d1f695c446f1"),
+          Title = "Teachers and school workforce",
+          Summary = "",
+          Slug = "teachers-and-school-workforce"
+        },
+        new Theme
+        {
+          Id = new Guid("a95d2ca2-a969-4320-b1e9-e4781112574a"),
+          Title = "UK education and training statistics",
+          Summary = "",
+          Slug = "uk-education-and-training-statistics"
         }
+      );
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
+      modelBuilder.Entity<Topic>().HasData(
+        new Topic
         {
+          Id = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"),
+          Title = "Childcare and early years",
+          Summary = "",
+          ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"),
+          Slug = "childcare-and-early-years"
+        },
+        new Topic
+        {
+          Id = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
+          Title = "Children in need and child protection",
+          Summary = "",
+          ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"),
+          Slug = "children-in-need-and-child-protection"
+        },
+        new Topic
+        {
+          Id = new Guid("734820b7-f80e-45c3-bb92-960edcc6faa5"),
+          Title = "Children's social work workforce",
+          Summary = "",
+          ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"),
+          Slug = "childrens-social-work-workforce"
+        },
+        new Topic
+        {
+          Id = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"),
+          Title = "Early years foundation stage profile",
+          Summary = "",
+          ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"),
+          Slug = "early-years-foundation-stage-profile"
+        },
+        new Topic
+        {
+          Id = new Guid("66ff5e67-36cf-4210-9ad2-632baeb4eca7"),
+          Title = "Looked-after children",
+          Summary = "",
+          ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"),
+          Slug = "looked-after-children"
+        },
+        new Topic
+        {
+          Id = new Guid("d5288137-e703-43a1-b634-d50fc9785cb9"),
+          Title = "Secure children's homes",
+          Summary = "",
+          ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"),
+          Slug = "secure-children-homes"
+        },
+        new Topic
+        {
+          Id = new Guid("0b920c62-ff67-4cf1-89ec-0c74a364e6b4"),
+          Title = "Destinations of key stage 4 and key stage 5 pupils",
+          Summary = "",
+          ThemeId = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"),
+          Slug = "destinations-of-ks4-and-ks5-pupils"
+        },
+        new Topic
+        {
+          Id = new Guid("3bef5b2b-76a1-4be1-83b1-a3269245c610"),
+          Title = "Graduate labour market",
+          Summary = "",
+          ThemeId = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"),
+          Slug = "graduate-labour-market"
+        },
+        new Topic
+        {
+          Id = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"),
+          Title = "NEET and participation",
+          Summary = "",
+          ThemeId = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"),
+          Slug = "neet-and-participation"
+        },
+        new Topic
+        {
+          Id = new Guid("4c658598-450b-4493-b972-8812acd154a7"),
+          Title = "Local authority and school finance",
+          Summary = "",
+          ThemeId = new Guid("bc08839f-2970-4f34-af2d-29608a48082f"),
+          Slug = "local-authority-and-school-finance"
+        },
+        new Topic
+        {
+          Id = new Guid("5c5bc908-f813-46e2-aae8-494804a57aa1"),
+          Title = "Student loan forecasts",
+          Summary = "",
+          ThemeId = new Guid("bc08839f-2970-4f34-af2d-29608a48082f"),
+          Slug = "student-loan-forecasts"
+        },
+        new Topic
+        {
+          Id = new Guid("ba0e4a29-92ef-450c-97c5-80a0a6144fb5"),
+          Title = "Advanced learner loans",
+          Summary = "",
+          ThemeId = new Guid("92c5df93-c4da-4629-ab25-51bd2920cdca"),
+          Slug = "advanced-learner-loans"
+        },
+        new Topic
+        {
+          Id = new Guid("dd4a5d02-fcc9-4b7f-8c20-c153754ba1e4"),
+          Title = "FE choices",
+          Summary = "",
+          ThemeId = new Guid("92c5df93-c4da-4629-ab25-51bd2920cdca"),
+          Slug = "fe-choices"
+        },
+        new Topic
+        {
+          Id = new Guid("88d08425-fcfd-4c87-89da-70b2062a7367"),
+          Title = "Further education and skills",
+          Summary = "",
+          ThemeId = new Guid("92c5df93-c4da-4629-ab25-51bd2920cdca"),
+          Slug = "further-education-and-skills"
+        },
+        new Topic
+        {
+          Id = new Guid("cf1f1dc5-27c2-4d15-a55a-9363b7757ff3"),
+          Title = "Further education for benefits claimants",
+          Summary = "",
+          ThemeId = new Guid("92c5df93-c4da-4629-ab25-51bd2920cdca"),
+          Slug = "further-education-for-benefits-claimants"
+        },
+        new Topic
+        {
+          Id = new Guid("dc7b7a89-e968-4a7e-af5f-bd7d19c346a5"),
+          Title = "National achievement rates tables",
+          Summary = "",
+          ThemeId = new Guid("92c5df93-c4da-4629-ab25-51bd2920cdca"),
+          Slug = "national-achievement-rates-tables"
+        },
+        new Topic
+        {
+          Id = new Guid("53a1fbb7-5234-435f-892b-9baad4c82535"),
+          Title = "Higher education graduate employment and earnings",
+          Summary = "",
+          ThemeId = new Guid("2ca22e34-b87a-4281-a0eb-b80f4f8dd374"),
+          Slug = "higher-education-graduate-employment-and-earnings"
+        },
+        new Topic
+        {
+          Id = new Guid("2458a916-df6e-4845-9658-a81eace42ffd"),
+          Title = "Higher education statistics",
+          Summary = "",
+          ThemeId = new Guid("2ca22e34-b87a-4281-a0eb-b80f4f8dd374"),
+          Slug = "higher-education-statistics"
+        },
+        new Topic
+        {
+          Id = new Guid("04d95654-9fe0-4f78-9dfd-cf396661ebe9"),
+          Title = "Participation rates in higher education",
+          Summary = "",
+          ThemeId = new Guid("2ca22e34-b87a-4281-a0eb-b80f4f8dd374"),
+          Slug = "participation-rates-in-higher-education"
+        },
+        new Topic
+        {
+          Id = new Guid("7871f559-0cfe-47c0-b48d-25b2bc8a0418"),
+          Title = "Widening participation in higher education",
+          Summary = "",
+          ThemeId = new Guid("2ca22e34-b87a-4281-a0eb-b80f4f8dd374"),
+          Slug = "widening-participation-in-higher-education"
+        },
+        new Topic
+        {
+          Id = new Guid("c9f0b897-d58a-42b0-9d12-ca874cc7c810"),
+          Title = "Admission appeals",
+          Summary = "",
+          ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
+          Slug = "admission-appeals"
+        },
+        new Topic
+        {
+          Id = new Guid("77941b7d-bbd6-4069-9107-565af89e2dec"),
+          Title = "Exclusions",
+          Summary = "",
+          ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
+          Slug = "exclusions"
+        },
+        new Topic
+        {
+          Id = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460"),
+          Title = "Pupil absence",
+          Summary = "",
+          ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
+          Slug = "pupil-absence"
+        },
+        new Topic
+        {
+          Id = new Guid("6b8c0242-68e2-420c-910c-e19524e09cd2"),
+          Title = "Parental responsibility measures",
+          Summary = "",
+          ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
+          Slug = "parental-responsibility-measures"
+        },
+        new Topic
+        {
+          Id = new Guid("5e196d11-8ac4-4c82-8c46-a10a67c1118e"),
+          Title = "Pupil projections",
+          Summary = "",
+          ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
+          Slug = "pupil-projections"
+        },
+        new Topic
+        {
+          Id = new Guid("e50ba9fd-9f19-458c-aceb-4422f0c7d1ba"),
+          Title = "School and pupils numbers",
+          Summary = "",
+          ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
+          Slug = "school-and-pupil-numbers"
+        },
+        new Topic
+        {
+          Id = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
+          Title = "School applications",
+          Summary = "",
+          ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
+          Slug = "school-applications"
+        },
+        new Topic
+        {
+          Id = new Guid("87c27c5e-ae49-4932-aedd-4405177d9367"),
+          Title = "School capacity",
+          Summary = "",
+          ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
+          Slug = "school-capacity"
+        },
+        new Topic
+        {
+          Id = new Guid("85349b0a-19c7-4089-a56b-ad8dbe85449a"),
+          Title = "Special educational needs (SEN)",
+          Summary = "",
+          ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
+          Slug = "special-educational-needs"
+        },
+        new Topic
+        {
+          Id = new Guid("85b5454b-3761-43b1-8e84-bd056a8efcd3"),
+          Title = "16 to 19 attainment",
+          Summary = "",
+          ThemeId = new Guid("74648781-85a9-4233-8be3-fe6f137165f4"),
+          Slug = "16-to-19-attainment"
+        },
+        new Topic
+        {
+          Id = new Guid("1e763f55-bf09-4497-b838-7c5b054ba87b"),
+          Title = "GCSEs (key stage 4)",
+          Summary = "",
+          ThemeId = new Guid("74648781-85a9-4233-8be3-fe6f137165f4"),
+          Slug = "gcses-key-stage-4"
+        },
+        new Topic
+        {
+          Id = new Guid("504446c2-ddb1-4d52-bdbc-4148c2c4c460"),
+          Title = "Key stage 1",
+          Summary = "",
+          ThemeId = new Guid("74648781-85a9-4233-8be3-fe6f137165f4"),
+          Slug = "key-stage-1"
+        },
+        new Topic
+        {
+          Id = new Guid("eac38700-b968-4029-b8ac-0eb8e1356480"),
+          Title = "Key stage 2",
+          Summary = "",
+          ThemeId = new Guid("74648781-85a9-4233-8be3-fe6f137165f4"),
+          Slug = "key-stage-2"
+        },
+        new Topic
+        {
+          Id = new Guid("a7ce9542-20e6-401d-91f4-f832c9e58b12"),
+          Title = "Outcome based success measures",
+          Summary = "",
+          ThemeId = new Guid("74648781-85a9-4233-8be3-fe6f137165f4"),
+          Slug = "outcome-based-success-measures"
+        },
+        new Topic
+        {
+          Id = new Guid("1318eb73-02a8-4e50-82a9-7e271176c4d1"),
+          Title = "Performance tables",
+          Summary = "",
+          ThemeId = new Guid("74648781-85a9-4233-8be3-fe6f137165f4"),
+          Slug = "performance-tables"
+        },
+        new Topic
+        {
+          Id = new Guid("0f8792d2-28b1-4537-a1b4-3e139fcf0ca7"),
+          Title = "Initial teacher training (ITT)",
+          Summary = "",
+          ThemeId = new Guid("b601b9ea-b1c7-4970-b354-d1f695c446f1"),
+          Slug = "initial-teacher-training"
+        },
+        new Topic
+        {
+          Id = new Guid("28cfa002-83cb-4011-9ddd-859ec99e0aa0"),
+          Title = "School workforce",
+          Summary = "",
+          ThemeId = new Guid("b601b9ea-b1c7-4970-b354-d1f695c446f1"),
+          Slug = "school-workforce"
+        },
+        new Topic
+        {
+          Id = new Guid("6d434e17-7b76-425d-897d-c7b369b42e35"),
+          Title = "Teacher workforce statistics and analysis",
+          Summary = "",
+          ThemeId = new Guid("b601b9ea-b1c7-4970-b354-d1f695c446f1"),
+          Slug = "teacher-workforce-statistics-and-analysis"
+        },
+        new Topic
+        {
+          Id = new Guid("692050da-9ac9-435a-80d5-a6be4915f0f7"),
+          Title = "UK education and training statistics",
+          Summary = "",
+          ThemeId = new Guid("a95d2ca2-a969-4320-b1e9-e4781112574a"),
+          Slug = "uk-education-and-training-statistics"
         }
+      );
 
-        public DbSet<Methodology> Methodologies { get; set; }        
-        public DbSet<Theme> Themes { get; set; }
-        public DbSet<Topic> Topics { get; set; }
-        public DbSet<Publication> Publications { get; set; }
-        public DbSet<Release> Releases { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+      modelBuilder.Entity<Publication>().HasData(
+        new Publication
         {
-            modelBuilder.Entity<Methodology>()
-                .Property(b => b.Content)
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
-            modelBuilder.Entity<Methodology>()
-                .Property(b => b.Annexes)
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
-            
-            modelBuilder.Entity<Release>()
-                .Property(b => b.Content)
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
+          Id = new Guid("d63daa75-5c3e-48bf-a232-f232e0d13898"),
+          Title = "30 hours free childcare",
+          Summary = "",
+          TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"),
+          Slug = "30-hours-free-childcare"
+        },
+        new Publication
+        {
+          Id = new Guid("79a08466-dace-4ff0-94b6-59c5528c9262"),
+          Title = "Childcare and early years provider survey",
+          Summary = "",
+          TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"),
+          Slug = "childcare-and-early-years-provider-survey"
+        },
+        new Publication
+        {
+          Id = new Guid("060c5376-35d8-420b-8266-517a9339b7bc"),
+          Title = "Childcare and early years survey of parents",
+          Summary = "",
+          TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"),
+          Slug = "childcare-and-early-years-survey-of-parents"
+        },
+        new Publication
+        {
+          Id = new Guid("0ce6a6c6-5451-4967-8dd4-2f4fa8131982"),
+          Title = "Education provision: children under 5 years of age",
+          Summary = "",
+          TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"),
+          Slug = "education-provision-children-under-5"
+        },
+        new Publication
+        {
+          Id = new Guid("89869bba-0c00-40f7-b7d6-e28cb904ad37"),
+          Title = "Characteristics of children in need",
+          Summary = "",
+          TopicId = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
+          Slug = "characteristics-of-children-in-need"
+        },
+        new Publication
+        {
+          Id = new Guid("d8baee79-3c88-45f4-b12a-07b91e9b5c11"),
+          Title = "Children's social work workforce",
+          Summary = "",
+          TopicId = new Guid("734820b7-f80e-45c3-bb92-960edcc6faa5"),
+          Slug = "childrens-social-work-workforce"
+        },
+        new Publication
+        {
+          Id = new Guid("fcda2962-82a6-4052-afa2-ea398c53c85f"),
+          Title = "Early years foundation stage profile results",
+          Summary = "",
+          TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"),
+          Slug = "early-years-foundation-stage-profile-results"
+        },
+        new Publication
+        {
+          Id = new Guid("3260801d-601a-48c6-93b7-cf51680323d1"),
+          Title = "Children looked after in England including adoptions",
+          Summary = "",
+          TopicId = new Guid("66ff5e67-36cf-4210-9ad2-632baeb4eca7"),
+          Slug = "children-looked-after-in-england-including-adoptions"
+        },
+        new Publication
+        {
+          Id = new Guid("f51895df-c682-45e6-b23e-3138ddbfdaeb"),
+          Title = "Outcomes for children looked after by LAs",
+          Summary = "",
+          TopicId = new Guid("66ff5e67-36cf-4210-9ad2-632baeb4eca7"),
+          Slug = "outcomes-for-children-looked-after-by-las"
+        },
+        new Publication
+        {
+          Id = new Guid("d7bd5d9d-dc65-4b1d-99b1-4d815b7369a3"),
+          Title = "Children accommodated in secure children's homes",
+          Summary = "",
+          TopicId = new Guid("d5288137-e703-43a1-b634-d50fc9785cb9"),
+          Slug = "children-accommodated-in-secure-childrens-homes"
+        },
+        new Publication
+        {
+          Id = new Guid("8a92c6a5-8110-4c9c-87b1-e15f1c80c66a"),
+          Title = "Destinations of key stage 4 and key stage 5 pupils",
+          Summary = "",
+          TopicId = new Guid("0b920c62-ff67-4cf1-89ec-0c74a364e6b4"),
+          Slug = "destinations-of-ks4-and-ks5-pupils"
+        },
+        new Publication
+        {
+          Id = new Guid("42a888c4-9ee7-40fd-9128-f5de546780b3"),
+          Title = "Graduate labour market statistics",
+          Summary = "",
+          TopicId = new Guid("3bef5b2b-76a1-4be1-83b1-a3269245c610"),
+          Slug = "graduate-labour-markets"
+        },
+        new Publication
+        {
+          Id = new Guid("a0eb117e-44a8-4732-adf1-8fbc890cbb62"),
+          Title = "Participation in education and training and employment",
+          Summary = "",
+          TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"),
+          Slug = "participation-in-education-training-and-employement"
+        },
+        new Publication
+        {
+          Id = new Guid("2e510281-ca8c-41bf-bbe0-fd15fcc81aae"),
+          Title = "NEET statistics quarterly brief",
+          Summary = "",
+          TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"),
+          Slug = "neet-statistics-quarterly-brief"
+        },
+        new Publication
+        {
+          Id = new Guid("8ab47806-e36f-4226-9988-1efe23156872"),
+          Title = "Income and expenditure in academies in England",
+          Summary = "",
+          TopicId = new Guid("4c658598-450b-4493-b972-8812acd154a7"),
+          Slug = "income-and-expenditure-in-academies-in-england"
+        },
+        new Publication
+        {
+          Id = new Guid("dcb8b32b-4e50-4fe2-a539-58f9b6b3a366"),
+          Title = "LA and school expenditure",
+          Summary = "",
+          TopicId = new Guid("4c658598-450b-4493-b972-8812acd154a7"),
+          Slug = "la-and-school-expenditure"
+        },
+        new Publication
+        {
+          Id = new Guid("94d16c6e-1e5f-48d5-8195-8ea770f1b0d4"),
+          Title = "Planned LA and school expenditure",
+          Summary = "",
+          TopicId = new Guid("4c658598-450b-4493-b972-8812acd154a7"),
+          Slug = "planned-la-and-school-expenditure"
+        },
+        new Publication
+        {
+          Id = new Guid("fd68e147-b7ee-464f-8b02-dcd917dc362d"),
+          Title = "Student loan forecasts for England",
+          Summary = "",
+          TopicId = new Guid("5c5bc908-f813-46e2-aae8-494804a57aa1"),
+          Slug = "student-loan-forecasts-for-england"
+        },
+        new Publication
+        {
+          Id = new Guid("75568912-25ba-499a-8a96-6161b54994db"),
+          Title = "Advanced learner loans applications",
+          Summary = "",
+          TopicId = new Guid("ba0e4a29-92ef-450c-97c5-80a0a6144fb5"),
+          Slug = "advanced-learner-loans-applications"
+        },
+        new Publication
+        {
+          Id = new Guid("f00a784b-52e8-475b-b8ee-dbe730382ba8"),
+          Title = "FE chioces employer satisfaction survey",
+          Summary = "",
+          TopicId = new Guid("dd4a5d02-fcc9-4b7f-8c20-c153754ba1e4"),
+          Slug = "fe-choices-employer-satisfaction-survey"
+        },
+        new Publication
+        {
+          Id = new Guid("657b1484-0369-4a0e-873a-367b79a48c35"),
+          Title = "FE choices learner satisfaction survey",
+          Summary = "",
+          TopicId = new Guid("dd4a5d02-fcc9-4b7f-8c20-c153754ba1e4"),
+          Slug = "fe-choices-learner-satisfaction-survey"
+        },
+        new Publication
+        {
+          Id = new Guid("d24783b6-24a7-4ef3-8304-fd07eeedff92"),
+          Title = "Apprenticeship and levy statistics",
+          Summary = "",
+          TopicId = new Guid("88d08425-fcfd-4c87-89da-70b2062a7367"),
+          Slug = "apprenticeship-and-levy-statistics"
+        },
+        new Publication
+        {
+          Id = new Guid("cf0ec981-3583-42a5-b21b-3f2f32008f1b"),
+          Title = "Apprenticeships and traineeships",
+          Summary = "",
+          TopicId = new Guid("88d08425-fcfd-4c87-89da-70b2062a7367"),
+          Slug = "apprenticeships-and-traineeships"
+        },
+        new Publication
+        {
+          Id = new Guid("13b81bcb-e8cd-4431-9807-ca588fd1d02a"),
+          Title = "Further education and skills",
+          Summary = "",
+          TopicId = new Guid("88d08425-fcfd-4c87-89da-70b2062a7367"),
+          Slug = "further-education-and-skills"
+        },
+        new Publication
+        {
+          Id = new Guid("ce6098a6-27b6-44b5-8e63-36df3a659e69"),
+          Title = "Further education and benefits claimants",
+          Summary = "",
+          TopicId = new Guid("cf1f1dc5-27c2-4d15-a55a-9363b7757ff3"),
+          Slug = "further-education-and-benefits-claimants"
+        },
+        new Publication
+        {
+          Id = new Guid("7a57d4c0-5233-4d46-8e27-748fbc365715"),
+          Title = "National achievement rates tables",
+          Summary = "",
+          TopicId = new Guid("dc7b7a89-e968-4a7e-af5f-bd7d19c346a5"),
+          Slug = "national-achievement-rates-tables"
+        },
+        new Publication
+        {
+          Id = new Guid("4d29c28c-efd1-4245-a80c-b55c6a50e3f7"),
+          Title = "Graduate outcomes (LEO)",
+          Summary = "",
+          TopicId = new Guid("53a1fbb7-5234-435f-892b-9baad4c82535"),
+          Slug = "graduate-outcomes"
+        },
+        new Publication
+        {
+          Id = new Guid("d4b9551b-d92c-4f98-8731-847780d3c9fa"),
+          Title = "Higher education: destinations of leavers",
+          Summary = "",
+          TopicId = new Guid("2458a916-df6e-4845-9658-a81eace42ffd"),
+          Slug = "higher-education-destinations-of-leavers"
+        },
+        new Publication
+        {
+          Id = new Guid("14cfd218-5480-4ba1-a051-5b1e6be14b46"),
+          Title = "Higher education enrolments and qualifications",
+          Summary = "",
+          TopicId = new Guid("2458a916-df6e-4845-9658-a81eace42ffd"),
+          Slug = "higher-education-enrolments-and-qualifications"
+        },
+        new Publication
+        {
+          Id = new Guid("b83f55db-73fc-46fc-9fda-9b59f5896e9d"),
+          Title = "Performance indicators in higher education",
+          Summary = "",
+          TopicId = new Guid("2458a916-df6e-4845-9658-a81eace42ffd"),
+          Slug = "performance-indicators-in-higher-education"
+        },
+        new Publication
+        {
+          Id = new Guid("6c25a3e9-fc96-472f-895c-9ae4492dd2a4"),
+          Title = "Staff at higher education providers in the UK",
+          Summary = "",
+          TopicId = new Guid("2458a916-df6e-4845-9658-a81eace42ffd"),
+          Slug = "staff-at-higher-education-providers-in-the-uk"
+        },
+        new Publication
+        {
+          Id = new Guid("0c67bbdb-4eb0-41cf-a62e-2589cee58538"),
+          Title = "Participation rates in higher education",
+          Summary = "",
+          TopicId = new Guid("04d95654-9fe0-4f78-9dfd-cf396661ebe9"),
+          Slug = "participation-rates-in-higher-education"
+        },
+        new Publication
+        {
+          Id = new Guid("c28f7aca-f1e8-4916-8ce3-fc177b140695"),
+          Title = "Widening participation in higher education",
+          Summary = "",
+          TopicId = new Guid("7871f559-0cfe-47c0-b48d-25b2bc8a0418"),
+          Slug = "widening-participation-in-higher-education"
+        },
+        new Publication
+        {
+          Id = new Guid("123461ab-50be-45d9-8523-c5241a2c9c5b"),
+          Title = "Admission appeals in England",
+          Summary = "",
+          TopicId = new Guid("c9f0b897-d58a-42b0-9d12-ca874cc7c810"),
+          Slug = "admission-appeals-in-england"
+        },
+        new Publication
+        {
+          Id = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+          Title = "Permanent and fixed-period exclusions in England",
+          Summary = "",
+          TopicId = new Guid("77941b7d-bbd6-4069-9107-565af89e2dec"),
+          Slug = "permanent-and-fixed-period-exclusions-in-england"
+        },
+        new Publication
+        {
+          Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+          Title = "Pupil absence in schools in England",
+          Summary = "",
+          TopicId = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460"),
+          Slug = "pupil-absence-in-schools-in-england",
+          NextUpdate = new DateTime(2018, 3, 22),
+          DataSource =
+              "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)"
+        },
+        new Publication
+        {
+          Id = new Guid("6c388293-d027-4f74-8d74-29a42e02231c"),
+          Title = "Pupil absence in schools in England: autumn term",
+          Summary = "",
+          TopicId = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460"),
+          Slug = "pupil-absence-in-schools-in-england-autumn-term"
+        },
+        new Publication
+        {
+          Id = new Guid("14953fda-02ff-45ed-9573-3a7a0ad8cb10"),
+          Title = "Pupil absence in schools in England: autumn and spring",
+          Summary = "",
+          TopicId = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460"),
+          Slug = "pupil-absence-in-schools-in-england-autumn-and-spring"
+        },
+        new Publication
+        {
+          Id = new Guid("86af24dc-67c4-47f0-a849-e94c7a1cfe9b"),
+          Title = "Parental responsibility measures",
+          Summary = "",
+          TopicId = new Guid("6b8c0242-68e2-420c-910c-e19524e09cd2"),
+          Slug = "parental-responsibility-measures"
+        },
+        new Publication
+        {
+          Id = new Guid("aa545525-9ffe-496c-a5b3-974ace56746e"),
+          Title = "National pupil projections",
+          Summary = "",
+          TopicId = new Guid("5e196d11-8ac4-4c82-8c46-a10a67c1118e"),
+          Slug = "national-pupil-projections"
+        },
+        new Publication
+        {
+          Id = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+          Title = "School and pupils and their characteristics",
+          Summary = "",
+          TopicId = new Guid("e50ba9fd-9f19-458c-aceb-4422f0c7d1ba"),
+          Slug = "school-pupils-and-their-characteristics"
+        },
+        new Publication
+        {
+          Id = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
+          Title = "Secondary and primary schools applications and offers",
+          Summary = "",
+          TopicId = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
+          Slug = "secondary-and-primary-schools-applications-and-offers"
+        },
+        new Publication
+        {
+          Id = new Guid("fa591a15-ae37-41b5-98f6-4ce06e5225f4"),
+          Title = "School capacity",
+          Summary = "",
+          TopicId = new Guid("87c27c5e-ae49-4932-aedd-4405177d9367"),
+          Slug = "school-capacity"
+        },
+        new Publication
+        {
+          Id = new Guid("f657afb4-8f4a-427d-a683-15f11a2aefb5"),
+          Title = "Special educational needs in England",
+          Summary = "",
+          TopicId = new Guid("85349b0a-19c7-4089-a56b-ad8dbe85449a"),
+          Slug = "special-educational-needs-in-england"
+        },
+        new Publication
+        {
+          Id = new Guid("30874b87-483a-427e-8916-43cf9020d9a1"),
+          Title = "Special educational needs: analysis and summary of data sources",
+          Summary = "",
+          TopicId = new Guid("85349b0a-19c7-4089-a56b-ad8dbe85449a"),
+          Slug = "special-educational-needs-analysis-and-summary-of-data-sources"
+        },
+        new Publication
+        {
+          Id = new Guid("88312cc0-fe1d-4ab5-81df-33fd708185cb"),
+          Title = "Statements on SEN and EHC plans",
+          Summary = "",
+          TopicId = new Guid("85349b0a-19c7-4089-a56b-ad8dbe85449a"),
+          Slug = "statements-on-sen-and-ehc-plans"
+        },
+        new Publication
+        {
+          Id = new Guid("1b2fb05c-eb2c-486b-80be-ebd772eda4f1"),
+          Title = "16 to 18 school and college performance tables",
+          Summary = "",
+          TopicId = new Guid("85b5454b-3761-43b1-8e84-bd056a8efcd3"),
+          Slug = "16-to-18-school-and-college-performance-tables"
+        },
+        new Publication
+        {
+          Id = new Guid("3f3a66ec-5777-42ee-b427-8102a14ce0c5"),
+          Title = "A level and other 16 to 18 results",
+          Summary = "",
+          TopicId = new Guid("85b5454b-3761-43b1-8e84-bd056a8efcd3"),
+          Slug = "a-level-and-other-16-to-18-results"
+        },
+        new Publication
+        {
+          Id = new Guid("2e95f880-629c-417b-981f-0901e97776ff"),
+          Title = "Level 2 and 3 attainment by young people aged 19",
+          Summary = "",
+          TopicId = new Guid("85b5454b-3761-43b1-8e84-bd056a8efcd3"),
+          Slug = "level-2-and-3-attainment-by-young-people-aged-19"
+        },
+        new Publication
+        {
+          Id = new Guid("bfdcaae1-ce6b-4f63-9b2b-0a1f3942887f"),
+          Title = "GCSE and equivalent results",
+          Summary = "",
+          TopicId = new Guid("1e763f55-bf09-4497-b838-7c5b054ba87b"),
+          Slug = "gcse-and-equivalent-results"
+        },
+        new Publication
+        {
+          Id = new Guid("1d0e4263-3d70-433e-bd95-f29754db5888"),
+          Title = "Multi-academy trust performance measures",
+          Summary = "",
+          TopicId = new Guid("1e763f55-bf09-4497-b838-7c5b054ba87b"),
+          Slug = "multi-academy-trust-performance-measures"
+        },
+        new Publication
+        {
+          Id = new Guid("c8756008-ed50-4632-9b96-01b5ca002a43"),
+          Title = "Revised GCSE and equivalent results in England",
+          Summary = "",
+          TopicId = new Guid("1e763f55-bf09-4497-b838-7c5b054ba87b"),
+          Slug = "revised-gcse-and-equivalent-results-in-england"
+        },
+        new Publication
+        {
+          Id = new Guid("9e7e9d5c-b761-43a4-9685-4892392200b7"),
+          Title = "Secondary school performance tables",
+          Summary = "",
+          TopicId = new Guid("1e763f55-bf09-4497-b838-7c5b054ba87b"),
+          Slug = "secondary-school-performance-tables"
+        },
+        new Publication
+        {
+          Id = new Guid("441a13f6-877c-4f18-828f-119dbd401a5b"),
+          Title = "Phonics screening check and key stage 1 assessments",
+          Summary = "",
+          TopicId = new Guid("504446c2-ddb1-4d52-bdbc-4148c2c4c460"),
+          Slug = "phonics-screening-check-and-ks1-assessments"
+        },
+        new Publication
+        {
+          Id = new Guid("7ecea655-7b22-4832-b697-26e86769399a"),
+          Title = "Key stage 2 national curriculum test:review outcomes",
+          Summary = "",
+          TopicId = new Guid("eac38700-b968-4029-b8ac-0eb8e1356480"),
+          Slug = "ks2-national-curriculum-test-review-outcomes"
+        },
+        new Publication
+        {
+          Id = new Guid("eab51107-4ef0-4926-8f8b-c8bd7f5a21d5"),
+          Title = "Multi-academy trust performance measures",
+          Summary = "",
+          TopicId = new Guid("eac38700-b968-4029-b8ac-0eb8e1356480"),
+          Slug = "multi-academy-trust-performance-measures"
+        },
+        new Publication
+        {
+          Id = new Guid("10370062-93b0-4dde-9097-5a56bf5b3064"),
+          Title = "National curriculum assessments at key stage 2",
+          Summary = "",
+          TopicId = new Guid("eac38700-b968-4029-b8ac-0eb8e1356480"),
+          Slug = "national-curriculum-assessments-at-ks2"
+        },
+        new Publication
+        {
+          Id = new Guid("2434335f-f8e1-41fb-8d6e-4a11bc62b14a"),
+          Title = "Primary school performance tables",
+          Summary = "",
+          TopicId = new Guid("eac38700-b968-4029-b8ac-0eb8e1356480"),
+          Slug = "primary-school-performance-tables"
+        },
+        new Publication
+        {
+          Id = new Guid("8b12776b-3d36-4475-8115-00974d7de1d0"),
+          Title = "Further education outcome-based success measures",
+          Summary = "",
+          TopicId = new Guid("a7ce9542-20e6-401d-91f4-f832c9e58b12"),
+          Slug = "further-education-outcome-based-success-measures"
+        },
+        new Publication
+        {
+          Id = new Guid("bddcd4b8-db0d-446c-b6e9-03d4230c6927"),
+          Title = "Primary school performance tables",
+          Summary = "",
+          TopicId = new Guid("1318eb73-02a8-4e50-82a9-7e271176c4d1"),
+          Slug = "primary-school-performance-tables-2"
+        },
+        new Publication
+        {
+          Id = new Guid("263e10d2-b9c3-4e90-a6aa-b52b86de1f5f"),
+          Title = "School and college performance tables",
+          Summary = "",
+          TopicId = new Guid("1318eb73-02a8-4e50-82a9-7e271176c4d1"),
+          Slug = "school-and-college-performance-tables"
+        },
+        new Publication
+        {
+          Id = new Guid("28aabfd4-a3fb-45e1-bb34-21ca3b7d1aec"),
+          Title = "Secondary school performance tables",
+          Summary = "",
+          TopicId = new Guid("1318eb73-02a8-4e50-82a9-7e271176c4d1"),
+          Slug = "secondary-school-performance-tables"
+        },
+        new Publication
+        {
+          Id = new Guid("d34978d5-0317-46bc-9258-13412270ac4d"),
+          Title = "Initial teacher training performance profiles",
+          Summary = "",
+          TopicId = new Guid("0f8792d2-28b1-4537-a1b4-3e139fcf0ca7"),
+          Slug = "initial-teacher-training-performance-profiles"
+        },
+        new Publication
+        {
+          Id = new Guid("9cc08298-7370-499f-919a-7d203ba21415"),
+          Title = "Initial teacher training: trainee number census",
+          Summary = "",
+          TopicId = new Guid("0f8792d2-28b1-4537-a1b4-3e139fcf0ca7"),
+          Slug = "initial-teacher-training-trainee-number-census"
+        },
+        new Publication
+        {
+          Id = new Guid("3ceb43d0-e705-4cb9-aeb9-cb8638fcbf3d"),
+          Title = "TSM and initial teacher training allocations",
+          Summary = "",
+          TopicId = new Guid("0f8792d2-28b1-4537-a1b4-3e139fcf0ca7"),
+          Slug = "tsm-and-initial-teacher-training-allocations"
+        },
+        new Publication
+        {
+          Id = new Guid("b318967f-2931-472a-93f2-fbed1e181e6a"),
+          Title = "School workforce in England",
+          Summary = "",
+          TopicId = new Guid("28cfa002-83cb-4011-9ddd-859ec99e0aa0"),
+          Slug = "school-workforce-in-england"
+        },
+        new Publication
+        {
+          Id = new Guid("d0b47c96-d7de-4d80-9ff7-3bff135d2636"),
+          Title = "Teacher analysis compendium",
+          Summary = "",
+          TopicId = new Guid("6d434e17-7b76-425d-897d-c7b369b42e35"),
+          Slug = "teacher-analysis-compendium"
+        },
+        new Publication
+        {
+          Id = new Guid("2ffbc8d3-eb53-4c4b-a6fb-219a5b95ebc8"),
+          Title = "Education and training statistics for the UK",
+          Summary = "",
+          TopicId = new Guid("692050da-9ac9-435a-80d5-a6be4915f0f7"),
+          Slug = "education-and-training-statistics-for-the-uk"
+        }
+      );
 
-            modelBuilder.Entity<Release>()
-                .Property(b => b.KeyStatistics)
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<DataBlock>(v));
+      modelBuilder.Entity<Release>().HasData(
+          //absence
+          new Release
+          {
+            Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+            Title = "Pupil absence data and statistics for schools in England",
+            ReleaseName = "2016 to 2017",
+            PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+            Published = new DateTime(2017, 3, 22),
+            Slug = "2016-17",
+            Summary =
+                  "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas. \n\n",
 
-            modelBuilder.Entity<Theme>().HasData(
-                new Theme
-                {
-                    Id = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Title = "Early years and schools",
-                    Summary = "Lorem ipsum dolor sit amet.", Slug = "early-years-and-schools"
-                },
-                new Theme
-                {
-                    Id = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"), Title = "Social Care",
-                    Summary = "Lorem ipsum dolor sit amet.", Slug = "social-care"
-                },
-                new Theme
-                {
-                    Id = new Guid("bc08839f-2970-4f34-af2d-29608a48082f"), Title = "Higher education",
-                    Summary = "Lorem ipsum dolor sit amet.", Slug = "higher-education"
-                }
-            );
+            KeyStatistics = new DataBlock
+            {
+              DataBlockRequest = new DataBlockRequest
+              {
+                subjectId = 1,
+                geographicLevel = "National",
+                startYear = "2016",
+                endYear = "2017",
+                filters = new List<string> { "1", "2" },
+                indicators = new List<string> { "23", "26", "28" }
+              },
 
-            modelBuilder.Entity<Topic>().HasData(
-                new Topic
-                {
-                    Id = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Title = "Absence and exclusions",
-                    Summary = "Pupil absence and permanent and fixed-period exclusions statistics and data",
-                    ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Slug = "absence-and-exclusions"
-                },
-                new Topic
-                {
-                    Id = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"), Title = "School & pupil numbers",
-                    Summary = "Schools, pupils and their characteristics, SEN and EHC plans, SEN in England",
-                    ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Slug = "school-and-pupil-numbers"
-                },
-                new Topic
-                {
-                    Id = new Guid("734820b7-f80e-45c3-bb92-960edcc6faa5"), Title = "Capacity and admissions",
-                    Summary = "School capacity, admission appeals",
-                    ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Slug = "capacity-admissions"
-                },
-                new Topic
-                {
-                    Id = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"), Title = "Results",
-                    Summary = "Local authority and school finance",
-                    ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Slug = "results"
-                },
-                new Topic
-                {
-                    Id = new Guid("66ff5e67-36cf-4210-9ad2-632baeb4eca7"), Title = "School finance",
-                    Summary = "Local authority and school finance",
-                    ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Slug = "school-finance"
-                },
-                new Topic
-                {
-                    Id = new Guid("d5288137-e703-43a1-b634-d50fc9785cb9"), Title = "Teacher Numbers",
-                    Summary = "The number and characteristics of teachers",
-                    ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"), Slug = "teacher-numbers"
-                },
-                new Topic
-                {
-                    Id = new Guid("0b920c62-ff67-4cf1-89ec-0c74a364e6b4"), Title = "Number of Children",
-                    Summary = "Lorem ipsum dolor sit amet.", ThemeId = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"),
-                    Slug = "number-of-children"
-                },
-                new Topic
-                {
-                    Id = new Guid("3bef5b2b-76a1-4be1-83b1-a3269245c610"), Title = "Vulnerable Children",
-                    Summary = "Lorem ipsum dolor sit amet.", ThemeId = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"),
-                    Slug = "vulnerable-children"
-                },
-                new Topic
-                {
-                    Id = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"), Title = "Further Education",
-                    Summary = "Lorem ipsum dolor sit amet.", ThemeId = new Guid("bc08839f-2970-4f34-af2d-29608a48082f"),
-                    Slug = "further-education"
-                },
-                new Topic
-                {
-                    Id = new Guid("4c658598-450b-4493-b972-8812acd154a7"), Title = "Higher Education",
-                    Summary = "Lorem ipsum dolor sit amet.", ThemeId = new Guid("bc08839f-2970-4f34-af2d-29608a48082f"),
-                    Slug = "higher-education"
-                }
-            );
-
-            modelBuilder.Entity<Publication>().HasData(
-                // Absence and exclusions
-                new Publication
-                {
-                    Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Title = "Pupil absence in schools in England",
-                    Summary =
-                        "View statistics, create charts and tables and download data files for authorised, overall, persistent and unauthorised absence",
-                    TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"),
-                    Slug = "pupil-absence-in-schools-in-england",
-                    NextUpdate = new DateTime(2018, 3, 22),
-                    DataSource =
-                        "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)"
-                },
-                new Publication
-                {
-                    Id = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                    Title = "Permanent and fixed period exclusions",
-                    Summary =
-                        "View statistics, create charts and tables and download data files for fixed-period and permanent exclusion statistics",
-                    TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"),
-                    Slug = "permanent-and-fixed-period-exclusions"
-                },
-
-                // School and pupil numbers
-                new Publication
-                {
-                    Id = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
-                    Title = "Schools, pupils and their characteristics",
-                    Summary = "Statistics on the number and characteristics of schools and pupils.",
-                    TopicId = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
-                    Slug = "schools-pupils-and-their-characteristics"
-                },
-
-                // Capacity Admissions
-                new Publication
-                {
-                    Id = new Guid("d04142bd-f448-456b-97bc-03863143836b"), Title = "School capacity",
-                    Summary = "Lorem ipsum dolor sit amet.", TopicId = new Guid("734820b7-f80e-45c3-bb92-960edcc6faa5"),
-                    Slug = "school-capacity"
-                },
-                new Publication
-                {
-                    Id = new Guid("a20ea465-d2d0-4fc1-96ee-6b2ca4e0520e"), Title = "Admission appeals in England",
-                    Summary = "Lorem ipsum dolor sit amet.", TopicId = new Guid("734820b7-f80e-45c3-bb92-960edcc6faa5"),
-                    Slug = "admission-appeals-in-England"
-                },
-
-                // Results
-                new Publication
-                {
-                    Id = new Guid("526dea0e-abf3-476e-9ca4-9dbd9b101bc8"),
-                    Title = "Early years foundation stage profile results", Summary = "Lorem ipsum dolor sit amet.",
-                    TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"),
-                    Slug = "early-years-foundation-stage-profile-results"
-                },
-                new Publication
-                {
-                    Id = new Guid("9674ac24-649a-400c-8a2c-871793d9cd7a"),
-                    Title = "Phonics screening check and KS1 assessments", Summary = "Lorem ipsum dolor sit amet.",
-                    TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"),
-                    Slug = "phonics-screening-check-and-ks1-assessments"
-                },
-                new Publication
-                {
-                    Id = new Guid("a4b22113-47d3-48fc-b2da-5336c801a31f"), Title = "KS2 statistics",
-                    Summary = "Lorem ipsum dolor sit amet.", TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"),
-                    Slug = "ks2-statistics"
-                },
-                new Publication
-                {
-                    Id = new Guid("bfdcaae1-ce6b-4f63-9b2b-0a1f3942887f"),
-                    Title = "GCSE and equivalent results in England",
-                    Summary =
-                        "View statistics, create charts and tables and download data files for GCSE and equivalent results in England",
-                    TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"),
-                    Slug = "gcse-and-equivalent-results-in-england"
-                },
-
-                // Teacher Numbers
-                new Publication
-                {
-                    Id = new Guid("8b2c1269-3495-4f89-83eb-524fc0b6effc"), Title = "School workforce",
-                    Summary = "Lorem ipsum dolor sit amet.", TopicId = new Guid("d5288137-e703-43a1-b634-d50fc9785cb9"),
-                    Slug = "school-workforce"
-                },
-                new Publication
-                {
-                    Id = new Guid("fe94b33d-0419-4fac-bf73-28299d5e4247"),
-                    Title = "Initial teacher training performance profiles", Summary = "Lorem ipsum dolor sit amet.",
-                    TopicId = new Guid("d5288137-e703-43a1-b634-d50fc9785cb9"),
-                    Slug = "initial-teacher-training-performance-profiles"
-                },
-
-                // Number of Children
-                new Publication
-                {
-                    Id = new Guid("bd781dc5-cfc7-4543-b8d7-a3a7b3606b3d"), Title = "Children in need",
-                    Summary = "Lorem ipsum dolor sit amet.", TopicId = new Guid("0b920c62-ff67-4cf1-89ec-0c74a364e6b4"),
-                    Slug = "children-in-need"
-                },
-                new Publication
-                {
-                    Id = new Guid("143c672b-18d7-478b-a6e7-b843c9b3fd42"), Title = "Looked after children",
-                    Summary = "Lorem ipsum dolor sit amet.", TopicId = new Guid("0b920c62-ff67-4cf1-89ec-0c74a364e6b4"),
-                    Slug = "looked-after-children"
-                },
-
-                // Further Education 
-                new Publication
-                {
-                    Id = new Guid("70902b3c-0bb4-457d-b40a-2a959cdc7d00"), Title = "16 to 18 school performance",
-                    Summary = "Lorem ipsum dolor sit amet.", TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"),
-                    Slug = "16-to-18-school-performance"
-                },
-                new Publication
-                {
-                    Id = new Guid("d0e56978-c944-4b12-9156-bfe50c94c2a0"), Title = "Destination of leavers",
-                    Summary = "Lorem ipsum dolor sit amet.", TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"),
-                    Slug = "destination-of-leavers"
-                },
-                new Publication
-                {
-                    Id = new Guid("ad81ebdd-2bbc-47e8-a32c-f396d6e2bb72"), Title = "Further education and skills",
-                    Summary = "Lorem ipsum dolor sit amet.", TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"),
-                    Slug = "further-education-and-skills"
-                },
-                new Publication
-                {
-                    Id = new Guid("201cb72d-ef35-4680-ade7-b09a8dca9cc1"), Title = "Apprenticeship and levy statistics",
-                    Summary = "Lorem ipsum dolor sit amet.", TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"),
-                    Slug = "apprenticeship-and-levy-statistics"
-                },
-                new Publication
-                {
-                    Id = new Guid("7bd128a3-ae7f-4e1b-984e-d1b795c61630"), Title = "Apprenticeships and traineeships",
-                    Summary = "Lorem ipsum dolor sit amet.", TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"),
-                    Slug = "apprenticeships-and-traineeships"
-                }
-            );
-
-            modelBuilder.Entity<Release>().HasData(
-                //absence
-                new Release
-                {
-                    Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                    Title = "Pupil absence data and statistics for schools in England",
-                    ReleaseName = "2016 to 2017",
-                    PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Published = new DateTime(2017, 3, 22),
-                    Slug = "2016-17",
-                    Summary =
-                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas. \n\n",
-
-                    KeyStatistics = new DataBlock
-                    {
-                        DataBlockRequest = new DataBlockRequest
-                        {
-                            subjectId = 1,
-                            geographicLevel = "National",
-                            startYear = "2016",
-                            endYear = "2017",
-                            filters = new List<string> {"1", "2"},
-                            indicators = new List<string> {"23", "26", "28"}
-                        },
-
-                        Summary = new Summary
-                        {
-                            dataKeys = new List<string>
-                            {
+              Summary = new Summary
+              {
+                dataKeys = new List<string>
+                      {
                                 "23",
                                 "26",
                                 "28"
-                            },
+                      },
 
-                            description = new MarkDownBlock
-                            {
-                                Body = " * pupils missed on average 8.2 school days \n " +
-                                       " * overall and unauthorised absence rates up on previous year \n" +
-                                       " * unauthorised rise due to higher rates of unauthorised holidays \n" +
-                                       " * 10% of pupils persistently absent during 2016/17"
-                            }
-                        }
-                    },
+                description = new MarkDownBlock
+                {
+                  Body = " * pupils missed on average 8.2 school days \n " +
+                                 " * overall and unauthorised absence rates up on previous year \n" +
+                                 " * unauthorised rise due to higher rates of unauthorised holidays \n" +
+                                 " * 10% of pupils persistently absent during 2016/17"
+                }
+              }
+            },
 
-                    Content = new List<ContentSection>
-                    {
+            Content = new List<ContentSection>
+              {
                         new ContentSection
                         {
                             Order = 1, Heading = "About this release", Caption = "",
@@ -461,39 +1170,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 }
                             }
                         }
-                    }
-                },
-                new Release
-                {
-                    Id = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"),
-                    Title = "Pupil absence data and statistics for schools in England",
-                    ReleaseName = "2015 to 2016",
-                    PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Published = new DateTime(2016, 3, 25),
-                    Slug = "2015-16",
-                    Summary =
-                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
+              }
+          },
+          new Release
+          {
+            Id = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"),
+            Title = "Pupil absence data and statistics for schools in England",
+            ReleaseName = "2015 to 2016",
+            PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+            Published = new DateTime(2016, 3, 25),
+            Slug = "2015-16",
+            Summary =
+                  "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
 
-                    KeyStatistics = new DataBlock
-                    {
-                        Summary = new Summary
-                        {
-                            dataKeys = new List<string>
-                            {
+            KeyStatistics = new DataBlock
+            {
+              Summary = new Summary
+              {
+                dataKeys = new List<string>
+                      {
                                 "--",
                                 "--",
                                 "--"
-                            },
+                      },
 
-                            description = new MarkDownBlock
-                            {
-                                Body = ""
-                            }
-                        }
-                    },
+                description = new MarkDownBlock
+                {
+                  Body = ""
+                }
+              }
+            },
 
-                    Content = new List<ContentSection>
-                    {
+            Content = new List<ContentSection>
+              {
                         new ContentSection {Order = 1, Heading = "About this release", Caption = ""},
                         new ContentSection {Order = 2, Heading = "Absence rates", Caption = ""},
                         new ContentSection {Order = 3, Heading = "Persistent absence", Caption = ""},
@@ -501,44 +1210,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         new ContentSection {Order = 5, Heading = "Absence for four year olds", Caption = ""},
                         new ContentSection {Order = 6, Heading = "Pupil referral unit absence", Caption = ""},
                         new ContentSection {Order = 7, Heading = "Pupil absence by local authority", Caption = ""}
-                    }
-                },
+              }
+          },
 
-                // exclusions
-                new Release
-                {
-                    Id = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                    Title = "Permanent and fixed period exclusions",
-                    ReleaseName = "2016 to 2017",
-                    PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                    Published = new DateTime(2018, 7, 19),
-                    Slug = "2016-17",
-                    Summary =
-                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of permanent and fixed-period exclusion subject areas. \n\n" +
-                        "You can also view a regional breakdown of statistics and data within the [local authorities section](#contents-sections-heading-9)",
-                    KeyStatistics = new DataBlock
-                    {
-                        Summary = new Summary
-                        {
-                            dataKeys = new List<string>
-                            {
+          // exclusions
+          new Release
+          {
+            Id = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+            Title = "Permanent and fixed period exclusions",
+            ReleaseName = "2016 to 2017",
+            PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+            Published = new DateTime(2018, 7, 19),
+            Slug = "2016-17",
+            Summary =
+                  "Read national statistical summaries and definitions, view charts and tables and download data files across a range of permanent and fixed-period exclusion subject areas. \n\n" +
+                  "You can also view a regional breakdown of statistics and data within the [local authorities section](#contents-sections-heading-9)",
+            KeyStatistics = new DataBlock
+            {
+              Summary = new Summary
+              {
+                dataKeys = new List<string>
+                      {
                                 "perm_excl_rate",
                                 "perm_excl",
                                 "fixed_excl_rate"
-                            },
+                      },
 
-                            description = new MarkDownBlock
-                            {
-                                Body =
-                                    " * overall rate of permanent exclusions has increased from 0.08 per cent of pupil enrolments in 2015/16 to 0.10 per cent in 2016/17 \n" +
-                                    " * number of exclusions has also increased, from 6,685 to 7,720 \n" +
-                                    " * overall rate of fixed period exclusions increased, from 4.29 per cent of pupil enrolments in 2015/16 to 4.76 per cent in 2016/17 \n" +
-                                    " * number of exclusions has also increased, from 339,360 to 381,865. \n"
-                            }
-                        }
-                    },
-                    Content = new List<ContentSection>
-                    {
+                description = new MarkDownBlock
+                {
+                  Body =
+                              " * overall rate of permanent exclusions has increased from 0.08 per cent of pupil enrolments in 2015/16 to 0.10 per cent in 2016/17 \n" +
+                              " * number of exclusions has also increased, from 6,685 to 7,720 \n" +
+                              " * overall rate of fixed period exclusions increased, from 4.29 per cent of pupil enrolments in 2015/16 to 4.76 per cent in 2016/17 \n" +
+                              " * number of exclusions has also increased, from 339,360 to 381,865. \n"
+                }
+              }
+            },
+            Content = new List<ContentSection>
+              {
                         new ContentSection
                         {
                             Order = 1, Heading = "About this release", Caption = "",
@@ -673,41 +1382,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 }
                             }
                         }
-                    }
-                },
+              }
+          },
 
-                // school pupil numbers
-                new Release
-                {
-                    Id = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
-                    Title = " Schools, pupils and their characteristics: January 2018 ",
-                    ReleaseName = "January 2018 ",
-                    PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
-                    Published = new DateTime(2018, 5, 28),
-                    Slug = "january-2018",
-                    Summary =
-                        "Statistics on pupils in schools in England as collected in the January 2018 school census.",
-                    KeyStatistics = new DataBlock
-                    {
-                        Heading = "Latest headline facts and figures - 2016 to 2017",
+          // // school pupil numbers
+          new Release
+          {
+            Id = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
+            Title = "Schools, pupils and their characteristics: January 2018",
+            ReleaseName = "January 2018",
+            PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+            Published = new DateTime(2018, 5, 28),
+            Slug = "january-2018",
+            Summary =
+                  "Statistics on pupils in schools in England as collected in the January 2018 school census.",
+            KeyStatistics = new DataBlock
+            {
+              Heading = "Latest headline facts and figures - 2016 to 2017",
 
-                        Summary = new Summary
-                        {
-                            dataKeys = new List<string>
-                            {
+              Summary = new Summary
+              {
+                dataKeys = new List<string>
+                      {
                                 "--",
                                 "--",
                                 "--"
-                            },
+                      },
 
-                            description = new MarkDownBlock
-                            {
-                                Body = ""
-                            }
-                        }
-                    },
-                    Content = new List<ContentSection>
-                    {
+                description = new MarkDownBlock
+                {
+                  Body = ""
+                }
+              }
+            },
+            Content = new List<ContentSection>
+              {
                         new ContentSection
                         {
                             Order = 1, Heading = "About this release", Caption = "",
@@ -720,49 +1429,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 }
                             }
                         },
-                    }
-                },
+              }
+          },
 
-                // GCSE / KS4
-                new Release
-                {
-                    Id = new Guid("e7ae88fb-afaf-4d51-a78a-bbb2de671daf"),
-                    Title = "GCSE and equivalent results in England, 2016 to 2017",
-                    ReleaseName = "2016 to 2017",
-                    PublicationId = new Guid("bfdcaae1-ce6b-4f63-9b2b-0a1f3942887f"),
-                    Published = new DateTime(2018, 6, 20),
-                    Slug = "2016-17",
-                    Summary =
-                        "This statistical first release (SFR) provides information on the achievements in GCSE examinations and other qualifications of young people in academic year 2016 to 2017. This typically covers those starting the academic year aged 15. \n\n" +
-                        "You can also view a regional breakdown of statistics and data within the [local authorities section](#contents-sections-content-6) \n\n" +
-                        "[Find out more about our GCSE and equivalent results methodology and terminology](#extra-information-sections-heading-1)",
-                    KeyStatistics = new DataBlock
-                    {
-                        Heading = "Latest headline facts and figures - 2016 to 2017",
+          // // GCSE / KS4
+          new Release
+          {
+            Id = new Guid("e7ae88fb-afaf-4d51-a78a-bbb2de671daf"),
+            Title = "GCSE and equivalent results in England, 2016 to 2017",
+            ReleaseName = "2016 to 2017",
+            PublicationId = new Guid("bfdcaae1-ce6b-4f63-9b2b-0a1f3942887f"),
+            Published = new DateTime(2018, 6, 20),
+            Slug = "2016-17",
+            Summary =
+                  "This statistical first release (SFR) provides information on the achievements in GCSE examinations and other qualifications of young people in academic year 2016 to 2017. This typically covers those starting the academic year aged 15. \n\n" +
+                  "You can also view a regional breakdown of statistics and data within the [local authorities section](#contents-sections-content-6) \n\n" +
+                  "[Find out more about our GCSE and equivalent results methodology and terminology](#extra-information-sections-heading-1)",
+            KeyStatistics = new DataBlock
+            {
+              Heading = "Latest headline facts and figures - 2016 to 2017",
 
 
-                        Summary = new Summary
-                        {
-                            dataKeys = new List<string>
-                            {
+              Summary = new Summary
+              {
+                dataKeys = new List<string>
+                      {
                                 "--",
                                 "--",
                                 "--"
-                            },
+                      },
 
-                            description = new MarkDownBlock
-                            {
-                                Body =
-                                    " * average Attainment8 scores remained stable compared to 2017s \n" +
-                                    " * percentage of pupils achieving 5 or above in English and Maths increased \n" +
-                                    " * EBacc entry increased slightly \n" +
-                                    " * over 250 schools met the coasting definition in 2018"
-                            }
-                        },
-                    },
+                description = new MarkDownBlock
+                {
+                  Body =
+                              " * average Attainment8 scores remained stable compared to 2017s \n" +
+                              " * percentage of pupils achieving 5 or above in English and Maths increased \n" +
+                              " * EBacc entry increased slightly \n" +
+                              " * over 250 schools met the coasting definition in 2018"
+                }
+              },
+            },
 
-                    Content = new List<ContentSection>
-                    {
+            Content = new List<ContentSection>
+              {
                         new ContentSection
                         {
                             Order = 1,
@@ -970,277 +1679,255 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 }
                             }
                         },
-                    }
-                }
-            );
+              }
+          }
+      );
 
-            modelBuilder.Entity<Update>().HasData(
-                new Update
-                {
-                    Id = new Guid("9c0f0139-7f88-4750-afe0-1c85cdf1d047"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                    On = new DateTime(2017, 4, 19),
-                    Reason =
-                        "Underlying data file updated to include absence data by pupil residency and school location, and updated metadata document."
-                },
-                new Update
-                {
-                    Id = new Guid("18e0d40e-bdf7-4c84-99dd-732e72e9c9a5"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                    On = new DateTime(2017, 3, 22),
-                    Reason = "First published."
-                },
-                new Update
-                {
-                    Id = new Guid("51bd1e2f-2669-4708-b300-799b6be9ec9a"),
-                    ReleaseId = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"),
-                    On = new DateTime(2016, 3, 25),
-                    Reason = "First published."
-                },
-                new Update
-                {
-                    Id = new Guid("4fca874d-98b8-4c79-ad20-d698fb0af7dc"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                    On = new DateTime(2018, 7, 19),
-                    Reason = "First published."
-                },
-                new Update
-                {
-                    Id = new Guid("33ff3f17-0671-41e9-b404-5661ab8a9476"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                    On = new DateTime(2018, 8, 25),
-                    Reason =
-                        " Updated exclusion rates for Gypsy/Roma pupils, to include extended ethnicity categories within the headcount (Gypsy, Roma and other Gypsy/Roma). "
-                },
-                new Update
-                {
-                    Id = new Guid("9aab1af8-27d4-43c4-a7cd-afb375c8809c"),
-                    ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
-                    On = new DateTime(2018, 5, 28),
-                    Reason = "First published."
-                },
-                new Update
-                {
-                    Id = new Guid("aa4c0f33-cdf4-4df9-9540-18472d46a301"),
-                    ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
-                    On = new DateTime(2018, 6, 13),
-                    Reason =
-                        "Amended title of table 8e in attachment 'Schools pupils and their characteristics 2018 - LA tables'."
-                },
-                new Update
-                {
-                    Id = new Guid("4bd0f73b-ef2b-4901-839a-80cbf8c0871f"),
-                    ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
-                    On = new DateTime(2018, 7, 23),
-                    Reason =
-                        "Removed unrelated extra material from table 7c in attachment 'Schools pupils and their characteristics 2018 - LA tables'."
-                },
-                new Update
-                {
-                    Id = new Guid("7f911a4e-7a56-4f6f-92a6-bd556a9bcfd3"),
-                    ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
-                    On = new DateTime(2018, 9, 5),
-                    Reason = "Added cross-border movement local authority level and underlying data tables."
-                },
-                new Update
-                {
-                    Id = new Guid("d008b331-af29-4c7e-bb8a-5a2005aa0131"),
-                    ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
-                    On = new DateTime(2018, 9, 11),
-                    Reason =
-                        "Added open document version of 'Schools pupils and their characteristics 2018 - Cross-border movement local authority tables'."
-                },
-                new Update
-                {
-                    Id = new Guid("8900bab9-74ec-4b5d-8be1-648ff4870167"),
-                    ReleaseId = new Guid("e7ae88fb-afaf-4d51-a78a-bbb2de671daf"),
-                    On = new DateTime(2018, 6, 2),
-                    Reason = "First published."
-                }
-            );
+      modelBuilder.Entity<Update>().HasData(
+          new Update
+          {
+            Id = new Guid("9c0f0139-7f88-4750-afe0-1c85cdf1d047"),
+            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+            On = new DateTime(2017, 4, 19),
+            Reason =
+                  "Underlying data file updated to include absence data by pupil residency and school location, and updated metadata document."
+          },
+          new Update
+          {
+            Id = new Guid("18e0d40e-bdf7-4c84-99dd-732e72e9c9a5"),
+            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+            On = new DateTime(2017, 3, 22),
+            Reason = "First published."
+          },
+          new Update
+          {
+            Id = new Guid("51bd1e2f-2669-4708-b300-799b6be9ec9a"),
+            ReleaseId = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"),
+            On = new DateTime(2016, 3, 25),
+            Reason = "First published."
+          },
+          new Update
+          {
+            Id = new Guid("4fca874d-98b8-4c79-ad20-d698fb0af7dc"),
+            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+            On = new DateTime(2018, 7, 19),
+            Reason = "First published."
+          },
+          new Update
+          {
+            Id = new Guid("33ff3f17-0671-41e9-b404-5661ab8a9476"),
+            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+            On = new DateTime(2018, 8, 25),
+            Reason =
+                  "Updated exclusion rates for Gypsy/Roma pupils, to include extended ethnicity categories within the headcount (Gypsy, Roma and other Gypsy/Roma)."
+          },
+          new Update
+          {
+            Id = new Guid("aa4c0f33-cdf4-4df9-9540-18472d46a301"),
+            ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
+            On = new DateTime(2018, 6, 13),
+            Reason =
+                  "Amended title of table 8e in attachment 'Schools pupils and their characteristics 2018 - LA tables'."
+          },
+          new Update
+          {
+            Id = new Guid("4bd0f73b-ef2b-4901-839a-80cbf8c0871f"),
+            ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
+            On = new DateTime(2018, 7, 23),
+            Reason =
+                  "Removed unrelated extra material from table 7c in attachment 'Schools pupils and their characteristics 2018 - LA tables'."
+          },
+          new Update
+          {
+            Id = new Guid("7f911a4e-7a56-4f6f-92a6-bd556a9bcfd3"),
+            ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
+            On = new DateTime(2018, 9, 5),
+            Reason = "Added cross-border movement local authority level and underlying data tables."
+          },
+          new Update
+          {
+            Id = new Guid("d008b331-af29-4c7e-bb8a-5a2005aa0131"),
+            ReleaseId = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
+            On = new DateTime(2018, 9, 11),
+            Reason =
+                  "Added open document version of 'Schools pupils and their characteristics 2018 - Cross-border movement local authority tables'."
+          },
+          new Update
+          {
+            Id = new Guid("8900bab9-74ec-4b5d-8be1-648ff4870167"),
+            ReleaseId = new Guid("e7ae88fb-afaf-4d51-a78a-bbb2de671daf"),
+            On = new DateTime(2018, 6, 20),
+            Reason = "First published."
+          }
+      );
 
-            modelBuilder.Entity<Link>().HasData(
-                new Link
-                {
-                    PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Id = new Guid("45bc02ff-de90-489b-b78e-cdc7db662353"), Description = "2014 to 2015",
-                    Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Id = new Guid("82292fe7-1545-44eb-a094-80c5064701a7"), Description = "2013 to 2014",
-                    Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Id = new Guid("6907625d-0c2e-4fd8-8e96-aedd85b2ff97"), Description = "2012 to 2013",
-                    Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Id = new Guid("a538e57a-da5e-4a2c-a89e-b74dbae0c30b"), Description = "2011 to 2012",
-                    Url =
-                        "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Id = new Guid("18b24d60-c56e-44f0-8baa-6db4c6e7deee"), Description = "2010 to 2011",
-                    Url =
-                        "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Id = new Guid("c5444f5a-6ba5-4c80-883c-6bca0d8a9eb5"), Description = "2009 to 2010",
-                    Url =
-                        "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                    Id = new Guid("e3a532c4-df72-4daf-b621-5d04418fd521"),
-                    Description = "2015 to 2016",
-                    Url =
-                        "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2015-to-2016"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                    Id = new Guid("a0a8999a-9580-48b8-b443-61446ea579e4"),
-                    Description = "2014 to 2015",
-                    Url =
-                        "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2014-to-2015"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                    Id = new Guid("97c8ee35-4c62-406c-880a-cdfc92590490"),
-                    Description = "2013 to 2014",
-                    Url =
-                        "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2013-to-2014"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                    Id = new Guid("d76afaed-a665-4366-8897-78e9b90aa28a"),
-                    Description = "2012 to 2013",
-                    Url =
-                        "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2012-to-2013"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                    Id = new Guid("7f6c5499-640a-44c7-afdc-41e78c7e8b24"),
-                    Description = "2011 to 2012",
-                    Url =
-                        "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-2011-to-2012-academic-year"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                    Id = new Guid("8c12b38a-a071-4c47-ba16-dffa734849ed"),
-                    Description = "2010 to 2011",
-                    Url =
-                        "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2010-to-2011"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                    Id = new Guid("04ebb3e6-67fd-41f3-89e4-ed9566bcbe96"),
-                    Description = "2009 to 2010",
-                    Url =
-                        "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2009-to-2010"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                    Id = new Guid("1b9375dd-06c7-4391-8265-447d6992a853"),
-                    Description = "2008 to 2009",
-                    Url =
-                        "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-academic-year-2008-to-2009"
-                },
+      modelBuilder.Entity<Link>().HasData(
+        new Link
+        {
+          PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+          Id = new Guid("08134c1d-8a58-49a4-8d8b-22e586ffd5ae"),
+          Description = "2008 to 2009",
+          Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-academic-year-2008-to-2009",
+        },
+        new Link
+        {
+          PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+          Id = new Guid("250bace6-aeb9-4fe9-8de2-3a25e0dc717f"),
+          Description = "2009 to 2010",
+          Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2009-to-2010",
+        },
+        new Link
+        {
+          PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+          Id = new Guid("a319e4ef-b957-40fb-8a47-b1a97814b220"),
+          Description = "2010 to 2011",
+          Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2010-to-2011",
+        },
+        new Link
+        {
+          PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+          Id = new Guid("13acf54a-8016-49ff-9050-c61ebe7acad2"),
+          Description = "2011 to 2012",
+          Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-2011-to-2012-academic-year",
+        },
+        new Link
+        {
+          PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+          Id = new Guid("45bd7f62-2018-4a5c-9b93-ccece8e89c46"),
+          Description = "2012 to 2013",
+          Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2012-to-2013",
+        },
+        new Link
+        {
+          PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+          Id = new Guid("f1225f98-40d5-494c-90f9-99f9fb59ac9d"),
+          Description = "2013 to 2014",
+          Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2013-to-2014",
+        },
+        new Link
+        {
+          PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+          Id = new Guid("78239816-507d-42b7-98fd-4a71d0d4eb1f"),
+          Description = "2014 to 2015",
+          Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2014-to-2015",
+        },
+        new Link
+        {
+          PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+          Id = new Guid("564dacdc-f58e-4aa0-8dbd-d8368b4fb6ba"),
+          Description = "2015 to 2016",
+          Url = "https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2015-to-2016",
+        },
+        new Link
+        {
+          PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+          Id = new Guid("89c02688-646d-45b5-8919-9a3fafcfe0e9"),
+          Description = "2009 to 2010",
+          Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010",
+        },
+        new Link
+        {
+          PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+          Id = new Guid("81d91c86-9bf2-496c-b026-9dc255c35635"),
+          Description = "2010 to 2011",
+          Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011",
+        },
+        new Link
+        {
+          PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+          Id = new Guid("e20141d0-d894-4b8d-a78f-e41c23500786"),
+          Description = "2011 to 2012",
+          Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics",
+        },
+        new Link
+        {
+          PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+          Id = new Guid("ce15f487-87b0-4c07-98f1-6c6732196be7"),
+          Description = "2012 to 2013",
+          Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013",
+        },
+        new Link
+        {
+          PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+          Id = new Guid("75991639-ad77-4ba6-91fc-ac08c00a4ce8"),
+          Description = "2013 to 2014",
+          Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014",
+        },
+        new Link
+        {
+          PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+          Id = new Guid("28e53936-5a52-44be-a7a6-d2f14a426d28"),
+          Description = "2014 to 2015",
+          Url = "https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015",
+        },
+        new Link
+        {
+          PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+          Id = new Guid("dc8b0d8c-08bb-47cc-b3a1-9e6ac9c2c268"),
+          Description = "January 2010",
+          Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2010",
+        },
+        new Link
+        {
+          PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+          Id = new Guid("b086ba70-703c-40dd-aaef-d2e19335188e"),
+          Description = "January 2011",
+          Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2011",
+        },
+        new Link
+        {
+          PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+          Id = new Guid("181ec43e-cf22-4cab-a128-0a5702468566"),
+          Description = "January 2012",
+          Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2012",
+        },
+        new Link
+        {
+          PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+          Id = new Guid("e6b36ee8-ef66-4864-a4b3-9047ee3da338"),
+          Description = "January 2013",
+          Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2013",
+        },
+        new Link
+        {
+          PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+          Id = new Guid("398ba8c6-3ea0-49da-8645-ceb3c7fb9860"),
+          Description = "January 2014",
+          Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2014",
+        },
+        new Link
+        {
+          PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+          Id = new Guid("5e244416-6f2a-4d22-bea4-c22a229befef"),
+          Description = "January 2015",
+          Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2015",
+        },
+        new Link
+        {
+          PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+          Id = new Guid("e3c1db23-8a8f-47fe-b2cd-8e677db700a2"),
+          Description = "January 2016",
+          Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2016",
+        },
+        new Link
+        {
+          PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
+          Id = new Guid("313435b3-fe56-4b92-8e13-670dbf510062"),
+          Description = "January 2017",
+          Url = "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2017",
+        }
+      );
 
-                //school pupil numbers
-                new Link
-                {
-                    PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
-                    Id = new Guid("6404a25c-7352-4887-aa0e-c62948d45b57"),
-                    Description = "January 2017",
-                    Url =
-                        "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2017"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
-                    Id = new Guid("31b06d27-7e31-491f-bd5d-89105369ac60"),
-                    Description = "January 2016",
-                    Url =
-                        "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2016"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
-                    Id = new Guid("e764ef78-97f6-406c-aaaf-d3a5c847b362"),
-                    Description = "January 2015",
-                    Url =
-                        "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2015"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
-                    Id = new Guid("1479a18c-b5a6-47c5-bb48-c8d60084b1a4"),
-                    Description = "January 2014",
-                    Url =
-                        "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2014"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
-                    Id = new Guid("86893fdd-4a24-4fe9-9902-02ad8bbf8632"),
-                    Description = "January 2013",
-                    Url =
-                        "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2013"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
-                    Id = new Guid("95c24ea7-4ebe-4f73-88f1-91ea33ec00bf"),
-                    Description = "January 2012",
-                    Url =
-                        "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2012"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
-                    Id = new Guid("758b83d6-bd47-44aa-8ee2-359f350fef0a"),
-                    Description = "January 2011",
-                    Url =
-                        "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2011"
-                },
-                new Link
-                {
-                    PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
-                    Id = new Guid("acbef79a-7b53-492e-a679-ca994edfc892"),
-                    Description = "January 2010",
-                    Url =
-                        "https://www.gov.uk/government/statistics/schools-pupils-and-their-characteristics-january-2010"
-                }
-            );
-
-            modelBuilder.Entity<Methodology>().HasData(
-                new Methodology
-                {
-                    Id = new Guid("caa8e56f-41d2-4129-a5c3-53b051134bd7"),
-                    Title = "Pupil absence statistics: methodology",
-                    Published = new DateTime(2018, 3, 22),
-                    Summary = "Find out about the methodology behind pupil absence statistics and data and how and why they're collected and published.",
-                    PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Content = new List<ContentSection>
-                    {
+      modelBuilder.Entity<Methodology>().HasData(
+          new Methodology
+          {
+            Id = new Guid("caa8e56f-41d2-4129-a5c3-53b051134bd7"),
+            Title = "Pupil absence statistics: methodology",
+            Published = new DateTime(2018, 3, 22),
+            Summary = "Find out about the methodology behind pupil absence statistics and data and how and why they're collected and published.",
+            PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+            Content = new List<ContentSection>
+              {
                         new ContentSection
                         {
                             Heading = "1. Overview of absence statistics",
@@ -1290,9 +1977,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Order = 7,
                             Content = new List<IContentBlock>()
                         }
-                    },
-                    Annexes = new List<ContentSection>
-                    {
+              },
+            Annexes = new List<ContentSection>
+              {
                         new ContentSection
                         {
                             Heading = "Annex A - Glossary",
@@ -1335,9 +2022,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Order = 6,
                             Content = new List<IContentBlock>()
                         }
-                    },
-                }
-            );
-        }
+              },
+          }
+      );
     }
+  }
 }

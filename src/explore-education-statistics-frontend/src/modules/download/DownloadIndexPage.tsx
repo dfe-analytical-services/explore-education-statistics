@@ -65,7 +65,7 @@ class DownloadIndexPage extends Component<Props> {
 
         <h2 className="govuk-heading-l">Choose a theme</h2>
 
-        {themes.length > 0 ? (
+        {/* {themes.length > 0 ? (
           <>
             {themes.map(({ id, title }) => (
               <div key={id}>
@@ -77,17 +77,37 @@ class DownloadIndexPage extends Component<Props> {
           </>
         ) : (
           <div className="govuk-inset-text">No data currently published</div>
-        )}
+        )} */}
 
-        {/* Hard code the below links temporarily, until they're put in the Content API */}
+        <p>
+          <a href="#">Children and early years - including social care</a>
+        </p>
+        <p>
+          <a href="#">Destinations of pupils and students - including NEET</a>
+        </p>
+        <p>
+          <a href="#">Finance and funding</a>
+        </p>
+        <p>
+          <a href="#">Further education</a>
+        </p>
+        <p>
+          <a href="#">Higher education</a>
+        </p>
         <p>
           <Link to="/download/pupils-schools">Pupils and schools</Link>
         </p>
         <p>
-          <Link to="/download/school-college-performance">
+          <a href="/download/school-college-performance">
             Schools and college performance - including GCSE and key stage
             performance
-          </Link>
+          </a>
+        </p>
+        <p>
+          <a href="#">Teachers and school workforce</a>
+        </p>
+        <p>
+          <a href="#">UK education and training statistics</a>
         </p>
       </Page>
     );

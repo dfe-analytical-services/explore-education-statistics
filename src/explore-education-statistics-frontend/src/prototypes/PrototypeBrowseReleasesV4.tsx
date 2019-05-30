@@ -16,7 +16,7 @@ const BrowseReleasesPage = () => {
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body">
             Browse to find the statistics and data you’re looking for and open
-            the section to get links to:
+            the section to view:
           </p>
           <ul className="govuk-bulllet-list govuk-!-margin-bottom-6">
             <li>
@@ -24,16 +24,8 @@ const BrowseReleasesPage = () => {
               explanations
             </li>
             <li>
-              charts and tables to help you compare, contrast and view national
-              and regional statistical data and trends
-            </li>
-            <li>
-              our table tool to build your own tables online and explore our
-              range of national and regional data
-            </li>
-            <li>
-              underlying data so you can download files and carry out your own
-              statistical analysis
+              charts and tables to help you compare and contrast national and
+              regional statistical data and trends
             </li>
           </ul>
         </div>
@@ -62,10 +54,10 @@ const BrowseReleasesPage = () => {
 
       <Accordion id="themes">
         <AccordionSection
-          heading="Children and early years - including social care"
-          caption=""
+          heading="Children, early years and social care"
+          caption="Including EYFS, secure children's homes and social workforce statistics"
         >
-          <Details summary="Childcare and early years">
+          <Details summary="Childcare and early years - including parent and provider surveys">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bullet-list govuk-!-margin-top-0">
                 <li>
@@ -127,7 +119,7 @@ const BrowseReleasesPage = () => {
               </ul>
             </div>
           </Details>
-          <Details summary="Early years foundation stage profile">
+          <Details summary="Early years foundation stage (EYFS) profile">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
@@ -140,7 +132,7 @@ const BrowseReleasesPage = () => {
               </ul>
             </div>
           </Details>
-          <Details summary="Looked-after children">
+          <Details summary="Looked-after children - inlcuding adoptions">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
@@ -180,8 +172,8 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
 
         <AccordionSection
-          heading="Destinations of pupils and students - including NEET"
-          caption=""
+          heading="Destinations of pupils and students"
+          caption="Including graduate labour market and not in education, employment or training (NEET) statistics"
         >
           <Details summary="Destinations of key stage 4 and key stage 5 pupils	">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
@@ -209,7 +201,7 @@ const BrowseReleasesPage = () => {
               </ul>
             </div>
           </Details>
-          <Details summary="NEET and participation">
+          <Details summary="Not in education, employment or training (NEET) and participation">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
@@ -232,8 +224,11 @@ const BrowseReleasesPage = () => {
             </div>
           </Details>
         </AccordionSection>
-        <AccordionSection heading="Finance and funding" caption="">
-          <Details summary="Local authority and school finance">
+        <AccordionSection
+          heading="Finance and funding"
+          caption="Including local authority (LA) and student loan statistics"
+        >
+          <Details summary="Local authority and school finance - including academy and planned LA and school expenditure">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
@@ -276,7 +271,10 @@ const BrowseReleasesPage = () => {
             </div>
           </Details>
         </AccordionSection>
-        <AccordionSection heading="Further education" caption="">
+        <AccordionSection
+          heading="Further education"
+          caption="Including advanced learner loan, benefit claimant and apprenticeship and traineeship statistics"
+        >
           <Details summary="Advanced learner loans">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
@@ -290,7 +288,7 @@ const BrowseReleasesPage = () => {
               </ul>
             </div>
           </Details>
-          <Details summary="FE Choices">
+          <Details summary="FE Choices - including employer and learner surveys">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
@@ -310,7 +308,7 @@ const BrowseReleasesPage = () => {
               </ul>
             </div>
           </Details>
-          <Details summary="Further education and skills">
+          <Details summary="Further education and skills -including apprenticeships and traineeships">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
                 <li>
@@ -366,7 +364,10 @@ const BrowseReleasesPage = () => {
           </Details>
         </AccordionSection>
 
-        <AccordionSection heading="Higher education" caption="">
+        <AccordionSection
+          heading="Higher education"
+          caption="Including university graduate employment and participation statistics"
+        >
           <Details summary="Higher education graduate employment and earnings">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bullet-list govuk-!-margin-top-0">
@@ -380,7 +381,7 @@ const BrowseReleasesPage = () => {
               </ul>
             </div>
           </Details>
-          <Details summary="Higher education statistics">
+          <Details summary="Higher education statistics - including outcome, performance and staff">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bullet-list govuk-!-margin-top-0">
                 <li>
@@ -444,7 +445,10 @@ const BrowseReleasesPage = () => {
           </Details>
         </AccordionSection>
 
-        <AccordionSection heading="Pupils and schools" caption="">
+        <AccordionSection
+          heading="Pupils and schools"
+          caption="Including application, capacity and special educational needs (SEN) statistics"
+        >
           <Details summary="Admission appeals">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bullet-list govuk-!-margin-top-0">
@@ -537,7 +541,7 @@ const BrowseReleasesPage = () => {
               </ul>
             </div>
           </Details>
-          <Details summary="School applications">
+          <Details summary="School applications and offers">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bullet-list govuk-!-margin-top-0">
                 <li>
@@ -597,10 +601,10 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
 
         <AccordionSection
-          heading="School and college performance - including GCSE and key stage results"
-          caption=""
+          heading="School and college outcomes and performance"
+          caption="Including GCSE and key stage result and school table statistics"
         >
-          <Details summary="16 to 19 attainment">
+          <Details summary="16 to 19 attainment - including A levels, level 2 and 3 and other results">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bullet-list govuk-!-margin-top-0">
                 <li>
@@ -631,7 +635,7 @@ const BrowseReleasesPage = () => {
               </ul>
             </div>
           </Details>
-          <Details summary="GCSEs (key stage 4)	">
+          <Details summary="GCSEs (key stage 4) - including multi-academy trust (MAT) measures and secondary school tables">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bullet-list govuk-!-margin-top-0">
                 <li>
@@ -666,7 +670,7 @@ const BrowseReleasesPage = () => {
               </ul>
             </div>
           </Details>
-          <Details summary="Key stage 1">
+          <Details summary="Key stage 1 - including phonics">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bullet-list govuk-!-margin-top-0">
                 <li>
@@ -681,7 +685,7 @@ const BrowseReleasesPage = () => {
               </ul>
             </div>
           </Details>
-          <Details summary="Key stage 2">
+          <Details summary="Key stage 2 - including multi-academy trust (MAT) measures, national curriculum assessments and primary school tables">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bullet-list govuk-!-margin-top-0">
                 <li>
@@ -734,7 +738,7 @@ const BrowseReleasesPage = () => {
               </ul>
             </div>
           </Details>
-          <Details summary="Performance tables	">
+          <Details summary="Performance tables - including college, primary and secondary school tables">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bullet-list govuk-!-margin-top-0">
                 <li>
@@ -762,8 +766,11 @@ const BrowseReleasesPage = () => {
             </div>
           </Details>
         </AccordionSection>
-        <AccordionSection heading="Teachers and school workforce" caption="">
-          <Details summary="Initial teacher training (ITT)">
+        <AccordionSection
+          heading="Teachers and school workforce"
+          caption="Including initial teacher training (ITT), staff and teaching statistics"
+        >
+          <Details summary="Initial teacher training (ITT) - including performance profiles, trainee census and training allocations">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
               <ul className="govuk-bullet-list govuk-!-margin-top-0">
                 <li>
@@ -821,7 +828,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection
           heading="UK education and training statistics"
-          caption=""
+          caption="Including expenditure, post-compulsory education, qualification and school statistics"
         >
           <Details summary="UK education and training statistics">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">

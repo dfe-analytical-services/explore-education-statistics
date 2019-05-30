@@ -172,7 +172,7 @@
 									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
 									"});",
 									"",
-									"pm.test(\"Returned array should be correct length\", function () { pm.expect(pm.response.json().length).to.equal(3); });"
+									"pm.test(\"Should be correct number of themes\", function () { pm.expect(pm.response.json().length).to.equal(9); });"
 								],
 								"type": "text/javascript"
 							}
@@ -213,7 +213,7 @@
 									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
 									"});",
 									"",
-									"pm.test(\"Returned array should be correct length\", function () { pm.expect(pm.response.json().length).to.equal(3); });"
+									"pm.test(\"Should be correct number of themes\", function () { pm.expect(pm.response.json().length).to.equal(9); });"
 								],
 								"type": "text/javascript"
 							}
