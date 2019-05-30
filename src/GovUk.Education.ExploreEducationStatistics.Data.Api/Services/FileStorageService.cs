@@ -16,6 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     {
         private readonly string _storageConnectionString;
         private readonly ILogger _logger;
+        
+        private const string containerName = "downloads";
 
         public FileStorageService(IConfiguration config,
             ILogger<FileStorageService> logger)
@@ -29,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
 
             var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference("downloads");
+            var blobContainer = blobClient.GetContainerReference(containerName);
             var blockBlobReference = blobContainer.GetBlockBlobReference($"{publication}/{release}/{filename}");
 
             return blockBlobReference.Exists();
@@ -40,19 +42,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
 
             var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference("downloads");
+            var blobContainer = blobClient.GetContainerReference(containerName);
             var blockBlobReference = blobContainer.GetBlockBlobReference($"{publication}/{release}/{filename}");
 
             if (!blockBlobReference.Exists())
             {
                 throw new ArgumentException("File not found: {filename}", filename);
             }
-
+            
             var stream = new MemoryStream();
 
             await blockBlobReference.DownloadToStreamAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            return new FileStreamResult(stream, "application/octet-stream")
+            return new FileStreamResult(stream, blockBlobReference.Properties.ContentType)
             {
                 FileDownloadName = filename
             };
@@ -63,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
 
             var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference("test");
+            var blobContainer = blobClient.GetContainerReference(containerName);
 
             var list = blobContainer.ListBlobs($"{publication}/{release}", true);
 
