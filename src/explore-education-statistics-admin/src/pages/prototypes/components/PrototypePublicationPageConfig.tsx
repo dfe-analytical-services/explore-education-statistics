@@ -415,14 +415,19 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
               </div>
               <div className="govuk-summary-list__row">
                 <dt className="govuk-summary-list__key">
-                  Next scheduled publication date
+                  Next scheduled release date
                 </dt>
                 <dd className="govuk-summary-list__value">20 September 2019</dd>
               </div>
+              <div className="govuk-summary-list__row">
+                <dt className="govuk-summary-list__key" />
+                <dd className="govuk-summary-list__actions">
+                  <Link to="/prototypes/publication-edit-new">
+                    Edit publication details
+                  </Link>
+                </dd>
+              </div>
             </dl>
-            <Link to="/prototypes/publication-edit-new">
-              Edit publication details
-            </Link>
           </>
         )}
         {sectionId === 'newPublication' && (
@@ -437,9 +442,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
               Create new publication
             </button>
 
-            <div className="govuk-!-margin-top-6">
-              <Link to="/prototypes/admin-dashboard">Cancel update</Link>
-            </div>
+            <Link to="/prototypes/admin-dashboard">Cancel update</Link>
           </div>
         )}
         {sectionId === 'editPublication' && (

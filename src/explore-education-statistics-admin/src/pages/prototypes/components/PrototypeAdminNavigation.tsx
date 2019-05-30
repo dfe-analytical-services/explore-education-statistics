@@ -41,6 +41,20 @@ const PrototypeAdminNavigation = ({ sectionId, task }: Props) => {
           </li>
           <li
             className={
+              sectionId === 'addTable'
+                ? 'app-navigation--current-page'
+                : 'app-navigation--non-selected-page'
+            }
+          >
+            <Link
+              to="/prototypes/publication-create-new-absence-table?status=step1"
+              className="govuk-link govuk-link--no-visited-state"
+            >
+              Create data tables
+            </Link>
+          </li>
+          <li
+            className={
               sectionId === 'addContent'
                 ? 'app-navigation--current-page'
                 : 'app-navigation--non-selected-page'
@@ -86,12 +100,10 @@ const PrototypeAdminNavigation = ({ sectionId, task }: Props) => {
 
       {task !== 'editRelease' && (
         <>
-          <span className="govuk-caption-l">
-            <span className="govuk-tag">New release in progress</span>Academic
-            year 2018 to 2019
-          </span>
+          <span className="govuk-tag">New release in progress</span>
           <h1 className="govuk-heading-l">
-            Pupil absence statistics and data for schools in England
+            Pupil absence statistics and data for schools in England{' '}
+            <span className="govuk-caption-l">Academic year 2018 to 2019</span>
           </h1>
         </>
       )}

@@ -10,6 +10,7 @@ const PrototypePublicationSummary = () => {
   return (
     <>
       <h2 className="govuk-heading-m">Release setup summary</h2>
+
       <dl className="govuk-summary-list">
         <div className="govuk-summary-list__row">
           <dt className="govuk-summary-list__key">Publication title</dt>
@@ -25,10 +26,29 @@ const PrototypePublicationSummary = () => {
           <dt className="govuk-summary-list__key">Release period</dt>
           <dd className="govuk-summary-list__value">2018 to 2019</dd>
         </div>
+        <div className="govuk-summary-list__row">
+          <dt className="govuk-summary-list__key">Lead statistician</dt>
+          <dd className="govuk-summary-list__value">Alex Miller</dd>
+        </div>
+        <div className="govuk-summary-list__row">
+          <dt className="govuk-summary-list__key">Scheduled release</dt>
+          <dd className="govuk-summary-list__value">20 September 2019</dd>
+        </div>
+        <div className="govuk-summary-list__row">
+          <dt className="govuk-summary-list__key" />
+          <dd className="govuk-summary-list__actions">
+            <Link to="/prototypes/publication-create-new-absence-config-edit">
+              Edit release setup details
+            </Link>
+          </dd>
+        </div>
       </dl>
-      <Link to="/prototypes/publication-create-new-absence-config-edit">
-        Edit release setup details
-      </Link>
+
+      <p>
+        <Link to="/prototypes/publication-create-new-absence-data">
+          Next step, add / edit data
+        </Link>
+      </p>
     </>
   );
 };
