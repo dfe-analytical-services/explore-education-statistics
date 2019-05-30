@@ -44,27 +44,6 @@ function PublicationList({ publications }: Props) {
                     Create your own tables online
                   </Link>
                 </div>
-                <div className="govuk-grid-column-one-third">
-                  <Details summary="Download data files">
-                    <ul className="govuk-list-bullet">
-                      <li>
-                        <a href="#" className="govuk-link">
-                          Download Excel files
-                        </a>
-                      </li>
-                      <li>
-                        <a href="#" className="govuk-link">
-                          Download .csv files
-                        </a>
-                      </li>
-                      <li>
-                        <a href="#" className="govuk-link">
-                          Access API
-                        </a>
-                      </li>
-                    </ul>
-                  </Details>
-                </div>
               </div>
             </div>
           </li>
