@@ -606,7 +606,7 @@
       },
       "resources": [
         {
-            "name": "downloads",
+            "name": "default/downloads",
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
             "apiVersion": "2019-04-01",
             "dependsOn": [
