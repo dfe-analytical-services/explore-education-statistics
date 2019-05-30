@@ -19,31 +19,26 @@ function PublicationList({ publications }: Props) {
       {publications.length > 0 ? (
         publications.map(({ id, slug, summary, title }) => (
           <li key={id}>
-            <h3 className="govuk-heading-m govuk-!-margin-bottom-0">{title}</h3>
-            <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
-              {summary}
-            </p>
-            <div className="govuk-!-margin-top-0 govuk-!-margin-bottom-5">
-              <div className="govuk-grid-row">
-                <div className="govuk-grid-column-one-third">
-                  <Link
-                    className="govuk-link govuk-!-margin-right-9"
-                    to={`/statistics/publication?publication=${slug}`}
-                    as={`/statistics/${slug}`}
-                    data-testid={`view-stats-${slug}`}
-                  >
-                    View statistics and data
-                  </Link>
-                </div>
-                <div className="govuk-grid-column-one-third">
-                  <Link
-                    className="govuk-link govuk-!-margin-right-9"
-                    to={`/table-tool/${slug}`}
-                    data-testid={`create-table-${slug}`}
-                  >
-                    Create your own tables online
-                  </Link>
-                </div>
+            <strong>{title}</strong>
+            <div className="govuk-!-margin-top-0 govuk-!-margin-bottom-4">
+              <div className="govuk-grid-column-one-third">
+                <Link
+                  className="govuk-link govuk-!-margin-right-9"
+                  to={`/statistics/publication?publication=${slug}`}
+                  as={`/statistics/${slug}`}
+                  data-testid={`view-stats-${slug}`}
+                >
+                  View statistics and data
+                </Link>
+              </div>
+              <div className="govuk-grid-column-one-third">
+                <Link
+                  className="govuk-link"
+                  to={`/table-tool/${slug}`}
+                  data-testid={`create-table-${slug}`}
+                >
+                  Create your own tables online
+                </Link>
               </div>
             </div>
           </li>
