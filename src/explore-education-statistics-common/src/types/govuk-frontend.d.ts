@@ -24,7 +24,11 @@ declare module 'govuk-frontend/components/checkboxes/checkboxes' {
 }
 
 declare module 'govuk-frontend/components/details/details' {
-  export default GovUkModule;
+  export class Details extends GovUkModule {
+    public setAttributes(): void;
+  }
+
+  export default Details;
 }
 
 declare module 'govuk-frontend/components/error-summary/error-summary' {

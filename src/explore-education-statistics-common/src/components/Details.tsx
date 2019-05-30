@@ -1,64 +1,85 @@
 import classNames from 'classnames';
-import React, { Component, createRef, ReactNode } from 'react';
+import DetailsModule from 'govuk-frontend/components/details/details';
+import React, {
+  MouseEvent,
+  MutableRefObject,
+  ReactNode,
+  useEffect,
+  useRef,
+} from 'react';
 
 export interface DetailsProps {
   className?: string;
   children: ReactNode;
   id?: string;
-  onToggle?: (isOpen: boolean) => void;
+  onToggle?: (isOpen: boolean, event: MouseEvent<HTMLElement>) => void;
   open?: boolean;
   summary: string | ReactNode;
 }
 
-class Details extends Component<DetailsProps> {
-  private ref = createRef<HTMLElement>();
+const Details = ({
+  className,
+  children,
+  id,
+  open = false,
+  onToggle,
+  summary,
+}: DetailsProps) => {
+  const ref = useRef<HTMLElement>(null);
+  const module: MutableRefObject<DetailsModule | null> = useRef(null);
 
-  public componentDidMount(): void {
-    if (this.ref.current) {
+  useEffect(() => {
+    if (ref.current) {
       import('govuk-frontend/components/details/details').then(
         ({ default: GovUkDetails }) => {
-          new GovUkDetails(this.ref.current).init();
+          module.current = new GovUkDetails(ref.current);
+          module.current.init();
         },
       );
     }
-  }
+  }, []);
 
-  public render() {
-    const { className, children, id, open, onToggle, summary } = this.props;
+  useEffect(() => {
+    if (module.current) {
+      module.current.setAttributes();
+    }
+  }, [open]);
 
-    return (
-      <details
-        className={classNames('govuk-details', className)}
-        open={open}
-        ref={this.ref}
-        data-testid={summary}
+  return (
+    <details
+      className={classNames('govuk-details', className)}
+      open={open}
+      ref={ref}
+      data-testid={summary}
+    >
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+      <summary
+        className="govuk-details__summary"
+        role="button"
+        tabIndex={0}
+        onClick={event => {
+          event.persist();
+
+          if (onToggle) {
+            onToggle(
+              event.currentTarget.getAttribute('aria-expanded') === 'true',
+              event,
+            );
+          }
+        }}
       >
-        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-        <summary
-          className="govuk-details__summary"
-          role="button"
-          tabIndex={0}
-          onClick={event => {
-            if (onToggle) {
-              onToggle(
-                event.currentTarget.getAttribute('aria-expanded') === 'true',
-              );
-            }
-          }}
+        <span
+          className="govuk-details__summary-text"
+          data-testid="details--expand"
         >
-          <span
-            className="govuk-details__summary-text"
-            data-testid="details--expand"
-          >
-            {summary}
-          </span>
-        </summary>
-        <div className="govuk-details__text" id={id}>
-          {children}
-        </div>
-      </details>
-    );
-  }
-}
+          {summary}
+        </span>
+      </summary>
+      <div className="govuk-details__text" id={id}>
+        {children}
+      </div>
+    </details>
+  );
+};
 
 export default Details;
