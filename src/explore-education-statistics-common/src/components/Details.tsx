@@ -1,12 +1,10 @@
+import useMounted from '@common/hooks/useMounted';
+import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
-import DetailsModule from 'govuk-frontend/components/details/details';
-import React, {
-  MouseEvent,
-  MutableRefObject,
-  ReactNode,
-  useEffect,
-  useRef,
-} from 'react';
+import React, { MouseEvent, ReactNode, useEffect, useRef } from 'react';
+
+let hasNativeDetails: boolean;
+let idCounter = 0;
 
 export interface DetailsProps {
   className?: string;
@@ -20,51 +18,64 @@ export interface DetailsProps {
 const Details = ({
   className,
   children,
-  id,
+  id = `details-content-${(idCounter += 1)}`,
   open = false,
   onToggle,
   summary,
 }: DetailsProps) => {
   const ref = useRef<HTMLElement>(null);
-  const module: MutableRefObject<DetailsModule | null> = useRef(null);
+
+  const { onMounted } = useMounted();
+  const [isOpened, setOpened] = useToggle(open);
 
   useEffect(() => {
-    if (ref.current) {
-      import('govuk-frontend/components/details/details').then(
-        ({ default: GovUkDetails }) => {
-          module.current = new GovUkDetails(ref.current);
-          module.current.init();
-        },
-      );
+    if (typeof hasNativeDetails === 'undefined') {
+      hasNativeDetails =
+        typeof document.createElement('details').open === 'boolean';
     }
   }, []);
 
   useEffect(() => {
-    if (module.current) {
-      module.current.setAttributes();
-    }
-  }, [open]);
+    setOpened(open);
+  }, [open, setOpened]);
 
   return (
     <details
       className={classNames('govuk-details', className)}
       open={open}
       ref={ref}
+      role={onMounted('group')}
       data-testid={summary}
     >
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
       <summary
+        aria-controls={onMounted(id)}
+        aria-expanded={onMounted(isOpened)}
         className="govuk-details__summary"
-        role="button"
-        tabIndex={0}
+        role={onMounted('button')}
+        tabIndex={onMounted(0)}
         onClick={event => {
           event.persist();
 
           if (onToggle) {
-            onToggle(
-              event.currentTarget.getAttribute('aria-expanded') === 'true',
-              event,
-            );
+            onToggle(!isOpened, event);
+
+            if (event.isDefaultPrevented()) {
+              return;
+            }
+          }
+
+          setOpened(!isOpened);
+        }}
+        onKeyPress={event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            (event.target as HTMLElement).click();
+          }
+        }}
+        onKeyUp={event => {
+          if (event.key === ' ') {
+            event.preventDefault();
           }
         }}
       >
@@ -75,7 +86,18 @@ const Details = ({
           {summary}
         </span>
       </summary>
-      <div className="govuk-details__text" id={id}>
+      <div
+        aria-hidden={onMounted(!isOpened)}
+        className="govuk-details__text"
+        id={onMounted(id)}
+        style={
+          !hasNativeDetails
+            ? {
+                display: !isOpened ? 'none' : undefined,
+              }
+            : undefined
+        }
+      >
         {children}
       </div>
     </details>
