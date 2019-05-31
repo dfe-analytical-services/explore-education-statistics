@@ -992,7 +992,10 @@ const BrowseReleasesPage = () => {
             </div>
           </Details>
         </AccordionSection>
+      </Accordion>
 
+      <h2 className="govuk-heading-m">Miscellaneous</h2>
+      <Accordion id="ad hoc">
         <AccordionSection
           heading="Ad hoc and transparency statistics"
           caption="Including statistics which are not part of DfE's regular statistical releases"
