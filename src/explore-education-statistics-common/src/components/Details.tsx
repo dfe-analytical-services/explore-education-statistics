@@ -39,6 +39,22 @@ const Details = ({
     setOpened(open);
   }, [open, setOpened]);
 
+  useEffect(() => {
+    if (hasNativeDetails) {
+      return;
+    }
+
+    if (ref.current) {
+      // Don't really need to include this, but just
+      // polyfills DOM behaviour for IE/Edge
+      if (isOpened) {
+        ref.current.setAttribute('open', '');
+      } else {
+        ref.current.removeAttribute('open');
+      }
+    }
+  }, [isOpened]);
+
   return (
     <details
       className={classNames('govuk-details', className)}
