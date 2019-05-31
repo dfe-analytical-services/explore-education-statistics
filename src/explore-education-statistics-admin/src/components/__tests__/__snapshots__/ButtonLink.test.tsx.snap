@@ -1,7 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ButtonLink renders correctly with required props 1`] = `
-
 <a class="govuk-button"
    role="button"
    aria-disabled="false"
@@ -9,5 +8,4 @@ exports[`ButtonLink renders correctly with required props 1`] = `
 >
   Test button
 </a>
-
 `;

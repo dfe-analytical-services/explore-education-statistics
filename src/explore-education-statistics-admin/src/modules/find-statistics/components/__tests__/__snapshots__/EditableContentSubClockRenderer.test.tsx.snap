@@ -1,7 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`EditableContentSubBlockRenderer Renders editable Markdown block correctly 1`] = `
-
 <div class="editableContent  ">
   <div class="editableButton">
     <div class="editableButtonContent">
@@ -16,11 +15,9 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
     </div>
   </div>
 </div>
-
 `;
 
 exports[`EditableContentSubBlockRenderer Renders non-editable Markdown block correctly 1`] = `
-
 <div class>
   <div class="editableButton">
     <div class="editableButtonContent">
@@ -35,5 +32,4 @@ exports[`EditableContentSubBlockRenderer Renders non-editable Markdown block cor
     </div>
   </div>
 </div>
-
 `;
