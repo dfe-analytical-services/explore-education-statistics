@@ -31,7 +31,7 @@ describe('createErrorHelper', () => {
     });
 
     test('gets nested touched error message', () => {
-      const { getError } = createErrorHelper({
+      const { getError } = createErrorHelper<{}>({
         errors: {
           test: {
             something: 'Please select',
@@ -48,7 +48,7 @@ describe('createErrorHelper', () => {
     });
 
     test('does not get nested untouched error message', () => {
-      const { getError, hasError } = createErrorHelper({
+      const { getError, hasError } = createErrorHelper<{}>({
         errors: {
           test: {
             something: 'Please select',
@@ -66,7 +66,7 @@ describe('createErrorHelper', () => {
     });
 
     test('does not get error message when path does not match', () => {
-      const { getError, hasError } = createErrorHelper({
+      const { getError, hasError } = createErrorHelper<{}>({
         errors: {
           test: {
             something: 'Please select',
@@ -84,7 +84,7 @@ describe('createErrorHelper', () => {
     });
 
     test('does not get error message when path only partially matches', () => {
-      const { getError, hasError } = createErrorHelper({
+      const { getError, hasError } = createErrorHelper<{}>({
         errors: {
           test: {
             something: 'Please select',
@@ -132,7 +132,7 @@ describe('createErrorHelper', () => {
     });
 
     test('gets nested touched errors as single-level object with dot-notation keys', () => {
-      const { getAllErrors } = createErrorHelper({
+      const { getAllErrors } = createErrorHelper<{}>({
         errors: {
           test: {
             something: 'Please select',
@@ -151,7 +151,7 @@ describe('createErrorHelper', () => {
     });
 
     test('does not get nested untouched errors', () => {
-      const { getAllErrors } = createErrorHelper({
+      const { getAllErrors } = createErrorHelper<{}>({
         errors: {
           test: {
             something: 'Please select',
@@ -168,7 +168,7 @@ describe('createErrorHelper', () => {
     });
 
     test('gets deeply nested touched errors as single-level object with dot-notation keys', () => {
-      const { getAllErrors } = createErrorHelper({
+      const { getAllErrors } = createErrorHelper<{}>({
         errors: {
           a: {
             b: {
@@ -195,7 +195,7 @@ describe('createErrorHelper', () => {
     });
 
     test('gets touched error messages for mixed error bag', () => {
-      const { getAllErrors } = createErrorHelper({
+      const { getAllErrors } = createErrorHelper<{}>({
         errors: {
           address: {
             line1: 'Address 1 is required',

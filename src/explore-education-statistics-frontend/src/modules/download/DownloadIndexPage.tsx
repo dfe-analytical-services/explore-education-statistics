@@ -1,8 +1,8 @@
-import { Topic } from '@common/components/TopicList';
 import { contentApi } from '@common/services/api';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
+import { Topic } from '@frontend/modules/find-statistics/components/TopicList';
 import React, { Component } from 'react';
 
 interface Props {
