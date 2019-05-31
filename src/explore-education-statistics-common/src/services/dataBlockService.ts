@@ -122,7 +122,7 @@ interface ResponseMetaData {
 export interface DataBlockMetadata {
   indicators: Dictionary<LabelValueUnitMetadata>;
   filters: Dictionary<LabelValueMetadata>;
-  timePeriods: Dictionary<TimePeriod>;
+  timePeriods: Dictionary<LabelValueMetadata>;
 }
 
 export interface DataBlockRequest {

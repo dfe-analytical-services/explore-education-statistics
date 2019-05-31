@@ -2,8 +2,8 @@ import { contentApi } from '@common/services/api';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
+import { Topic } from '@frontend/modules/find-statistics/components/TopicList';
 import React, { Component } from 'react';
-import { Topic } from '@common/components/TopicList';
 
 interface Props {
   themes: {
@@ -25,8 +25,6 @@ class DownloadIndexPage extends Component<Props> {
   }
 
   public render() {
-    const { themes } = this.props;
-
     return (
       <Page
         breadcrumbs={[

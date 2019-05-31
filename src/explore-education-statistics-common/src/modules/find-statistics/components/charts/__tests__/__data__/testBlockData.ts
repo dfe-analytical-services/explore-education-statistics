@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import {
   DataBlockData,
   DataBlockMetadata,
   DataBlockResponse,
   GeographicLevel,
 } from '@common/services/dataBlockService';
-import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 const data: DataBlockData = {
   publicationId: 'test',
@@ -85,11 +85,11 @@ const metaData: DataBlockMetadata = {
   filters: {
     '1': {
       label: 'All Schools',
-      value: 1,
+      value: '1',
     },
     '2': {
       label: 'All Pupils',
-      value: 1,
+      value: '1',
     },
   },
 
@@ -97,28 +97,28 @@ const metaData: DataBlockMetadata = {
     '23': {
       label: 'Unauthorised absence rate',
       unit: '%',
-      value: 23,
+      value: '23',
     },
     '26': {
       label: 'Overall absence rate',
       unit: '%',
-      value: 26,
+      value: '26',
     },
     '28': {
       label: 'Authorised absence rate',
       unit: '%',
-      value: 28,
+      value: '28',
     },
   },
 
   timePeriods: {
     '2014': {
       label: '2014',
-      value: 2014,
+      value: '2014',
     },
     '2015': {
       label: '2015',
-      value: 2015,
+      value: '2015',
     },
   },
 };

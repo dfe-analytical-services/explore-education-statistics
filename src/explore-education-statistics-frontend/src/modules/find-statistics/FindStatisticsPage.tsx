@@ -3,7 +3,7 @@ import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
 import React, { Component } from 'react';
-import TopicList, { Topic } from '@common/components/TopicList';
+import TopicList, { Topic } from './components/TopicList';
 
 interface Props {
   themes: {
