@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
     public class ContentService : IContentService
     {
         private readonly ApplicationDbContext _context;
-        
+
         public ContentService(
             ApplicationDbContext context)
         {
@@ -25,9 +25,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                 {
                     Id = x.Id, Title = x.Title, Summary = x.Summary,
                     Publications = x.Publications
-                        .Where(p => p.Releases.Count > 0)
                         .Select(p => new PublicationTree
-                            {Id = p.Id, Title = p.Title, Summary = p.Summary, Slug = p.Slug}).OrderBy(publication => publication.Title).ToList()
+                        {
+                            Id = p.Id,
+                            Title = p.Title,
+                            Summary = p.Summary,
+                            Slug = p.Slug,
+                            LegacyPublicationUrl = p.LegacyPublicationUrl != null ? p.LegacyPublicationUrl.ToString() : null
+                        }).OrderBy(publication => publication.Title).ToList()
                 }).OrderBy(topic => topic.Title).ToList()
             }).OrderBy(theme => theme.Title).ToList();
 
