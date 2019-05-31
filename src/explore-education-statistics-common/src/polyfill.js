@@ -1,6 +1,4 @@
 import 'cross-fetch/polyfill';
-import 'core-js/fn/array/virtual/flatten';
-import 'core-js/fn/array/virtual/flat-map';
 
 if (typeof Promise === 'undefined') {
   window.Promise = require('core-js/fn/promise');
@@ -18,10 +16,9 @@ if (
   !Object.keys
 ) {
   require('core-js');
-}
-
-if (!String.prototype.repeat) {
-  require('core-js/fn/string/repeat');
+} else {
+  require('core-js/fn/array/virtual/flatten');
+  require('core-js/fn/array/virtual/flat-map');
 }
 
 // Alias Array.flat to Array.flatten as
