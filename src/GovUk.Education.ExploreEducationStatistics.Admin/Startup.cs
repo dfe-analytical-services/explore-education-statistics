@@ -88,6 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .FormActions(s => s.Self())
                 .FrameAncestors(s => s.Self())
                 .ImageSources(s => s.Self())
+                .ImageSources(s => s.CustomSources("data:"))
                 .ScriptSources(s => s.Self())
                 .ScriptSources(s => s.UnsafeInline())
             );
