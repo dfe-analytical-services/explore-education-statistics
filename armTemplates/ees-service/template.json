@@ -582,8 +582,6 @@
         }
       ]
     },
-
-
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('notificationsstorageAccountName')]",
@@ -597,7 +595,7 @@
     {
       "name": "[variables('publicStorageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2019-04-01",
+      "apiVersion": "2018-07-01",
       "location": "[resourceGroup().location]",
       "kind": "StorageV2",
       "sku": {
@@ -607,8 +605,8 @@
       "resources": [
         {
             "name": "default/downloads",
-            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2019-04-01",
+            "type": "blobServices/containers",
+            "apiVersion": "2018-07-01",
             "dependsOn": [
                 "[variables('publicStorageAccountName')]"
             ]
