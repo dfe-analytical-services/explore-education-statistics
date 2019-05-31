@@ -57,64 +57,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
               new Theme
               {
                   Id = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"),
-                  Title = "Children and early years - including social care",
-                  Summary = "",
+                  Title = "Children, early years and social care",
+                  Summary = "Including children in need, EYFS, and looked after children and social workforce statistics",
                   Slug = "children-and-early-years"
               },
               new Theme
               {
                   Id = new Guid("6412a76c-cf15-424f-8ebc-3a530132b1b3"),
-                  Title = "Destination of pupils and students - including NEET",
-                  Summary = "",
+                  Title = "Destination of pupils and students",
+                  Summary = "Including graduate labour market and not in education, employment or training (NEET) statistics",
                   Slug = "destination-of-pupils-and-students"
               },
               new Theme
               {
                   Id = new Guid("bc08839f-2970-4f34-af2d-29608a48082f"),
                   Title = "Finance and funding",
-                  Summary = "",
+                  Summary = "Including local authority (LA) and student loan statistics",
                   Slug = "finance-and-funding"
               },
               new Theme
               {
                   Id = new Guid("92c5df93-c4da-4629-ab25-51bd2920cdca"),
                   Title = "Further education",
-                  Summary = "",
+                  Summary = "Including advanced learner loan, benefit claimant and apprenticeship and traineeship statistics",
                   Slug = "further-education"
               },
               new Theme
               {
                   Id = new Guid("2ca22e34-b87a-4281-a0eb-b80f4f8dd374"),
                   Title = "Higher education",
-                  Summary = "",
+                  Summary = "Including university graduate employment and participation statistics",
                   Slug = "higher-education"
               },
               new Theme
               {
                   Id = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
                   Title = "Pupils and schools",
-                  Summary = "",
+                  Summary = "Including absence, application and offers, capacity exclusion and special educational needs (SEN) statistics",
                   Slug = "pupils-and-schools"
               },
               new Theme
               {
                   Id = new Guid("74648781-85a9-4233-8be3-fe6f137165f4"),
-                  Title = "School and college performance - include GCSE and key stage results",
-                  Summary = "",
+                  Title = "School and college outcomes and performance",
+                  Summary = "Including GCSE and key stage statistcs",
                   Slug = "school-and-college-performance"
               },
               new Theme
               {
                   Id = new Guid("b601b9ea-b1c7-4970-b354-d1f695c446f1"),
                   Title = "Teachers and school workforce",
-                  Summary = "",
+                  Summary = "Including initial teacher training (ITT) statistics",
                   Slug = "teachers-and-school-workforce"
               },
               new Theme
               {
                   Id = new Guid("a95d2ca2-a969-4320-b1e9-e4781112574a"),
                   Title = "UK education and training statistics",
-                  Summary = "",
+                  Summary = "Including summarised expenditure, post-compulsory education, qualitification and school statistics",
                   Slug = "uk-education-and-training-statistics"
               }
             );
@@ -460,7 +460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Summary = "",
                   TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"),
                   Slug = "childcare-and-early-years-survey-of-parents",
-                  LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-survey-of-parents")
+                  LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-providers-survey")
               },
               new Publication
               {
@@ -469,7 +469,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Summary = "",
                   TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"),
                   Slug = "education-provision-children-under-5",
-                  LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-survey-of-parents")
+                  LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-childcare-and-early-years#provision-for-children-under-5-years-of-age-in-england")
               },
               new Publication
               {
@@ -477,7 +477,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Title = "Characteristics of children in need",
                   Summary = "",
                   TopicId = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
-                  Slug = "characteristics-of-children-in-need"
+                  Slug = "characteristics-of-children-in-need",
+                  LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-children-in-need#characteristics-of-children-in-need")
               },
               new Publication
               {
@@ -549,7 +550,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Summary = "",
                   TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"),
                   Slug = "participation-in-education-training-and-employement",
-                  LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-neet#participation-in-education,-employment-or-training")
+                  LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-neet#participation-in-education")
               },
               new Publication
               {
@@ -559,7 +560,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   TopicId = new Guid("6a0f4dce-ae62-4429-834e-dd67cee32860"),
                   Slug = "neet-statistics-quarterly-brief",
                   LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-neet#neet:-2016-to-2017-data-")
-
               },
               new Publication
               {
@@ -578,7 +578,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   TopicId = new Guid("4c658598-450b-4493-b972-8812acd154a7"),
                   Slug = "la-and-school-expenditure",
                   LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-local-authority-school-finance-data#local-authority-and-school-finance")
-
               },
               new Publication
               {
@@ -624,7 +623,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   TopicId = new Guid("dd4a5d02-fcc9-4b7f-8c20-c153754ba1e4"),
                   Slug = "fe-choices-learner-satisfaction-survey",
                   LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/fe-choices#learner-satisfaction-survey-data")
-
               },
               new Publication
               {
@@ -804,8 +802,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Title = "School and pupils and their characteristics",
                   Summary = "",
                   TopicId = new Guid("e50ba9fd-9f19-458c-aceb-4422f0c7d1ba"),
-                  Slug = "school-pupils-and-their-characteristics",
-                  LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-school-and-pupil-numbers#documents")
+                  Slug = "school-pupils-and-their-characteristics"
               },
               new Publication
               {
@@ -885,7 +882,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Title = "GCSE and equivalent results",
                   Summary = "",
                   TopicId = new Guid("1e763f55-bf09-4497-b838-7c5b054ba87b"),
-                  Slug = "gcse-and-equivalent-results",
+                  Slug = "gcse-and-equivalent-results"
               },
               new Publication
               {
@@ -939,7 +936,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Summary = "",
                   TopicId = new Guid("eac38700-b968-4029-b8ac-0eb8e1356480"),
                   Slug = "multi-academy-trust-performance-measures",
-                  LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-key-stage-2#pupil-attainment-at-key-stage-2")
+                  LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-key-stage-2#national-curriculum-assessments-at-key-stage-2")
               },
               new Publication
               {
