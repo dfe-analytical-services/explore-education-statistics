@@ -57,7 +57,7 @@ const BrowseReleasesPage = () => {
       <Accordion id="themes">
         <AccordionSection
           heading="Children, early years and social care"
-          caption="Including EYFS, secure children's homes and social workforce statistics"
+          caption="Including children in need, EYFS, looked after children and social workforce statistics"
         >
           <Details summary="Childcare and early years - including parent and provider surveys">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
@@ -519,7 +519,7 @@ const BrowseReleasesPage = () => {
 
         <AccordionSection
           heading="Pupils and schools"
-          caption="Including application, capacity and special educational needs (SEN) statistics"
+          caption="Including absence, application and offers, capacity, exclusion and special educational needs (SEN) statistics"
         >
           <Details summary="Admission appeals">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
@@ -700,7 +700,7 @@ const BrowseReleasesPage = () => {
 
         <AccordionSection
           heading="School and college outcomes and performance"
-          caption="Including GCSE and key stage result and school table statistics"
+          caption="Including GCSE and key stage statistics"
         >
           <Details summary="16 to 19 attainment - including A levels, level 2 and 3 and other results">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
@@ -898,7 +898,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection
           heading="Teachers and school workforce"
-          caption="Including initial teacher training (ITT), staff and teaching statistics"
+          caption="Including initial teacher training (ITT) statistics"
         >
           <Details summary="Initial teacher training (ITT) - including performance profiles, trainee census and training allocations">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
@@ -972,7 +972,7 @@ const BrowseReleasesPage = () => {
         </AccordionSection>
         <AccordionSection
           heading="UK education and training statistics"
-          caption="Including expenditure, post-compulsory education, qualification and school statistics"
+          caption="Including summarised expenditure, post-compulsory education, qualification and school statistics"
         >
           <Details summary="UK education and training statistics">
             <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
@@ -984,6 +984,47 @@ const BrowseReleasesPage = () => {
                     </strong>{' '}
                     - currently available via{' '}
                     <a href="https://www.gov.uk/government/collections/statistics-education-and-training#documents">
+                      Statistics at DfE
+                    </a>
+                  </p>
+                </li>
+              </ul>
+            </div>
+          </Details>
+        </AccordionSection>
+
+        <AccordionSection
+          heading="Ad hoc and transparency statistics"
+          caption="Including statistics which are not part of DfE's regular statistical releases"
+        >
+          <Details summary="UK education and training statistics">
+            <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bullet-list govuk-!-margin-top-0">
+                <li>
+                  <p>
+                    <strong>DfE external data shares</strong> - currently
+                    available via{' '}
+                    <a href="https://www.gov.uk/government/publications/dfe-external-data-shares">
+                      Statistics at DfE
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    <strong>Further education skills index</strong> - currently
+                    available via{' '}
+                    <a href="https://www.gov.uk/government/publications/further-education-skills-index">
+                      Statistics at DfE
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    <strong>
+                      School Improvement support for 2018 to 2019 academic year
+                    </strong>{' '}
+                    - currently available via{' '}
+                    <a href="https://www.gov.uk/government/publications/school-improvement-support-for-2018-to-2019-summary-statistics">
                       Statistics at DfE
                     </a>
                   </p>
