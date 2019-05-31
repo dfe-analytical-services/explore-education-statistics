@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
 {
     public interface IFileStorageService
     {
-        bool FileExists(string publication, string release, string filename);
+        bool FileExistsAndIsReleased(string publication, string release, string filename);
 
         IEnumerable<string> ListFiles(string publication, string release);
         

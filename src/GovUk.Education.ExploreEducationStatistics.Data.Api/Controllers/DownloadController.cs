@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("{publication}/{release}/{filename}")]
         public async Task<ActionResult> GetFile(string publication, string release, string filename)
         {
-            if (!_fileStorageService.FileExists(publication, release, filename))
+            if (!_fileStorageService.FileExistsAndIsReleased(publication, release, filename))
             {
                 return NotFound();
             }
