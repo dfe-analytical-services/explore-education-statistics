@@ -9,9 +9,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -47,6 +49,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     options.Filters.Add(new AuthorizeFilter(policy));
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            var connectionString = Configuration.GetConnectionString("ContentDb");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                const string connection = "Data Source=../GovUk.Education.ExploreEducationStatistics.Content.Api/dfe-meta.db";
+
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options
+                        .UseSqlite(connection,
+                            builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
+                        .EnableSensitiveDataLogging()
+                );
+            }
+            else
+            {
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options
+                        .UseSqlServer(connectionString,
+                            builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName)));
+            }
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
