@@ -162,7 +162,7 @@ const PublicationDataPage = () => {
             <dd className="govuk-summary-list__value">National</dd>
             <dd className="govuk-summary-list__actions">
               <Link to="publication-create-new-absence-table?status=step2">
-                Change file
+                Change location
               </Link>
             </dd>
           </div>
@@ -170,10 +170,200 @@ const PublicationDataPage = () => {
       )}
       <hr />
       <h2 className="govuk-heading-m">3. Time period</h2>
+      {window.location.search === '?status=step3' && (
+        <>
+          <FormGroup>
+            <FormFieldset id="lead" legend="">
+              <FormGroup>
+                <FormSelect
+                  id="start-date"
+                  label="Start"
+                  name="start-date"
+                  options={[
+                    { label: '2012', value: '2012' },
+                    { label: '2013', value: '2013' },
+                    { label: '2014', value: '2014' },
+                    { label: '2015', value: '2015' },
+                    { label: '2016', value: '2016' },
+                    { label: '2017', value: '2017' },
+                    { label: '2018', value: '2018' },
+                    { label: '2019', value: '2019' },
+                  ]}
+                />
+              </FormGroup>
+              <FormGroup>
+                <FormSelect
+                  id="end-date"
+                  label="End"
+                  name="end-date"
+                  options={[
+                    { label: '2012', value: '2012' },
+                    { label: '2013', value: '2013' },
+                    { label: '2014', value: '2014' },
+                    { label: '2015', value: '2015' },
+                    { label: '2016', value: '2016' },
+                    { label: '2017', value: '2017' },
+                    { label: '2018', value: '2018' },
+                    { label: '2019', value: '2019' },
+                  ]}
+                />
+              </FormGroup>
+            </FormFieldset>
+          </FormGroup>
+          <Link
+            to="publication-create-new-absence-table?status=step4"
+            className="govuk-button govuk-!-margin-right-3"
+          >
+            Next step
+          </Link>
+          <Link
+            to="publication-create-new-absence-table?status=step2"
+            className="govuk-button govuk-button--secondary"
+          >
+            Previous step
+          </Link>
+        </>
+      )}
+      {['?status=step4', '?status=step5'].includes(window.location.search) && (
+        <>
+          <dl className="govuk-summary-list govuk-summary-list--no-border">
+            <div className="govuk-summary-list__row">
+              <dt className="govuk-summary-list__key">Start date</dt>
+              <dd className="govuk-summary-list__value">2012 to 2013</dd>
+              <dd className="govuk-summary-list__actions" />
+            </div>
+            <div className="govuk-summary-list__row">
+              <dt className="govuk-summary-list__key">End date</dt>
+              <dd className="govuk-summary-list__value">2016 to 2017</dd>
+              <dd className="govuk-summary-list__actions">
+                <Link to="publication-create-new-absence-table?status=step3">
+                  Change time period
+                </Link>
+              </dd>
+            </div>
+          </dl>
+        </>
+      )}
       <hr />
       <h2 className="govuk-heading-m">4. Filters</h2>
+      {['?status=step4', '?status=step5'].includes(window.location.search) && (
+        <>
+          <h3 className="govuk-heading-s">
+            Categories
+            <span className="govuk-hint">
+              Select at least one option from each category
+            </span>
+          </h3>
+
+          <Details
+            summary="Characteristic"
+            tag="1 selected"
+            className="govuk-!-margin-bottom-2"
+          >
+            <div className="dfe-filter-overflow">
+              <img
+                src="/static/images/prototype/characteristic-filter.png"
+                alt=""
+              />
+            </div>
+          </Details>
+          <Details summary="School type" tag="1 selected">
+            <div className="dfe-filter-overflow">
+              <img src="/static/images/prototype/school-filter.png" alt="" />
+            </div>
+          </Details>
+
+          <h3 className="govuk-heading-s">
+            Indicators
+            <span className="govuk-hint">Select at least one indicator</span>
+          </h3>
+          <Details summary="Indicator" tag="3 selected">
+            <div className="dfe-filter-overflow">
+              <img
+                src="/static/images/prototype/indicator-filters.png"
+                alt=""
+              />
+            </div>
+          </Details>
+          <Link
+            to="publication-create-new-absence-table?status=step5"
+            className="govuk-button govuk-!-margin-right-5"
+          >
+            Create table
+          </Link>
+          <Link
+            to="publication-create-new-absence-table?status=step3"
+            className="govuk-button govuk-button--secondary"
+          >
+            Previous step
+          </Link>
+        </>
+      )}
       <hr />
       <h2 className="govuk-heading-m">5. View and save table</h2>
+      {['?status=step5'].includes(window.location.search) && (
+        <div className="govuk-width-container">
+          <table className="govuk-table">
+            <thead className="govuk-table__head">
+              <tr>
+                <th colSpan={2} rowSpan={2} />
+                <th
+                  colSpan={5}
+                  className="govuk-table__header govuk-table__header--center"
+                >
+                  All pupils
+                </th>
+              </tr>
+              <tr>
+                <th scope="col" className="govuk-table__header--numeric">
+                  2012/13
+                </th>
+                <th scope="col" className="govuk-table__header--numeric">
+                  2013/14
+                </th>
+                <th scope="col" className="govuk-table__header--numeric">
+                  2014/15
+                </th>
+                <th scope="col" className="govuk-table__header--numeric">
+                  2015/16
+                </th>
+                <th scope="col" className="govuk-table__header--numeric">
+                  2016/17
+                </th>
+              </tr>
+            </thead>
+            <tbody className="govuk-table__body">
+              <tr>
+                <th rowSpan={3} scope="row">
+                  All schools
+                </th>
+                <th scope="row">Authorised absence rate</th>
+                <td className="govuk-table__cell--numeric">4.2%</td>
+                <td className="govuk-table__cell--numeric">3.5%</td>
+                <td className="govuk-table__cell--numeric">3.5%</td>
+                <td className="govuk-table__cell--numeric">3.4%</td>
+                <td className="govuk-table__cell--numeric">3.4%</td>
+              </tr>
+              <tr>
+                <th scope="row">Unuthorised absence rate</th>
+                <td className="govuk-table__cell--numeric">1.1%</td>
+                <td className="govuk-table__cell--numeric">1.1%</td>
+                <td className="govuk-table__cell--numeric">1.1%</td>
+                <td className="govuk-table__cell--numeric">1.1%</td>
+                <td className="govuk-table__cell--numeric">1.3%</td>
+              </tr>
+              <tr>
+                <th scope="row">Overall absence rate</th>
+                <td className="govuk-table__cell--numeric">5.3%</td>
+                <td className="govuk-table__cell--numeric">4.5%</td>
+                <td className="govuk-table__cell--numeric">4.6%</td>
+                <td className="govuk-table__cell--numeric">4.6%</td>
+                <td className="govuk-table__cell--numeric">4.7%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
       <hr />
     </PrototypePage>
   );

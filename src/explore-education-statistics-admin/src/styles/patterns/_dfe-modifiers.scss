@@ -84,3 +84,8 @@ h1.govuk-panel__title {
     margin-bottom: 0;
   }
 }
+
+.dfe-filter-overflow {
+  max-height: 600px;
+  overflow-x: auto;
+}
