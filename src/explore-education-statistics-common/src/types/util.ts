@@ -21,17 +21,21 @@ export type KeysWithType<T, U> = {
 }[keyof T];
 
 /**
- * Remove any specified keys from T.
+ * Remove any specified keys from T, that exist on T.
  */
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type OmitStrict<T, K extends keyof T> = T extends any
+  ? Pick<T, Exclude<keyof T, K>>
+  : never;
 
 /**
  * Remove any keys from T and replace them with
  * the corresponding keys from U.
  */
-export type Overwrite<T, U> = Omit<T, keyof T & keyof U> & U;
+export type Overwrite<T, U> = OmitStrict<T, keyof T & keyof U> & U;
 
 /**
  * Make specified keys from T optional.
  */
-export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+export type PartialBy<T, K extends keyof T> = OmitStrict<T, K> &
+  Partial<Pick<T, K>>;
