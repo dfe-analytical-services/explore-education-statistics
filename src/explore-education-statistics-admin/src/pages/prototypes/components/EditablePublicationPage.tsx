@@ -118,7 +118,7 @@ class EditablePublicationPage extends Component<Props, State> {
       <div>
         <h2 className="govuk-heading-l reorderable-relative">
           <button
-            className="reorderable"
+            className="govuk-button govuk-button--secondary reorderable"
             onClick={() => this.setState({ reordering: true })}
             type="button"
           >
@@ -150,7 +150,7 @@ class EditablePublicationPage extends Component<Props, State> {
         <h2 className="govuk-heading-l reorderable-relative">
           <button
             type="button"
-            className="reorderable"
+            className="govuk-button reorderable"
             onClick={() => this.addNewSection()}
           >
             Add new section
@@ -165,11 +165,11 @@ class EditablePublicationPage extends Component<Props, State> {
       <DragDropContext onDragEnd={this.onDragEnd}>
         <h2 className="govuk-heading-l reorderable-relative">
           <button
-            className="reorderable"
+            className="govuk-button reorderable"
             onClick={() => this.setState({ reordering: false })}
             type="button"
           >
-            Done
+            Save reordering
           </button>
           Contents
         </h2>
