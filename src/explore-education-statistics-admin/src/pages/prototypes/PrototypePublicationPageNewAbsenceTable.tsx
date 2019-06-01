@@ -7,6 +7,7 @@ import {
   FormSelect,
   FormRadioGroup,
 } from '@common/components/form';
+import PrototypeAdminExampleTables from './components/PrototypeAdminExampleTables';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
 import Link from '../../components/Link';
@@ -24,6 +25,20 @@ const PublicationDataPage = () => {
       ]}
     >
       <PrototypeAdminNavigation sectionId="addTable" />
+
+      <h2 className="govuk-heading-m">Build tables for release</h2>
+
+      <p className="govuk-body">
+        Choose the data from your uploaded files then use filters to create your
+        table.
+      </p>
+
+      <p className="govuk-body">
+        Once you've created a table, you can save it for use in your release.
+      </p>
+
+      <hr />
+
       <h2 className="govuk-heading-m">1. Select data file</h2>
       {window.location.search === '?status=step1' && (
         <form method="get">
@@ -89,7 +104,7 @@ const PublicationDataPage = () => {
         </form>
       )}
       {window.location.search !== '?status=step1' && (
-        <dl className="govuk-summary-list govuk-summary-list--no-border">
+        <dl className="govuk-summary-list govuk-!-margin-0 govuk-summary-list--no-border">
           <div className="govuk-summary-list__row">
             <dt className="govuk-summary-list__key">Selected data</dt>
             <dd className="govuk-summary-list__value">Geographical absence</dd>
@@ -156,7 +171,7 @@ const PublicationDataPage = () => {
       {['?status=step3', '?status=step4', '?status=step5'].includes(
         window.location.search,
       ) && (
-        <dl className="govuk-summary-list govuk-summary-list--no-border">
+        <dl className="govuk-summary-list govuk-!-margin-0 govuk-summary-list--no-border">
           <div className="govuk-summary-list__row">
             <dt className="govuk-summary-list__key">Location</dt>
             <dd className="govuk-summary-list__value">National</dd>
@@ -226,7 +241,7 @@ const PublicationDataPage = () => {
       )}
       {['?status=step4', '?status=step5'].includes(window.location.search) && (
         <>
-          <dl className="govuk-summary-list govuk-summary-list--no-border">
+          <dl className="govuk-summary-list govuk-!-margin-0 govuk-summary-list--no-border">
             <div className="govuk-summary-list__row">
               <dt className="govuk-summary-list__key">Start date</dt>
               <dd className="govuk-summary-list__value">2012 to 2013</dd>
@@ -245,7 +260,9 @@ const PublicationDataPage = () => {
         </>
       )}
       <hr />
-      <h2 className="govuk-heading-m">4. Filters</h2>
+      <h2 className="govuk-heading-m" id="tableFilters">
+        4. Filters
+      </h2>
       {['?status=step4', '?status=step5'].includes(window.location.search) && (
         <>
           <h3 className="govuk-heading-s">
@@ -289,7 +306,7 @@ const PublicationDataPage = () => {
             to="publication-create-new-absence-table?status=step5"
             className="govuk-button govuk-!-margin-right-5"
           >
-            Create table
+            Uodate table
           </Link>
           <Link
             to="publication-create-new-absence-table?status=step3"
@@ -303,65 +320,22 @@ const PublicationDataPage = () => {
       <h2 className="govuk-heading-m">5. View and save table</h2>
       {['?status=step5'].includes(window.location.search) && (
         <div className="govuk-width-container">
-          <table className="govuk-table">
-            <thead className="govuk-table__head">
-              <tr>
-                <th colSpan={2} rowSpan={2} />
-                <th
-                  colSpan={5}
-                  className="govuk-table__header govuk-table__header--center"
-                >
-                  All pupils
-                </th>
-              </tr>
-              <tr>
-                <th scope="col" className="govuk-table__header--numeric">
-                  2012/13
-                </th>
-                <th scope="col" className="govuk-table__header--numeric">
-                  2013/14
-                </th>
-                <th scope="col" className="govuk-table__header--numeric">
-                  2014/15
-                </th>
-                <th scope="col" className="govuk-table__header--numeric">
-                  2015/16
-                </th>
-                <th scope="col" className="govuk-table__header--numeric">
-                  2016/17
-                </th>
-              </tr>
-            </thead>
-            <tbody className="govuk-table__body">
-              <tr>
-                <th rowSpan={3} scope="row">
-                  All schools
-                </th>
-                <th scope="row">Authorised absence rate</th>
-                <td className="govuk-table__cell--numeric">4.2%</td>
-                <td className="govuk-table__cell--numeric">3.5%</td>
-                <td className="govuk-table__cell--numeric">3.5%</td>
-                <td className="govuk-table__cell--numeric">3.4%</td>
-                <td className="govuk-table__cell--numeric">3.4%</td>
-              </tr>
-              <tr>
-                <th scope="row">Unuthorised absence rate</th>
-                <td className="govuk-table__cell--numeric">1.1%</td>
-                <td className="govuk-table__cell--numeric">1.1%</td>
-                <td className="govuk-table__cell--numeric">1.1%</td>
-                <td className="govuk-table__cell--numeric">1.1%</td>
-                <td className="govuk-table__cell--numeric">1.3%</td>
-              </tr>
-              <tr>
-                <th scope="row">Overall absence rate</th>
-                <td className="govuk-table__cell--numeric">5.3%</td>
-                <td className="govuk-table__cell--numeric">4.5%</td>
-                <td className="govuk-table__cell--numeric">4.6%</td>
-                <td className="govuk-table__cell--numeric">4.6%</td>
-                <td className="govuk-table__cell--numeric">4.7%</td>
-              </tr>
-            </tbody>
-          </table>
+          <PrototypeAdminExampleTables />
+
+          <FormGroup>
+            <FormTextInput
+              id="save-table"
+              name="save-table"
+              label="Save table as"
+              value="Table for absence highlights panel"
+            />
+          </FormGroup>
+          <Link
+            to="publication-create-new-absence-view-table"
+            className="govuk-button govuk-!-margin-right-3"
+          >
+            Save table
+          </Link>
         </div>
       )}
       <hr />

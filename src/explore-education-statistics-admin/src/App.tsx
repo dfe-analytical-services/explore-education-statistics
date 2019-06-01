@@ -19,6 +19,7 @@ import PublicationCreateNewAbsenceConfig from './pages/prototypes/PrototypePubli
 import PublicationCreateNewAbsenceConfigEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceConfigEdit';
 import PublicationCreateNewAbsenceData from './pages/prototypes/PrototypePublicationPageNewAbsenceData';
 import PublicationCreateNewAbsenceTable from './pages/prototypes/PrototypePublicationPageNewAbsenceTable';
+import PublicationCreateNewAbsenceViewTables from './pages/prototypes/PrototypePublicationPageNewAbsenceViewTables';
 import PublicationCreateNewAbsenceSchedule from './pages/prototypes/PrototypePublicationPageNewAbsenceSchedule';
 import PublicationCreateNewAbsenceScheduleEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceScheduleEdit';
 import PublicationCreateNewAbsenceStatus from './pages/prototypes/PrototypePublicationPageNewAbsenceStatus';
@@ -88,6 +89,11 @@ function App() {
           exact
           path="/prototypes/publication-create-new-absence-table"
           component={PublicationCreateNewAbsenceTable}
+        />
+        <Route
+          exact
+          path="/prototypes/publication-create-new-absence-view-table"
+          component={PublicationCreateNewAbsenceViewTables}
         />
         <Route
           exact
