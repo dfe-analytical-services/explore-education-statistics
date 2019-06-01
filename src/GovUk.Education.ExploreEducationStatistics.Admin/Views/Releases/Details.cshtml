@@ -1,66 +1,65 @@
-﻿@model GovUk.Education.ExploreEducationStatistics.Content.Model.Release
+﻿@using Newtonsoft.Json
+@model GovUk.Education.ExploreEducationStatistics.Content.Model.Release
 
 @{
     ViewData["Title"] = Model.Title;
 }
+<span class="govuk-caption-l">Release</span>
+<h1 class="govuk-heading-l">@Model.Title</h1>
 
-<h1 class="govuk-heading-xl">@Model.Title</h1>
-
-<div>
-    <h4>Release</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ReleaseName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ReleaseName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Published)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Published)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Slug)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Slug)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Summary)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Summary)
-        </dd>
-        <dt class = "col-sm-2">
+<h3 class="govuk-heading-m">Details</h3>
+<table class="govuk-table">
+    <tbody>
+    <tr class="govuk-table__row">
+        <td class="govuk-table__header">
             @Html.DisplayNameFor(model => model.Publication)
-        </dt>
-        <dd class = "col-sm-10">
+        </td>
+        <td class="govuk-table__cell">
             @Html.DisplayFor(model => model.Publication.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Content)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Content)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.KeyStatistics)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.KeyStatistics)
-        </dd>
-    </dl>
-</div>
+        </td>
+    </tr>
+    <tr class="govuk-table__row">
+        <td class="govuk-table__header">
+            @Html.DisplayNameFor(model => model.ReleaseName)
+        </td>
+        <td class="govuk-table__cell">
+            @Html.DisplayFor(model => model.ReleaseName)
+        </td>
+    </tr>
+    <tr class="govuk-table__row">
+        <td class="govuk-table__header">
+            @Html.DisplayNameFor(model => model.Slug)
+        </td>
+        <td class="govuk-table__cell">
+            /@Html.DisplayFor(model => model.Publication.Slug)/@Html.DisplayFor(model => model.Slug)/
+        </td>
+    </tr>
+    <tr class="govuk-table__row">
+        <td class="govuk-table__header">
+            @Html.DisplayNameFor(model => model.ReleaseName)
+        </td>
+        <td class="govuk-table__cell">
+            @Html.DisplayFor(model => model.ReleaseName)
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<h3 class="govuk-heading-m">Content</h3>
+
+<h4 class="govuk-heading-s">@Html.DisplayNameFor(model => model.Summary)</h4>
+<p class="govuk-body">@Html.DisplayFor(model => model.Summary)</p>
+
+
+<h4 class="govuk-heading-s">@Html.DisplayNameFor(model => model.KeyStatistics)</h4>
+<pre style="white-space: pre-wrap;">@(JsonConvert.SerializeObject(Model.KeyStatistics))</pre>
+
+<h4 class="govuk-heading-s">@Html.DisplayNameFor(model => model.Content)</h4>
+<pre style="white-space: pre-wrap;">@(JsonConvert.SerializeObject(Model.Content))</pre>
+
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="govuk-button">Edit</a>
+    <p>
+        <a asp-action="Index" class="govuk-back-link">Back to List</a>
+    </p>
 </div>
