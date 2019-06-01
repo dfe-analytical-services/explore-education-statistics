@@ -1,10 +1,9 @@
-﻿@model GovUk.Education.ExploreEducationStatistics.Content.Model.Publication
+﻿@model GovUk.Education.ExploreEducationStatistics.Content.Model.Topic
 
 @{
     ViewData["Title"] = Model.Title;
 }
-
-<span class="govuk-caption-l">Publication</span>
+<span class="govuk-caption-l">Topic</span>
 <h1 class="govuk-heading-l">@Model.Title</h1>
 
 <div class="govuk-grid-row">
@@ -15,10 +14,10 @@
             <tbody>
             <tr class="govuk-table__row">
                 <td class="govuk-table__header">
-                    @Html.DisplayNameFor(model => model.Topic)
+                    @Html.DisplayNameFor(model => model.Theme)
                 </td>
                 <td class="govuk-table__cell">
-                    <a asp-controller="Topics" asp-action="Details" asp-route-id="@Model.TopicId" class="govuk-link">@Html.DisplayFor(model => model.Topic.Title)</a>
+                    @Html.DisplayFor(model => model.Theme.Title)
                 </td>
             </tr>
             <tr class="govuk-table__row">
@@ -37,31 +36,13 @@
                     @Html.DisplayFor(model => model.Summary)
                 </td>
             </tr>
-
-            <tr class="govuk-table__row">
-                <td class="govuk-table__header">
-                    @Html.DisplayNameFor(model => model.NextUpdate)
-                </td>
-                <td class="govuk-table__cell">
-                    @Html.DisplayFor(model => model.NextUpdate)
-                </td>
-            </tr>
-            <tr class="govuk-table__row">
-                <td class="govuk-table__header">
-                    @Html.DisplayNameFor(model => model.LegacyPublicationUrl)
-                </td>
-                <td class="govuk-table__cell">
-                    <a href="@Model.LegacyPublicationUrl" class="govuk-link" target="_blank">@Html.DisplayFor(model => model.LegacyPublicationUrl)</a>
-                </td>
-            </tr>
             </tbody>
         </table>
     </div>
-
     <div class="govuk-grid-column-one-third">
-        <h3 class="govuk-heading-m">Releases</h3>
+        <h3 class="govuk-heading-m">Publications</h3>
         <ul class="govuk-list">
-            @foreach (var item in Model.Releases)
+            @foreach (var item in Model.Publications)
             {
                 <li>
                     <a asp-route-id="@item.Id" asp-action="Details" asp-controller="Publications" class="govuk-link">@Html.DisplayFor(modelItem => item.Title)</a>
@@ -71,6 +52,7 @@
     </div>
 
 </div>
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id" class="govuk-button">Edit</a>
     <p>

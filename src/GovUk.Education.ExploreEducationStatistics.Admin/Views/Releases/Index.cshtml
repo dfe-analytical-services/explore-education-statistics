@@ -10,7 +10,6 @@
     <a asp-action="Create" class="govuk-button">Create new release</a>
 </p>
 <table class="govuk-table">
-    <caption class="govuk-table__caption">Current releases</caption>
     <thead class="govuk-table__head">
     <tr class="govuk-table__row">
         <th class="govuk-table__header">
@@ -28,7 +27,6 @@
         <th class="govuk-table__header">
             @Html.DisplayNameFor(model => model.Publication)
         </th>
-        <th class="govuk-table__header"></th>
     </tr>
     </thead>
     <tbody>
@@ -36,7 +34,10 @@
     {
         <tr class="govuk-table__row">
             <td class="govuk-table__header">
-                @Html.DisplayFor(modelItem => item.Title)
+                <a asp-action="Details" asp-route-id="@item.Id" class="govuk-link">
+                    @Html.DisplayFor(modelItem => item.Title)
+                </a>
+
             </td>
             <td class="govuk-table__cell">
                 @Html.DisplayFor(modelItem => item.ReleaseName)
@@ -45,15 +46,10 @@
                 @Html.DisplayFor(modelItem => item.Published)
             </td>
             <td class="govuk-table__cell">
-                @Html.DisplayFor(modelItem => item.Slug)
+                /@Html.DisplayFor(modelItem => item.Slug)/
             </td>
             <td class="govuk-table__cell">
                 @Html.DisplayFor(modelItem => item.Publication.Title)
-            </td>
-            <td class="govuk-table__cell">
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
     }

@@ -7,28 +7,25 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 {
-    [Authorize]
-    public class PublicationsController : Controller
+    public class ThemesController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public PublicationsController(ApplicationDbContext context)
+        public ThemesController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Publications
+        // GET: Themes
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Publications.Include(p => p.Topic).OrderBy(p => p.Title);
-            return View(await applicationDbContext.ToListAsync());
+            return View(await _context.Themes.OrderBy(t => t.Title).ToListAsync());
         }
 
-        // GET: Publications/Details/5
+        // GET: Themes/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -36,44 +33,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                 return NotFound();
             }
 
-            var publication = await _context.Publications
-                .Include(p => p.Topic)
-                .Include(p => p.Releases).OrderBy(t => t.Title)
+            var theme = await _context.Themes
+                .Include(t => t.Topics).OrderBy(t => t.Title)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (publication == null)
+            if (theme == null)
             {
                 return NotFound();
             }
 
-            return View(publication);
+            return View(theme);
         }
 
-        // GET: Publications/Create
+        // GET: Themes/Create
         public IActionResult Create()
         {
-            ViewData["TopicId"] = new SelectList(_context.Topics.OrderBy(t => t.Title), "Id", "Title");
             return View();
         }
 
-        // POST: Publications/Create
+        // POST: Themes/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Slug,Title,Description,DataSource,Summary,NextUpdate,LegacyPublicationUrl,TopicId")] Publication publication)
+        public async Task<IActionResult> Create([Bind("Id,Slug,Title,Summary")] Theme theme)
         {
             if (ModelState.IsValid)
             {
-                publication.Id = Guid.NewGuid();
-                _context.Add(publication);
+                theme.Id = Guid.NewGuid();
+                _context.Add(theme);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["TopicId"] = new SelectList(_context.Topics, "Id", "Title", publication.TopicId);
-            return View(publication);
+            return View(theme);
         }
 
-        // GET: Publications/Edit/5
+        // GET: Themes/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -81,23 +75,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                 return NotFound();
             }
 
-            var publication = await _context.Publications.FindAsync(id);
-            if (publication == null)
+            var theme = await _context.Themes.FindAsync(id);
+            if (theme == null)
             {
                 return NotFound();
             }
-            ViewData["TopicId"] = new SelectList(_context.Topics, "Id", "Title", publication.TopicId);
-            return View(publication);
+            return View(theme);
         }
 
-        // POST: Publications/Edit/5
+        // POST: Themes/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Slug,Title,Description,DataSource,Summary,NextUpdate,LegacyPublicationUrl,TopicId")] Publication publication)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Slug,Title,Summary")] Theme theme)
         {
-            if (id != publication.Id)
+            if (id != theme.Id)
             {
                 return NotFound();
             }
@@ -106,12 +99,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(publication);
+                    _context.Update(theme);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PublicationExists(publication.Id))
+                    if (!ThemeExists(theme.Id))
                     {
                         return NotFound();
                     }
@@ -122,11 +115,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["TopicId"] = new SelectList(_context.Topics, "Id", "Title", publication.TopicId);
-            return View(publication);
+            return View(theme);
         }
 
-        // GET: Publications/Delete/5
+        // GET: Themes/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -134,31 +126,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                 return NotFound();
             }
 
-            var publication = await _context.Publications
-                .Include(p => p.Topic)
+            var theme = await _context.Themes
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (publication == null)
+            if (theme == null)
             {
                 return NotFound();
             }
 
-            return View(publication);
+            return View(theme);
         }
 
-        // POST: Publications/Delete/5
+        // POST: Themes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var publication = await _context.Publications.FindAsync(id);
-            _context.Publications.Remove(publication);
+            var theme = await _context.Themes.FindAsync(id);
+            _context.Themes.Remove(theme);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool PublicationExists(Guid id)
+        private bool ThemeExists(Guid id)
         {
-            return _context.Publications.Any(e => e.Id == id);
+            return _context.Themes.Any(e => e.Id == id);
         }
     }
 }

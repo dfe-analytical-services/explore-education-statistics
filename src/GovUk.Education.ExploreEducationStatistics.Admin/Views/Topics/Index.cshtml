@@ -1,19 +1,17 @@
-﻿@model IEnumerable<GovUk.Education.ExploreEducationStatistics.Content.Model.Publication>
+﻿@model IEnumerable<GovUk.Education.ExploreEducationStatistics.Content.Model.Topic>
 
 @{
-    ViewData["Title"] = "Publications";
+    ViewData["Title"] = "Topics";
 }
 
-<h1 class="govuk-heading-l">Publications</h1>
-
+<h1 class="govuk-heading-l">Topics</h1>
 <p>
-    <a asp-action="Create" class="govuk-button">Create new publication</a>
+    <a asp-action="Create" class="govuk-button">Create new topic</a>
 </p>
+
 <table class="govuk-table">
-    <caption class="govuk-table__caption">Current publications</caption>
     <thead class="govuk-table__head">
     <tr class="govuk-table__row">
-
         <th class="govuk-table__header">
             @Html.DisplayNameFor(model => model.Title)
         </th>
@@ -21,7 +19,7 @@
             @Html.DisplayNameFor(model => model.Slug)
         </th>
         <th class="govuk-table__header">
-            @Html.DisplayNameFor(model => model.Topic)
+            @Html.DisplayNameFor(model => model.Theme)
         </th>
     </tr>
     </thead>
@@ -29,7 +27,6 @@
     @foreach (var item in Model)
     {
         <tr class="govuk-table__row">
-
             <td class="govuk-table__header">
                 <a asp-action="Details" asp-route-id="@item.Id" class="govuk-link">@Html.DisplayFor(modelItem => item.Title)</a>
             </td>
@@ -37,7 +34,7 @@
                 /@Html.DisplayFor(modelItem => item.Slug)/
             </td>
             <td class="govuk-table__cell">
-                <a asp-route-id="@item.TopicId" asp-action="Details" asp-controller="Topics" class="govuk-link">@Html.DisplayFor(modelItem => item.Topic.Title)</a>
+                <a asp-controller="Themes" asp-action="Details" asp-route-id="@item.ThemeId" class="govuk-link">@Html.DisplayFor(modelItem => item.Theme.Title)</a>
             </td>
         </tr>
     }
