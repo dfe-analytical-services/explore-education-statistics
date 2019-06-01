@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
         // GET: Publications/Create
         public IActionResult Create()
         {
-            ViewData["TopicId"] = new SelectList(_context.Topics, "Id", "Title");
+            ViewData["TopicId"] = new SelectList(_context.Topics.OrderBy(t => t.Title), "Id", "Title");
             return View();
         }
 

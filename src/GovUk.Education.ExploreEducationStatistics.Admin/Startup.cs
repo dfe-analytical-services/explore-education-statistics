@@ -132,14 +132,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 })
             );
 
-            app.UseSpa(spa =>
-            {
-                if (env.IsDevelopment())
-                {
-                    spa.Options.SourcePath = "../explore-education-statistics-admin";
-                    spa.UseReactDevelopmentServer(npmScript: "start");
-                }
-            });
+//            app.UseSpa(spa =>
+//            {
+//                if (env.IsDevelopment())
+//                {
+//                    spa.Options.SourcePath = "../explore-education-statistics-admin";
+//                    spa.UseReactDevelopmentServer(npmScript: "start");
+//                }
+//            });
         }
     }
 }

@@ -1,67 +1,57 @@
 ﻿@model GovUk.Education.ExploreEducationStatistics.Content.Model.Publication
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create new publication";
 }
 
-<h1>Create</h1>
+<h1 class="govuk-heading-xl">Create new publication</h1>
 
-<h4>Publication</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Slug" class="control-label"></label>
-                <input asp-for="Slug" class="form-control" />
-                <span asp-validation-for="Slug" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DataSource" class="control-label"></label>
-                <input asp-for="DataSource" class="form-control" />
-                <span asp-validation-for="DataSource" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Summary" class="control-label"></label>
-                <input asp-for="Summary" class="form-control" />
-                <span asp-validation-for="Summary" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="NextUpdate" class="control-label"></label>
-                <input asp-for="NextUpdate" class="form-control" />
-                <span asp-validation-for="NextUpdate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="LegacyPublicationUrl" class="control-label"></label>
-                <input asp-for="LegacyPublicationUrl" class="form-control" />
-                <span asp-validation-for="LegacyPublicationUrl" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TopicId" class="control-label"></label>
-                <select asp-for="TopicId" class ="form-control" asp-items="ViewBag.TopicId"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create"  class="govuk-button" />
-            </div>
-        </form>
+
+<form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="govuk-form-group">
+        <label asp-for="TopicId" class="govuk-label govuk-label--s">Topic</label>
+        <select asp-for="TopicId" class="govuk-select" asp-items="ViewBag.TopicId"></select>
     </div>
-</div>
+    <div class="govuk-form-group">
+        <label asp-for="Title" class="govuk-label govuk-label--s"></label>
+        <input asp-for="Title" class="govuk-input"/>
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="govuk-form-group">
+        <label asp-for="Slug" class="govuk-label govuk-label--s"></label>
+        <input asp-for="Slug" class="govuk-input govuk-input--width-20"/>
+        <span asp-validation-for="Slug" class="text-danger"></span>
+    </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+    <div class="govuk-form-group">
+        <label asp-for="LegacyPublicationUrl" class="govuk-label govuk-label--s">Legacy publication url</label>
+        <span id="event-name-hint" class="govuk-hint">
+            Link the publication on the Gov.UK platform
+        </span>
+        <input asp-for="LegacyPublicationUrl" class="govuk-input"/>
+        <span asp-validation-for="LegacyPublicationUrl" class="text-danger"></span>
+    </div>
+
+    <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+    <div class="govuk-form-group">
+        <label asp-for="Summary" class="govuk-label govuk-label--s"></label>
+        <textarea asp-for="Summary" class="govuk-textarea"></textarea>
+        <span asp-validation-for="Summary" class="text-danger"></span>
+    </div>
+
+    <div class="govuk-form-group">
+        <input type="submit" value="Create" class="govuk-button"/>
+    </div>
+
+    <a asp-action="Index" class="govuk-link">Cancel</a>
+
+</form>
+
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }
