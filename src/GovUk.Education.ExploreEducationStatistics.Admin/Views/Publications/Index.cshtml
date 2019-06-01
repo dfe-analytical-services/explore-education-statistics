@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<GovUk.Education.ExploreEducationStatistics.Content.Model.Publication>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Publications";
 }
 
-<h1>Publications</h1>
+<h1 class="govuk-heading-l">Publications</h1>
 
 <p>
     <a asp-action="Create" class="govuk-button">Create new publication</a>
@@ -19,9 +19,6 @@
         </th>
         <th class="govuk-table__header">
             @Html.DisplayNameFor(model => model.Slug)
-        </th>
-        <th class="govuk-table__header">
-            @Html.DisplayNameFor(model => model.NextUpdate)
         </th>
         <th class="govuk-table__header">
             @Html.DisplayNameFor(model => model.Topic)
@@ -39,9 +36,6 @@
             </td>
             <td class="govuk-table__cell">
                 @Html.DisplayFor(modelItem => item.Slug)
-            </td>
-            <td class="govuk-table__cell">
-                @Html.DisplayFor(modelItem => item.NextUpdate)
             </td>
             <td class="govuk-table__cell">
                 @Html.DisplayFor(modelItem => item.Topic.Title)

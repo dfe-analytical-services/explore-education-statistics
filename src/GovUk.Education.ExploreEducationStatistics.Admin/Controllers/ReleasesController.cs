@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
         // GET: Releases
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Releases.Include(r => r.Publication);
+            var applicationDbContext = _context.Releases.Include(r => r.Publication).OrderBy(r => r.Title);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
         // GET: Releases/Create
         public IActionResult Create()
         {
-            ViewData["PublicationId"] = new SelectList(_context.Publications, "Id", "Title");
+            ViewData["PublicationId"] = new SelectList(_context.Publications.OrderBy(p => p.Title), "Id", "Title");
             return View();
         }
 

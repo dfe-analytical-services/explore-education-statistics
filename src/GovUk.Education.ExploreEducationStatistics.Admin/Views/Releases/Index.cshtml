@@ -1,38 +1,39 @@
 ﻿@model IEnumerable<GovUk.Education.ExploreEducationStatistics.Content.Model.Release>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Releases";
 }
 
-<h1>Releases</h1>
+<h1 class="govuk-heading-l">Releases</h1>
 
 <p>
     <a asp-action="Create" class="govuk-button">Create new release</a>
 </p>
 <table class="govuk-table">
     <caption class="govuk-table__caption">Current releases</caption>
-    <thead  class="govuk-table__head">
-        <tr class="govuk-table__row">
-            <th class="govuk-table__header">
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th class="govuk-table__header">
-                @Html.DisplayNameFor(model => model.ReleaseName)
-            </th>
-            <th class="govuk-table__header">
-                @Html.DisplayNameFor(model => model.Published)
-            </th>
-            <th class="govuk-table__header">
-                @Html.DisplayNameFor(model => model.Slug)
-            </th>
-            <th class="govuk-table__header">
-                @Html.DisplayNameFor(model => model.Publication)
-            </th>
-            <th class="govuk-table__header"></th>
-        </tr>
+    <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+        <th class="govuk-table__header">
+            @Html.DisplayNameFor(model => model.Title)
+        </th>
+        <th class="govuk-table__header">
+            @Html.DisplayNameFor(model => model.ReleaseName)
+        </th>
+        <th class="govuk-table__header">
+            @Html.DisplayNameFor(model => model.Published)
+        </th>
+        <th class="govuk-table__header">
+            @Html.DisplayNameFor(model => model.Slug)
+        </th>
+        <th class="govuk-table__header">
+            @Html.DisplayNameFor(model => model.Publication)
+        </th>
+        <th class="govuk-table__header"></th>
+    </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+    @foreach (var item in Model)
+    {
         <tr class="govuk-table__row">
             <td class="govuk-table__header">
                 @Html.DisplayFor(modelItem => item.Title)
@@ -47,9 +48,6 @@
                 @Html.DisplayFor(modelItem => item.Slug)
             </td>
             <td class="govuk-table__cell">
-                @Html.DisplayFor(modelItem => item.Summary)
-            </td>
-            <td class="govuk-table__cell">
                 @Html.DisplayFor(modelItem => item.Publication.Title)
             </td>
             <td class="govuk-table__cell">
@@ -58,6 +56,6 @@
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
-}
+    }
     </tbody>
 </table>

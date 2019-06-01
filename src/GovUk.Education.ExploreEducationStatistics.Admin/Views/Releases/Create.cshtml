@@ -1,67 +1,43 @@
 ﻿@model GovUk.Education.ExploreEducationStatistics.Content.Model.Release
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create new release";
 }
 
-<h1>Create</h1>
+<h1 class="govuk-heading-xl">Create new release</h1>
 
-<h4>Release</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ReleaseName" class="control-label"></label>
-                <input asp-for="ReleaseName" class="form-control" />
-                <span asp-validation-for="ReleaseName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Published" class="control-label"></label>
-                <input asp-for="Published" class="form-control" />
-                <span asp-validation-for="Published" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Slug" class="control-label"></label>
-                <input asp-for="Slug" class="form-control" />
-                <span asp-validation-for="Slug" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Summary" class="control-label"></label>
-                <input asp-for="Summary" class="form-control" />
-                <span asp-validation-for="Summary" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PublicationId" class="control-label"></label>
-                <select asp-for="PublicationId" class ="form-control" asp-items="ViewBag.PublicationId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Content" class="control-label"></label>
-                <input asp-for="Content" class="form-control" />
-                <span asp-validation-for="Content" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="KeyStatistics" class="control-label"></label>
-                <input asp-for="KeyStatistics" class="form-control" />
-                <span asp-validation-for="KeyStatistics" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create"  class="govuk-button" />
-            </div>
-        </form>
+<form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="govuk-form-group">
+        <label asp-for="PublicationId" class="govuk-label govuk-label--s"></label>
+        <select asp-for="PublicationId" class="govuk-select" asp-items="ViewBag.PublicationId"></select>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div class="govuk-form-group">
+        <label asp-for="Title" class="govuk-label govuk-label--s"></label>
+        <input asp-for="Title" class="govuk-input" type="text">
+    </div>
+    <div class="govuk-form-group">
+        <label asp-for="ReleaseName" class="govuk-label govuk-label--s"></label>
+        <input asp-for="ReleaseName" class="govuk-input govuk-input--width-10"/>
+        <span asp-validation-for="ReleaseName" class="text-danger"></span>
+    </div>
+    <div class="govuk-form-group">
+        <label asp-for="Slug" class="govuk-label govuk-label--s"></label>
+        <input asp-for="Slug" class="govuk-input govuk-input--width-10"/>
+        <span asp-validation-for="Slug" class="text-danger"></span>
+    </div>
+    <div class="govuk-form-group">
+        <label asp-for="Summary" class="govuk-label govuk-label--s"></label>
+        <textarea  asp-for="Summary" class="govuk-textarea"></textarea>
+        <span asp-validation-for="Summary" class="text-danger"></span>
+    </div>
+    <div class="govuk-form-group">
+        <input type="submit" value="Create" class="govuk-button"/>
+    </div>
+    <a class="govuk-link" asp-action="Index">Cancel</a>
+</form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

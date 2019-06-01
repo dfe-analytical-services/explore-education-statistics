@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
         // GET: Publications
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Publications.Include(p => p.Topic);
+            var applicationDbContext = _context.Publications.Include(p => p.Topic).OrderBy(p => p.Title);
             return View(await applicationDbContext.ToListAsync());
         }
 
