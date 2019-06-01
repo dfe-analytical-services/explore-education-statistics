@@ -4,74 +4,54 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Publications</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="govuk-button">Create new publication</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Slug)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DataSource)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Summary)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NextUpdate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LegacyPublicationUrl)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Topic)
-            </th>
-            <th></th>
-        </tr>
+<table class="govuk-table">
+    <caption class="govuk-table__caption">Current publications</caption>
+    <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+        
+        <th class="govuk-table__header">
+            @Html.DisplayNameFor(model => model.Title)
+        </th>
+        <th class="govuk-table__header">
+            @Html.DisplayNameFor(model => model.Slug)
+        </th>
+        <th class="govuk-table__header">
+            @Html.DisplayNameFor(model => model.NextUpdate)
+        </th>
+        <th class="govuk-table__header">
+            @Html.DisplayNameFor(model => model.Topic)
+        </th>
+        <th class="govuk-table__header"></th>
+    </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Slug)
-            </td>
-            <td>
+    @foreach (var item in Model)
+    {
+        <tr class="govuk-table__row">
+            
+            <td class="govuk-table__header">
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
+            <td class="govuk-table__cell">
+                @Html.DisplayFor(modelItem => item.Slug)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataSource)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Summary)
-            </td>
-            <td>
+            <td class="govuk-table__cell">
                 @Html.DisplayFor(modelItem => item.NextUpdate)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LegacyPublicationUrl)
-            </td>
-            <td>
+            <td class="govuk-table__cell">
                 @Html.DisplayFor(modelItem => item.Topic.Title)
             </td>
-            <td>
+            <td class="govuk-table__cell">
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
-}
+    }
     </tbody>
 </table>
