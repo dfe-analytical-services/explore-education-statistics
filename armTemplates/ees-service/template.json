@@ -28,11 +28,11 @@
     },
     "skuData": {
       "type": "string",
-      "defaultValue": "B1 Basic"
+      "defaultValue": "S1 Standard"
     },
     "skuContent": {
       "type": "string",
-      "defaultValue": "B1 Basic"
+      "defaultValue": "S1 Standard"
     },
     "skuAdmin": {
       "type": "string",
