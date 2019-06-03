@@ -8,7 +8,7 @@ interface Props {
 
 const PrototypeExampleTable = ({ tableId, task }: Props) => {
   return (
-    <>
+    <div className="govuk-width-container">
       <table className="govuk-table">
         <caption className="govuk-table__caption govuk-!-margin-bottom-6">
           Table showing 'Absence by characteristic' from 'Pupil absence' in
@@ -72,6 +72,7 @@ const PrototypeExampleTable = ({ tableId, task }: Props) => {
           </tr>
         </tbody>
       </table>
+      <p className="govuk-body-s">Source: DfE prototype example statistics</p>
       {task === 'view' && (
         <Link
           className="govuk-button"
@@ -80,7 +81,7 @@ const PrototypeExampleTable = ({ tableId, task }: Props) => {
           Edit this table
         </Link>
       )}
-    </>
+    </div>
   );
 };
 

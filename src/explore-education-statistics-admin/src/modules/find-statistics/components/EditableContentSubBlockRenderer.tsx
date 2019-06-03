@@ -1,4 +1,5 @@
 import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
+import PrototypeExampleTableList from '@admin/pages/prototypes/components/PrototypeAdminExampleTableList';
 import { ContentBlock } from '@common/services/publicationService';
 import marked from 'marked';
 import React, { Component } from 'react';
@@ -21,13 +22,16 @@ class EditableContentSubBlockRenderer extends Component<Props> {
     switch (block.type) {
       case 'MarkDownBlock':
         return (
-          <PrototypeEditableContent
-            editable={editable}
-            onContentChange={onContentChange}
-            content={`
+          <>
+            {editable && <PrototypeExampleTableList />}
+            <PrototypeEditableContent
+              editable={editable}
+              onContentChange={onContentChange}
+              content={`
          <div className="govuk-body">${marked(block.body)} </div>
       `}
-          />
+            />
+          </>
         );
       case 'InsetTextBlock':
         return (

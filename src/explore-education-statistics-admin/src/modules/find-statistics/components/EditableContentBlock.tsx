@@ -17,18 +17,20 @@ class EditableContentBlock extends Component<Props> {
       content.map((block, index) => {
         const key = `${index}-${block.heading}-${block.type}`;
         return (
-          <EditableContentSubBlockRenderer
-            editable={editable}
-            block={block}
-            key={key}
-            id={id}
-            index={index}
-            onContentChange={newContent => {
-              if (onContentChange) {
-                onContentChange(block, newContent);
-              }
-            }}
-          />
+          <>
+            <EditableContentSubBlockRenderer
+              editable={editable}
+              block={block}
+              key={key}
+              id={id}
+              index={index}
+              onContentChange={newContent => {
+                if (onContentChange) {
+                  onContentChange(block, newContent);
+                }
+              }}
+            />
+          </>
         );
       })
     ) : (

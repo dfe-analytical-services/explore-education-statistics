@@ -12,6 +12,7 @@ interface Props {
   isNew?: boolean;
   isLatest?: boolean;
   editing?: boolean;
+  review?: boolean;
   years: string;
   lastEdited: Date;
   lastEditor: User;
@@ -25,6 +26,7 @@ const DashboardRelease = ({
   isNew,
   isLatest,
   editing,
+  review,
   years,
   lastEdited,
   lastEditor,
@@ -80,9 +82,15 @@ const DashboardRelease = ({
             {format(lastEdited, 'HH:mm')} by <a href="#">{lastEditor.name}</a>
           </dd>
           <dd className="govuk-summary-list__actions">
-            {!editing && (
-              <Link to="/prototypes/publication-edit">Edit this release</Link>
+            {review && (
+              <Link to="/prototypes/publication-edit?review">
+                Review this release
+              </Link>
             )}
+            {!editing ||
+              (!review && (
+                <Link to="/prototypes/publication-edit">Edit this release</Link>
+              ))}
             {editing && (
               <Link to="/prototypes/publication-create-new-absence-config">
                 View / edit this draft

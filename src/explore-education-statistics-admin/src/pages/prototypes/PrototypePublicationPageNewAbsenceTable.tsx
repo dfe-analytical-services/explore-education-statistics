@@ -321,15 +321,35 @@ const PublicationDataPage = () => {
       {['?status=step5'].includes(window.location.search) && (
         <div className="govuk-width-container">
           <PrototypeAdminExampleTables />
-
+          <FormGroup>
+            <label htmlFor="footnotes" className="govuk-label">
+              Foot notes
+            </label>
+            <textarea
+              name="footnotes"
+              id="footnotes"
+              className="govuk-textarea"
+            />
+          </FormGroup>
+          <FormGroup>
+            <FormTextInput
+              id="source"
+              name="source"
+              label="Source"
+              value="Education Prototype Statistics"
+              width={20}
+            />
+          </FormGroup>
           <FormGroup>
             <FormTextInput
               id="save-table"
               name="save-table"
               label="Save table as"
               value="Table for absence highlights panel"
+              width={20}
             />
           </FormGroup>
+
           <Link
             to="publication-create-new-absence-view-table"
             className="govuk-button govuk-!-margin-right-3"
