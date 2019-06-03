@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Seed.Models;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
@@ -33,9 +35,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             {
                 _context.ChangeTracker.AutoDetectChangesEnabled = false;
 
-                foreach (var publication in SamplePublications.Publications.Values)
+                foreach (var theme in SamplePublications.Themes)
                 {
-                    Seed(publication);
+                    _logger.LogInformation("Updating Theme {Theme}", theme.Title);
+                    var updated = _context.Theme.Update(theme).Entity;
+                    _context.SaveChanges();
+                    
+                    var subjects = updated.Topics
+                        .SelectMany(topic => topic.Publications)
+                        .SelectMany(publication => publication.Releases)
+                        .SelectMany(release => release.Subjects);
+
+                    Seed(subjects);
                 }
             }
             finally
@@ -47,54 +58,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             _logger.LogInformation("Seeding completed with duration {duration} ", stopWatch.Elapsed.ToString());
         }
 
-        private void Seed(Publication publication)
+        private void Seed(IEnumerable<Subject> subjects)
         {
-            _logger.LogInformation("Seeding Publication {Publication}", publication.PublicationId);
-
-            foreach (var release in publication.Releases)
+            foreach (var subject in subjects)
             {
-                SeedRelease(release);
+                var file = SamplePublications.SubjectFiles.GetValueOrDefault(subject.Id);
+                _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
+                
+                var lines = file.GetCsvLines();
+                var metaLines = file.GetMetaCsvLines();
+
+                _importerService.Import(lines, metaLines, subject);
             }
-        }
-
-        private void SeedRelease(Release release)
-        {
-            _logger.LogInformation("Seeding Release for {Publication}, {Release}", release.PublicationId,
-                release.Name);
-
-            var releaseDb = CreateRelease(release);
-
-            foreach (var subject in release.Subjects)
-            {
-                SeedSubject(releaseDb, subject);
-            }
-        }
-
-        private void SeedSubject(Model.Release release, Subject subject)
-        {
-            _logger.LogInformation("Seeding Subject for {Publication}, {Subject}", release.PublicationId,
-                subject.Name);
-
-            var subjectDb = CreateSubject(release, subject);
-
-            var lines = subject.GetCsvLines();
-            var metaLines = subject.GetMetaLines();
-            
-            _importerService.Import(lines, metaLines, subjectDb);
-        }
-
-        private Model.Release CreateRelease(Release release)
-        {
-            var releaseDb = _context.Release.Add(new Model.Release(release.ReleaseDate, release.PublicationId)).Entity;
-            _context.SaveChanges();
-            return releaseDb;
-        }
-
-        private Model.Subject CreateSubject(Model.Release release, Subject subject)
-        {
-            var subjectDb = _context.Subject.Add(new Model.Subject(subject.Name, release)).Entity;
-            _context.SaveChanges();
-            return subjectDb;
         }
     }
 }
