@@ -2,7 +2,18 @@
 
 .optionsContainer {
   margin: govuk-spacing(4) 0 govuk-spacing(1);
-  max-height: 20vh;
   overflow-y: auto;
   padding: govuk-spacing(2);
+
+  @media (max-height: 720px) {
+    max-height: 70vh;
+  }
+
+  @media (min-height: 720px) and (max-height: 1080px) {
+    max-height: 50vh;
+  }
+
+  @media (min-height: 1080px) {
+    max-height: 30vh;
+  }
 }
