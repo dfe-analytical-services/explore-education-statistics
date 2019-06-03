@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190603114401_AddTopicAndTheme")]
-    partial class AddTopicAndTheme
+    [Migration("20190603174141_AlterReleaseIdType")]
+    partial class AlterReleaseIdType
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -176,39 +176,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.ToTable("ObservationFilterItem");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Publication", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Name");
-
-                    b.Property<string>("Slug");
-
-                    b.Property<Guid>("TopicId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TopicId");
-
-                    b.ToTable("Publication");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Release", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name");
+                    b.Property<Guid>("Ident")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<Guid>("PublicationId");
 
                     b.Property<DateTime>("ReleaseDate");
 
-                    b.Property<string>("Slug");
-
-                    b.HasKey("Id");
+                    b.HasKey("Ident");
 
                     b.HasIndex("PublicationId");
 
@@ -241,45 +218,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<long>("ReleaseId");
+                    b.Property<Guid>("ReleaseIdent");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReleaseId");
+                    b.HasIndex("ReleaseIdent");
 
                     b.ToTable("Subject");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Theme", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Name");
-
-                    b.Property<string>("Slug");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Theme");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Topic", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Name");
-
-                    b.Property<string>("Slug");
-
-                    b.Property<Guid>("ThemeId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ThemeId");
-
-                    b.ToTable("Topic");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Filter", b =>
@@ -625,35 +570,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Publication", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Topic", "Topic")
-                        .WithMany("Publications")
-                        .HasForeignKey("TopicId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Release", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Publication", "Publication")
-                        .WithMany("Releases")
-                        .HasForeignKey("PublicationId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Release", "Release")
                         .WithMany("Subjects")
-                        .HasForeignKey("ReleaseId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Topic", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Theme", "Theme")
-                        .WithMany("Topics")
-                        .HasForeignKey("ThemeId")
+                        .HasForeignKey("ReleaseIdent")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

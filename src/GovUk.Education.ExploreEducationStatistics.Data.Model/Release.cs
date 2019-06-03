@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class Release
     {
-        public long Id { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public DateTime ReleaseDate { get; set; }
         public string Slug { get; set; }
