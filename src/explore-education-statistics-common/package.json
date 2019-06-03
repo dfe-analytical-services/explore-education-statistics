@@ -39,6 +39,7 @@
     "jest": "^24.8.0",
     "jest-dom": "^3.4.0",
     "jest-junit": "^6.4.0",
+    "jest-matcher-utils": "^24.8.0",
     "jest-resolve": "^24.8.0",
     "jest-serializer-html": "^6.0.0",
     "jest-watch-typeahead": "^0.3.1",
@@ -89,8 +90,8 @@
       "<rootDir>/test/setupTests.js"
     ],
     "testMatch": [
-      "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
-      "<rootDir>/src/**/(*.)(spec|test).{js,jsx,ts,tsx}"
+      "<rootDir>/src/**/(*.)(spec|test).{js,jsx,ts,tsx}",
+      "<rootDir>/test/**/(*.)(spec|test).{js,jsx,ts,tsx}"
     ],
     "testPathIgnorePatterns": [
       "node_modules",
