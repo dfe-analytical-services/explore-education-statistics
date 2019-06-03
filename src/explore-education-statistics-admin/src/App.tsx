@@ -14,6 +14,7 @@ import PublicationEditNew from './pages/prototypes/PrototypePublicationPageEditN
 import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
 
 import PublicationEditPage from './pages/prototypes/PrototypePublicationPageEditAbsence';
+import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
 import PublicationCreateNewAbsence from './pages/prototypes/PrototypePublicationPageNewAbsence';
 import PublicationCreateNewAbsenceConfig from './pages/prototypes/PrototypePublicationPageNewAbsenceConfig';
 import PublicationCreateNewAbsenceConfigEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceConfigEdit';
@@ -44,6 +45,11 @@ function App() {
           exact
           path="/prototypes/publication-edit"
           component={PublicationEditPage}
+        />
+        <Route
+          exact
+          path="/prototypes/publication-review"
+          component={PublicationReviewPage}
         />
         <Route
           exact

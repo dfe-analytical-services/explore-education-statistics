@@ -20,6 +20,19 @@ const AdminDashboardPublications = () => {
           caption=""
         >
           <ul className="govuk-list dfe-admin">
+            {window.location.search === '?status=readyApproval' && (
+              <li>
+                <DashboardRelease
+                  title="Academic year,"
+                  years="2018 to 2019"
+                  tag="Ready to review"
+                  review
+                  lastEdited={new Date('2019-03-20 17:37')}
+                  lastEditor={{ id: 'me', name: 'me', permissions: [] }}
+                  published={new Date('2019-09-20 09:30')}
+                />
+              </li>
+            )}
             {window.location.search === '?status=editNewRelease' && (
               <li>
                 <DashboardRelease

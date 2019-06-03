@@ -83,14 +83,13 @@ const DashboardRelease = ({
           </dd>
           <dd className="govuk-summary-list__actions">
             {review && (
-              <Link to="/prototypes/publication-edit?review">
+              <Link to="/prototypes/publication-review">
                 Review this release
               </Link>
             )}
-            {!editing ||
-              (!review && (
-                <Link to="/prototypes/publication-edit">Edit this release</Link>
-              ))}
+            {!editing && !review && (
+              <Link to="/prototypes/publication-edit">Edit this release</Link>
+            )}
             {editing && (
               <Link to="/prototypes/publication-create-new-absence-config">
                 View / edit this draft
