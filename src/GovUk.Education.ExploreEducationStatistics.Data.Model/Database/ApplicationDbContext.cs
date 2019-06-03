@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -49,6 +50,122 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureProvider(modelBuilder);
             ConfigureWard(modelBuilder);
             ConfigureAdditionalTypes(modelBuilder);
+
+            modelBuilder.Entity<Theme>().HasData(new List<Theme>
+            {
+                new Theme
+                {
+                    Id = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
+                    Title = "Pupils and schools",
+                    Slug = "pupils-and-schools"
+                },
+                new Theme
+                {
+                    Id = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"),
+                    Title = "Children, early years and social care",
+                    Slug = "children-and-early-years"
+                }
+            });
+
+            modelBuilder.Entity<Topic>().HasData(new List<Topic>
+            {
+                new Topic
+                {
+                    Id = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460"),
+                    Title = "Pupil absence",
+                    Slug = "pupil-absence",
+                    ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f")
+                },
+                new Topic
+                {
+                    Id = new Guid("77941b7d-bbd6-4069-9107-565af89e2dec"),
+                    Title = "Exclusions",
+                    Slug = "exclusions",
+                    ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f")
+                },
+                new Topic
+                {
+                    Id = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
+                    Title = "School applications",
+                    Slug = "school-applications",
+                    ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f")
+                },
+                new Topic
+                {
+                    Id = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"),
+                    Title = "Early years foundation stage profile",
+                    Slug = "early-years-foundation-stage-profile",
+                    ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53")
+                }
+            });
+
+            modelBuilder.Entity<Publication>().HasData(new List<Publication>
+            {
+                new Publication
+                {
+                    Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+                    Title = "Pupil absence data and statistics for schools in England",
+                    Slug = "pupil-absence-in-schools-in-england",
+                    TopicId = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460")
+                },
+                new Publication
+                {
+                    Id = new Guid("8345e27a-7a32-4b20-a056-309163bdf9c4"),
+                    Title = "Permanent and fixed-period exclusions in England",
+                    Slug = "permanent-and-fixed-period-exclusions-in-england",
+                    TopicId = new Guid("77941b7d-bbd6-4069-9107-565af89e2dec")
+                },
+                new Publication
+                {
+                    Id = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
+                    Title = "Secondary and primary schools applications and offers",
+                    Slug = "secondary-and-primary-schools-applications-and-offers",
+                    TopicId = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c")
+                },
+                new Publication
+                {
+                    Id = new Guid("fcda2962-82a6-4052-afa2-ea398c53c85f"),
+                    Title = "Early years foundation stage profile data",
+                    Slug = "early-years-foundation-stage-profile-results",
+                    TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769")
+                }
+            });
+
+            modelBuilder.Entity<Release>().HasData(new List<Release>
+            {
+                new Release
+                {
+                    Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                    ReleaseDate = new DateTime(2018, 4, 25),
+                    Title = "2016 to 2017",
+                    Slug = "2016-17",
+                    PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad")
+                },
+                new Release
+                {
+                    Id = new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a"),
+                    ReleaseDate = new DateTime(2019, 5, 20),
+                    Title = "2017 to 2018",
+                    Slug = "2017-18",
+                    PublicationId = new Guid("fcda2962-82a6-4052-afa2-ea398c53c85f")
+                },
+                new Release
+                {
+                    Id = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                    ReleaseDate = new DateTime(2018, 7, 19),
+                    Title = "2016 to 2017",
+                    Slug = "2016-17",
+                    PublicationId = new Guid("8345e27a-7a32-4b20-a056-309163bdf9c4")
+                },
+                new Release
+                {
+                    Id = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    ReleaseDate = new DateTime(2019, 4, 29),
+                    Title = "2018",
+                    Slug = "2018",
+                    PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05")
+                }
+            });
         }
 
         private static void ConfigureObservationFilterItem(ModelBuilder modelBuilder)
@@ -116,7 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .Property(observation => observation.GeographicLevel)
                 .HasConversion(geographicLevelConverter)
                 .HasMaxLength(6);
-            
+
             modelBuilder.Entity<Observation>()
                 .HasIndex(observation => observation.GeographicLevel);
         }
