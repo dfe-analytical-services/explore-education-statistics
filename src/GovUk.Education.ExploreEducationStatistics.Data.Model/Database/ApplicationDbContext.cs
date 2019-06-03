@@ -11,19 +11,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             Database.SetCommandTimeout(int.MaxValue);
         }
-
-        public DbQuery<GeoJson> GeoJson { get; set; }
+        
         public DbSet<Filter> Filter { get; set; }
         public DbSet<FilterItem> FilterItem { get; set; }
         public DbSet<FilterGroup> FilterGroup { get; set; }
-        public DbSet<IndicatorGroup> IndicatorGroup { get; set; }
+        public DbQuery<GeoJson> GeoJson { get; set; }
         public DbSet<Indicator> Indicator { get; set; }
+        public DbSet<IndicatorGroup> IndicatorGroup { get; set; }
         public DbSet<Location> Location { get; set; }
         public DbSet<Observation> Observation { get; set; }
         public DbSet<ObservationFilterItem> ObservationFilterItem { get; set; }
         public DbSet<Release> Release { get; set; }
         public DbSet<School> School { get; set; }
         public DbSet<Subject> Subject { get; set; }
+        public DbSet<Theme> Theme { get; set; }
+        public DbSet<Topic> Topic { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
