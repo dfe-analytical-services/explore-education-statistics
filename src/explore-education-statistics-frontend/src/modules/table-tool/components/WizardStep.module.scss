@@ -6,13 +6,12 @@ $step-padding-top: govuk-spacing(6);
 
 .step {
   align-items: flex-start;
-  display: none;
+  display: flex;
   padding-left: govuk-spacing(8);
   position: relative;
 
-  &.stepActive,
-  &.stepEnabled {
-    display: flex;
+  &.stepHidden {
+    display: none;
   }
 
   &::before {

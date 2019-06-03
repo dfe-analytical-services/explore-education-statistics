@@ -6,10 +6,10 @@ import WizardStep, { WizardStepProps } from './WizardStep';
 export interface InjectedWizardProps {
   stepNumber: number;
   currentStep: number;
-  setCurrentStep: (step: number) => void;
+  setCurrentStep(step: number): void;
   isActive: boolean;
-  goToNextStep: () => void;
-  goToPreviousStep: () => void;
+  goToNextStep(): void;
+  goToPreviousStep(): void;
 }
 
 interface Props {
@@ -25,34 +25,36 @@ const Wizard = ({ children, initialStep = 1, id }: Props) => {
     isComponentType(child, WizardStep),
   );
 
-  return (
-    <div className={styles.container}>
-      <div>
-        <ol className={styles.stepNav}>
-          {filteredChildren.map((child, index) => {
-            const stepNumber = index + 1;
+  const lastStep = filteredChildren.length;
 
-            return cloneElement<WizardStepProps | InjectedWizardProps>(child, {
-              stepNumber,
-              currentStep,
-              setCurrentStep,
-              id: child.props.id || `${id}-${stepNumber}`,
-              isActive: stepNumber === currentStep,
-              goToPreviousStep: () => {
-                setCurrentStep(stepNumber - 1 < 1 ? 1 : stepNumber - 1);
-              },
-              goToNextStep: () => {
-                setCurrentStep(
-                  stepNumber + 1 > filteredChildren.length
-                    ? filteredChildren.length
-                    : stepNumber + 1,
-                );
-              },
-            });
-          })}
-        </ol>
-      </div>
-    </div>
+  return (
+    <ol className={styles.stepNav}>
+      {filteredChildren.map((child, index) => {
+        const stepNumber = index + 1;
+
+        return cloneElement<WizardStepProps | InjectedWizardProps>(child, {
+          stepNumber,
+          currentStep,
+          setCurrentStep(nextStep: number) {
+            if (nextStep <= lastStep && nextStep >= 1) {
+              setCurrentStep(nextStep);
+            }
+          },
+          id: child.props.id || `${id}-step-${stepNumber}`,
+          isActive: stepNumber === currentStep,
+          goToPreviousStep() {
+            setCurrentStep(stepNumber - 1 < 1 ? 1 : stepNumber - 1);
+          },
+          goToNextStep() {
+            setCurrentStep(
+              stepNumber + 1 > filteredChildren.length
+                ? filteredChildren.length
+                : stepNumber + 1,
+            );
+          },
+        });
+      })}
+    </ol>
   );
 };
 
