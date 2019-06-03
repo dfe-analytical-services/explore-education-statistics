@@ -309,6 +309,110 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasIndex("ReleaseId");
 
                     b.ToTable("Subject");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Name = "Absence by characteristic",
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Name = "Absence by geographic level",
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            Name = "Absence by term",
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            Name = "Absence for four year olds",
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                        },
+                        new
+                        {
+                            Id = 5L,
+                            Name = "Absence in prus",
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                        },
+                        new
+                        {
+                            Id = 6L,
+                            Name = "Absence number missing at least one session by reason",
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                        },
+                        new
+                        {
+                            Id = 7L,
+                            Name = "Absence rate percent bands",
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                        },
+                        new
+                        {
+                            Id = 8L,
+                            Name = "ELG underlying data 2013 - 2018",
+                            ReleaseId = new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a")
+                        },
+                        new
+                        {
+                            Id = 9L,
+                            Name = "Areas of learning underlying data 2013 - 2018",
+                            ReleaseId = new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a")
+                        },
+                        new
+                        {
+                            Id = 10L,
+                            Name = "APS GLD ELG underlying data 2013 - 2018",
+                            ReleaseId = new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a")
+                        },
+                        new
+                        {
+                            Id = 11L,
+                            Name = "Exclusions by characteristic",
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                        },
+                        new
+                        {
+                            Id = 12L,
+                            Name = "Exclusions by geographic level",
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                        },
+                        new
+                        {
+                            Id = 13L,
+                            Name = "Exclusions by reason",
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                        },
+                        new
+                        {
+                            Id = 14L,
+                            Name = "Duration of fixed exclusions",
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                        },
+                        new
+                        {
+                            Id = 15L,
+                            Name = "Number of fixed exclusions",
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                        },
+                        new
+                        {
+                            Id = 16L,
+                            Name = "Total days missed due to fixed period exclusions",
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                        },
+                        new
+                        {
+                            Id = 17L,
+                            Name = "Applications and offers by school phase",
+                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717")
+                        });
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Theme", b =>

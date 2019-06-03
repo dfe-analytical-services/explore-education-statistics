@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             Database.SetCommandTimeout(int.MaxValue);
         }
-        
+
         public DbSet<Filter> Filter { get; set; }
         public DbSet<FilterItem> FilterItem { get; set; }
         public DbSet<FilterGroup> FilterGroup { get; set; }
@@ -164,6 +164,112 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     Title = "2018",
                     Slug = "2018",
                     PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05")
+                }
+            });
+
+            modelBuilder.Entity<Subject>().HasData(new List<Subject>
+            {
+                new Subject
+                {
+                    Id = 1,
+                    Name = "Absence by characteristic",
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                },
+                new Subject
+                {
+                    Id = 2,
+                    Name = "Absence by geographic level",
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                },
+                new Subject
+                {
+                    Id = 3,
+                    Name = "Absence by term",
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                },
+                new Subject
+                {
+                    Id = 4,
+                    Name = "Absence for four year olds",
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                },
+                new Subject
+                {
+                    Id = 5,
+                    Name = "Absence in prus",
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                },
+                new Subject
+                {
+                    Id = 6,
+                    Name = "Absence number missing at least one session by reason",
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                },
+                new Subject
+                {
+                    Id = 7,
+                    Name = "Absence rate percent bands",
+                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                },
+                new Subject
+                {
+                    Id = 8,
+                    Name = "ELG underlying data 2013 - 2018",
+                    ReleaseId = new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a")
+                },
+                new Subject
+                {
+                    Id = 9,
+                    Name = "Areas of learning underlying data 2013 - 2018",
+                    ReleaseId = new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a")
+                },
+                new Subject
+                {
+                    Id = 10,
+                    Name = "APS GLD ELG underlying data 2013 - 2018",
+                    ReleaseId = new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a")
+                },
+                new Subject
+                {
+                    Id = 11,
+                    Name = "Exclusions by characteristic",
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                },
+                new Subject
+                {
+                    Id = 12,
+                    Name = "Exclusions by geographic level",
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                },
+                new Subject
+                {
+                    Id = 13,
+                    Name = "Exclusions by reason",
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                },
+                new Subject
+                {
+                    Id = 14,
+                    Name = "Duration of fixed exclusions",
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                },
+                new Subject
+                {
+                    Id = 15,
+                    Name = "Number of fixed exclusions",
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                },
+                new Subject
+                {
+                    Id = 16,
+                    Name = "Total days missed due to fixed period exclusions",
+                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                },
+                new Subject
+                {
+                    Id = 17,
+                    Name = "Applications and offers by school phase",
+                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717")
                 }
             });
         }

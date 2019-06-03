@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
-    public partial class AddTopicAndTheme : Migration
+    public partial class AddTopicAndThemeAndSeedData : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -113,6 +113,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     { new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a"), new Guid("fcda2962-82a6-4052-afa2-ea398c53c85f"), new DateTime(2019, 5, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), "2017-18", "2017 to 2018" }
                 });
 
+            migrationBuilder.InsertData(
+                table: "Subject",
+                columns: new[] { "Id", "Name", "ReleaseId" },
+                values: new object[,]
+                {
+                    { 1L, "Absence by characteristic", new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5") },
+                    { 8L, "ELG underlying data 2013 - 2018", new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a") },
+                    { 17L, "Applications and offers by school phase", new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717") },
+                    { 16L, "Total days missed due to fixed period exclusions", new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278") },
+                    { 15L, "Number of fixed exclusions", new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278") },
+                    { 14L, "Duration of fixed exclusions", new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278") },
+                    { 13L, "Exclusions by reason", new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278") },
+                    { 9L, "Areas of learning underlying data 2013 - 2018", new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a") },
+                    { 12L, "Exclusions by geographic level", new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278") },
+                    { 7L, "Absence rate percent bands", new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5") },
+                    { 6L, "Absence number missing at least one session by reason", new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5") },
+                    { 5L, "Absence in prus", new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5") },
+                    { 4L, "Absence for four year olds", new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5") },
+                    { 3L, "Absence by term", new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5") },
+                    { 2L, "Absence by geographic level", new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5") },
+                    { 11L, "Exclusions by characteristic", new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278") },
+                    { 10L, "APS GLD ELG underlying data 2013 - 2018", new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a") }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Publication_TopicId",
                 table: "Publication",
@@ -146,6 +170,91 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "Theme");
+
+            migrationBuilder.DeleteData(
+                table: "Subject",
+                keyColumn: "Id",
+                keyValue: 1L);
+
+            migrationBuilder.DeleteData(
+                table: "Subject",
+                keyColumn: "Id",
+                keyValue: 2L);
+
+            migrationBuilder.DeleteData(
+                table: "Subject",
+                keyColumn: "Id",
+                keyValue: 3L);
+
+            migrationBuilder.DeleteData(
+                table: "Subject",
+                keyColumn: "Id",
+                keyValue: 4L);
+
+            migrationBuilder.DeleteData(
+                table: "Subject",
+                keyColumn: "Id",
+                keyValue: 5L);
+
+            migrationBuilder.DeleteData(
+                table: "Subject",
+                keyColumn: "Id",
+                keyValue: 6L);
+
+            migrationBuilder.DeleteData(
+                table: "Subject",
+                keyColumn: "Id",
+                keyValue: 7L);
+
+            migrationBuilder.DeleteData(
+                table: "Subject",
+                keyColumn: "Id",
+                keyValue: 8L);
+
+            migrationBuilder.DeleteData(
+                table: "Subject",
+                keyColumn: "Id",
+                keyValue: 9L);
+
+            migrationBuilder.DeleteData(
+                table: "Subject",
+                keyColumn: "Id",
+                keyValue: 10L);
+
+            migrationBuilder.DeleteData(
+                table: "Subject",
+                keyColumn: "Id",
+                keyValue: 11L);
+
+            migrationBuilder.DeleteData(
+                table: "Subject",
+                keyColumn: "Id",
+                keyValue: 12L);
+
+            migrationBuilder.DeleteData(
+                table: "Subject",
+                keyColumn: "Id",
+                keyValue: 13L);
+
+            migrationBuilder.DeleteData(
+                table: "Subject",
+                keyColumn: "Id",
+                keyValue: 14L);
+
+            migrationBuilder.DeleteData(
+                table: "Subject",
+                keyColumn: "Id",
+                keyValue: 15L);
+
+            migrationBuilder.DeleteData(
+                table: "Subject",
+                keyColumn: "Id",
+                keyValue: 16L);
+
+            migrationBuilder.DeleteData(
+                table: "Subject",
+                keyColumn: "Id",
+                keyValue: 17L);
 
             migrationBuilder.DeleteData(
                 table: "Release",
