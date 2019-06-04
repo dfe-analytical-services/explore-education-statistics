@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
 {
-    public enum DataCsvFilename
+    public enum DataCsvFile
     {
         absence_by_characteristic,
         absence_by_geographic_level,

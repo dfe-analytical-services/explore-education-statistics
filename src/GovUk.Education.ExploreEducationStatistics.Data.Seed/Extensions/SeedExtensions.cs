@@ -1,19 +1,18 @@
 using System.Collections.Generic;
 using System.IO;
-using GovUk.Education.ExploreEducationStatistics.Data.Seed.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions
 {
     public static class SeedExtensions
     {
-        public static IEnumerable<string> GetCsvLines(this Subject subject)
+        public static IEnumerable<string> GetCsvLines(this DataCsvFile file)
         {
-            return ReadAllLines(subject.Filename.ToString());
+            return ReadAllLines(file.ToString());
         }
 
-        public static IEnumerable<string> GetMetaLines(this Subject subject)
+        public static IEnumerable<string> GetMetaCsvLines(this DataCsvFile file)
         {
-            return ReadAllLines(subject.Filename + ".meta");
+            return ReadAllLines(file + ".meta");
         }
 
         private static IEnumerable<string> ReadAllLines(string filename)

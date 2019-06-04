@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
@@ -7,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public long Id { get; set; }
         public string Name { get; set; }
         public Release Release { get; set; }
-        public long ReleaseId { get; set; }
+        public Guid ReleaseId { get; set; }
         public IEnumerable<Observation> Observations { get; set; }
 
         public Subject()

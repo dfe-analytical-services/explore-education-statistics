@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             {
                 throw new ArgumentException("Subject does not exist", nameof(subjectId));
             }
-            return _releaseService.GetLatestRelease(subject.Release.PublicationId) == subject.ReleaseId;
+            return _releaseService.GetLatestRelease(subject.Release.PublicationId).Equals(subject.ReleaseId);
         }
     }
 }

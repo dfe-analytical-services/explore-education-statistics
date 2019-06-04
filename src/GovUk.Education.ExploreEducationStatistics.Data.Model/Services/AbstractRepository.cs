@@ -38,9 +38,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return DbSet().Count(expression);
         }
 
-        public IEnumerable<TEntity> All()
+        public IEnumerable<TEntity> All(List<Expression<Func<TEntity, object>>> include = null)
         {
-            return DbSet();
+            var queryable = DbSet().AsQueryable();
+            include?.ForEach(i => queryable = queryable.Include(i));
+            return queryable;
         }
 
         public TEntity Find(TKey id, List<Expression<Func<TEntity, object>>> include)
