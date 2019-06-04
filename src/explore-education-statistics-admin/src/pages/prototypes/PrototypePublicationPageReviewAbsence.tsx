@@ -103,7 +103,7 @@ class PublicationPage extends Component<{}, State> {
                   conditional: (
                     <FormGroup>
                       <label htmlFor="question" className="govuk-label">
-                        Add you comment or question
+                        Add your comment or question
                       </label>
                       <textarea
                         name="question"
