@@ -78,6 +78,24 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
               <FormGroup>
                 <div className="govuk-grid-row">
                   <div className="govuk-grid-column-one-half-from-desktop">
+                    <FormFieldCheckboxSearchSubGroups
+                      name="indicators"
+                      id={`${formId}-indicators`}
+                      legend="Indicators"
+                      legendSize="s"
+                      hint="Select at least one indicator"
+                      error={getError('indicators')}
+                      selectAll
+                      options={Object.entries(specification.indicators).map(
+                        ([_, group]) => {
+                          return {
+                            legend: group.label,
+                            options: group.options,
+                          };
+                        },
+                      )}
+                    />
+
                     <FormFieldset
                       id={`${formId}-filters`}
                       legend="Categories"
@@ -111,25 +129,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                         },
                       )}
                     </FormFieldset>
-                  </div>
-                  <div className="govuk-grid-column-one-half-from-desktop">
-                    <FormFieldCheckboxSearchSubGroups
-                      name="indicators"
-                      id={`${formId}-indicators`}
-                      legend="Indicators"
-                      legendSize="s"
-                      hint="Select at least one indicator"
-                      error={getError('indicators')}
-                      selectAll
-                      options={Object.entries(specification.indicators).map(
-                        ([_, group]) => {
-                          return {
-                            legend: group.label,
-                            options: group.options,
-                          };
-                        },
-                      )}
-                    />
                   </div>
                 </div>
               </FormGroup>

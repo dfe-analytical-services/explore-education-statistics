@@ -1,0 +1,57 @@
+﻿@model IEnumerable<GovUk.Education.ExploreEducationStatistics.Content.Model.Release>
+
+@{
+    ViewData["Title"] = "Releases";
+}
+
+<h1 class="govuk-heading-l">Releases</h1>
+
+<p>
+    <a asp-action="Create" class="govuk-button">Create new release</a>
+</p>
+<table class="govuk-table">
+    <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+        <th class="govuk-table__header">
+            @Html.DisplayNameFor(model => model.Title)
+        </th>
+        <th class="govuk-table__header">
+            @Html.DisplayNameFor(model => model.ReleaseName)
+        </th>
+        <th class="govuk-table__header">
+            @Html.DisplayNameFor(model => model.Published)
+        </th>
+        <th class="govuk-table__header">
+            @Html.DisplayNameFor(model => model.Slug)
+        </th>
+        <th class="govuk-table__header">
+            @Html.DisplayNameFor(model => model.Publication)
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr class="govuk-table__row">
+            <td class="govuk-table__header">
+                <a asp-action="Details" asp-route-id="@item.Id" class="govuk-link">
+                    @Html.DisplayFor(modelItem => item.Title)
+                </a>
+
+            </td>
+            <td class="govuk-table__cell">
+                @Html.DisplayFor(modelItem => item.ReleaseName)
+            </td>
+            <td class="govuk-table__cell">
+                @Html.DisplayFor(modelItem => item.Published)
+            </td>
+            <td class="govuk-table__cell">
+                /@Html.DisplayFor(modelItem => item.Slug)/
+            </td>
+            <td class="govuk-table__cell">
+                @Html.DisplayFor(modelItem => item.Publication.Title)
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

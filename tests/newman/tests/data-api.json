@@ -686,7 +686,7 @@
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Filter SubjectId 7, Start/End date 2012-2014 Copy",
+									"name": "Subject Meta - Filter SubjectId 7, Start/End date 2012-2014",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -771,6 +771,34 @@
 										}
 									},
 									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "a0e957f4-5b18-4986-a053-dd5a9d12ed41",
+										"type": "text/javascript",
+										"exec": [
+											"pm.globals.set(\"FILT_GenderMale\", \"3\");",
+											"pm.globals.set(\"FILT_GenderFemale\", \"4\");",
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"72\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"73\");",
+											"pm.globals.set(\"FILT_FSMEligible\", \"42\");",
+											"pm.globals.set(\"FILT_FSMNotEligible\", \"43\");",
+											"pm.globals.set(\"FILT_FSMUnclassified\", \"44\");"
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "7f1dd3fe-1ecd-4adc-a95e-a4b3e350146d",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
 								}
 							],
 							"_postman_isSubFolder": true
@@ -1533,7 +1561,7 @@
 			]
 		},
 		{
-			"name": "Data",
+			"name": "Tablebuilder",
 			"item": [
 				{
 					"name": "Pupil absence in schools in England",
@@ -3144,6 +3172,503 @@
 							""
 						]
 					}
+				}
+			]
+		},
+		{
+			"name": "Data",
+			"item": [
+				{
+					"name": "Pupil absence in schools in England",
+					"item": [
+						{
+							"name": "By characteristic",
+							"item": [
+								{
+									"name": "Absence by characteristic - National - *",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"exec": [
+													"respJson = pm.response.json()",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
+													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
+													"});",
+													"",
+													"pm.test(\"Number of metaData filters should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(6); ",
+													"});",
+													"",
+													"pm.test(\"Number of metaData locations should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(1); ",
+													"});",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    pm.expect(respJson.geographicLevel).to.equal(\"National\");",
+													"})",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { ",
+													"    pm.expect(respJson.result.length).to.equal(16); ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Absence by characteristic - National - * - Male, Female AND Primary, Secondary",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"exec": [
+													"respJson = pm.response.json()",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Number of metaData filters should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(4); ",
+													"});",
+													"",
+													"pm.test(\"Number of metaData locations should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(1); ",
+													"});",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
+													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
+													"});",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    pm.expect(respJson.geographicLevel).to.equal(\"National\");",
+													"})",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { ",
+													"    pm.expect(respJson.result.length).to.equal(4); ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}, {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Absence by characteristic - LA - *",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
+													"pm.test(\"Number of metaData filters should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(6); ",
+													"});",
+													"",
+													"/*",
+													"$ csvgrep -p time_period/201415\\|201516/ -p geographic_level/local\\ authority/ -p characteristic/Gender\\ [M,m]ale\\|Gender\\ [F,f]emale/ csvs/absence_by_characteristic.csv | csvcut -k country_name | sed 1d | sort | uniq | wc -l",
+													"1",
+													"$ csvgrep -p time_period/201415\\|201516/ -p geographic_level/local\\ authority/ -p characteristic/Gender\\ [M,m]ale\\|Gender\\ [F,f]emale/ csvs/absence_by_characteristic.csv | csvcut -k region_name | sed 1d | sort | uniq | wc -l",
+													"10",
+													"$ csvgrep -p time_period/201415\\|201516/ -p geographic_level/local\\ authority/ -p characteristic/Gender\\ [M,m]ale\\|Gender\\ [F,f]emale/ csvs/absence_by_characteristic.csv | csvcut -k la_name | sed 1d | sort | uniq | wc -l",
+													"152",
+													"1 + 10 + 152 = 163",
+													"*/",
+													"",
+													"pm.test(\"Number of metaData locations should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(163); ",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(2412); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Absence by characteristic - LA - Wandsworth",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Number of metaData filters should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(3); ",
+													"});",
+													"",
+													"pm.test(\"Number of metaData locations should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(3); ",
+													"});",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(4); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"localAuthorities\": [\n    \t\"E09000032\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Absence by characteristic - LA district - *",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"exec": [
+													"respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Number of metaData filters should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(7); ",
+													"});",
+													"",
+													"/*",
+													"$ csvgrep -p time_period/201617/ -p geographic_level/local\\ authority\\ district/ -p characteristic/FSM\\ eligible$\\|FSM\\ not\\ eligible$\\|FSM\\ unclassified$/ csvs/absence_by_characteristic.csv | csvcut -k country_name | sed 1d | sort | uniq | wc -l",
+													"1",
+													"$ csvgrep -p time_period/201617/ -p geographic_level/local\\ authority\\ district/ -p characteristic/FSM\\ eligible$\\|FSM\\ not\\ eligible$\\|FSM\\ unclassified$/ csvs/absence_by_characteristic.csv | csvcut -k region_name | sed 1d | sort | uniq | wc -l",
+													"10",
+													"$ csvgrep -p time_period/201617/ -p geographic_level/local\\ authority\\ district/ -p characteristic/FSM\\ eligible$\\|FSM\\ not\\ eligible$\\|FSM\\ unclassified$/ csvs/absence_by_characteristic.csv | csvcut -k sch_lad_name | sed 1d | sort | uniq | wc -l",
+													"326",
+													"1 + 10 + 326 = 337",
+													"*/",
+													"pm.test(\"Number of metaData locations should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(337); ",
+													"});",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
+													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { ",
+													"    pm.expect(respJson.result.length).to.equal(3688);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Absence by characteristic - LA district - Hartlepool",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"exec": [
+													"respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"// pm.test(\"Publication id matches the publication id of the subject\", function () { ",
+													"//     pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
+													"// });",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { ",
+													"    pm.expect(respJson.result.length).to.equal(8); ",
+													"});",
+													"",
+													"pm.test(\"Number of metaData locations should be correct\", function () {",
+													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(3); ",
+													"});",
+													"",
+													"pm.test(\"All results should have LA District name Hartlepool\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.sch_lad_name).to.equal(\"Hartlepool\"); ",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"localAuthorityDistricts\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_AllPupils}}, {{FILT_FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Absence by characteristic - LA district - Adur",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Number of metaData filters should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(3); ",
+													"});",
+													"",
+													"pm.test(\"Number of metaData indicators should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.indicators).length).to.equal(3); ",
+													"});",
+													"",
+													"pm.test(\"Number of metaData locations should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(3); ",
+													"});",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(2); });",
+													"",
+													"",
+													"pm.test(\"All results should have LA District name Adur\", function () {",
+													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
+													"        pm.expect(pm.response.json().result[i].location.localAuthorityDistrict.sch_lad_name).to.equal(\"Adur\"); ",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"localAuthorityDistricts\": [\n    \t\"E07000223\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "ec9d2b73-2598-40e5-abd3-b8598bbf2497",
+										"type": "text/javascript",
+										"exec": [
+											"pm.globals.set(\"FILT_AllPupils\", \"1\");",
+											"pm.globals.set(\"FILT_GenderMale\", \"3\");",
+											"pm.globals.set(\"FILT_GenderFemale\", \"4\");",
+											"pm.globals.set(\"FILT_Special\", \"71\");",
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"72\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"73\");",
+											"pm.globals.set(\"FILT_FSMEligible\", \"42\");",
+											"pm.globals.set(\"FILT_FSMNotEligible\", \"43\");",
+											"pm.globals.set(\"FILT_FSMUnclassified\", \"44\");"
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "65c89d21-118a-4749-bd42-fa874f4a7be9",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "d788e097-9c6f-43c3-89bc-db3db49c5404",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "07a946d0-b2d1-44a1-acc5-a04c987e7a69",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"_postman_isSubFolder": true
 				}
 			]
 		},

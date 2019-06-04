@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
         {
             var tree = _context.Themes.Select(t => new ThemeTree
             {
-                Id = t.Id, Title = t.Title,
+                Id = t.Id, Title = t.Title, Summary = t.Summary,
                 Topics = t.Topics.Select(x => new TopicTree
                 {
                     Id = x.Id, Title = x.Title, Summary = x.Summary,

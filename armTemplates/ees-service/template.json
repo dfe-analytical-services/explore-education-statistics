@@ -28,11 +28,11 @@
     },
     "skuData": {
       "type": "string",
-      "defaultValue": "B1 Basic"
+      "defaultValue": "S1 Standard"
     },
     "skuContent": {
       "type": "string",
-      "defaultValue": "B1 Basic"
+      "defaultValue": "S1 Standard"
     },
     "skuAdmin": {
       "type": "string",
@@ -183,6 +183,10 @@
               "value": "6.9.1"
             },
             {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "1"
+            },
+            {
               "name": "SeedConfig:BatchSize",
               "value": "50"
             }
@@ -282,6 +286,10 @@
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
               "value": "6.9.1"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "1"
             }
           ],
           "connectionStrings": [
@@ -370,6 +378,10 @@
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
               "value": "6.9.1"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "1"
             }
           ],
           "connectionStrings": [

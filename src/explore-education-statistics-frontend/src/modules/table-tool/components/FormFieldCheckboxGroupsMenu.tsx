@@ -47,6 +47,11 @@ const FormFieldCheckboxGroupsMenu = <T extends {}>(
   return (
     <DetailsMenu
       open={open}
+      onToggle={(isOpen, event) => {
+        if (error) {
+          event.preventDefault();
+        }
+      }}
       summary={
         <>
           {legend}

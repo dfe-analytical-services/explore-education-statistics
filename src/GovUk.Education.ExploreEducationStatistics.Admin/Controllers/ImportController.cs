@@ -5,11 +5,13 @@ using System.IO;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 {
+    [Authorize]
     public class ImportController : Controller
     {
         private IImportService _importService;
