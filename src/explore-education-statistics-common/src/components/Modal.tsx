@@ -23,7 +23,7 @@ const Modal = ({ children, dialogClass, title, ...props }: Props) => {
         return document.getElementById(process.env.APP_ROOT_ID) as HTMLElement;
       }}
     >
-      <h1>{title}</h1>
+      <h1 className="govuk-heading-l">{title}</h1>
       {children}
     </AriaModal>
   );

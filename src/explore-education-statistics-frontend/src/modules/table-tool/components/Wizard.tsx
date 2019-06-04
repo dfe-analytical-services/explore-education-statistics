@@ -28,33 +28,33 @@ const Wizard = ({ children, initialStep = 1, id }: Props) => {
   const lastStep = filteredChildren.length;
 
   return (
-    <ol className={styles.stepNav}>
-      {filteredChildren.map((child, index) => {
-        const stepNumber = index + 1;
+    <>
+      <ol className={styles.stepNav}>
+        {filteredChildren.map((child, index) => {
+          const stepNumber = index + 1;
 
-        return cloneElement<WizardStepProps | InjectedWizardProps>(child, {
-          stepNumber,
-          currentStep,
-          setCurrentStep(nextStep: number) {
-            if (nextStep <= lastStep && nextStep >= 1) {
-              setCurrentStep(nextStep);
-            }
-          },
-          id: child.props.id || `${id}-step-${stepNumber}`,
-          isActive: stepNumber === currentStep,
-          goToPreviousStep() {
-            setCurrentStep(stepNumber - 1 < 1 ? 1 : stepNumber - 1);
-          },
-          goToNextStep() {
-            setCurrentStep(
-              stepNumber + 1 > filteredChildren.length
-                ? filteredChildren.length
-                : stepNumber + 1,
-            );
-          },
-        });
-      })}
-    </ol>
+          return cloneElement<WizardStepProps | InjectedWizardProps>(child, {
+            stepNumber,
+            currentStep,
+            setCurrentStep(nextStep: number) {
+              if (nextStep <= lastStep && nextStep >= 1) {
+                setCurrentStep(nextStep);
+              }
+            },
+            id: child.props.id || `${id}-step-${stepNumber}`,
+            isActive: stepNumber === currentStep,
+            goToPreviousStep() {
+              setCurrentStep(stepNumber - 1 < 1 ? 1 : stepNumber - 1);
+            },
+            goToNextStep() {
+              setCurrentStep(
+                stepNumber + 1 > lastStep ? lastStep : stepNumber + 1,
+              );
+            },
+          });
+        })}
+      </ol>
+    </>
   );
 };
 
