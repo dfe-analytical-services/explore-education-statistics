@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   FormGroup,
   FormFieldset,
   FormTextInput,
   FormSelect,
-  FormRadioGroup,
-  Form,
+  // FormRadioGroup,
+  // Form,
 } from '@common/components/form';
 import Link from '../../../components/Link';
 
@@ -15,7 +15,7 @@ interface Props {
 }
 
 const PrototypePublicationConfig = ({ sectionId }: Props) => {
-  const [value, setValue] = useState('academic-year');
+  // const [value, setValue] = useState('academic-year');
 
   return (
     <>

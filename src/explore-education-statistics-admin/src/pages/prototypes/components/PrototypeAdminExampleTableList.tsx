@@ -2,19 +2,19 @@ import React, { useState } from 'react';
 import Details from '@common/components/Details';
 import {
   FormGroup,
-  FormFieldset,
-  FormTextInput,
-  FormSelect,
+  // FormFieldset,
+  // FormTextInput,
+  // FormSelect,
   FormRadioGroup,
 } from '@common/components/form';
 import PrototypeAdminExampleTables from './PrototypeAdminExampleTables';
 
-interface Props {
-  tableId?: string;
-  task?: string;
-}
+// interface Props {
+//   tableId?: string;
+//   task?: string;
+// }
 
-const PrototypeExampleTable = ({ tableId, task }: Props) => {
+const PrototypeExampleTable = () => {
   const [value, setValue] = useState('academic-year');
   return (
     <>

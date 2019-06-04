@@ -101,9 +101,9 @@ const Details = ({
           data-testid="details--expand"
         >
           {summary}
-            {tag && (
-              <span className="govuk-tag govuk-!-margin-left-2">{tag}</span>
-            )}
+          {tag && (
+            <span className="govuk-tag govuk-!-margin-left-2">{tag}</span>
+          )}
         </span>
       </summary>
       <div

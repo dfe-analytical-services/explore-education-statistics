@@ -1,16 +1,8 @@
 import React from 'react';
 import Details from '@common/components/Details';
-import {
-  FormGroup,
-  FormFieldset,
-  FormTextInput,
-  FormSelect,
-  FormRadioGroup,
-} from '@common/components/form';
 import PrototypeAdminExampleTables from './components/PrototypeAdminExampleTables';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
-import Link from '../../components/Link';
 
 const PublicationDataPage = () => {
   return (

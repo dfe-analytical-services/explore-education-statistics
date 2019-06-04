@@ -1,6 +1,5 @@
 import DashboardRelease from '@admin/pages/prototypes/components/DashboardRelease';
 import React from 'react';
-import Link from '@admin/components/Link';
 
 const AdminDashboardReadyForApproval = () => {
   return (

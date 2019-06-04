@@ -3,7 +3,6 @@ import TabsSection from '@common/components/TabsSection';
 import React from 'react';
 import { RouteChildrenProps } from 'react-router';
 import AdminDashboardPublications from '@admin/pages/prototypes/components/AdminDashboardPublications';
-import AdminDashboardInProgress from '@admin/pages/prototypes/components/AdminDashboardInProgress';
 import AdminDashboardReadyForApproval from '@admin/pages/prototypes/components/AdminDashboardReadyForApproval';
 import AdminDashboardNeedsWork from '@admin/pages/prototypes/components/AdminDashboardNeedsWork';
 import AdminDashboardApprovedForPublication from '@admin/pages/prototypes/components/AdminDashboardApprovedForPublication';
@@ -44,14 +43,14 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         <TabsSection id="publications" title="Publications">
           <AdminDashboardPublications />
         </TabsSection>
-        {/*<TabsSection
+        {/* <TabsSection
           id="task-in-progress"
           title={`In progress ${
             location.search === '?status=editNewRelease' ? '(2)' : '(1)'
           }`}
         >
           <AdminDashboardInProgress />
-        </TabsSection>*/}
+        </TabsSection> */}
         <TabsSection
           id="task-ready-approval1"
           title={`Ready to review ${

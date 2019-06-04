@@ -9,14 +9,14 @@ import Link from '../../components/Link';
 interface State {
   data: Release | undefined;
   // publication: string | undefined;
-  editing: boolean;
+  // editing: boolean;
 }
 
 class PublicationPage extends Component<{}, State> {
   public state = {
     data: undefined,
     // publication: undefined,
-    editing: false,
+    // editing: false,
   };
 
   public async componentDidMount() {
@@ -35,7 +35,7 @@ class PublicationPage extends Component<{}, State> {
   }
 
   public render() {
-    const { editing, data } = this.state;
+    const { data } = this.state;
 
     return (
       <PrototypePage

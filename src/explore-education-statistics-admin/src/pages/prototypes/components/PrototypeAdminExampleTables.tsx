@@ -2,11 +2,11 @@ import React from 'react';
 import Link from '../../../components/Link';
 
 interface Props {
-  tableId?: string;
+  // tableId?: string;
   task?: string;
 }
 
-const PrototypeExampleTable = ({ tableId, task }: Props) => {
+const PrototypeExampleTable = ({ task }: Props) => {
   return (
     <div className="govuk-width-container">
       <table className="govuk-table">
