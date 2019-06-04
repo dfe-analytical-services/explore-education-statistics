@@ -7,7 +7,6 @@ import {
   FormSelect,
   FormRadioGroup,
 } from '@common/components/form';
-import Link from '../../../components/Link';
 import PrototypeAdminExampleTables from './PrototypeAdminExampleTables';
 
 interface Props {
@@ -62,9 +61,9 @@ const PrototypeExampleTable = ({ tableId, task }: Props) => {
             ]}
           />
         </FormGroup>
-        <Link className="govuk-button" to="#">
+        <a className="govuk-button" href="#">
           Add selected table option to section
-        </Link>
+        </a>
       </Details>
     </>
   );
