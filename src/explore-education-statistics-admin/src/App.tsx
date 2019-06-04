@@ -9,12 +9,18 @@ import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentatio
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
 
 import PublicationCreateNew from './pages/prototypes/PrototypePublicationPageCreateNew';
+import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
+import PublicationEditNew from './pages/prototypes/PrototypePublicationPageEditNew';
+import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
 
 import PublicationEditPage from './pages/prototypes/PrototypePublicationPageEditAbsence';
+import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
 import PublicationCreateNewAbsence from './pages/prototypes/PrototypePublicationPageNewAbsence';
 import PublicationCreateNewAbsenceConfig from './pages/prototypes/PrototypePublicationPageNewAbsenceConfig';
 import PublicationCreateNewAbsenceConfigEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceConfigEdit';
 import PublicationCreateNewAbsenceData from './pages/prototypes/PrototypePublicationPageNewAbsenceData';
+import PublicationCreateNewAbsenceTable from './pages/prototypes/PrototypePublicationPageNewAbsenceTable';
+import PublicationCreateNewAbsenceViewTables from './pages/prototypes/PrototypePublicationPageNewAbsenceViewTables';
 import PublicationCreateNewAbsenceSchedule from './pages/prototypes/PrototypePublicationPageNewAbsenceSchedule';
 import PublicationCreateNewAbsenceScheduleEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceScheduleEdit';
 import PublicationCreateNewAbsenceStatus from './pages/prototypes/PrototypePublicationPageNewAbsenceStatus';
@@ -42,8 +48,28 @@ function App() {
         />
         <Route
           exact
+          path="/prototypes/publication-review"
+          component={PublicationReviewPage}
+        />
+        <Route
+          exact
           path="/prototypes/publication-create-new"
           component={PublicationCreateNew}
+        />
+        <Route
+          exact
+          path="/prototypes/publication-confirm-new"
+          component={PublicationConfirmNew}
+        />
+        <Route
+          exact
+          path="/prototypes/publication-edit-new"
+          component={PublicationEditNew}
+        />
+        <Route
+          exact
+          path="/prototypes/release-create-new"
+          component={ReleaseCreateNew}
         />
         <Route
           exact
@@ -64,6 +90,16 @@ function App() {
           exact
           path="/prototypes/publication-create-new-absence-data"
           component={PublicationCreateNewAbsenceData}
+        />
+        <Route
+          exact
+          path="/prototypes/publication-create-new-absence-table"
+          component={PublicationCreateNewAbsenceTable}
+        />
+        <Route
+          exact
+          path="/prototypes/publication-create-new-absence-view-table"
+          component={PublicationCreateNewAbsenceViewTables}
         />
         <Route
           exact

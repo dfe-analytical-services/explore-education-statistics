@@ -1,26 +1,23 @@
 import React from 'react';
-import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
 import PrototypeReleaseConfig from './components/PrototypeReleasePageConfig';
 
-const PublicationConfigEditPage = () => {
-  const sectionId = 'setup';
-
+const PublicationPage = () => {
   return (
     <PrototypePage
       wide
       breadcrumbs={[
         {
-          link: '/prototypes/admin-dashboard?status=editRelease',
+          link: '/prototypes/admin-dashboard',
           text: 'Administrator dashboard',
         },
         { text: 'Create new release', link: '#' },
       ]}
     >
-      <PrototypeAdminNavigation sectionId={sectionId} />
-      <PrototypeReleaseConfig sectionId={sectionId} />
+      <h1 className="govuk-heading-xl">Create new release</h1>
+      <PrototypeReleaseConfig />
     </PrototypePage>
   );
 };
 
-export default PublicationConfigEditPage;
+export default PublicationPage;
