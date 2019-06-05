@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render } from 'react-testing-library';
+import { fireEvent, render, wait } from 'react-testing-library';
 import Wizard from '../Wizard';
 import WizardStep from '../WizardStep';
 
@@ -352,5 +352,63 @@ describe('Wizard', () => {
 
     expect(step3).toHaveFocus();
     expect(step3).toHaveScrolledIntoView();
+  });
+
+  test('calls `onStepChange` handler when step changes', () => {
+    const onStepChange = jest.fn();
+
+    const { getByText } = render(
+      <Wizard id="test-wizard" onStepChange={onStepChange}>
+        <WizardStep>
+          {({ setCurrentStep }) => (
+            <button type="button" onClick={() => setCurrentStep(3)}>
+              Go to step 3
+            </button>
+          )}
+        </WizardStep>
+        <WizardStep>Step 2</WizardStep>
+        <WizardStep>Step 3</WizardStep>
+      </Wizard>,
+    );
+
+    expect(onStepChange).not.toHaveBeenCalled();
+
+    fireEvent.click(getByText('Go to step 3'));
+
+    expect(onStepChange).toHaveBeenCalledWith(3, 1);
+  });
+
+  test('can change to a different step by returning a number from `onStepChange` handler', async () => {
+    const { container, getByText } = render(
+      <Wizard id="test-wizard" onStepChange={() => 2}>
+        <WizardStep>
+          {({ setCurrentStep }) => (
+            <button type="button" onClick={() => setCurrentStep(3)}>
+              Go to step 3
+            </button>
+          )}
+        </WizardStep>
+        <WizardStep>Step 2</WizardStep>
+        <WizardStep>Step 3</WizardStep>
+      </Wizard>,
+    );
+
+    const step1 = container.querySelector('#test-wizard-step-1') as HTMLElement;
+    const step2 = container.querySelector('#test-wizard-step-2') as HTMLElement;
+    const step3 = container.querySelector('#test-wizard-step-3') as HTMLElement;
+
+    expect(step1).toBeVisible();
+    expect(step1).toHaveClass('stepActive');
+    expect(step2).not.toBeVisible();
+    expect(step3).not.toBeVisible();
+
+    fireEvent.click(getByText('Go to step 3'));
+
+    await wait();
+
+    expect(step1).toBeVisible();
+    expect(step2).toBeVisible();
+    expect(step2).toHaveClass('stepActive');
+    expect(step3).not.toBeVisible();
   });
 });
