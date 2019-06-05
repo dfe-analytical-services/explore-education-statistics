@@ -25,6 +25,12 @@ async function startServer(port = process.env.PORT || 3000) {
   // Use Helmet for configuration of headers and disable express powered by header
   server.disable('x-powered-by');
   server.use(helmet());
+  server.use(helmet.featurePolicy({
+    features: {
+      fullscreen: ["'self'"],
+      vibrate: ["'none'"],
+    }
+  }));
   server.use(referrerPolicy({ policy: 'no-referrer-when-downgrade' }));
 
   // Strip trailing slashes as these
