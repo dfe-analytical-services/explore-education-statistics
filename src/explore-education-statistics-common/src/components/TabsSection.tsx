@@ -35,9 +35,14 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
     return (
       <section
         aria-labelledby={onMedia(tabProps['aria-labelledby'])}
-        className={classNames('govuk-tabs__panel', styles.panel, {
-          'govuk-tabs__panel--hidden': tabProps.hidden,
-        })}
+        className={classNames(
+          'govuk-tabs__panel',
+          'dfe-content-overflow',
+          styles.panel,
+          {
+            'govuk-tabs__panel--hidden': tabProps.hidden,
+          },
+        )}
         id={id}
         ref={ref}
         role={onMedia('tabpanel')}

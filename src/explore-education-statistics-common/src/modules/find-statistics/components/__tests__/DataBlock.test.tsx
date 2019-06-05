@@ -33,35 +33,7 @@ describe('DataBlock', () => {
     },
   };
 
-  test('datablock renders downloads only', async () => {
-    const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
-      (_: DataBlockRequest) => {
-        return Promise.resolve(testData.response);
-      },
-    );
-
-    const { container } = render(
-      <DataBlock
-        id="test"
-        type="datablock"
-        dataBlockRequest={dataBlockRequest}
-        showTables={false}
-      />,
-    );
-
-    await wait();
-
-    expect(getDataBlockForSubject).toBeCalledWith(dataBlockRequest);
-
-    expect(
-      Array.from(container.querySelectorAll('section.govuk-tabs__panel'))
-        .length,
-    ).toBe(1);
-
-    expect(container.innerHTML).toMatchSnapshot();
-  });
-
-  test('datablock renders horizontal chart', async () => {
+  test('renders horizontal chart', async () => {
     const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
       (_: DataBlockRequest) => {
         return Promise.resolve(testData.response);
@@ -93,9 +65,8 @@ describe('DataBlock', () => {
     expect(getDataBlockForSubject).toBeCalledWith(dataBlockRequest);
 
     expect(
-      Array.from(container.querySelectorAll('section.govuk-tabs__panel'))
-        .length,
-    ).toBe(2);
+      container.querySelectorAll('section.govuk-tabs__panel'),
+    ).toHaveLength(1);
 
     expect(
       domUtil.elementContainingText(
@@ -105,14 +76,11 @@ describe('DataBlock', () => {
       ).length,
     ).toBe(1);
 
-    expect(Array.from(container.querySelectorAll('.recharts-bar')).length).toBe(
-      3,
-    );
-
-    expect(container.innerHTML).toMatchSnapshot();
+    expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
+    expect(container.querySelector('svg')).toMatchSnapshot();
   });
 
-  test('datablock renders vertical chart', async () => {
+  test('renders vertical chart', async () => {
     const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
       (_: DataBlockRequest) => {
         return Promise.resolve(testData.response);
@@ -143,9 +111,8 @@ describe('DataBlock', () => {
     expect(getDataBlockForSubject).toBeCalledWith(dataBlockRequest);
 
     expect(
-      Array.from(container.querySelectorAll('section.govuk-tabs__panel'))
-        .length,
-    ).toBe(2);
+      container.querySelectorAll('section.govuk-tabs__panel'),
+    ).toHaveLength(1);
 
     expect(
       domUtil.elementContainingText(
@@ -155,64 +122,11 @@ describe('DataBlock', () => {
       ).length,
     ).toBe(1);
 
-    expect(Array.from(container.querySelectorAll('.recharts-bar')).length).toBe(
-      3,
-    );
-
-    expect(container.innerHTML).toMatchSnapshot();
+    expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
+    expect(container.querySelector('svg')).toMatchSnapshot();
   });
 
-  test('datablock renders vertical chart', async () => {
-    const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
-      (_: DataBlockRequest) => {
-        return Promise.resolve(testData.response);
-      },
-    );
-
-    const { container } = render(
-      <DataBlock
-        id="test"
-        type="datablock"
-        dataBlockRequest={dataBlockRequest}
-        showTables={false}
-        charts={[
-          {
-            type: 'verticalbar',
-            indicators: ['23', '26', '28'],
-            xAxis: { title: 'test x axis' },
-            yAxis: { title: 'test y axis' },
-            width: 800,
-            height: 600,
-          },
-        ]}
-      />,
-    );
-
-    await wait();
-
-    expect(getDataBlockForSubject).toBeCalledWith(dataBlockRequest);
-
-    expect(
-      Array.from(container.querySelectorAll('section.govuk-tabs__panel'))
-        .length,
-    ).toBe(2);
-
-    expect(
-      domUtil.elementContainingText(
-        container,
-        'section.govuk-tabs__panel h3',
-        'Charts',
-      ).length,
-    ).toBe(1);
-
-    expect(Array.from(container.querySelectorAll('.recharts-bar')).length).toBe(
-      3,
-    );
-
-    expect(container.innerHTML).toMatchSnapshot();
-  });
-
-  test('datablock renders table', async () => {
+  test('renders table', async () => {
     const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
       (_: DataBlockRequest) => {
         return Promise.resolve(testData.response);
@@ -235,7 +149,7 @@ describe('DataBlock', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('datablock renders summary', async () => {
+  test('renders summary', async () => {
     const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
       (_: DataBlockRequest) => {
         return Promise.resolve(testData.response);
