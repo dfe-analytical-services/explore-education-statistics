@@ -1,4 +1,3 @@
-import ModalConfirm from '@common/components/ModalConfirm';
 import { ConfirmContextProvider } from '@common/context/ConfirmContext';
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import tableBuilderService, {
@@ -13,6 +12,7 @@ import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
+import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
 import mapValues from 'lodash/mapValues';
 import React, { Component } from 'react';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
@@ -208,109 +208,123 @@ class TableToolPage extends Component<Props, State> {
         </p>
 
         <ConfirmContextProvider>
-          <Wizard id="tableTool-steps">
-            <WizardStep>
-              {stepProps => (
-                <PublicationForm
-                  {...stepProps}
-                  options={themeMeta}
-                  onSubmit={this.handlePublicationFormSubmit}
-                />
-              )}
-            </WizardStep>
-            <WizardStep>
-              {stepProps => (
-                <PublicationSubjectForm
-                  {...stepProps}
-                  options={subjects}
-                  onSubmit={this.handlePublicationSubjectFormSubmit}
-                />
-              )}
-            </WizardStep>
-            <WizardStep>
-              {stepProps => (
-                <LocationFiltersForm
-                  {...stepProps}
-                  options={subjectMeta.locations}
-                  onSubmit={this.handleLocationFiltersFormSubmit}
-                />
-              )}
-            </WizardStep>
-            <WizardStep>
-              {stepProps => (
-                <TimePeriodForm
-                  {...stepProps}
-                  options={subjectMeta.timePeriod.options}
-                  onSubmit={values => {
-                    this.setState({
-                      timePeriods: TimePeriod.createRange(
-                        TimePeriod.fromString(values.start),
-                        TimePeriod.fromString(values.end),
-                      ),
-                    });
-                  }}
-                />
-              )}
-            </WizardStep>
-            <WizardStep>
-              {stepProps => (
-                <FiltersForm
-                  {...stepProps}
-                  onSubmit={this.handleFiltersFormSubmit}
-                  specification={subjectMeta}
-                />
-              )}
-            </WizardStep>
-            <WizardStep>
-              {stepProps => (
-                <>
-                  <WizardStepHeading {...stepProps}>
-                    Explore data
-                  </WizardStepHeading>
+          {({ askConfirm }) => (
+            <>
+              <Wizard
+                id="tableTool-steps"
+                onStepChange={async (nextStep, previousStep) => {
+                  if (nextStep < previousStep) {
+                    const confirmed = await askConfirm();
+                    return confirmed ? nextStep : previousStep;
+                  }
 
-                  {tableData.length > 0 && (
+                  return nextStep;
+                }}
+              >
+                <WizardStep>
+                  {stepProps => (
+                    <PublicationForm
+                      {...stepProps}
+                      options={themeMeta}
+                      onSubmit={this.handlePublicationFormSubmit}
+                    />
+                  )}
+                </WizardStep>
+                <WizardStep>
+                  {stepProps => (
+                    <PublicationSubjectForm
+                      {...stepProps}
+                      options={subjects}
+                      onSubmit={this.handlePublicationSubjectFormSubmit}
+                    />
+                  )}
+                </WizardStep>
+                <WizardStep>
+                  {stepProps => (
+                    <LocationFiltersForm
+                      {...stepProps}
+                      options={subjectMeta.locations}
+                      onSubmit={this.handleLocationFiltersFormSubmit}
+                    />
+                  )}
+                </WizardStep>
+                <WizardStep>
+                  {stepProps => (
+                    <TimePeriodForm
+                      {...stepProps}
+                      options={subjectMeta.timePeriod.options}
+                      onSubmit={values => {
+                        this.setState({
+                          timePeriods: TimePeriod.createRange(
+                            TimePeriod.fromString(values.start),
+                            TimePeriod.fromString(values.end),
+                          ),
+                        });
+                      }}
+                    />
+                  )}
+                </WizardStep>
+                <WizardStep>
+                  {stepProps => (
+                    <FiltersForm
+                      {...stepProps}
+                      onSubmit={this.handleFiltersFormSubmit}
+                      specification={subjectMeta}
+                    />
+                  )}
+                </WizardStep>
+                <WizardStep>
+                  {stepProps => (
                     <>
-                      <div className="govuk-!-margin-bottom-2">
-                        <TimePeriodDataTable
-                          filters={filters}
-                          indicators={indicators}
-                          publicationName={publication ? publication.title : ''}
-                          subjectName={subjectName}
-                          locations={locations}
-                          timePeriods={timePeriods}
-                          results={tableData}
-                        />
-                      </div>
+                      <WizardStepHeading {...stepProps}>
+                        Explore data
+                      </WizardStepHeading>
 
-                      <ul className="govuk-list">
-                        {publication && (
-                          <li>
-                            <a href={publication.slug}>Go to publication</a>
-                          </li>
-                        )}
-                        <li>
-                          <a href="#download">Download data (.csv)</a>
-                        </li>
-                        <li>
-                          <a href="#api">Access developer API</a>
-                        </li>
-                        <li>
-                          <a href="#methodology">Methodology</a>
-                        </li>
-                        <li>
-                          <a href="#contact">Contact</a>
-                        </li>
-                      </ul>
+                      {tableData.length > 0 && (
+                        <>
+                          <div className="govuk-!-margin-bottom-2">
+                            <TimePeriodDataTable
+                              filters={filters}
+                              indicators={indicators}
+                              publicationName={
+                                publication ? publication.title : ''
+                              }
+                              subjectName={subjectName}
+                              locations={locations}
+                              timePeriods={timePeriods}
+                              results={tableData}
+                            />
+                          </div>
+
+                          <ul className="govuk-list">
+                            {publication && (
+                              <li>
+                                <a href={publication.slug}>Go to publication</a>
+                              </li>
+                            )}
+                            <li>
+                              <a href="#download">Download data (.csv)</a>
+                            </li>
+                            <li>
+                              <a href="#api">Access developer API</a>
+                            </li>
+                            <li>
+                              <a href="#methodology">Methodology</a>
+                            </li>
+                            <li>
+                              <a href="#contact">Contact</a>
+                            </li>
+                          </ul>
+                        </>
+                      )}
                     </>
                   )}
-                </>
-              )}
-            </WizardStep>
-          </Wizard>
+                </WizardStep>
+              </Wizard>
 
-          <ModalConfirm title="Go back to previous step">
-            <p>You will lose any changes you have made in the current step.</p>
-          </ModalConfirm>
+              <PreviousStepModalConfirm />
+            </>
+          )}
         </ConfirmContextProvider>
       </Page>
     );

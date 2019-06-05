@@ -1,18 +1,18 @@
 import useToggle from '@common/hooks/useToggle';
 import React, {
   createContext,
+  MutableRefObject,
   ReactNode,
   useContext,
   useMemo,
-  useState,
+  useRef,
 } from 'react';
 
 export interface ConfirmContextValue {
   isConfirming: boolean;
-  toggleConfirming(confirming?: boolean): void;
-  handleConfirm(): void;
-  handleCancel(): void;
-  setHandlers(handlers: { onConfirm?(): void; onCancel?(): void }): void;
+  askConfirm(): Promise<boolean>;
+  confirm(): void;
+  cancel(): void;
 }
 
 export const ConfirmContext = createContext<ConfirmContextValue | undefined>(
@@ -20,75 +20,56 @@ export const ConfirmContext = createContext<ConfirmContextValue | undefined>(
 );
 
 interface Props {
-  children: ReactNode;
+  children: ReactNode | ((contextProps: ConfirmContextValue) => ReactNode);
 }
 
 export const ConfirmContextProvider = ({ children }: Props) => {
   const [isConfirming, toggleConfirming] = useToggle(false);
-  const [handlers, setHandlers] = useState<{
-    onConfirm?(): void;
-    onCancel?(): void;
-  }>({});
+
+  const resolver: MutableRefObject<
+    ((confirmed: boolean) => void) | null
+  > = useRef(null);
 
   const value = useMemo<ConfirmContextValue>(() => {
     return {
       isConfirming,
-      toggleConfirming,
-      setHandlers,
-      handleConfirm() {
-        if (handlers.onConfirm) {
-          handlers.onConfirm();
-        }
+      askConfirm() {
+        toggleConfirming(true);
 
-        setHandlers({});
+        return new Promise<boolean>(resolve => {
+          resolver.current = resolve;
+        });
       },
-      handleCancel() {
-        if (handlers.onCancel) {
-          handlers.onCancel();
+      confirm() {
+        if (resolver.current) {
+          resolver.current(true);
+          toggleConfirming(false);
+          resolver.current = null;
         }
-
-        setHandlers({});
+      },
+      cancel() {
+        if (resolver.current) {
+          resolver.current(false);
+          toggleConfirming(false);
+          resolver.current = null;
+        }
       },
     };
-  }, [isConfirming, toggleConfirming, handlers]);
+  }, [isConfirming, toggleConfirming]);
 
   return (
-    <ConfirmContext.Provider value={value}>{children}</ConfirmContext.Provider>
+    <ConfirmContext.Provider value={value}>
+      {typeof children === 'function' ? children(value) : children}
+    </ConfirmContext.Provider>
   );
 };
 
-export function useConfirmContext() {
-  const context = useContext(ConfirmContext);
+export function useConfirmContext(): ConfirmContextValue {
+  const context = useContext(ConfirmContext) as ConfirmContextValue;
 
   if (!context) {
     throw new Error('Must be used with a ConfirmContextProvider');
   }
 
-  const {
-    isConfirming,
-    toggleConfirming,
-    handleCancel,
-    handleConfirm,
-    setHandlers,
-  } = context;
-
-  return {
-    isConfirming,
-    askConfirm(onConfirm?: () => void, onCancel?: () => void) {
-      setHandlers({
-        onConfirm,
-        onCancel,
-      });
-
-      toggleConfirming(true);
-    },
-    confirm() {
-      handleConfirm();
-      toggleConfirming(false);
-    },
-    cancel() {
-      handleCancel();
-      toggleConfirming(false);
-    },
-  };
+  return context;
 }

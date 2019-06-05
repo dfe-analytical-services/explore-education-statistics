@@ -1,4 +1,3 @@
-import { useConfirmContext } from '@common/context/ConfirmContext';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import { InjectedWizardProps } from './Wizard';
@@ -21,8 +20,6 @@ const WizardStepHeading = ({
 }: Props & InjectedWizardProps) => {
   const stepEnabled = currentStep > stepNumber;
 
-  const { askConfirm } = useConfirmContext();
-
   return (
     <>
       {isActive ? (
@@ -42,11 +39,7 @@ const WizardStepHeading = ({
         >
           <button
             type="button"
-            onClick={() => {
-              askConfirm(() => {
-                setCurrentStep(stepNumber);
-              });
-            }}
+            onClick={() => setCurrentStep(stepNumber)}
             className={styles.stepButton}
           >
             <span className="govuk-visually-hidden">{`Step ${stepNumber}:`}</span>

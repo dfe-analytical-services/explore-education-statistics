@@ -1,6 +1,5 @@
 import Button from '@common/components/Button';
 import { FormGroup } from '@common/components/form';
-import { useConfirmContext } from '@common/context/ConfirmContext';
 import { FormikState } from 'formik';
 import React, { MouseEventHandler } from 'react';
 import { InjectedWizardProps } from './Wizard';
@@ -24,8 +23,6 @@ const WizardStepFormActions = ({
   submitText = 'Next step',
   submittingText = 'Submitting',
 }: Props) => {
-  const { askConfirm } = useConfirmContext();
-
   return (
     <FormGroup>
       <Button
@@ -40,17 +37,15 @@ const WizardStepFormActions = ({
         <Button
           type="button"
           variant="secondary"
-          onClick={event =>
-            askConfirm(() => {
-              if (onPreviousStep) {
-                onPreviousStep(event);
-              }
+          onClick={event => {
+            if (onPreviousStep) {
+              onPreviousStep(event);
+            }
 
-              if (!event.isDefaultPrevented()) {
-                goToPreviousStep();
-              }
-            })
-          }
+            if (!event.isDefaultPrevented()) {
+              goToPreviousStep();
+            }
+          }}
         >
           Previous step
         </Button>
