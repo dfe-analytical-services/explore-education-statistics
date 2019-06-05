@@ -3,19 +3,12 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
 {
     public class TokenService : ITokenService
     {
-        private readonly ILogger _logger;
-
-        public TokenService(ILogger logger)
-        {
-            _logger = logger;
-        }
 
         public string GenerateToken(string secretKey, string email, DateTime expiryDateTime)
         {
@@ -52,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
             }
             catch (Exception e)
             {
-                _logger.LogInformation($"error validating token : {e.Message}");
+                //_logger.LogInformation($"error validating token : {e.Message}");
             }
 
             return email;

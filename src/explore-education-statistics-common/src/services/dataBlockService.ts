@@ -3,7 +3,7 @@ import TimePeriod, { TimePeriodCode } from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import { Feature, Geometry } from 'geojson';
 
-import LocationService from './temporaryLocationService';
+// import LocationService from './temporaryLocationService';
 
 export enum GeographicLevel {
   Establishment = 'Establishment',
@@ -145,6 +145,7 @@ export interface DataBlockGeoJsonProperties {
   ctry17nm?: string | null;
   lad17cd?: string | null;
   lad17nm?: string | null;
+
   // allow anything to come through from the API, but very probably ignored
   [name: string]: unknown;
 }
@@ -152,9 +153,9 @@ export interface DataBlockGeoJsonProperties {
 export type DataBlockGeoJSON = Feature<Geometry, DataBlockGeoJsonProperties>;
 
 interface DataBlockLocationMetadata {
-  code: string;
+  value: string;
   label: string;
-  geoJson: DataBlockGeoJSON;
+  geoJson: DataBlockGeoJSON[];
 }
 
 // ------------------------------------------
@@ -162,7 +163,7 @@ interface DataBlockLocationMetadata {
 export interface DataBlockMetadata {
   indicators: Dictionary<LabelValueUnitMetadata>;
   filters: Dictionary<LabelValueMetadata>;
-  timePeriods: Dictionary<TimePeriod>;
+  timePeriods: Dictionary<LabelValueMetadata>;
   locations: Dictionary<DataBlockLocationMetadata>;
 }
 
@@ -181,135 +182,31 @@ export interface DataBlockRequest {
 
 export interface DataBlockResponse {
   metaData: DataBlockMetadata;
-  data: DataBlockData;
-}
 
-function mapOptions<T extends LabelValueMetadata>(ids: string[], options: T[]) {
-  return Object.values(options).reduce((results, option) => {
-    if (ids.includes(option.value)) {
-      return { ...results, [option.value]: option };
-    }
-
-    return results;
-  }, {});
-}
-
-function mapTimePeriodOptions(
-  years: number[],
-  options: TimePeriodOptionMetadata[],
-) {
-  return Object.values(options).reduce((results, option) => {
-    if (years.includes(option.year)) {
-      return {
-        ...results,
-        [option.year]: new TimePeriod(option.year, option.code),
-      };
-    }
-
-    return results;
-  }, {});
-}
-
-function mapOptionsMap<
-  R extends LabelValueMetadata,
-  T extends OptionListMetadata<R>
->(ids: string[], options: Dictionary<T>): Dictionary<R> {
-  return Object.values(options).reduce(
-    (mapped, option) => ({ ...mapped, ...mapOptions(ids, option.options) }),
-    {},
-  );
-}
-
-function remapIndicators(
-  indicatorIds: string[],
-  { indicators }: ResponseMetaData,
-): Dictionary<LabelValueUnitMetadata> {
-  return mapOptionsMap(indicatorIds, indicators);
-}
-
-function remapFilters(
-  filterIds: string[],
-  { filters }: ResponseMetaData,
-): Dictionary<LabelValueMetadata> {
-  return Object.values(filters).reduce(
-    (mapped, filter) => ({
-      ...mapped,
-      ...mapOptionsMap(filterIds, filter.options),
-    }),
-    {},
-  );
-}
-
-function remapTimePeriod(
-  years: number[],
-  { timePeriod }: ResponseMetaData,
-): Dictionary<TimePeriod> {
-  return mapTimePeriodOptions(years, timePeriod.options);
-}
-
-function getUsedTimeIdentifiers(data: DataBlockData) {
-  return Array.from(
-    data.result.reduce((timeIdentifiers, result) => {
-      return timeIdentifiers.add(result.year);
-    }, new Set<number>()),
-  );
-}
-
-function getUsedLocations(
-  request: DataBlockRequest,
-  data: DataBlockData,
-): Dictionary<DataBlockLocationMetadata> {
-  return data.result.reduce(
-    (locations: Dictionary<DataBlockLocationMetadata>, result) => {
-      const geoJson = LocationService.getGeoJSONForLocation(
-        request.geographicLevel,
-        result.location,
-      );
-
-      if (geoJson) {
-        const { code } = geoJson.properties;
-        const label = geoJson.properties.name;
-
-        if (code && label) {
-          const dbm: DataBlockLocationMetadata = { code, label, geoJson };
-
-          return { ...locations, [code]: dbm };
-        }
-      }
-
-      return locations;
-    },
-    {},
-  );
+  publicationId: string;
+  releaseId: number;
+  subjectId: number;
+  releaseDate: Date;
+  geographicLevel: GeographicLevel;
+  result: Result[];
 }
 
 const DataBlockService = {
   async getDataBlockForSubject(request: DataBlockRequest) {
-    // TODO: move all this into the API
-    const metaData: ResponseMetaData = await dataApi.get(
-      `/meta/subject/${request.subjectId}`,
+    const response: DataBlockResponse = await dataApi.post('/Data', request);
+
+    response.metaData.timePeriods = response.result.reduce(
+      (results: Dictionary<LabelValueMetadata>, { timeIdentifier, year }) => {
+        const key = `${year}_${timeIdentifier}`;
+        if (results[key]) return results;
+
+        return {
+          ...results,
+          [key]: new TimePeriod(year, timeIdentifier),
+        };
+      },
+      {},
     );
-
-    const data: DataBlockData = await dataApi.post('/tablebuilder', request);
-
-    const usedIndicators = remapIndicators(request.indicators, metaData);
-    const usedFilters = remapFilters(request.filters, metaData);
-    const times = getUsedTimeIdentifiers(data);
-    const usedTimeIdentifiers = remapTimePeriod(times, metaData);
-
-    const usedLocations = getUsedLocations(request, data);
-
-    const usedMetadata: DataBlockMetadata = {
-      indicators: usedIndicators,
-      filters: usedFilters,
-      timePeriods: usedTimeIdentifiers,
-      locations: usedLocations,
-    };
-
-    const response: DataBlockResponse = {
-      metaData: usedMetadata,
-      data,
-    };
 
     return response;
   },

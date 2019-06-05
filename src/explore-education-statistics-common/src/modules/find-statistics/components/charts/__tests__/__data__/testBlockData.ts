@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import {
   DataBlockData,
   DataBlockMetadata,
@@ -6,8 +7,6 @@ import {
   GeographicLevel,
   ResponseMetaData,
 } from '@common/services/dataBlockService';
-import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import TimePeriod from '@common/services/types/TimePeriod';
 
 import Features from './testLocationData';
 
@@ -116,15 +115,21 @@ const metaData: DataBlockMetadata = {
   },
 
   timePeriods: {
-    '2014': new TimePeriod(2014, 'HT6'),
-    '2015': new TimePeriod(2015, 'HT6'),
+    '2014_HT6': {
+      label: '2014/15',
+      value: '2014_HT6',
+    },
+    '2015_HT6': {
+      label: '2015/16',
+      value: '2015_HT6',
+    },
   },
 
   locations: {
     E92000001: {
-      code: 'E92000001',
+      value: 'E92000001',
       label: 'England',
-      geoJson: Features.E92000001,
+      geoJson: [Features.E92000001],
     },
   },
 };
@@ -2735,7 +2740,7 @@ const AbstractChartProps: ChartProps = {
 };
 
 const response: DataBlockResponse = {
-  data,
+  ...data,
   metaData,
 };
 

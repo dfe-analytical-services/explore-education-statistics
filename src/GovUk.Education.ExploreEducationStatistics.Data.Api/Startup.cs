@@ -1,9 +1,9 @@
-﻿using AutoMapper;
+﻿using System.Diagnostics.CodeAnalysis;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TableBuilder;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.TableBuilder;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
@@ -15,10 +15,12 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 {
+    [ExcludeFromCodeCoverage] 
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -54,13 +56,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Data API", Version = "v1"});
             });
 
-            services.AddTransient<IResultBuilder<Observation, TableBuilderObservationViewModel>, ResultBuilder>();
-            services.AddTransient<ITableBuilderService, TableBuilderService>();
-            services.AddTransient<IMetaService, MetaService>();
-
+            services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
+            services.AddTransient<IDataService<ResultViewModel>, TableBuilderDataService>();
+            services.AddTransient<IDataService<ResultWithMetaViewModel>, DataService>();
+            services.AddTransient<IPublicationMetaService, PublicationMetaService>();
+            services.AddTransient<ISubjectMetaService, SubjectMetaService>();
+            services.AddTransient<ITableBuilderSubjectMetaService, TableBuilderSubjectMetaService>();
+            services.AddTransient<IFileStorageService, FileStorageService>();
             services.AddTransient<IFilterGroupService, FilterGroupService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
             services.AddTransient<IFilterService, FilterService>();
+            services.AddTransient<IGeoJsonService, GeoJsonService>();
             services.AddTransient<IIndicatorGroupService, IndicatorGroupService>();
             services.AddTransient<IIndicatorService, IndicatorService>();
             services.AddTransient<ILocationService, LocationService>();
@@ -69,6 +75,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<ISchoolService, SchoolService>();
             services.AddTransient<ISubjectService, SubjectService>();
 
+            services.AddMvc()
+                .AddJsonOptions(options => {
+                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                });
+            
             services.AddCors();
             services.AddAutoMapper();
         }

@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                 "absence", new Publication
                 {
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Name = "Pupil absence statistics and data for schools in England",
+                    Name = "Pupil absence data and statistics for schools in England",
                     Releases = new[]
                     {
                         new Release
@@ -56,6 +56,113 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                 {
                                     Filename = DataCsvFilename.absence_rate_percent_bands,
                                     Name = "Absence rate percent bands"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "early_years_foundation_stage_profile_data", new Publication
+                {
+                    PublicationId = new Guid("fcda2962-82a6-4052-afa2-ea398c53c85f"),
+                    Name = "Early years foundation stage profile data",
+                    Releases = new[]
+                    {
+                        new Release
+                        {
+                            PublicationId = new Guid("fcda2962-82a6-4052-afa2-ea398c53c85f"),
+                            ReleaseDate = new DateTime(2019, 5, 20),
+                            Name = "2017/18",
+                            Subjects = new[]
+                            {
+                                new Subject
+                                {
+                                    Filename = DataCsvFilename.EYFSP_ELG_underlying_data_2013_2018,
+                                    Name = "ELG underlying data 2013 - 2018"
+                                },
+                                new Subject
+                                {
+                                    Filename = DataCsvFilename.EYFSP_areas_of_learning_underlying_data_2013_2018,
+                                    Name = "Areas of learning underlying data 2013 - 2018"
+                                },
+                                new Subject
+                                {
+                                    Filename = DataCsvFilename.EYFSP_APS_GLD_ELG_underlying_data_2013_2018,
+                                    Name = "APS GLD ELG underlying data 2013 - 2018"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "exclusions", new Publication
+                {
+                    PublicationId = new Guid("8345e27a-7a32-4b20-a056-309163bdf9c4"),
+                    Name = "Permanent and fixed period exclusions",
+                    Releases = new[]
+                    {
+                        new Release
+                        {
+                            PublicationId = new Guid("8345e27a-7a32-4b20-a056-309163bdf9c4"),
+                            ReleaseDate = new DateTime(2018, 7, 19),
+                            Name = "2016/17",
+                            Subjects = new[]
+                            {
+                                new Subject
+                                {
+                                    Filename = DataCsvFilename.exclusions_by_characteristic,
+                                    Name = "Exclusions by characteristic"
+                                },
+                                new Subject
+                                {
+                                    Filename = DataCsvFilename.exclusions_by_geographic_level,
+                                    Name = "Exclusions by geographic level"
+                                },
+                                new Subject
+                                {
+                                    Filename = DataCsvFilename.exclusions_by_reason,
+                                    Name = "Exclusions by reason"
+                                },
+                                new Subject
+                                {
+                                    Filename = DataCsvFilename.exclusions_duration_of_fixed_exclusions,
+                                    Name = "Duration of fixed exclusions"
+                                },
+                                new Subject
+                                {
+                                    Filename = DataCsvFilename.exclusions_number_of_fixed_exclusions,
+                                    Name = "Number of fixed exclusions"
+                                },
+                                new Subject
+                                {
+                                    Filename = DataCsvFilename.exclusions_total_days_missed_fixed_exclusions,
+                                    Name = "Total days missed due to fixed period exclusions"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "school_applications_and_offers", new Publication
+                {
+                    PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
+                    Name = "School applications and offers",
+                    Releases = new[]
+                    {
+                        new Release
+                        {
+                            PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
+                            ReleaseDate = new DateTime(2019, 4, 29),
+                            Name = "2018",
+                            Subjects = new[]
+                            {
+                                new Subject
+                                {
+                                    Filename = DataCsvFilename.school_applications_and_offers,
+                                    Name = "Applications and offers by school phase"
                                 }
                             }
                         }

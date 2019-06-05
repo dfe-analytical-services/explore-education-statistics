@@ -1,7 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Breadcrumbs renders correctly with just home breadcrumb 1`] = `
-
 <div class="govuk-breadcrumbs">
   <ol class="govuk-breadcrumbs__list"
       data-testid="breadcrumbs--list"
@@ -15,11 +14,9 @@ exports[`Breadcrumbs renders correctly with just home breadcrumb 1`] = `
     </li>
   </ol>
 </div>
-
 `;
 
 exports[`Breadcrumbs renders correctly with multiple breadcrumbs 1`] = `
-
 <div class="govuk-breadcrumbs">
   <ol class="govuk-breadcrumbs__list"
       data-testid="breadcrumbs--list"
@@ -43,5 +40,4 @@ exports[`Breadcrumbs renders correctly with multiple breadcrumbs 1`] = `
     </li>
   </ol>
 </div>
-
 `;

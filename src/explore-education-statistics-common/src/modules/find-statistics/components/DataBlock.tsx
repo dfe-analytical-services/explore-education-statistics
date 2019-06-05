@@ -18,8 +18,8 @@ import {
 import React, { Component, ReactNode } from 'react';
 import DataBlockService, {
   DataBlockRequest,
-  DataBlockMetadata,
   DataBlockData,
+  DataBlockResponse,
 } from '@common/services/dataBlockService';
 import ChartRenderer, {
   ChartRendererProps,
@@ -64,7 +64,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
         dataBlockRequest,
       );
 
-      this.parseDataResponse(result.data, result.metaData);
+      this.parseDataResponse(result);
     } else {
       // this.parseDataResponse(data, meta);
     }
@@ -74,24 +74,30 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
     this.currentDataQuery = undefined;
   }
 
-  private parseDataResponse(
-    json: DataBlockData,
-    jsonMeta: DataBlockMetadata,
-  ): void {
+  private parseDataResponse(response: DataBlockResponse): void {
     const newState: DataBlockState = {};
+
+    const data: DataBlockData = response;
+    const meta = response.metaData;
 
     const { charts, summary, tables } = this.props;
 
-    if (json.result.length > 0) {
+    if (response.result.length > 0) {
       if (tables) {
-        newState.tables = [{ data: json, meta: jsonMeta, ...tables[0] }];
+        newState.tables = [
+          {
+            data,
+            meta,
+            ...tables[0],
+          },
+        ];
       } else {
         //TODO: remove when data is updated
         newState.tables = [
           {
-            data: json,
-            meta: jsonMeta,
-            indicators: Object.keys(json.result[0].measures),
+            data,
+            meta,
+            indicators: Object.keys(response.result[0].measures),
           },
         ];
       }
@@ -104,16 +110,16 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
         ...chart,
 
-        data: json,
-        meta: jsonMeta,
+        data,
+        meta,
       }));
     }
 
     if (summary) {
       newState.summary = {
         ...summary,
-        data: json,
-        meta: jsonMeta,
+        data,
+        meta,
       };
     }
     this.setState(newState);

@@ -3,13 +3,18 @@ import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
 import React, { Component } from 'react';
-import TopicList, { Topic } from './components/TopicList';
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
+import Details from '@common/components/Details';
+import PublicationList from './components/PublicationList';
+import { Topic } from './components/TopicList';
 
 interface Props {
   themes: {
     id: string;
     slug: string;
     title: string;
+    summary: string;
     topics: Topic[];
   }[];
 }
@@ -47,16 +52,8 @@ class FindStatisticsPage extends Component<Props> {
                 explanations
               </li>
               <li>
-                charts and tables to help you compare, contrast and view
-                national and regional statistical data and trends
-              </li>
-              <li>
-                our table tool to build your own tables online and explore our
-                range of national and regional data
-              </li>
-              <li>
-                links to underlying data so you can download files and carry out
-                your own statistical analysis
+                charts and tables to help you compare contrast and view national
+                and regional statistical data and trends
               </li>
             </ul>
           </div>
@@ -82,15 +79,34 @@ class FindStatisticsPage extends Component<Props> {
         </div>
 
         {themes.length > 0 ? (
-          <>
-            {themes.map(({ id, title, topics }) => (
-              <div key={id}>
-                <h2 className="govuk-heading-l">{title}</h2>
-
-                <TopicList topics={topics} theme={id} />
-              </div>
-            ))}
-          </>
+          <Accordion id="themes">
+            {themes.map(
+              ({
+                id: themeId,
+                title: themeTitle,
+                summary: themeSummary,
+                topics,
+              }) => (
+                <AccordionSection
+                  key={themeId}
+                  heading={themeTitle}
+                  caption={themeSummary}
+                >
+                  {topics.map(
+                    ({ id: topicId, title: topicTitle, publications }) => (
+                      <Details key={topicId} summary={topicTitle}>
+                        <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+                          <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+                            <PublicationList publications={publications} />
+                          </ul>
+                        </div>
+                      </Details>
+                    ),
+                  )}
+                </AccordionSection>
+              ),
+            )}
+          </Accordion>
         ) : (
           <div className="govuk-inset-text">No data currently published.</div>
         )}

@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
+                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -127,7 +127,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("GeographicLevel")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(6);
 
                     b.Property<long>("LocationId");
 
@@ -138,11 +139,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.Property<long>("SubjectId");
 
                     b.Property<string>("TimeIdentifier")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(6);
 
                     b.Property<int>("Year");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GeographicLevel");
 
                     b.HasIndex("LocationId");
 

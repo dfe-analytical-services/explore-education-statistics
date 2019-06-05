@@ -1,8 +1,10 @@
-﻿using System.IO;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
+    [ExcludeFromCodeCoverage] 
     public partial class AddLocationLevels : Migration
     {
         private readonly string _migrationsPath = "Migrations/";

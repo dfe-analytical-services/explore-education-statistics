@@ -4,9 +4,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public enum GeographicLevel
     {
-        [EnumLabelValue("Establishment", "EST")]
-        Establishment,
-
         [EnumLabelValue("Local Authority", "LA")]
         Local_Authority,
 

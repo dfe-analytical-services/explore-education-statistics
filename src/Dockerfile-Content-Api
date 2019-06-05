@@ -1,0 +1,25 @@
+FROM microsoft/dotnet:2.2-aspnetcore-runtime AS base
+WORKDIR /app
+EXPOSE 5010
+EXPOSE 5011
+ENV ASPNETCORE_URLS=http://+:5010
+
+FROM microsoft/dotnet:2.2-sdk AS build
+WORKDIR /src
+COPY ["GovUk.Education.ExploreEducationStatistics.Content.Model/GovUk.Education.ExploreEducationStatistics.Content.Model.csproj", "GovUk.Education.ExploreEducationStatistics.Content.Model/"]
+COPY ["GovUk.Education.ExploreEducationStatistics.Content.Api/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj", "GovUk.Education.ExploreEducationStatistics.Content.Api/"]
+RUN dotnet restore "GovUk.Education.ExploreEducationStatistics.Content.Api/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj"
+
+COPY ./GovUk.Education.ExploreEducationStatistics.Content.Model ./GovUk.Education.ExploreEducationStatistics.Content.Model
+COPY ./GovUk.Education.ExploreEducationStatistics.Content.Api ./GovUk.Education.ExploreEducationStatistics.Content.Api
+
+WORKDIR "/src/GovUk.Education.ExploreEducationStatistics.Content.Api"
+RUN dotnet build "GovUk.Education.ExploreEducationStatistics.Content.Api.csproj" -c Release -o /app
+
+FROM build AS publish
+RUN dotnet publish "GovUk.Education.ExploreEducationStatistics.Content.Api.csproj" -c Release -o /app
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app .
+ENTRYPOINT ["dotnet", "GovUk.Education.ExploreEducationStatistics.Content.Api.dll"]

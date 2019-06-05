@@ -62,18 +62,17 @@ const Form = ({
       onReset={formik.handleReset}
       onSubmit={async event => {
         event.preventDefault();
-        formik.setSubmitting(true);
 
         try {
           await formik.submitForm();
         } catch (error) {
-          setSubmitError({
-            id: submitId,
-            message: error.message,
-          });
+          if (error) {
+            setSubmitError({
+              id: submitId,
+              message: error.message,
+            });
+          }
         }
-
-        formik.setSubmitting(false);
       }}
     >
       <ErrorSummary errors={allErrors} id={`${id}-summary`} />

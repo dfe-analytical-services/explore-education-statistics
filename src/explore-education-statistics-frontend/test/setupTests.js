@@ -19,8 +19,8 @@ Element.prototype.scrollIntoView = jest.fn();
 beforeEach(() => {
   window.matchMedia = jest.fn(() => {
     return {
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
       matches: true,
     };
   });

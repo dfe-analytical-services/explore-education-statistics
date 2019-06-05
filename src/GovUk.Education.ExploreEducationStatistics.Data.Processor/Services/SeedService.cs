@@ -2,24 +2,20 @@ using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class SeedService : ISeedService
     {
-        private readonly ILogger _logger;
         private readonly ApplicationDbContext _context;
         private readonly IImporterService _importerService;
         private readonly IBlobService _blobService;
 
         public SeedService(
-            ILogger logger,
             ApplicationDbContext context,
             IImporterService importerService,
             IBlobService blobService)
         {
-            _logger = logger;
             _context = context;
             _importerService = importerService;
             _blobService = blobService;
@@ -27,8 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public void SeedRelease(Release release)
         {
-            _logger.LogInformation("Seeding Release for {Publication}, {Release}", release.PublicationId, release.Name);
-
             var releaseDb = CreateRelease(release);
 
             foreach (var subject in release.Subjects)
@@ -39,11 +33,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private void SeedSubject(Model.Release release, Subject subject)
         {
-            _logger.LogInformation("Seeding Subject for {Publication}, {Subject}", release.PublicationId, subject.Name);
- 
             var subjectDb = CreateSubject(release, subject);
             var sSubject = subjectDb.Name.Split("_");
-            var destFolder = sSubject[0] + "/" + release.PublicationId.ToString();
+            var destFolder = sSubject[0] + "/" + release.PublicationId;
 
             _importerService.Import(subject.GetCsvLines(), subject.GetMetaLines(), subjectDb);
 

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class IndicatorGroupService : AbstractDataService<IndicatorGroup, long>, IIndicatorGroupService
+    public class IndicatorGroupService : AbstractRepository<IndicatorGroup, long>, IIndicatorGroupService
     {
         public IndicatorGroupService(ApplicationDbContext context,
             ILogger<IndicatorGroupService> logger) : base(context, logger)

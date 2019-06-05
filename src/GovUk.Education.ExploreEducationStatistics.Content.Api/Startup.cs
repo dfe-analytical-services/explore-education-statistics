@@ -1,7 +1,9 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Converters;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Data;
+﻿using System.Diagnostics.CodeAnalysis;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +16,7 @@ using Swashbuckle.AspNetCore.Swagger;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 {
+    [ExcludeFromCodeCoverage]
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -40,11 +43,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             if (string.IsNullOrWhiteSpace(connectionString))
             {
                 const string connection = "Data Source=dfe-meta.db";
-                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connection));
+                
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options
+                        .UseSqlite(connection,
+                            builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
+                        .EnableSensitiveDataLogging()
+                );
             }
             else
             {
-                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options
+                        .UseSqlServer(connectionString,
+                            builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName)));
             }
 
             // Adds Brotli and Gzip compressing
@@ -58,8 +70,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             services.AddCors();
-
+            services.AddAutoMapper();
             services.AddTransient<IContentService, ContentService>();
+            services.AddTransient<IReleaseService, ReleaseService>();
+            services.AddTransient<IPublicationService, PublicationService>();
+            services.AddTransient<IMethodologyService, MethodologyService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

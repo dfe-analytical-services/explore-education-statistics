@@ -1,4 +1,9 @@
-import { Form, FormFieldSelect, FormFieldset } from '@common/components/form';
+import {
+  Form,
+  FormFieldSelect,
+  FormFieldset,
+  Formik,
+} from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -6,7 +11,7 @@ import Yup from '@common/lib/validation/yup';
 import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import { Comparison } from '@common/types/util';
-import { Formik, FormikProps } from 'formik';
+import { FormikProps } from 'formik';
 import React from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
@@ -46,16 +51,18 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
     </WizardStepHeading>
   );
 
+  const initialValues = {
+    start: '',
+    end: '',
+  };
+
   return (
     <Formik<FormValues>
       onSubmit={async values => {
         await onSubmit(values);
         goToNextStep();
       }}
-      initialValues={{
-        start: '',
-        end: '',
-      }}
+      initialValues={initialValues}
       validationSchema={Yup.object<FormValues>({
         end: Yup.string()
           .required('End date is required')
@@ -130,7 +137,14 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
               />
             </FormFieldset>
 
-            <WizardStepFormActions {...props} form={form} formId={formId} />
+            <WizardStepFormActions
+              {...props}
+              form={form}
+              formId={formId}
+              onPreviousStep={() => {
+                form.resetForm(initialValues);
+              }}
+            />
           </Form>
         ) : (
           <>

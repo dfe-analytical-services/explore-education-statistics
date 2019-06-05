@@ -11,7 +11,6 @@ import { dataApi } from '@common/services/api';
 jest.mock('@common/services/api', () => {
   return {
     dataApi: {
-      get: jest.fn(),
       post: jest.fn(),
     },
   };
@@ -20,13 +19,8 @@ jest.mock('@common/services/api', () => {
 describe('dataBlockService', () => {
   beforeEach(() => {
     // @ts-ignore
-    dataApi.get.mockImplementation(() => {
-      return Promise.resolve(testData.testBlockMetaData);
-    });
-
-    // @ts-ignore
     dataApi.post.mockImplementation(() => {
-      return Promise.resolve(testData.testBlockData);
+      return Promise.resolve(testData.response);
     });
   });
 
@@ -44,8 +38,7 @@ describe('dataBlockService', () => {
       dataBlockRequest,
     );
 
-    expect(dataApi.get).toBeCalledWith('/meta/subject/1');
-    expect(dataApi.post).toBeCalledWith('/tablebuilder', dataBlockRequest);
+    expect(dataApi.post).toBeCalledWith('/Data', dataBlockRequest);
 
     expect(result).toMatchSnapshot(result);
   });
@@ -55,19 +48,20 @@ describe('dataBlockService', () => {
       dataBlockRequest,
     );
 
-    expect(dataApi.get).toBeCalledWith('/meta/subject/1');
-    expect(dataApi.post).toBeCalledWith('/tablebuilder', dataBlockRequest);
+    expect(dataApi.post).toBeCalledWith('/Data', dataBlockRequest);
 
     expect(result.metaData.locations).not.toBeUndefined();
 
     expect(result.metaData.locations.E92000001).not.toBeUndefined();
 
     // @ts-ignore
-    const geoJson: DataBlockGeoJSON =
+    const geoJson: DataBlockGeoJSON[] =
       result.metaData.locations.E92000001.geoJson;
 
-    expect(geoJson.geometry).not.toBeUndefined();
+    expect(geoJson.length).toBe(1);
 
-    expect(geoJson.properties).not.toBeUndefined();
+    expect(geoJson[0].geometry).not.toBeUndefined();
+
+    expect(geoJson[0].properties).not.toBeUndefined();
   });
 });

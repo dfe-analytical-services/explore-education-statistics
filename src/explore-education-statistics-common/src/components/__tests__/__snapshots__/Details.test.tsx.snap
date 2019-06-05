@@ -3,14 +3,13 @@
 exports[`Details renders correctly 1`] = `
 
 <details class="govuk-details"
-         data-testid="Test summary"
          role="group"
 >
   <summary class="govuk-details__summary"
-           role="button"
-           tabindex="0"
            aria-controls="test-details"
            aria-expanded="false"
+           role="button"
+           tabindex="0"
   >
     <span class="govuk-details__summary-text"
           data-testid="details--expand"
@@ -19,8 +18,9 @@ exports[`Details renders correctly 1`] = `
     </span>
   </summary>
   <div class="govuk-details__text"
-       id="test-details"
+       style
        aria-hidden="true"
+       id="test-details"
   >
     Test content
   </div>
@@ -32,14 +32,13 @@ exports[`Details renders correctly with \`open\` prop set to true 1`] = `
 
 <details class="govuk-details"
          open
-         data-testid="Test summary"
          role="group"
 >
   <summary class="govuk-details__summary"
-           role="button"
-           tabindex="0"
            aria-controls="test-details"
            aria-expanded="true"
+           role="button"
+           tabindex="0"
   >
     <span class="govuk-details__summary-text"
           data-testid="details--expand"
@@ -48,8 +47,8 @@ exports[`Details renders correctly with \`open\` prop set to true 1`] = `
     </span>
   </summary>
   <div class="govuk-details__text"
-       id="test-details"
        aria-hidden="false"
+       id="test-details"
   >
     Test content
   </div>

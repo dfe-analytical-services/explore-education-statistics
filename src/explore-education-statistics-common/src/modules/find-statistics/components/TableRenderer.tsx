@@ -4,6 +4,7 @@ import {
   DataBlockData,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
+import TimePeriod from '@common/services/types/TimePeriod';
 
 export interface Props {
   data: DataBlockData;
@@ -26,7 +27,7 @@ const TableHeading = ({ data, meta, indicators }: Props) => {
             className="govuk-table__header govuk-table__cell--numeric"
             scope="col"
           >
-            {meta.timePeriods[result.year].label}
+            {meta.timePeriods[`${result.year}_${result.timeIdentifier}`].label}
           </th>
         ))}
       </tr>

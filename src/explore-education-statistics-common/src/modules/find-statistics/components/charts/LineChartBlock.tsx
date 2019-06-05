@@ -57,7 +57,11 @@ export default class LineChartBlock extends Component<ChartProps> {
             [indicatorName]: result.measures[indicatorName],
           };
         },
-        { name: `${meta.timePeriods[result.year].label}` },
+        {
+          name: `${
+            meta.timePeriods[`${result.year}_${result.timeIdentifier}`].label
+          }`,
+        },
       );
     });
 

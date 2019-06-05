@@ -9,16 +9,13 @@ import 'leaflet/dist/leaflet.css';
 import React from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
 import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import {
-  DataBlockGeoJsonProperties,
-  GeographicLevel,
-} from '@common/services/dataBlockService';
+import { DataBlockGeoJsonProperties } from '@common/services/dataBlockService';
 import { FormSelect } from '@common/components/form';
 import classNames from 'classnames';
 import { SelectOption } from '@common/components/form/FormSelect';
 import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
-import temporaryLocationService from '@common/services/temporaryLocationService';
+import UKGeoJson from '@common/services/UKGeoJson';
 
 export type MapFeature = Feature<Geometry, GeoJsonProperties>;
 
@@ -47,11 +44,13 @@ function MapBlock(props: MapProps) {
 
   const locationGeoJSON = Object.values(meta.locations)
     .map(({ geoJson }) => geoJson)
-    .filter(gj => gj !== undefined);
+    .filter(gj => gj !== undefined)
+    .map(geojsonArray => geojsonArray[0]);
 
   // Build options for forms
   const locationOptions = [
     { label: 'All', value: '' },
+
     ...locationGeoJSON
       .map(({ properties: { name, code } }) => ({ label: name, value: code }))
       .sort((a, b) => {
@@ -139,15 +138,7 @@ function MapBlock(props: MapProps) {
     console.log(feature);
   };
 
-  const uk = temporaryLocationService.getGeoJSONForLocation(
-    GeographicLevel.National,
-    {
-      country: { country_code: 'UK', country_name: 'UK' },
-      region: { region_code: '', region_name: '' },
-      localAuthority: { new_la_code: '', la_name: '', old_la_code: '' },
-      localAuthorityDistrict: { sch_lad_code: '', sch_lad_name: '' },
-    },
-  );
+  const uk = UKGeoJson.UK;
 
   return (
     <div className="govuk-grid-row">
