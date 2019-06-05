@@ -30,13 +30,12 @@ const PrototypeDataSample = ({
             <PrototypeDataTilesHighlights />
             <ul className="govuk-list govuk-list--bullet">
               <li>pupils missed on average 8.2 school days</li>
+              <li>overall and unauthorised absence rates up on 2015/16</li>
               <li>
-                overall and unauthorised absence rates up on previous year
+                unauthorised absence rise due to higher rates of unauthorised
+                holidays
               </li>
-              <li>
-                unauthorised rise due to higher rates of unauthorised holidays
-              </li>
-              <li>10% of pupils persistently absent during 2016/17</li>
+              <li>10% of pupils persistently absent across 2016/17</li>
             </ul>
           </TabsSection>
         )}

@@ -18,7 +18,7 @@ const PublicationPage = () => {
           link: '/prototypes/browse-releases-find',
           text: 'Find statistics and download data',
         },
-        { text: 'Absence statistics for schools in England', link: '#' },
+        { text: 'Pupil absence statistics for schools in England', link: '#' },
       ]}
     >
       <strong className="govuk-tag govuk-!-margin-bottom-2">
@@ -26,7 +26,7 @@ const PublicationPage = () => {
         Latest statistics and data{' '}
       </strong>
       <h1 className="govuk-heading-xl">
-        Pupil absence statistics and data for schools in England - V2
+        Pupil absence statistics for schools in England - V2
       </h1>
       <dl className="dfe-meta-content">
         <dt className="govuk-caption-m">Published: </dt>
@@ -72,7 +72,7 @@ const PublicationPage = () => {
 
           <Details summary="Download data files">
             <p>
-              Download using the following formats or access our data via our
+              Download data in the following formats or access our data via our
               API:
             </p>
             <ul className="govuk-list-bullet">
@@ -721,7 +721,8 @@ const PublicationPage = () => {
           </p>
           <h3 className="govuk-heading-s">Local authority (LA) level data</h3>
           <p>
-            Download using the following formats or access our data via our API:
+            Download data in the following formats or access our data via our
+            API:
           </p>
           <ul className="govuk-list-bullet">
             <li>
@@ -779,7 +780,7 @@ const PublicationPage = () => {
             <li>special schools</li>
           </ul>
           <p>
-            They also includes information for{' '}
+            They also include information for{' '}
             <a href="/glossary#pupil-referral-unit">pupil referral units</a> and
             pupils aged 4 years.
           </p>

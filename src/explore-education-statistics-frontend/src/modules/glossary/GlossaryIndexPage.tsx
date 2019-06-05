@@ -438,6 +438,10 @@ function GlossaryIndexPage() {
           <h3 id="what-is-an-api">What is an API?</h3>
           <p>INSERT DEFINITION - TBC.</p>
         </AccordionSection>
+        <AccordionSection heading="X">
+          <h3 id="xxx-xxx">SOMETHING BEGINNIG WITH X</h3>
+          <p>INSERT DEFINITION - TBC.</p>
+        </AccordionSection>
         <AccordionSection heading="Y">
           <h3 id="year-1-year-2">year 1, year 2</h3>
           <p>INSERT DEFINITION - TBC.</p>
