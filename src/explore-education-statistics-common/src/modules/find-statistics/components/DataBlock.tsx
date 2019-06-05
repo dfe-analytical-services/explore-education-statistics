@@ -22,6 +22,8 @@ import {
   Table,
 } from '@common/services/publicationService';
 import React, { Component, ReactNode } from 'react';
+import { MapFeature } from './charts/MapBlock';
+import DownloadDetails from './DownloadDetails';
 
 export interface DataBlockProps {
   id: string;
@@ -139,8 +141,14 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
               {tables.map((table, idx) => {
                 const key = `${id}0_table_${idx}`;
 
-                return <TableRenderer key={key} {...table} />;
+                return (
+                  <>
+                    <TableRenderer key={key} {...table} />
+                    <DownloadDetails />
+                  </>
+                );
               })}
+
               {additionalTabContent}
             </TabsSection>
           )}
@@ -154,22 +162,17 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
               {charts.map((chart, idx) => {
                 const key = `${id}_chart_${idx}`;
 
-                return <ChartRenderer key={key} {...chart} height={height} />;
+                return (
+                  <>
+                    <ChartRenderer key={key} {...chart} height={height} />
+                    <DownloadDetails />
+                  </>
+                );
               })}
+
               {additionalTabContent}
             </TabsSection>
           )}
-
-          <TabsSection id={`datablock_${id}_downloads`} title="Data downloads">
-            <p>
-              You can customise and download data as Excel, .csv or .pdf files.
-              Our data can also be accessed via an API.
-            </p>
-            <div className="govuk-inset-text">
-              Data downloads have not yet been implemented within the service.
-            </div>
-            {additionalTabContent}
-          </TabsSection>
         </Tabs>
       </div>
     );

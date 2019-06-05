@@ -30,7 +30,7 @@ const ContentSubBlockRenderer = ({ block, id }: Props) => {
           id={`${id}_datablock`}
           additionalTabContent={
             <>
-              <h2 className="govuk-heading-m govuk-!-margin-top-9">
+              <h2 className="govuk-heading-m">
                 Explore and edit this data online
               </h2>
               <p>Use our table tool to explore this data.</p>
