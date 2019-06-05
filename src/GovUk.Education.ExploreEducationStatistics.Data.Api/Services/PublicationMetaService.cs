@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
@@ -23,18 +26,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _mapper = mapper;
         }
 
-        public PublicationMetaViewModel GetPublicationMeta(Guid publicationId)
+        public PublicationSubjectsMetaViewModel GetPublication(Guid publicationId)
         {
             var releaseId = _releaseService.GetLatestRelease(publicationId);
 
             var subjectMetaViewModels = _mapper.Map<IEnumerable<IdLabelViewModel>>(
                 _subjectService.FindMany(subject => subject.Release.Id == releaseId));
 
-            return new PublicationMetaViewModel
+            return new PublicationSubjectsMetaViewModel
             {
                 PublicationId = publicationId,
                 Subjects = subjectMetaViewModels
             };
+        }
+
+        public IEnumerable<ThemeMetaViewModel> GetThemes()
+        {
+            return _mapper.Map<IEnumerable<ThemeMetaViewModel>>(_releaseService.All(
+                    new List<Expression<Func<Release, object>>>
+                    {
+                        release => release.Publication.Topic.Theme
+                    })
+                .GroupBy(release => release.Publication.Topic.Theme)
+                .Select(grouping => grouping.Key)
+            );
         }
     }
 }

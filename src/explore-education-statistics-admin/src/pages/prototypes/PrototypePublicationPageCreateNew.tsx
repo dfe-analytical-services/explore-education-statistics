@@ -3,6 +3,7 @@ import PrototypePage from './components/PrototypePage';
 import PrototypePublicationConfig from './components/PrototypePublicationPageConfig';
 
 const PublicationPage = () => {
+  const sectionId = 'newPublication';
   return (
     <PrototypePage
       wide
@@ -11,11 +12,11 @@ const PublicationPage = () => {
           link: '/prototypes/admin-dashboard',
           text: 'Administrator dashboard',
         },
-        { text: 'Create new release', link: '#' },
+        { text: 'Create new publication', link: '#' },
       ]}
     >
-      <h1 className="govuk-heading-xl">Create new release</h1>
-      <PrototypePublicationConfig />
+      <h1 className="govuk-heading-xl">Create new publication</h1>
+      <PrototypePublicationConfig sectionId={sectionId} />
     </PrototypePage>
   );
 };

@@ -22,10 +22,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
                 .ForMember(dest => dest.Value, opts => opts.MapFrom(indicator => indicator.Id))
                 .ForMember(dest => dest.Unit, opts => opts.MapFrom(MapIndicatorUnitExpression()));
 
+            CreateMap<Location, LocationViewModel>();
+            
+            CreateMap<Publication, PublicationMetaViewModel>();
+            
             CreateMap<Subject, IdLabelViewModel>()
                 .ForMember(dest => dest.Label, opts => opts.MapFrom(subject => subject.Name));
 
-            CreateMap<Location, LocationViewModel>();
+            CreateMap<Theme, ThemeMetaViewModel>();
+            
+            CreateMap<Topic, TopicMetaViewModel>();
         }
 
         private static Expression<Func<Indicator, string>> MapIndicatorUnitExpression()

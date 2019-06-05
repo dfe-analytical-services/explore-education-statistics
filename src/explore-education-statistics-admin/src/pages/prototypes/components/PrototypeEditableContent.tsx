@@ -108,7 +108,7 @@ class PrototypeEditableContent extends React.Component<Props, State> {
     return (
       <div className={styles.editableContentEditing}>
         <div className={styles.editableButton}>
-          <button onClick={this.save} type="button">
+          <button className="govuk-button" onClick={this.save} type="button">
             Save
           </button>
         </div>

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
@@ -16,10 +18,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             _publicationMetaService = publicationMetaService;
         }
 
-        [HttpGet("publication/{publicationId}")]
-        public ActionResult<PublicationMetaViewModel> GetPublicationMeta(Guid publicationId)
+        [HttpGet("themes")]
+        public ActionResult<IEnumerable<ThemeMetaViewModel>> GetThemes()
         {
-            var viewModel = _publicationMetaService.GetPublicationMeta(publicationId);
+            return _publicationMetaService.GetThemes().ToList();
+        }
+        
+        [HttpGet("publication/{publicationId}")]
+        public ActionResult<PublicationSubjectsMetaViewModel> GetPublication(Guid publicationId)
+        {
+            var viewModel = _publicationMetaService.GetPublication(publicationId);
             if (viewModel == null)
             {
                 return NotFound();

@@ -1,7 +1,7 @@
 import React from 'react';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
-import PrototypePublicationConfig from './components/PrototypePublicationPageConfig';
+import PrototypeReleaseConfig from './components/PrototypeReleasePageConfig';
 
 const PublicationConfigEditPage = () => {
   const sectionId = 'setup';
@@ -18,7 +18,7 @@ const PublicationConfigEditPage = () => {
       ]}
     >
       <PrototypeAdminNavigation sectionId={sectionId} />
-      <PrototypePublicationConfig sectionId={sectionId} />
+      <PrototypeReleaseConfig sectionId={sectionId} />
     </PrototypePage>
   );
 };

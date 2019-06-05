@@ -1,10 +1,10 @@
 import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
+import PrototypeExampleTableList from '@admin/pages/prototypes/components/PrototypeAdminExampleTableList';
 import { ContentBlock } from '@common/services/publicationService';
 import marked from 'marked';
 import React, { Component } from 'react';
 // import { Draggable } from 'react-beautiful-dnd';
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
-import Link from '@admin/components/Link';
 
 interface Props {
   block: ContentBlock;
@@ -21,13 +21,16 @@ class EditableContentSubBlockRenderer extends Component<Props> {
     switch (block.type) {
       case 'MarkDownBlock':
         return (
-          <PrototypeEditableContent
-            editable={editable}
-            onContentChange={onContentChange}
-            content={`
+          <>
+            {editable && <PrototypeExampleTableList />}
+            <PrototypeEditableContent
+              editable={editable}
+              onContentChange={onContentChange}
+              content={`
          <div className="govuk-body">${marked(block.body)} </div>
       `}
-          />
+            />
+          </>
         );
       case 'InsetTextBlock':
         return (
@@ -59,9 +62,9 @@ class EditableContentSubBlockRenderer extends Component<Props> {
                     Explore and edit this data online
                   </h2>
                   <p>Use our table tool to explore this data.</p>
-                  <Link to="/table-tool/" className="govuk-button">
+                  <a href="/table-tool/" className="govuk-button">
                     Explore data
-                  </Link>
+                  </a>
                 </>
               }
             />

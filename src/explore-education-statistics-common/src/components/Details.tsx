@@ -8,6 +8,7 @@ let idCounter = 0;
 
 export interface DetailsProps {
   className?: string;
+  tag?: string;
   children: ReactNode;
   id?: string;
   onToggle?: (isOpen: boolean, event: MouseEvent<HTMLElement>) => void;
@@ -22,6 +23,7 @@ const Details = ({
   open = false,
   onToggle,
   summary,
+  tag,
 }: DetailsProps) => {
   const ref = useRef<HTMLElement>(null);
 
@@ -99,6 +101,9 @@ const Details = ({
           data-testid="details--expand"
         >
           {summary}
+          {tag && (
+            <span className="govuk-tag govuk-!-margin-left-2">{tag}</span>
+          )}
         </span>
       </summary>
       <div

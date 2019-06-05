@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 
         int Count(Expression<Func<TEntity, bool>> expression);
 
-        IEnumerable<TEntity> All();
+        IEnumerable<TEntity> All(List<Expression<Func<TEntity, object>>> include = null);
 
         TEntity Find(TKey id);
 

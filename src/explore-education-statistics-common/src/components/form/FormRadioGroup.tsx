@@ -1,4 +1,4 @@
-import { Omit, PartialBy } from '@common/types/util';
+import { OmitStrict, PartialBy } from '@common/types/util';
 import classNames from 'classnames';
 import kebabCase from 'lodash/kebabCase';
 import orderBy from 'lodash/orderBy';
@@ -11,7 +11,7 @@ import FormRadio, {
 } from './FormRadio';
 
 type RadioOption = PartialBy<
-  Omit<FormRadioProps, 'checked' | 'name' | 'onChange'>,
+  OmitStrict<FormRadioProps, 'checked' | 'name' | 'onChange'>,
   'id'
 >;
 
