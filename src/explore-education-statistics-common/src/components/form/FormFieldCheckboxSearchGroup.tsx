@@ -1,4 +1,4 @@
-import { Omit } from '@common/types/util';
+import { OmitStrict } from '@common/types/util';
 import React from 'react';
 import FieldCheckboxArray from './FieldCheckboxArray';
 import FormCheckboxSearchGroup, {
@@ -9,7 +9,7 @@ import { onAllChange, onChange } from './util/checkboxGroupFieldHelpers';
 export type FormFieldCheckboxSearchGroupProps<FormValues> = {
   name: keyof FormValues | string;
   showError?: boolean;
-} & Omit<FormCheckboxSearchGroupProps, 'value'>;
+} & OmitStrict<FormCheckboxSearchGroupProps, 'value'>;
 
 const FormFieldCheckboxSearchGroup = <T extends {}>(
   props: FormFieldCheckboxSearchGroupProps<T>,

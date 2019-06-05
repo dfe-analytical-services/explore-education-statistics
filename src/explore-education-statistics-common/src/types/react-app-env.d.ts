@@ -7,10 +7,6 @@ declare namespace NodeJS {
     NODE_ENV: 'development' | 'production' | 'test';
     PUBLIC_URL: string;
   }
-
-  interface Process {
-    browser: boolean;
-  }
 }
 
 declare module '*.bmp' {

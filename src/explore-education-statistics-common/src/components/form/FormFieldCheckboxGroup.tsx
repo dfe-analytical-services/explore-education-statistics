@@ -1,4 +1,4 @@
-import { Omit } from '@common/types/util';
+import { OmitStrict } from '@common/types/util';
 import React from 'react';
 import FieldCheckboxArray from './FieldCheckboxArray';
 import FormCheckboxGroup, { FormCheckboxGroupProps } from './FormCheckboxGroup';
@@ -7,7 +7,7 @@ import { onAllChange, onChange } from './util/checkboxGroupFieldHelpers';
 type Props<FormValues> = {
   name: keyof FormValues | string;
   showError?: boolean;
-} & Omit<FormCheckboxGroupProps, 'value'>;
+} & OmitStrict<FormCheckboxGroupProps, 'value'>;
 
 const FormFieldCheckboxGroup = <T extends {}>(props: Props<T>) => {
   const { options } = props;
