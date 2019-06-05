@@ -71,7 +71,6 @@
     "test:watch": "jest --watch",
     "test:snapshot": "jest --updateSnapshot"
   },
-  "types": "src/types",
   "author": "",
   "license": "MIT",
   "private": true,
