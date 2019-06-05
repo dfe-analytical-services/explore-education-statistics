@@ -14,8 +14,8 @@ Go to Table Tool page
 
 Select "Pupil absence" publication
     [Tags]  HappyPath
-    user clicks details    css:[data-testid="Early years and schools"]
-    user clicks details    css:[data-testid="Absence and exclusions"]
+    user clicks element containing text    Early years and schools
+    user clicks element containing text    Absence and exclusions
     user clicks element    css:[data-testid="Pupil absence"]
     user clicks element    css:#publicationForm-submit
     user waits until page contains    Choose a subject
