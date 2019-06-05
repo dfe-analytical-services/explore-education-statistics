@@ -4,7 +4,7 @@ import Details from '@common/components/Details';
 import Link from '@frontend/components/Link';
 import PrototypePage from '@frontend/prototypes/components/PrototypePage';
 import React from 'react';
-import PrototypeDataSample from './components/PrototypeDataSampleExclusions';
+import PrototypeDataSample from './components/PrototypeDataSampleApplications';
 
 const PublicationPageExclusions = () => {
   return (
@@ -22,8 +22,7 @@ const PublicationPageExclusions = () => {
         Latest statistics and data{' '}
       </strong>
       <h1 className="govuk-heading-xl">
-        Applications and offers statistics for primary and secondary schools in
-        England
+        Secondary and primary school applications and offers in England
       </h1>
       <dl className="dfe-meta-content">
         <dt className="govuk-caption-m">Published: </dt>
@@ -39,19 +38,21 @@ const PublicationPageExclusions = () => {
                 Read national statistical summaries, view charts and tables and
                 download data files.
               </p>
+              <p>
+                All figures refer to the <strong>2016/17 academic year</strong>{' '}
+                - unless otherwise stated.
+              </p>
               <p className="govuk-inset-text">
-                View a regional breakdown of statistics and data under the{' '}
-                <a href="#contents-exclusions-sections-heading-9">
-                  Regional and local authority (LA) breakdown
-                </a>{' '}
-                section
+                <a href="#contents-exclusions-sections-heading-8">
+                  View regional and local authority (LA) breakdowns
+                </a>
               </p>
 
               <p>
                 Find out how and why these statistics are collected and
                 published -{' '}
                 <Link to="#">
-                  Applications and offers for primary and secondary schools:
+                  Secondary and primary school applications and offers:
                   methodology
                 </Link>
               </p>
@@ -68,8 +69,8 @@ const PublicationPageExclusions = () => {
 
           <Details summary="Download data files">
             <p>
-              You can customise and download data as Excel or .csv files. Our
-              data can also be accessed via an API.
+              Download data in the following formats or access our data via our
+              API:
             </p>
             <ul className="govuk-list">
               <li>
@@ -88,8 +89,12 @@ const PublicationPageExclusions = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="govuk-link">
+                <a href="/glossary#what-is-an-api" className="govuk-link">
                   Access API
+                </a>{' '}
+                -{' '}
+                <a href="/glossary#what-is-an-api" className="govuk-link">
+                  What is an API?
                 </a>
               </li>
             </ul>
@@ -104,7 +109,7 @@ const PublicationPageExclusions = () => {
 
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <span className="govuk-caption-m govuk-caption-inline">
-                For school year:{' '}
+                For:{' '}
               </span>
               March and April 2018 (latest data)
             </h3>
@@ -155,7 +160,7 @@ const PublicationPageExclusions = () => {
             </Details>
 
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <span className="govuk-caption-m">Last updated: </span>14 June
+              <span className="govuk-caption-m">Last updated: </span>11 June
               2018
             </h3>
 
@@ -191,7 +196,7 @@ const PublicationPageExclusions = () => {
               <ul className="govuk-list">
                 <li>
                   <Link to="#">
-                    Applications and offers for primary and secondary schools:
+                    Secondary and primary school applications and offers:
                     methodology
                   </Link>
                 </li>
@@ -252,32 +257,9 @@ const PublicationPageExclusions = () => {
         chartDataKeys={['total', 'primary', 'secondary', 'special']}
       />
 
-      <h2 className="govuk-heading-l">Contents</h2>
       <Accordion id="contents-exclusions-sections">
-        <AccordionSection heading="About these statistics">
-          <p className="govuk-body">
-            This statistical release outlines the number of offers made to
-            applicants for primary and secondary school places and the
-            proportion which have received preferred offers (1st, 2nd, 3rd
-            preference etc).
-          </p>
-          <p className="govuk-body">
-            The data is collected from local authorities, where its produced as
-            part of the annual application and offer process for applicants
-            requiring a place to start at primary or secondary school in
-            September 2018.
-          </p>
-          <p className="govuk-body">
-            The offers were made and data collected based on the national offer
-            days of 1 March 2018 (secondary) and 16 April 2018 (primary).
-          </p>
-          <p className="govuk-body">
-            DO WE NEED THIS ON EVERY DOCUMENT??? We welcome feedback on any
-            aspect of this document at{' '}
-            <a href="#">schools.statistics@education.gov.uk</a>
-          </p>
-        </AccordionSection>
-        <AccordionSection heading="Secondary applications and offers ">
+        <AccordionSection heading="Secondary applications and offers">
+          <h3 className="govuk-heading-s">SOME SORT OF HEADLINE???</h3>{' '}
           <p className="govuk-body">
             These figures come from the application and offer process undertaken
             by local authorities to enable them to send out offers of a place in
@@ -297,45 +279,10 @@ const PublicationPageExclusions = () => {
             any of their preferred schools also dropped slightly to 95.5% in
             2018 (from 96.1%).
           </p>
-          <PrototypeDataSample
-            sectionId="permanentExclusions"
-            chartTitle="permanent exclusions in England"
-            xAxisLabel="School Year"
-            yAxisLabel="Permanent exclusions"
-            chartData={[
-              {
-                name: '2012/13',
-                primary: 4.7,
-                'primary and secondary': 5.9,
-                secondary: 7.3,
-              },
-              {
-                name: '2013/14',
-                primary: 3.9,
-                'primary and secondary': 4.3,
-                secondary: 5.0,
-              },
-              {
-                name: '2014/15',
-                primary: 4.6,
-                'primary and secondary': 5.8,
-                secondary: 7.1,
-              },
-              {
-                name: '2015/16',
-                primary: 3.8,
-                'primary and secondary': 4.0,
-                secondary: 4.6,
-              },
-              {
-                name: '2016/17',
-                primary: 4.7,
-                'primary and secondary': 5.8,
-                secondary: 7.1,
-              },
-            ]}
-            chartDataKeys={['primary', 'secondary', 'primary and secondary']}
-          />
+          <p>
+            INSERT - Table A: Timeseries of key secondary preference rates,
+            England
+          </p>
         </AccordionSection>
 
         <AccordionSection heading="Secondary geographical variation">
@@ -356,45 +303,7 @@ const PublicationPageExclusions = () => {
             proportions receiving any preferred offer compared to those for
             receiving a first preference (see chart below).
           </p>
-          <PrototypeDataSample
-            sectionId="fixedPeriodExclusions"
-            chartTitle="fixed-period exclusion rates in England"
-            xAxisLabel="School Year"
-            yAxisLabel="Fixed-period exclusion rate"
-            chartData={[
-              {
-                name: '2012/13',
-                primary: 14.7,
-                'primary and secondary': 18.9,
-                secondary: 23.3,
-              },
-              {
-                name: '2013/14',
-                primary: 13.9,
-                'primary and secondary': 18.3,
-                secondary: 22.0,
-              },
-              {
-                name: '2014/15',
-                primary: 14.6,
-                'primary and secondary': 18.8,
-                secondary: 24.1,
-              },
-              {
-                name: '2015/16',
-                primary: 13.8,
-                'primary and secondary': 18.0,
-                secondary: 22.6,
-              },
-              {
-                name: '2016/17',
-                primary: 14.7,
-                'primary and secondary': 18.9,
-                secondary: 24.1,
-              },
-            ]}
-            chartDataKeys={['primary', 'secondary', 'primary and secondary']}
-          />
+          <p>INSERT CHART IN HERE!!!</p>
           <p>
             An applicant can apply for any school, including those situated in
             another local authority. Their authority liaises with the requested
@@ -411,7 +320,10 @@ const PublicationPageExclusions = () => {
           </p>
         </AccordionSection>
 
-        <AccordionSection heading="Primary applications and offers">
+        <AccordionSection heading="Primary applications and offers ">
+          <h3 className="govuk-heading-s">
+            Enrolments with one or more fixed-period exclusion definition
+          </h3>{' '}
           <p>
             The primary table is based on the offers made by local authorities
             on the primary national offer day of 16 April 2018. This national
@@ -428,8 +340,12 @@ const PublicationPageExclusions = () => {
             offer of any of their preferences has also increased slightly, from
             97.7% (2017) to 98.1%.
           </p>
+          <p>
+            INSERT - Table B: Timeseries of key primary preference rates,
+            England Entry into academic year
+          </p>
         </AccordionSection>
-        <AccordionSection heading="Primary geographical variation">
+        <AccordionSection heading="Primary geographical variation ">
           <p>
             At local authority level East Riding of Yorkshire (97.6%),
             Northumberland (97.4%) and Rutland (97.4%) achieved the best first
@@ -445,6 +361,7 @@ const PublicationPageExclusions = () => {
             primary level was 86.6% (85.9% in 2017), compared to 66.0% at
             secondary level (68.2% in 2017).
           </p>
+          <p>INSERT CHART HERE!!!</p>
           <p>
             As in previous years, at primary level a smaller proportion of
             offers were made of schools outside the applicant’s local authority
@@ -459,96 +376,119 @@ const PublicationPageExclusions = () => {
 
       <Accordion id="extra-information-exclusions-sections">
         <AccordionSection
-          heading="Applications and offers for primary and secondary schools: methodology"
-          caption="How we collect and process statistics and data"
+          heading="Secondary and primary school applications and offers: methodology"
+          caption="Find out how and why we collect, process and publish these statistics"
           headingTag="h3"
         >
-          <ul className="govuk-list">
-            <li>
-              <a href="#" className="govuk-link">
-                How do we collect it?
-              </a>
-            </li>
-            <li>
-              <a href="#" className="govuk-link">
-                What do we do with it?
-              </a>
-            </li>
-            <li>
-              <a href="#" className="govuk-link">
-                Related policies
-              </a>
-            </li>
-          </ul>
+          <p>
+            Read our{' '}
+            <a href="#">
+              Secondary and primary school applications and offers: methodology
+            </a>{' '}
+            guidance.
+          </p>
         </AccordionSection>
+
+        <AccordionSection heading="About these statistics">
+          <p className="govuk-body">
+            The statistics and data cover permanent and fixed period exclusions
+            and school-level exclusions during the 2016/17 academic year in the
+            following state-funded school types as reported in the school
+            census:
+          </p>
+          <ul className="govuk-list-bullet">
+            <li>primary schools</li>
+            <li>secondary schools</li>
+            <li>special schools</li>
+          </ul>
+          <p className="govuk-body">
+            They also include national-level information on permanent and
+            fixed-period exclusions for{' '}
+            <a href="/glossary#pupil-referral-unit">pupil referral units</a>.
+          </p>
+          <p>
+            All figures are based on unrounded data so constituent parts may not
+            add up due to rounding.
+          </p>
+          <p>
+            This statistical release provides the number of offers made to
+            applicants for both secondary and primary school places and the
+            proportion which have received preferred offers (1st, 2nd, 3rd
+            preference etc). The data is collected from local authorities, where
+            it is produced as part of the annual application and offer process
+            for applicants requiring a place to start at secondary or at primary
+            school in September 2018. The offers were made, and data collected,
+            based on the national offer days of 1 March 2018 (secondary) and 16
+            April 2018 (primary).
+          </p>
+        </AccordionSection>
+
         <AccordionSection
-          heading="National or Official (??) Statistics"
+          heading="Official OR National Statistics"
           headingTag="h3"
         >
           <p className="govuk-body">
-            The United Kingdom Statistics Authority designated these statistics
-            as National Statistics in <a href="#">Month Year</a> in accordance
-            with the Statistics and Registration Service Act 2007 and signifying
-            compliance with the Code of Practice for Statistics.
+            The{' '}
+            <a href="https://www.statisticsauthority.gov.u">
+              UK Statistics Authority
+            </a>{' '}
+            designated these statistics as National Statistics in [INSERT MONTH
+            YEAR] in accordance with the{' '}
+            <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
+              Statistics and Registration Service Act 2007
+            </a>
+            .
           </p>
           <p className="govuk-body">
-            Designation can be broadly interpreted to mean that the statistics:
+            Designation signifies their compliance with the authority's{' '}
+            <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
+              Code of Practice for Statistics
+            </a>{' '}
+            which broadly means these statistics are:
           </p>
           <ul className="govuk-list govuk-list--bullet">
-            <li>meet identified user needs;</li>
-            <li>are well explained and readily accessible;</li>
-            <li>are produced according to sound methods, and</li>
-            <li>
-              are managed impartially and objectively in the public interest
-            </li>
+            <li>managed impartially and objectively in the public interest</li>
+            <li>meeting identified user needs</li>
+            <li>produced according to sound methods</li>
+            <li>well-explained and readily accessible</li>
           </ul>
           <p className="govuk-body">
-            Once statistics have been designated as National Statistics it is a
-            statutory requirement that the Code of Practice shall continue to be
-            observed. Information on improvements made to these statistics to
-            continue their compliance with the Code of Practice are provided in
-            this <a href="#">accompanying document</a>
+            Once designated as National Statistics it's a statutory requirement
+            for statistics to ffollow and comply with the Code of Practice for
+            Statistics.
           </p>
-        </AccordionSection>
-        <AccordionSection heading="Feedback and questions" headingTag="h3">
-          <ul className="govuk-list">
-            <li>
-              <a href="#" className="govuk-link">
-                Feedback on this page
-              </a>
-            </li>
-            <li>
-              <a href="#" className="govuk-link">
-                Make a suggestion
-              </a>
-            </li>
-            <li>
-              <a href="#" className="govuk-link">
-                Ask a question
-              </a>
-            </li>
-          </ul>
-        </AccordionSection>
-        <AccordionSection heading="Contact us" headingTag="h3">
           <p>
-            If you have a specific enquiry about absence and exclusion
-            statistics and data:
+            Find out more about the standards we follow to produce these
+            statistics through our{' '}
+            <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
+              Standards for official statistics published by DfE
+            </a>{' '}
+            guidance.
           </p>
+        </AccordionSection>
+
+        <AccordionSection heading="Contact us" headingTag="h3">
           <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
             School absence and exclusions team
           </h4>
           <p className="govuk-!-margin-top-0">
-            Email
-            <br />
-            <a href="mailto:schools.statistics@education.gov.uk">
-              schools.statistics@education.gov.uk
-            </a>
+            If you have a specific enquiry about absence and exclusion
+            statistics and data
           </p>
-          <p>
-            Telephone: Mark Pearson
-            <br />
-            0114 274 2585
-          </p>
+          <div className="govuk-inset-text">
+            <p className="govuk-!-margin-top-0">
+              Email:{' '}
+              <a href="mailto:school.preference@education.gov.uk">
+                school.preference@education.gov.uk
+              </a>
+            </p>
+
+            <p>
+              Telephone: [INSERT NAME OF STATISTICIAN]
+              <br />
+              020 7783 8553
+            </p>
+          </div>
 
           <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
             Press office
@@ -567,7 +507,7 @@ const PublicationPageExclusions = () => {
           </p>
           <p>
             Telephone <br />
-            037 0000 2288
+            0370 000 2288
           </p>
         </AccordionSection>
       </Accordion>
@@ -575,10 +515,7 @@ const PublicationPageExclusions = () => {
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
         Create your own tables online
       </h2>
-      <p>
-        Use our tool to build tables using our range of national and regional
-        data.
-      </p>
+      <p>Use our tool to build tables using national and regional data.</p>
       <Link to="/prototypes/table-tool" className="govuk-button">
         Create tables
       </Link>

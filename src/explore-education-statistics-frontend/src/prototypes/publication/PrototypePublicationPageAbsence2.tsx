@@ -255,7 +255,7 @@ const PublicationPage = () => {
             <h3 className="govuk-heading-s">Overall absence</h3>
             <p>
               The <a href="/glossary#overall-absence">overall absence</a> rate
-              has increased across state-funded primary,secondary and special
+              has increased across state-funded primary, secondary and special
               schools between 2015/16 and 2016/17 driven by an increase in the
               unauthorised absence rate.
             </p>
