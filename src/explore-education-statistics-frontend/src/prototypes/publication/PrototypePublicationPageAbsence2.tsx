@@ -72,10 +72,10 @@ const PublicationPage = () => {
 
           <Details summary="Download data files">
             <p>
-              You can customise and download data as Excel or .csv files. Our
-              data can also be accessed via an API.
+              Download using the following formats or access our data via our
+              API:
             </p>
-            <ul className="govuk-list">
+            <ul className="govuk-list-bullet">
               <li>
                 <a href="#" className="govuk-link">
                   Download .csv files
@@ -96,7 +96,7 @@ const PublicationPage = () => {
                   Access API
                 </a>{' '}
                 -{' '}
-                <a href="#" className="govuk-link">
+                <a href="/glossary#what-is-an-api" className="govuk-link">
                   What is an API?
                 </a>
               </li>
@@ -316,7 +316,7 @@ const PublicationPage = () => {
             chartDataKeys={['primary', 'secondary', 'primary and secondary']}
           />
 
-          <h3 className="govuk-heading-s">Unauthorised absence rate</h3>
+          <h3 className="govuk-heading-s">Unauthorised absence</h3>
           <p>
             The{' '}
             <a href="/glossary#unauthorised-absence">unauthorised absence</a>{' '}
@@ -327,7 +327,7 @@ const PublicationPage = () => {
             This is due to an increase in absence due to family holidays not
             agreed by schools.
           </p>
-          <h3 className="govuk-heading-s">Authorised absence rate</h3>
+          <h3 className="govuk-heading-s">Authorised absence</h3>
           <p>
             The <a href="/glossary#authorised-absence">authorised absence</a>{' '}
             rate has stayed at 3.4% since 2015/16 but has been decreasing in
@@ -721,8 +721,7 @@ const PublicationPage = () => {
           </p>
           <h3 className="govuk-heading-s">Local authority (LA) level data</h3>
           <p>
-            You download data files in the following formats or access our data
-            via an API:
+            Download using the following formats or access our data via our API:
           </p>
           <ul className="govuk-list-bullet">
             <li>
