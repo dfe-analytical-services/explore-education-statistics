@@ -13,8 +13,10 @@ Navigate to Absence publication
     user clicks link  Find statistics and data
     user waits until page contains  Browse to find the statistics and data you’re looking for
 
-    user clicks element   css:[data-testid="SectionHeader Pupil absence"] button
-    element attribute value should be  css:[data-testid="SectionHeader Pupil absence"] button   aria-expanded   true
+    user clicks element   css:[data-testid="SectionHeader Pupils and schools"] button
+    element attribute value should be  css:[data-testid="SectionHeader Pupils and schools"] button   aria-expanded   true
+
+    user clicks element containing text  Pupil absence
 
     user clicks element   css:[data-testid="view-stats-pupil-absence-in-schools-in-england"]
     user waits until page contains  Pupil absence data and statistics for schools in England
@@ -53,8 +55,9 @@ Validate "About these statistics" -- "Last updated"
     [Tags]     HappyPath
     user checks element contains  css:[data-testid="last-updated"] time     19 April 2017
 
-    user clicks details   css:[data-testid="See all 2 updates"]
-    element attribute value should be  css:[data-testid="See all 2 updates"] summary   aria-expanded   true
+#    user clicks details   css:[data-testid="See all 2 updates"]
+    user clicks element containing text   See all 2 updates
+#    element attribute value should be  css:[data-testid="See all 2 updates"] summary   aria-expanded   true
 
     user checks element contains  css:[data-testid="last-updated-element"]:nth-child(1) time   19 April 2017
     user checks element contains  css:[data-testid="last-updated-element"]:nth-child(1) p   Underlying data file updated to include absence data
@@ -62,8 +65,9 @@ Validate "About these statistics" -- "Last updated"
     user checks element contains  css:[data-testid="last-updated-element"]:nth-child(2) time   22 March 2017
     user checks element contains  css:[data-testid="last-updated-element"]:nth-child(2) p   First published.
 
-    user clicks details   css:[data-testid="See all 2 updates"]
-    element attribute value should be  css:[data-testid="See all 2 updates"] summary   aria-expanded   false
+#    user clicks details   css:[data-testid="See all 2 updates"]
+    user clicks element containing text   See all 2 updates
+#    element attribute value should be  css:[data-testid="See all 2 updates"] summary   aria-expanded   false
 
 Validate Key Statistics data block -- Summary tab
     [Tags]  HappyPath   Failing

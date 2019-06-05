@@ -157,7 +157,7 @@ exports[`DataBlock datablock renders horizontal chart 1`] = `
                     <tspan x="167"
                            dy="0.355em"
                     >
-                      2014
+                      2014/15
                     </tspan>
                   </text>
                 </g>
@@ -187,7 +187,7 @@ exports[`DataBlock datablock renders horizontal chart 1`] = `
                     <tspan x="167"
                            dy="0.355em"
                     >
-                      2015
+                      2015/16
                     </tspan>
                   </text>
                 </g>
@@ -692,6 +692,195 @@ exports[`DataBlock datablock renders horizontal chart 1`] = `
 
 `;
 
+exports[`DataBlock datablock renders map 1`] = `
+
+<div class="govuk-datablock"
+     data-testid="DataBlock "
+>
+  <div class="govuk-tabs">
+    <ul class="govuk-tabs__list"
+        role="tablist"
+    >
+      <li class="govuk-tabs__list-item"
+          role="presentation"
+      >
+        <a aria-controls="datablock_test_charts"
+           aria-selected="true"
+           role="tab"
+           class="govuk-tabs__tab govuk-tabs__tab--selected"
+           href="#datablock_test_charts"
+           id="datablock_test_charts-tab"
+        >
+          Charts
+        </a>
+      </li>
+      <li class="govuk-tabs__list-item"
+          role="presentation"
+      >
+        <a class="govuk-tabs__tab"
+           href="#datablock_test_downloads"
+           id="datablock_test_downloads-tab"
+           aria-controls="datablock_test_downloads"
+           aria-selected="false"
+           role="tab"
+           tabindex="-1"
+        >
+          Data downloads
+        </a>
+      </li>
+    </ul>
+    <section class="govuk-tabs__panel panel"
+             id="datablock_test_charts"
+             data-testid="Charts"
+             aria-labelledby="datablock_test_charts-tab"
+             role="tabpanel"
+             tabindex="-1"
+    >
+      <h3>
+        Charts
+      </h3>
+      <h3>
+      </h3>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-third"
+             aria-live="assertive"
+        >
+          <form>
+            <div class="govuk-form-group govuk-!-margin-bottom-6">
+              <label class="govuk-label"
+                     for="selectedLocation"
+              >
+                Select a location
+              </label>
+              <select class="govuk-select select"
+                      id="selectedLocation"
+                      name="selectedLocation"
+              >
+                <option value>
+                  All
+                </option>
+                <option value="E92000001">
+                  England
+                </option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="govuk-grid-column-two-thirds">
+          <div style="width: 800px; height: 600px; position: relative;"
+               class="leaflet-container leaflet-grab leaflet-touch-drag"
+               tabindex="0"
+          >
+            <div class="leaflet-pane leaflet-map-pane"
+                 style="left: 0px; top: 0px;"
+            >
+              <div class="leaflet-pane leaflet-tile-pane">
+              </div>
+              <div class="leaflet-pane leaflet-shadow-pane">
+              </div>
+              <div class="leaflet-pane leaflet-overlay-pane">
+                <svg pointer-events="none"
+                     width="0"
+                     height="0"
+                     style="left: 0px; top: 0px;"
+                     viewbox="0 0 0 0"
+                >
+                  <g>
+                    <path class="leaflet-interactive"
+                          stroke="#3388ff"
+                          stroke-opacity="1"
+                          stroke-width="3"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          fill="#3388ff"
+                          fill-opacity="0.2"
+                          fill-rule="evenodd"
+                          d="M0 0"
+                    >
+                    </path>
+                    <path class="leaflet-interactive"
+                          stroke="777"
+                          stroke-opacity="1"
+                          stroke-width="1"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          fill="777"
+                          fill-opacity="0.2"
+                          fill-rule="evenodd"
+                          d="M-1 1L-1 -1L1 -1L1 1z"
+                    >
+                    </path>
+                  </g>
+                </svg>
+              </div>
+              <div class="leaflet-pane leaflet-marker-pane">
+              </div>
+              <div class="leaflet-pane leaflet-tooltip-pane">
+              </div>
+              <div class="leaflet-pane leaflet-popup-pane">
+              </div>
+            </div>
+            <div class="leaflet-control-container">
+              <div class="leaflet-top leaflet-left">
+                <div class="leaflet-control-zoom leaflet-bar leaflet-control">
+                  <a class="leaflet-control-zoom-in"
+                     href="#"
+                     title="Zoom in"
+                     role="button"
+                     aria-label="Zoom in"
+                  >
+                    +
+                  </a>
+                  <a class="leaflet-control-zoom-out"
+                     href="#"
+                     title="Zoom out"
+                     role="button"
+                     aria-label="Zoom out"
+                  >
+                    −
+                  </a>
+                </div>
+              </div>
+              <div class="leaflet-top leaflet-right">
+              </div>
+              <div class="leaflet-bottom leaflet-left">
+              </div>
+              <div class="leaflet-bottom leaflet-right">
+                <div class="leaflet-control-attribution leaflet-control">
+                  <a href="https://leafletjs.com"
+                     title="A JS library for interactive maps"
+                  >
+                    Leaflet
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="govuk-tabs__panel panel govuk-tabs__panel--hidden"
+             id="datablock_test_downloads"
+             data-testid="Data downloads"
+             aria-labelledby="datablock_test_downloads-tab"
+             role="tabpanel"
+             tabindex="-1"
+    >
+      <h3>
+        Data downloads
+      </h3>
+      <p>
+        You can customise and download data as Excel, .csv or .pdf files. Our data can also be accessed via an API.
+      </p>
+      <div class="govuk-inset-text">
+        Data downloads have not yet been implemented within the service.
+      </div>
+    </section>
+  </div>
+</div>
+
+`;
+
 exports[`DataBlock datablock renders table 1`] = `
 
 <div class="govuk-datablock"
@@ -752,12 +941,12 @@ exports[`DataBlock datablock renders table 1`] = `
             <th class="govuk-table__header govuk-table__cell--numeric"
                 scope="col"
             >
-              2014
+              2014/15
             </th>
             <th class="govuk-table__header govuk-table__cell--numeric"
                 scope="col"
             >
-              2015
+              2015/16
             </th>
           </tr>
         </thead>
@@ -933,7 +1122,7 @@ exports[`DataBlock datablock renders vertical chart 1`] = `
                     <tspan x="323.75"
                            dy="0.71em"
                     >
-                      2014
+                      2014/15
                     </tspan>
                   </text>
                 </g>
@@ -964,7 +1153,7 @@ exports[`DataBlock datablock renders vertical chart 1`] = `
                     <tspan x="621.25"
                            dy="0.71em"
                     >
-                      2015
+                      2015/16
                     </tspan>
                   </text>
                 </g>
@@ -1582,7 +1771,7 @@ exports[`DataBlock datablock renders vertical chart 2`] = `
                     <tspan x="323.75"
                            dy="0.71em"
                     >
-                      2014
+                      2014/15
                     </tspan>
                   </text>
                 </g>
@@ -1613,7 +1802,7 @@ exports[`DataBlock datablock renders vertical chart 2`] = `
                     <tspan x="621.25"
                            dy="0.71em"
                     >
-                      2015
+                      2015/16
                     </tspan>
                   </text>
                 </g>

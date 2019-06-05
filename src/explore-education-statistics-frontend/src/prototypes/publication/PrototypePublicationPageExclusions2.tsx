@@ -39,18 +39,20 @@ const PublicationPageExclusions = () => {
                 Read national statistical summaries, view charts and tables and
                 download data files.
               </p>
+              <p>
+                All figures refer to the <strong>2016/17 academic year</strong>{' '}
+                - unless otherwise stated.
+              </p>
               <p className="govuk-inset-text">
-                View a regional breakdown of statistics and data under the{' '}
-                <a href="#contents-exclusions-sections-heading-9">
-                  Regional and local authority (LA) breakdown
-                </a>{' '}
-                section
+                <a href="#contents-exclusions-sections-heading-8">
+                  View regional and local authority (LA) breakdowns
+                </a>
               </p>
 
               <p>
                 Find out how and why these statistics are collected and
                 published -{' '}
-                <Link to="#">
+                <Link to="/prototypes/methodology-absence2">
                   Permanent and fixed-period exclusions statistics: methodology
                 </Link>
               </p>
@@ -67,8 +69,8 @@ const PublicationPageExclusions = () => {
 
           <Details summary="Download data files">
             <p>
-              You can customise and download data as Excel or .csv files. Our
-              data can also be accessed via an API.
+              Download data in the following formats or access our data via our
+              API:
             </p>
             <ul className="govuk-list">
               <li>
@@ -87,8 +89,12 @@ const PublicationPageExclusions = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="govuk-link">
+                <a href="/glossary#what-is-an-api" className="govuk-link">
                   Access API
+                </a>{' '}
+                -{' '}
+                <a href="/glossary#what-is-an-api" className="govuk-link">
+                  What is an API?
                 </a>
               </li>
             </ul>
@@ -103,7 +109,7 @@ const PublicationPageExclusions = () => {
 
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <span className="govuk-caption-m govuk-caption-inline">
-                For school year:{' '}
+                For academic year:{' '}
               </span>
               2016 to 2017 (latest data)
             </h3>
@@ -189,7 +195,10 @@ const PublicationPageExclusions = () => {
             <nav role="navigation" aria-labelledby="related-content">
               <ul className="govuk-list">
                 <li>
-                  <Link to="#">Pupil exclusions statistics: methodology</Link>
+                  <Link to="#">
+                    Permanent and fixed-period exclusions statistics:
+                    methodology
+                  </Link>
                 </li>
               </ul>
             </nav>
@@ -200,7 +209,7 @@ const PublicationPageExclusions = () => {
       <hr />
 
       <h2 className="govuk-heading-l">
-        Headline facts and figures - 2016 to 2017
+        Headline facts and figures - 2016/2017 academic year
       </h2>
 
       <PrototypeDataSample
@@ -248,45 +257,7 @@ const PublicationPageExclusions = () => {
         chartDataKeys={['total', 'primary', 'secondary', 'special']}
       />
 
-      <h2 className="govuk-heading-l">Contents</h2>
       <Accordion id="contents-exclusions-sections">
-        <AccordionSection heading="About these statistics">
-          <p className="govuk-body">
-            This National Statistics release reports on permanent and fixed
-            period exclusions from state-funded primary, state-funded secondary
-            and special schools during the 2016/17 academic year as reported in
-            the School Census. This release also includes school level
-            exclusions figures for state-funded primary, secondary and special
-            schools and national level figures on permanent and fixed-period
-            exclusions from pupil referral units. All figures in this release
-            are based on unrounded data; therefore, constituent parts may not
-            add up due to rounding.
-          </p>
-          <p className="govuk-body">
-            An Exclusions statistics guide, which provides historical
-            information on exclusion statistics, technical background
-            information to the figures and data collection, and definitions of
-            key terms should be referenced alongside this release.
-          </p>
-          <div className="govuk-bo">
-            In this publication: The following tables are included in the
-            statistical publication
-          </div>
-          <ul className="govuk-list-bullet">
-            <li>national tables (Excel .xls and open format)</li>
-            <li>local authority (LA) tables</li>
-            <li>underlying data (open format .csv and metadata .txt)</li>
-          </ul>
-          <p className="govuk-body">
-            The underlying data is accompanied by a metadata document that
-            describes underlying data files.
-          </p>
-          <p className="govuk-body">
-            We welcome feedback on any aspect of this document at{' '}
-            <a href="#">schools.statistics@education.gov.uk</a>
-          </p>
-        </AccordionSection>
-
         <AccordionSection heading="Permanent exclusions">
           <div className="govuk-inset-text">
             <h3 className="govuk-heading-s">
@@ -656,93 +627,105 @@ const PublicationPageExclusions = () => {
 
       <Accordion id="extra-information-exclusions-sections">
         <AccordionSection
-          heading="Pupil exclusions statistics: methodology"
-          caption="How we collect and process statistics and data"
+          heading="Permanent and fixed-period exclusions statistics: methodology"
+          caption="Find out how and why we collect, process and publish these statistics"
           headingTag="h3"
         >
-          <ul className="govuk-list">
-            <li>
-              <a href="#" className="govuk-link">
-                How do we collect it?
-              </a>
-            </li>
-            <li>
-              <a href="#" className="govuk-link">
-                What do we do with it?
-              </a>
-            </li>
-            <li>
-              <a href="#" className="govuk-link">
-                Related policies
-              </a>
-            </li>
-          </ul>
+          <p>
+            Read our{' '}
+            <a href="/prototypes/methodology-absence2">
+              Permanent and fixed-period exclusions statistics: methodology
+            </a>{' '}
+            guidance.
+          </p>
         </AccordionSection>
+
+        <AccordionSection heading="About these statistics">
+          <p className="govuk-body">
+            The statistics and data cover permanent and fixed period exclusions
+            and school-level exclusions during the 2016/17 academic year in the
+            following state-funded school types as reported in the school
+            census:
+          </p>
+          <ul className="govuk-list-bullet">
+            <li>primary schools</li>
+            <li>secondary schools</li>
+            <li>special schools</li>
+          </ul>
+          <p className="govuk-body">
+            They also include national-level information on permanent and
+            fixed-period exclusions for{' '}
+            <a href="/glossary#pupil-referral-unit">pupil referral units</a>.
+          </p>
+          <p>
+            All figures are based on unrounded data so constituent parts may not
+            add up due to rounding.
+          </p>
+        </AccordionSection>
+
         <AccordionSection heading="National Statistics" headingTag="h3">
           <p className="govuk-body">
-            The United Kingdom Statistics Authority designated these statistics
-            as National Statistics in <a href="#">Month Year</a> in accordance
-            with the Statistics and Registration Service Act 2007 and signifying
-            compliance with the Code of Practice for Statistics.
+            The{' '}
+            <a href="https://www.statisticsauthority.gov.u">
+              UK Statistics Authority
+            </a>{' '}
+            designated these statistics as National Statistics in [INSERT MONTH
+            YEAR] in accordance with the{' '}
+            <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
+              Statistics and Registration Service Act 2007
+            </a>
+            .
           </p>
           <p className="govuk-body">
-            Designation can be broadly interpreted to mean that the statistics:
+            Designation signifies their compliance with the authority's{' '}
+            <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
+              Code of Practice for Statistics
+            </a>{' '}
+            which broadly means these statistics are:
           </p>
           <ul className="govuk-list govuk-list--bullet">
-            <li>meet identified user needs;</li>
-            <li>are well explained and readily accessible;</li>
-            <li>are produced according to sound methods, and</li>
-            <li>
-              are managed impartially and objectively in the public interest
-            </li>
+            <li>managed impartially and objectively in the public interest</li>
+            <li>meeting identified user needs</li>
+            <li>produced according to sound methods</li>
+            <li>well-explained and readily accessible</li>
           </ul>
           <p className="govuk-body">
-            Once statistics have been designated as National Statistics it is a
-            statutory requirement that the Code of Practice shall continue to be
-            observed. Information on improvements made to these statistics to
-            continue their compliance with the Code of Practice are provided in
-            this <a href="#">accompanying document</a>
+            Once designated as National Statistics it's a statutory requirement
+            for statistics to ffollow and comply with the Code of Practice for
+            Statistics.
           </p>
-        </AccordionSection>
-        <AccordionSection heading="Feedback and questions" headingTag="h3">
-          <ul className="govuk-list">
-            <li>
-              <a href="#" className="govuk-link">
-                Feedback on this page
-              </a>
-            </li>
-            <li>
-              <a href="#" className="govuk-link">
-                Make a suggestion
-              </a>
-            </li>
-            <li>
-              <a href="#" className="govuk-link">
-                Ask a question
-              </a>
-            </li>
-          </ul>
-        </AccordionSection>
-        <AccordionSection heading="Contact us" headingTag="h3">
           <p>
-            If you have a specific enquiry about absence and exclusion
-            statistics and data:
+            Find out more about the standards we follow to produce these
+            statistics through our{' '}
+            <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
+              Standards for official statistics published by DfE
+            </a>{' '}
+            guidance.
           </p>
+        </AccordionSection>
+
+        <AccordionSection heading="Contact us" headingTag="h3">
           <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
             School absence and exclusions team
           </h4>
           <p className="govuk-!-margin-top-0">
-            Email
-            <br />
-            <a href="mailto:schools.statistics@education.gov.uk">
-              schools.statistics@education.gov.uk
-            </a>
+            If you have a specific enquiry about absence and exclusion
+            statistics and data
           </p>
-          <p>
-            Telephone: Mark Pearson
-            <br />
-            0114 274 2585
-          </p>
+          <div className="govuk-inset-text">
+            <p className="govuk-!-margin-top-0">
+              Email:{' '}
+              <a href="mailto:schools.statistics@education.gov.uk">
+                schools.statistics@education.gov.uk
+              </a>
+            </p>
+
+            <p>
+              Telephone: Mark Pearson
+              <br />
+              0114 274 2585
+            </p>
+          </div>
 
           <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
             Press office
@@ -761,7 +744,7 @@ const PublicationPageExclusions = () => {
           </p>
           <p>
             Telephone <br />
-            037 0000 2288
+            0370 000 2288
           </p>
         </AccordionSection>
       </Accordion>
@@ -769,10 +752,7 @@ const PublicationPageExclusions = () => {
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
         Create your own tables online
       </h2>
-      <p>
-        Use our tool to build tables using our range of national and regional
-        data.
-      </p>
+      <p>Use our tool to build tables using national and regional data.</p>
       <Link to="/prototypes/table-tool" className="govuk-button">
         Create tables
       </Link>

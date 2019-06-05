@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                         {
                             new Publication
                             {
-                                Id = new Guid("8345e27a-7a32-4b20-a056-309163bdf9c4"),
+                                Id = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                                 Title = "Permanent and fixed-period exclusions in England",
                                 Slug = "permanent-and-fixed-period-exclusions-in-england",
                                 Releases = new[]
