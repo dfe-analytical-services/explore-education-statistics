@@ -11,10 +11,10 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
+import { ThemeMeta } from '@common/services/tableBuilderService';
 import { FormikProps } from 'formik';
 import camelCase from 'lodash';
 import React, { useState } from 'react';
-import { PublicationOptions } from '../TableToolPage';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
@@ -27,7 +27,7 @@ export type PublicationFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
   onSubmit: PublicationFormSubmitHandler;
-  options: PublicationOptions[];
+  options: ThemeMeta[];
 }
 
 const PublicationForm = (props: Props & InjectedWizardProps) => {
