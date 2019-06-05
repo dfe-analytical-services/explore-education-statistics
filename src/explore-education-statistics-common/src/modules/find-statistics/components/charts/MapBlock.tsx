@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/camelcase */
+/* eslint-disable @typescript-eslint/camelcase,no-shadow,no-param-reassign */
 import {
   Feature,
   FeatureCollection,
@@ -16,6 +16,8 @@ import { SelectOption } from '@common/components/form/FormSelect';
 import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import UKGeoJson from '@common/services/UKGeoJson';
+
+import styles from './MapBlock.module.scss';
 
 export type MapFeature = Feature<Geometry, GeoJsonProperties>;
 
@@ -40,6 +42,7 @@ function MapBlock(props: MapProps) {
     meta,
     data,
     dataGroupings = [],
+    indicators,
   } = props;
 
   const locationGeoJSON = Object.values(meta.locations)
@@ -100,9 +103,48 @@ function MapBlock(props: MapProps) {
   const mapRef = React.createRef<Map>();
 
   const getGeometryForOptions = () => {
+    const selectedYear = 2016;
+    const displayedFilter = +indicators[0];
+
+    const sourceData = data.result
+      .filter(result => result.year === selectedYear)
+      .map(result => ({
+        location:
+          meta.locations[
+            //result.location.localAuthorityDistrict.sch_lad_code
+            result.location.localAuthority.new_la_code ||
+              result.location.region.region_code ||
+              result.location.country.country_code
+          ],
+        dataValue: +result.measures[displayedFilter],
+      }))
+      .filter(
+        r => r.location !== undefined && r.location.geoJson !== undefined,
+      );
+
+    const { min, max } = sourceData.reduce(
+      ({ min, max }, { dataValue }) => ({
+        min: dataValue < min ? dataValue : min,
+        max: dataValue > max ? dataValue : max,
+      }),
+      { min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY },
+    );
+
+    const range = max - min;
+    const scale = 4.0 / range;
+
+    const calculateColorStyle = (value: number) =>
+      styles[`rate${Math.floor((value - min) * scale)}`];
+
     const value: FeatureCollection<Geometry, DataBlockGeoJsonProperties> = {
       type: 'FeatureCollection',
-      features: locationGeoJSON,
+      features: sourceData.map(({ location, dataValue }) => ({
+        ...location.geoJson[0],
+        properties: {
+          ...location.geoJson[0].properties,
+          className: calculateColorStyle(dataValue),
+        },
+      })),
     };
 
     return value;
@@ -135,7 +177,7 @@ function MapBlock(props: MapProps) {
 
   const onEachFeature = (feature: MapFeature) => {
     // eslint-disable-next-line
-    console.log(feature);
+    // console.log(feature);
   };
 
   const uk = UKGeoJson.UK;
@@ -251,21 +293,26 @@ function MapBlock(props: MapProps) {
             width: (width && `${width}px`) || '100%',
             height: `${height || 600}px`,
           }}
+          className={styles.map}
           ref={mapRef}
           center={position}
-          // className={styles.map}
           zoom={6.5}
           // minZoom={6.5}
           // zoomSnap={0.5}
           // maxBounds={this.state.maxBounds}
         >
+          {uk ? <GeoJSON data={uk} className={styles.uk} /> : ''}
+
           <GeoJSON
             data={geometry}
             onEachFeature={onEachFeature}
+            style={(feature?: Feature) => ({
+              className:
+                feature && feature.properties && feature.properties.className,
+            })}
             // style={this.styleFeature}
             // onClick={this.handleClick}
           />
-          {uk ? <GeoJSON data={uk} style={{ color: '777', weight: 1 }} /> : ''}
         </Map>
       </div>
     </div>

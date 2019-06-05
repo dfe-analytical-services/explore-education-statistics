@@ -1,0 +1,36 @@
+.map {
+  background-color: #f8f8fc;
+
+  path {
+    fill-opacity: 1;
+    stroke: #081b26;
+    stroke-width: 1px;
+  }
+
+  .selected {
+    fill: #ffbf47 !important;
+    stroke-width: 3px;
+  }
+}
+
+path.uk {
+  fill: #104f75;
+  stroke: #cfdce3;
+  fill-opacity: 0.1;
+}
+
+.rate0 {
+  fill: #cfdce3;
+}
+.rate1 {
+  fill: #9fb9c8;
+}
+.rate2 {
+  fill: #7095ac;
+}
+.rate3 {
+  fill: #407291;
+}
+.rate4 {
+  fill: #104f75;
+}
