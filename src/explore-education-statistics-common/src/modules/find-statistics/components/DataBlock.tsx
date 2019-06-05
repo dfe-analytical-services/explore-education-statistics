@@ -1,9 +1,9 @@
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/find-statistics/components/ChartRenderer';
-import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
 import SummaryRenderer, {
   SummaryRendererProps,
 } from '@common/modules/find-statistics/components/SummaryRenderer';
@@ -41,6 +41,7 @@ export interface DataBlockProps {
 }
 
 interface DataBlockState {
+  isLoading: boolean;
   charts?: ChartRendererProps[];
   tables?: TableRendererProps[];
   summary?: SummaryRendererProps;
@@ -51,12 +52,16 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
     showTables: true,
   };
 
-  public state: DataBlockState = {};
+  public state: DataBlockState = {
+    isLoading: false,
+  };
 
-  private currentDataQuery?: DataQuery = undefined;
+  private query?: DataQuery = undefined;
 
   public async componentDidMount() {
     const { dataBlockRequest } = this.props;
+
+    this.setState({ isLoading: true });
 
     if (dataBlockRequest) {
       const result = await DataBlockService.getDataBlockForSubject(
@@ -70,14 +75,16 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
   }
 
   public async componentWillUnmount() {
-    this.currentDataQuery = undefined;
+    this.query = undefined;
   }
 
   private parseDataResponse(
     json: DataBlockData,
     jsonMeta: DataBlockMetadata,
   ): void {
-    const newState: DataBlockState = {};
+    const newState: DataBlockState = {
+      isLoading: false,
+    };
 
     const { charts, summary, tables } = this.props;
 
@@ -123,57 +130,61 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       additionalTabContent,
       id,
     } = this.props;
-    const { charts, summary, tables } = this.state;
+    const { charts, summary, tables, isLoading } = this.state;
 
     return (
       <div data-testid={`DataBlock ${heading}`}>
         {heading && <h3>{heading}</h3>}
 
-        <Tabs>
-          {summary && (
-            <TabsSection id={`datablock_${id}_summary`} title="Summary">
-              <SummaryRenderer {...summary} />
-            </TabsSection>
-          )}
+        {isLoading ? (
+          <LoadingSpinner text="Loading content..." />
+        ) : (
+          <Tabs>
+            {summary && (
+              <TabsSection id={`datablock_${id}_summary`} title="Summary">
+                <SummaryRenderer {...summary} />
+              </TabsSection>
+            )}
 
-          {tables && showTables && (
-            <TabsSection id={`datablock_${id}_tables`} title="Data tables">
-              {tables.map((table, idx) => {
-                const key = `${id}0_table_${idx}`;
+            {tables && showTables && (
+              <TabsSection id={`datablock_${id}_tables`} title="Data tables">
+                {tables.map((table, idx) => {
+                  const key = `${id}0_table_${idx}`;
 
-                return (
-                  <>
-                    <TableRenderer key={key} {...table} />
-                    <DownloadDetails />
-                  </>
-                );
-              })}
+                  return (
+                    <>
+                      <TableRenderer key={key} {...table} />
+                      <DownloadDetails />
+                    </>
+                  );
+                })}
 
-              {additionalTabContent}
-            </TabsSection>
-          )}
+                {additionalTabContent}
+              </TabsSection>
+            )}
 
-          {charts && (
-            <TabsSection
-              id={`datablock_${id}_charts`}
-              title="Charts"
-              lazy={false}
-            >
-              {charts.map((chart, idx) => {
-                const key = `${id}_chart_${idx}`;
+            {charts && (
+              <TabsSection
+                id={`datablock_${id}_charts`}
+                title="Charts"
+                lazy={false}
+              >
+                {charts.map((chart, idx) => {
+                  const key = `${id}_chart_${idx}`;
 
-                return (
-                  <>
-                    <ChartRenderer key={key} {...chart} height={height} />
-                    <DownloadDetails />
-                  </>
-                );
-              })}
+                  return (
+                    <>
+                      <ChartRenderer key={key} {...chart} height={height} />
+                      <DownloadDetails />
+                    </>
+                  );
+                })}
 
-              {additionalTabContent}
-            </TabsSection>
-          )}
-        </Tabs>
+                {additionalTabContent}
+              </TabsSection>
+            )}
+          </Tabs>
+        )}
       </div>
     );
   }
