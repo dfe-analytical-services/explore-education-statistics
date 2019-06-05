@@ -42,13 +42,15 @@ const PublicationPage = () => {
                 Read national statistical summaries, view charts and tables and
                 download data files.
               </p>
+              <p>
+                All figures refer to the <strong>2016/17 academic year</strong>{' '}
+                - unless otherwise stated.
+              </p>
 
               <p className="govuk-inset-text">
-                View a regional breakdown of statistics and data under the{' '}
-                <a href="#contents-sections-heading-9">
-                  Regional and local authority (LA) breakdown
-                </a>{' '}
-                section
+                <a href="#contents-sections-heading-8">
+                  View regional and local authority (LA) breakdowns
+                </a>
               </p>
 
               <p>
@@ -110,7 +112,7 @@ const PublicationPage = () => {
 
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <span className="govuk-caption-m govuk-caption-inline">
-                For school year:{' '}
+                For academic year:{' '}
               </span>
               2016 to 2017 (latest data)
             </h3>
@@ -205,7 +207,7 @@ const PublicationPage = () => {
       </div>
       <hr />
       <h2 className="govuk-heading-l">
-        Headline facts and figures - 2016 to 2017
+        Headline facts and figures - 2016/17 academic year
       </h2>
       <PrototypeDataSample
         sectionId="headlines"
@@ -248,45 +250,32 @@ const PublicationPage = () => {
       />
 
       <Accordion id="contents-sections">
-        <AccordionSection heading="About these statistics">
-          <p className="govuk-body">
-            The statistics and data show the absence of pupils of compulsory
-            school age during the 2016/17 academic year in the following
-            state-funded school types:
-          </p>
-          <ul className="govuk-list">
-            <li>primary schools</li>
-            <li>secondary schools</li>
-            <li>special schools</li>
-          </ul>
-          <p>
-            The statistics and data also includes information on absence in
-            pupil referral units and for pupils aged 4.
-          </p>
-          <p>
-            We use the key measures of 'overall' and 'persistent' absence to
-            monitor pupil absence while 'absence by reason' and 'pupil
-            characteristics' are also included.
-          </p>
-          <p>
-            The statistics and data are available at national, regional, local
-            authority (LA) and school level and are used by LAs and schools to
-            compare their local absence rates to regional and national averages
-            for different pupil groups.
-          </p>
-          <p>
-            The statistics and data are also used for policy development as key
-            indicators in behaviour and school attendance policy.
-          </p>
-        </AccordionSection>
-
         <AccordionSection heading="Pupil absence rates">
-          <Details summary="Overall absence rate definition">
-            The total number of overall absence sessions for all pupils as a
-            percentage of the total number of possible sessions for all pupils,
-            where overall absence is the sum of authorised and unauthorised
-            absence and 1 session is equal to half-a-day.
-          </Details>
+          <div className="govuk-text">
+            <h3 className="govuk-heading-s">Overall absence</h3>
+            <p>
+              The <a href="/glossary#overall-absence">overall absence</a> rate
+              has increased across state-funded primary,secondary and special
+              schools between 2015/16 and 2016/17 driven by an increase in the
+              unauthorised absence rate.
+            </p>
+            <p>
+              It increased from 4.6% to 4.7% over this period while the{' '}
+              <a href="/glossary#unauthorised-absence">unauthorised absence</a>{' '}
+              rate increased from 1.1% to 1.3%.
+            </p>
+            <p>
+              The rate stayed the same at 4% in primary schools but increased
+              from 5.2% to 5.4% for secondary schools. However, in special
+              schools it was much higher and rose to 9.7%.
+            </p>
+            <p>
+              The overall and{' '}
+              <a href="/glossary#authorised-absence">authorised absence</a>{' '}
+              rates have been fairly stable over recent years after gradually
+              decreasing between 2006/07 and 2013/14.
+            </p>
+          </div>
           <PrototypeDataSample
             sectionId="absenceRates"
             chartTitle="absence rates in England"
@@ -326,78 +315,61 @@ const PublicationPage = () => {
             ]}
             chartDataKeys={['primary', 'secondary', 'primary and secondary']}
           />
+
+          <h3 className="govuk-heading-s">Unauthorised absence rate</h3>
           <p>
-            The overall absence rate across state-funded primary, secondary and
-            special schools increased from 4.6% in 2015/16 to 4.7% in 2016/17.
+            The{' '}
+            <a href="/glossary#unauthorised-absence">unauthorised absence</a>{' '}
+            rate has not varied much since 2006/07 but at is at its highest
+            since records began - 1.3%.
           </p>
           <p>
-            In primary schools the overall absence rate stayed the same at 4%
-            and the rate in secondary schools increased from 5.2% to 5.4%.
+            This is due to an increase in absence due to family holidays not
+            agreed by schools.
           </p>
-          <p>Absence in special schools is much higher at 9.7% in 2016/17.</p>
+          <h3 className="govuk-heading-s">Authorised absence rate</h3>
           <p>
-            The increase in overall absence rate has been driven by an increase
-            in the unauthorised absence rate across state-funded primary,
-            secondary and special schools - which increased from 1.1% to 1.3%
-            between 2015/16 and 2016/17.
+            The <a href="/glossary#authorised-absence">authorised absence</a>{' '}
+            rate has stayed at 3.4% since 2015/16 but has been decreasing in
+            recent years within primary schools.
           </p>
+          <h3 className="govuk-heading-s">Total number of days missed</h3>
           <p>
-            Looking at longer-term trends - overall and authorised absence rates
-            have been fairly stable over recent years after decreasing gradually
-            between 2006/07 and 2013/14.
-          </p>
-          <p>
-            Unauthorised absence rates have not varied much since 2006/07 button
-            the unauthorised absence rate at 1.3% is now at its highest since
-            records began.
+            The total number of days missed for{' '}
+            <a href="/glossary#overall-absence">overall absence</a> across
+            state-funded primary, secondary and special schools has increased to
+            56.7 million from 54.8 million in 2015/16.
           </p>
           <p>
-            This is due to an increase in absence due to family holidays that
-            were not agreed by the school.
+            This partly reflects a rise in the total number of pupils with the
+            average number of days missed per pupil slightly increased to 8.2
+            days from 8.1 days in 2015/16.
           </p>
           <p>
-            The authorised absence rate at 3.4% has not changed since last year
-            but have been decreasing across recent years in primary schools.
-          </p>
-          <p>
-            The total number of days missed due to overall absence across
-            state-funded primary, secondary and special schools increased from
-            54.8 million in 2015/16 to 56.7 million in 2016/17.
-          </p>
-          <p>
-            This partly reflects the rise in the total number of pupil
-            enrolments - the average number of days missed per enrolment has
-            increased very slightly from 8.1 days in 2015/16 to 8.2 days in
-            2016/17.
-          </p>
-          <p>
-            In 2016/17, 91.8% of pupils in primary, secondary and special
-            schools missed at least 1 session during the school year which is
-            similar to 91.7% figure in 2015/16.
+            In 2016/17, 91.8% of primary, secondary and special school pupils
+            missed at least 1 session during the school year - similar to the
+            91.7% figure from 2015/16.
           </p>
         </AccordionSection>
 
         <AccordionSection heading="Persistent absence">
-          <Details summary="Persistent absence definition">
+          <div className="govuk-text">
             <p>
-              'Persistent absence' occurs when a pupil (also known as a 'pupil
-              enrolment') misses 10% or more of their possible sessions.
+              The <a href="/glossary#persistent-absence">persistent absence</a>{' '}
+              rate increased to and accounted for 37.6% of all absence - up from
+              36.6% in 2015 to 16 but still down from 43.3% in 2011 to 12.
             </p>
             <p>
-              This definition changed at the start of the 2015/16 academic year
-              and data on this page has been recalculated using the new
-              methodology.
+              It also accounted for almost a third (31.6%) of all{' '}
+              <a href="/glossary#authorised-absence">authorised absence</a> and
+              more than half (53.8%) of all{' '}
+              <a href="/glossary#unauthorised-absence">unauthorised absence</a>.
             </p>
             <p>
-              As a result, use caution when interpreting the data as it may be
-              impacted by this change in methodology.
+              Overall, it's increased across primary and secondary schools to
+              10.8% - up from 10.5% in 2015 to 16.
             </p>
-            <p>
-              For more information on this subject and previous methodologies
-              read our <a href="#">Pupil absence statistics: methodology</a>
-              guidance.
-            </p>
-          </Details>
+          </div>
           <PrototypeDataSample
             sectionId="persistentAbsence"
             chartTitle="persistent absence rates in England"
@@ -437,54 +409,41 @@ const PublicationPage = () => {
             ]}
             chartDataKeys={['primary', 'secondary', 'primary and secondary']}
           />
+          <h3 className="govuk-heading-s">Persistent absentees</h3>
           <p>
-            Persistent absence in primary and secondary schools in 2016/17 was
-            10.8% up from 10.5% in 2015/16.
+            The <a href="/glossary#overall-absence">overall absence</a> rate for
+            persistent absentees across all schools increased to 18.1% - nearly
+            4 times higher than the rate for all pupils. This is slightly up
+            from 17.6% in 2015/16.
           </p>
+          <h3 className="govuk-heading-s">Illness absence rate</h3>
           <p>
-            It accounted for 37.6% of all absence in 2016/17 up from 36.6% in
-            2015/16 but still down on the 43.3% rater recorded in 2011/12.
-          </p>
-          <p>
-            The overall absence rate for persistent absentees across all schools
-            was 18.1%, nearly 4 times higher than the rate for all pupils.
-          </p>
-          <p>
-            This is a slight increase from 2015/16 when the overall absence rate
-            for persistent absentees was 17.6%.
-          </p>
-          <p>
-            Persistent absence accounts for almost a third (31.6%) of all
-            authorised absence and more than half (53.8%) of all unauthorised
-            absence.
-          </p>
-          <p>
-            The rate of illness absences is almost 4 times higher (7.6%) for
-            persistent absentees compared to other pupils (2%).
+            The illness absence rate is almost 4 times higher for persistent
+            absentees at 7.6% compared to 2% for other pupils.
           </p>
         </AccordionSection>
 
-        <AccordionSection heading="Reasons for absence">
-          <div className="govuk-inset-text">
-            <p>
-              Within this release absence by reason is broken down in the
-              following ways:
-            </p>
-            <ul className="govuk-list">
+        <AccordionSection
+          id="reasons-for-absence"
+          heading="Reasons for absence"
+        >
+          <div className="govuk-text">
+            <p>These have been broken down into the following:</p>
+            <ul className="govuk-list-bullet">
               <li>
-                Distribution of absence by reason - the proportion of absence
+                distribution of absence by reason - the proportion of absence
                 for each reason, calculated by taking the number of absences for
                 a specific reason as a percentage of the total number of
                 absences
               </li>
               <li>
-                Rate of absence by reason - the rate of absence for each reason,
+                rate of absence by reason - the rate of absence for each reason,
                 calculated by taking the number of absences for a specific
                 reason as a percentage of the total number of possible sessions
               </li>
               <li>
-                One or more sessions missed due to each reason - the number of
-                pupil enrolments missing at least 1 session due to each reason
+                one or more sessions missed due to each reason - the number of
+                pupils missing at least 1 session due to each reason
               </li>
             </ul>
           </div>
@@ -527,35 +486,41 @@ const PublicationPage = () => {
             ]}
             chartDataKeys={['overall', 'illness', 'family holiday']}
           />
+          <h3 className="govuk-heading-s">Illness</h3>
           <p>
-            Illness is the main driver for overall absence rates but while
-            overall absence rates have increased slightly since 2015/16 illness
-            rates have remained the same at 2.6%.
+            This is the main driver behind{' '}
+            <a href="/glossary#overall-absence">overall absence</a> and
+            accounted for 55.3% of all absence - down from 57.3% in 2015/16 and
+            60.1% in 2014/15.
           </p>
           <p>
-            Illness accounted for 55.3% of all absence in 2016/17 down from
-            57.3% in 2015/16 and 60.1% in 2014/15.
+            While the overall absence rate has slightly increased since 2015/16
+            the illness rate has stayed the same at 2.6%.
           </p>
           <p>
-            The rate of absence due to other unauthorised circumstances has
-            remained the same as in 2015/16 at 0.7%.
+            The absence rate due to other unauthorised circumstances has also
+            stayed the same since 2015/16 at 0.7%.
           </p>
           <h3 className="govuk-heading-s">Absence due to family holiday</h3>
           <p>
-            The percentage of pupils who missed at least 1 session due to a
-            family holiday in 2016/17 was 16.9% compared with 14.7% in 2015/16.
+            The unauthorised holiday absence rate has increased gradually since
+            2006/07 while authorised holiday absence rates are much lower than
+            in 2006/07 and remained steady over recent years.
           </p>
           <p>
-            The absence rate due to family holidays agreed by the school statyed
-            at 0.1% for 2016/17 while the percentage of all possible sessions
-            missed due to unauthorised family holidays increased from 0.3% in
-            2015/16 to 0.4% in 2016/17.
+            The percentage of pupils who missed at least 1 session due to family
+            holiday increased to 16.9% - up from 14.7% in 2015/16.
           </p>
           <p>
-            Unauthorised holiday absence rates have been increasing gradually
-            since 2006/07 while authorised holiday absence rates are much lower
-            now than in 2006/07 and remained steady over recent years.
+            The absence rate due to family holidays agreed by the school stayed
+            at 0.1%.
           </p>
+          <p>
+            Meanwhile, the percentage of all possible sessions missed due to
+            unauthorised family holidays increased to 0.4% - up from 0.3% in
+            2015/16.
+          </p>
+          <h3 className="govuk-heading-s">Regulation amendment</h3>
           <p>
             A regulation amendment in September 2013 stated that term-time leave
             could only be granted in exceptional circumstances which explains
@@ -563,118 +528,161 @@ const PublicationPage = () => {
             2013/14.
           </p>
           <p>
-            The statistics and data shown here relate to the period after the
-            Isle of Wight Council v Jon Platt High Court judgment (May 2016)
+            These statistics and data relate to the period after the{' '}
+            <a href="https://commonslibrary.parliament.uk/insights/term-time-holidays-supreme-court-judgment/">
+              Isle of Wight Council v Jon Platt High Court judgment (May 2016)
+            </a>{' '}
             where the High Court supported a local magistrates’ ruling that
-            there was no case to answer and partially to the period after the
-            April 2017 Supreme Court judgment where it unanimously agreed that
-            no children should be taken out of school without good reason and
-            clarified that 'regularly' means 'in accordance with the rules
-            prescribed by the school'.
+            there was no case to answer.
+          </p>
+          <p>
+            They also partially relate to the period after the April 2017
+            Supreme Court judgment where it unanimously agreed that no children
+            should be taken out of school without good reason and clarified that
+            'regularly' means 'in accordance with the rules prescribed by the
+            school'.
           </p>
         </AccordionSection>
+
         <AccordionSection heading="Distribution of absence">
           <p>
-            Nearly half of all pupils (48.9%) were absent for 5 days or fewer
-            across primary, secondary and special schools in 2016/17, down from
-            49.1% in 2015/16.
+            Nearly half of all pupils (48.9%) were absent for 5 days or less
+            across primary, secondary and special schools - down from 49.1% in
+            2015/16.
           </p>
           <p>
-            The rate of pupils who had more than 25 days of absence in 2016/17
-            (4.3% ) was the same as in 2015/16.
+            The average total absence for primary school pupils was 7.2 days
+            compared to 16.9 days for special school and 9.3 day for secondary
+            school pupils.
+          </p>
+          <p>
+            The rate of pupils who had more than 25 days of absence stayed the
+            same as in 2015/16 at 4.3%.
           </p>
           <p>
             These pupils accounted for 23.5% of days missed while 8.2% of pupils
-            had no absence during 2016/17.
+            had no absence.
           </p>
-          <p>
-            The average total absence in primary schools per pupil was 7.2 days
-            compared to 16.9 days in special and 9.3 days in secondary schools.
-          </p>
-          <p>
-            Across all schools, the overall absence rate is lowest in the autumn
-            and highest in the summer term, authorised absence is in the spring
-            and lowest in the summer term while unauthorised absence is highest
-            in the summer term.
-          </p>
+          <h3 className="govuk-heading-s">Absence by term</h3>
+          <p>Across all schools:</p>
+          <ul className="govuk-list-bullet">
+            <li>
+              <a href="/glossary#overall-absence">overall absence</a> - highest
+              in summer and lowest in autumn
+            </li>
+            <li>
+              <a href="/glossary#authorised-absence">authorised absence</a> -
+              highest in spring and lowest in summer
+            </li>
+            <li>
+              <a href="/glossary#unauthorised-absence">unauthorised absence</a>{' '}
+              - highest in summer
+            </li>
+          </ul>
         </AccordionSection>
+
         <AccordionSection heading="Absence by pupil characteristics">
           <p>
-            The patterns of absence rates for pupils with different
-            characteristics have been consistent across recent years.
+            The <a href="/glossary#overall-absence">overall absence</a> and{' '}
+            <a href="/glossary#persistent-absence">persistent absence</a>{' '}
+            patterns for pupils with different characteristics have been
+            consistent over recent years.
           </p>
-          <h3 className="govuk-heading-s">Ethnic group</h3>
-          <p>
-            The highest overall absence rates were for Traveller of Irish
-            Heritage and Gypsy/ Roma pupils at 18.1% and 12.9% respectively.
-          </p>
-          <p>
-            Overall absence rates for pupils of a Chinese and Black African
-            ethnicity were substantially lower than the national average of 4.7%
-            at 2.4% and 2.9% respectively.
-          </p>
-          <p>
-            A similar pattern is seen in persistent absence rates where
-            Traveller of Irish heritage pupils had the highest rate at 64% and
-            Chinese pupils had the lowest rate at 3.1%.
-          </p>
+          <h3 className="govuk-heading-s">Ethnic groups</h3>
+          <p>Overall absence rate:</p>
+          <ul className="govuk-list-bullet">
+            <li>
+              Travellers of Irish heritage and Gypsy / Roma pupils - highest at
+              18.1% and 12.9% respectively
+            </li>
+            <li>
+              Chinese and Black African ethnicity pupils - substantially lower
+              than the national average of 4.7% at 2.4% and 2.9% respectively
+            </li>
+          </ul>
+          <p>Persistent absence rate:</p>
+          <ul className="govuk-list-bullet">
+            <li>Travellers of Irish heritage pupils - highest at 64%</li>
+            <li>Chinese pupils - lowest at 3.1%</li>
+          </ul>
           <h3 className="govuk-heading-s">
             Free school meals (FSM) eligibility
           </h3>
-          <p>
-            Absence rates are higher for pupils who are known to be eligible for
-            and claiming free school meals.
-          </p>
-          <p>
-            The overall absence rate was 7.3% compared to 4.2% for non-FSM
-            pupils while persistent absence was more than double the rate for
-            non-FSM pupils.
-          </p>
+          <p>Overall absence rate:</p>
+          <ul className="govuk-list-bullet">
+            <li>
+              pupils known to be eligible for and claiming FSM - higher at 7.3%
+              compared to 4.2% for non-FSM pupils
+            </li>
+          </ul>
+          <p>Persistent absence rate:</p>
+          <ul className="govuk-list-bullet">
+            <li>
+              pupils known to be eligible for and claiming FSM - more than
+              double the rate of non-FSM pupils
+            </li>
+          </ul>
           <h3 className="govuk-heading-s">Gender</h3>
-          <p>
-            Overall absence rates were very similar for boys (4.7%) and girls
-            (4.6%) and persistent absence rates were also similar for boys
-            (10.9%) and girls (10.6%).
-          </p>
+          <p>Overall absence rate:</p>
+          <ul className="govuk-list-bullet">
+            <li>boys and girls - very similar at 4.7% and 4.6% respectively</li>
+          </ul>
+          <p>Persistent absence rate:</p>
+          <ul className="govuk-list-bullet">
+            <li>boys and girls - similar at 10.9% and 10.6% respectively</li>
+          </ul>
           <h3 className="govuk-heading-s">National curriculum year group</h3>
-          <p>
-            Pupils in national curriculum year groups 3 (3.9%) and 4 (4%) had
-            the lowest overall absence rates while pupils in year groups 10
-            (6.1%) and 11 (6.2%) had the highest rates. This trend is repeated
-            for persistent absence.
-          </p>
+          <p>Overall absence rate:</p>
+          <ul className="govuk-list-bullet">
+            <li>
+              pupils in national curriculum year groups 3 and 4 - lowest at 3.9%
+              and 4% respectively
+            </li>
+            <li>
+              pupils in national curriculum year groups 10 and 11 - highest at
+              6.1% and 6.2% respectively
+            </li>
+          </ul>
+          <p>This trend is repeated for the persistent absence rate.</p>
           <h3 className="govuk-heading-s">Special educational need (SEN)</h3>
-          <p>
-            Pupils with a statement of special educational needs (SEN) or
-            education healthcare plan (EHC) had an overall absence rate of 8.2%
-            compared to 4.3% for those with no identified SEN.
-          </p>
-          <p>
-            The persistent absence rate was more than 2 times higher for pupils
-            with an SEN statement or EHC plan compared to thise with no
-            identified SEN.
-          </p>
+          <p>Overall absence rate:</p>
+          <ul className="govuk-list-bullet">
+            <li>
+              pupils with a SEN statement or education healthcare (EHC) plan -
+              8.2% compared to 4.3% for those with no identified SEN
+            </li>
+          </ul>
+          <p>Persistent absence rate:</p>
+          <ul className="govuk-list-bullet">
+            <li>
+              pupils with a SEN statement or education healthcare (EHC) plan -
+              more than 2 times higher than pupils with no identified SEN
+            </li>
+          </ul>
         </AccordionSection>
+
         <AccordionSection heading="Absence for 4-year-olds">
           <p>
-            The overall absence rate for 4-year-olds in 2016/17 was 5.1% which
-            is down on the 5.2% rate for the previous 2 years.
+            The <a href="/glossary#overall-absence">overall absence</a> rate
+            decreased to 5.1% - down from 5.2% for the previous 2 years.
           </p>
           <p>
-            Absence recorded for 4-year-olds is not treated as 'authorised' or
-            'unauthorised' and is therefore reported as overall absence only.
+            Absence recorded for 4-year-olds is not treated as authorised or
+            unauthorised and only reported as overall absence.
           </p>
         </AccordionSection>
+
         <AccordionSection heading="Pupil referral unit absence">
           <p>
-            The overall absence rate for pupil referral units in 2016/17 was
-            33.9% compared to 32.6% in 2015/16.
+            The <a href="/glossary#overall-absence">overall absence</a> rate
+            increased to 33.9% - up from 32.6% in 2015/16.
           </p>
           <p>
-            Persistent absence in pupil referral units was 73.9% in 2016/17
-            compared to 72.5% in 2015/16.
+            The <a href="/glossary#persistent-absence">persistent absence</a>{' '}
+            rate increased to 73.9% - up from 72.5% in 2015/16.
           </p>
         </AccordionSection>
+
         <AccordionSection
           heading="Regional and local authority (LA) breakdown"
           onToggle={() => mapRef && mapRef.refresh()}
@@ -689,28 +697,34 @@ const PublicationPage = () => {
           />
 
           <p>
-            Overall and persistent absence rates vary across primary, secondary
-            and special schools by region LA.
+            <a href="/glossary#overall-absence">Overall absence</a> and{' '}
+            <a href="/glossary#persistent-absence">persistent absence</a> rates
+            vary across primary, secondary and special schools by region and
+            local authority (LA).
           </p>
+          <h3 className="govuk-heading-s">Overall absence</h3>
           <p>
-            Similar to last year, the 3 regions with the highest overall absence
-            rate across all school types are the North East (4.9%), Yorkshire
-            and the Humber (4.9%) and the South West (4.8%) with Inner and Outer
-            London having the lowest overall absence rate (4.4%).
+            Similar to 2015/16, the 3 regions with the highest rates across all
+            school types were:
           </p>
+          <ul className="govuk-list-bullet">
+            <li>North East - 4.9%</li>
+            <li>Yorkshire and the Humber - 4.9%</li>
+            <li>South West - 4.8%</li>
+          </ul>
+          <p>Meanwhile, Inner and Outer London had the lowest rates at 4.4%.</p>
+          <h3 className="govuk-heading-s">Persistent absence</h3>
           <p>
-            The region with the highest persistent absence rate is Yorkshire and
-            the Humber (11.9%) with Outer London having the lowest rate of
-            persistent absence (10%).
+            The region with the highest persistent absence rate was Yorkshire
+            and the Humber with 11.9% while Outer London had the lowest rate at
+            10%.
           </p>
+          <h3 className="govuk-heading-s">Local authority (LA) level data</h3>
           <p>
-            For LA-level absence statistics and data download our data files.
+            You download data files in the following formats or access our data
+            via an API:
           </p>
-          <p>
-            You can customise and download data as Excel or .csv files. Our data
-            can also be accessed via an API.
-          </p>
-          <ul className="govuk-list">
+          <ul className="govuk-list-bullet">
             <li>
               <a href="#" className="govuk-link">
                 Download .csv files
@@ -731,7 +745,7 @@ const PublicationPage = () => {
                 Access API
               </a>{' '}
               -{' '}
-              <a href="#" className="govuk-link">
+              <a href="/glossary#what-is-an-api" className="govuk-link">
                 What is an API?
               </a>
             </li>
@@ -742,101 +756,124 @@ const PublicationPage = () => {
       <Accordion id="extra-information-sections">
         <AccordionSection
           heading="Pupil absence statistics: methodology"
-          caption="How we collect and process statistics and data"
+          caption="Find out how and why we collect, process and publish these statistics"
           headingTag="h3"
         >
-          <ul className="govuk-list">
-            <li>
-              <a href="/prototypes/methodology-absence" className="govuk-link">
-                How we collect statistics and data?
-              </a>
-            </li>
-            <li>
-              <a href="/prototypes/methodology-absence" className="govuk-link">
-                What do we do with statistics and data?
-              </a>
-            </li>
-            <li>
-              <a href="/prototypes/methodology-absence" className="govuk-link">
-                Related policies
-              </a>
-            </li>
-          </ul>
+          <p>
+            Read our{' '}
+            <a href="/prototypes/methodology-absence">
+              Pupil absence statistics: methodology
+            </a>{' '}
+            guidance.
+          </p>
         </AccordionSection>
+
+        <AccordionSection heading="About these statistics">
+          <p className="govuk-body">
+            The statistics and data cover the absence of pupils of compulsory
+            school age during the 2016/17 academic year in the following
+            state-funded school types:
+          </p>
+          <ul className="govuk-list-bullet">
+            <li>primary schools</li>
+            <li>secondary schools</li>
+            <li>special schools</li>
+          </ul>
+          <p>
+            They also includes information for{' '}
+            <a href="/glossary#pupil-referral-unit">pupil referral units</a> and
+            pupils aged 4 years.
+          </p>
+          <p>
+            We use the key measures of{' '}
+            <a href="/glossary#overall-absence">overall absence</a> and{' '}
+            <a href="/glossary#persistent-absence">persistent absence</a> to
+            monitor pupil absence and also include{' '}
+            <a href="#contents-sections-heading-3">absence by reason</a> and{' '}
+            <a href="#contents-sections-heading-5">pupil characteristics</a>.
+          </p>
+          <p>
+            The statistics and data are available at national, regional, local
+            authority (LA) and school level and are used by LAs and schools to
+            compare their local absence rates to regional and national averages
+            for different pupil groups.
+          </p>
+          <p>
+            They're also used for policy development as key indicators in
+            behaviour and school attendance policy.
+          </p>
+        </AccordionSection>
+
         <AccordionSection heading="National Statistics" headingTag="h3">
           <p className="govuk-body">
-            The United Kingdom Statistics Authority designated these statistics
-            as National Statistics in <a href="#">Month Year</a> in accordance
-            with the Statistics and Registration Service Act 2007 and signifying
-            compliance with the Code of Practice for Statistics.
+            The{' '}
+            <a href="https://www.statisticsauthority.gov.u">
+              UK Statistics Authority
+            </a>{' '}
+            designated these statistics as National Statistics in [INSERT MONTH
+            YEAR] in accordance with the{' '}
+            <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
+              Statistics and Registration Service Act 2007
+            </a>
+            .
           </p>
           <p className="govuk-body">
-            Designation can be broadly interpreted to mean that the statistics:
+            Designation signifies their compliance with the authority's{' '}
+            <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
+              Code of Practice for Statistics
+            </a>{' '}
+            which broadly means these statistics are:
           </p>
           <ul className="govuk-list govuk-list--bullet">
-            <li>meet identified user needs</li>
-            <li>are well explained and readily accessible</li>
-            <li>are produced according to sound methods</li>
-            <li>
-              are managed impartially and objectively in the public interest
-            </li>
+            <li>managed impartially and objectively in the public interest</li>
+            <li>meeting identified user needs</li>
+            <li>produced according to sound methods</li>
+            <li>well-explained and readily accessible</li>
           </ul>
           <p className="govuk-body">
-            Once statistics have been designated as National Statistics it's a
-            statutory requirement that the Code of Practice shall continue to be
-            observed.
+            Once designated as National Statistics it's a statutory requirement
+            for statistics to ffollow and comply with the Code of Practice for
+            Statistics.
           </p>
           <p>
-            Information on improvements made to these statistics to continue
-            their compliance with the Code of Practice are provided in this{' '}
-            <a href="#">accompanying document</a>
+            Find out more about the standards we follow to produce these
+            statistics through our{' '}
+            <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
+              Standards for official statistics published by DfE
+            </a>{' '}
+            guidance.
           </p>
         </AccordionSection>
-        <AccordionSection heading="Feedback and questions" headingTag="h3">
-          <ul className="govuk-list">
-            <li>
-              <a href="#" className="govuk-link">
-                Feedback on this page
-              </a>
-            </li>
-            <li>
-              <a href="#" className="govuk-link">
-                Make a suggestion
-              </a>
-            </li>
-            <li>
-              <a href="#" className="govuk-link">
-                Ask a question
-              </a>
-            </li>
-          </ul>
-        </AccordionSection>
+
         <AccordionSection heading="Contact us" headingTag="h3">
-          <p>
-            If you have a specific enquiry about absence and exclusion
-            statistics and data:
-          </p>
           <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
             School absence and exclusions team
           </h4>
-
           <p className="govuk-!-margin-top-0">
-            Email <br />
-            <a href="mailto:schools.statistics@education.gov.uk">
-              schools.statistics@education.gov.uk
-            </a>
+            If you have a specific enquiry about absence and exclusion
+            statistics and data
           </p>
+          <div className="govuk-inset-text">
+            <p className="govuk-!-margin-top-0">
+              Email:{' '}
+              <a href="mailto:schools.statistics@education.gov.uk">
+                schools.statistics@education.gov.uk
+              </a>
+            </p>
 
-          <p>
-            Telephone: Mark Pearson <br /> 0114 274 2585
-          </p>
-
+            <p>
+              Telephone: Mark Pearson
+              <br />
+              0114 274 2585
+            </p>
+          </div>
           <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
             Press office
           </h4>
-          <p className="govuk-!-margin-top-0">If you have a media enquiry:</p>
+          <p className="govuk-!-margin-top-0">If you have a media enquiry</p>
           <p>
-            Telephone <br />
+            Telephone
+            <br />
             020 7925 6789
           </p>
           <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
@@ -844,21 +881,19 @@ const PublicationPage = () => {
           </h4>
           <p className="govuk-!-margin-top-0">
             If you have a general enquiry about the Department for Education
-            (DfE) or education:
+            (DfE) or education
           </p>
           <p>
-            Telephone <br />
-            037 0000 2288
+            Telephone
+            <br />
+            0370 000 2288
           </p>
         </AccordionSection>
       </Accordion>
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
         Create your own tables online
       </h2>
-      <p>
-        Use our tool to build tables using our range of national and regional
-        data.
-      </p>
+      <p>Use our tool to build tables using national and regional data.</p>
       <Link to="/prototypes/table-tool" className="govuk-button">
         Create tables
       </Link>
