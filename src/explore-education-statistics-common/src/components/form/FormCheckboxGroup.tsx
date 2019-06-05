@@ -1,5 +1,5 @@
 import ButtonText from '@common/components/ButtonText';
-import { Omit, PartialBy } from '@common/types/util';
+import { OmitStrict, PartialBy } from '@common/types/util';
 import classNames from 'classnames';
 import kebabCase from 'lodash/kebabCase';
 import orderBy from 'lodash/orderBy';
@@ -19,7 +19,7 @@ import styles from './FormCheckboxGroup.module.scss';
 import FormFieldset, { FormFieldsetProps } from './FormFieldset';
 
 export type CheckboxOption = PartialBy<
-  Omit<FormCheckboxProps, 'name' | 'checked' | 'onChange'>,
+  OmitStrict<FormCheckboxProps, 'name' | 'checked' | 'onChange'>,
   'id'
 >;
 

@@ -1,11 +1,11 @@
-import { Omit } from '@common/types/util';
+import { OmitStrict } from '@common/types/util';
 import { Field, FieldProps } from 'formik';
 import React from 'react';
 import FormSortableList, { FormSortableListProps } from './FormSortableList';
 
 type Props<FormValues> = {
   name: keyof FormValues | string;
-} & Omit<FormSortableListProps, 'value'>;
+} & OmitStrict<FormSortableListProps, 'value'>;
 
 const FormFieldSortableList = <T extends {}>(props: Props<T>) => {
   const { name } = props;
