@@ -39,8 +39,8 @@ const PublicationPageExclusions = () => {
                 download data files.
               </p>
               <p>
-                All figures refer to the <strong>2016/17 academic year</strong>{' '}
-                - unless otherwise stated.
+                All figures refer to the <strong>March and April 2018</strong> -
+                unless otherwise stated.
               </p>
               <p className="govuk-inset-text">
                 <a href="#contents-exclusions-sections-heading-8">

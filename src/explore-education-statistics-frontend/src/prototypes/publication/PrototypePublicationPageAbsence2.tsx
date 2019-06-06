@@ -114,7 +114,7 @@ const PublicationPage = () => {
               <span className="govuk-caption-m govuk-caption-inline">
                 For academic year:{' '}
               </span>
-              2016 to 2017 (latest data)
+              2016/17 (latest data)
             </h3>
 
             <Details summary="See previous 7 releases">
