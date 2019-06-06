@@ -152,10 +152,10 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
                   const key = `${id}0_table_${idx}`;
 
                   return (
-                    <>
-                      <TableRenderer key={key} {...table} />
+                    <React.Fragment key={key}>
+                      <TableRenderer {...table} />
                       <DownloadDetails />
-                    </>
+                    </React.Fragment>
                   );
                 })}
 
@@ -173,10 +173,10 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
                   const key = `${id}_chart_${idx}`;
 
                   return (
-                    <>
-                      <ChartRenderer key={key} {...chart} height={height} />
+                    <React.Fragment key={key}>
+                      <ChartRenderer {...chart} height={height} />
                       <DownloadDetails />
-                    </>
+                    </React.Fragment>
                   );
                 })}
 

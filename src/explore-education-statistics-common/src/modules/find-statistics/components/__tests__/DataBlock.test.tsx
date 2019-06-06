@@ -1,12 +1,10 @@
-import React from 'react';
-import { render, wait } from 'react-testing-library';
+import testData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
 import _dataBlockService, {
   DataBlockRequest,
   GeographicLevel,
 } from '@common/services/dataBlockService';
-import testData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
-import domUtil from '@common-test/domUtil';
-import { Summary } from '@common/services/publicationService';
+import React from 'react';
+import { render, wait } from 'react-testing-library';
 import DataBlock from '../DataBlock';
 
 jest.mock('@common/services/dataBlockService');
@@ -23,14 +21,6 @@ describe('DataBlock', () => {
     endYear: '2015',
     filters: ['1', '2'],
     indicators: ['23', '26', '28'],
-  };
-
-  const summary: Summary = {
-    dataKeys: ['23', '26', '28'],
-    description: {
-      type: 'MarkDownBlock',
-      body: `<div>test</div>`,
-    },
   };
 
   test('renders horizontal chart', async () => {
@@ -69,15 +59,10 @@ describe('DataBlock', () => {
     ).toHaveLength(1);
 
     expect(
-      domUtil.elementContainingText(
-        container,
-        'section.govuk-tabs__panel h3',
-        'Charts',
-      ).length,
-    ).toBe(1);
+      container.querySelector('section.govuk-tabs__panel h3'),
+    ).toHaveTextContent('Charts');
 
     expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
-    expect(container.querySelector('svg')).toMatchSnapshot();
   });
 
   test('renders vertical chart', async () => {
@@ -115,15 +100,10 @@ describe('DataBlock', () => {
     ).toHaveLength(1);
 
     expect(
-      domUtil.elementContainingText(
-        container,
-        'section.govuk-tabs__panel h3',
-        'Charts',
-      ).length,
-    ).toBe(1);
+      container.querySelector('section.govuk-tabs__panel h3'),
+    ).toHaveTextContent('Charts');
 
     expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
-    expect(container.querySelector('svg')).toMatchSnapshot();
   });
 
   test('renders table', async () => {
@@ -146,7 +126,7 @@ describe('DataBlock', () => {
 
     expect(getDataBlockForSubject).toBeCalledWith(dataBlockRequest);
 
-    expect(container.innerHTML).toMatchSnapshot();
+    expect(container.querySelector('table')).toMatchSnapshot();
   });
 
   test('renders summary', async () => {
@@ -162,7 +142,13 @@ describe('DataBlock', () => {
         type="databock"
         dataBlockRequest={dataBlockRequest}
         showTables={false}
-        summary={summary}
+        summary={{
+          dataKeys: ['23', '26', '28'],
+          description: {
+            type: 'MarkDownBlock',
+            body: `<div>test</div>`,
+          },
+        }}
       />,
     );
 
@@ -170,8 +156,8 @@ describe('DataBlock', () => {
 
     expect(getDataBlockForSubject).toBeCalledWith(dataBlockRequest);
 
-    expect(container.querySelector('#datablock_8_summary')).toBeDefined();
-
-    // expect(container.innerHTML).toMatchSnapshot();
+    expect(
+      container.querySelector('#datablock_test_summary'),
+    ).toMatchSnapshot();
   });
 });
