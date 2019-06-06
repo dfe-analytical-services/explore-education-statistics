@@ -1,6 +1,16 @@
 /* eslint-disable react/destructuring-assignment,prefer-destructuring,no-param-reassign */
 
+import EditableAccordion from '@admin/components/EditableAccordion';
+import EditableAccordionSection from '@admin/components/EditableAccordionSection';
+import Link from '@admin/components/Link';
+import EditableContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
 import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
+import PrototypeDataSample from '@admin/pages/prototypes/publication/components/PrototypeDataSample';
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
+import Details from '@common/components/Details';
+import RelatedItems from '@common/components/RelatedItems';
+import { Release } from '@common/services/publicationService';
 import React, { Component } from 'react';
 import {
   DragDropContext,
@@ -9,15 +19,6 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
-import Details from '@common/components/Details';
-import Link from '@admin/components/Link';
-import PrototypeDataSample from '@admin/pages/prototypes/publication/components/PrototypeDataSample';
-import { Release } from '@common/services/publicationService';
-import EditableAccordion from '@admin/components/EditableAccordion';
-import EditableAccordionSection from '@admin/components/EditableAccordionSection';
-import EditableContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
 
 interface State {
   reordering: boolean;
@@ -299,7 +300,7 @@ class EditablePublicationPage extends Component<Props, State> {
             </div>
 
             <div className="govuk-grid-column-one-third">
-              <aside className="app-related-items">
+              <RelatedItems>
                 <h2 className="govuk-heading-m" id="subsection-title">
                   About these statistics
                 </h2>
@@ -382,13 +383,14 @@ class EditablePublicationPage extends Component<Props, State> {
                   <a href="#">Notify me</a>
                 </p>
 
-                <h2
-                  className="govuk-heading-m govuk-!-margin-top-6"
-                  id="related-content"
-                >
-                  Related content
-                </h2>
                 <nav role="navigation" aria-labelledby="related-content">
+                  <h2
+                    className="govuk-heading-m govuk-!-margin-top-6"
+                    id="related-content"
+                  >
+                    Related information
+                  </h2>
+
                   <ul className="govuk-list">
                     <li>
                       <Link to="/prototypes/methodology-absence">
@@ -397,7 +399,7 @@ class EditablePublicationPage extends Component<Props, State> {
                     </li>
                   </ul>
                 </nav>
-              </aside>
+              </RelatedItems>
             </div>
           </div>
           <hr />

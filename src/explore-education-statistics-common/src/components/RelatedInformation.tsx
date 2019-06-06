@@ -1,5 +1,5 @@
+import RelatedItems from '@common/components/RelatedItems';
 import React, { ReactNode } from 'react';
-import styles from './RelatedInformation.module.scss';
 
 interface Props {
   children: ReactNode;
@@ -13,14 +13,14 @@ const RelatedInformation = ({
   id = 'related-information',
 }: Props) => {
   return (
-    <aside className={styles.container}>
+    <RelatedItems>
       <nav role="navigation" aria-labelledby={id}>
         <h2 className="govuk-heading-m" id={id}>
           {heading}
         </h2>
         {children}
       </nav>
-    </aside>
+    </RelatedItems>
   );
 };
 
