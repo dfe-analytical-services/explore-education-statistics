@@ -9,7 +9,7 @@ import PrototypeDataSample from '@admin/pages/prototypes/publication/components/
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
-import RelatedItems from '@common/components/RelatedItems';
+import RelatedAside from '@common/components/RelatedAside';
 import { Release } from '@common/services/publicationService';
 import React, { Component } from 'react';
 import {
@@ -300,7 +300,7 @@ class EditablePublicationPage extends Component<Props, State> {
             </div>
 
             <div className="govuk-grid-column-one-third">
-              <RelatedItems>
+              <RelatedAside>
                 <h2 className="govuk-heading-m" id="subsection-title">
                   About these statistics
                 </h2>
@@ -399,7 +399,7 @@ class EditablePublicationPage extends Component<Props, State> {
                     </li>
                   </ul>
                 </nav>
-              </RelatedItems>
+              </RelatedAside>
             </div>
           </div>
           <hr />

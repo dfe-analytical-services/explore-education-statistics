@@ -1,4 +1,4 @@
-import RelatedItems from '@common/components/RelatedItems';
+import RelatedAside from '@common/components/RelatedAside';
 import React, { ReactNode } from 'react';
 
 interface Props {
@@ -13,14 +13,14 @@ const RelatedInformation = ({
   id = 'related-information',
 }: Props) => {
   return (
-    <RelatedItems>
+    <RelatedAside>
       <nav role="navigation" aria-labelledby={id}>
         <h2 className="govuk-heading-m" id={id}>
           {heading}
         </h2>
         {children}
       </nav>
-    </RelatedItems>
+    </RelatedAside>
   );
 };
 

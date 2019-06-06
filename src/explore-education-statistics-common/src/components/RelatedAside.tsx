@@ -5,8 +5,8 @@ interface Props {
   children: ReactNode;
 }
 
-const RelatedItems = ({ children }: Props) => {
+const RelatedAside = ({ children }: Props) => {
   return <aside className={styles.container}>{children}</aside>;
 };
 
-export default RelatedItems;
+export default RelatedAside;
