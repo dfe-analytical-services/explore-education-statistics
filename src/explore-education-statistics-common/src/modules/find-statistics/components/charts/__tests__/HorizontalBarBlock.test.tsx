@@ -35,11 +35,11 @@ describe('HorzontalBarBlock', () => {
     ).toBe(1);
 
     expect(
-      domUtil.elementContainingText(container, 'text tspan', '2014').length,
+      domUtil.elementContainingText(container, 'text tspan', '2014/15').length,
     ).toBe(1);
 
     expect(
-      domUtil.elementContainingText(container, 'text tspan', '2015').length,
+      domUtil.elementContainingText(container, 'text tspan', '2015/16').length,
     ).toBe(1);
 
     expect(container).toMatchSnapshot();

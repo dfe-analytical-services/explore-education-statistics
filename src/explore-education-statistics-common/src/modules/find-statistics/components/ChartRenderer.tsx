@@ -1,8 +1,11 @@
 import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
-import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
-import { Axis, ReferenceLine } from '@common/services/publicationService';
+import {
+  Axis,
+  ChartDataGroup,
+  ReferenceLine,
+} from '@common/services/publicationService';
 import dynamic from 'next-server/dynamic';
 import React from 'react';
 import {
@@ -22,19 +25,18 @@ export interface ChartRendererProps {
   indicators: string[];
   data: DataBlockData;
   meta: DataBlockMetadata;
-  xAxis?: Axis;
-  yAxis?: Axis;
+  xAxis: Axis;
+  yAxis: Axis;
   height?: number;
   width?: number;
   stacked?: boolean;
-  geometry?: MapFeature;
   referenceLines?: ReferenceLine[];
+  dataGroupings?: ChartDataGroup[];
 }
 
 function ChartRenderer(props: ChartRendererProps) {
   const {
     data,
-    geometry,
     height,
     width,
     meta,
@@ -44,6 +46,7 @@ function ChartRenderer(props: ChartRendererProps) {
     type,
     xAxis = { title: '' },
     yAxis = { title: '' },
+    dataGroupings,
   } = props;
 
   const labels = Object.entries(meta.indicators).reduce(
@@ -68,7 +71,7 @@ function ChartRenderer(props: ChartRendererProps) {
     case 'line':
       return (
         <LineChartBlock
-          chartDataKeys={indicators}
+          indicators={indicators}
           data={data}
           meta={meta}
           labels={labels}
@@ -82,7 +85,7 @@ function ChartRenderer(props: ChartRendererProps) {
     case 'verticalbar':
       return (
         <VerticalBarBlock
-          chartDataKeys={indicators}
+          indicators={indicators}
           data={data}
           meta={meta}
           labels={labels}
@@ -96,7 +99,7 @@ function ChartRenderer(props: ChartRendererProps) {
     case 'horizontalbar':
       return (
         <HorizontalBarBlock
-          chartDataKeys={indicators}
+          indicators={indicators}
           data={data}
           meta={meta}
           labels={labels}
@@ -111,7 +114,7 @@ function ChartRenderer(props: ChartRendererProps) {
     case 'map':
       return (
         <DynamicMapBlock
-          chartDataKeys={indicators}
+          indicators={indicators}
           data={data}
           meta={meta}
           labels={labels}
@@ -119,7 +122,7 @@ function ChartRenderer(props: ChartRendererProps) {
           yAxis={yAxis}
           height={height}
           width={width}
-          geometry={geometry}
+          dataGroupings={dataGroupings}
         />
       );
     default:

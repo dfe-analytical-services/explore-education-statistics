@@ -30,19 +30,20 @@ const PrototypeDataSample = ({
             <PrototypeDataTilesHighlights />
             <ul className="govuk-list govuk-list--bullet">
               <li>
-                overall rate of permanent exclusions has increased from 0.08 per
-                cent of pupil enrolments in 2015/16 to 0.10 per cent in 2016/17
+                overall permanent exclusions rate increased to 0.10% - up from
+                0.08% in 2015/16
               </li>
               <li>
-                number of exclusions has also increased, from 6,685 to 7,720
+                number of exclusions increased to 7,720 - up from 6,685 in
+                2015/16
               </li>
               <li>
-                overall rate of fixed period exclusions increased, from 4.29 per
-                cent of pupil enrolments in 2015/16 to 4.76 per cent in 2016/17
+                overall fixed-period exclusions rate increased to 4.76% - up
+                from 4.29% in 2015/16
               </li>
               <li>
-                number of exclusions has also increased, from 339,360 to
-                381,865.
+                number of exclusions increased to 381,865 - up from 339,360 in
+                2015/16
               </li>
             </ul>
           </TabsSection>

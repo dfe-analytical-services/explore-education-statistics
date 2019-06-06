@@ -22,6 +22,22 @@ export interface GroupedFilterOptions {
   };
 }
 
+export interface ThemeMeta {
+  id: string;
+  title: string;
+  slug: string;
+  topics: {
+    id: string;
+    title: string;
+    slug: string;
+    publications: {
+      id: string;
+      title: string;
+      slug: string;
+    }[];
+  }[];
+}
+
 export interface PublicationSubject {
   id: string;
   label: string;
@@ -77,6 +93,9 @@ export interface TableData {
 }
 
 export default {
+  getThemes(): Promise<ThemeMeta[]> {
+    return dataApi.get(`/meta/themes`);
+  },
   getPublicationMeta(publicationUuid: string): Promise<PublicationMeta> {
     return dataApi.get(`/meta/publication/${publicationUuid}`);
   },
