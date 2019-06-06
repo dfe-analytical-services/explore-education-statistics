@@ -36,7 +36,7 @@ exports[`DataBlock renders summary 1`] = `
           role="group"
         >
           <summary
-            aria-controls="details-content-10"
+            aria-controls="details-content-4"
             aria-expanded="false"
             class="govuk-details__summary"
             role="button"
@@ -52,7 +52,8 @@ exports[`DataBlock renders summary 1`] = `
           <div
             aria-hidden="true"
             class="govuk-details__text"
-            id="details-content-10"
+            id="details-content-4"
+            style=""
           >
             Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
           </div>
@@ -78,7 +79,7 @@ exports[`DataBlock renders summary 1`] = `
           role="group"
         >
           <summary
-            aria-controls="details-content-11"
+            aria-controls="details-content-5"
             aria-expanded="false"
             class="govuk-details__summary"
             role="button"
@@ -94,7 +95,8 @@ exports[`DataBlock renders summary 1`] = `
           <div
             aria-hidden="true"
             class="govuk-details__text"
-            id="details-content-11"
+            id="details-content-5"
+            style=""
           >
             Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
           </div>
@@ -120,7 +122,7 @@ exports[`DataBlock renders summary 1`] = `
           role="group"
         >
           <summary
-            aria-controls="details-content-12"
+            aria-controls="details-content-6"
             aria-expanded="false"
             class="govuk-details__summary"
             role="button"
@@ -136,7 +138,8 @@ exports[`DataBlock renders summary 1`] = `
           <div
             aria-hidden="true"
             class="govuk-details__text"
-            id="details-content-12"
+            id="details-content-6"
+            style=""
           >
             Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
           </div>
