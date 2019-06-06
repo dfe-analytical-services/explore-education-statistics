@@ -70,7 +70,7 @@ class DownloadIndexPage extends Component<Props> {
         </div>
 
         {themes.length > 0 ? (
-          <Accordion id="themes">
+          <Accordion id="themesDownloads">
             {themes.map(
               ({
                 id: themeId,
