@@ -103,51 +103,6 @@ class DownloadIndexPage extends Component<Props> {
         ) : (
           <div className="govuk-inset-text">No data currently published.</div>
         )}
-
-        {/* {themes.length > 0 ? (
-          <>
-            {themes.map(({ id, title }) => (
-              <div key={id}>
-                <p>
-                  <a href="#">{title}</a>
-                </p>
-              </div>
-            ))}
-          </>
-        ) : (
-          <div className="govuk-inset-text">No data currently published</div>
-        )} */}
-
-        <p>
-          <a href="#">Children and early years - including social care</a>
-        </p>
-        <p>
-          <a href="#">Destinations of pupils and students - including NEET</a>
-        </p>
-        <p>
-          <a href="#">Finance and funding</a>
-        </p>
-        <p>
-          <a href="#">Further education</a>
-        </p>
-        <p>
-          <a href="#">Higher education</a>
-        </p>
-        <p>
-          <Link to="/download/pupils-schools">Pupils and schools</Link>
-        </p>
-        <p>
-          <a href="/download/school-college-performance">
-            Schools and college performance - including GCSE and key stage
-            performance
-          </a>
-        </p>
-        <p>
-          <a href="#">Teachers and school workforce</a>
-        </p>
-        <p>
-          <a href="#">UK education and training statistics</a>
-        </p>
       </Page>
     );
   }
