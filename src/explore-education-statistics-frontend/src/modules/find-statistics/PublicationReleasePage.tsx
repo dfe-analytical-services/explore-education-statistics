@@ -102,45 +102,83 @@ class PublicationReleasePage extends Component<Props> {
               </div>
             </div>
             <Details summary="Download data files">
-              <ul className="govuk-list">
+              <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a
-                    href={`${baseUrl.data}/downloads/${
-                      data.publication.slug
-                    }/csv/`}
+                  <Link
+                    to={`${
+                      baseUrl.data
+                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_by_characteristic.csv`}
                     className="govuk-link"
                   >
-                    Download .csv files
-                  </a>
+                    Absence by characteristic
+                  </Link>
+                  {` `}(csv, 100mb)
                 </li>
                 <li>
-                  <a
-                    href={`${baseUrl.data}/downloads/${
-                      data.publication.slug
-                    }/excel/`}
+                  <Link
+                    to={`${
+                      baseUrl.data
+                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_by_geographic_level.csv`}
                     className="govuk-link"
                   >
-                    Download Excel files
-                  </a>
+                    Absence by geographic level
+                  </Link>
+                  {` `}(csv, 100mb)
                 </li>
                 <li>
-                  <a
-                    href={`${baseUrl.data}/downloads/${
-                      data.publication.slug
-                    }/pdf/`}
+                  <Link
+                    to={`${
+                      baseUrl.data
+                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_by_term.csv`}
                     className="govuk-link"
                   >
-                    Download .pdf files
-                  </a>
+                    Absence by term
+                  </Link>
+                  {` `}(csv, 100mb)
                 </li>
                 <li>
-                  <a href={baseUrl.data} className="govuk-link">
-                    Access API
-                  </a>{' '}
-                  -{' '}
-                  <a href={baseUrl.data} className="govuk-link">
-                    What is an API?
-                  </a>
+                  <Link
+                    to={`${
+                      baseUrl.data
+                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_for_four_year_olds.csv`}
+                    className="govuk-link"
+                  >
+                    Absence for four year olds
+                  </Link>
+                  {` `}(csv, 100mb)
+                </li>
+                <li>
+                  <Link
+                    to={`${
+                      baseUrl.data
+                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_in_prus.csv`}
+                    className="govuk-link"
+                  >
+                    Absence in prus
+                  </Link>
+                  {` `}(csv, 100mb)
+                </li>
+                <li>
+                  <Link
+                    to={`${
+                      baseUrl.data
+                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_number_missing_at_least_one_session_by_reason.csv`}
+                    className="govuk-link"
+                  >
+                    Absence number missing at least one session by reason
+                  </Link>
+                  {` `}(csv, 100mb)
+                </li>
+                <li>
+                  <Link
+                    to={`${
+                      baseUrl.data
+                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_rate_percent_bands.csv`}
+                    className="govuk-link"
+                  >
+                    Absence rate percent bands
+                  </Link>
+                  {` `}(csv, 100mb)
                 </li>
               </ul>
               <h2 className="govuk-heading-m govuk-!-margin-top-9">
