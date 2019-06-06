@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase,no-shadow,no-param-reassign */
 import {
   Feature,
   FeatureCollection,
@@ -17,6 +16,7 @@ import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import UKGeoJson from '@common/services/UKGeoJson';
 
+import { Layer, LeafletMouseEvent, Path } from 'leaflet';
 import styles from './MapBlock.module.scss';
 
 export type MapFeature = Feature<Geometry, GeoJsonProperties>;
@@ -52,7 +52,7 @@ function MapBlock(props: MapProps) {
 
   // Build options for forms
   const locationOptions = [
-    { label: 'All', value: '' },
+    { label: 'select...', value: '' },
 
     ...locationGeoJSON
       .map(({ properties: { name, code } }) => ({ label: name, value: code }))
@@ -102,30 +102,38 @@ function MapBlock(props: MapProps) {
 
   const mapRef = React.createRef<Map>();
 
+  const [selectedIndicator, updateSelectedIndicator] = React.useState(
+    indicators[0],
+  );
+
   const getGeometryForOptions = () => {
     const selectedYear = 2016;
-    const displayedFilter = +indicators[0];
+    const displayedFilter = +selectedIndicator;
 
-    const sourceData = data.result
-      .filter(result => result.year === selectedYear)
+    const resultsFilteredByYear = data.result.filter(
+      result => result.year === selectedYear,
+    );
+
+    const sourceData = resultsFilteredByYear
       .map(result => ({
         location:
           meta.locations[
-            //result.location.localAuthorityDistrict.sch_lad_code
             result.location.localAuthority.new_la_code ||
               result.location.region.region_code ||
               result.location.country.country_code
           ],
-        dataValue: +result.measures[displayedFilter],
+        selectedMeasure: +result.measures[displayedFilter],
+        measures: result.measures,
       }))
       .filter(
         r => r.location !== undefined && r.location.geoJson !== undefined,
       );
 
     const { min, max } = sourceData.reduce(
-      ({ min, max }, { dataValue }) => ({
-        min: dataValue < min ? dataValue : min,
-        max: dataValue > max ? dataValue : max,
+      // eslint-disable-next-line no-shadow
+      ({ min, max }, { selectedMeasure }) => ({
+        min: selectedMeasure < min ? selectedMeasure : min,
+        max: selectedMeasure > max ? selectedMeasure : max,
       }),
       { min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY },
     );
@@ -138,11 +146,13 @@ function MapBlock(props: MapProps) {
 
     const value: FeatureCollection<Geometry, DataBlockGeoJsonProperties> = {
       type: 'FeatureCollection',
-      features: sourceData.map(({ location, dataValue }) => ({
+      features: sourceData.map(({ location, selectedMeasure, measures }) => ({
         ...location.geoJson[0],
+        id: location.geoJson[0].properties.code,
         properties: {
           ...location.geoJson[0].properties,
-          className: calculateColorStyle(dataValue),
+          measures,
+          className: calculateColorStyle(selectedMeasure),
         },
       })),
     };
@@ -156,17 +166,50 @@ function MapBlock(props: MapProps) {
     updateGeometry(getGeometryForOptions());
   };
 
-  requestAnimationFrame(() => {
-    if (mapRef.current) {
-      mapRef.current.leafletElement.invalidateSize();
-    }
-  });
+  const onSelectIndicator = (value: string) => {
+    updateSelectedIndicator(value);
+  };
 
   const [selectedLocation, updateSelectedLocation] = React.useState('');
 
+  const getFeatureElementById = (id: string) => {
+    const selectedFeature = geometry.features.find(
+      feature => feature.id === id,
+    );
+
+    if (selectedFeature) {
+      const selectedLayer: Path = selectedFeature.properties.layer as Path;
+      return { element: selectedLayer.getElement(), layer: selectedLayer };
+    }
+
+    return { element: undefined, layer: undefined };
+  };
+
   const selectLocationOption = (locationValue: string) => {
+    const { element: currentSelectedLocationElement } = getFeatureElementById(
+      selectedLocation,
+    );
+
+    if (currentSelectedLocationElement) {
+      currentSelectedLocationElement.classList.remove(styles.selected);
+    }
+
+    const {
+      layer: selectedLayer,
+      element: selectedLocationElement,
+    } = getFeatureElementById(locationValue);
+
+    if (selectedLocationElement && selectedLayer) {
+      selectedLocationElement.classList.add(styles.selected);
+
+      // @ts-ignore
+      mapRef.current.leafletElement.fitBounds(selectedLayer.getBounds(), {
+        padding: [200, 200],
+      });
+      selectedLayer.bringToFront();
+    }
+
     updateSelectedLocation(locationValue);
-    // updateGeometryForOptions();
   };
 
   const updateSelectedGroupOption = (group: GroupOption, value: string) => {
@@ -175,9 +218,44 @@ function MapBlock(props: MapProps) {
     updateGeometryForOptions();
   };
 
-  const onEachFeature = (feature: MapFeature) => {
-    // eslint-disable-next-line
-    // console.log(feature);
+  const onEachFeature = (feature: MapFeature, featureLayer: Path) => {
+    featureLayer.bindTooltip(layer => {
+      if (feature.properties) {
+        // eslint-disable-next-line no-param-reassign
+        feature.properties.layer = featureLayer;
+
+        const content = Object.entries(feature.properties.measures).map(
+          ([id, value]) =>
+            `${meta.indicators[id].label} : ${value}${
+              meta.indicators[id].unit
+            }`,
+        );
+
+        content.unshift(`<strong>${feature.properties.name}</strong>`);
+
+        return content.join('<br />');
+      }
+      return '';
+    });
+  };
+
+  interface MapClickEvent extends LeafletMouseEvent {
+    layer: Layer;
+    sourceTarget: {
+      feature: MapFeature;
+    };
+  }
+
+  const onClick = (e: MapClickEvent) => {
+    const { feature } = e.sourceTarget;
+
+    if (feature.properties) {
+      const selectedFeatureId = feature.properties.code;
+
+      selectLocationOption(selectedFeatureId);
+
+      //console.log(feature);
+    }
   };
 
   const uk = UKGeoJson.UK;
@@ -189,6 +267,18 @@ function MapBlock(props: MapProps) {
         aria-live="assertive"
       >
         <form>
+          <div className="govuk-form-group govuk-!-margin-bottom-6">
+            <FormSelect
+              name="selectedIndicator"
+              id="selectedIndicator"
+              label="Select data to view"
+              value={selectedIndicator}
+              onChange={e => onSelectIndicator(e.currentTarget.value)}
+              order={null}
+              options={indicators.map(indicator => meta.indicators[indicator])}
+            />
+          </div>
+
           <div className="govuk-form-group govuk-!-margin-bottom-6">
             <FormSelect
               name="selectedLocation"
@@ -289,12 +379,12 @@ function MapBlock(props: MapProps) {
 
       <div className={classNames('govuk-grid-column-two-thirds')}>
         <Map
+          ref={mapRef}
           style={{
             width: (width && `${width}px`) || '100%',
             height: `${height || 600}px`,
           }}
           className={styles.map}
-          ref={mapRef}
           center={position}
           zoom={6.5}
           // minZoom={6.5}
@@ -303,16 +393,21 @@ function MapBlock(props: MapProps) {
         >
           {uk ? <GeoJSON data={uk} className={styles.uk} /> : ''}
 
-          <GeoJSON
-            data={geometry}
-            onEachFeature={onEachFeature}
-            style={(feature?: Feature) => ({
-              className:
-                feature && feature.properties && feature.properties.className,
-            })}
-            // style={this.styleFeature}
-            // onClick={this.handleClick}
-          />
+          {geometry ? (
+            <GeoJSON
+              data={geometry}
+              onEachFeature={onEachFeature}
+              style={(feature?: Feature) => ({
+                className:
+                  feature && feature.properties && feature.properties.className,
+              })}
+              onclick={onClick}
+              // style={this.styleFeature}
+              // onClick={this.handleClick}
+            />
+          ) : (
+            ''
+          )}
         </Map>
       </div>
     </div>

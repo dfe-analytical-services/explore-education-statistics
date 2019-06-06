@@ -146,7 +146,7 @@ export interface DataBlockGeoJsonProperties {
   lad17cd?: string | null;
   lad17nm?: string | null;
 
-  // allow anything to come through from the API, but very probably ignored
+  // allow anything as this is an extension of the GeoJsonProperties object at its heart
   [name: string]: unknown;
 }
 
