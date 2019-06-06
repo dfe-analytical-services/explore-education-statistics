@@ -1,9 +1,14 @@
-import { Form, FormFieldset, FormGroup } from '@common/components/form';
-import FormFieldCheckboxSearchSubGroups from '@common/components/form/FormFieldCheckboxSearchSubGroups';
+import {
+  Form,
+  FormFieldCheckboxSearchSubGroups,
+  FormFieldset,
+  FormGroup,
+  Formik,
+} from '@common/components/form';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
 import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
-import { Formik, FormikProps } from 'formik';
+import { FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import React, { useRef } from 'react';
@@ -37,13 +42,15 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     <WizardStepHeading {...props}>Choose your filters</WizardStepHeading>
   );
 
+  const initialValues = {
+    filters: mapValues(specification.filters, () => []),
+    indicators: [],
+  };
+
   return (
     <Formik<FormValues>
       enableReinitialize
-      initialValues={{
-        filters: mapValues(specification.filters, () => []),
-        indicators: [],
-      }}
+      initialValues={initialValues}
       validationSchema={Yup.object<FormValues>({
         filters: Yup.object(
           mapValues(specification.filters, () =>
@@ -71,6 +78,24 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
               <FormGroup>
                 <div className="govuk-grid-row">
                   <div className="govuk-grid-column-one-half-from-desktop">
+                    <FormFieldCheckboxSearchSubGroups
+                      name="indicators"
+                      id={`${formId}-indicators`}
+                      legend="Indicators"
+                      legendSize="s"
+                      hint="Select at least one indicator"
+                      error={getError('indicators')}
+                      selectAll
+                      options={Object.entries(specification.indicators).map(
+                        ([_, group]) => {
+                          return {
+                            legend: group.label,
+                            options: group.options,
+                          };
+                        },
+                      )}
+                    />
+
                     <FormFieldset
                       id={`${formId}-filters`}
                       legend="Categories"
@@ -105,25 +130,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       )}
                     </FormFieldset>
                   </div>
-                  <div className="govuk-grid-column-one-half-from-desktop">
-                    <FormFieldCheckboxSearchSubGroups
-                      name="indicators"
-                      id={`${formId}-indicators`}
-                      legend="Indicators"
-                      legendSize="s"
-                      hint="Select at least one indicator"
-                      error={getError('indicators')}
-                      selectAll
-                      options={Object.entries(specification.indicators).map(
-                        ([_, group]) => {
-                          return {
-                            legend: group.label,
-                            options: group.options,
-                          };
-                        },
-                      )}
-                    />
-                  </div>
                 </div>
               </FormGroup>
 
@@ -133,6 +139,12 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                 formId={formId}
                 submitText="Create table"
                 submittingText="Creating table"
+                onPreviousStep={() => {
+                  form.resetForm({
+                    filters: mapValues(specification.filters, () => []),
+                    indicators: [],
+                  });
+                }}
               />
             </Form>
           </div>

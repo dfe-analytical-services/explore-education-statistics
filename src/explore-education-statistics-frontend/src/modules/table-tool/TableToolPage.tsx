@@ -5,6 +5,7 @@ import tableBuilderService, {
   PublicationSubject,
   PublicationSubjectMeta,
   TableData,
+  ThemeMeta,
 } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
@@ -43,39 +44,9 @@ export interface PublicationOptions {
   }[];
 }
 
-const defaultPublicationOptions: PublicationOptions[] = [
-  {
-    id: 'early-years-and-schools',
-    title: 'Early years and schools',
-    topics: [
-      {
-        id: 'absence-and-exclusions',
-        title: 'Absence and exclusions',
-        publications: [
-          {
-            id: 'cbbd299f-8297-44bc-92ac-558bcf51f8ad',
-            title: 'Pupil absence',
-            slug: '/statistics/pupil-absence-in-schools-in-england',
-          },
-          // {
-          //   id: 'bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9',
-          //   title: 'Exclusions',
-          // },
-        ],
-      },
-      {
-        id: 'school-and-pupil-numbers',
-        title: 'School and pupil numbers',
-        publications: [
-          // {
-          //   id: 'a91d9e05-be82-474c-85ae-4913158406d0',
-          //   title: 'Schools, pupils and their characteristics',
-          // },
-        ],
-      },
-    ],
-  },
-];
+interface Props {
+  themeMeta: ThemeMeta[];
+}
 
 interface State {
   timePeriods: TimePeriod[];
@@ -90,7 +61,7 @@ interface State {
   tableData: TableData['result'];
 }
 
-class TableToolPage extends Component<{}, State> {
+class TableToolPage extends Component<Props, State> {
   public state: State = {
     filters: {},
     timePeriods: [],
@@ -112,10 +83,16 @@ class TableToolPage extends Component<{}, State> {
     tableData: [],
   };
 
+  public static async getInitialProps() {
+    const themeMeta = await tableBuilderService.getThemes();
+    return { themeMeta };
+  }
+
   private handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId,
   }) => {
-    const publication = defaultPublicationOptions
+    const { themeMeta } = this.props;
+    const publication = themeMeta
       .flatMap(option => option.topics)
       .flatMap(option => option.publications)
       .find(option => option.id === publicationId);
@@ -201,6 +178,7 @@ class TableToolPage extends Component<{}, State> {
   };
 
   public render() {
+    const { themeMeta } = this.props;
     const {
       filters,
       indicators,
@@ -232,7 +210,7 @@ class TableToolPage extends Component<{}, State> {
             {stepProps => (
               <PublicationForm
                 {...stepProps}
-                options={defaultPublicationOptions}
+                options={themeMeta}
                 onSubmit={this.handlePublicationFormSubmit}
               />
             )}

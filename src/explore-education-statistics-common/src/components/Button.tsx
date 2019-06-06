@@ -7,7 +7,7 @@ export interface ButtonProps {
   className?: string;
   disabled?: boolean;
   id?: string;
-  onClick?: MouseEventHandler;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
   variant?: 'secondary' | 'warning';
   type?: 'button' | 'submit' | 'reset';
 }

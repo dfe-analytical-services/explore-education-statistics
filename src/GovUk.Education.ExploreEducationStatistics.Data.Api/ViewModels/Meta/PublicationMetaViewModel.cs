@@ -1,22 +1,11 @@
-using System.Collections.Generic;
+using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
 {
-    public class SubjectMetaViewModel
+    public class PublicationMetaViewModel
     {
-        public Dictionary<string,
-            LegendOptionsMetaValueModel<Dictionary<string,
-                LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>> Filters { get; set; }
-
-        public Dictionary<string,
-            LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>> Indicators { get; set; }
-
-        public Dictionary<string, LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>> Locations
-        {
-            get;
-            set;
-        }
-
-        public LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>> TimePeriod { get; set; }
+        public Guid Id { get; set; }
+        public string Title { get; set; }
+        public string Slug { get; set; }
     }
 }

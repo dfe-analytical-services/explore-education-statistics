@@ -1,7 +1,647 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`EditableContentSubBlockRenderer Renders editable Markdown block correctly 1`] = `
-
+<details class="govuk-details"
+         role="group"
+>
+  <summary class="govuk-details__summary"
+           aria-controls="details-content-2"
+           aria-expanded="false"
+           role="button"
+           tabindex="0"
+  >
+    <span class="govuk-details__summary-text"
+          data-testid="details--expand"
+    >
+      Add a table to this section
+    </span>
+  </summary>
+  <div class="govuk-details__text"
+       aria-hidden="true"
+       id="details-content-2"
+  >
+    <div class="govuk-form-group">
+      <div class="govuk-form-group">
+        <fieldset class="govuk-fieldset"
+                  id="select-table"
+        >
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+            Select a table
+          </legend>
+          <div class="govuk-radios">
+            <div class="govuk-radios__item">
+              <input data-aria-controls="table-1-conditional"
+                     class="govuk-radios__input"
+                     id="table-1"
+                     name="select-table"
+                     type="radio"
+                     data-testid="An example table for absence highlights panel"
+                     value="table-1"
+              >
+              <label class="govuk-label govuk-radios__label"
+                     for="table-1"
+              >
+                An example table for absence highlights panel
+              </label>
+            </div>
+            <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
+                 id="table-1-conditional"
+            >
+              <div class="govuk-width-container">
+                <table class="govuk-table">
+                  <caption class="govuk-table__caption govuk-!-margin-bottom-6">
+                    Table showing 'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17
+                  </caption>
+                  <thead class="govuk-table__head">
+                    <tr>
+                      <th colspan="2">
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2012/13
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2013/14
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2014/15
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2015/16
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2016/17
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="govuk-table__body">
+                    <tr>
+                      <th rowspan="4"
+                          scope="row"
+                      >
+                        All schools
+                      </th>
+                      <th scope="row">
+                        Number of pupil enrolments
+                      </th>
+                      <td class="govuk-table__cell--numeric">
+                        6,477,725
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        6,554,005
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        6,642,755
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        6,737,190
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        6,899,770
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">
+                        Authorised absence rate
+                      </th>
+                      <td class="govuk-table__cell--numeric">
+                        4.2%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        3.5%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        3.5%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        3.4%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        3.4%
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">
+                        Unuthorised absence rate
+                      </th>
+                      <td class="govuk-table__cell--numeric">
+                        1.1%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        1.1%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        1.1%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        1.1%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        1.3%
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">
+                        Overall absence rate
+                      </th>
+                      <td class="govuk-table__cell--numeric">
+                        5.3%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        4.5%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        4.6%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        4.6%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        4.7%
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p class="govuk-body-s">
+                  Source: DfE prototype example statistics
+                </p>
+              </div>
+            </div>
+            <div class="govuk-radios__item">
+              <input data-aria-controls="table-2-conditional"
+                     class="govuk-radios__input"
+                     id="table-2"
+                     name="select-table"
+                     type="radio"
+                     data-testid="Example table 2"
+                     value="table-2"
+              >
+              <label class="govuk-label govuk-radios__label"
+                     for="table-2"
+              >
+                Example table 2
+              </label>
+            </div>
+            <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
+                 id="table-2-conditional"
+            >
+              <div class="govuk-width-container">
+                <table class="govuk-table">
+                  <caption class="govuk-table__caption govuk-!-margin-bottom-6">
+                    Table showing 'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17
+                  </caption>
+                  <thead class="govuk-table__head">
+                    <tr>
+                      <th colspan="2">
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2012/13
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2013/14
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2014/15
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2015/16
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2016/17
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="govuk-table__body">
+                    <tr>
+                      <th rowspan="4"
+                          scope="row"
+                      >
+                        All schools
+                      </th>
+                      <th scope="row">
+                        Number of pupil enrolments
+                      </th>
+                      <td class="govuk-table__cell--numeric">
+                        6,477,725
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        6,554,005
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        6,642,755
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        6,737,190
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        6,899,770
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">
+                        Authorised absence rate
+                      </th>
+                      <td class="govuk-table__cell--numeric">
+                        4.2%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        3.5%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        3.5%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        3.4%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        3.4%
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">
+                        Unuthorised absence rate
+                      </th>
+                      <td class="govuk-table__cell--numeric">
+                        1.1%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        1.1%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        1.1%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        1.1%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        1.3%
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">
+                        Overall absence rate
+                      </th>
+                      <td class="govuk-table__cell--numeric">
+                        5.3%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        4.5%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        4.6%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        4.6%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        4.7%
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p class="govuk-body-s">
+                  Source: DfE prototype example statistics
+                </p>
+              </div>
+            </div>
+            <div class="govuk-radios__item">
+              <input data-aria-controls="table-3-conditional"
+                     class="govuk-radios__input"
+                     id="table-3"
+                     name="select-table"
+                     type="radio"
+                     data-testid="Example table 3"
+                     value="table-3"
+              >
+              <label class="govuk-label govuk-radios__label"
+                     for="table-3"
+              >
+                Example table 3
+              </label>
+            </div>
+            <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
+                 id="table-3-conditional"
+            >
+              <div class="govuk-width-container">
+                <table class="govuk-table">
+                  <caption class="govuk-table__caption govuk-!-margin-bottom-6">
+                    Table showing 'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17
+                  </caption>
+                  <thead class="govuk-table__head">
+                    <tr>
+                      <th colspan="2">
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2012/13
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2013/14
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2014/15
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2015/16
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2016/17
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="govuk-table__body">
+                    <tr>
+                      <th rowspan="4"
+                          scope="row"
+                      >
+                        All schools
+                      </th>
+                      <th scope="row">
+                        Number of pupil enrolments
+                      </th>
+                      <td class="govuk-table__cell--numeric">
+                        6,477,725
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        6,554,005
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        6,642,755
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        6,737,190
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        6,899,770
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">
+                        Authorised absence rate
+                      </th>
+                      <td class="govuk-table__cell--numeric">
+                        4.2%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        3.5%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        3.5%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        3.4%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        3.4%
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">
+                        Unuthorised absence rate
+                      </th>
+                      <td class="govuk-table__cell--numeric">
+                        1.1%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        1.1%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        1.1%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        1.1%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        1.3%
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">
+                        Overall absence rate
+                      </th>
+                      <td class="govuk-table__cell--numeric">
+                        5.3%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        4.5%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        4.6%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        4.6%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        4.7%
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p class="govuk-body-s">
+                  Source: DfE prototype example statistics
+                </p>
+              </div>
+            </div>
+            <div class="govuk-radios__item">
+              <input data-aria-controls="table-3-conditional"
+                     class="govuk-radios__input"
+                     id="table-3"
+                     name="select-table"
+                     type="radio"
+                     data-testid="Example table 4"
+                     value="table-4"
+              >
+              <label class="govuk-label govuk-radios__label"
+                     for="table-3"
+              >
+                Example table 4
+              </label>
+            </div>
+            <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
+                 id="table-3-conditional"
+            >
+              <div class="govuk-width-container">
+                <table class="govuk-table">
+                  <caption class="govuk-table__caption govuk-!-margin-bottom-6">
+                    Table showing 'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17
+                  </caption>
+                  <thead class="govuk-table__head">
+                    <tr>
+                      <th colspan="2">
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2012/13
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2013/14
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2014/15
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2015/16
+                      </th>
+                      <th scope="col"
+                          class="govuk-table__header--numeric"
+                      >
+                        2016/17
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="govuk-table__body">
+                    <tr>
+                      <th rowspan="4"
+                          scope="row"
+                      >
+                        All schools
+                      </th>
+                      <th scope="row">
+                        Number of pupil enrolments
+                      </th>
+                      <td class="govuk-table__cell--numeric">
+                        6,477,725
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        6,554,005
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        6,642,755
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        6,737,190
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        6,899,770
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">
+                        Authorised absence rate
+                      </th>
+                      <td class="govuk-table__cell--numeric">
+                        4.2%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        3.5%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        3.5%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        3.4%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        3.4%
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">
+                        Unuthorised absence rate
+                      </th>
+                      <td class="govuk-table__cell--numeric">
+                        1.1%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        1.1%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        1.1%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        1.1%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        1.3%
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">
+                        Overall absence rate
+                      </th>
+                      <td class="govuk-table__cell--numeric">
+                        5.3%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        4.5%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        4.6%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        4.6%
+                      </td>
+                      <td class="govuk-table__cell--numeric">
+                        4.7%
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p class="govuk-body-s">
+                  Source: DfE prototype example statistics
+                </p>
+              </div>
+            </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input"
+                     id="no-table"
+                     name="select-table"
+                     type="radio"
+                     data-testid="Remove table"
+                     value="no-table"
+              >
+              <label class="govuk-label govuk-radios__label"
+                     for="no-table"
+              >
+                Remove table
+              </label>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+    <a class="govuk-button"
+       href="#"
+    >
+      Add selected table option to section
+    </a>
+  </div>
+</details>
 <div class="editableContent  ">
   <div class="editableButton">
     <div class="editableButtonContent">
@@ -16,11 +656,9 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
     </div>
   </div>
 </div>
-
 `;
 
 exports[`EditableContentSubBlockRenderer Renders non-editable Markdown block correctly 1`] = `
-
 <div class>
   <div class="editableButton">
     <div class="editableButtonContent">
@@ -35,5 +673,4 @@ exports[`EditableContentSubBlockRenderer Renders non-editable Markdown block cor
     </div>
   </div>
 </div>
-
 `;

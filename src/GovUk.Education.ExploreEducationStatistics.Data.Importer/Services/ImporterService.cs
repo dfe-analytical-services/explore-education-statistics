@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 _logger.LogInformation(
                     "Importing batch {Index} of {TotalCount} for Publication {Publication}, {Subject}", index,
-                    batches.Count(), subject.Release.PublicationId, subject.Name);
+                    batches.Count(), subject.Release.Publication.Title, subject.Name);
 
                 var observations = GetObservations(batch, headers, subject, subjectMeta);
                 _context.Observation.AddRange(observations);
@@ -187,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 GetParliamentaryConstituency(line, headers),
                 GetProvider(line, headers),
                 GetWard(line, headers)
-                ).Id;
+            ).Id;
         }
 
         private static School GetSchool(IReadOnlyList<string> line, List<string> headers)
@@ -249,7 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return CsvUtil.BuildType(line, headers, columns, values =>
                 new LocalEnterprisePartnership(values[0], values[1]));
         }
-        
+
         private static Institution GetInstitution(IReadOnlyList<string> line,
             List<string> headers)
         {
@@ -257,7 +257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return CsvUtil.BuildType(line, headers, columns, values =>
                 new Institution(values[0], values[1]));
         }
-        
+
         private static Mat GetMat(IReadOnlyList<string> line,
             List<string> headers)
         {
@@ -265,7 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return CsvUtil.BuildType(line, headers, columns, values =>
                 new Mat(values[0], values[1]));
         }
-        
+
         private static MayoralCombinedAuthority GetMayoralCombinedAuthority(IReadOnlyList<string> line,
             List<string> headers)
         {
@@ -273,7 +273,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return CsvUtil.BuildType(line, headers, columns, values =>
                 new MayoralCombinedAuthority(values[0], values[1]));
         }
-        
+
         private static OpportunityArea GetOpportunityArea(IReadOnlyList<string> line,
             List<string> headers)
         {
@@ -281,7 +281,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return CsvUtil.BuildType(line, headers, columns, values =>
                 new OpportunityArea(values[0], values[1]));
         }
-        
+
         private static ParliamentaryConstituency GetParliamentaryConstituency(IReadOnlyList<string> line,
             List<string> headers)
         {
@@ -289,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return CsvUtil.BuildType(line, headers, columns, values =>
                 new ParliamentaryConstituency(values[0], values[1]));
         }
-        
+
         private static Provider GetProvider(IReadOnlyList<string> line,
             List<string> headers)
         {
@@ -297,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return CsvUtil.BuildType(line, headers, columns, values =>
                 new Provider(values[0], values[1], values[2], values[3]));
         }
-        
+
         private static Ward GetWard(IReadOnlyList<string> line,
             List<string> headers)
         {

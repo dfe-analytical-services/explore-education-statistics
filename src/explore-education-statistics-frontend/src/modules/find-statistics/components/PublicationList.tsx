@@ -1,9 +1,9 @@
-import Details from '@common/components/Details';
 import Link from '@frontend/components/Link';
 import React from 'react';
 
 export interface Publication {
   id: string;
+  legacyPublicationUrl: string | null;
   slug: string;
   summary: string;
   title: string;
@@ -17,14 +17,16 @@ function PublicationList({ publications }: Props) {
   return (
     <>
       {publications.length > 0 ? (
-        publications.map(({ id, slug, summary, title }) => (
+        publications.map(({ id, legacyPublicationUrl, slug, title }) => (
           <li key={id}>
-            <h3 className="govuk-heading-m govuk-!-margin-bottom-0">{title}</h3>
-            <p className="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-1">
-              {summary}
-            </p>
-            <div className="govuk-!-margin-top-0 govuk-!-margin-bottom-5">
-              <div className="govuk-grid-row">
+            <strong>{title}</strong>
+            {legacyPublicationUrl ? (
+              <span>
+                - currently available via{' '}
+                <a href={legacyPublicationUrl}>Statistics at DfE</a>
+              </span>
+            ) : (
+              <div className="govuk-grid-row govuk-!-margin-top-0 govuk-!-margin-bottom-4">
                 <div className="govuk-grid-column-one-third">
                   <Link
                     className="govuk-link govuk-!-margin-right-9"
@@ -37,47 +39,19 @@ function PublicationList({ publications }: Props) {
                 </div>
                 <div className="govuk-grid-column-one-third">
                   <Link
-                    className="govuk-link govuk-!-margin-right-9"
+                    className="govuk-link"
                     to={`/table-tool/${slug}`}
                     data-testid={`create-table-${slug}`}
                   >
                     Create your own tables online
                   </Link>
                 </div>
-                <div className="govuk-grid-column-one-third">
-                  <Details summary="Download data files">
-                    <ul className="govuk-list-bullet">
-                      <li>
-                        <a href="#" className="govuk-link">
-                          Download Excel files
-                        </a>
-                      </li>
-                      <li>
-                        <a href="#" className="govuk-link">
-                          Download .csv files
-                        </a>
-                      </li>
-                      <li>
-                        <a href="#" className="govuk-link">
-                          Access API
-                        </a>
-                      </li>
-                    </ul>
-                  </Details>
-                </div>
               </div>
-            </div>
+            )}
           </li>
         ))
       ) : (
-        <div className="govuk-inset-text">
-          These statistics and data are not yet available on the explore
-          education statistics service. To find and download these statistics
-          and data browse{' '}
-          <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics#statistical-collections">
-            Statistics at DfE
-          </a>
-        </div>
+        <></>
       )}
     </>
   );

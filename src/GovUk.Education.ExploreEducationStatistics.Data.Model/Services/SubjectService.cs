@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class SubjectService : AbstractDataService<Subject, long>, ISubjectService
+    public class SubjectService : AbstractRepository<Subject, long>, ISubjectService
     {
         private readonly IReleaseService _releaseService;
 
@@ -20,7 +20,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         public bool IsSubjectForLatestRelease(long subjectId)
         {
             var subject = Find(subjectId, new List<Expression<Func<Subject, object>>> {subject1 => subject1.Release});
-            return _releaseService.GetLatestRelease(subject.Release.PublicationId) == subject.ReleaseId;
+            if (subject == null)
+            {
+                throw new ArgumentException("Subject does not exist", nameof(subjectId));
+            }
+            return _releaseService.GetLatestRelease(subject.Release.PublicationId).Equals(subject.ReleaseId);
         }
     }
 }

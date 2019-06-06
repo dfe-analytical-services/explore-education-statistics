@@ -31,8 +31,8 @@ function PrivacyNoticePage() {
           changes to the statistics and data it contains.
         </p>
         <p>
-          Your use of our service means you accept and consent to our use of
-          your personal data as set out in this privacy notice.
+          Your use of our service means you agree to our use of your personal
+          data as set out in this privacy notice.
         </p>
       </div>
       <div>
@@ -49,9 +49,9 @@ function PrivacyNoticePage() {
           meet 1 (or more) conditions in the data protection legislation.
         </p>
         <p>
-          For the purpose of this service, the relevant condition(s) we're
-          meeting are as set out in Article 6(1)(e) and Article 9(2)(e and g) of
-          the General Data Protection Regulation (GDPR).
+          For the purpose of this service, the relevant condition we're relying
+          on is Article 6(1)(e) of the General Data Protection Regulation
+          (GDPR).
         </p>
       </div>
       <div>
@@ -66,26 +66,22 @@ function PrivacyNoticePage() {
           (with whom we need to share your personal data for specific purposes).
         </p>
         <p>
-          Where we need to share your personal data with others, we ensure that
+          Where we need to share your personal data with others, we make sure
           this data sharing complies with data protection legislation.
         </p>
         <p>
           For the purpose of this service we need to share your personal data
           with{' '}
-          <a href="https://www.notifications.service.gov.uk/">GOV.UK Notify</a>
+          <a href="https://www.notifications.service.gov.uk/">GOV.UK Notify</a>{' '}
           (a service provided by the Government Digital Service which is part of
-          the Cabinet Office) in order for them to send you email notifications
-          about this service.
-        </p>
-        <p>
-          This data sharing is lawful because (insert reason/relevant
-          condition(s) which make this sharing lawful here).
+          the Cabinet Office) so we can send you email notifications about this
+          service.
         </p>
       </div>
       <div>
         <h3>Where your data is stored</h3>
         <p>
-          We store your data on secure servers in the
+          We store your data on secure servers in the{' '}
           <a href="https://www.gov.uk/eu-eea">European Economic Area (EEA)</a>.
           By submitting your personal data, you agree to this.
         </p>
@@ -94,15 +90,15 @@ function PrivacyNoticePage() {
         <h3>How long we'll keep your personal data</h3>
         <p>
           We’ll only keep your personal data for as long as we need it for the
-          purpose(s) of this piece of work, after which point it will be
-          securely destroyed.
+          purpose of sending you notifications, after which your personal data
+          will be securely destroyed.
         </p>
         <p>
-          Please note that, under Data Protection legislation, and in compliance
-          with the relevant data processing conditions, personal data can be
-          kept for longer periods of time when processed purely for archiving
-          purposes in the public interest, statistical purposes and historical
-          or scientific research.
+          Under Data Protection legislation, and in compliance with the relevant
+          data processing conditions, personal data can be kept for longer
+          periods of time when processed purely for archiving in the public
+          interest, statistical purposes and historical or scientific research.
+          For further information refer to GDPR Article 6(1)(e).
         </p>
       </div>
       <div>
@@ -111,7 +107,7 @@ function PrivacyNoticePage() {
         <ul>
           <li>ask us for access to information about you that we hold</li>
           <li>
-            have your personal data rectified if it's inaccurate or incomplete
+            have your personal data rectified - if it's inaccurate or incomplete
           </li>
           <li>
             request the deletion or removal of personal data where there's no
@@ -150,12 +146,12 @@ function PrivacyNoticePage() {
       <div>
         <h3>Withdrawal of consent and the right to lodge a complaint</h3>
         <p>
-          Where we’re processing your personal data with your consent, you have
+          Where we’re processing your personal data with your consent - you have
           the right to withdraw that consent.
         </p>
         <p>
           If you change your mind, or you are unhappy with our use of your
-          personal data, please let us know by contacting the explore education
+          personal data, let us know by contacting the explore education
           statistics service at{' '}
           <a href="mailto:explore.statistics@education.gov.uk">
             explore.statistics@education.gov.uk
@@ -182,11 +178,11 @@ function PrivacyNoticePage() {
         <h3>Contact information</h3>
         <p>
           If you have any questions about how your personal information will be
-          used, please contact the explore education statistics service at
+          used contact the explore education statistics service at
           <a href="mailto:explore.statistics@education.gov.uk">
             explore.statistics@education.gov.uk
           </a>{' '}
-          or contact the DfE Data Protection Officer (DPO) via DfE's{' '}
+          or contact DfE's Data Protection Officer (DPO) via our{' '}
           <a href="https://www.gov.uk/contact-dfe">
             Contact the Department for Education (DfE)
           </a>{' '}

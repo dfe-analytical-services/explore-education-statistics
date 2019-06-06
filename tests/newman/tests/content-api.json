@@ -6,156 +6,158 @@
 	},
 	"item": [
 		{
-			"name": "Publication",
-			"item": [
-				{
-					"name": "Get Specific Publication",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "ff0279ab-8825-4c10-b5eb-e5628eb8905b",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "9e15d6ea-ffcb-4c8e-9b64-06688bc8eb62",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-									"",
-									"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().id).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{content_api_url}}/content/publication/pupil-absence-in-schools-in-england",
-							"host": [
-								"{{content_api_url}}"
-							],
-							"path": [
-								"content",
-								"publication",
-								"pupil-absence-in-schools-in-england"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Latest Specific Publication",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "ff0279ab-8825-4c10-b5eb-e5628eb8905b",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "8c0b7ff3-a619-44f3-b2fb-60d5342f69aa",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () { ",
-									"    pm.response.to.have.status(200); ",
-									"});",
-									"",
-									"pm.test(\"Should be latest publication\", function () {",
-									"   pm.expect(pm.response.json().slug).to.equal(\"2016-17\"); ",
-									"});",
-									"",
-									"pm.test(\"Publication slug matches the publication requested\", function () { ",
-									"    pm.expect(pm.response.json().publication.slug).to.equal(\"pupil-absence-in-schools-in-england\");",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{content_api_url}}/content/publication/pupil-absence-in-schools-in-england/latest",
-							"host": [
-								"{{content_api_url}}"
-							],
-							"path": [
-								"content",
-								"publication",
-								"pupil-absence-in-schools-in-england",
-								"latest"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Release",
-			"item": [
-				{
-					"name": "Get Specific Release",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-									"",
-									"pm.test(\"Release id matches the release requested\", function () { pm.expect(pm.response.json().id).to.equal(\"4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5\"); });"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "e95e89f8-249c-43ca-bb24-d7cb82df7e26",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{content_api_url}}/content/release/4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
-							"host": [
-								"{{content_api_url}}"
-							],
-							"path": [
-								"content",
-								"release",
-								"4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
 			"name": "Content",
 			"item": [
+				{
+					"name": "Publication",
+					"item": [
+						{
+							"name": "Get Latest Specific Publication",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "ff0279ab-8825-4c10-b5eb-e5628eb8905b",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "8c0b7ff3-a619-44f3-b2fb-60d5342f69aa",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Should be latest publication\", function () {",
+											"   pm.expect(pm.response.json().slug).to.equal(\"2016-17\"); ",
+											"});",
+											"",
+											"pm.test(\"Publication slug matches the publication requested\", function () { ",
+											"    pm.expect(pm.response.json().publication.slug).to.equal(\"pupil-absence-in-schools-in-england\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{content_api_url}}/content/publication/pupil-absence-in-schools-in-england/latest",
+									"host": [
+										"{{content_api_url}}"
+									],
+									"path": [
+										"content",
+										"publication",
+										"pupil-absence-in-schools-in-england",
+										"latest"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Specific Publication",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "ff0279ab-8825-4c10-b5eb-e5628eb8905b",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "9e15d6ea-ffcb-4c8e-9b64-06688bc8eb62",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().id).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{content_api_url}}/content/publication/pupil-absence-in-schools-in-england",
+									"host": [
+										"{{content_api_url}}"
+									],
+									"path": [
+										"content",
+										"publication",
+										"pupil-absence-in-schools-in-england"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Release",
+					"item": [
+						{
+							"name": "Get Specific Release",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"pm.test(\"Release id matches the release requested\", function () { pm.expect(pm.response.json().id).to.equal(\"4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5\"); });"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "e95e89f8-249c-43ca-bb24-d7cb82df7e26",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{content_api_url}}/content/release/4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
+									"host": [
+										"{{content_api_url}}"
+									],
+									"path": [
+										"content",
+										"release",
+										"4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
 				{
 					"name": "Get Content tree",
 					"event": [
@@ -170,7 +172,7 @@
 									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
 									"});",
 									"",
-									"pm.test(\"Returned array should be correct length\", function () { pm.expect(pm.response.json().length).to.equal(3); });"
+									"pm.test(\"Should be more than eight themes\", function () { pm.expect(pm.response.json().length).to.be.above(8); });"
 								],
 								"type": "text/javascript"
 							}
@@ -211,7 +213,7 @@
 									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
 									"});",
 									"",
-									"pm.test(\"Returned array should be correct length\", function () { pm.expect(pm.response.json().length).to.equal(3); });"
+									"pm.test(\"Should be more than eight themes\", function () { pm.expect(pm.response.json().length).to.be.above(8); });"
 								],
 								"type": "text/javascript"
 							}

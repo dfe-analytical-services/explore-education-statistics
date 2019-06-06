@@ -1,5 +1,4 @@
 import 'cross-fetch/polyfill';
-import 'core-js/fn/array/virtual/flat-map';
 
 if (typeof Promise === 'undefined') {
   window.Promise = require('core-js/fn/promise');
@@ -10,33 +9,28 @@ if (typeof Promise === 'undefined') {
 // This probably shouldn't be needed as long
 // as babel-preset-env is working correctly.
 if (
-  !('startsWith' in String.prototype) ||
-  !('endsWith' in String.prototype) ||
-  !('includes' in Array.prototype) ||
-  !('assign' in Object) ||
-  !('keys' in Object)
+  !String.prototype.startsWith ||
+  !String.prototype.endsWith ||
+  !Array.prototype.includes ||
+  !Object.assign ||
+  !Object.keys
 ) {
   require('core-js');
+} else {
+  require('core-js/fn/array/virtual/flatten');
+  require('core-js/fn/array/virtual/flat-map');
 }
 
-if (!('repeat' in String.prototype)) {
-  require('core-js/fn/string/repeat');
+// Alias Array.flat to Array.flatten as
+// core-js@2 uses the older proposal
+if (!Array.prototype.flat) {
+  // eslint-disable-next-line no-extend-native
+  Array.prototype.flat = Array.prototype.flatten;
 }
 
 // NodeList.forEach
 if (window.NodeList && !NodeList.prototype.forEach) {
   NodeList.prototype.forEach = Array.prototype.forEach;
-}
-
-// Alias addListener/removeListener (as these are deprecated)
-if (
-  typeof MediaQueryList.prototype.addEventListener === 'undefined' ||
-  typeof MediaQueryList.prototype.removeEventListener === 'undefined'
-) {
-  MediaQueryList.prototype.addEventListener =
-    MediaQueryList.prototype.addListener;
-  MediaQueryList.prototype.removeEventListener =
-    MediaQueryList.prototype.removeListener;
 }
 
 // For IE11

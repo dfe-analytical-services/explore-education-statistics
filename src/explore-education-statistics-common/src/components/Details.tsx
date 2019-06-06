@@ -1,64 +1,127 @@
+import useMounted from '@common/hooks/useMounted';
+import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
-import React, { Component, createRef, ReactNode } from 'react';
+import React, { MouseEvent, ReactNode, useEffect, useRef } from 'react';
+
+let hasNativeDetails: boolean;
+let idCounter = 0;
 
 export interface DetailsProps {
   className?: string;
+  tag?: string;
   children: ReactNode;
   id?: string;
-  onToggle?: (isOpen: boolean) => void;
+  onToggle?: (isOpen: boolean, event: MouseEvent<HTMLElement>) => void;
   open?: boolean;
   summary: string | ReactNode;
 }
 
-class Details extends Component<DetailsProps> {
-  private ref = createRef<HTMLElement>();
+const Details = ({
+  className,
+  children,
+  id = `details-content-${(idCounter += 1)}`,
+  open = false,
+  onToggle,
+  summary,
+  tag,
+}: DetailsProps) => {
+  const ref = useRef<HTMLElement>(null);
 
-  public componentDidMount(): void {
-    if (this.ref.current) {
-      import('govuk-frontend/components/details/details').then(
-        ({ default: GovUkDetails }) => {
-          new GovUkDetails(this.ref.current).init();
-        },
-      );
+  const { onMounted } = useMounted();
+  const [isOpened, setOpened] = useToggle(open);
+
+  useEffect(() => {
+    if (typeof hasNativeDetails === 'undefined') {
+      hasNativeDetails =
+        typeof document.createElement('details').open === 'boolean';
     }
-  }
+  }, []);
 
-  public render() {
-    const { className, children, id, open, onToggle, summary } = this.props;
+  useEffect(() => {
+    setOpened(open);
+  }, [open, setOpened]);
 
-    return (
-      <details
-        className={classNames('govuk-details', className)}
-        open={open}
-        ref={this.ref}
-        data-testid={summary}
-      >
-        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-        <summary
-          className="govuk-details__summary"
-          role="button"
-          tabIndex={0}
-          onClick={event => {
-            if (onToggle) {
-              onToggle(
-                event.currentTarget.getAttribute('aria-expanded') === 'true',
-              );
+  useEffect(() => {
+    if (hasNativeDetails) {
+      return;
+    }
+
+    if (ref.current) {
+      // Don't really need to include this, but just
+      // polyfills DOM behaviour for IE/Edge
+      if (isOpened) {
+        ref.current.setAttribute('open', '');
+      } else {
+        ref.current.removeAttribute('open');
+      }
+    }
+  }, [isOpened]);
+
+  return (
+    <details
+      className={classNames('govuk-details', className)}
+      open={open}
+      ref={ref}
+      role={onMounted('group')}
+    >
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+      <summary
+        aria-controls={onMounted(id)}
+        aria-expanded={onMounted(isOpened)}
+        className="govuk-details__summary"
+        role={onMounted('button')}
+        tabIndex={onMounted(0)}
+        onClick={event => {
+          event.persist();
+
+          if (onToggle) {
+            onToggle(!isOpened, event);
+
+            if (event.isDefaultPrevented()) {
+              return;
             }
-          }}
+          }
+
+          setOpened(!isOpened);
+        }}
+        onKeyPress={event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            (event.target as HTMLElement).click();
+          }
+        }}
+        onKeyUp={event => {
+          if (event.key === ' ') {
+            event.preventDefault();
+          }
+        }}
+      >
+        <span
+          className="govuk-details__summary-text"
+          data-testid="details--expand"
         >
-          <span
-            className="govuk-details__summary-text"
-            data-testid="details--expand"
-          >
-            {summary}
-          </span>
-        </summary>
-        <div className="govuk-details__text" id={id}>
-          {children}
-        </div>
-      </details>
-    );
-  }
-}
+          {summary}
+          {tag && (
+            <span className="govuk-tag govuk-!-margin-left-2">{tag}</span>
+          )}
+        </span>
+      </summary>
+      <div
+        aria-hidden={onMounted(!isOpened)}
+        className="govuk-details__text"
+        id={onMounted(id)}
+        style={onMounted(
+          !hasNativeDetails
+            ? {
+                display: !isOpened ? 'none' : undefined,
+              }
+            : undefined,
+        )}
+      >
+        {children}
+      </div>
+    </details>
+  );
+};
 
 export default Details;

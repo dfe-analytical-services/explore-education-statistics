@@ -1,33 +1,38 @@
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
-    using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
-    using Microsoft.Azure.WebJobs;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Logging;
-    using Newtonsoft.Json.Linq;
-    using Willezone.Azure.WebJobs.Extensions.DependencyInjection;
-
     public class Processor
     {
-        private const string StorageConnectionName = "AzureStorage";
+        private const string StorageConnectionName = "TableStorageConnString";
         private const string ContainerName = "releases";
         private const string UploadsDir = "admin-file-uploads";
 
+        private readonly IProcessorService _processorService;
+
+        public Processor(IProcessorService processorService)
+        {
+            _processorService = processorService;
+        }
+
         [FunctionName("FilesProcessor")]
-        public static void FilesProcessorFunc(
+        public void FilesProcessorFunc(
             [QueueTrigger("imports-pending", Connection = "")] JObject fNotifyIn,
             [Queue("imports-processed", Connection = "")] out JObject fNotifyOut,
-            [Inject]IProcessorService processorService,
             ILogger logger,
             ExecutionContext context)
         {
-            logger.LogInformation($"C# Queue trigger function processed: {fNotifyIn.ToString()}");
+            logger.LogInformation($"FilesProcessor function triggered: {fNotifyIn.ToString()}");
 
             var filesProcessorNotification = ExtractNotification(fNotifyIn);
             var config = LoadAppSettings(context);
             var blobStorageConnectionStr = config.GetConnectionString(StorageConnectionName);
 
-            processorService.ProcessFiles(filesProcessorNotification, ContainerName, blobStorageConnectionStr, UploadsDir);
+            _processorService.ProcessFiles(filesProcessorNotification, ContainerName, blobStorageConnectionStr, UploadsDir);
 
             logger.LogInformation("Completed files processing");
 

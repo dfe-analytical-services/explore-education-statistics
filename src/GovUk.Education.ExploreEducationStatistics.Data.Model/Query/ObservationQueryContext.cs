@@ -32,6 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
                 StartYear = StartYear,
                 EndYear = EndYear,
                 Years = Years,
+                GeographicLevel = GeographicLevel,
+                Indicators = Indicators,
                 Countries = Countries,
                 LocalAuthorities = LocalAuthorities,
                 LocalAuthorityDistricts = LocalAuthorityDistricts,

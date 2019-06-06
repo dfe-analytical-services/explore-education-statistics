@@ -127,7 +127,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("GeographicLevel")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(6);
 
                     b.Property<long>("LocationId");
 
@@ -138,11 +139,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.Property<long>("SubjectId");
 
                     b.Property<string>("TimeIdentifier")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(6);
 
                     b.Property<int>("Year");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GeographicLevel");
 
                     b.HasIndex("LocationId");
 
@@ -170,21 +174,106 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.ToTable("ObservationFilterItem");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Publication", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Slug");
+
+                    b.Property<string>("Title");
+
+                    b.Property<Guid>("TopicId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TopicId");
+
+                    b.ToTable("Publication");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+                            Slug = "pupil-absence-in-schools-in-england",
+                            Title = "Pupil absence in schools in England",
+                            TopicId = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460")
+                        },
+                        new
+                        {
+                            Id = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+                            Slug = "permanent-and-fixed-period-exclusions-in-england",
+                            Title = "Permanent and fixed-period exclusions in England",
+                            TopicId = new Guid("77941b7d-bbd6-4069-9107-565af89e2dec")
+                        },
+                        new
+                        {
+                            Id = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
+                            Slug = "secondary-and-primary-schools-applications-and-offers",
+                            Title = "Secondary and primary schools applications and offers",
+                            TopicId = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c")
+                        },
+                        new
+                        {
+                            Id = new Guid("fcda2962-82a6-4052-afa2-ea398c53c85f"),
+                            Slug = "early-years-foundation-stage-profile-results",
+                            Title = "Early years foundation stage profile results",
+                            TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769")
+                        });
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Release", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<Guid>("PublicationId");
 
                     b.Property<DateTime>("ReleaseDate");
+
+                    b.Property<string>("Slug");
+
+                    b.Property<string>("Title");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PublicationId");
 
                     b.ToTable("Release");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
+                            PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
+                            ReleaseDate = new DateTime(2018, 4, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Slug = "2016-17",
+                            Title = "2016 to 2017"
+                        },
+                        new
+                        {
+                            Id = new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a"),
+                            PublicationId = new Guid("fcda2962-82a6-4052-afa2-ea398c53c85f"),
+                            ReleaseDate = new DateTime(2019, 5, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Slug = "2017-18",
+                            Title = "2017 to 2018"
+                        },
+                        new
+                        {
+                            Id = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
+                            PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+                            ReleaseDate = new DateTime(2018, 7, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Slug = "2016-17",
+                            Title = "2016 to 2017"
+                        },
+                        new
+                        {
+                            Id = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                            PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
+                            ReleaseDate = new DateTime(2019, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Slug = "2018",
+                            Title = "2018"
+                        });
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.School", b =>
@@ -213,13 +302,193 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<long>("ReleaseId");
+                    b.Property<Guid>("ReleaseId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ReleaseId");
 
                     b.ToTable("Subject");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Name = "Absence by characteristic",
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Name = "Absence by geographic level",
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            Name = "Absence by term",
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            Name = "Absence for four year olds",
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                        },
+                        new
+                        {
+                            Id = 5L,
+                            Name = "Absence in prus",
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                        },
+                        new
+                        {
+                            Id = 6L,
+                            Name = "Absence number missing at least one session by reason",
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                        },
+                        new
+                        {
+                            Id = 7L,
+                            Name = "Absence rate percent bands",
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                        },
+                        new
+                        {
+                            Id = 8L,
+                            Name = "ELG underlying data 2013 - 2018",
+                            ReleaseId = new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a")
+                        },
+                        new
+                        {
+                            Id = 9L,
+                            Name = "Areas of learning underlying data 2013 - 2018",
+                            ReleaseId = new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a")
+                        },
+                        new
+                        {
+                            Id = 10L,
+                            Name = "APS GLD ELG underlying data 2013 - 2018",
+                            ReleaseId = new Guid("47299b78-a4a6-4f7e-a86f-4713f4a0599a")
+                        },
+                        new
+                        {
+                            Id = 11L,
+                            Name = "Exclusions by characteristic",
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                        },
+                        new
+                        {
+                            Id = 12L,
+                            Name = "Exclusions by geographic level",
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                        },
+                        new
+                        {
+                            Id = 13L,
+                            Name = "Exclusions by reason",
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                        },
+                        new
+                        {
+                            Id = 14L,
+                            Name = "Duration of fixed exclusions",
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                        },
+                        new
+                        {
+                            Id = 15L,
+                            Name = "Number of fixed exclusions",
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                        },
+                        new
+                        {
+                            Id = 16L,
+                            Name = "Total days missed due to fixed period exclusions",
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                        },
+                        new
+                        {
+                            Id = 17L,
+                            Name = "Applications and offers by school phase",
+                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717")
+                        });
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Theme", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Slug");
+
+                    b.Property<string>("Title");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Theme");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
+                            Slug = "pupils-and-schools",
+                            Title = "Pupils and schools"
+                        },
+                        new
+                        {
+                            Id = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"),
+                            Slug = "children-and-early-years",
+                            Title = "Children, early years and social care"
+                        });
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Topic", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Slug");
+
+                    b.Property<Guid>("ThemeId");
+
+                    b.Property<string>("Title");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ThemeId");
+
+                    b.ToTable("Topic");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460"),
+                            Slug = "pupil-absence",
+                            ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
+                            Title = "Pupil absence"
+                        },
+                        new
+                        {
+                            Id = new Guid("77941b7d-bbd6-4069-9107-565af89e2dec"),
+                            Slug = "exclusions",
+                            ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
+                            Title = "Exclusions"
+                        },
+                        new
+                        {
+                            Id = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
+                            Slug = "school-applications",
+                            ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
+                            Title = "School applications"
+                        },
+                        new
+                        {
+                            Id = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769"),
+                            Slug = "early-years-foundation-stage-profile",
+                            ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"),
+                            Title = "Early years foundation stage profile"
+                        });
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Filter", b =>
@@ -565,11 +834,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Publication", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Topic", "Topic")
+                        .WithMany("Publications")
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Release", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Publication", "Publication")
+                        .WithMany("Releases")
+                        .HasForeignKey("PublicationId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Release", "Release")
                         .WithMany("Subjects")
                         .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Topic", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Theme", "Theme")
+                        .WithMany("Topics")
+                        .HasForeignKey("ThemeId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

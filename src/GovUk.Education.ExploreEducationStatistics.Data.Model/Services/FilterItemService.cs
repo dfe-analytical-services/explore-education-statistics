@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class FilterItemService : AbstractDataService<FilterItem, long>, IFilterItemService
+    public class FilterItemService : AbstractRepository<FilterItem, long>, IFilterItemService
     {
         public FilterItemService(ApplicationDbContext context,
             ILogger<FilterItemService> logger) : base(context, logger)
@@ -19,11 +19,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             var filterItemIds = (from ofi in _context.Set<ObservationFilterItem>()
                 join
-                    o in _context.Observation.Where(query.ObservationPredicate()) on ofi
-                        .ObservationId equals o.Id
+                    o in _context.Observation.Where(query.ObservationPredicate()) 
+                    on ofi.ObservationId equals o.Id
                 select ofi.FilterItemId).Distinct().ToList();
 
             return DbSet()
+                .AsNoTracking()
                 .Where(item => filterItemIds.Contains(item.Id))
                 .Include(item => item.FilterGroup.Filter);
         }

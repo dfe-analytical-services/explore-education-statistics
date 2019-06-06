@@ -1,5 +1,5 @@
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
-import { Omit } from '@common/types/util';
+import { OmitStrict } from '@common/types/util';
 import { Field, FieldProps } from 'formik';
 import React from 'react';
 import FormRadioGroup, { FormRadioGroupProps } from './FormRadioGroup';
@@ -7,7 +7,7 @@ import FormRadioGroup, { FormRadioGroupProps } from './FormRadioGroup';
 type Props<FormValues> = {
   name: keyof FormValues | string;
   showError?: boolean;
-} & Omit<FormRadioGroupProps, 'value'>;
+} & OmitStrict<FormRadioGroupProps, 'value'>;
 
 const FormFieldRadioGroup = <T extends {}>(props: Props<T>) => {
   const { error, name, onChange, showError = true } = props;

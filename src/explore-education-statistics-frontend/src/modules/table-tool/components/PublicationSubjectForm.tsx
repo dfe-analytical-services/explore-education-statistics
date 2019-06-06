@@ -1,9 +1,9 @@
-import { Form, FormFieldRadioGroup } from '@common/components/form';
+import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { PublicationSubject } from '@common/services/tableBuilderService';
-import { Formik, FormikProps } from 'formik';
+import { FormikProps } from 'formik';
 import React, { useState } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
@@ -35,6 +35,10 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
     </WizardStepHeading>
   );
 
+  const initialValues = {
+    subjectId: '',
+  };
+
   return (
     <Formik
       enableReinitialize
@@ -45,9 +49,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
         });
         goToNextStep();
       }}
-      initialValues={{
-        subjectId: '',
-      }}
+      initialValues={initialValues}
       validationSchema={Yup.object<FormValues>({
         subjectId: Yup.string().required('Choose a publication subject'),
       })}
@@ -67,7 +69,15 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
               }}
             />
 
-            <WizardStepFormActions {...props} form={form} formId={formId} />
+            <WizardStepFormActions
+              {...props}
+              form={form}
+              formId={formId}
+              onPreviousStep={() => {
+                form.resetForm(initialValues);
+                setSubjectName('');
+              }}
+            />
           </Form>
         ) : (
           <>

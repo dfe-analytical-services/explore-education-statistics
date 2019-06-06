@@ -34,13 +34,13 @@ services:
 #    depends_on:
 #      - data-api
 #      - content-api
-#  data-storage:
-#    container_name: ees-storage
-#    image: arafato/azurite
-#    ports:
-#      - "10000:10000"
-#      - "10001:10001"
-#      - "10002:10002"
+  data-storage:
+    container_name: ees-storage
+    build:
+      context: .
+      dockerfile: Dockerfile-Azurite
+    ports:
+      - "10000:10000"
   db:
     container_name: ees-mssql
     image: "mcr.microsoft.com/mssql/server"

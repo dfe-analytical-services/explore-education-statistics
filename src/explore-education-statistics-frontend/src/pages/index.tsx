@@ -39,7 +39,7 @@ function HomePage() {
             regional data.
           </p>
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="/statistics" data-testid="home--download-data-link">
+            <Link to="/download" data-testid="home--download-data-link">
               Download data files
             </Link>
           </h2>

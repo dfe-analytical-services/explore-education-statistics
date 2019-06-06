@@ -75,6 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IPublicationService, PublicationService>();
             services.AddTransient<IMethodologyService, MethodologyService>();
+            services.AddTransient<IDownloadService, DownloadService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,54 +1,37 @@
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
-    [Route("downloads")]
+    [Route("api/[controller]")]
     [ApiController]
     public class DownloadController : ControllerBase
     {
-        [HttpGet("{publication}/csv")]
-        public IActionResult GetCsvBundle(string publication)
+        private readonly IFileStorageService _fileStorageService;
+
+        public DownloadController(IFileStorageService fileStorageService)
         {
-            var filename = string.Empty;
-            switch (publication)
-            {
-                case "pupil-absence-in-schools-in-england":
-                    filename = "absence";
-                    break;
-                case "permanent-and-fixed-period-exclusions":
-                    filename = "exclusion";
-                    break;
-                case "schools-pupils-and-their-characteristics":
-                    filename = "schpupnum";
-                    break;
-                default:
-                    return NotFound();
-            }
+            _fileStorageService = fileStorageService;
+        }
 
-            const string contentType = "application/zip";
-            HttpContext.Response.ContentType = contentType;
-
-
-            var file = filename + ".zip";
-            var directory = Directory.GetCurrentDirectory();
-            var newPath = Path.GetFullPath(directory);
-
-            var path = newPath + "/wwwroot/data/zip/" + file;
-
-            try
-            {
-                var result = new FileContentResult(System.IO.File.ReadAllBytes(path), contentType)
-                {
-                    FileDownloadName = $"{publication}.zip"
-                };
-
-                return result;
-            }
-            catch (DirectoryNotFoundException)
+        [HttpGet("{publication}/{release}/{filename}")]
+        public async Task<ActionResult> GetFile(string publication, string release, string filename)
+        {
+            if (!_fileStorageService.FileExistsAndIsReleased(publication, release, filename))
             {
                 return NotFound();
             }
+
+            return await _fileStorageService.StreamFile(publication, release, filename);
+        }
+
+        [HttpGet("list/{publication}/{release}")]
+        public ActionResult<IEnumerable<string>> ListFiles(string publication, string release)
+        {
+            return _fileStorageService.ListFiles(publication, release).ToList();
         }
     }
 }

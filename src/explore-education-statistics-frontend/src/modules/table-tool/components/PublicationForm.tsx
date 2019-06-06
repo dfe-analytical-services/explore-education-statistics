@@ -1,19 +1,20 @@
 import DetailsMenu from '@common/components/DetailsMenu';
 import {
+  Form,
   FormFieldRadioGroup,
   FormFieldset,
   FormGroup,
+  Formik,
+  FormTextSearchInput,
 } from '@common/components/form';
-import Form from '@common/components/form/Form';
-import FormTextSearchInput from '@common/components/form/FormTextSearchInput';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
-import { Formik, FormikProps } from 'formik';
+import { ThemeMeta } from '@common/services/tableBuilderService';
+import { FormikProps } from 'formik';
 import camelCase from 'lodash';
 import React, { useState } from 'react';
-import { PublicationOptions } from '../TableToolPage';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
@@ -26,7 +27,7 @@ export type PublicationFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
   onSubmit: PublicationFormSubmitHandler;
-  options: PublicationOptions[];
+  options: ThemeMeta[];
 }
 
 const PublicationForm = (props: Props & InjectedWizardProps) => {

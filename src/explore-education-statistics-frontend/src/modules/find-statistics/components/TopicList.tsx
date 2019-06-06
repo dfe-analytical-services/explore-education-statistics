@@ -23,7 +23,7 @@ function TopicList({ theme, topics }: Props) {
         <Accordion id={theme}>
           {topics.map(({ id, title, summary, publications }) => (
             <AccordionSection heading={title} caption={summary} key={id}>
-              <ul className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+              <ul className="govuk-bullet-list govuk-!-margin-top-0">
                 <PublicationList publications={publications} />
               </ul>
             </AccordionSection>

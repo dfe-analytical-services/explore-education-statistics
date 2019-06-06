@@ -69,7 +69,7 @@ describe('Tabs', () => {
   });
 
   test('tab links match section ids', () => {
-    const { getByText } = render(
+    const { getAllByText } = render(
       <Tabs>
         <TabsSection id="section-1" title="Tab 1">
           <p>Test section 1 content</p>
@@ -80,12 +80,12 @@ describe('Tabs', () => {
       </Tabs>,
     );
 
-    expect(getByText('Tab 1')).toHaveAttribute('href', '#section-1');
-    expect(getByText('Tab 2')).toHaveAttribute('href', '#section-2');
+    expect(getAllByText('Tab 1')[0]).toHaveAttribute('href', '#section-1');
+    expect(getAllByText('Tab 2')[0]).toHaveAttribute('href', '#section-2');
   });
 
   test('clicking tab reveals correct section', () => {
-    const { getByText, container } = render(
+    const { getAllByText, container } = render(
       <Tabs>
         <TabsSection id="section-1" title="Tab 1">
           <p>Test section 1 content</p>
@@ -102,14 +102,14 @@ describe('Tabs', () => {
     expect(tabSection1).not.toHaveClass(hiddenSectionClass);
     expect(tabSection2).toHaveClass(hiddenSectionClass);
 
-    fireEvent.click(getByText('Tab 2'));
+    fireEvent.click(getAllByText('Tab 2')[0]);
 
     expect(tabSection1).toHaveClass(hiddenSectionClass);
     expect(tabSection2).not.toHaveClass(hiddenSectionClass);
   });
 
   test('clicking tab changes location hash', () => {
-    const { getByText } = render(
+    const { getAllByText } = render(
       <Tabs>
         <TabsSection id="section-1" title="Tab 1">
           <p>Test section 1 content</p>
@@ -122,13 +122,13 @@ describe('Tabs', () => {
 
     expect(window.location.hash).toBe('');
 
-    fireEvent.click(getByText('Tab 2'));
+    fireEvent.click(getAllByText('Tab 2')[0]);
 
     expect(window.location.hash).toBe('#section-2');
   });
 
   test('clicking tab renders lazy section', () => {
-    const { getByText, queryByText } = render(
+    const { getAllByText, queryByText } = render(
       <Tabs>
         <TabsSection id="section-1" title="Tab 1">
           <p>Test section 1 content</p>
@@ -141,7 +141,7 @@ describe('Tabs', () => {
 
     expect(queryByText('Test section 2 content')).toBeNull();
 
-    fireEvent.click(getByText('Tab 2'));
+    fireEvent.click(getAllByText('Tab 2')[0]);
 
     expect(queryByText('Test section 2 content')).not.toBeNull();
   });
@@ -155,7 +155,7 @@ describe('Tabs', () => {
     let tabSection3: HTMLElement;
 
     beforeEach(() => {
-      const { getByText, container } = render(
+      const { getAllByText, container } = render(
         <Tabs>
           <TabsSection id="section-1" title="Tab 1">
             <p>Test section 1 content</p>
@@ -169,9 +169,9 @@ describe('Tabs', () => {
         </Tabs>,
       );
 
-      tab1 = getByText('Tab 1') as HTMLAnchorElement;
-      tab2 = getByText('Tab 2') as HTMLAnchorElement;
-      tab3 = getByText('Tab 3') as HTMLAnchorElement;
+      tab1 = getAllByText('Tab 1')[0] as HTMLAnchorElement;
+      tab2 = getAllByText('Tab 2')[0] as HTMLAnchorElement;
+      tab3 = getAllByText('Tab 3')[0] as HTMLAnchorElement;
 
       tabSection1 = container.querySelector('#section-1') as HTMLElement;
       tabSection2 = container.querySelector('#section-2') as HTMLElement;

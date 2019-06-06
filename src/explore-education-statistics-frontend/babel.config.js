@@ -4,7 +4,7 @@ module.exports = {
       'next/babel',
       {
         'preset-env': {
-          useBuiltIns: 'usage',
+          useBuiltIns: 'entry',
           targets: {
             browsers: ['ie>=11', 'safari>=12', 'ios>=9.3', 'last 1 version'],
           },

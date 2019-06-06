@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9875ca56-ecdb-487f-9557-07311038b763",
+		"_postman_id": "ce6e3666-4fcb-476c-8a3d-22f534804709",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -368,7 +368,7 @@
 											"script": {
 												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
 												"exec": [
-													"// pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
+													"pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
 												],
 												"type": "text/javascript"
 											}
@@ -378,14 +378,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/8",
+											"raw": "{{data_api_url}}/meta/subject/99999",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"8"
+												"99999"
 											]
 										}
 									},
@@ -409,8 +409,6 @@
 											"script": {
 												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
 												"exec": [
-													"console.log(pm.response.json());",
-													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Fields are present\", function () {",
@@ -509,8 +507,6 @@
 											"script": {
 												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
 												"exec": [
-													"console.log(pm.response.json());",
-													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Fields are present\", function () {",
@@ -610,8 +606,6 @@
 											"script": {
 												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
 												"exec": [
-													"console.log(pm.response.json());",
-													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Fields are present\", function () {",
@@ -709,8 +703,6 @@
 											"script": {
 												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
 												"exec": [
-													"console.log(pm.response.json());",
-													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Fields are present\", function () {",
@@ -766,6 +758,678 @@
 										"body": {
 											"mode": "raw",
 											"raw": "{\n\tSubjectId: 7,\n\tStartYear: 2012,\n\tEndYear: 2014\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "a0e957f4-5b18-4986-a053-dd5a9d12ed41",
+										"type": "text/javascript",
+										"exec": [
+											"pm.globals.set(\"FILT_GenderMale\", \"3\");",
+											"pm.globals.set(\"FILT_GenderFemale\", \"4\");",
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"72\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"73\");",
+											"pm.globals.set(\"FILT_FSMEligible\", \"42\");",
+											"pm.globals.set(\"FILT_FSMNotEligible\", \"43\");",
+											"pm.globals.set(\"FILT_FSMUnclassified\", \"44\");"
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "7f1dd3fe-1ecd-4adc-a95e-a4b3e350146d",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Permanent and fixed period exclusions",
+							"item": [
+								{
+									"name": "Subject Meta - Exclusions by characteristic",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject/11",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject",
+												"11"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Subject Meta - Exclusions by geographic level",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject/12",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject",
+												"12"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Subject Meta - Exclusions by reason",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject/13",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject",
+												"13"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Subject Meta - Duration of fixed exclusions",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject/14",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject",
+												"14"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Subject Meta - Number of fixed exclusions",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject/15",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject",
+												"15"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Subject Meta - Total days missed due to fixed period exclusions",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject/16",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject",
+												"16"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Early years",
+							"item": [
+								{
+									"name": "Subject Meta - Early learning goal underlying data 2013-2018",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject/8",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject",
+												"8"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Subject Meta - Areas of learning underlying data 2013-2018",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject/9",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject",
+												"9"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Subject Meta - APS GLD ELG underlying data 2013-2018",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject/10",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject",
+												"10"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "School preferences",
+							"item": [
+								{
+									"name": "Subject Meta - Applications and offers by school phase",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});",
+													"",
+													"pm.test(\"Filter SchoolPhase should be correct\", function () {",
+													"    pm.expect(pm.response.json().filters).to.have.property(\"SchoolPhase\");",
+													"    pm.expect(pm.response.json().filters.SchoolPhase.options.Default.options.length).to.equal(2);",
+													"});",
+													"",
+													"pm.test(\"Filter YearOfAdmission should be correct\", function () {",
+													"    pm.expect(pm.response.json().filters).to.have.property(\"YearOfAdmission\");",
+													"    pm.expect(pm.response.json().filters.YearOfAdmission.options.Default.options.length).to.equal(4);",
+													"});",
+													"",
+													"pm.test(\"Indicator Admissions should be correct\", function () {",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"Admissions\");",
+													"    pm.expect(pm.response.json().indicators.Admissions.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().indicators.Admissions.options[0].label).to.equal(\"Number of admissions\");",
+													"});",
+													"",
+													"pm.test(\"Indicator Applications should be correct\", function () {",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"Applications\");",
+													"    pm.expect(pm.response.json().indicators.Applications.options.length).to.equal(3);      ",
+													"});",
+													"",
+													"pm.test(\"Indicator PreferencesBreakdowns should be correct\", function () {",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"PreferencesBreakdowns\");",
+													"    pm.expect(pm.response.json().indicators.PreferencesBreakdowns.options.length).to.equal(11);    ",
+													"});",
+													"",
+													"pm.test(\"Location National should be correct\", function () {",
+													"    pm.expect(pm.response.json().locations).to.have.property(\"National\");",
+													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.National.options[0].label).to.equal(\"England\");",
+													"});",
+													"",
+													"pm.test(\"Location Regional should be correct\", function () {",
+													"    pm.expect(pm.response.json().locations).to.have.property(\"Regional\");",
+													"    pm.expect(pm.response.json().locations.Regional.options.length).to.equal(9); // Outer London/Inner London share same code",
+													"});",
+													"",
+													"pm.test(\"Location LocalAuthority should be correct\", function () {",
+													"    pm.expect(pm.response.json().locations).to.have.property(\"LocalAuthority\"); ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject/17",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject",
+												"17"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Subject Meta - Filter SubjectId 17, Regions South East, South West",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"});",
+													"",
+													"pm.test(\"Number of school phase default options should be correct\", function () { ",
+													"    pm.expect(pm.response.json().filters.SchoolPhase.options.Default.options.length).to.equal(2);",
+													"});",
+													"",
+													"pm.test(\"Number of YearOfAdmission options should be correct\", function () { ",
+													"    pm.expect(pm.response.json().filters.YearOfAdmission.options.Default.options.length).to.equal(3);",
+													"});",
+													"",
+													"pm.test(\"Time periods options should be correct\", function() {",
+													"    pm.expect(pm.response.json().timePeriod.options.length).to.equal(5);",
+													"});",
+													"",
+													"pm.test(\"Number of location options should be correct\", function() {",
+													"    pm.expect(pm.response.json().locations).to.have.property(\"National\");",
+													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
+													"    ",
+													"    pm.expect(pm.response.json().locations).to.have.property(\"Regional\");",
+													"    pm.expect(pm.response.json().locations.Regional.options.length).to.equal(2);",
+													"    ",
+													"    pm.expect(pm.response.json().locations).to.have.property(\"LocalAuthority\");",
+													"    pm.expect(pm.response.json().locations.LocalAuthority.options.length).to.equal(34);",
+													"});",
+													"",
+													"pm.test(\"Expect correct number of indicator categories\", function () {",
+													"    pm.expect(Object.keys(pm.response.json().indicators).length).to.equal(3);",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"Admissions\");",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"Applications\");",
+													"    pm.expect(pm.response.json().indicators).to.have.property(\"PreferencesBreakdowns\");",
+													"",
+													"    pm.expect(pm.response.json().indicators).to.not.have.property(\"AbsenceFields\");",
+													"    pm.expect(pm.response.json().indicators).to.not.have.property(\"AbsenceByReason\");",
+													"    pm.expect(pm.response.json().indicators).to.not.have.property(\"AbsenceForPersistentAbsentees\");",
+													"});",
+													"",
+													"pm.test(\"Expect number of Admissions indicators to be correct\", function () {",
+													"    pm.expect(pm.response.json().indicators.Admissions.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().indicators.Admissions.options[0].label).to.equal(\"Number of admissions\");    ",
+													"});",
+													"",
+													"pm.test(\"Expect number of Applications indicators to be correct\", function () {",
+													"    pm.expect(pm.response.json().indicators.Applications.options.length).to.equal(3);",
+													"});",
+													"",
+													"pm.test(\"Expect number of PreferencesBreakdowns indicators to be correct\", function () {",
+													"    pm.expect(pm.response.json().indicators.PreferencesBreakdowns.options.length).to.equal(11);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\tSubjectId: 17,\n\tRegions: [\n\t\t\"E12000008\",\n\t\t\"E12000009\"\n\t]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -897,7 +1561,7 @@
 			]
 		},
 		{
-			"name": "Data",
+			"name": "Tablebuilder",
 			"item": [
 				{
 					"name": "Pupil absence in schools in England",
@@ -1727,7 +2391,6 @@
 											"script": {
 												"id": "6ef52a6e-a307-4849-b277-6f929e629b1c",
 												"exec": [
-													"/*",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Compulsory fields are present\", function () {",
@@ -1745,12 +2408,7 @@
 													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(673); });",
-													"",
-													"pm.test(\"Response time is less than 200ms\", function () {",
-													"    pm.expect(pm.response.responseTime).to.be.below(5000);",
-													"});",
-													"*/"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(673); });"
 												],
 												"type": "text/javascript"
 											}
@@ -2514,6 +3172,503 @@
 							""
 						]
 					}
+				}
+			]
+		},
+		{
+			"name": "Data",
+			"item": [
+				{
+					"name": "Pupil absence in schools in England",
+					"item": [
+						{
+							"name": "By characteristic",
+							"item": [
+								{
+									"name": "Absence by characteristic - National - *",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"exec": [
+													"respJson = pm.response.json()",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
+													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
+													"});",
+													"",
+													"pm.test(\"Number of metaData filters should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(6); ",
+													"});",
+													"",
+													"pm.test(\"Number of metaData locations should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(1); ",
+													"});",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    pm.expect(respJson.geographicLevel).to.equal(\"National\");",
+													"})",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { ",
+													"    pm.expect(respJson.result.length).to.equal(16); ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Absence by characteristic - National - * - Male, Female AND Primary, Secondary",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"exec": [
+													"respJson = pm.response.json()",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Number of metaData filters should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(4); ",
+													"});",
+													"",
+													"pm.test(\"Number of metaData locations should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(1); ",
+													"});",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
+													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
+													"});",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    pm.expect(respJson.geographicLevel).to.equal(\"National\");",
+													"})",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { ",
+													"    pm.expect(respJson.result.length).to.equal(4); ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}, {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Absence by characteristic - LA - *",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
+													"pm.test(\"Number of metaData filters should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(6); ",
+													"});",
+													"",
+													"/*",
+													"$ csvgrep -p time_period/201415\\|201516/ -p geographic_level/local\\ authority/ -p characteristic/Gender\\ [M,m]ale\\|Gender\\ [F,f]emale/ csvs/absence_by_characteristic.csv | csvcut -k country_name | sed 1d | sort | uniq | wc -l",
+													"1",
+													"$ csvgrep -p time_period/201415\\|201516/ -p geographic_level/local\\ authority/ -p characteristic/Gender\\ [M,m]ale\\|Gender\\ [F,f]emale/ csvs/absence_by_characteristic.csv | csvcut -k region_name | sed 1d | sort | uniq | wc -l",
+													"10",
+													"$ csvgrep -p time_period/201415\\|201516/ -p geographic_level/local\\ authority/ -p characteristic/Gender\\ [M,m]ale\\|Gender\\ [F,f]emale/ csvs/absence_by_characteristic.csv | csvcut -k la_name | sed 1d | sort | uniq | wc -l",
+													"152",
+													"1 + 10 + 152 = 163",
+													"*/",
+													"",
+													"pm.test(\"Number of metaData locations should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(163); ",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(2412); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Absence by characteristic - LA - Wandsworth",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Number of metaData filters should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(3); ",
+													"});",
+													"",
+													"pm.test(\"Number of metaData locations should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(3); ",
+													"});",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(4); });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"localAuthorities\": [\n    \t\"E09000032\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Absence by characteristic - LA district - *",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"exec": [
+													"respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Number of metaData filters should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(7); ",
+													"});",
+													"",
+													"/*",
+													"$ csvgrep -p time_period/201617/ -p geographic_level/local\\ authority\\ district/ -p characteristic/FSM\\ eligible$\\|FSM\\ not\\ eligible$\\|FSM\\ unclassified$/ csvs/absence_by_characteristic.csv | csvcut -k country_name | sed 1d | sort | uniq | wc -l",
+													"1",
+													"$ csvgrep -p time_period/201617/ -p geographic_level/local\\ authority\\ district/ -p characteristic/FSM\\ eligible$\\|FSM\\ not\\ eligible$\\|FSM\\ unclassified$/ csvs/absence_by_characteristic.csv | csvcut -k region_name | sed 1d | sort | uniq | wc -l",
+													"10",
+													"$ csvgrep -p time_period/201617/ -p geographic_level/local\\ authority\\ district/ -p characteristic/FSM\\ eligible$\\|FSM\\ not\\ eligible$\\|FSM\\ unclassified$/ csvs/absence_by_characteristic.csv | csvcut -k sch_lad_name | sed 1d | sort | uniq | wc -l",
+													"326",
+													"1 + 10 + 326 = 337",
+													"*/",
+													"pm.test(\"Number of metaData locations should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(337); ",
+													"});",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
+													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { ",
+													"    pm.expect(respJson.result.length).to.equal(3688);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Absence by characteristic - LA district - Hartlepool",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"exec": [
+													"respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"// pm.test(\"Publication id matches the publication id of the subject\", function () { ",
+													"//     pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
+													"// });",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { ",
+													"    pm.expect(respJson.result.length).to.equal(8); ",
+													"});",
+													"",
+													"pm.test(\"Number of metaData locations should be correct\", function () {",
+													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(3); ",
+													"});",
+													"",
+													"pm.test(\"All results should have LA District name Hartlepool\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.sch_lad_name).to.equal(\"Hartlepool\"); ",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"localAuthorityDistricts\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_AllPupils}}, {{FILT_FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Absence by characteristic - LA district - Adur",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Number of metaData filters should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(3); ",
+													"});",
+													"",
+													"pm.test(\"Number of metaData indicators should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.indicators).length).to.equal(3); ",
+													"});",
+													"",
+													"pm.test(\"Number of metaData locations should be correct\", function () {",
+													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(3); ",
+													"});",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(2); });",
+													"",
+													"",
+													"pm.test(\"All results should have LA District name Adur\", function () {",
+													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
+													"        pm.expect(pm.response.json().result[i].location.localAuthorityDistrict.sch_lad_name).to.equal(\"Adur\"); ",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"localAuthorityDistricts\": [\n    \t\"E07000223\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "ec9d2b73-2598-40e5-abd3-b8598bbf2497",
+										"type": "text/javascript",
+										"exec": [
+											"pm.globals.set(\"FILT_AllPupils\", \"1\");",
+											"pm.globals.set(\"FILT_GenderMale\", \"3\");",
+											"pm.globals.set(\"FILT_GenderFemale\", \"4\");",
+											"pm.globals.set(\"FILT_Special\", \"71\");",
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"72\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"73\");",
+											"pm.globals.set(\"FILT_FSMEligible\", \"42\");",
+											"pm.globals.set(\"FILT_FSMNotEligible\", \"43\");",
+											"pm.globals.set(\"FILT_FSMUnclassified\", \"44\");"
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "65c89d21-118a-4749-bd42-fa874f4a7be9",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "d788e097-9c6f-43c3-89bc-db3db49c5404",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "07a946d0-b2d1-44a1-acc5-a04c987e7a69",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"_postman_isSubFolder": true
 				}
 			]
 		},

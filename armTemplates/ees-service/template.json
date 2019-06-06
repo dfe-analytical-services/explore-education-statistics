@@ -28,11 +28,11 @@
     },
     "skuData": {
       "type": "string",
-      "defaultValue": "B1 Basic"
+      "defaultValue": "S1 Standard"
     },
     "skuContent": {
       "type": "string",
-      "defaultValue": "B1 Basic"
+      "defaultValue": "S1 Standard"
     },
     "skuAdmin": {
       "type": "string",
@@ -52,6 +52,10 @@
       }
     },
 
+    "publicAppBasicAuth": {
+      "type": "string",
+      "defaultValue": "true"
+    },
     "publicAppBasicAuthUsername": {
       "type": "string"
     },
@@ -125,7 +129,10 @@
     "notificationsAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-notify')]",
 
     "notificationsstorageAccountName": "[concat(parameters('subscription'), 'storage', variables('storageEnv'), 'notify')]",
-    "notificationsstorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]"
+    "notificationsstorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]",
+
+    "publicStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'public')]",
+    "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]"
   },
   "resources": [
     {
@@ -176,6 +183,10 @@
               "value": "6.9.1"
             },
             {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "1"
+            },
+            {
               "name": "SeedConfig:BatchSize",
               "value": "50"
             }
@@ -185,6 +196,11 @@
               "name": "StatisticsDb",
               "type": "SQLAzure",
               "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+            },
+            {
+              "name": "AzureStorage",
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]",
+              "type": "Custom"
             }
           ]
         }
@@ -270,6 +286,10 @@
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
               "value": "6.9.1"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "1"
             }
           ],
           "connectionStrings": [
@@ -358,6 +378,10 @@
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
               "value": "6.9.1"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "1"
             }
           ],
           "connectionStrings": [
@@ -452,7 +476,7 @@
             },
             {
               "name": "BASIC_AUTH",
-              "value": "true"
+              "value": "[parameters('publicAppBasicAuth')]"
             },
             {
               "name": "BASIC_AUTH_USERNAME",
@@ -570,8 +594,6 @@
         }
       ]
     },
-
-
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('notificationsstorageAccountName')]",
@@ -581,6 +603,27 @@
       "sku": {
         "name": "Standard_LRS"
       }
+    },
+    {
+      "name": "[variables('publicStorageAccountName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2018-07-01",
+      "location": "[resourceGroup().location]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "resources": [
+        {
+            "name": "default/downloads",
+            "type": "blobServices/containers",
+            "apiVersion": "2018-07-01",
+            "dependsOn": [
+                "[variables('publicStorageAccountName')]"
+            ]
+        }
+      ]
     },
     {
       "apiVersion": "2015-05-01",
@@ -652,7 +695,7 @@
             },
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
-              "value": "~2"
+              "value": "2.0.12438.0"
             },
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
@@ -769,7 +812,7 @@
             },
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
-              "value": "~2"
+              "value": "2.0.12438.0"
             },
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
@@ -784,6 +827,11 @@
             {
               "name": "TableStorageConnString",
               "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "StatisticsDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
             }
           ]          
         }

@@ -1,9 +1,10 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import classNames from 'classnames';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import PrintThisPage from '@common/components/PrintThisPage';
+import SearchForm from '@common/components/SearchForm';
+import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import { baseUrl } from '@common/services/api';
 import publicationService, {
   Release,
@@ -11,11 +12,10 @@ import publicationService, {
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
-import SearchForm from '@common/components/SearchForm';
+import classNames from 'classnames';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
-import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import ContentBlock from './components/ContentBlock';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -268,7 +268,7 @@ class PublicationReleasePage extends Component<Props> {
           className="govuk-heading-m govuk-!-margin-top-9"
           data-testid="extra-information"
         >
-          Help and support
+          Supporting information
         </h2>
         <Accordion id="extra-information-sections">
           <AccordionSection

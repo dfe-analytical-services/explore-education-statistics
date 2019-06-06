@@ -21,11 +21,11 @@ export default function useMedia(query: string) {
     const mediaQueryList = window.matchMedia(query);
     setMedia(mediaQueryList.matches);
 
-    mediaQueryList.addEventListener('change', onChange);
+    mediaQueryList.addListener(onChange);
 
     return () => {
       mounted = false;
-      mediaQueryList.removeEventListener('change', onChange);
+      mediaQueryList.removeListener(onChange);
     };
   }, [query]);
 
