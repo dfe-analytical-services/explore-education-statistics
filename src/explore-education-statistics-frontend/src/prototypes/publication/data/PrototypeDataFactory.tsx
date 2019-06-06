@@ -1,7 +1,8 @@
-/* eslint-disable @typescript-eslint/camelcase */
+/* eslint-disable @typescript-eslint/camelcase,@typescript-eslint/no-unused-vars */
 import { DataBlockProps } from '@common/modules/find-statistics/components/DataBlock';
 import { ChartProps } from 'explore-education-statistics-common/src/modules/find-statistics/components/charts/ChartFunctions';
 import { GeographicLevel } from 'explore-education-statistics-common/src/services/dataBlockService';
+import React from 'react';
 import TimePeriod from 'explore-education-statistics-common/src/services/types/TimePeriod';
 
 export const newApiTest: DataBlockProps = {
@@ -120,8 +121,6 @@ export const newApiHorizontalData: ChartProps = {
       '2014': new TimePeriod(2014, 'HT6'),
       '2015': new TimePeriod(2015, 'HT6'),
     },
-
-    locations: {},
   },
 
   labels: {
@@ -130,34 +129,7 @@ export const newApiHorizontalData: ChartProps = {
     '23': 'Unauthorised absence rate',
   },
 
-  indicators: ['23', '26', '28'],
+  chartDataKeys: ['23', '26', '28'],
   xAxis: { title: 'test x axis' },
   yAxis: { title: 'test y axis' },
-};
-
-export const newChartsApiDataBlock: DataBlockProps = {
-  type: 'datablock',
-  id: 'test',
-  dataBlockRequest: {
-    subjectId: 1,
-    regions: [],
-    localAuthorityDistricts: [],
-    localAuthorities: [],
-    countries: [],
-    geographicLevel: GeographicLevel.LocalAuthority,
-    startYear: '2014',
-    endYear: '2017',
-    indicators: ['23', '26', '28'],
-    filters: ['1', '2'],
-  },
-  showTables: false,
-  charts: [
-    {
-      type: 'map',
-      xAxis: { title: '' },
-      yAxis: { title: '' },
-      indicators: ['23', '26', '28'],
-      dataGroupings: [{ timePeriod: true }],
-    },
-  ],
 };

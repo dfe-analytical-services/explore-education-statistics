@@ -42,31 +42,4 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model {
         public Axis YAxis;
     }
 
-    public class HorizontalBarChart : IContentBlockChart 
-    {
-        public string Type => "horizontalbar";
-        public List<string> Indicators;
-        public Axis XAxis;
-        public Axis YAxis;
-
-    }
-
-    public class VerticalBarChart : IContentBlockChart 
-    {
-        public string Type => "verticalbar";
-        public List<string> Indicators;
-        public Axis XAxis;
-        public Axis YAxis;
-
-    }
-
-    public class MapChart : IContentBlockChart 
-    {
-        public string Type => "map";
-        public List<string> Indicators;
-        public Axis XAxis => new Axis { title = "map"};
-        public Axis YAxis => new Axis { title = "map"};
-
-    }
-
 }

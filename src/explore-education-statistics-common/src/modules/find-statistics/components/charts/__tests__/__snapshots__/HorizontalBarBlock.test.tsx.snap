@@ -78,7 +78,7 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
                   dy="0.355em"
                   x="167"
                 >
-                  2014/15
+                  2014
                 </tspan>
               </text>
             </g>
@@ -112,7 +112,7 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
                   dy="0.355em"
                   x="167"
                 >
-                  2015/16
+                  2015
                 </tspan>
               </text>
             </g>

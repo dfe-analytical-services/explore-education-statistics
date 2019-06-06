@@ -29,11 +29,11 @@ describe('VerticalBarBlock', () => {
     ).toBe(1);
 
     expect(
-      domUtil.elementContainingText(container, 'text tspan', '2014/15').length,
+      domUtil.elementContainingText(container, 'text tspan', '2014').length,
     ).toBe(1);
 
     expect(
-      domUtil.elementContainingText(container, 'text tspan', '2015/16').length,
+      domUtil.elementContainingText(container, 'text tspan', '2015').length,
     ).toBe(1);
 
     expect(Array.from(container.querySelectorAll('.recharts-bar')).length).toBe(
