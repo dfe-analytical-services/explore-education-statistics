@@ -19,12 +19,14 @@ export interface AccordionSectionProps {
   onToggle?: (open: boolean) => void;
 }
 
-export const classes = {
+const classes = {
   section: 'govuk-accordion__section',
   sectionButton: 'govuk-accordion__section-button',
   sectionContent: 'govuk-accordion__section-content',
   expanded: 'govuk-accordion__section--expanded',
 };
+
+export const accordionSectionClasses = classes;
 
 const AccordionSection = ({
   caption,

@@ -1,4 +1,7 @@
-import { openAllParentAccordionSections } from '@common/components/AccordionSection';
+import {
+  accordionSectionClasses,
+  openAllParentAccordionSections,
+} from '@common/components/AccordionSection';
 import { openAllParentDetails } from '@common/components/Details';
 import { openAllParentTabSections } from '@common/components/TabsSection';
 import findAllByText from '@common/lib/dom/findAllByText';
@@ -13,7 +16,7 @@ interface SearchResult {
   element: Element;
   scrollIntoView: () => void;
   text: string;
-  location: string[];
+  location: string;
 }
 
 interface State {
@@ -30,8 +33,8 @@ class SearchForm extends Component<{}, State> {
 
   private boundPerformSearch = debounce(this.performSearch, 1000);
 
-  private static calculateElementLocation(element: HTMLElement) {
-    const location: string[] = [];
+  private static getLocationText(element: HTMLElement): string {
+    const location = [];
 
     const locationHeaderElement = findPreviousSibling(element, 'h2, h3, h4');
 
@@ -39,11 +42,14 @@ class SearchForm extends Component<{}, State> {
       location.unshift(locationHeaderElement.textContent || '');
     }
 
-    const sectionContainer = findParent(element, '.govuk-accordion__section');
+    const accordionSection = findParent(
+      element,
+      `.${accordionSectionClasses.section}`,
+    );
 
-    if (sectionContainer) {
-      const accordionHeader = sectionContainer.querySelector(
-        '.govuk-accordion__section-heading',
+    if (accordionSection) {
+      const accordionHeader = accordionSection.querySelector(
+        `.${accordionSectionClasses.sectionButton}`,
       );
 
       if (accordionHeader) {
@@ -51,7 +57,7 @@ class SearchForm extends Component<{}, State> {
       }
     }
 
-    return location;
+    return location.join(' > ');
   }
 
   private performSearch() {
@@ -64,7 +70,7 @@ class SearchForm extends Component<{}, State> {
     const elements = findAllByText(searchValue, 'p');
 
     const searchResults: SearchResult[] = elements.map(element => {
-      const location = SearchForm.calculateElementLocation(element);
+      const location = SearchForm.getLocationText(element);
 
       const scrollIntoView = () => {
         openAllParentAccordionSections(element);
@@ -184,7 +190,7 @@ class SearchForm extends Component<{}, State> {
                 >
                   <span className={styles.resultHeader}>{result.text}</span>
                   <span className={styles.resultLocation}>
-                    {result.location.join(' > ')}
+                    {result.location}
                   </span>
                 </li>
               );
