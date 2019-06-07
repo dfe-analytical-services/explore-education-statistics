@@ -92,7 +92,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       if (tables) {
         newState.tables = [{ data: json, meta: jsonMeta, ...tables[0] }];
       } else {
-        //TODO: remove when data is updated
+        // TODO: remove when data is updated
         newState.tables = [
           {
             data: json,
