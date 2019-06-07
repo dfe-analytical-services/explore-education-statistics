@@ -1,11 +1,12 @@
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
+import Details from '@common/components/Details';
+import RelatedInformation from '@common/components/RelatedInformation';
 import { contentApi } from '@common/services/api';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
 import React, { Component } from 'react';
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
-import Details from '@common/components/Details';
 import PublicationList from './components/PublicationList';
 import { Topic } from './components/TopicList';
 
@@ -58,23 +59,18 @@ class FindStatisticsPage extends Component<Props> {
             </ul>
           </div>
           <div className="govuk-grid-column-one-third">
-            <aside className="app-related-items">
-              <h2 className="govuk-heading-m" id="releated-content">
-                Related content
-              </h2>
-              <nav role="navigation" aria-labelledby="subsection-title">
-                <ul className="govuk-list">
-                  <li>
-                    <Link to="/methodology">
-                      Education statistics: methodology
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/glossary">Education statistics: glossary</Link>
-                  </li>
-                </ul>
-              </nav>
-            </aside>
+            <RelatedInformation>
+              <ul className="govuk-list">
+                <li>
+                  <Link to="/methodology">
+                    Education statistics: methodology
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/glossary">Education statistics: glossary</Link>
+                </li>
+              </ul>
+            </RelatedInformation>
           </div>
         </div>
 

@@ -3,6 +3,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import PrintThisPage from '@common/components/PrintThisPage';
+import RelatedAside from '@common/components/RelatedAside';
 import SearchForm from '@common/components/SearchForm';
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import { baseUrl } from '@common/services/api';
@@ -209,8 +210,8 @@ class PublicationReleasePage extends Component<Props> {
           </div>
 
           <div className="govuk-grid-column-one-third">
-            <aside className="app-related-items">
-              <h3 id="subsection-title">About these statistics</h3>
+            <RelatedAside>
+              <h3>About these statistics</h3>
 
               <dl className="dfe-meta-content" data-testid="release-period">
                 <dt className="govuk-caption-m">For school year: </dt>
@@ -278,7 +279,7 @@ class PublicationReleasePage extends Component<Props> {
                   </li>
                 </ul>
               </nav> */}
-            </aside>
+            </RelatedAside>
           </div>
         </div>
         <hr />

@@ -1,5 +1,6 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import RelatedInformation from '@common/components/RelatedInformation';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
@@ -17,20 +18,13 @@ function GlossaryIndexPage() {
           </p>
         </div>
         <div className="govuk-grid-column-one-third">
-          <aside className="app-related-items">
-            <h2 className="govuk-heading-m" id="releated-content">
-              Related content
-            </h2>
-            <nav role="navigation" aria-labelledby="subsection-title">
-              <ul className="govuk-list">
-                <li>
-                  <Link to="/methodology">
-                    Education statistics: methodology
-                  </Link>
-                </li>
-              </ul>
-            </nav>
-          </aside>
+          <RelatedInformation>
+            <ul className="govuk-list">
+              <li>
+                <Link to="/methodology">Education statistics: methodology</Link>
+              </li>
+            </ul>
+          </RelatedInformation>
         </div>
       </div>
       <Accordion id="a-z">
