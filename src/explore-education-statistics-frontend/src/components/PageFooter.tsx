@@ -41,12 +41,25 @@ const PageFooter = ({ wide }: Props) => (
                 to="/contact"
                 data-testid="footer--contact-link"
               >
-                Contact
+                Contact us
               </Link>
             </li>
             <li className="govuk-footer__inline-list-item">
-              <Link className="govuk-footer__link" to="/prototypes">
-                Prototypes
+              <Link
+                className="govuk-footer__link"
+                to="/help-support"
+                data-testid="footer--help-support-link"
+              >
+                Help and support
+              </Link>
+            </li>
+            <li className="govuk-footer__inline-list-item">
+              <Link
+                className="govuk-footer__link"
+                to="/sitemap"
+                data-testid="footer--sitemap-link"
+              >
+                Sitemap
               </Link>
             </li>
           </ul>
