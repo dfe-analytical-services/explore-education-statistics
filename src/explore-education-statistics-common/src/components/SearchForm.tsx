@@ -80,7 +80,10 @@ class SearchForm extends Component<{}, State> {
         this.resetSearch();
 
         setTimeout(() => {
-          element.scrollIntoView();
+          element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
         });
       };
 
