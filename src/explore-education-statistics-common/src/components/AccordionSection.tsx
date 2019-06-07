@@ -1,3 +1,4 @@
+import findAllParents from '@common/lib/dom/findAllParents';
 import classNames from 'classnames';
 import React, { createElement, ReactNode } from 'react';
 import GoToTopLink from './GoToTopLink';
@@ -22,7 +23,7 @@ export const classes = {
   section: 'govuk-accordion__section',
   sectionButton: 'govuk-accordion__section-button',
   sectionContent: 'govuk-accordion__section-content',
-  expanded: 'goveuk-accordion__section--expanded',
+  expanded: 'govuk-accordion__section--expanded',
 };
 
 const AccordionSection = ({
@@ -41,15 +42,11 @@ const AccordionSection = ({
     <div
       onClick={event => {
         if (onToggle) {
-          onToggle(
-            event.currentTarget.classList.contains(
-              'govuk-accordion__section--expanded',
-            ),
-          );
+          onToggle(event.currentTarget.classList.contains(classes.expanded));
         }
       }}
       className={classNames(classes.section, className, {
-        'govuk-accordion__section--expanded': open,
+        [classes.expanded]: open,
       })}
       role="presentation"
     >
@@ -85,3 +82,17 @@ const AccordionSection = ({
 };
 
 export default AccordionSection;
+
+export const openAllParentAccordionSections = (target: HTMLElement) => {
+  const sections = findAllParents(target, `.${classes.section}`);
+
+  sections.forEach(section => {
+    const button = section.querySelector<HTMLElement>(
+      `.${classes.sectionButton}`,
+    );
+
+    if (button && button.getAttribute('aria-expanded') === 'false') {
+      button.click();
+    }
+  });
+};

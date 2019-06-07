@@ -1,4 +1,5 @@
 import { useDesktopMedia } from '@common/hooks/useMedia';
+import findAllParents from '@common/lib/dom/findAllParents';
 import classNames from 'classnames';
 import React, {
   createElement,
@@ -7,6 +8,11 @@ import React, {
   ReactNode,
 } from 'react';
 import styles from './TabsSection.module.scss';
+
+export const classes = {
+  panel: 'govuk-tabs__panel',
+  panelHidden: 'govuk-tabs__panel--hidden',
+};
 
 export interface TabsSectionProps {
   children: ReactNode;
@@ -36,11 +42,11 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
       <section
         aria-labelledby={onMedia(tabProps['aria-labelledby'])}
         className={classNames(
-          'govuk-tabs__panel',
+          classes.panel,
           'dfe-content-overflow',
           styles.panel,
           {
-            'govuk-tabs__panel--hidden': tabProps.hidden,
+            [classes.panelHidden]: tabProps.hidden,
           },
         )}
         id={id}
@@ -59,3 +65,19 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
 TabsSection.displayName = 'TabsSection';
 
 export default TabsSection;
+
+export const openAllParentTabSections = (target: HTMLElement) => {
+  const panels = findAllParents(target, `.${styles.panel}`);
+
+  panels.forEach(panel => {
+    const tabId = panel.getAttribute('aria-labelledby');
+
+    if (tabId) {
+      const tab = document.getElementById(tabId);
+
+      if (tab) {
+        tab.click();
+      }
+    }
+  });
+};
