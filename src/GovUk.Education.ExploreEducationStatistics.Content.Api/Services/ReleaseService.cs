@@ -85,20 +85,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                     PublicationId = r.PublicationId,
                     Updates = r.Updates
                 }));
-
-                var listFiles = _fileStorageService.ListFiles(release.Publication.Slug, release.Slug).ToList();
-
+                
                 var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-                releaseViewModel.DataFiles = listFiles;
+                releaseViewModel.DataFiles = ListFiles(release);
                 return releaseViewModel;
             }
 
             return null;
         }
 
-        private IEnumerable<string> ListFiles(string publication, string release)
+        private List<string> ListFiles(Release release)
         {
-            return _fileStorageService.ListFiles(publication, release);
+            return _fileStorageService.ListFiles(release.Publication.Slug, release.Slug).ToList();
         }
     }
 }
