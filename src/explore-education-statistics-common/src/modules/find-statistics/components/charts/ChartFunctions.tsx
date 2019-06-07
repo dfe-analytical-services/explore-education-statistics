@@ -1,8 +1,4 @@
-import {
-  Axis,
-  ChartDataGroup,
-  ReferenceLine,
-} from '@common/services/publicationService';
+import { Axis, ReferenceLine } from '@common/services/publicationService';
 import React, { ReactNode } from 'react';
 import {
   Label,
@@ -21,9 +17,7 @@ import {
 export interface ChartProps {
   data: DataBlockData;
   meta: DataBlockMetadata;
-  indicators: string[]; // the data values
-  dataGroupings?: ChartDataGroup[];
-
+  chartDataKeys: string[];
   labels: { [key: string]: string };
   xAxis: Axis;
   yAxis: Axis;

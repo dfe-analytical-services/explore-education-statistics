@@ -194,7 +194,7 @@ exports[`LineChartBlock renders with correct output 1`] = `
                   dy="0.71em"
                   x="100"
                 >
-                  2014/15
+                  2014
                 </tspan>
               </text>
             </g>
@@ -228,7 +228,7 @@ exports[`LineChartBlock renders with correct output 1`] = `
                   dy="0.71em"
                   x="850"
                 >
-                  2015/16
+                  2015
                 </tspan>
               </text>
             </g>

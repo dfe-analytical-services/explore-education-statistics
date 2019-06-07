@@ -18,7 +18,6 @@ exports[`Details renders correctly 1`] = `
     </span>
   </summary>
   <div class="govuk-details__text"
-       style
        aria-hidden="true"
        id="test-details"
   >

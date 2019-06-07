@@ -17,7 +17,6 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
     </span>
   </summary>
   <div class="govuk-details__text"
-       style
        aria-hidden="true"
        id="details-content-2"
   >

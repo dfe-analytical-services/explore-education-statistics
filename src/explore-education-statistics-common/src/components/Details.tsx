@@ -110,13 +110,13 @@ const Details = ({
         aria-hidden={onMounted(!isOpened)}
         className="govuk-details__text"
         id={onMounted(id)}
-        style={
+        style={onMounted(
           !hasNativeDetails
             ? {
                 display: !isOpened ? 'none' : undefined,
               }
-            : undefined
-        }
+            : undefined,
+        )}
       >
         {children}
       </div>

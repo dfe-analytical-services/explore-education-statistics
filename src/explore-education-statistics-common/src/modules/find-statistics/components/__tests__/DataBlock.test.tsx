@@ -260,37 +260,4 @@ describe('DataBlock', () => {
 
     // expect(container.innerHTML).toMatchSnapshot();
   });
-
-  test('datablock renders map', async () => {
-    const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
-      (_: DataBlockRequest) => {
-        return Promise.resolve(testData.response);
-      },
-    );
-
-    const { container } = render(
-      <DataBlock
-        id="test"
-        type="datablock"
-        dataBlockRequest={dataBlockRequest}
-        showTables={false}
-        charts={[
-          {
-            type: 'map',
-            indicators: ['23', '26', '28'],
-            xAxis: { title: 'test x axis' },
-            yAxis: { title: 'test y axis' },
-            width: 800,
-            height: 600,
-          },
-        ]}
-      />,
-    );
-
-    await wait();
-
-    expect(getDataBlockForSubject).toBeCalledWith(dataBlockRequest);
-
-    expect(container.innerHTML).toMatchSnapshot();
-  });
 });

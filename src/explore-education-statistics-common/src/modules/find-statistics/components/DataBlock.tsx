@@ -18,8 +18,8 @@ import {
 import React, { Component, ReactNode } from 'react';
 import DataBlockService, {
   DataBlockRequest,
+  DataBlockMetadata,
   DataBlockData,
-  DataBlockResponse,
 } from '@common/services/dataBlockService';
 import ChartRenderer, {
   ChartRendererProps,
@@ -64,7 +64,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
         dataBlockRequest,
       );
 
-      this.parseDataResponse(result);
+      this.parseDataResponse(result.data, result.metaData);
     } else {
       // this.parseDataResponse(data, meta);
     }
@@ -74,30 +74,24 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
     this.currentDataQuery = undefined;
   }
 
-  private parseDataResponse(response: DataBlockResponse): void {
+  private parseDataResponse(
+    json: DataBlockData,
+    jsonMeta: DataBlockMetadata,
+  ): void {
     const newState: DataBlockState = {};
-
-    const data: DataBlockData = response;
-    const meta = response.metaData;
 
     const { charts, summary, tables } = this.props;
 
-    if (response.result.length > 0) {
+    if (json.result.length > 0) {
       if (tables) {
-        newState.tables = [
-          {
-            data,
-            meta,
-            ...tables[0],
-          },
-        ];
+        newState.tables = [{ data: json, meta: jsonMeta, ...tables[0] }];
       } else {
         //TODO: remove when data is updated
         newState.tables = [
           {
-            data,
-            meta,
-            indicators: Object.keys(response.result[0].measures),
+            data: json,
+            meta: jsonMeta,
+            indicators: Object.keys(json.result[0].measures),
           },
         ];
       }
@@ -105,21 +99,18 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
     if (charts) {
       newState.charts = charts.map(chart => ({
-        xAxis: { title: '' },
-        yAxis: { title: '' },
-
         ...chart,
-
-        data,
-        meta,
+        geometry: chart.geometry as MapFeature,
+        data: json,
+        meta: jsonMeta,
       }));
     }
 
     if (summary) {
       newState.summary = {
         ...summary,
-        data,
-        meta,
+        data: json,
+        meta: jsonMeta,
       };
     }
     this.setState(newState);
