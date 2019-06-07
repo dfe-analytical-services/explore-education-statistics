@@ -1,29 +1,29 @@
-/* eslint-disable */
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
+import ChartRenderer, {
+  ChartRendererProps,
+} from '@common/modules/find-statistics/components/ChartRenderer';
 import SummaryRenderer, {
   SummaryRendererProps,
 } from '@common/modules/find-statistics/components/SummaryRenderer';
 import TableRenderer, {
   Props as TableRendererProps,
 } from '@common/modules/find-statistics/components/TableRenderer';
+import DataBlockService, {
+  DataBlockData,
+  DataBlockMetadata,
+  DataBlockRequest,
+} from '@common/services/dataBlockService';
 import {
   Chart,
   DataQuery,
   Summary,
   Table,
 } from '@common/services/publicationService';
-
 import React, { Component, ReactNode } from 'react';
-import DataBlockService, {
-  DataBlockRequest,
-  DataBlockMetadata,
-  DataBlockData,
-} from '@common/services/dataBlockService';
-import ChartRenderer, {
-  ChartRendererProps,
-} from '@common/modules/find-statistics/components/ChartRenderer';
+import { MapFeature } from './charts/MapBlock';
+import DownloadDetails from './DownloadDetails';
 
 export interface DataBlockProps {
   id: string;
@@ -41,8 +41,8 @@ export interface DataBlockProps {
 }
 
 interface DataBlockState {
+  isLoading: boolean;
   charts?: ChartRendererProps[];
-  // downloads?: any[];
   tables?: TableRendererProps[];
   summary?: SummaryRendererProps;
 }
@@ -52,12 +52,16 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
     showTables: true,
   };
 
-  public state: DataBlockState = {};
+  public state: DataBlockState = {
+    isLoading: false,
+  };
 
-  private currentDataQuery?: DataQuery = undefined;
+  private query?: DataQuery = undefined;
 
   public async componentDidMount() {
     const { dataBlockRequest } = this.props;
+
+    this.setState({ isLoading: true });
 
     if (dataBlockRequest) {
       const result = await DataBlockService.getDataBlockForSubject(
@@ -71,14 +75,16 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
   }
 
   public async componentWillUnmount() {
-    this.currentDataQuery = undefined;
+    this.query = undefined;
   }
 
   private parseDataResponse(
     json: DataBlockData,
     jsonMeta: DataBlockMetadata,
   ): void {
-    const newState: DataBlockState = {};
+    const newState: DataBlockState = {
+      isLoading: false,
+    };
 
     const { charts, summary, tables } = this.props;
 
@@ -124,57 +130,61 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       additionalTabContent,
       id,
     } = this.props;
-    const { charts, summary, tables } = this.state;
+    const { charts, summary, tables, isLoading } = this.state;
 
     return (
-      <div className="govuk-datablock" data-testid={`DataBlock ${heading}`}>
-        <Tabs>
-          {summary && (
-            <TabsSection id={`datablock_${id}_summary`} title="Summary">
-              <h3>{heading}</h3>
-              <SummaryRenderer {...summary} />
-            </TabsSection>
-          )}
+      <div data-testid={`DataBlock ${heading}`}>
+        {heading && <h3>{heading}</h3>}
 
-          {tables && showTables && (
-            <TabsSection id={`datablock_${id}_tables`} title="Data tables">
-              <h3>{heading}</h3>
-              {tables.map((table, idx) => {
-                const key = `${id}0_table_${idx}`;
+        {isLoading ? (
+          <LoadingSpinner text="Loading content..." />
+        ) : (
+          <Tabs>
+            {summary && (
+              <TabsSection id={`datablock_${id}_summary`} title="Summary">
+                <SummaryRenderer {...summary} />
+              </TabsSection>
+            )}
 
-                return <TableRenderer key={key} {...table} />;
-              })}
-              {additionalTabContent}
-            </TabsSection>
-          )}
+            {tables && showTables && (
+              <TabsSection id={`datablock_${id}_tables`} title="Data tables">
+                {tables.map((table, idx) => {
+                  const key = `${id}0_table_${idx}`;
 
-          {charts && (
-            <TabsSection
-              id={`datablock_${id}_charts`}
-              title="Charts"
-              lazy={false}
-            >
-              <h3>{heading}</h3>
-              {charts.map((chart, idx) => {
-                const key = `${id}_chart_${idx}`;
+                  return (
+                    <React.Fragment key={key}>
+                      <TableRenderer {...table} />
+                      <DownloadDetails />
+                    </React.Fragment>
+                  );
+                })}
 
-                return <ChartRenderer key={key} {...chart} height={height} />;
-              })}
-              {additionalTabContent}
-            </TabsSection>
-          )}
+                {additionalTabContent}
+              </TabsSection>
+            )}
 
-          <TabsSection id={`datablock_${id}_downloads`} title="Data downloads">
-            <p>
-              You can customise and download data as Excel, .csv or .pdf files.
-              Our data can also be accessed via an API.
-            </p>
-            <div className="govuk-inset-text">
-              Data downloads have not yet been implemented within the service.
-            </div>
-            {additionalTabContent}
-          </TabsSection>
-        </Tabs>
+            {charts && (
+              <TabsSection
+                id={`datablock_${id}_charts`}
+                title="Charts"
+                lazy={false}
+              >
+                {charts.map((chart, idx) => {
+                  const key = `${id}_chart_${idx}`;
+
+                  return (
+                    <React.Fragment key={key}>
+                      <ChartRenderer {...chart} height={height} />
+                      <DownloadDetails />
+                    </React.Fragment>
+                  );
+                })}
+
+                {additionalTabContent}
+              </TabsSection>
+            )}
+          </Tabs>
+        )}
       </div>
     );
   }

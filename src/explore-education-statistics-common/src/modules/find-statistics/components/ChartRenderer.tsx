@@ -2,13 +2,17 @@ import HorizontalBarBlock from '@common/modules/find-statistics/components/chart
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
-import { Axis, ReferenceLine } from '@common/services/publicationService';
-import dynamic from 'next-server/dynamic';
-import React from 'react';
 import {
   DataBlockData,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
+import {
+  Axis,
+  ChartType,
+  ReferenceLine,
+} from '@common/services/publicationService';
+import dynamic from 'next-server/dynamic';
+import React from 'react';
 
 const DynamicMapBlock = dynamic(
   () => import('@common/modules/find-statistics/components/charts/MapBlock'),
@@ -18,7 +22,7 @@ const DynamicMapBlock = dynamic(
 );
 
 export interface ChartRendererProps {
-  type: string;
+  type: ChartType;
   indicators: string[];
   data: DataBlockData;
   meta: DataBlockMetadata;
