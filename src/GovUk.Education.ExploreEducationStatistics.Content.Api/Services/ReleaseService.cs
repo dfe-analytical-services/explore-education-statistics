@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +13,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
     public class ReleaseService : IReleaseService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFileStorageService _fileStorageService;
+        private readonly IMapper _mapper;
 
-        public ReleaseService(ApplicationDbContext context)
+        public ReleaseService(ApplicationDbContext context, IFileStorageService fileStorageService, IMapper mapper)
         {
             _context = context;
+            _fileStorageService = fileStorageService;
+            _mapper = mapper;
         }
 
         public Release GetRelease(string id)
@@ -24,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                     .Include(x => x.Updates).FirstOrDefault(x => x.Id == newGuid)
                 : _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
                     .Include(x => x.Updates).FirstOrDefault(x => x.Slug == id);
-           
+
             if (release != null)
             {
                 var releases = _context.Releases.Where(x => x.Publication.Id == release.Publication.Id).ToList();
@@ -38,15 +44,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                     Slug = r.Slug,
                     Summary = r.Summary,
                     Publication = r.Publication,
-                    PublicationId =  r.PublicationId,
+                    PublicationId = r.PublicationId,
                     Updates = r.Updates
                 }));
             }
 
             return release;
-        } 
-         
-        public Release GetLatestRelease(string id)
+        }
+
+        public ReleaseViewModel GetLatestRelease(string id)
         {
             Release release;
 
@@ -79,9 +85,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                     PublicationId = r.PublicationId,
                     Updates = r.Updates
                 }));
+
+                var listFiles = _fileStorageService.ListFiles(release.Publication.Slug, release.Slug).ToList();
+
+                var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                releaseViewModel.DataFiles = listFiles;
+                return releaseViewModel;
             }
 
-            return release;
+            return null;
+        }
+
+        private IEnumerable<string> ListFiles(string publication, string release)
+        {
+            return _fileStorageService.ListFiles(publication, release);
         }
     }
 }
