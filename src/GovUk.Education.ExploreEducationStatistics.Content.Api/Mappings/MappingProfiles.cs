@@ -1,4 +1,6 @@
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Mappings
 {
@@ -9,6 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Mappings
     {
         public MappingProfiles()
         {
+            CreateMap<Release, ReleaseViewModel>()
+                .ForMember(dest => dest.DataFiles, opts => opts.Ignore());
         }
     }
 }

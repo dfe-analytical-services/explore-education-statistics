@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -11,15 +12,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     public class ContentController : ControllerBase
     {
         private readonly IContentService _contentService;
+        private readonly IFileStorageService _fileStorageService;
         private readonly IPublicationService _publicationService;
         private readonly IReleaseService _releaseService;
+        private readonly IMapper _mapper;
 
         public ContentController(
-            IContentService contentService, 
+            IContentService contentService,
+            IFileStorageService fileStorageService,
+            IMapper mapper,
             IPublicationService publicationService,
             IReleaseService releaseService)
         {
+            _mapper = mapper;
             _contentService = contentService;
+            _fileStorageService = fileStorageService;
             _publicationService = publicationService;
             _releaseService = releaseService;
         }
@@ -52,14 +59,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         // GET api/content/publication/5/latest
-        [HttpGet("publication/{id}/latest")]
-        public ActionResult<Release> GetLatestRelease(string id)
+        [HttpGet("publication/{publicationSlug}/latest")]
+        public ActionResult<ReleaseViewModel> GetLatestRelease(string publicationSlug)
         {
-            var release = _releaseService.GetLatestRelease(id);
+            var release = _releaseService.GetLatestRelease(publicationSlug);
+            var listFiles = _fileStorageService.ListFiles(publicationSlug, release.Slug).ToList();
 
             if (release != null)
             {
-                return release;
+                var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                releaseViewModel.DataFiles = listFiles;
+                return releaseViewModel;
             }
             return NotFound();
 
