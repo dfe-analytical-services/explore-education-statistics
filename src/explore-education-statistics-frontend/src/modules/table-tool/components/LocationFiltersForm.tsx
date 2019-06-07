@@ -4,9 +4,10 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
+import useResetFormOnPreviousStep from '@frontend/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
 import sortBy from 'lodash/sortBy';
-import React, { useEffect } from 'react';
+import React, { useRef } from 'react';
 import { useImmer } from 'use-immer';
 import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
 import { InjectedWizardProps } from './Wizard';
@@ -27,22 +28,27 @@ interface Props {
 }
 
 const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
-  const { options, onSubmit, isActive, goToNextStep } = props;
+  const {
+    options,
+    onSubmit,
+    isActive,
+    goToNextStep,
+    currentStep,
+    stepNumber,
+  } = props;
 
+  const formikRef = useRef<Formik<FormValues>>(null);
   const formId = 'locationFiltersForm';
 
   const [locationLevels, updateLocationLevels] = useImmer<
     Dictionary<{ label: string; value: string }[]>
   >({});
 
-  useEffect(() => {
-    updateLocationLevels(draft => {
-      Object.keys(options).forEach(key => {
-        draft[key] = [];
-      });
+  useResetFormOnPreviousStep(formikRef, currentStep, stepNumber, () => {
+    updateLocationLevels(() => {
+      return {};
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options]);
+  });
 
   const stepHeading = (
     <WizardStepHeading {...props} fieldsetHeading>
@@ -50,23 +56,22 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
     </WizardStepHeading>
   );
 
-  const initialValues = {
-    locations: Object.keys(options).reduce((acc, level) => {
-      return {
-        ...acc,
-        [level]: [],
-      };
-    }, {}),
-  };
-
   return (
     <Formik<FormValues>
       enableReinitialize
+      ref={formikRef}
       onSubmit={async values => {
         await onSubmit(values);
         goToNextStep();
       }}
-      initialValues={initialValues}
+      initialValues={{
+        locations: Object.keys(options).reduce((acc, level) => {
+          return {
+            ...acc,
+            [level]: [],
+          };
+        }, {}),
+      }}
       validationSchema={Yup.object<FormValues>({
         locations: Yup.mixed().test(
           'required',
@@ -110,14 +115,16 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                         }}
                         onChange={(event, option) => {
                           updateLocationLevels(draft => {
-                            const matchingOption = locationLevels[
-                              levelKey
-                            ].find(
+                            if (!draft[levelKey]) {
+                              draft[levelKey] = [];
+                            }
+
+                            const matchingOption = draft[levelKey].find(
                               levelOption => levelOption.value === option.value,
                             );
 
                             if (matchingOption) {
-                              draft[levelKey] = locationLevels[levelKey].filter(
+                              draft[levelKey] = draft[levelKey].filter(
                                 levelOption =>
                                   levelOption.value !== option.value,
                               );
@@ -133,17 +140,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
               </div>
             </FormFieldset>
 
-            <WizardStepFormActions
-              {...props}
-              form={form}
-              formId={formId}
-              onPreviousStep={() => {
-                form.resetForm(initialValues);
-                updateLocationLevels(() => {
-                  return {};
-                });
-              }}
-            />
+            <WizardStepFormActions {...props} form={form} formId={formId} />
           </Form>
         ) : (
           <>

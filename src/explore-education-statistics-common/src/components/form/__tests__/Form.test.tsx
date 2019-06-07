@@ -143,7 +143,7 @@ describe('Form', () => {
     expect(queryByText('Line 2 of address is required')).not.toBeNull();
   });
 
-  test('calls onSubmit handler when form is submitted successfully', async () => {
+  test('calls `onSubmit` handler when form is submitted successfully', async () => {
     const handleSubmit = jest.fn();
 
     const { container } = render(
@@ -204,5 +204,47 @@ describe('Form', () => {
     );
 
     expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('removes submit error when form can be submitted successfully', async () => {
+    const onSubmit = jest.fn(() => {
+      throw new Error('Something went wrong');
+    });
+
+    const { container, queryByText } = render(
+      <Formik
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().required(),
+        })}
+        onSubmit={onSubmit}
+      >
+        {() => <Form id="test-form">The form</Form>}
+      </Formik>,
+    );
+
+    const form = container.querySelector('#test-form') as HTMLFormElement;
+
+    fireEvent.submit(form, {
+      current: form,
+      target: form,
+    });
+
+    await wait();
+
+    expect(queryByText('Something went wrong')).not.toBeNull();
+
+    onSubmit.mockImplementation();
+
+    fireEvent.submit(form, {
+      current: form,
+      target: form,
+    });
+
+    await wait();
+
+    expect(queryByText('Something went wrong')).toBeNull();
   });
 });
