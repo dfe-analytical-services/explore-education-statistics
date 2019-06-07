@@ -77,15 +77,15 @@ class PublicationReleasePage extends Component<Props> {
                   </strong>
                 )}
                 <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
-                  <dt className="govuk-caption-m">Published:</dt>
-                  <dd>
+                  <dt className="govuk-caption-m">Published: </dt>
+                  <dd data-testid="published-date">
                     <strong>
                       <FormattedDate>{data.published}</FormattedDate>{' '}
                     </strong>
                   </dd>
                   <div>
-                    <dt className="govuk-caption-m">Next update:</dt>
-                    <dd>
+                    <dt className="govuk-caption-m">Next update: </dt>
+                    <dd data-testid="next-update">
                       <strong>
                         <FormattedDate format="MMMM yyyy">
                           {data.publication.nextUpdate}
@@ -137,23 +137,20 @@ class PublicationReleasePage extends Component<Props> {
             <RelatedAside>
               <h3>About these statistics</h3>
 
-              <dl className="dfe-meta-content" data-testid="release-period">
-                <dt className="govuk-caption-m">For school year:</dt>
-                <dd>
+              <dl className="dfe-meta-content">
+                <dt className="govuk-caption-m">For school year: </dt>
+                <dd data-testid="release-name">
                   <strong>{data.releaseName}</strong>
                 </dd>
                 <dd>
                   <Details summary={`See previous ${releaseCount} releases`}>
-                    <ul
-                      className="govuk-list"
-                      data-testid="previous-releases-list"
-                    >
+                    <ul className="govuk-list">
                       {[
                         ...data.publication.releases
                           .slice(1)
                           .map(({ id, slug, releaseName }) => [
                             releaseName,
-                            <li key={id} data-testid="item-internal">
+                            <li key={id} data-testid="previous-release-item">
                               <Link
                                 to={`/statistics/${
                                   data.publication.slug
@@ -166,7 +163,7 @@ class PublicationReleasePage extends Component<Props> {
                         ...data.publication.legacyReleases.map(
                           ({ id, description, url }) => [
                             description,
-                            <li key={id} data-testid="item-external">
+                            <li key={id} data-testid="previous-release-item">
                               <a href={url}>{description}</a>
                             </li>,
                           ],
@@ -180,9 +177,9 @@ class PublicationReleasePage extends Component<Props> {
                   </Details>
                 </dd>
               </dl>
-              <dl className="dfe-meta-content" data-testid="last-updated">
-                <dt className="govuk-caption-m">Last updated:</dt>
-                <dd>
+              <dl className="dfe-meta-content">
+                <dt className="govuk-caption-m">Last updated: </dt>
+                <dd data-testid="last-updated">
                   <strong>
                     <FormattedDate>{data.updates[0].on}</FormattedDate>
                   </strong>

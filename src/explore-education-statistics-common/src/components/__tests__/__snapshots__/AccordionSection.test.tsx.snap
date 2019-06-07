@@ -6,7 +6,6 @@ exports[`AccordionSection renders correctly with required props 1`] = `
      role="presentation"
 >
   <div class="govuk-accordion__section-header"
-       data-testid="SectionHeader Test heading"
   >
     <h2 class="govuk-accordion__section-heading">
       <button aria-expanded="false"
@@ -43,7 +42,6 @@ exports[`AccordionSection renders with caption 1`] = `
      role="presentation"
 >
   <div class="govuk-accordion__section-header"
-       data-testid="SectionHeader Test heading"
   >
     <h2 class="govuk-accordion__section-heading">
       <button aria-expanded="false"
@@ -83,7 +81,6 @@ exports[`AccordionSection renders with different heading size 1`] = `
      role="presentation"
 >
   <div class="govuk-accordion__section-header"
-       data-testid="SectionHeader Test heading"
   >
     <h3 class="govuk-accordion__section-heading">
       <button aria-expanded="false"

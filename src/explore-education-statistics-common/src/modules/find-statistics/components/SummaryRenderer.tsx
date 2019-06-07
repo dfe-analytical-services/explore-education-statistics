@@ -63,15 +63,17 @@ export default function SummaryRenderer({
           return (
             <div className={styles.keyStatTile} key={indicatorKey}>
               <div className={styles.keyStat}>
-                <h3 className="govuk-heading-s">
+                <h3
+                  className="govuk-heading-s"
+                  data-testid="key-stat-tile-title"
+                >
                   {meta.indicators[key].label}
                 </h3>
                 <p
                   className="govuk-heading-xl"
-                  data-testid={`tile ${meta.indicators[key].label}`}
+                  data-testid="key-stat-tile-value"
                 >
-                  {measures[key]}
-                  {meta.indicators[key].unit}
+                  {`${measures[key]}${meta.indicators[key].unit}`}
                 </p>
                 {dataSummary && (
                   <p className="govuk-body-s">{dataSummary[index]}</p>
