@@ -25,6 +25,47 @@ async function startServer(port = process.env.PORT || 3000) {
   // Use Helmet for configuration of headers and disable express powered by header
   server.disable('x-powered-by');
   server.use(helmet());
+  if (process.env.NODE_ENV == 'production') {
+    server.use(
+      helmet.contentSecurityPolicy({
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: [
+            "'self'",
+            'https://www.google-analytics.com/',
+            'https://static.hotjar.com/',
+          ],
+          styleSrc: ["'self'"],
+          imgSrc: ["'self'", 'data:'],
+          fontSrc: ["'self'"],
+          frameSrc: ["'self'"],
+          frameAncestors: ["'self'"],
+        },
+      }),
+    );
+  } else {
+    // if development we need to include unsafe eval in the csp for development tools
+    server.use(
+      helmet.contentSecurityPolicy({
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: [
+            "'self'",
+            "'unsafe-inline'",
+            "'unsafe-eval'",
+            'https://www.google-analytics.com/',
+            'https://static.hotjar.com/',
+          ],
+          styleSrc: ["'self'"],
+          imgSrc: ["'self'", 'data:'],
+          fontSrc: ["'self'"],
+          frameSrc: ["'self'"],
+          frameAncestors: ["'self'"],
+        },
+      }),
+    );
+  }
+
   server.use(
     helmet.featurePolicy({
       features: {
