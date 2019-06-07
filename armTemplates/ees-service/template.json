@@ -728,6 +728,10 @@
             {
               "name": "PublicationNotificationEmailTemplateId",
               "value": "[parameters('publicationNotificationEmailTemplateId')]"
+            },
+            {
+              "name": "SubscriptionConfirmationEmailTemplateId",
+              "value": "[parameters('subscriptionConfirmationEmailTemplateId')]"
             }
           ],
           "connectionStrings": [
