@@ -6,7 +6,6 @@
     "@types/classnames": "^2.2.8",
     "@types/jest": "^24.0.13",
     "@types/lodash": "^4.14.133",
-    "@types/lodash-es": "^4.17.2",
     "@types/memoizee": "^0.4.2",
     "@types/next": "^8.0.5",
     "@types/node": "^11.13.13",
