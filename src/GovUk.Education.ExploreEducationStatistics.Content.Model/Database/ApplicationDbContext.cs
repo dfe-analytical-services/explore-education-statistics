@@ -1081,7 +1081,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 "26",
                                 "28"
                             },
-
+                            dataSummary = new List<string>
+                            {
+                                "Up from 40.1 in 2015/16",
+                                "Down from 40.1 in 2015/16",
+                                "Up from 40.1 in 2015/16"
+                            },
                             description = new MarkDownBlock
                             {
                                 Body = " * pupils missed on average 8.2 school days \n " +
@@ -1263,7 +1268,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 "--",
                                 "--"
                             },
-
+                            dataSummary = new List<string>
+                            {
+                                "",
+                                "",
+                                ""
+                            },
                             description = new MarkDownBlock
                             {
                                 Body = ""
@@ -1305,7 +1315,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 "perm_excl",
                                 "fixed_excl_rate"
                             },
-
+                            dataSummary = new List<string>
+                            {
+                                "Up from 40.1 in 2015/16",
+                                "Down from 40.1 in 2015/16",
+                                "Up from 40.1 in 2015/16"
+                            },
                             description = new MarkDownBlock
                             {
                                 Body =
@@ -1478,7 +1493,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 "--",
                                 "--"
                             },
-
+                            dataSummary = new List<string>
+                            {
+                                "",
+                                "",
+                                ""
+                            },
                             description = new MarkDownBlock
                             {
                                 Body = ""
@@ -1528,7 +1548,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 "--",
                                 "--"
                             },
-
+                            dataSummary = new List<string>
+                            {
+                                "",
+                                "",
+                                ""
+                            },
                             description = new MarkDownBlock
                             {
                                 Body =

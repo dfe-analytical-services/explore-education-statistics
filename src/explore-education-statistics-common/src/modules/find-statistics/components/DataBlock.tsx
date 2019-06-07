@@ -111,7 +111,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
         ...summary,
         data: json,
         meta: jsonMeta,
-      };
+      } as SummaryRendererProps;
     }
     this.setState(newState);
   }
