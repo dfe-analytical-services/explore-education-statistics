@@ -2,7 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-
     "subscription": {
       "type": "string",
       "metadata": {
@@ -16,12 +15,10 @@
         "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
       }
     },
-
     "appInsightsLocation": {
-      "type": "string", 
+      "type": "string",
       "defaultValue": "West Europe"
     },
-
     "skuPublic": {
       "type": "string",
       "defaultValue": "B1 Basic"
@@ -38,7 +35,6 @@
       "type": "string",
       "defaultValue": "F1 Free"
     },
-
     "sqlAdministratorLogin": {
       "type": "string",
       "metadata": {
@@ -51,7 +47,6 @@
         "description": "The password of the admin user of the SQL Server"
       }
     },
-
     "publicAppBasicAuth": {
       "type": "string",
       "defaultValue": "true"
@@ -65,7 +60,6 @@
         "descritpion": "Password protecting the public app, no requirement to be seceret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
       }
     },
-   
     "verificationEmailTemplateId": {
       "type": "securestring",
       "defaultValue": "",
@@ -78,6 +72,13 @@
       "defaultValue": "",
       "metadata": {
         "description": "Gov UK Notify service template Id for new release notification"
+      }
+    },
+    "subscriptionConfirmationEmailTemplateId": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Gov UK Notify service template Id for subscription confirmation"
       }
     },
     "notifyApiKey": {
@@ -100,37 +101,27 @@
     "dataAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-data')]",
     "dataPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-data')]",
     "dataAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-data')]",
-
     "contentAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-content')]",
     "contentPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-content')]",
     "contentAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-content')]",
-
     "adminAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-admin')]",
     "adminPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-admin')]",
     "adminAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-admin')]",
-
     "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public')]",
     "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-public')]",
     "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public')]",
-
     "storageEnv": "[concat('ees', parameters('envNumber'))]",
-
     "coreStorageAccountName": "[concat(parameters('subscription'), 'storage', variables('storageEnv'), 'core')]",
     "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('coreStorageAccountName'))]",
-
     "sqlserverName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
-
     "importerAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-importer')]",
     "importerPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-importer')]",
     "importerAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-importer')]",
-
     "notificationsAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-notify')]",
     "notificationsPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-notify')]",
     "notificationsAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-notify')]",
-
     "notificationsstorageAccountName": "[concat(parameters('subscription'), 'storage', variables('storageEnv'), 'notify')]",
     "notificationsstorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]",
-
     "publicStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'public')]",
     "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]"
   },
@@ -401,7 +392,6 @@
               "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
             }
           ]
-          
         }
       },
       "dependsOn": [
@@ -616,12 +606,12 @@
       },
       "resources": [
         {
-            "name": "default/downloads",
-            "type": "blobServices/containers",
-            "apiVersion": "2018-07-01",
-            "dependsOn": [
-                "[variables('publicStorageAccountName')]"
-            ]
+          "name": "default/downloads",
+          "type": "blobServices/containers",
+          "apiVersion": "2018-07-01",
+          "dependsOn": [
+            "[variables('publicStorageAccountName')]"
+          ]
         }
       ]
     },
@@ -632,11 +622,11 @@
       "kind": "web",
       "location": "[resourceGroup().location]",
       "tags": {
-          "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('notificationsAppName'))]": "Resource"
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('notificationsAppName'))]": "Resource"
       },
       "properties": {
-          "Application_Type": "web",
-          "ApplicationId": "[variables('notificationsAppName')]"
+        "Application_Type": "web",
+        "ApplicationId": "[variables('notificationsAppName')]"
       }
     },
     {
@@ -739,13 +729,10 @@
               "name": "TableStorageConnString",
               "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]"
             }
-          ]          
+          ]
         }
       }
     },
-
-
-
     {
       "apiVersion": "2015-05-01",
       "name": "[variables('importerAppInsights')]",
@@ -753,11 +740,11 @@
       "kind": "web",
       "location": "[resourceGroup().location]",
       "tags": {
-          "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('importerAppName'))]": "Resource"
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('importerAppName'))]": "Resource"
       },
       "properties": {
-          "Application_Type": "web",
-          "ApplicationId": "[variables('importerAppName')]"
+        "Application_Type": "web",
+        "ApplicationId": "[variables('importerAppName')]"
       }
     },
     {
@@ -825,7 +812,7 @@
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "value": "[reference(resourceId('microsoft.insights/components/', variables('importerAppInsights')), '2015-05-01').InstrumentationKey]"
-            }            
+            }
           ],
           "connectionStrings": [
             {
@@ -837,10 +824,9 @@
               "type": "SQLAzure",
               "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
             }
-          ]          
+          ]
         }
       }
     }
-
   ]
 }
