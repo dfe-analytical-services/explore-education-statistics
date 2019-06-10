@@ -10,6 +10,7 @@
     "@types/next": "^8.0.5",
     "@types/node": "^11.13.13",
     "@types/react": "^16.8.19",
+    "@types/react-aria-modal": "^2.12.2",
     "@types/react-dom": "^16.8.4",
     "@types/react-helmet": "^5.0.8",
     "@types/react-leaflet": "^2.2.1",
@@ -38,6 +39,7 @@
     "jest": "^24.8.0",
     "jest-dom": "^3.4.0",
     "jest-junit": "^6.4.0",
+    "jest-matcher-utils": "^24.8.0",
     "jest-resolve": "^24.8.0",
     "jest-serializer-html": "^6.0.0",
     "jest-watch-typeahead": "^0.3.1",
@@ -47,6 +49,7 @@
     "next": "^8.1.0",
     "next-server": "^8.1.0",
     "react": "^16.8.6",
+    "react-aria-modal": "^4.0.0",
     "react-dom": "^16.8.6",
     "react-helmet": "^5.2.1",
     "react-leaflet": "^2.3.0",
@@ -86,8 +89,8 @@
       "<rootDir>/test/setupTests.js"
     ],
     "testMatch": [
-      "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
-      "<rootDir>/src/**/(*.)(spec|test).{js,jsx,ts,tsx}"
+      "<rootDir>/src/**/(*.)(spec|test).{js,jsx,ts,tsx}",
+      "<rootDir>/test/**/(*.)(spec|test).{js,jsx,ts,tsx}"
     ],
     "testPathIgnorePatterns": [
       "node_modules",

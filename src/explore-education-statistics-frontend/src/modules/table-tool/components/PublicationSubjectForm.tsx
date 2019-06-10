@@ -3,8 +3,9 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { PublicationSubject } from '@common/services/tableBuilderService';
+import useResetFormOnPreviousStep from '@frontend/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
@@ -24,10 +25,22 @@ interface Props {
 }
 
 const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
-  const { isActive, onSubmit, options, goToNextStep } = props;
+  const {
+    isActive,
+    onSubmit,
+    options,
+    goToNextStep,
+    currentStep,
+    stepNumber,
+  } = props;
   const [subjectName, setSubjectName] = useState('');
 
+  const formikRef = useRef<Formik<FormValues>>(null);
   const formId = 'publicationSubjectForm';
+
+  useResetFormOnPreviousStep(formikRef, currentStep, stepNumber, () => {
+    setSubjectName('');
+  });
 
   const stepHeading = (
     <WizardStepHeading {...props} fieldsetHeading>
@@ -40,8 +53,9 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
   };
 
   return (
-    <Formik
+    <Formik<FormValues>
       enableReinitialize
+      ref={formikRef}
       onSubmit={async ({ subjectId }) => {
         await onSubmit({
           subjectId,
@@ -69,15 +83,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
               }}
             />
 
-            <WizardStepFormActions
-              {...props}
-              form={form}
-              formId={formId}
-              onPreviousStep={() => {
-                form.resetForm(initialValues);
-                setSubjectName('');
-              }}
-            />
+            <WizardStepFormActions {...props} form={form} formId={formId} />
           </Form>
         ) : (
           <>

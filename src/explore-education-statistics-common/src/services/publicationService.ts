@@ -1,6 +1,6 @@
 import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
-import { FeatureCollection } from 'geojson';
 import { DataBlockRequest } from '@common/services/dataBlockService';
+import { FeatureCollection } from 'geojson';
 import { contentApi } from './api';
 
 export interface Publication {
@@ -43,8 +43,10 @@ export interface Axis {
   size?: number;
 }
 
+export type ChartType = 'line' | 'verticalbar' | 'horizontalbar' | 'map';
+
 export interface Chart {
-  type: string;
+  type: ChartType;
   indicators: string[];
   xAxis?: Axis;
   yAxis?: Axis;
@@ -64,8 +66,10 @@ export interface Summary {
   description: { type: string; body: string };
 }
 
+export type ContentBlockType = 'MarkDownBlock' | 'InsetTextBlock' | 'DataBlock';
+
 export interface ContentBlock {
-  type: string;
+  type: ContentBlockType;
   body: string;
   heading?: string;
   dataBlockRequest?: DataBlockRequest;

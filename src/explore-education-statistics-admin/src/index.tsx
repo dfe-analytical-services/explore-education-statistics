@@ -4,6 +4,8 @@ import ReactDOM from 'react-dom';
 
 import * as serviceWorker from './serviceWorker';
 
+process.env.APP_ROOT_ID = 'root';
+
 import('./App').then(({ default: App }) => {
   ReactDOM.render(<App />, document.getElementById('root'));
 });

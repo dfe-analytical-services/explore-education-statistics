@@ -1,0 +1,6 @@
+@import '../styles/govuk-base';
+
+.container {
+  border-top: 10px solid govuk-colour('blue');
+  padding-top: govuk-spacing(2);
+}

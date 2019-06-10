@@ -20,11 +20,35 @@ async function startServer(port = process.env.PORT || 3000) {
     process.exit(1);
   }
 
+  let cspScriptSrc = [
+    "'self'",
+    "https://www.google-analytics.com/",
+    "https://static.hotjar.com/",
+  ]
+
+  if (process.env.NODE_ENV !== 'production') {
+   cspScriptSrc.push("'unsafe-inline'");
+   cspScriptSrc.push("'unsafe-eval'");
+  };
+
   const server = express();
 
   // Use Helmet for configuration of headers and disable express powered by header
   server.disable('x-powered-by');
   server.use(helmet());
+  server.use(
+    helmet.contentSecurityPolicy({
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: cspScriptSrc,
+        styleSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', "https://www.google-analytics.com/"],
+        fontSrc: ["'self'"],
+        frameSrc: ["'self'"],
+        frameAncestors: ["'self'"],
+      },
+    }),
+  );
   server.use(
     helmet.featurePolicy({
       features: {
