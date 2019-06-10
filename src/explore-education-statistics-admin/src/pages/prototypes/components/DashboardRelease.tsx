@@ -11,12 +11,15 @@ interface Props {
   lead?: string;
   isNew?: boolean;
   isLatest?: boolean;
+  isLive?: boolean;
   editing?: boolean;
   review?: boolean;
   years: string;
   lastEdited: Date;
   lastEditor: User;
   published: Date;
+  nextRelease?: Date;
+  dataType?: string;
 }
 
 const DashboardRelease = ({
@@ -25,17 +28,22 @@ const DashboardRelease = ({
   lead,
   isNew,
   isLatest,
+  isLive,
   editing,
   review,
   years,
   lastEdited,
   lastEditor,
   published,
+  nextRelease,
+  dataType,
 }: Props) => {
   return (
     <Details
       className="govuk-!-margin-bottom-0"
-      summary={`${title} ${years} ${isLatest ? '(Latest release)' : ''}`}
+      summary={`${title} ${years} ${isLive ? '(Live)' : ''} ${
+        isLatest ? '(Live - Latest release)' : ''
+      }`}
       tag={tag}
     >
       <dl className="govuk-summary-list govuk-!-margin-bottom-3">
@@ -65,6 +73,15 @@ const DashboardRelease = ({
             </React.Fragment>
           )}
         </div>
+        {nextRelease && (
+          <React.Fragment>
+            <dt className="govuk-summary-list__key">Next release</dt>
+            <dd className="govuk-summary-list__value">
+              {format(nextRelease, 'd MMMM yyyy')}
+            </dd>
+            <dd className="govuk-summary-list__actions" />
+          </React.Fragment>
+        )}
         <div className="govuk-summary-list__row">
           <dt className="govuk-summary-list__key">Lead statistician</dt>
           <dd className="govuk-summary-list__value">
@@ -73,6 +90,13 @@ const DashboardRelease = ({
           </dd>
           <dd className="govuk-summary-list__actions" />
         </div>
+        {dataType && (
+          <div className="govuk-summary-list__row">
+            <dt className="govuk-summary-list__key">Data type</dt>
+            <dd className="govuk-summary-list__value">{dataType}</dd>
+            <dd className="govuk-summary-list__actions" />
+          </div>
+        )}
         <div className="govuk-summary-list__row">
           <dt className="govuk-summary-list__key">Last edited</dt>
           <dd className="govuk-summary-list__value  dfe-details-no-margin">

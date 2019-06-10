@@ -14,11 +14,18 @@ const AdminDashboardPublications = () => {
         Edit an existing release or create a new release for current
         publications.
       </p>
+      <Link to="/prototypes/publication-create-new" className="govuk-button">
+        Create a new publication
+      </Link>
       <Accordion id="pupil-absence">
         <AccordionSection
           heading="Pupil absense statistics and data for schools in England"
           caption=""
         >
+          <p>
+            <Link to="#">View methodology</Link>
+          </p>
+
           <ul className="govuk-list dfe-admin">
             {window.location.search === '?status=readyApproval' && (
               <li>
@@ -30,6 +37,8 @@ const AdminDashboardPublications = () => {
                   lastEdited={new Date('2019-03-20 17:37')}
                   lastEditor={{ id: 'me', name: 'me', permissions: [] }}
                   published={new Date('2019-09-20 09:30')}
+                  nextRelease={new Date('2020-09-20 09:30')}
+                  dataType="Revised"
                 />
               </li>
             )}
@@ -43,7 +52,9 @@ const AdminDashboardPublications = () => {
                   isNew
                   lastEdited={new Date('2019-03-20 17:37')}
                   lastEditor={{ id: 'me', name: 'me', permissions: [] }}
-                  published={new Date('2019-09-20 09:30')}
+                  published={new Date('2019-09-24 09:30')}
+                  nextRelease={new Date('2020-09-25 09:30')}
+                  dataType="Provisional"
                 />
               </li>
             )}
@@ -58,29 +69,35 @@ const AdminDashboardPublications = () => {
                 }
                 isLatest
                 editing={window.location.search === '?status=editLiveRelease'}
-                lastEdited={new Date('2019-03-20 17:37')}
+                lastEdited={new Date('2018-03-20 17:37')}
                 lastEditor={{ id: 'me', name: 'me', permissions: [] }}
-                published={new Date('2019-03-20 09:30')}
+                published={new Date('2018-09-24 09:30')}
+                nextRelease={new Date('2019-09-23 09:30')}
+                dataType="Final"
               />
             </li>
             <li>
               <DashboardRelease
                 title="Academic year,"
                 years="2016 to 2017"
+                isLive
                 editing={window.location.search === '?status=editLiveRelease'}
                 lastEdited={new Date('2018-03-20 14:23')}
                 lastEditor={{ id: 'me', name: 'me', permissions: [] }}
-                published={new Date('2019-03-20 09:30')}
+                published={new Date('2017-09-25 09:30')}
+                dataType="Final"
               />
             </li>
             <li>
               <DashboardRelease
                 title="Academic year,"
                 years="2015 to 2016"
+                isLive
                 editing={window.location.search === '?status=editLiveRelease'}
                 lastEdited={new Date('2017-03-20 16:15')}
                 lastEditor={{ id: 'me', name: 'me', permissions: [] }}
-                published={new Date('2019-03-20 09:30')}
+                published={new Date('2016-03-26 09:30')}
+                dataType="Final"
               />
             </li>
           </ul>
@@ -92,6 +109,9 @@ const AdminDashboardPublications = () => {
           heading=" Pupil absense statistics and data for schools in England: autumn term"
           caption=""
         >
+          <p>
+            <Link to="#">View methodology</Link>
+          </p>
           <ul className="govuk-list">
             <li>
               <DashboardRelease
@@ -101,7 +121,8 @@ const AdminDashboardPublications = () => {
                 editing={window.location.search === '?status=editLiveRelease'}
                 lastEdited={new Date('2019-03-20 17:37')}
                 lastEditor={{ id: 'me', name: 'me', permissions: [] }}
-                published={new Date('2019-03-20 09:30')}
+                published={new Date('2018-01-08 09:30')}
+                nextRelease={new Date('2019-01-07 17:37')}
               />
             </li>
 
@@ -109,11 +130,10 @@ const AdminDashboardPublications = () => {
               <DashboardRelease
                 title="Autumn term, academic year, "
                 years="2016 to 2017"
-                editing
-                isNew={false}
+                isLive
                 lastEdited={new Date('2019-04-24 16:55')}
                 lastEditor={{ id: 'me', name: 'Ann Evans', permissions: [] }}
-                published={new Date('2019-03-20 09:30')}
+                published={new Date('2017-01-06 09:30')}
                 lead="Ann Evans"
               />
             </li>
@@ -127,6 +147,9 @@ const AdminDashboardPublications = () => {
         spring terms"
           caption=""
         >
+          <p>
+            <Link to="#">View methodology</Link>
+          </p>
           <ul className="govuk-list">
             <li>
               <DashboardRelease
@@ -136,7 +159,8 @@ const AdminDashboardPublications = () => {
                 editing={window.location.search === '?status=editLiveRelease'}
                 lastEdited={new Date('2019-03-20 17:37')}
                 lastEditor={{ id: 'me', name: 'me', permissions: [] }}
-                published={new Date('2019-03-20 09:30')}
+                published={new Date('2019-09-24 09:30')}
+                nextRelease={new Date('2020-09-25 09:30')}
               />
             </li>
 
@@ -145,8 +169,8 @@ const AdminDashboardPublications = () => {
                 title="Autumn and spring terms, academic year, "
                 years="2016 to 2017"
                 editing
-                isNew={false}
-                lastEdited={new Date('2019-04-24 16:55')}
+                isLive
+                lastEdited={new Date('2017-09-23 16:55')}
                 lastEditor={{ id: 'me', name: 'Ann Evans', permissions: [] }}
                 published={new Date('2019-03-20 09:30')}
                 lead="Ann Evans"
@@ -162,19 +186,15 @@ const AdminDashboardPublications = () => {
             heading="Pupil absense statistics and data for schools in England: summer term"
             caption="New publication, requires release adding"
           >
+            <p>
+              <Link to="#">Add methodology to this publication</Link>
+            </p>
             <Link to="/prototypes/release-create-new" className="govuk-button">
               Create new release
             </Link>
           </AccordionSection>
         )}
       </Accordion>
-
-      <Link
-        to="/prototypes/publication-create-new"
-        className="govuk-button govuk-button--secondary"
-      >
-        Create new publication
-      </Link>
     </>
   );
 };
