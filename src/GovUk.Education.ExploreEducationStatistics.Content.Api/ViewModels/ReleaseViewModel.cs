@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
 {
-    public class Release
+    public class ReleaseViewModel
     {
         public Guid Id { get; set; }
 
@@ -21,11 +22,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid PublicationId { get; set; }
 
         public Publication Publication { get; set; }
-        
+
         public List<Update> Updates { get; set; }
 
         public List<ContentSection> Content { get; set; }
-        
+
         public DataBlock KeyStatistics { get; set; }
+        
+        public List<string> DataFiles { get; set; }
     }
 }

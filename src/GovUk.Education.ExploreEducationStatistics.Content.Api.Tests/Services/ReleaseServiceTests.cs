@@ -1,16 +1,30 @@
 using System;
 using System.Collections.Generic;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 {
     public class ReleaseServiceTests
     {
+        private readonly MapperConfiguration config = new MapperConfiguration(cfg => {
+            cfg.CreateMap<Release, ReleaseViewModel>();
+        });
+            
+        private readonly IMapper mapper;
+
+        public ReleaseServiceTests()
+        {
+           mapper = config.CreateMapper();
+        }
+
         [Fact]
         public void GetLatest_ReturnsA_WithARelease()
         {
@@ -18,6 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             builder.UseInMemoryDatabase(databaseName: "FindLatestPublication");
             var options = builder.Options;
 
+            var fileStorageService = new Mock<IFileStorageService>();
+            
             using (var context = new ApplicationDbContext(options))
             {
                 var publications = new List<Publication>
@@ -39,11 +55,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             using (var context = new ApplicationDbContext(options))
             {
-                var service = new ReleaseService(context);
+                var service = new ReleaseService(context, fileStorageService.Object, mapper);
 
                 var result = service.GetLatestRelease("1003fa5c-b60a-4036-a178-e3a69a81b852");
 
-                Assert.IsType<Release>(result);
+                Assert.IsType<ReleaseViewModel>(result);
             }
         }
         
@@ -51,9 +67,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         public void GetId_ReturnsA_WithATheme()
         {
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            builder.UseInMemoryDatabase(databaseName: "ReleaseTheme");
+            builder.UseInMemoryDatabase("ReleaseTheme");
             var options = builder.Options;
 
+            var fileStorageService = new Mock<IFileStorageService>();
+            
             using (var context = new ApplicationDbContext(options))
             {
                 var releases = new List<Release>
@@ -74,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             using (var context = new ApplicationDbContext(options))
             {
-                var service = new ReleaseService(context);
+                var service = new ReleaseService(context, fileStorageService.Object, mapper);
 
                 var result = service.GetRelease("1003fa5c-b60a-4036-a178-e3a69a81b852");
 

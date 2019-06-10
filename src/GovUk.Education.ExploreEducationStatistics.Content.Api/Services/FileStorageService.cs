@@ -1,15 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {
     public class FileStorageService : IFileStorageService
     {
@@ -25,41 +24,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _storageConnectionString = config.GetConnectionString("AzureStorage");
         }
 
-        public bool FileExistsAndIsReleased(string publication, string release, string filename)
+        public IEnumerable<string> ListFiles(string publication, string release)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
 
             var blobClient = storageAccount.CreateCloudBlobClient();
             var blobContainer = blobClient.GetContainerReference(containerName);
-            var blob = blobContainer.GetBlockBlobReference($"{publication}/{release}/{filename}");
 
-            return blob.Exists() && IsFileReleased(blob);
+            return blobContainer.ListBlobs($"{publication}/{release}", true, BlobListingDetails.Metadata)
+                .OfType<CloudBlockBlob>()
+                .Where(IsFileReleased)
+                .Select(file => file.Name);
         }
 
-        public async Task<FileStreamResult> StreamFile(string publication, string release, string filename)
-        {
-            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
-
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(containerName);
-            var blob = blobContainer.GetBlockBlobReference($"{publication}/{release}/{filename}");
-
-            if (!blob.Exists())
-            {
-                throw new ArgumentException("File not found: {filename}", blob.Name);
-            }
-
-            var stream = new MemoryStream();
-
-            await blob.DownloadToStreamAsync(stream);
-            stream.Seek(0, SeekOrigin.Begin);
-            return new FileStreamResult(stream, blob.Properties.ContentType)
-            {
-                FileDownloadName = filename
-            };
-        }
-
-        private static bool IsFileReleased(ICloudBlob blob)
+        private static bool IsFileReleased(CloudBlob blob)
         {
             if (!blob.Exists())
             {
