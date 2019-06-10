@@ -20,16 +20,22 @@ async function startServer(port = process.env.PORT || 3000) {
     process.exit(1);
   }
 
-  let cspScriptSrc = [
+  const cspConnectSrc = [
     "'self'",
-    "https://www.google-analytics.com/",
-    "https://static.hotjar.com/",
-  ]
+    process.env.CONTENT_API_BASE_URL,
+    process.env.DATA_API_BASE_URL,
+    process.env.FUNCTION_API_BASE_URL,
+  ];
+  const cspScriptSrc = [
+    "'self'",
+    'https://www.google-analytics.com/',
+    'https://static.hotjar.com/',
+  ];
 
   if (process.env.NODE_ENV !== 'production') {
-   cspScriptSrc.push("'unsafe-inline'");
-   cspScriptSrc.push("'unsafe-eval'");
-  };
+    cspScriptSrc.push("'unsafe-inline'");
+    cspScriptSrc.push("'unsafe-eval'");
+  }
 
   const server = express();
 
@@ -42,8 +48,9 @@ async function startServer(port = process.env.PORT || 3000) {
         defaultSrc: ["'self'"],
         scriptSrc: cspScriptSrc,
         styleSrc: ["'self'"],
-        imgSrc: ["'self'", 'data:', "https://www.google-analytics.com/"],
+        imgSrc: ["'self'", 'data:', 'https://www.google-analytics.com/'],
         fontSrc: ["'self'"],
+        connectSrc: cspConnectSrc,
         frameSrc: ["'self'"],
         frameAncestors: ["'self'"],
       },
