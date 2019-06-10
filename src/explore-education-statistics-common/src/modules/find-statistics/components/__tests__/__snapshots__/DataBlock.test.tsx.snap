@@ -53,7 +53,6 @@ exports[`DataBlock renders summary 1`] = `
             aria-hidden="true"
             class="govuk-details__text"
             id="details-content-4"
-            style=""
           >
             Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
           </div>
@@ -96,7 +95,6 @@ exports[`DataBlock renders summary 1`] = `
             aria-hidden="true"
             class="govuk-details__text"
             id="details-content-5"
-            style=""
           >
             Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
           </div>
@@ -139,7 +137,6 @@ exports[`DataBlock renders summary 1`] = `
             aria-hidden="true"
             class="govuk-details__text"
             id="details-content-6"
-            style=""
           >
             Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
           </div>
