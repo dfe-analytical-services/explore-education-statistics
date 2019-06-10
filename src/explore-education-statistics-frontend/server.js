@@ -20,6 +20,7 @@ async function startServer(port = process.env.PORT || 3000) {
     process.exit(1);
   }
 
+  let cspConnectSrc = ["'self'", process.env.CONTENT_API_BASE_URL, process.env.DATA_API_BASE_URL, process.env.FUNCTION_API_BASE_URL]
   let cspScriptSrc = [
     "'self'",
     "https://www.google-analytics.com/",
@@ -44,6 +45,7 @@ async function startServer(port = process.env.PORT || 3000) {
         styleSrc: ["'self'"],
         imgSrc: ["'self'", 'data:', "https://www.google-analytics.com/"],
         fontSrc: ["'self'"],
+        connectSrc: cspConnectSrc,
         frameSrc: ["'self'"],
         frameAncestors: ["'self'"],
       },
