@@ -51,7 +51,7 @@ function HomePage() {
       </div>
 
       <hr />
-      <h3 className="govuk-heading-l govuk-!-margin-top-9">Supportng information</h3>
+      <h3 className="govuk-heading-l govuk-!-margin-top-9">Supporting information</h3>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-half">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
