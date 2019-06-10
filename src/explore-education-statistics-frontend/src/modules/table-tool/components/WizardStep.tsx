@@ -30,11 +30,12 @@ const WizardStep = ({ children, id, ...restProps }: WizardStepProps) => {
     <li
       className={classNames(styles.step, {
         [styles.stepActive]: isActive,
-        [styles.stepEnabled]: currentStep > stepNumber,
+        [styles.stepHidden]: stepNumber > currentStep,
       })}
       id={id}
       ref={ref}
       tabIndex={-1}
+      hidden={stepNumber > currentStep}
     >
       <div className={styles.content}>
         <span className={styles.number} aria-hidden>

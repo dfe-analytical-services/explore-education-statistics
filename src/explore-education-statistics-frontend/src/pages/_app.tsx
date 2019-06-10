@@ -1,10 +1,12 @@
 import { logPageView } from '@frontend/services/googleAnalyticsService';
+import { initHotJar } from '@frontend/services/hotjarService';
 import BaseApp, { Container, NextAppContext } from 'next/app';
 import Router from 'next/router';
 import React from 'react';
 import Helmet from 'react-helmet';
 import './_app.scss';
-import { initHotJar } from '@frontend/services/hotjarService';
+
+process.env.APP_ROOT_ID = '__next';
 
 class App extends BaseApp {
   public static async getInitialProps({ Component, ctx }: NextAppContext) {

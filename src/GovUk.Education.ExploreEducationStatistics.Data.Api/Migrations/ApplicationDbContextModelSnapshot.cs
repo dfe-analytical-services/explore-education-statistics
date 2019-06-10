@@ -196,12 +196,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         {
                             Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             Slug = "pupil-absence-in-schools-in-england",
-                            Title = "Pupil absence data and statistics for schools in England",
+                            Title = "Pupil absence in schools in England",
                             TopicId = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460")
                         },
                         new
                         {
-                            Id = new Guid("8345e27a-7a32-4b20-a056-309163bdf9c4"),
+                            Id = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             Slug = "permanent-and-fixed-period-exclusions-in-england",
                             Title = "Permanent and fixed-period exclusions in England",
                             TopicId = new Guid("77941b7d-bbd6-4069-9107-565af89e2dec")
@@ -217,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         {
                             Id = new Guid("fcda2962-82a6-4052-afa2-ea398c53c85f"),
                             Slug = "early-years-foundation-stage-profile-results",
-                            Title = "Early years foundation stage profile data",
+                            Title = "Early years foundation stage profile results",
                             TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769")
                         });
                 });
@@ -261,7 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         new
                         {
                             Id = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            PublicationId = new Guid("8345e27a-7a32-4b20-a056-309163bdf9c4"),
+                            PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             ReleaseDate = new DateTime(2018, 7, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Slug = "2016-17",
                             Title = "2016 to 2017"

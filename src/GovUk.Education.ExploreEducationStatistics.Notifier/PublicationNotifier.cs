@@ -27,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         private const string BaseUrlName = "BaseUrl";
         private const string WebApplicationBaseUrlName = "WebApplicationBaseUrl";
         private const string TokenSecretKeyName = "TokenSecretKey";
+        private const string ConfirmationEmailTemplateIdName = "SubscriptionConfirmationEmailTemplateId";
         private const string NotificationEmailTemplateIdName = "PublicationNotificationEmailTemplateId";
         private const string VerificationEmailTemplateIdName = "VerificationEmailTemplateId";
 
@@ -220,9 +221,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             logger.LogTrace("PublicationSubscriptionVerify function triggered");
 
             var config = LoadAppSettings(context);
+            var emailTemplateId = config.GetValue<string>(ConfirmationEmailTemplateIdName);
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
             var webApplicationBaseUrl = config.GetValue<string>(WebApplicationBaseUrlName);
+            var baseUrl = config.GetValue<string>(BaseUrlName);
             var email = _tokenService.GetEmailFromToken(token, tokenSecretKey);
+            var client = GetNotifyClient(config);
 
             if (email != null)
             {
@@ -239,6 +243,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                     // Add them to the verified subscribers table
                     logger.LogInformation($"adding {email} to subscribers");
                     await _storageTableService.UpdateSubscriber(subscriptionsTbl, sub);
+                    var unsubscribeToken = _tokenService.GenerateToken(tokenSecretKey, sub.RowKey, DateTime.UtcNow.AddYears(1));
+
+                    var vals = new Dictionary<string, dynamic>
+                    {
+                        {"publication_name", sub.Title},
+                        {"unsubscribe_link", baseUrl + sub.PartitionKey + "/unsubscribe/" + unsubscribeToken}
+                    };
+
+                    _emailService.sendEmail(client, email, emailTemplateId, vals);
+                    
                     return new RedirectResult(webApplicationBaseUrl + $"subscriptions?slug={sub.Slug}&verified=true", true);
                 }
             }

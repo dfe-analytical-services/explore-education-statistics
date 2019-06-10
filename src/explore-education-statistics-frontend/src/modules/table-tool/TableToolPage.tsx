@@ -1,3 +1,4 @@
+import { ConfirmContextProvider } from '@common/context/ConfirmContext';
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import tableBuilderService, {
   FilterOption,
@@ -5,11 +6,13 @@ import tableBuilderService, {
   PublicationSubject,
   PublicationSubjectMeta,
   TableData,
+  ThemeMeta,
 } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
+import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
 import mapValues from 'lodash/mapValues';
 import React, { Component } from 'react';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
@@ -43,39 +46,9 @@ export interface PublicationOptions {
   }[];
 }
 
-const defaultPublicationOptions: PublicationOptions[] = [
-  {
-    id: 'early-years-and-schools',
-    title: 'Early years and schools',
-    topics: [
-      {
-        id: 'absence-and-exclusions',
-        title: 'Absence and exclusions',
-        publications: [
-          {
-            id: 'cbbd299f-8297-44bc-92ac-558bcf51f8ad',
-            title: 'Pupil absence',
-            slug: '/statistics/pupil-absence-in-schools-in-england',
-          },
-          // {
-          //   id: 'bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9',
-          //   title: 'Exclusions',
-          // },
-        ],
-      },
-      {
-        id: 'school-and-pupil-numbers',
-        title: 'School and pupil numbers',
-        publications: [
-          // {
-          //   id: 'a91d9e05-be82-474c-85ae-4913158406d0',
-          //   title: 'Schools, pupils and their characteristics',
-          // },
-        ],
-      },
-    ],
-  },
-];
+interface Props {
+  themeMeta: ThemeMeta[];
+}
 
 interface State {
   timePeriods: TimePeriod[];
@@ -90,7 +63,7 @@ interface State {
   tableData: TableData['result'];
 }
 
-class TableToolPage extends Component<{}, State> {
+class TableToolPage extends Component<Props, State> {
   public state: State = {
     filters: {},
     timePeriods: [],
@@ -112,10 +85,16 @@ class TableToolPage extends Component<{}, State> {
     tableData: [],
   };
 
+  public static async getInitialProps() {
+    const themeMeta = await tableBuilderService.getThemes();
+    return { themeMeta };
+  }
+
   private handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId,
   }) => {
-    const publication = defaultPublicationOptions
+    const { themeMeta } = this.props;
+    const publication = themeMeta
       .flatMap(option => option.topics)
       .flatMap(option => option.publications)
       .find(option => option.id === publicationId);
@@ -201,6 +180,7 @@ class TableToolPage extends Component<{}, State> {
   };
 
   public render() {
+    const { themeMeta } = this.props;
     const {
       filters,
       indicators,
@@ -227,105 +207,125 @@ class TableToolPage extends Component<{}, State> {
           for your own offline analysis.
         </p>
 
-        <Wizard id="tableTool-steps">
-          <WizardStep>
-            {stepProps => (
-              <PublicationForm
-                {...stepProps}
-                options={defaultPublicationOptions}
-                onSubmit={this.handlePublicationFormSubmit}
-              />
-            )}
-          </WizardStep>
-          <WizardStep>
-            {stepProps => (
-              <PublicationSubjectForm
-                {...stepProps}
-                options={subjects}
-                onSubmit={this.handlePublicationSubjectFormSubmit}
-              />
-            )}
-          </WizardStep>
-          <WizardStep>
-            {stepProps => (
-              <LocationFiltersForm
-                {...stepProps}
-                options={subjectMeta.locations}
-                onSubmit={this.handleLocationFiltersFormSubmit}
-              />
-            )}
-          </WizardStep>
-          <WizardStep>
-            {stepProps => (
-              <TimePeriodForm
-                {...stepProps}
-                options={subjectMeta.timePeriod.options}
-                onSubmit={values => {
-                  this.setState({
-                    timePeriods: TimePeriod.createRange(
-                      TimePeriod.fromString(values.start),
-                      TimePeriod.fromString(values.end),
-                    ),
-                  });
+        <ConfirmContextProvider>
+          {({ askConfirm }) => (
+            <>
+              <Wizard
+                id="tableTool-steps"
+                onStepChange={async (nextStep, previousStep) => {
+                  if (nextStep < previousStep) {
+                    const confirmed = await askConfirm();
+                    return confirmed ? nextStep : previousStep;
+                  }
+
+                  return nextStep;
                 }}
-              />
-            )}
-          </WizardStep>
-          <WizardStep>
-            {stepProps => (
-              <FiltersForm
-                {...stepProps}
-                onSubmit={this.handleFiltersFormSubmit}
-                specification={subjectMeta}
-              />
-            )}
-          </WizardStep>
-          <WizardStep>
-            {stepProps => (
-              <>
-                <WizardStepHeading {...stepProps}>
-                  Explore data
-                </WizardStepHeading>
+              >
+                <WizardStep>
+                  {stepProps => (
+                    <PublicationForm
+                      {...stepProps}
+                      options={themeMeta}
+                      onSubmit={this.handlePublicationFormSubmit}
+                    />
+                  )}
+                </WizardStep>
+                <WizardStep>
+                  {stepProps => (
+                    <PublicationSubjectForm
+                      {...stepProps}
+                      options={subjects}
+                      onSubmit={this.handlePublicationSubjectFormSubmit}
+                    />
+                  )}
+                </WizardStep>
+                <WizardStep>
+                  {stepProps => (
+                    <LocationFiltersForm
+                      {...stepProps}
+                      options={subjectMeta.locations}
+                      onSubmit={this.handleLocationFiltersFormSubmit}
+                    />
+                  )}
+                </WizardStep>
+                <WizardStep>
+                  {stepProps => (
+                    <TimePeriodForm
+                      {...stepProps}
+                      options={subjectMeta.timePeriod.options}
+                      onSubmit={values => {
+                        this.setState({
+                          timePeriods: TimePeriod.createRange(
+                            TimePeriod.fromString(values.start),
+                            TimePeriod.fromString(values.end),
+                          ),
+                        });
+                      }}
+                    />
+                  )}
+                </WizardStep>
+                <WizardStep>
+                  {stepProps => (
+                    <FiltersForm
+                      {...stepProps}
+                      onSubmit={this.handleFiltersFormSubmit}
+                      specification={subjectMeta}
+                    />
+                  )}
+                </WizardStep>
+                <WizardStep>
+                  {stepProps => (
+                    <>
+                      <WizardStepHeading {...stepProps}>
+                        Explore data
+                      </WizardStepHeading>
 
-                {tableData.length > 0 && (
-                  <>
-                    <div className="govuk-!-margin-bottom-2">
-                      <TimePeriodDataTable
-                        filters={filters}
-                        indicators={indicators}
-                        publicationName={publication ? publication.title : ''}
-                        subjectName={subjectName}
-                        locations={locations}
-                        timePeriods={timePeriods}
-                        results={tableData}
-                      />
-                    </div>
+                      {tableData.length > 0 && (
+                        <>
+                          <div className="govuk-!-margin-bottom-2">
+                            <TimePeriodDataTable
+                              filters={filters}
+                              indicators={indicators}
+                              publicationName={
+                                publication ? publication.title : ''
+                              }
+                              subjectName={subjectName}
+                              locations={locations}
+                              timePeriods={timePeriods}
+                              results={tableData}
+                            />
+                          </div>
 
-                    <ul className="govuk-list">
-                      {publication && (
-                        <li>
-                          <a href={publication.slug}>Go to publication</a>
-                        </li>
+                          <ul className="govuk-list">
+                            {publication && (
+                              <li>
+                                <a href={publication.slug}>Go to publication</a>
+                              </li>
+                            )}
+                            <li>
+                              <a href="#download">Download data (.csv)</a>
+                            </li>
+                            <li>
+                              <a href="#api">Access developer API</a>
+                            </li>
+                            <li>
+                              <a href="#methodology">Methodology</a>
+                            </li>
+                            <li>
+                              <a href="#contact">Contact</a>
+                            </li>
+                          </ul>
+                        </>
                       )}
-                      <li>
-                        <a href="#download">Download data (.csv)</a>
-                      </li>
-                      <li>
-                        <a href="#api">Access developer API</a>
-                      </li>
-                      <li>
-                        <a href="#methodology">Methodology</a>
-                      </li>
-                      <li>
-                        <a href="#contact">Contact</a>
-                      </li>
-                    </ul>
-                  </>
-                )}
-              </>
-            )}
-          </WizardStep>
-        </Wizard>
+                    </>
+                  )}
+                </WizardStep>
+              </Wizard>
+
+              <PreviousStepModalConfirm />
+            </>
+          )}
+        </ConfirmContextProvider>
       </Page>
     );
   }

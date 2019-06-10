@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
         public int StartYear { get; set; }
         public int EndYear { get; set; }
         public IEnumerable<int> Years { get; set; }
-        public GeographicLevel GeographicLevel { get; set; }
+        public GeographicLevel? GeographicLevel { get; set; }
         public IEnumerable<long> Indicators { get; set; }
         public IEnumerable<string> Countries { get; set; }
         public IEnumerable<string> LocalAuthorities { get; set; }
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
 
             if (GeographicLevel != null)
             {
-                predicate = predicate.And(observation => GeographicLevel == GeographicLevel);
+                predicate = predicate.And(observation => observation.GeographicLevel == GeographicLevel);
             }
 
             if (Countries != null && Countries.Any())

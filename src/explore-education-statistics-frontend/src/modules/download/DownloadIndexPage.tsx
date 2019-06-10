@@ -1,15 +1,22 @@
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
+import Details from '@common/components/Details';
+import RelatedInformation from '@common/components/RelatedInformation';
+import SearchForm from '@common/components/SearchForm';
 import { contentApi } from '@common/services/api';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
-import { Topic } from '@frontend/modules/find-statistics/components/TopicList';
 import React, { Component } from 'react';
+import PublicationDownloadList from './components/PublicationDownloadList';
+import { Topic } from './components/TopicList';
 
 interface Props {
   themes: {
     id: string;
     slug: string;
     title: string;
+    summary: string;
     topics: Topic[];
   }[];
 }
@@ -20,11 +27,12 @@ class DownloadIndexPage extends Component<Props> {
   };
 
   public static async getInitialProps() {
-    const themes = await contentApi.get('/Content/tree');
+    const themes = await contentApi.get('/Download/tree');
     return { themes };
   }
 
   public render() {
+    const { themes } = this.props;
     return (
       <Page
         breadcrumbs={[
@@ -41,72 +49,56 @@ class DownloadIndexPage extends Component<Props> {
               Find the data files behind our range of national and regional
               statistics for your own analysis.
             </p>
+            <SearchForm />
           </div>
           <div className="govuk-grid-column-one-third">
-            <aside className="app-related-items">
-              <h2 className="govuk-heading-m" id="releated-content">
-                Related content
-              </h2>
-              <nav role="navigation" aria-labelledby="subsection-title">
-                <ul className="govuk-list">
-                  <li>
-                    <Link to="/statistics">Find statistics and data</Link>
-                  </li>
-                  <li>
-                    <Link to="/glossary">Education statistics: glossary</Link>
-                  </li>
-                </ul>
-              </nav>
-            </aside>
+            <RelatedInformation>
+              <ul className="govuk-list">
+                <li>
+                  <Link to="/statistics">Find statistics and data</Link>
+                </li>
+                <li>
+                  <Link to="/glossary">Education statistics: glossary</Link>
+                </li>
+              </ul>
+            </RelatedInformation>
           </div>
         </div>
 
-        <h2 className="govuk-heading-l">Choose a theme</h2>
-
-        {/* {themes.length > 0 ? (
-          <>
-            {themes.map(({ id, title }) => (
-              <div key={id}>
-                <p>
-                  <a href="#">{title}</a>
-                </p>
-              </div>
-            ))}
-          </>
+        {themes.length > 0 ? (
+          <Accordion id="themesDownloads">
+            {themes.map(
+              ({
+                id: themeId,
+                title: themeTitle,
+                summary: themeSummary,
+                topics,
+              }) => (
+                <AccordionSection
+                  key={themeId}
+                  heading={themeTitle}
+                  caption={themeSummary}
+                >
+                  {topics.map(
+                    ({ id: topicId, title: topicTitle, publications }) => (
+                      <Details key={topicId} summary={topicTitle}>
+                        <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
+                          <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
+                            <PublicationDownloadList
+                              publications={publications}
+                            />
+                          </ul>
+                        </div>
+                      </Details>
+                    ),
+                  )}
+                </AccordionSection>
+              ),
+            )}
+          </Accordion>
         ) : (
-          <div className="govuk-inset-text">No data currently published</div>
-        )} */}
-
-        <p>
-          <a href="#">Children and early years - including social care</a>
-        </p>
-        <p>
-          <a href="#">Destinations of pupils and students - including NEET</a>
-        </p>
-        <p>
-          <a href="#">Finance and funding</a>
-        </p>
-        <p>
-          <a href="#">Further education</a>
-        </p>
-        <p>
-          <a href="#">Higher education</a>
-        </p>
-        <p>
-          <Link to="/download/pupils-schools">Pupils and schools</Link>
-        </p>
-        <p>
-          <a href="/download/school-college-performance">
-            Schools and college performance - including GCSE and key stage
-            performance
-          </a>
-        </p>
-        <p>
-          <a href="#">Teachers and school workforce</a>
-        </p>
-        <p>
-          <a href="#">UK education and training statistics</a>
-        </p>
+          <div className="govuk-inset-text">No data currently published.</div>
+        )}
       </Page>
     );
   }

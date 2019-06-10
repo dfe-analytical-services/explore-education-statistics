@@ -61,6 +61,7 @@ const Form = ({
       id={id}
       onReset={formik.handleReset}
       onSubmit={async event => {
+        setSubmitError(undefined);
         event.preventDefault();
 
         try {

@@ -8,6 +8,7 @@ import {
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
 import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
+import useResetFormOnPreviousStep from '@frontend/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
@@ -32,25 +33,33 @@ interface Props {
 }
 
 const FiltersForm = (props: Props & InjectedWizardProps) => {
-  const { onSubmit, specification, goToNextStep } = props;
+  const {
+    onSubmit,
+    specification,
+    goToNextStep,
+    currentStep,
+    stepNumber,
+  } = props;
 
   const ref = useRef<HTMLDivElement>(null);
 
+  const formikRef = useRef<Formik<FormValues>>(null);
   const formId = 'filtersForm';
+
+  useResetFormOnPreviousStep(formikRef, currentStep, stepNumber);
 
   const stepHeading = (
     <WizardStepHeading {...props}>Choose your filters</WizardStepHeading>
   );
 
-  const initialValues = {
-    filters: mapValues(specification.filters, () => []),
-    indicators: [],
-  };
-
   return (
     <Formik<FormValues>
       enableReinitialize
-      initialValues={initialValues}
+      ref={formikRef}
+      initialValues={{
+        filters: mapValues(specification.filters, () => []),
+        indicators: [],
+      }}
       validationSchema={Yup.object<FormValues>({
         filters: Yup.object(
           mapValues(specification.filters, () =>
@@ -139,12 +148,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                 formId={formId}
                 submitText="Create table"
                 submittingText="Creating table"
-                onPreviousStep={() => {
-                  form.resetForm({
-                    filters: mapValues(specification.filters, () => []),
-                    indicators: [],
-                  });
-                }}
               />
             </Form>
           </div>

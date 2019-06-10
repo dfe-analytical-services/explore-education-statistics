@@ -1,8 +1,8 @@
 import { Comparison } from '@common/types/util';
 
-export type TimePeriodCode = 'AY' | 'HT6' | 'HT5';
+export type TimePeriodCode = 'AY' | 'CY' | 'HT6' | 'HT5';
 
-const allowedTimePeriodCodes: TimePeriodCode[] = ['AY', 'HT6', 'HT5'];
+const allowedTimePeriodCodes: TimePeriodCode[] = ['AY', 'CY', 'HT6', 'HT5'];
 
 class TimePeriod {
   public readonly year: number;
@@ -52,6 +52,8 @@ class TimePeriod {
         const yearString = this.year.toString();
         return `${yearString}/${Number(yearString.substring(2, 4)) + 1}`;
       }
+      case 'CY':
+        return this.year.toString();
       default:
         throw new Error('Cold not parse label');
     }
@@ -64,6 +66,7 @@ class TimePeriod {
   public previousPeriod(): TimePeriod {
     switch (this.code) {
       case 'AY':
+      case 'CY':
       case 'HT6':
       case 'HT5':
         return new TimePeriod(this.year - 1, this.code);
@@ -75,6 +78,7 @@ class TimePeriod {
   public nextPeriod(): TimePeriod {
     switch (this.code) {
       case 'AY':
+      case 'CY':
       case 'HT6':
       case 'HT5':
         return new TimePeriod(this.year + 1, this.code);

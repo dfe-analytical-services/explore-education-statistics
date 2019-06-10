@@ -1,0 +1,32 @@
+@import '../styles/govuk-base';
+
+.container {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: govuk-spacing(2);
+}
+
+.spinner {
+  animation: spin 2s linear infinite;
+  border: 12px solid govuk-colour('grey-4');
+  border-radius: 50%;
+  border-top-color: govuk-colour('blue');
+  display: block;
+  height: 80px;
+  width: 80px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.text {
+  margin-top: 0;
+}

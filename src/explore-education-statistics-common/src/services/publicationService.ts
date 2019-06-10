@@ -41,6 +41,8 @@ export interface Axis {
   size?: number;
 }
 
+export type ChartType = 'line' | 'verticalbar' | 'horizontalbar' | 'map';
+
 export interface ChartDataGroup {
   filters?: string[];
   location?: string[];
@@ -48,7 +50,7 @@ export interface ChartDataGroup {
 }
 
 export interface Chart {
-  type: string;
+  type: ChartType;
   indicators: string[];
   dataGroupings?: ChartDataGroup[];
   xAxis?: Axis;
@@ -68,8 +70,10 @@ export interface Summary {
   description: { type: string; body: string };
 }
 
+export type ContentBlockType = 'MarkDownBlock' | 'InsetTextBlock' | 'DataBlock';
+
 export interface ContentBlock {
-  type: string;
+  type: ContentBlockType;
   body: string;
   heading?: string;
   dataBlockRequest?: DataBlockRequest;
@@ -100,6 +104,12 @@ export interface Release {
     content: ContentBlock[];
   }[];
   keyStatistics: ContentBlock;
+  dataFiles: {
+    extension: string;
+    name: string;
+    path: string;
+    size: string;
+  }[];
 }
 
 export default {

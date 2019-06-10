@@ -18,11 +18,16 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
+        <PackageReference Include="AutoMapper" Version="8.1.0" />
+        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.1.0" />
+        <PackageReference Include="MediaTypeMap" Version="2.1.0" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.6.1" />
         <PackageReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.3" />
+        <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="10.0.3" />
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
     </ItemGroup>

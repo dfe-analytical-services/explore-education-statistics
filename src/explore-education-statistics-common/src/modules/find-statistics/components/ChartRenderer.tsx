@@ -4,6 +4,7 @@ import VerticalBarBlock from '@common/modules/find-statistics/components/charts/
 import {
   Axis,
   ChartDataGroup,
+  ChartType,
   ReferenceLine,
 } from '@common/services/publicationService';
 import dynamic from 'next-server/dynamic';
@@ -21,7 +22,7 @@ const DynamicMapBlock = dynamic(
 );
 
 export interface ChartRendererProps {
-  type: string;
+  type: ChartType;
   indicators: string[];
   data: DataBlockData;
   meta: DataBlockMetadata;

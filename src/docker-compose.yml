@@ -21,6 +21,8 @@ services:
     ports:
     - "5010:5010"
     - "5011:5011"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
 #  frontend:
 #    container_name: ees-frontend
 #    build: explore-education-statistics-frontend

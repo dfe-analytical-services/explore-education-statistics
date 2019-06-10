@@ -39,24 +39,14 @@ const WizardStepHeading = ({
         >
           <button
             type="button"
-            onClick={() => {
-              if (stepEnabled) {
-                setCurrentStep(stepNumber);
-              }
-            }}
+            onClick={() => setCurrentStep(stepNumber)}
             className={styles.stepButton}
           >
             <span className="govuk-visually-hidden">{`Step ${stepNumber}:`}</span>
             {children}
 
             {stepEnabled && (
-              <span
-                className={styles.toggleText}
-                aria-hidden
-                onClick={() => {
-                  setCurrentStep(stepNumber);
-                }}
-              >
+              <span className={styles.toggleText} aria-hidden>
                 Go to this step
               </span>
             )}
