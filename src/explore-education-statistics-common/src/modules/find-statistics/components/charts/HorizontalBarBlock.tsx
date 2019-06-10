@@ -27,11 +27,11 @@ export default function HorizontalBarBlock(props: StackedBarHorizontalProps) {
     referenceLines,
     yAxis,
     stacked,
-    chartDataKeys,
+    indicators,
   } = props;
 
-  const chartData = data.result.map(({ measures, year }) => ({
-    name: `${meta.timePeriods[year].label}`,
+  const chartData = data.result.map(({ measures, year, timeIdentifier }) => ({
+    name: `${meta.timePeriods[`${year}_${timeIdentifier}`].label}`,
     ...measures,
   }));
 
@@ -54,7 +54,7 @@ export default function HorizontalBarBlock(props: StackedBarHorizontalProps) {
         <Tooltip cursor={false} />
         <Legend />
 
-        {chartDataKeys.map((dataKey, index) => {
+        {indicators.map((dataKey, index) => {
           return (
             <Bar
               key={dataKey}

@@ -1,5 +1,159 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`DataBlock datablock renders map 1`] = `
+
+<div data-testid="DataBlock ">
+  <div class="govuk-tabs">
+    <ul class="govuk-tabs__list"
+        role="tablist"
+    >
+      <li class="govuk-tabs__list-item"
+          role="presentation"
+      >
+        <a class="govuk-tabs__tab govuk-tabs__tab--selected"
+           href="#datablock_test_charts"
+           id="datablock_test_charts-tab"
+           aria-controls="datablock_test_charts"
+           aria-selected="true"
+           role="tab"
+        >
+          Charts
+        </a>
+      </li>
+    </ul>
+    <section class="govuk-tabs__panel dfe-content-overflow panel"
+             id="datablock_test_charts"
+             data-testid="Charts"
+             aria-labelledby="datablock_test_charts-tab"
+             role="tabpanel"
+             tabindex="-1"
+    >
+      <h3>
+        Charts
+      </h3>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-third"
+             aria-live="assertive"
+        >
+          <form>
+            <div class="govuk-form-group govuk-!-margin-bottom-6">
+              <label class="govuk-label"
+                     for="selectedLocation"
+              >
+                Select a location
+              </label>
+              <select class="govuk-select select"
+                      id="selectedLocation"
+                      name="selectedLocation"
+              >
+                <option value>
+                  All
+                </option>
+                <option value="E92000001">
+                  England
+                </option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="govuk-grid-column-two-thirds">
+          <div style="width: 800px; height: 600px; position: relative;"
+               class="leaflet-container leaflet-grab leaflet-touch-drag"
+               tabindex="0"
+          >
+            <div class="leaflet-pane leaflet-map-pane"
+                 style="left: 0px; top: 0px;"
+            >
+              <div class="leaflet-pane leaflet-tile-pane">
+              </div>
+              <div class="leaflet-pane leaflet-shadow-pane">
+              </div>
+              <div class="leaflet-pane leaflet-overlay-pane">
+                <svg pointer-events="none"
+                     width="0"
+                     height="0"
+                     style="left: 0px; top: 0px;"
+                     viewbox="0 0 0 0"
+                >
+                  <g>
+                    <path class="leaflet-interactive"
+                          stroke="#3388ff"
+                          stroke-opacity="1"
+                          stroke-width="3"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          fill="#3388ff"
+                          fill-opacity="0.2"
+                          fill-rule="evenodd"
+                          d="M0 0"
+                    >
+                    </path>
+                    <path class="leaflet-interactive"
+                          stroke="777"
+                          stroke-opacity="1"
+                          stroke-width="1"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          fill="777"
+                          fill-opacity="0.2"
+                          fill-rule="evenodd"
+                          d="M-1 1L-1 -1L1 -1L1 1z"
+                    >
+                    </path>
+                  </g>
+                </svg>
+              </div>
+              <div class="leaflet-pane leaflet-marker-pane">
+              </div>
+              <div class="leaflet-pane leaflet-tooltip-pane">
+              </div>
+              <div class="leaflet-pane leaflet-popup-pane">
+              </div>
+            </div>
+            <div class="leaflet-control-container">
+              <div class="leaflet-top leaflet-left">
+                <div class="leaflet-control-zoom leaflet-bar leaflet-control">
+                  <a class="leaflet-control-zoom-in"
+                     href="#"
+                     title="Zoom in"
+                     role="button"
+                     aria-label="Zoom in"
+                  >
+                    +
+                  </a>
+                  <a class="leaflet-control-zoom-out"
+                     href="#"
+                     title="Zoom out"
+                     role="button"
+                     aria-label="Zoom out"
+                  >
+                    −
+                  </a>
+                </div>
+              </div>
+              <div class="leaflet-top leaflet-right">
+              </div>
+              <div class="leaflet-bottom leaflet-left">
+              </div>
+              <div class="leaflet-bottom leaflet-right">
+                <div class="leaflet-control-attribution leaflet-control">
+                  <a href="https://leafletjs.com"
+                     title="A JS library for interactive maps"
+                  >
+                    Leaflet
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+`;
+
 exports[`DataBlock renders summary 1`] = `
 <section
   aria-labelledby="datablock_test_summary-tab"
@@ -168,13 +322,13 @@ exports[`DataBlock renders table 1`] = `
         class="govuk-table__header govuk-table__cell--numeric"
         scope="col"
       >
-        2014
+        2014/15
       </th>
       <th
         class="govuk-table__header govuk-table__cell--numeric"
         scope="col"
       >
-        2015
+        2015/16
       </th>
     </tr>
   </thead>

@@ -21,7 +21,8 @@ export interface FormSelectProps {
   options: SelectOption[];
   order?:
     | (keyof SelectOption)[]
-    | ((option: SelectOption) => SelectOption[keyof SelectOption])[];
+    | ((option: SelectOption) => SelectOption[keyof SelectOption])[]
+    | null;
   orderDirection?: ('asc' | 'desc')[];
   value?: string | number;
 }
@@ -54,7 +55,10 @@ const FormSelect = ({
         onChange={onChange}
         value={value}
       >
-        {orderBy(options, order, orderDirection).map(option => (
+        {(order === null
+          ? options
+          : orderBy(options, order, orderDirection)
+        ).map(option => (
           <option value={option.value} key={`${option.value}-${option.label}`}>
             {option.label}
           </option>
