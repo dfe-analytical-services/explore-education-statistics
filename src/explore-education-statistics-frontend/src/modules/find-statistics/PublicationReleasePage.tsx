@@ -115,83 +115,17 @@ class PublicationReleasePage extends Component<Props> {
 
             <Details summary="Download data files">
               <ul className="govuk-list govuk-list--bullet">
-                <li>
-                  <Link
-                    to={`${
-                      baseUrl.data
-                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_by_characteristic.csv`}
-                    className="govuk-link"
-                  >
-                    Absence by characteristic
-                  </Link>
-                  {` `}(csv, 100mb)
-                </li>
-                <li>
-                  <Link
-                    to={`${
-                      baseUrl.data
-                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_by_geographic_level.csv`}
-                    className="govuk-link"
-                  >
-                    Absence by geographic level
-                  </Link>
-                  {` `}(csv, 100mb)
-                </li>
-                <li>
-                  <Link
-                    to={`${
-                      baseUrl.data
-                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_by_term.csv`}
-                    className="govuk-link"
-                  >
-                    Absence by term
-                  </Link>
-                  {` `}(csv, 100mb)
-                </li>
-                <li>
-                  <Link
-                    to={`${
-                      baseUrl.data
-                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_for_four_year_olds.csv`}
-                    className="govuk-link"
-                  >
-                    Absence for four year olds
-                  </Link>
-                  {` `}(csv, 100mb)
-                </li>
-                <li>
-                  <Link
-                    to={`${
-                      baseUrl.data
-                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_in_prus.csv`}
-                    className="govuk-link"
-                  >
-                    Absence in prus
-                  </Link>
-                  {` `}(csv, 100mb)
-                </li>
-                <li>
-                  <Link
-                    to={`${
-                      baseUrl.data
-                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_number_missing_at_least_one_session_by_reason.csv`}
-                    className="govuk-link"
-                  >
-                    Absence number missing at least one session by reason
-                  </Link>
-                  {` `}(csv, 100mb)
-                </li>
-                <li>
-                  <Link
-                    to={`${
-                      baseUrl.data
-                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_rate_percent_bands.csv`}
-                    className="govuk-link"
-                  >
-                    Absence rate percent bands
-                  </Link>
-                  {` `}(csv, 100mb)
-                </li>
+                {data.dataFiles.map(({ extension, name, path, size }) => (
+                  <li key={path} data-testid="item-download">
+                    <Link
+                      to={`${baseUrl.data}/api/download/${path}`}
+                      className="govuk-link"
+                    >
+                      {name}
+                    </Link>
+                    {` `}({extension}, {size})
+                  </li>
+                ))}
               </ul>
               <h2 className="govuk-heading-m govuk-!-margin-top-9">
                 Explore and edit this data online

@@ -100,6 +100,12 @@ export interface Release {
     content: ContentBlock[];
   }[];
   keyStatistics: ContentBlock;
+  dataFiles: {
+    extension: string;
+    name: string;
+    path: string;
+    size: string;
+  }[];
 }
 
 export default {

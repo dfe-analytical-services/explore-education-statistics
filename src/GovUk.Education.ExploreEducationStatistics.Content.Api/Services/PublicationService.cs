@@ -19,7 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public PublicationViewModel GetPublication(string slug)
         {
-
             return _mapper.Map<PublicationViewModel>(_context.Publications.FirstOrDefault(t => t.Slug == slug));
         }
     }

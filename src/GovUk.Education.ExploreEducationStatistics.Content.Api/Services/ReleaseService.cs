@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -94,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             return null;
         }
 
-        private List<string> ListFiles(Release release)
+        private List<FileInfo> ListFiles(Release release)
         {
             return _fileStorageService.ListFiles(release.Publication.Slug, release.Slug).ToList();
         }

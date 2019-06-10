@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
@@ -28,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
         public List<ContentSection> Content { get; set; }
 
         public DataBlock KeyStatistics { get; set; }
-        
-        public List<string> DataFiles { get; set; }
+
+        public List<FileInfo> DataFiles { get; set; }
     }
 }
