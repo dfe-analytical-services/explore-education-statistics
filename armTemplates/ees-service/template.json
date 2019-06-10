@@ -470,6 +470,10 @@
               "value": "[concat('https://', variables('dataAppName'),'.azurewebsites.net/')]"
             },
             {
+              "name": "FUNCTION_API_BASE_URL",
+              "value": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/')]"
+            },
+            {
               "name": "BASIC_AUTH",
               "value": "[parameters('publicAppBasicAuth')]"
             },
