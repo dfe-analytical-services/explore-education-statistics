@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             contentService.Setup(s => s.GetContentTree());
             publicationService.Setup(s => s.GetPublication("publication-a"));
             releaseService.Setup(s => s.GetLatestRelease("publication-a")).Returns(
-                new Release
+                new ReleaseViewModel
                 {
                     Title = "Publication A",
                     Slug = "publication-a"
@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             var result = controller.GetLatestRelease("publication-a");
 
-            Assert.IsAssignableFrom<Release>(result.Value);
+            Assert.IsAssignableFrom<ReleaseViewModel>(result.Value);
             Assert.Equal("Publication A", result.Value.Title);
         }
 
@@ -140,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var publicationService = new Mock<IPublicationService>();
             var releaseService = new Mock<IReleaseService>();
 
-            releaseService.Setup(s => s.GetLatestRelease("publication-a")).Returns((Release) null);
+            releaseService.Setup(s => s.GetLatestRelease("publication-a")).Returns((ReleaseViewModel) null);
 
             var controller =
                 new ContentController(contentService.Object, publicationService.Object, releaseService.Object);

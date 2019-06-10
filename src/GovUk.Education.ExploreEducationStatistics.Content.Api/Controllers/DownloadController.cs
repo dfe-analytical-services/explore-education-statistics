@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -9,23 +7,24 @@ using Microsoft.AspNetCore.Mvc;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
     [Route("api/[controller]")]
+    [ApiController]
     public class DownloadController : ControllerBase
     {
-        private readonly IDownloadService _service;
-        public DownloadController(IDownloadService service)
+        private readonly IDownloadService _downloadService;
+
+        public DownloadController(IDownloadService downloadService)
         {
-            _service = service;
+            _downloadService = downloadService;
         }
 
-        // GET
         [HttpGet("tree")]
         public ActionResult<List<ThemeTree>> GetDownloadTree()
         {
-            var tree = _service.GetTree();
+            var tree = _downloadService.GetDownloadTree();
 
             if (tree.Any())
             {
-                return tree;
+                return tree.ToList();
             }
 
             return NoContent();
