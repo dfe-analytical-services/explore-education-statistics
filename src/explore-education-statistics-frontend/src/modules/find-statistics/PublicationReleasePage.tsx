@@ -365,7 +365,7 @@ class PublicationReleasePage extends Component<Props> {
           </AccordionSection>
           <AccordionSection heading="Contact us" headingTag="h3">
             <p>
-              If you have a specific enquiry about {data.publication.theme}{' '}
+              If you have a specific enquiry about {data.publication.topic.theme.title}
               statistics and data:
             </p>
             {data.publication.contact && (

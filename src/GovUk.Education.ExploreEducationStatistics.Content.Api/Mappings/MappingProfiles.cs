@@ -13,9 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Mappings
         {
             CreateMap<Release, ReleaseViewModel>()
                 .ForMember(dest => dest.DataFiles, opts => opts.Ignore());
-            
-            CreateMap<Release, PublicationViewModel>()
-                .ForMember(dest => dest.Theme, opts => { opts.MapFrom(unit => unit.Publication.Topic.Theme.Title); });
         }
     }
 }

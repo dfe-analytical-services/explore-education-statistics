@@ -20,13 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public PublicationViewModel GetPublication(string slug)
         {
-            var model = _mapper.Map<PublicationViewModel>(
-                _context.Publications
-                    .Include(p => p.Topic.Theme.Title)
-                    .Include(p => p.Contact)
-                    .FirstOrDefault(t => t.Slug == slug));
-
-            return model;
+            return _mapper.Map<PublicationViewModel>(_context.Publications.FirstOrDefault(t => t.Slug == slug));
         }
     }
 }

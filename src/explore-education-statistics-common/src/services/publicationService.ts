@@ -21,7 +21,11 @@ export interface Publication {
     description: string;
     url: string;
   }[];
-  theme: string;
+  topic: {
+    theme: {
+      title: string;
+    }
+  }
   contact: {
     teamName: string;
     teamEmail: string;
