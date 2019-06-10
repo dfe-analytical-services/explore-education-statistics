@@ -802,7 +802,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Title = "School and pupils and their characteristics",
                   Summary = "",
                   TopicId = new Guid("e50ba9fd-9f19-458c-aceb-4422f0c7d1ba"),
-                  Slug = "school-pupils-and-their-characteristics"
+                  Slug = "school-pupils-and-their-characteristics",
+                  LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-school-and-pupil-numbers")
               },
               new Publication
               {
@@ -811,7 +812,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Summary = "",
                   TopicId = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
                   Slug = "secondary-and-primary-schools-applications-and-offers",
-                  LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-school-applications#documents")
+                  // LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-school-applications#documents")
               },
               new Publication
               {
@@ -882,7 +883,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Title = "GCSE and equivalent results",
                   Summary = "",
                   TopicId = new Guid("1e763f55-bf09-4497-b838-7c5b054ba87b"),
-                  Slug = "gcse-and-equivalent-results"
+                  Slug = "gcse-and-equivalent-results",
+                  LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#gcse-and-equivalent-results")
               },
               new Publication
               {
@@ -1056,10 +1058,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Title = "Pupil absence data and statistics for schools in England",
                     ReleaseName = "2016 to 2017",
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Published = new DateTime(2017, 3, 22),
+                    Published = new DateTime(2018, 3, 22),
                     Slug = "2016-17",
                     Summary =
-                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas. \n\n",
+                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.\n\n" +
+                        "> View a regional breakdown of statistics and data under the [Regional and local authority (LA) breakdown](#contents-sections-heading-9) section\n\n" + 
+                        "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england).",
 
                     KeyStatistics = new DataBlock
                     {
@@ -1067,8 +1071,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         {
                             subjectId = 1,
                             geographicLevel = "National",
-                            startYear = "2016",
-                            endYear = "2017",
+                            startYear = "2012",
+                            endYear = "2016",
                             filters = new List<string> { "1", "2" },
                             indicators = new List<string> { "23", "26", "28" }
                         },
@@ -1084,9 +1088,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
                             description = new MarkDownBlock
                             {
-                                Body = " * pupils missed on average 8.2 school days \n " +
-                                       " * overall and unauthorised absence rates up on previous year \n" +
-                                       " * unauthorised rise due to higher rates of unauthorised holidays \n" +
+                                Body = " * pupils missed on average 8.2 school days\n" +
+                                       " * overall and unauthorised absence rates up on previous year\n" +
+                                       " * unauthorised rise due to higher rates of unauthorised holidays\n" +
                                        " * 10% of pupils persistently absent during 2016/17"
                             }
                         }
@@ -1096,25 +1100,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new ContentSection
                         {
-                            Order = 1, Heading = "About this release", Caption = "",
+                            Order = 1, Heading = "About these statistics", Caption = "",
                             Content = new List<IContentBlock>
                             {
                                 new MarkDownBlock
                                 {
                                     Body =
-                                        "This statistical first release (SFR) reports on absence of pupils of compulsory school age in state-funded primary, secondary and special schools during the 2016/17 academic year. Information on absence in pupil referral units, and for pupils aged four, is also included. The Department uses two key measures to monitor pupil absence – overall and persistent absence. Absence by reason and pupils characteristics is also included in this release. Figures are available at national, regional, local authority and school level. Figures held in this release are used for policy development as key indicators in behaviour and school attendance policy. Schools and local authorities also use the statistics to compare their local absence rates to regional and national averages for different pupil groups."
+                                        "The statistics and data show the absence of pupils of compulsory school age during the 2016/17 academic year in the follwoing state-funded school types:\n\n" +
+                                        "- primary schools\n" +
+                                        "- secondary schools\n" +
+                                        "- special schools\n\n" +
+                                        "The statistics and data also includes information on absence in pupil referral units and for pupils aged 4.\n\n" +
+                                        "We use the key measures of 'overall' and 'persistent' absence to monitor pupil absence while 'absence by reason' and 'pupil characteristics' are also included.\n\n" +
+                                        "The statistics and data are available at national, regional, local authority (LA) and school level and are used by LAs and schools to compare their local absence rates to regional and national averages for different pupil groups.\n\n" +
+                                        "The statistics and data are also used for policy development as key indicators in behaviour and school attendance policy.\n"
                                 }
                             }
                         },
                         new ContentSection
                         {
-                            Order = 2, Heading = "Absence rates", Caption = "",
+                            Order = 2, Heading = "Pupil absence rates", Caption = "",
                             Content = new List<IContentBlock>
                             {
                                 new MarkDownBlock
                                 {
                                     Body =
-                                        "The overall absence rate across state-funded primary, secondary and special schools increased from 4.6 per cent in 2015/16 to 4.7 per cent in 2016/17. In primary schools the overall absence rate stayed the same at 4 per cent and the rate in secondary schools increased from 5.2 per cent to 5.4 per cent. Absence in special schools is much higher at 9.7 per cent in 2016/17\n\nThe increase in overall absence rate has been driven by an increase in the unauthorised absence rate across state-funded primary, secondary and special schools - which increased from 1.1 per cent to 1.3 per cent between 2015/16 and 2016/17.\n\nLooking at longer-term trends, overall and authorised absence rates have been fairly stable over recent years after decreasing gradually between 2006/07 and 2013/14. Unauthorised absence rates have not varied much since 2006/07, however the unauthorised absence rate is now at its highest since records began, at 1.3 per cent.\n\nThis increase in unauthorised absence is due to an increase in absence due to family holidays that were not agreed by the school. The authorised absence rate has not changed since last year, at 3.4 per cent. Though in primary schools authorised absence rates have been decreasing across recent years.\n\nThe total number of days missed due to overall absence across state-funded primary, secondary and special schools has increased since last year, from 54.8 million in 2015/16 to 56.7 million in 2016/17. This partly reflects the rise in the total number of pupil enrolments, the average number of days missed per enrolment has increased very slightly from 8.1 days in 2015/16 to 8.2 days in 2016/17.\n\nIn 2016/17, 91.8 per cent of pupils in state-funded primary, state-funded secondary and special schools missed at least one session during the school year, this is similar to the previous year (91.7 per cent in 2015/16)."
+                                        "DETAIL - Overall absence rate definition\n" +
+                                        "> The total number of overall absence sessions for all pupils as a percentage of the total number of possible sessions for all pupils, where overall absence is the sum of authorised and unauthorised absence and 1 session is equal to half-a-day.\n"
                                 },
                                 new DataBlock
                                 {
@@ -1124,7 +1136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         subjectId = 1,
                                         geographicLevel = "National",
                                         startYear = "2012",
-                                        endYear = "2017",
+                                        endYear = "2016",
                                         filters = new List<string> {"1", "2"},
                                         indicators = new List<string> {"23", "26", "28"}
                                     },
@@ -1153,6 +1165,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             },
                                         }
                                     }
+                                },
+                                new MarkDownBlock
+                                {
+                                    Body = 
+                                        "The overall absence rate across state-funded primary, secondary and special schools increased from 4.6% in 2015/16 to 4.7% in 2016/17.\n\n" +
+                                        "In primary schools the overall absence rate stayed the same at 4% and the rate in secondary schools increased from 5.2% to 5.4%.\n\n" +
+                                        "Absence in special schools is much higher at 9.7% in 2016/17\n\n" +
+                                        "The increase in overall absence rate has been driven by an increase in the unauthorised absence rate across state-funded primary, secondary and special schools - which increased from 1.1% to 1.3% between 2015/16 and 2016/17.\n\n" +
+                                        "Looking at longer-term trends - overall and authorised absence rates have been fairly stable over recent years after decreasing gradually between 2006/07 and 2013/14.\n\n" +
+                                        "Unauthorised absence rates have not varied much since 2006/07, although at 1.3%, it is now at the highest since records began.\n\n" +
+                                        "This is due to absences for family holidays that were not agreed with the school.\n\n" +
+                                        "The authorised absence rate at 3.4% has not changed since last year but has been decreasing across recent years in primary schools.\n\n" +
+                                        "The total number of days missed due to overall absence across state-funded primary, secondary and special schools increased since from 54.8 million in 2015/16 to 56.7 million in 2016/17.\n\n" +
+                                        "This partly reflects the rise in the total number of pupil enrolments - the average number of days missed per enrolment has increased very slightly from 8.1 days in 2015/16 to 8.2 days in 2016/17.\n\n" + 
+                                        "In 2016/17, 91.8% of pupils in state-funded primary, state-funded secondary and special schools missed at least one session during the school year, which is similar to the 91.7% figure in 2015/16."
                                 }
                             }
                         },
@@ -1161,10 +1188,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Order = 3, Heading = "Persistent absence", Caption = "",
                             Content = new List<IContentBlock>
                             {
+                                new MarkDownBlock 
+                                {
+                                    Body =
+                                        "DETAIL - Persistence absence definition\n" +
+                                        "> 'Persistent absence' occurs when a pupil (also known as a 'pupil enrolment') misses 10% or more of their possible sessions.\n\n" +
+                                        "> This definition changed at the start of the 2015/16 academic year and data on this page has been recalculated using the new methodology.\n\n" +
+                                        "> As a result, use caution when interpreting the data as it may be impacted by this change in methodology.\n\n" + 
+                                        "> For more information on this subject and previous methodologies read our [Pupil absence statistics: methodology](../methodology/) guidance."
+                                },
+                                new DataBlock
+                                {
+                                    Heading = null,
+                                    DataBlockRequest = new DataBlockRequest
+                                    {
+                                        subjectId = 1,
+                                        geographicLevel = "National",
+                                        startYear = "2012",
+                                        endYear = "2016",
+                                        filters = new List<string> {"1", "2"},
+                                        indicators = new List<string> {"23", "26", "28"}
+                                    },
+                                    Tables = new List<Table>
+                                    {
+                                        new Table
+                                        {
+                                            indicators = new List<string> {"23", "26", "28"}
+                                        }
+                                    },
+                                    Charts = new List<IContentBlockChart>
+                                    {
+                                        new LineChart
+                                        {
+                                            XAxis = new Axis
+                                            {
+                                                title = "School Year"
+                                            },
+                                            YAxis = new Axis
+                                            {
+                                                title = "Absence Rate"
+                                            },
+                                            Indicators = new List<string>
+                                            {
+                                                "23", "26", "28"
+                                            },
+                                        }
+                                    }
+                                },
                                 new MarkDownBlock
                                 {
                                     Body =
-                                        "The percentage of enrolments in state-funded primary and state-funded secondary schools that were classified as persistent absentees in 2016/17 was 10.8 per cent. This is up from the equivalent figure of 10.5 per cent in 2015/16 (see Figure 2).\n\nIn 2016/17, persistent absentees accounted for 37.6 per cent of all absence compared to 36.6 per cent in 2015/16. Longer term, there has been a decrease in the proportion of absence that persistent absentees account for – down from 43.3 per cent in 2011/12.\n\nThe overall absence rate for persistent absentees across all schools was 18.1 per cent, nearly four times higher than the rate for all pupils. This is a slight increase from 2015/16, when the overall absence rate for persistent absentees was 17.6 per cent.\n\nPersistent absentees account for almost a third, 31.6 per cent, of all authorised absence and more than half, 53.8 per cent of all unauthorised absence. The rate of illness absences is almost four times higher for persistent absentees compared to other pupils, at 7.6 per cent and 2.0 per cent respectively."
+                                        "Persistent absence in state-funded primary and state-funded secondary schools in 2016/17 was up 10.8% from 10.5% in 2015/16.\n\n" +
+                                        "It accounted for 37.6% of all absences in 2016/17 up from 36.6% in 2015/16 but still down on the 43.3% recorded in 2011/12.\n\n" +
+                                        "The overall absence rate for persistent absentees across all schools was 18.1%, nearly 4 times higher than the rate for all pupils.\n\n" +
+                                        "This is a slight increase from 2015/16 when the overall absence rate for persistent absentees was 17.6%.\n\n" +
+                                        "Persistent absentees account for almost a third (31.6%) of all authorised absence and more than half (53.8%) of all unauthorised absence.\n\n" +
+                                        "The rate of illness absences is almost 4 times higher (7.6%) for persistent absentees compared to other pupils (2%)."
                                 }
                             }
                         },
@@ -1176,7 +1255,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new InsetTextBlock
                                 {
                                     Body =
-                                        "Within this release absence by reason is broken down in three different ways:\n\nDistribution of absence by reason: The proportion of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of absences.\n\nRate of absence by reason: The rate of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of possible sessions.\n\nOne or more sessions missed due to each reason: The number of pupil enrolments missing at least one session due to each reason."
+                                        "Within this release absence by reason is broken down in three different ways:\n\n" +
+                                        "- Distribution of absence by reason: The proportion of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of absences.\n\n" +
+                                        "- Rate of absence by reason: The rate of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of possible sessions.\n\n" +
+                                        "- One or more sessions missed due to each reason: The number of pupil enrolments missing at least one session due to each reason."
+                                },
+                                new DataBlock
+                                {
+                                    Heading = null,
+                                    DataBlockRequest = new DataBlockRequest
+                                    {
+                                        subjectId = 1,
+                                        geographicLevel = "National",
+                                        startYear = "2012",
+                                        endYear = "2016",
+                                        filters = new List<string> {"1", "2"},
+                                        indicators = new List<string> {"23", "26", "28"}
+                                    },
+                                    Tables = new List<Table>
+                                    {
+                                        new Table
+                                        {
+                                            indicators = new List<string> {"23", "26", "28"}
+                                        }
+                                    },
+                                    Charts = new List<IContentBlockChart>
+                                    {
+                                        new LineChart
+                                        {
+                                            XAxis = new Axis
+                                            {
+                                                title = "School Year"
+                                            },
+                                            YAxis = new Axis
+                                            {
+                                                title = "Absence Rate"
+                                            },
+                                            Indicators = new List<string>
+                                            {
+                                                "23", "26", "28"
+                                            },
+                                        }
+                                    }
+                                },
+                                new MarkDownBlock
+                                {
+                                    Body =
+                                        "Illness is the main driver for overall absence rates but while overall absence rates have increased slightly since 2015/16 illness rates have remained the same at 2.6%.\n\n" +
+                                        "Illness accounted for 55.3% of all absence in 2016/17 down from 57.3% in 2015/16 and 60.1% in 2014/15.\n\n" +
+                                        "The rate of absence due to other unauthorised circumstances has remained the same as in 2015/16 at 0.7%.\n\n" +
+                                        "### Absence due to family holiday\n\n" +
+                                        "The percentage of pupils who missed at least 1 session due to a family holiday in 2016/17 was 16.9% compared with 14.7% in 2015/16.\n\n" +
+                                        "The absence rate due to family holidays agreed by the school statyed at 0.1% for 2016/17 while the percentage of all possible sessions missed due to unauthorised family holidays increased from 0.3% in 2015/16 to 0.4% in 2016/17.\n\n" +
+                                        "Unauthorised holiday absence rates have been increasing gradually since 2006/07 while authorised holiday absence rates are much lower now than in 2006/07 and remained steady over recent years.\n\n" +
+                                        "A regulation amendment in September 2013 stated that term-time leave could only be granted in exceptional circumstances which explains the sharp fall in authorised holiday absence between 2012/13 and 2013/14.\n\n" +
+                                        "The statistics and data shown here relate to the period after the Isle of Wight Council v Jon Platt High Court judgment (May 2016) where the High Court supported a local magistrates’ ruling that there was no case to answer and partially to the period after the April 2017 Supreme Court judgment where it unanimously agreed that no children should be taken out of school without good reason and clarified that 'regularly' means 'in accordance with the rules prescribed by the school'.\n\n"
                                 }
                             }
                         },
@@ -1188,7 +1321,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                        "Nearly half of all pupils (48.9 per cent) were absent for five days or fewer across state-funded primary, secondary and special schools in 2016/17, down from 49.1 per cent in 2015/16.\n\n4.3 per cent of pupil enrolments had more than 25 days of absence in 2016/17 (the same as in 2015/16). These pupil enrolments accounted for 23.5 per cent of days missed. 8.2 per cent of pupil enrolments had no absence during 2016/17.\n\nPer pupil enrolment, the average total absence in primary schools was 7.2 days, compared to 16.9 days in special schools and 9.3 days in secondary schools.\n\nWhen looking at absence rates across terms for primary, secondary and special schools, the overall absence rate is lowest in the autumn term and highest in the summer term. The authorised rate is highest in the spring term and lowest in the summer term, and the unauthorised rate is highest in the summer term."
+                                        "Nearly half of all pupils (48.9%) were absent for 5 days or fewer across state-funded primary, secondary and special schools in 2016/17, down from 49.1% in 2015/16.\n\n" +
+                                        "The rate of pupils who had more than 25 days of absence in 2016/17 (4.3%) was the same as in 2015/16.\n\n" +
+                                        "These pupil enrolments accounted for 23.5% of days missed while 8.2% of pupil enrolments had no absence during 2016/17.\n\n" +
+                                        "The average total absence in primary schools per pupil was 7.2 days compared 16.9 days in special and 9.3 days in secondary schools.\n\n" +
+                                        "Across all schools, the overall absence rate is lowest in the autumn term and highest in the summer term, authorised rate is highest in the spring term and lowest in the summer term, while unauthorised rate is highest in the summer term."
                                 }
                             }
                         },
@@ -1200,19 +1337,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                        "The patterns of absence rates for pupils with different characteristics have been consistent across recent years.\n\n### Gender\n\nThe overall absence rates across state-funded primary, secondary and special schools were very similar for boys and girls, at 4.7 per cent and 4.6 per cent respectively. The persistent absence rates were also similar, at 10.9 per cent for boys and 10.6 per cent for girls.\n\n### Free school meals (FSM) eligibility\n\nAbsence rates are higher for pupils who are known to be eligible for and claiming free school meals. The overall absence rate for these pupils was 7.3 per cent, compared to 4.2 per cent for non FSM pupils. The persistent absence rate for pupils who were eligible for FSM was more than twice the rate for those pupils not eligible for FSM.\n\n### National curriculum year group\n\nPupils in national curriculum year groups 3 and 4 had the lowest overall absence rates at 3.9 and 4 per cent respectively. Pupils in national curriculum year groups 10 and 11 had the highest overall absence rate at 6.1 per cent and 6.2 per cent respectively. This trend is repeated for persistent absence.\n\n### Special educational need (SEN)\n\nPupils with a statement of special educational needs (SEN) or education healthcare plan (EHC) had an overall absence rate of 8.2 per cent compared to 4.3 per cent for those with no identified SEN. The percentage of pupils with a statement of SEN or an EHC plan that are persistent absentees was more than two times higher than the percentage for pupils with no identified SEN.\n\n### Ethnic group\n\nThe highest overall absence rates were for Traveller of Irish Heritage and Gypsy/ Roma pupils at 18.1 per cent and 12.9 per cent respectively. Overall absence rates for pupils of a Chinese and Black African ethnicity were substantially lower than the national average of 4.7 per cent at 2.4 per cent and 2.9 per cent respectively. A similar pattern is seen in persistent absence rates; Traveller of Irish heritage pupils had the highest rate at 64 per cent and Chinese pupils had the lowest rate at 3.1 per cent."
+                                        "The patterns of absence rates for pupils with different characteristics have been consistent across recent years.\n\n" +
+                                        "### Ethnic group\n\n" +
+                                        "The highest overall absence rates were for Traveller of Irish Heritage and Gypsy/ Roma pupils at 18.1% and 12.9% respectively.\n\n" +
+                                        "Overall absence rates for pupils of a Chinese and Black African ethnicity were substantially lower than the national average of 4.7% at 2.4% and 2.9% respectively.\n\n" +
+                                        "A similar pattern is seen in persistent absence rates where Traveller of Irish heritage pupils had the highest rate at 64% and Chinese pupils had the lowest rate at 3.1%.\n\n" +
+                                        "### Free school meals (FSM) eligibility\n\n" +
+                                        "Absence rates are higher for pupils who are known to be eligible for and claiming free school meals.\n\n" +
+                                        "The overall absence rate was 7.3% compared to 4.2% for non-FSM pupils while persistent absence was more than double the rate for non-FSM pupils.\n\n" +
+                                        "### Gender\n\n" +
+                                        "Overall absence rates were very similar for boys (4.7%) and girls (4.6%) and persistent absence rates were also similar for boys (10.9%) and girls (10.6%).\n\n" +
+                                        "### National curriculum year group\n\n" +
+                                        "Pupils in national curriculum year groups 3 (3.9%) and 4 (4%) had the lowest overall absence rates while pupils in year groups 10 (6.1%) and 11 (6.2%) had the highest rates. This trend is repeated for persistent absence.\n\n" +
+                                        "### Special educational need (SEN)\n\n" +
+                                        "Pupils with a statement of special educational needs (SEN) or education healthcare plan (EHC) had an overall absence rate of 8.2% compared to 4.3% for those with no identified SEN.\n\n" +
+                                        "The persistent absence rate was more than 2 times higher for pupils with an SEN statement or EHC plan compared to thise with no identified SEN."
                                 }
                             }
                         },
                         new ContentSection
                         {
-                            Order = 7, Heading = "Absence for four year olds", Caption = "",
+                            Order = 7, Heading = "Absence for 4-year-olds", Caption = "",
                             Content = new List<IContentBlock>
                             {
                                 new MarkDownBlock
                                 {
                                     Body =
-                                        "The overall absence rate for four year olds in 2016/17 was 5.1 per cent which is lower than the rate of 5.2 per cent which it has been for the last two years.\n\nAbsence recorded for four year olds is not treated as 'authorised' or 'unauthorised' and is therefore reported as overall absence only."
+                                        "The overall absence rate for 4-year-olds in 2016/17 was 5.1% which is down on the rate of 5.2% for the previous two years.\n\n" +
+                                        "Absence recorded for 4-year-olds is not treated as 'authorised' or 'unauthorised' and is therefore reported as overall absence only."
                                 }
                             }
                         },
@@ -1224,19 +1376,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                        "The overall absence rate for pupil referral units in 2016/17 was 33.9 per cent, compared to 32.6 per cent in 2015/16. The percentage of enrolments in pupil referral units who were persistent absentees was 73.9 per cent in 2016/17, compared to 72.5 per cent in 2015/16."
+                                        "The overall absence rate for pupil referral units in 2016/17 was 33.9% compared to 32.6% in 2015/16.\n\n" +
+                                        "The percentage of enrolments in pupil referral units who were persistent absentees was 73.9% in 2016/17, compared to 72.5% in 2015/16."
                                 }
                             }
                         },
                         new ContentSection
                         {
-                            Order = 9, Heading = "Pupil absence by local authority", Caption = "",
+                            Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = "",
                             Content = new List<IContentBlock>
                             {
+                                // TODO: ADD LA MAP
+                                new MarkDownBlock
+                                {
+                                    Body = "MAP GOES HERE"
+                                },
                                 new MarkDownBlock
                                 {
                                     Body =
-                                        "There is variation in overall and persistent absence rates across state-funded primary, secondary and special schools by region and local authority. Similarly to last year, the three regions with the highest overall absence rate across all state-funded primary, secondary and special schools are the North East (4.9 per cent), Yorkshire and the Humber (4.9 per cent) and the South West (4.8 per cent), with Inner and Outer London having the lowest overall absence rate (4.4 per cent). The region with the highest persistent absence rate is Yorkshire and the Humber, where 11.9 per cent of pupil enrolments are persistent absentees, with Outer London having the lowest rate of persistent absence (at 10.0 per cent).\n\nAbsence information at local authority district level is also published within this release, in the accompanying underlying data files."
+                                        "Overall and persistent absence rates vary across primary, secondary and special schools by region and LA.\n\n" +
+                                        "Similar to last year, the 3 regions with the highest overall absence rate across state-funded primary, state-funded secondary and special schools are the North East (4.9%), Yorkshire and the Humber (4.9%) and the South West (4.8%) with Inner and Outer London having the lowest overall absence rate (4.4%).\n\n" +
+                                        "The region with the highest persistent absence rate is Yorkshire and the Humber (11.9%) with Outer London having the lowest rate of persistent absence (10.0%).\n\n" +
+                                        "For LA-level absence statistics and data download our data files.\n\n" +
+                                        "You can customise and download data as Excel or .csv files. Our data can also be accessed via an API.\n\n" +
+                                        "[Download .csv files]('#')\n\n" +
+                                        "[Download Excel files]('#')\n\n" +
+                                        "[Download pdf files]('#')\n\n" +
+                                        "[Access API]('#') - [What is an API?]('#')"
                                 }
                             }
                         }
@@ -1293,26 +1459,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Published = new DateTime(2018, 7, 19),
                     Slug = "2016-17",
                     Summary =
-                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of permanent and fixed-period exclusion subject areas. \n\n" +
-                        "You can also view a regional breakdown of statistics and data within the [local authorities section](#contents-sections-heading-9)",
+                        "Read national statistical summaries, view charts and tables and download data files.\n\n" +
+                        "> View a regional breakdown of statistics and data under the [Regional and local authority (LA) breakdown]('#contents-exclusions-sections-heading-9') section\n\n" +
+                        "Find out how and why these statistics are collected and published - [Permanent and fixed-period exclusion statistics: methodology]('#')",
                     KeyStatistics = new DataBlock
                     {
+                        DataBlockRequest = new DataBlockRequest
+                        {
+                            subjectId = 12,
+                            geographicLevel = "National",
+                            startYear = "2012",
+                            endYear = "2016",
+                            filters = new List<string> { "727" },
+                            indicators = new List<string> { "153", "154", "155", "156", "158" }
+                        },
                         Summary = new Summary
                         {
                             dataKeys = new List<string>
                             {
-                                "perm_excl_rate",
-                                "perm_excl",
-                                "fixed_excl_rate"
+                                "155",
+                                "156",
+                                "158"
                             },
-
                             description = new MarkDownBlock
                             {
                                 Body =
-                                    " * overall rate of permanent exclusions has increased from 0.08 per cent of pupil enrolments in 2015/16 to 0.10 per cent in 2016/17 \n" +
-                                    " * number of exclusions has also increased, from 6,685 to 7,720 \n" +
-                                    " * overall rate of fixed period exclusions increased, from 4.29 per cent of pupil enrolments in 2015/16 to 4.76 per cent in 2016/17 \n" +
-                                    " * number of exclusions has also increased, from 339,360 to 381,865. \n"
+                                    " * overall rate of permanent exclusions has increased to 0.10% - up from 0.08% in 2015/16\n" +
+                                    " * number of exclusions increased to 7,720 - up from 6,685 in 2015/16\n" +
+                                    " * overall fixed-period exclusions rate increased to 4.76% - up from 4.29% in 2015/16\n" +
+                                    " * number of exclusions increased to 381,865 - up from 339,360 in 2015/16\n"
                             }
                         }
                     },
@@ -1326,7 +1501,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                        "This National Statistics release reports on permanent and fixed period exclusions from state-funded primary, state-funded secondary and special schools during the 2016/17 academic year as reported in the School Census. This release also includes school level exclusions figures for state-funded primary, secondary and special schools and national level figures on permanent and fixed-period exclusions from pupil referral units. All figures in this release are based on unrounded data; therefore, constituent parts may not add up due to rounding.\n\nAn Exclusions statistics guide, which provides historical information on exclusion statistics, technical background information to the figures and data collection, and definitions of key terms should be referenced alongside this release.\n\nIn this publication: The following tables are included in the statistical publication\n\n*   national tables (Excel .xls and open format)\n\n*   local authority (LA) tables\n\n*   underlying data (open format .csv and metadata .txt)\n\nThe underlying data is accompanied by a metadata document that describes underlying data files.\n\nWe welcome feedback on any aspect of this document at [schools.statistics@education.gov.uk](#)"
+                                        "This National Statistics release reports on permanent and fixed period exclusions from state-funded primary, state-funded secondary and special schools during the 2016/17 academic year as reported in the School Census. This release also includes school level exclusions figures for state-funded primary, secondary and special schools and national level figures on permanent and fixed-period exclusions from pupil referral units. All figures in this release are based on unrounded data; therefore, constituent parts may not add up due to rounding.\n\n" +
+                                        "An Exclusions statistics guide, which provides historical information on exclusion statistics, technical background information to the figures and data collection, and definitions of key terms should be referenced alongside this release.\n\n" +
+                                        "The following tables are included in the statistical publication\n\n" +
+                                        "*   national tables (Excel .xls and open format)\n\n" +
+                                        "*   local authority (LA) tables\n\n" +
+                                        "*   underlying data (open format .csv and metadata .txt)\n\n" +
+                                        "The underlying data is accompanied by a metadata document that describes underlying data files.\n\n" +
+                                        "We welcome feedback on any aspect of this document at [schools.statistics@education.gov.uk](#)"
                                 }
                             }
                         },
@@ -1348,7 +1530,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                        "The rate of permanent exclusions across all state-funded primary, secondary and special schools has also increased from 0.08 per cent to 0.10 per cent of pupil enrolments, which is equivalent to around 10 pupils per 10,000.\n\nMost (83 per cent) permanent exclusions occurred in secondary schools. The rate of permanent exclusions in secondary schools increased from 0.17 per cent in 2015/16 to 0.20 per cent in 2016/17, which is equivalent to around 20 pupils per 10,000.\n\nThe rate of permanent exclusions also rose in primary schools, at 0.03 per cent, but decreased in special schools from 0.08 per cent in 2015/16 to 0.07 per cent in 2016/17. Looking at longer-term trends, the rate of permanent exclusions across all state-funded primary, secondary and special schools followed a generally downward trend from 2006/07 when the rate was 0.12 per cent until 2012/13, and has been rising again since then, although rates are still lower now than in 2006/07."
+                                        "The rate of permanent exclusions across all state-funded primary, secondary and special schools has also increased from 0.08% to 0.10% of pupil enrolments, which is equivalent to around 10 pupils per 10,000.\n\n" +
+                                        "Most (83%) permanent exclusions occurred in secondary schools. The rate of permanent exclusions in secondary schools increased from 0.17% in 2015/16 to 0.20% in 2016/17, which is equivalent to around 20 pupils per 10,000.\n\n" +
+                                        "The rate of permanent exclusions also rose in primary schools, at 0.03%, but decreased in special schools from 0.08% in 2015/16 to 0.07% in 2016/17. Looking at longer-term trends, the rate of permanent exclusions across all state-funded primary, secondary and special schools followed a generally downward trend from 2006/07 when the rate was 0.12% until 2012/13, and has been rising again since then, although rates are still lower now than in 2006/07."
                                 }
                             }
                         },
@@ -1370,7 +1554,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                        "The number of fixed-period exclusions across all state-funded primary, secondary and special schools has increased from 339,360 in 2015/16 to 381,865 in 2016/17. This corresponds to around 2,010 fixed-period exclusions per day1 in 2016/17, up from an average of 1,786 per day in 2015/16.\n\nThere were increases in the number and rate of fixed-period exclusions for state-funded primary and secondary schools and special schools:"
+                                        "The number of fixed-period exclusions across all state-funded primary, secondary and special schools has increased from 339,360 in 2015/16 to 381,865 in 2016/17. This corresponds to around 2,010 fixed-period exclusions per day1 in 2016/17, up from an average of 1,786 per day in 2015/16.\n\n" +
+                                        "There were increases in the number and rate of fixed-period exclusions for state-funded primary and secondary schools and special schools:" +
+                                        "* in state-funded primary schools, the number of fixed-period exclusions increased from 55,740 in 2015/16 to 64,340 in 2016/17, whilst the rate of fixed-period exclusions increased from 1.21 per cent to 1.37%\n\n" +
+                                        "* in state-funded secondary schools, the number of fixed-period exclusions increased from 270,135 in 2015/16 to 302,890 in 2016/17, which corresponded to an increase in the rate of fixed period exclusions from 8.46% to 9.4%\n\n" +
+                                        "* in special schools, the number of fixed-period exclusions increased in special schools from 13,485 in 2015/16 to 14,635 in 2016/17, an increase in the rate of fixed-period exclusions from 12.53% to 13.03%"
                                 }
                             }
                         },
@@ -1388,7 +1576,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                        "In state-funded primary, secondary and special schools, there were 183,475 pupil enrolments, 2.29 per cent, with at least one fixed term exclusion in 2016/17, up from 167,125 pupil enrolments, 2.11 per cent, in 2015/16.\n\nOf those pupils with at least one fixed-period exclusion, 59.1 per cent were excluded only on one occasion, and 1.5 per cent received 10 or more fixed-period exclusions during the year. The percentage of pupils with at least one fixed-period exclusion that went on to receive a permanent one was 3.5 per cent.\n\nThe average length of fixed-period exclusions across state-funded primary, secondary and special schools in 2016/17 was 2.1 days, slightly shorter than in 2015/16.\n\nThe highest proportion of fixed-period exclusions (46.6 per cent) lasted for only one day. Only 2.0 per cent of fixed-period exclusions lasted for longer than one week and longer fixed-period exclusions were more prevalent in secondary schools."
+                                        "In state-funded primary, secondary and special schools, there were 183,475 pupil enrolments, 2.29%, with at least one fixed term exclusion in 2016/17, up from 167,125 pupil enrolments, 2.11%, in 2015/16.\n\n" +
+                                        "Of those pupils with at least one fixed-period exclusion, 59.1% were excluded only on one occasion, and 1.5% received 10 or more fixed-period exclusions during the year. The percentage of pupils with at least one fixed-period exclusion that went on to receive a permanent one was 3.5%.\n\n" +
+                                        "The average length of fixed-period exclusions across state-funded primary, secondary and special schools in 2016/17 was 2.1 days, slightly shorter than in 2015/16.\n\n" +
+                                        "The highest proportion of fixed-period exclusions (46.6%) lasted for only one day. Only 2.0% of fixed-period exclusions lasted for longer than one week and longer fixed-period exclusions were more prevalent in secondary schools."
                                 }
                             }
                         },
@@ -1400,7 +1591,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                        "Persistent disruptive behaviour remained the most common reason for permanent exclusions in state-funded primary, secondary and special schools - accounting for 2,755 (35.7 per cent) of all permanent exclusions in 2016/17. This is equivalent to 3 permanent exclusions per 10,000 pupils. However, in special schools alone, the most common reason for exclusion was physical assault against and adult, which made up 37.8 per cent of all permanent exclusions and 28.1 per cent of all fixed-period exclusions.\n\nAll reasons except bullying and theft saw an increase in permanent exclusions since last year. The most common reasons - persistent disruptive behaviour, physical assault against a pupil and other reasons had the largest increases.\n\nPersistent disruptive behaviour is also the most common reason for fixed-period exclusions. The 108,640 fixed-period exclusions for persistent disruptive behaviour in state-funded primary, secondary and special schools made up 28.4 per cent of all fixed-period exclusions, up from 27.7 per cent in 2015/16. This is equivalent to around 135 fixed-period exclusions per 10,000 pupils.\n\nAll reasons saw an increase in fixed-period exclusions since last year. Persistent disruptive behaviour and other reasons saw the biggest increases."
+                                        "Persistent disruptive behaviour remained the most common reason for permanent exclusions in state-funded primary, secondary and special schools - accounting for 2,755 (35.7%) of all permanent exclusions in 2016/17. This is equivalent to 3 permanent exclusions per 10,000 pupils. However, in special schools alone, the most common reason for exclusion was physical assault against and adult, which made up 37.8% of all permanent exclusions and 28.1% of all fixed-period exclusions.\n\n" +
+                                        "All reasons except bullying and theft saw an increase in permanent exclusions since last year. The most common reasons - persistent disruptive behaviour, physical assault against a pupil and other reasons had the largest increases.\n\n" +
+                                        "Persistent disruptive behaviour is also the most common reason for fixed-period exclusions. The 108,640 fixed-period exclusions for persistent disruptive behaviour in state-funded primary, secondary and special schools made up 28.4% of all fixed-period exclusions, up from 27.7% in 2015/16. This is equivalent to around 135 fixed-period exclusions per 10,000 pupils.\n\n" +
+                                        "All reasons saw an increase in fixed-period exclusions since last year. Persistent disruptive behaviour and other reasons saw the biggest increases."
                                 }
                             }
                         },
@@ -1412,7 +1606,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                        "In 2016/17 we saw a similar pattern by pupil characteristics to previous years. The groups that we usually expect to have higher rates are the ones that have increased exclusions since last year e.g. boys, pupils with special educational needs, pupils known to be eligible for and claiming free school meals and national curriculum years 9 and 10.\n\n**Age, national curriculum year group and gender**\n\n*   Over half of all permanent (57.2 per cent) and fixed-period (52.6 per cent) exclusions occur in national curriculum year 9 or above.\n\n*   A quarter (25.0 per cent) of all permanent exclusions were for pupils aged 14, and pupils of this age group also had the highest rate of fixed-period exclusion, and the highest rate of pupils receiving one or more fixed-period exclusion.\n\n*   The permanent exclusion rate for boys (0.15 per cent) was over three times higher than that for girls (0.04 per cent) and the fixed-period exclusion rate was almost three times higher (6.91 compared with 2.53 per cent).\n\n**Free school meals (FSM) eligibility**\n\n*   Pupils known to be eligible for and claiming free school meals (FSM) had a permanent exclusion rate of 0.28 per cent and fixed period exclusion rate of 12.54 per cent - around four times higher than those who are not eligible (0.07 and 3.50 per cent respectively).\n\n*   Pupils known to be eligible for and claiming free school meals (FSM) accounted for 40.0 per cent of all permanent exclusions and 36.7 per cent of all fixed-period exclusions. Special educational need (SEN)\n\n*   Pupils with identified special educational needs (SEN) accounted for around half of all permanent exclusions (46.7 per cent) and fixed-period exclusions (44.9 per cent).\n\n*   Pupils with SEN support had the highest permanent exclusion rate at 0.35 per cent. This was six times higher than the rate for pupils with no SEN (0.06 per cent).\n\n*   Pupils with an Education, Health and Care (EHC) plan or with a statement of SEN had the highest fixed-period exclusion rate at 15.93 per cent - over five times higher than pupils with no SEN (3.06 per cent).\n\n**Ethnic group**\n\n*   Pupils of Gypsy/Roma and Traveller of Irish Heritage ethnic groups had the highest rates of both permanent and fixed-period exclusions, but as the population is relatively small these figures should be treated with some caution.\n\n*   Black Caribbean pupils had a permanent exclusion rate nearly three times higher (0.28 per cent) than the school population as a whole (0.10 per cent). Pupils of Asian ethnic groups had the lowest rates of permanent and fixed-period exclusion."
+                                        "In 2016/17 we saw a similar pattern by pupil characteristics to previous years. The groups that we usually expect to have higher rates are the ones that have increased exclusions since last year e.g. boys, pupils with special educational needs, pupils known to be eligible for and claiming free school meals and national curriculum years 9 and 10.\n\n" +
+                                        "**Age, national curriculum year group and gender**\n\n" +
+                                        "* Over half of all permanent (57.2%) and fixed-period (52.6%) exclusions occur in national curriculum year 9 or above.\n\n" +
+                                        "* A quarter (25.0%) of all permanent exclusions were for pupils aged 14, and pupils of this age group also had the highest rate of fixed-period exclusion, and the highest rate of pupils receiving one or more fixed-period exclusion.\n\n" +
+                                        "* The permanent exclusion rate for boys (0.15%) was over three times higher than that for girls (0.04%) and the fixed-period exclusion rate was almost three times higher (6.91 compared with 2.53%).\n\n" +
+                                        "**Free school meals (FSM) eligibility**\n\n" +
+                                        "* Pupils known to be eligible for and claiming free school meals (FSM) had a permanent exclusion rate of 0.28% and fixed period exclusion rate of 12.54% - around four times higher than those who are not eligible (0.07 and 3.50% respectively).\n\n" +
+                                        "* Pupils known to be eligible for and claiming free school meals (FSM) accounted for 40.0% of all permanent exclusions and 36.7% of all fixed-period exclusions. Special educational need (SEN)\n\n" +
+                                        "* Pupils with identified special educational needs (SEN) accounted for around half of all permanent exclusions (46.7%) and fixed-period exclusions (44.9%).\n\n" +
+                                        "* Pupils with SEN support had the highest permanent exclusion rate at 0.35%. This was six times higher than the rate for pupils with no SEN (0.06%).\n\n" +
+                                        "* Pupils with an Education, Health and Care (EHC) plan or with a statement of SEN had the highest fixed-period exclusion rate at 15.93% - over five times higher than pupils with no SEN (3.06%).\n\n" +
+                                        "**Ethnic group**\n\n" +
+                                        "* Pupils of Gypsy/Roma and Traveller of Irish Heritage ethnic groups had the highest rates of both permanent and fixed-period exclusions, but as the population is relatively small these figures should be treated with some caution.\n\n" +
+                                        "* Black Caribbean pupils had a permanent exclusion rate nearly three times higher (0.28%) than the school population as a whole (0.10%). Pupils of Asian ethnic groups had the lowest rates of permanent and fixed-period exclusion."
                                 }
                             }
                         },
@@ -1424,7 +1631,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                        "Independent review Panel definition: Parents (and pupils if aged over 18) are able to request a review of a permanent exclusion. An independent review panel’s role is to review the decision of the governing body not to reinstate a permanently excluded pupil. The panel must consider the interests and circumstances of the excluded pupil, including the circumstances in which the pupil was excluded and have regard to the interests of other pupils and people working at the school.\n\nIn 2016/17 in maintained primary, secondary and special schools and academies there were 560 reviews lodged with independent review panels of which 525 (93.4%) were determined and 45 (8.0%) resulted in an offer of reinstatement."
+                                        "Independent review Panel definition: Parents (and pupils if aged over 18) are able to request a review of a permanent exclusion. An independent review panel’s role is to review the decision of the governing body not to reinstate a permanently excluded pupil. The panel must consider the interests and circumstances of the excluded pupil, including the circumstances in which the pupil was excluded and have regard to the interests of other pupils and people working at the school.\n\n" +
+                                        "In 2016/17 in maintained primary, secondary and special schools and academies there were 560 reviews lodged with independent review panels of which 525 (93.4%) were determined and 45 (8.0%) resulted in an offer of reinstatement."
                                 }
                             }
                         },
@@ -1436,7 +1644,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                        "The rate of permanent exclusion in pupil referral units decreased from 0.14 per cent in 2015/16 to 0.13 in 2016/17. After an increase from 2013/14 to 2014/15, permanent exclusions rates have remained fairly steady. There were 25,815 fixed-period exclusions in pupil referral units in 2016/17, up from 23,400 in 2015/16. The fixed period exclusion rate has been steadily increasing since 2013/14.\n\nThe percentage of pupil enrolments in pupil referral units who one or more fixed-period exclusion was 59.17 per cent in 2016/17, up from 58.15 per cent in 2015/16."
+                                        "The rate of permanent exclusion in pupil referral units decreased from 0.14% in 2015/16 to 0.13 in 2016/17. After an increase from 2013/14 to 2014/15, permanent exclusions rates have remained fairly steady. There were 25,815 fixed-period exclusions in pupil referral units in 2016/17, up from 23,400 in 2015/16. The fixed period exclusion rate has been steadily increasing since 2013/14.\n\n" +
+                                        "The percentage of pupil enrolments in pupil referral units who one or more fixed-period exclusion was 59.17% in 2016/17, up from 58.15% in 2015/16."
                                 }
                             }
                         },
@@ -1448,13 +1657,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                        "There is considerable variation in the permanent and fixed-period exclusion rate at local authority level (see accompanying maps on the web page).\n\nThe regions with the highest overall rates of permanent exclusion across state-funded primary, secondary and special schools are the West Midlands and the North West (at 0.14 per cent). The regions with the lowest rates are the South East (at 0.06 per cent) and Yorkshire and the Humber (at 0.07 per cent).\n\nThe region with the highest fixed-period exclusion rate is Yorkshire and the Humber (at 7.22 per cent), whilst the lowest rate was seen in Outer London (3.49 per cent).\n\nThese regions also had the highest and lowest rates of exclusion in the previous academic year."
+                                        "There is considerable variation in the permanent and fixed-period exclusion rate at local authority level (see accompanying maps on the web page).\n\n" +
+                                        "The regions with the highest overall rates of permanent exclusion across state-funded primary, secondary and special schools are the West Midlands and the North West (at 0.14%). The regions with the lowest rates are the South East (at 0.06%) and Yorkshire and the Humber (at 0.07%).\n\n" +
+                                        "The region with the highest fixed-period exclusion rate is Yorkshire and the Humber (at 7.22%), whilst the lowest rate was seen in Outer London (3.49%).\n\n" +
+                                        "These regions also had the highest and lowest rates of exclusion in the previous academic year."
                                 }
                             }
                         }
                     }
                 },
-
+                /*
                 // // school pupil numbers
                 new Release
                 {
@@ -1501,7 +1713,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                     }
                 },
-
+                */
+                /*  
                 // // GCSE / KS4
                 new Release
                 {
@@ -1750,6 +1963,132 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             }
                         },
                     }
+                },
+                */
+                // Secondary and primary schools applications offers
+                new Release
+                {
+                  Id = new Guid("324c292f-2198-4591-87e5-4fcc8e238424"),
+                  Title = "Secondary and primary school applications and offers",
+                  ReleaseName = "March and April 2018",
+                  PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
+                  Published = new DateTime(2018, 6, 14),
+                  Slug = "2018-03-04",
+                  Summary = "",
+                  KeyStatistics = new DataBlock
+                  {
+                    DataBlockRequest = new DataBlockRequest
+                    {
+                      subjectId = 17,
+                      geographicLevel = "National",
+                      startYear = "2014",
+                      endYear = "2018",
+                      filters = new List<string> { "845" /*, "848"*/ },
+                      indicators = new List<string> { "193" }
+                    },
+                    Summary = new Summary
+                    {
+                      dataKeys = new List<string>
+                      {
+                        "193"
+                      },
+                      description = new MarkDownBlock
+                      {
+                        Body = 
+                          "* The majority of applicants for a school place received a preferred offer\n" +
+                          "* The percentage receiving secondary a first-choice offer drops as applications increase\n" +
+                          "* A slightly increased proportion received a primary first-choice offer as applications fall\n"
+                      }
+                    }
+                  },
+                  Content = new List<ContentSection>
+                  {
+                    new ContentSection
+                    {
+                      Order = 1, Heading = "About this release",
+                      Caption = "",
+                      Content = new List<IContentBlock>
+                      {
+                        new MarkDownBlock
+                        {
+                          Body = "This statistical release provides the number of offers made to applicants for both secondary and primary school places and the proportion which have received preferred offers (1st, 2nd, 3rd preference etc). The data is collected from local authorities, where it is produced as part of the annual application and offer process for applicants requiring a place to start at secondary or at primary school in September 2018. The offers were made, and data collected, based on the national offer days of 1 March 2018 (secondary) and 16 April 2018 (primary). "
+                        }
+                      }
+                    },
+                    new ContentSection
+                    {
+                      Order = 2, Heading = "Secondary applications and offers",
+                      Caption = "",
+                      Content = new List<IContentBlock>
+                      {
+                        new MarkDownBlock
+                        {
+                          Body = "These figures come from the application and offer process undertaken by local authorities to enable them to send out offers of a place in a secondary school to all applicants on the national offer day of 1 March 2018. The secondary figures have been collected since 2008 and a time series of the key figures has been provided below. 582,761 applications were received for a place at secondary school in 2018, a 3.6% increase on 2017. This continues the increase first seen since 2013, when the rise in births which began in the previous decade started to reach secondary school age, and follows a 2.6% increase between 2016 and 2017. Since 2013, when secondary applications were at their lowest, there has been a 16.6% increase in the number of parents applying for a secondary school place for their child. The proportion of secondary applicants receiving an offer of their first choice school has dropped from 83.5% in 2017 to 82.1% in 2018. The proportion of applicants who received an offer of any of their preferred schools also dropped slightly to 95.5% in 2018 (from 96.1%)."
+                        },
+                        new DataBlock
+                        {
+                          Heading = "Timeseries of key secondary preference rates, England",
+                        },
+                      }
+                    },
+                    new ContentSection
+                    {
+                      Order = 3, Heading = "Secondary applications and offers geographical variation",
+                      Caption = "",
+                      Content = new List<IContentBlock>
+                      {
+                        new MarkDownBlock
+                        {
+                          Body = "At local authority level Northumberland (98.1%), East Riding of Yorkshire (96.7%) and Bedford (96.4%) achieved the three best first preference rates in 2018. Northumberland has been the top performer in this measure for the last three years. As in previous years, the lowest first preference rates at secondary level are all in London. Omitting City of London (which has a tiny number of application and has no secondary schools), Hammersmith & Fulham (51.4%), Kensington & Chelsea (54.3%) and Lambeth (55.2%) achieved the lowest rates in 2018. Hammersmith & Fulham has had the lowest first preference rate for the last three years. The higher number of practical options available to London applicants and ability to name six preferences may encourage parents to make more speculative choices for their top preferences. There is much less regional variation in the proportions receiving any preferred offer compared to those for receiving a first preference (see chart below)."
+                        },
+                        new DataBlock
+                        {
+                          Heading = "Chart showing Secondary school preferences by region, 2018"
+                        },
+                        new MarkDownBlock
+                        {
+                          Body = "An applicant can apply for any school, including those situated in another local authority. Their authority liaises with the requested school, to ensure the applicant is considered under the admissions criteria, and makes the offer. In 2018 91.6% of secondary offers made were of schools inside the home authority. This figure has been stable for the past few years. This release concentrates on the headline figures for the proportion of children receiving their first preference or a preferred offer. However, the main tables provide more information such as the number of places available, the proportion of children for whom a preferred offer was not received and whether the applicants were provided with offers within or outside their home authority."
+                        }
+                      }
+                    },
+                    new ContentSection
+                    {
+                      Order = 4, Heading = "Primary applications and offers",
+                      Caption = "",
+                      Content = new List<IContentBlock>
+                      {
+                        new MarkDownBlock
+                        {
+                          Body = "The primary table is based on the offers made by local authorities on the primary national offer day of 16 April 2018. This national offer day was introduced in 2014, which was the first year that primary application and offer data were collected and published. A timeseries of the key figures has been provided below. The number of applications for a primary school place in 2018 was 608,180, 2.0% lower than in 2017 (620,330). This decrease is a result of the notable drop in births in 2013, which is now feeding into primary school applications. The number of applications is the lowest seen in the five years that this data has been collected. The proportion of applicants receiving their first preference offer has risen to 91.0%, up 1.0 percentage point on 2017. The proportion receiving an offer of any of their preferences has also increased slightly, from 97.7% (2017) to 98.1%. "
+                        },
+                        new DataBlock
+                        {
+                          Heading = "Table showing Timeseries of key primary preference rates, England Entry into academic year"
+                        }
+                      }
+                    },
+                    new ContentSection
+                    {
+                      Order = 5, Heading = "Primary applications and offers geographical variation",
+                      Caption = "",
+                      Content = new List<IContentBlock>
+                      {
+                        new MarkDownBlock
+                        {
+                          Body = "At local authority level East Riding of Yorkshire (97.6%), Northumberland (97.4%) and Rutland (97.4%) achieved the best first preference rates in 2018. All these authorities are in the top three for the first time in the last three years. The local authorities with the worst first preference rates in 2018 were Kensington & Chelsea with 68.4%, Camden (76.5%) and Hammersmith & Fulham (76.6%). Both Kensington & Chelsea and Hammersmith & Fulham have been in the bottom three performers in this measure for the last three years. Although overall results are better at primary level than at secondary, for London local authorities the improvement is much more marked. In 2018, for London as a whole, the first preference rate at primary level was 86.6% (85.9% in 2017), compared to 66.0% at secondary level (68.2% in 2017)."
+                        },
+                        new DataBlock
+                        {
+                          Heading = "Chart showing Primary school preferences by region, 2018"
+                        },
+                        new MarkDownBlock
+                        {
+                          Body =
+                            "As in previous years, at primary level a smaller proportion of offers were made of schools outside the applicant’s local authority compared to secondary level. In 2018 97.1% of offers were inside the home authority. This has remained stable for the five years for which primary data is available."
+                        }
+                      }
+                    },
+                  }
                 }
             );
 
@@ -1827,6 +2166,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("8900bab9-74ec-4b5d-8be1-648ff4870167"),
                     ReleaseId = new Guid("e7ae88fb-afaf-4d51-a78a-bbb2de671daf"),
                     On = new DateTime(2018, 6, 20),
+                    Reason = "First published."
+                },
+                new Update
+                {
+                    Id = new Guid("448ca9ea-0cd2-4e6d-b85b-76c3ef7d3bf9"),
+                    ReleaseId = new Guid("324c292f-2198-4591-87e5-4fcc8e238424"),
+                    On = new DateTime(2018, 6, 14),
                     Reason = "First published."
                 }
             );
