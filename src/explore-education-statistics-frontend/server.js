@@ -58,7 +58,7 @@ async function startServer(port = process.env.PORT || 3000) {
           'https://static.hotjar.com',
         ],
         fontSrc: ["'self'", 'https://static.hotjar.com'],
-        connectSrc: cspConnectSrc,
+        connectSrc: process.env.NODE_ENV !== 'production' ? ['*'] : cspConnectSrc,
         frameSrc: ["'self'", 'https://vars.hotjar.com '],
         frameAncestors: ["'self'"],
         childSrc: ["'self'", 'https://vars.hotjar.com'],
