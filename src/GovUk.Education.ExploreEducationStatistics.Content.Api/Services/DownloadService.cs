@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -45,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             return mapper.Map<IEnumerable<ThemeTree>>(themes);
         }
 
-        private Release GetLatestRelease(Publication publication)
+        private static Release GetLatestRelease(Publication publication)
         {
             return publication.Releases.ToList()
                 .OrderByDescending(release => release.Published)
@@ -57,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             return _context.Releases.Include(release => release.Publication.Topic.Theme);
         }
 
-        private IEnumerable<string> ListFiles(string publication, string release)
+        private IEnumerable<FileInfo> ListFiles(string publication, string release)
         {
             return _fileStorageService.ListFiles(publication, release);
         }
