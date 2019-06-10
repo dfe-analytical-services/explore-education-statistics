@@ -69,7 +69,6 @@ async function startServer(port = process.env.PORT || 3000) {
     helmet.featurePolicy({
       features: {
         fullscreen: ["'self'"],
-        vibrate: ["'none'"],
       },
     }),
   );
