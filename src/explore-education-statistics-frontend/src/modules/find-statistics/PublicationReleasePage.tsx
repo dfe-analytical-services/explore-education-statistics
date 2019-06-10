@@ -331,22 +331,33 @@ class PublicationReleasePage extends Component<Props> {
           </AccordionSection>
           <AccordionSection heading="Contact us" headingTag="h3">
             <p>
-              If you have a specific enquiry about [[ THEME ]] statistics and
-              data:
+              If you have a specific enquiry about {data.publication.theme}{' '}
+              statistics and data:
             </p>
-            <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-              [[ TEAM NAME ]]
-            </h4>
-            <p className="govuk-!-margin-top-0">
-              Email <br />
-              <a href="mailto:schools.statistics@education.gov.uk">
-                [[ TEAM EMAIL ADDRESS ]]
-              </a>
-            </p>
-            <p>
-              Telephone: [[ LEAD STATISTICIAN NAME ]] <br /> [[ LEAD
-              STATISTICIAN TEL. NO.]]
-            </p>
+            {data.publication.contact && (
+              <div>
+                <p className="govuk-!-margin-top-0">
+                  <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+                    {data.publication.contact.teamName}
+                  </h4>
+                </p>
+                <p className="govuk-!-margin-top-0">
+                  Email <br />
+                  <a
+                    href={`mailto:${data.publication.contact.teamEmail}`}
+                    className="govuk-link"
+                  >
+                    {data.publication.contact.teamEmail}
+                  </a>
+                </p>
+                <p>
+                  Telephone: {data.publication.contact.contactName}
+                  <br />
+                  {data.publication.contact.contactTelNo}
+                </p>
+              </div>
+            )}
+
             <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
               Press office
             </h4>

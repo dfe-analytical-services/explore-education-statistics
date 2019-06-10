@@ -31,5 +31,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid TopicId { get; set; }
 
         public Topic Topic { get; set; }
+        
+        public Guid ContactId { get; set; }
+
+        public Contact Contact { get; set; }
     }
 }

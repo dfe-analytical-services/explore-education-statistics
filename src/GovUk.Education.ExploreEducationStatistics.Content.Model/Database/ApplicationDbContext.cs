@@ -21,6 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Publication> Publications { get; set; }
         public DbSet<Release> Releases { get; set; }
+        public DbSet<Contact> Contacts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -434,6 +435,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
               }
             );
 
+            modelBuilder.Entity<Contact>().HasData(
+              new Contact
+              {
+                  Id = new Guid("11bb7387-e85e-4571-9669-8a760dcb004f"),
+                  TeamName = "Simon's Team",
+                  TeamEmail = "teamshakes@gmail.com",
+                  ContactName = "Simon Shakespeare",
+                  ContactTelNo = "0114 262 1619"
+              }
+            );
+
             modelBuilder.Entity<Publication>().HasData(
               new Publication
               {
@@ -442,7 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Summary = "",
                   TopicId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"),
                   Slug = "30-hours-free-childcare",
-                  LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-childcare-and-early-years#30-hours-free-childcare")
+                  LegacyPublicationUrl = new Uri("https://www.gov.uk/government/collections/statistics-childcare-and-early-years#30-hours-free-childcare"),
               },
               new Publication
               {
@@ -758,7 +770,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Slug = "pupil-absence-in-schools-in-england",
                   NextUpdate = new DateTime(2018, 3, 22),
                   DataSource =
-                    "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)"
+                    "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)",
+                  ContactId = new Guid("11bb7387-e85e-4571-9669-8a760dcb004f")
               },
               new Publication
               {

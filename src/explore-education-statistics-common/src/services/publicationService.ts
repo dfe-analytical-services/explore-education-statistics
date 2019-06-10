@@ -21,6 +21,13 @@ export interface Publication {
     description: string;
     url: string;
   }[];
+  theme: string;
+  contact: {
+    teamName: string;
+    teamEmail: string;
+    contactName: string;
+    contactTelNo: string;
+  };
 }
 
 export interface DataQuery {
