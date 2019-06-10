@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -48,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             if (!blob.Exists())
             {
-                throw new ArgumentException("File not found: {filename}", GetFilePath(blob));
+                throw new ArgumentException("File not found: {filename}", blob.Name);
             }
 
             var stream = new MemoryStream();
@@ -61,25 +59,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        public IEnumerable<string> ListFiles(string publication, string release)
-        {
-            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
-
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(containerName);
-
-            var list = blobContainer.ListBlobs($"{publication}/{release}", true);
-
-            return list.Select(GetFilePath);
-        }
-
-        private static bool IsFileReleased(CloudBlob blob)
+        private static bool IsFileReleased(ICloudBlob blob)
         {
             if (!blob.Exists())
             {
-                throw new ArgumentException("File not found: {filename}", GetFilePath(blob));
+                throw new ArgumentException("File not found: {filename}", blob.Name);
             }
-            
+
             if (blob.Metadata.TryGetValue("releasedatetime", out var releaseDateTime))
             {
                 return DateTime.Compare(ParseDateTime(releaseDateTime), DateTime.Now) <= 0;
@@ -91,12 +77,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private static DateTime ParseDateTime(string dateTime)
         {
             return DateTime.ParseExact(dateTime, "o", CultureInfo.InvariantCulture, DateTimeStyles.None);
-        }
-
-        private static string GetFilePath(IListBlobItem blob)
-        {
-            var path = blob.Uri.LocalPath;
-            return path.Substring(path.IndexOf(containerName) + containerName.Length);
         }
     }
 }

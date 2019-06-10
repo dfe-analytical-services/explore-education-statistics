@@ -11,8 +11,9 @@ import Yup from '@common/lib/validation/yup';
 import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import { Comparison } from '@common/types/util';
+import useResetFormOnPreviousStep from '@frontend/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
-import React from 'react';
+import React, { useRef } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
@@ -28,9 +29,19 @@ interface Props {
 }
 
 const TimePeriodForm = (props: Props & InjectedWizardProps) => {
-  const { options, onSubmit, isActive, goToNextStep } = props;
+  const {
+    options,
+    onSubmit,
+    isActive,
+    goToNextStep,
+    currentStep,
+    stepNumber,
+  } = props;
 
+  const formikRef = useRef<Formik<FormValues>>(null);
   const formId = 'timePeriodForm';
+
+  useResetFormOnPreviousStep(formikRef, currentStep, stepNumber);
 
   const timePeriodOptions: SelectOption[] = [
     {
@@ -51,18 +62,18 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
     </WizardStepHeading>
   );
 
-  const initialValues = {
-    start: '',
-    end: '',
-  };
-
   return (
     <Formik<FormValues>
+      enableReinitialize
+      ref={formikRef}
       onSubmit={async values => {
         await onSubmit(values);
         goToNextStep();
       }}
-      initialValues={initialValues}
+      initialValues={{
+        start: '',
+        end: '',
+      }}
       validationSchema={Yup.object<FormValues>({
         end: Yup.string()
           .required('End date is required')
@@ -137,14 +148,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
               />
             </FormFieldset>
 
-            <WizardStepFormActions
-              {...props}
-              form={form}
-              formId={formId}
-              onPreviousStep={() => {
-                form.resetForm(initialValues);
-              }}
-            />
+            <WizardStepFormActions {...props} form={form} formId={formId} />
           </Form>
         ) : (
           <>

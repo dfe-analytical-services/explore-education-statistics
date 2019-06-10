@@ -3,6 +3,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import PrintThisPage from '@common/components/PrintThisPage';
+import RelatedAside from '@common/components/RelatedAside';
 import SearchForm from '@common/components/SearchForm';
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import { baseUrl } from '@common/services/api';
@@ -63,84 +64,133 @@ class PublicationReleasePage extends Component<Props> {
       >
         <div className={styles.releaseHeader}>
           <PageTitle title={data.title} />
-
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-two-thirds">
-              <dl className="dfe-meta-content govuk-!-margin-0">
-                <dt className="govuk-caption-m">Published: </dt>
-                <dd>
-                  <strong>
-                    <FormattedDate>{data.published}</FormattedDate>
-                  </strong>
-                </dd>
-              </dl>
-            </div>
-            <div className="govuk-grid-column-one-third">
-              <SearchForm />
-            </div>
-          </div>
         </div>
         <div className={classNames('govuk-grid-row', styles.releaseIntro)}>
           <div className="govuk-grid-column-two-thirds">
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-three-quarters">
                 {!release && (
-                  <strong className="govuk-tag">
+                  <strong className="govuk-tag govuk-!-margin-right-6">
                     {' '}
                     This is the latest data{' '}
                   </strong>
                 )}
-                <ReactMarkdown className="govuk-body" source={data.summary} />
+                <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
+                  <dt className="govuk-caption-m">Published: </dt>
+                  <dd>
+                    <strong>
+                      <FormattedDate>{data.published}</FormattedDate>{' '}
+                    </strong>
+                  </dd>
+                  <div>
+                    <dt className="govuk-caption-m">Next update: </dt>
+                    <dd>
+                      <strong>
+                        <FormattedDate>
+                          {data.publication.nextUpdate}
+                        </FormattedDate>
+                      </strong>
+                    </dd>
+                  </div>
+                </dl>
+                <Link
+                  unvisited
+                  to={`/subscriptions?slug=${data.publication.slug}`}
+                  data-testid={`subsciption-${data.publication.slug}`}
+                >
+                  Subscribe to email updates
+                </Link>
               </div>
               <div className="govuk-grid-column-one-quarter">
                 <img
                   src="/static/images/UKSA-quality-mark.jpg"
                   alt="UK statistics authority quality mark"
-                  height="130"
-                  width="130"
+                  height="120"
+                  width="120"
                 />
               </div>
             </div>
+
+            <ReactMarkdown className="govuk-body" source={data.summary} />
+
             <Details summary="Download data files">
-              <ul className="govuk-list">
+              <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <a
-                    href={`${baseUrl.data}/downloads/${
-                      data.publication.slug
-                    }/csv/`}
+                  <Link
+                    to={`${
+                      baseUrl.data
+                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_by_characteristic.csv`}
                     className="govuk-link"
                   >
-                    Download .csv files
-                  </a>
+                    Absence by characteristic
+                  </Link>
+                  {` `}(csv, 100mb)
                 </li>
                 <li>
-                  <a
-                    href={`${baseUrl.data}/downloads/${
-                      data.publication.slug
-                    }/excel/`}
+                  <Link
+                    to={`${
+                      baseUrl.data
+                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_by_geographic_level.csv`}
                     className="govuk-link"
                   >
-                    Download Excel files
-                  </a>
+                    Absence by geographic level
+                  </Link>
+                  {` `}(csv, 100mb)
                 </li>
                 <li>
-                  <a
-                    href={`${baseUrl.data}/downloads/${
-                      data.publication.slug
-                    }/pdf/`}
+                  <Link
+                    to={`${
+                      baseUrl.data
+                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_by_term.csv`}
                     className="govuk-link"
                   >
-                    Download .pdf files
-                  </a>
+                    Absence by term
+                  </Link>
+                  {` `}(csv, 100mb)
                 </li>
                 <li>
-                  <a href={baseUrl.data} className="govuk-link">
-                    Access API
-                  </a>{' '}
-                  -{' '}
-                  <a href={baseUrl.data} className="govuk-link">
-                    What is an API?
-                  </a>
+                  <Link
+                    to={`${
+                      baseUrl.data
+                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_for_four_year_olds.csv`}
+                    className="govuk-link"
+                  >
+                    Absence for four year olds
+                  </Link>
+                  {` `}(csv, 100mb)
+                </li>
+                <li>
+                  <Link
+                    to={`${
+                      baseUrl.data
+                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_in_prus.csv`}
+                    className="govuk-link"
+                  >
+                    Absence in prus
+                  </Link>
+                  {` `}(csv, 100mb)
+                </li>
+                <li>
+                  <Link
+                    to={`${
+                      baseUrl.data
+                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_number_missing_at_least_one_session_by_reason.csv`}
+                    className="govuk-link"
+                  >
+                    Absence number missing at least one session by reason
+                  </Link>
+                  {` `}(csv, 100mb)
+                </li>
+                <li>
+                  <Link
+                    to={`${
+                      baseUrl.data
+                    }/api/download/pupil-absence-in-schools-in-england/2016-17/absence_rate_percent_bands.csv`}
+                    className="govuk-link"
+                  >
+                    Absence rate percent bands
+                  </Link>
+                  {` `}(csv, 100mb)
                 </li>
               </ul>
               <h2 className="govuk-heading-m govuk-!-margin-top-9">
@@ -153,11 +203,15 @@ class PublicationReleasePage extends Component<Props> {
                 Explore data
               </Link>
             </Details>
+
+            <div className="govuk-!-margin-top-3 govuk-!-margin-bottom-3">
+              <SearchForm />
+            </div>
           </div>
 
           <div className="govuk-grid-column-one-third">
-            <aside className="app-related-items">
-              <h3 id="subsection-title">About these statistics</h3>
+            <RelatedAside>
+              <h3>About these statistics</h3>
 
               <dl className="dfe-meta-content" data-testid="release-period">
                 <dt className="govuk-caption-m">For school year: </dt>
@@ -194,7 +248,6 @@ class PublicationReleasePage extends Component<Props> {
                   </Details>
                 </dd>
               </dl>
-
               <dl className="dfe-meta-content" data-testid="last-updated">
                 <dt className="govuk-caption-m">Last updated: </dt>
                 <dd>
@@ -213,25 +266,6 @@ class PublicationReleasePage extends Component<Props> {
                   </Details>
                 </dd>
               </dl>
-
-              <dl className="dfe-meta-content" data-testid="next-update">
-                <dt className="govuk-caption-m">Next update:</dt>
-                <dd>
-                  <strong>
-                    <FormattedDate>{data.publication.nextUpdate}</FormattedDate>
-                  </strong>
-                  <div>
-                    <Link
-                      unvisited
-                      to={`/subscriptions?slug=${data.publication.slug}`}
-                      data-testid={`subsciption-${data.publication.slug}`}
-                    >
-                      Notify me
-                    </Link>
-                  </div>
-                </dd>
-              </dl>
-
               {/* <h2
                 className="govuk-heading-m govuk-!-margin-top-6"
                 id="related-content"
@@ -245,7 +279,7 @@ class PublicationReleasePage extends Component<Props> {
                   </li>
                 </ul>
               </nav> */}
-            </aside>
+            </RelatedAside>
           </div>
         </div>
         <hr />

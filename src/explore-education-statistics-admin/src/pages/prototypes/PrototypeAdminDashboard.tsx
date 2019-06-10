@@ -1,13 +1,14 @@
+import AdminDashboardApprovedForPublication from '@admin/pages/prototypes/components/AdminDashboardApprovedForPublication';
+import AdminDashboardNeedsWork from '@admin/pages/prototypes/components/AdminDashboardNeedsWork';
+import AdminDashboardPublications from '@admin/pages/prototypes/components/AdminDashboardPublications';
+import AdminDashboardReadyForApproval from '@admin/pages/prototypes/components/AdminDashboardReadyForApproval';
+import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React from 'react';
 import { RouteChildrenProps } from 'react-router';
-import AdminDashboardPublications from '@admin/pages/prototypes/components/AdminDashboardPublications';
-import AdminDashboardReadyForApproval from '@admin/pages/prototypes/components/AdminDashboardReadyForApproval';
-import AdminDashboardNeedsWork from '@admin/pages/prototypes/components/AdminDashboardNeedsWork';
-import AdminDashboardApprovedForPublication from '@admin/pages/prototypes/components/AdminDashboardApprovedForPublication';
-import PrototypePage from './components/PrototypePage';
 import Link from '../../components/Link';
+import PrototypePage from './components/PrototypePage';
 
 const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
   return (
@@ -23,20 +24,15 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
           </h1>
         </div>
         <div className="govuk-grid-column-one-third">
-          <aside className="app-related-items">
-            <h2 className="govuk-heading-m" id="releated-content">
-              Help and guidance
-            </h2>
-            <nav role="navigation" aria-labelledby="subsection-title">
-              <ul className="govuk-list">
-                <li>
-                  <Link to="/prototypes/methodology-home">
-                    Administrators guide{' '}
-                  </Link>
-                </li>
-              </ul>
-            </nav>
-          </aside>
+          <RelatedInformation heading="Help and guidance">
+            <ul className="govuk-list">
+              <li>
+                <Link to="/prototypes/methodology-home">
+                  Administrators guide{' '}
+                </Link>
+              </li>
+            </ul>
+          </RelatedInformation>
         </div>
       </div>
       <Tabs>

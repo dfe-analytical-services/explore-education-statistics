@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces
@@ -6,6 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interf
     {
         Release GetRelease(string id);
         
-        Release GetLatestRelease(string id);
+        ReleaseViewModel GetLatestRelease(string id);
     }
 }

@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
     public class Topic
     {
-        [Key] [Required] public Guid Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required] public string Title { get; set; }
 
