@@ -28,9 +28,9 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
       <form action="/prototypes/publication-create-new-absence-config">
         <FormGroup>
           <FormRadioGroup
-            legend="Release type"
-            id="release-type"
-            name="release-type"
+            legend="Time period coverage "
+            id="time-period"
+            name="time-period"
             value={value}
             onChange={event => {
               setValue(event.target.value);
@@ -42,10 +42,6 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                 value: 'academic-year',
                 conditional: (
                   <FormFieldset id="test" legend="">
-                    <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
-                      Release period
-                    </legend>
-
                     <FormGroup>
                       <FormTextInput
                         id="release-period"
@@ -108,7 +104,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                 value: 'calendar-year',
                 conditional: (
                   <FormGroup>
-                    <FormFieldset id="calendar year" legend="Release period">
+                    <FormFieldset id="calendar year" legend="">
                       <div className="govuk-form-group">
                         <label htmlFor="calendar-year" className="govuk-label">
                           Year
@@ -305,6 +301,16 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
             />
           </FormFieldset>
         </FormGroup>
+        <dl className="govuk-summary-list govuk-width-container">
+          <div className="govuk-summary-list__row">
+            <dt className="govuk-summary-list__key">Email:</dt>
+            <dd className="govuk-summary-list__value">example@email.co.uk</dd>
+          </div>
+          <div className="govuk-summary-list__row">
+            <dt className="govuk-summary-list__key">Telephone:</dt>
+            <dd className="govuk-summary-list__value">07954 765423</dd>
+          </div>
+        </dl>
         <fieldset className="govuk-fieldset">
           <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
             Schedule publish date
@@ -366,6 +372,134 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
             </div>
           </div>
         </fieldset>
+        <fieldset className="govuk-fieldset govuk-!-margin-top-6 govuk-!-margin-bottom-6">
+          <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
+            Next release expected
+          </legend>
+          <div className="govuk-date-input" id="schedule-publish-date">
+            <div className="govuk-date-input__item">
+              <div className="govuk-form-group">
+                <label
+                  htmlFor="schedule-day"
+                  className="govuk-label govuk-date-input__label"
+                >
+                  Day
+                </label>
+                <input
+                  className="govuk-input govuk-date-input__inout govuk-input--width-2"
+                  id="schedule-day"
+                  name="schedule-day"
+                  type="number"
+                  pattern="[0-9]*"
+                  value="20"
+                />
+              </div>
+            </div>
+            <div className="govuk-date-input__item">
+              <div className="govuk-form-group">
+                <label
+                  htmlFor="schedule-month"
+                  className="govuk-label govuk-date-input__label"
+                >
+                  Month
+                </label>
+                <input
+                  className="govuk-input govuk-date-input__inout govuk-input--width-2"
+                  id="schedule-month"
+                  name="schedule-month"
+                  type="number"
+                  pattern="[0-9]*"
+                  value="09"
+                />
+              </div>
+            </div>
+            <div className="govuk-date-input__item">
+              <div className="govuk-form-group">
+                <label
+                  htmlFor="schedule-year"
+                  className="govuk-label govuk-date-input__label"
+                >
+                  Year
+                </label>
+                <input
+                  className="govuk-input govuk-date-input__inout govuk-input--width-4"
+                  id="schedule-year"
+                  name="schedule-year"
+                  type="number"
+                  pattern="[0-9]*"
+                  value="2019"
+                />
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <FormGroup>
+          <FormRadioGroup
+            legend="Data type"
+            id="data-type"
+            name="data-type"
+            value={value}
+            onChange={event => {
+              setValue(event.target.value);
+            }}
+            options={[
+              {
+                id: 'data-final',
+                label: 'Final',
+                value: 'data-final',
+              },
+              {
+                id: 'data-provisional',
+                label: 'Provisional',
+                value: 'data-provisional',
+              },
+              {
+                id: 'data-revised',
+                label: 'Revised',
+                value: 'data-revised',
+              },
+            ]}
+          />
+        </FormGroup>
+
+        <FormGroup>
+          <FormRadioGroup
+            legend="Release type"
+            id="release-type"
+            name="release-type"
+            value={value}
+            onChange={event => {
+              setValue(event.target.value);
+            }}
+            options={[
+              {
+                id: 'national-stats',
+                label: 'National statistics',
+                value: 'national-stats',
+              },
+              {
+                id: 'adhoc-stats',
+                label: 'Official / adhoc statistics',
+                value: 'adhoc-stats',
+              },
+            ]}
+          />
+        </FormGroup>
+
+        <FormGroup>
+          <FormFieldset id="lead-statisician" legend="Lead statistician">
+            <FormSelect
+              id="select-lead-statisician"
+              label="Select lead statistician"
+              name="select-lead-statisician"
+              options={[
+                { label: 'Mark Pearson', value: 'mark-pearson' },
+                { label: 'Alex Miller', value: 'alex-miller' },
+              ]}
+            />
+          </FormFieldset>
+        </FormGroup>
 
         {!sectionId && (
           <>

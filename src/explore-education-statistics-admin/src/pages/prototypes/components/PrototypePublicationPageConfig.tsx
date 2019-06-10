@@ -94,7 +94,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                           <FormTextInput
                             id="external-url"
                             name="external-url"
-                            label="Link to external methodology"
+                            label="URL"
                             value="http://"
                           />
                         </FormGroup>
@@ -130,6 +130,18 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                 />
               </FormFieldset>
             </FormGroup>
+            <dl className="govuk-summary-list govuk-width-container">
+              <div className="govuk-summary-list__row">
+                <dt className="govuk-summary-list__key">Email:</dt>
+                <dd className="govuk-summary-list__value">
+                  example@email.co.uk
+                </dd>
+              </div>
+              <div className="govuk-summary-list__row">
+                <dt className="govuk-summary-list__key">Telephone:</dt>
+                <dd className="govuk-summary-list__value">07954 765423</dd>
+              </div>
+            </dl>
           </>
         )}
         {sectionId === 'confirmPublication' && (
