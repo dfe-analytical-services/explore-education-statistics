@@ -61,7 +61,7 @@ async function startServer(port = process.env.PORT || 3000) {
         connectSrc: cspConnectSrc,
         frameSrc: ["'self'", 'https://vars.hotjar.com '],
         frameAncestors: ["'self'"],
-        childSrc: ["'self", 'https://vars.hotjar.com'],
+        childSrc: ["'self'", 'https://vars.hotjar.com'],
       },
     }),
   );
