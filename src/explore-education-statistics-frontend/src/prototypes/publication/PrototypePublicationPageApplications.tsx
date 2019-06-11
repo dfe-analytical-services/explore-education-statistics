@@ -318,11 +318,11 @@ const PublicationPageExclusions = () => {
           </ul>
           <p>
             Northumberland has been the top performer in this measure since
-            2016.
+            2015.
           </p>
           <p>
-            As in previous years, the lowest first preference rates at secondary
-            level were all in London.
+            As in previous years, the lowest first preference rates were all in
+            London.
           </p>
           <ul className="govuk-list-bullet">
             <li>Hammersmith and Fulham - 51.4%</li>
@@ -335,7 +335,7 @@ const PublicationPageExclusions = () => {
           </p>
           <p>
             Hammersmith and Fulham has had the lowest first preference rate
-            since 2016.
+            since 2015.
           </p>
           <p>
             The higher number of practical options available to London
@@ -425,28 +425,55 @@ const PublicationPageExclusions = () => {
           </p>
         </AccordionSection>
         <AccordionSection heading="Primary geographical variation ">
+          <h3 className="govuk-heading-s">First preference rates</h3>
           <p>
-            At local authority level East Riding of Yorkshire (97.6%),
-            Northumberland (97.4%) and Rutland (97.4%) achieved the best first
-            preference rates in 2018. All these authorities are in the top three
-            for the first time in the last three years. The local authorities
-            with the worst first preference rates in 2018 were Kensington &
-            Chelsea with 68.4%, Camden (76.5%) and Hammersmith & Fulham (76.6%).
-            Both Kensington & Chelsea and Hammersmith & Fulham have been in the
-            bottom three performers in this measure for the last three years.
-            Although overall results are better at primary level than at
-            secondary, for London local authorities the improvement is much more
-            marked. In 2018, for London as a whole, the first preference rate at
-            primary level was 86.6% (85.9% in 2017), compared to 66.0% at
-            secondary level (68.2% in 2017).
+            At local authority (LA) level, the 3 highest first preference rates
+            were achieved by the following local authorities:
           </p>
+          <ul className="govuk-list-bullet">
+            <li>East Riding of Yorkshire - 97.6%</li>
+            <li>Northumberland - 97.4%</li>
+            <li>Rutland - 97.4%</li>
+          </ul>
+          <p>
+            These authorities are in the top 3 for the first time since 2015.
+          </p>
+          <p>The lowest first preference rates were all in London.</p>
+          <ul className="govuk-list-bullet">
+            <li>Kensington and Chelsea - 68.4%</li>
+            <li>Camden - 76.5%</li>
+            <li>Hammersmith and Fulham - 76.6%</li>
+          </ul>
+          <p>
+            Hammersmith and Fulham and Kensington and Chelsea have both been in
+            the bottom 3 since 2015.
+          </p>
+          <p>
+            Although overall results are better at primary level than at
+            secondary, for London as a whole the improvement is much more
+            marked:
+          </p>
+          <ul className="govuk-list-bullet">
+            <li>
+              primary first preference rate increased to 86.6% - up from 85.9%
+              in 2017
+            </li>
+            <li>
+              secondary first preference rate decreased to 66% - down from 68.%
+              in 2017
+            </li>
+          </ul>
           <p>INSERT CHART HERE!!!</p>
+          <h3 className="govuk-heading-s">Primary offers</h3>
+          <p>
+            In 2018, 97.1% of pimary offers made were from schools inside the
+            home authority. This figure has been stable since 2014 when this
+            data was first collected and published.
+          </p>
           <p>
             As in previous years, at primary level a smaller proportion of
-            offers were made of schools outside the applicant’s local authority
-            compared to secondary level. In 2018 97.1% of offers were inside the
-            home authority. This has remained stable for the five years for
-            which primary data is available.
+            offers were made of schools outside the applicant’s home authority
+            compared to secondary level.
           </p>
         </AccordionSection>
       </Accordion>
@@ -470,35 +497,20 @@ const PublicationPageExclusions = () => {
 
         <AccordionSection heading="About these statistics">
           <p className="govuk-body">
-            The statistics and data cover permanent and fixed period exclusions
-            and school-level exclusions during the 2016/17 academic year in the
-            following state-funded school types as reported in the school
-            census:
+            The statistics and data cover the number of offers made to
+            applicants for primary and secondary school places and the
+            proportion which have received their preferred offers.
           </p>
-          <ul className="govuk-list-bullet">
-            <li>primary schools</li>
-            <li>secondary schools</li>
-            <li>special schools</li>
-          </ul>
           <p className="govuk-body">
-            They also include national-level information on permanent and
-            fixed-period exclusions for{' '}
-            <a href="/glossary#pupil-referral-unit">pupil referral units</a>.
+            The data was collected from local authorities (LAs) where it was
+            produced as part of the annual applications and offers process for
+            applicants requiring a primary or secondary school place in
+            September 2018.
           </p>
           <p>
-            All figures are based on unrounded data so constituent parts may not
-            add up due to rounding.
-          </p>
-          <p>
-            This statistical release provides the number of offers made to
-            applicants for both secondary and primary school places and the
-            proportion which have received preferred offers (1st, 2nd, 3rd
-            preference etc). The data is collected from local authorities, where
-            it is produced as part of the annual application and offer process
-            for applicants requiring a place to start at secondary or at primary
-            school in September 2018. The offers were made, and data collected,
-            based on the national offer days of 1 March 2018 (secondary) and 16
-            April 2018 (primary).
+            The offers were made, and data collected, based on the National
+            Offer Days of 1 March 2018 for secondary schools and 16 April 2018
+            for primary schools.
           </p>
         </AccordionSection>
 
