@@ -186,6 +186,21 @@ function GlossaryIndexPage() {
           <p>INSERT DEFINITION - TBC.</p>
         </AccordionSection>
         <AccordionSection heading="I">
+          <h3 id="independent-review-panel">independent review panel</h3>
+          <p>
+            Parents (and pupils if aged over 18 years) can request a review of a
+            permanent exclusion.
+          </p>
+          <p>
+            An independent review panel’s role is to review the decision of the
+            governing body not to reinstate a permanently excluded pupil.
+          </p>
+          <p>
+            It must consider the interests and circumstances of the excluded
+            pupil, including the circumstances in which the pupil was excluded,
+            and have regard to the interests of other pupils and people working
+            at the school.
+          </p>
           <h3 id="individual-schools-budget">individual schools budget</h3>
           <p>INSERT DEFINITION - TBC.</p>
           <h3 id="initial-teacher-training">initial teacher training</h3>
