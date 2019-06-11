@@ -183,7 +183,7 @@ const PublicationPageExclusions = () => {
               <span className="govuk-caption-m">Next update: </span>19 July 2019
             </h3>
             <p className="govuk-caption-m govuk-!-margin-top-0">
-              <a href="#">Notify me</a>
+              <a href="#">Sign up for email alerts</a>
             </p>
 
             <h2
