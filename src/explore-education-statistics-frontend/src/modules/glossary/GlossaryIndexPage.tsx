@@ -155,7 +155,8 @@ function GlossaryIndexPage() {
           </p>
           <p>
             This total includes exclusions from previous schools covered by the
-            exclusion legislation.
+            exclusion legislation so pupils with repeat exclusions can inflate
+            fixed-period exclusion rates.
           </p>
           <h3 id="foundation-degrees">foundation degrees</h3>
           <p>INSERT DEFINITION - TBC.</p>
@@ -185,6 +186,21 @@ function GlossaryIndexPage() {
           <p>INSERT DEFINITION - TBC.</p>
         </AccordionSection>
         <AccordionSection heading="I">
+          <h3 id="independent-review-panel">independent review panel</h3>
+          <p>
+            Parents (and pupils if aged over 18 years) can request a review of a
+            permanent exclusion.
+          </p>
+          <p>
+            An independent review panel’s role is to review the decision of the
+            governing body not to reinstate a permanently excluded pupil.
+          </p>
+          <p>
+            It must consider the interests and circumstances of the excluded
+            pupil, including the circumstances in which the pupil was excluded,
+            and have regard to the interests of other pupils and people working
+            at the school.
+          </p>
           <h3 id="individual-schools-budget">individual schools budget</h3>
           <p>INSERT DEFINITION - TBC.</p>
           <h3 id="initial-teacher-training">initial teacher training</h3>
@@ -240,6 +256,8 @@ function GlossaryIndexPage() {
           <p>INSERT DEFINITION - TBC.</p>
           <h3 id="national-curriculum-tests">national curriculum tests</h3>
           <p>Not SATs - INSERT DEFINITION - TBC.</p>
+          <h3 id="national-offer-day">National Offer Day</h3>
+          <p>INSERT DEFINITION - TBC.</p>
           <h3 id="national-pupil-database">national pupil database</h3>
           <p>INSERT DEFINITION - TBC.</p>
           <h3 id="national-scholarship-fund">national scholarship fund</h3>
@@ -262,6 +280,14 @@ function GlossaryIndexPage() {
           <p>INSERT DEFINITION - TBC.</p>
         </AccordionSection>
         <AccordionSection heading="O">
+          <h3 id="one-or-more-fixed-period-exclusion">
+            one or more fixed-period exclusion
+          </h3>
+          <p>
+            Pupils who have had at least 1 fixed-period excluions across a full
+            academic year.
+          </p>
+          <p>Includes those with repeated fixed-period exclusions.</p>
           <h3 id="overall-absence">overall absence</h3>
           <p>
             The total number of all authorised and unauthorised absences from
