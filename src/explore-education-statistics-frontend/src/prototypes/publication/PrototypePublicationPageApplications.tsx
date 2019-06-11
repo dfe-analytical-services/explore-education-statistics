@@ -259,7 +259,7 @@ const PublicationPageExclusions = () => {
 
       <Accordion id="contents-exclusions-sections">
         <AccordionSection heading="Secondary applications and offers">
-          <h3 className="govuk-heading-s">SOME SORT OF HEADLINE???</h3>
+          <h3 className="govuk-heading-s">Secondary applications</h3>
           <p className="govuk-body">
             A total of 582,761 applications were received for secondary school
             places - an increase of 3.6% since 2017. This follows a 2.6%
@@ -274,10 +274,11 @@ const PublicationPageExclusions = () => {
             Since 2013, when secondary applications were at their lowest, there
             has been a 16.6% increase in the number of applications.
           </p>
+          <h3 className="govuk-heading-s">Secondary offers</h3>
           <p>
-            However, the proportion of secondary applicants receiving an offer
-            of their first-choice school has decreased to 82.1% - down from
-            83.5% in 2017.
+            The proportion of secondary applicants receiving an offer of their
+            first-choice school has decreased to 82.1% - down from 83.5% in
+            2017.
           </p>
           <p>
             The proportion of applicants who received an offer of any of their
