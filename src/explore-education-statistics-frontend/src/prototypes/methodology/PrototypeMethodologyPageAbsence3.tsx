@@ -33,7 +33,9 @@ const PublicationPage = () => {
         },
       ]}
     >
-      <h1 className="govuk-heading-xl">Exclusions statistics: methodology</h1>
+      <h1 className="govuk-heading-xl">
+        Secondary and primary school applications and offers: methodology
+      </h1>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <dl className="dfe-meta-content govuk-!-margin-0">
