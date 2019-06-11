@@ -259,7 +259,7 @@ const PublicationPageExclusions = () => {
 
       <Accordion id="contents-exclusions-sections">
         <AccordionSection heading="Permanent exclusions">
-          <div className="govuk-inset-text">
+          <div className="govuk-text">
             <p>
               The number of{' '}
               <a href="/glossary#permanent-exclusion">permanent exclusions</a>
@@ -340,7 +340,7 @@ const PublicationPageExclusions = () => {
         </AccordionSection>
 
         <AccordionSection heading="Fixed-period exclusions">
-          <div className="govuk-inset-text">
+          <div className="govuk-text">
             <p>
               The number of{' '}
               <a href="/glossary#fixed-period-exclusion">
@@ -430,41 +430,46 @@ const PublicationPageExclusions = () => {
         </AccordionSection>
 
         <AccordionSection heading="Number and length of fixed-period exclusions">
-          <div className="govuk-inset-text">
+          <div className="govuk-text">
             <h3 className="govuk-heading-s">
-              Enrolments with one or more fixed-period exclusion definition
-            </h3>{' '}
+              Pupils with one or more fixed-period exclusion definition
+            </h3>
             <p>
-              Pupils with one or more fixed-period exclusion refer to pupil
-              enrolments that had at least one fixed-period exclusion across the
-              full academic year. It includes those with repeated fixed-period
-              exclusions.
+              The number of pupils with{' '}
+              <a href="/glossary#one-or-more-fixed-period-exclusion">
+                1 or more fixed-period exclusion
+              </a>
+              has increased across state-funded primary, secondary and special
+              schools to 183,475 (2.29% of pupils) up from 167,125 (2.11% of
+              pupils) in 2015/16.
+            </p>
+            <p>
+              Of these kinds of pupils, 59.1% excluded on only 1 occasion while
+              1.5% received 10 or more fixed-period exclusions during the year.
+            </p>
+            <p>
+              The percentage of pupils who went on to receive a{' '}
+              <a href="/glossary#permanent-exclusion">permanent exclusion</a>
+              was 3.5%.
+            </p>
+            <p>
+              The average length of{' '}
+              <a href="/glossary#fixed-period-exclusion">
+                fixed-period exclusions
+              </a>
+              across schools decreased to 2.1 days - slightly shorter than in
+              2015/16.
+            </p>
+            <p>
+              The highest proportion of fixed-period exclusions (46.6%) lasted
+              for only 1 day.
+            </p>
+            <p>
+              Only 2.0% of fixed-period exclusions lasted for longer than 1 week
+              and longer fixed-period exclusions were more prevalent in
+              secondary schools.
             </p>
           </div>
-          <p>
-            In state-funded primary, secondary and special schools, there were
-            183,475 pupil enrolments, 2.29%, with at least one fixed term
-            exclusion in 2016/17, up from 167,125 pupil enrolments, 2.11 %, in
-            2015/16.
-          </p>
-          <p>
-            Of those pupils with at least one fixed-period exclusion, 59.1 per
-            cent were excluded only on one occasion, and 1.5% received 10 or
-            more fixed-period exclusions during the year. The percentage of
-            pupils with at least one fixed-period exclusion that went on to
-            receive a permanent one was 3.5%.
-          </p>
-          <p>
-            The average length of fixed-period exclusions across state-funded
-            primary, secondary and special schools in 2016/17 was 2.1 days,
-            slightly shorter than in 2015/16.
-          </p>
-          <p>
-            The highest proportion of fixed-period exclusions (46.6%) lasted for
-            only one day. Only 2.0% of fixed-period exclusions lasted for longer
-            than one week and longer fixed-period exclusions were more prevalent
-            in secondary schools.
-          </p>
         </AccordionSection>
         <AccordionSection heading="Reasons for exclusions">
           <p>
