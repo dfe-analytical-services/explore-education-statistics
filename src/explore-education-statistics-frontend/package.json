@@ -129,8 +129,8 @@
       "<rootDir>/test/setupTests.js"
     ],
     "testMatch": [
-      "<rootDir>/src/**/(*.)(spec|test).{js,jsx,ts,tsx}",
-      "<rootDir>/test/**/(*.)(spec|test).{js,jsx,ts,tsx}"
+      "<rootDir>/src/**/*.(spec|test).{js,jsx,ts,tsx}",
+      "<rootDir>/test/**/*.(spec|test).{js,jsx,ts,tsx}"
     ],
     "testEnvironment": "jsdom",
     "testURL": "http://localhost",

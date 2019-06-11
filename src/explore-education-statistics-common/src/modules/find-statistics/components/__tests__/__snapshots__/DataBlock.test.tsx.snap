@@ -38,6 +38,27 @@ exports[`DataBlock datablock renders map 1`] = `
           <form>
             <div class="govuk-form-group govuk-!-margin-bottom-6">
               <label class="govuk-label"
+                     for="selectedIndicator"
+              >
+                Select data to view
+              </label>
+              <select class="govuk-select select"
+                      id="selectedIndicator"
+                      name="selectedIndicator"
+              >
+                <option value="23">
+                  Unauthorised absence rate
+                </option>
+                <option value="26">
+                  Overall absence rate
+                </option>
+                <option value="28">
+                  Authorised absence rate
+                </option>
+              </select>
+            </div>
+            <div class="govuk-form-group govuk-!-margin-bottom-6">
+              <label class="govuk-label"
                      for="selectedLocation"
               >
                 Select a location
@@ -47,7 +68,7 @@ exports[`DataBlock datablock renders map 1`] = `
                       name="selectedLocation"
               >
                 <option value>
-                  All
+                  select...
                 </option>
                 <option value="E92000001">
                   England
@@ -55,10 +76,47 @@ exports[`DataBlock datablock renders map 1`] = `
               </select>
             </div>
           </form>
+          <div>
+            <h3 class="govuk-heading-s">
+              Key to Unauthorised absence rate
+            </h3>
+            <dl class="govuk-list">
+              <dd class="legend">
+                <span class="rate0">
+                  &nbsp;
+                </span>
+                NaN%&nbsp; to NaN%
+              </dd>
+              <dd class="legend">
+                <span class="rate1">
+                  &nbsp;
+                </span>
+                NaN%&nbsp; to NaN%
+              </dd>
+              <dd class="legend">
+                <span class="rate2">
+                  &nbsp;
+                </span>
+                NaN%&nbsp; to NaN%
+              </dd>
+              <dd class="legend">
+                <span class="rate3">
+                  &nbsp;
+                </span>
+                NaN%&nbsp; to NaN%
+              </dd>
+              <dd class="legend">
+                <span class="rate4">
+                  &nbsp;
+                </span>
+                NaN%&nbsp; to NaN%
+              </dd>
+            </dl>
+          </div>
         </div>
         <div class="govuk-grid-column-two-thirds">
-          <div style="width: 800px; height: 600px; position: relative;"
-               class="leaflet-container leaflet-grab leaflet-touch-drag"
+          <div class="map leaflet-container leaflet-grab leaflet-touch-drag"
+               style="width: 800px; height: 600px; position: relative;"
                tabindex="0"
           >
             <div class="leaflet-pane leaflet-map-pane"
@@ -76,7 +134,7 @@ exports[`DataBlock datablock renders map 1`] = `
                      viewbox="0 0 0 0"
                 >
                   <g>
-                    <path class="leaflet-interactive"
+                    <path class="uk leaflet-interactive"
                           stroke="#3388ff"
                           stroke-opacity="1"
                           stroke-width="3"
@@ -85,19 +143,7 @@ exports[`DataBlock datablock renders map 1`] = `
                           fill="#3388ff"
                           fill-opacity="0.2"
                           fill-rule="evenodd"
-                          d="M0 0"
-                    >
-                    </path>
-                    <path class="leaflet-interactive"
-                          stroke="777"
-                          stroke-opacity="1"
-                          stroke-width="1"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          fill="777"
-                          fill-opacity="0.2"
-                          fill-rule="evenodd"
-                          d="M-1 1L-1 -1L1 -1L1 1z"
+                          d="M-3 3L-3 -3L3 -3L3 3z"
                     >
                     </path>
                   </g>

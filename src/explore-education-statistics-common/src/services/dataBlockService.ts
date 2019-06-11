@@ -152,7 +152,7 @@ export interface DataBlockGeoJsonProperties {
 
 export type DataBlockGeoJSON = Feature<Geometry, DataBlockGeoJsonProperties>;
 
-interface DataBlockLocationMetadata {
+export interface DataBlockLocationMetadata {
   value: string;
   label: string;
   geoJson: DataBlockGeoJSON[];

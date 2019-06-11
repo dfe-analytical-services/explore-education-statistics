@@ -12,16 +12,17 @@ import {
   DataBlockData,
   DataBlockGeoJsonProperties,
   DataBlockLocation,
+  DataBlockLocationMetadata,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
 import { FormSelect } from '@common/components/form';
 import classNames from 'classnames';
 import { SelectOption } from '@common/components/form/FormSelect';
-import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import UKGeoJson from '@common/services/UKGeoJson';
 
-import { geoJSON, Layer, LeafletMouseEvent, Path } from 'leaflet';
+import { Layer, LeafletMouseEvent, Path } from 'leaflet';
+import Details from '@common/components/Details';
 import styles from './MapBlock.module.scss';
 
 export type MapFeature = Feature<Geometry, GeoJsonProperties>;
@@ -31,18 +32,30 @@ interface MapProps extends ChartProps {
   maxBounds?: LatLngBounds;
 }
 
+interface IdValue {
+  id: string;
+  value: string;
+}
+
 interface MapState {
-  meta: DataBlockMetadata;
-  data: DataBlockData;
-  indicators: string[];
+  options: {
+    location: SelectOption[];
+  };
 
-  selectedIndicator: string;
-
-  locationOptions: SelectOption[];
+  selected: {
+    indicator: string;
+    location: string;
+    results: IdValue[];
+  };
 
   geometry: FeatureCollection<Geometry, DataBlockGeoJsonProperties> | undefined;
+  legend: LegendEntry[];
+}
 
-  selectedLocation: string;
+interface LegendEntry {
+  min: string;
+  max: string;
+  idx: number;
 }
 
 interface GroupOption {
@@ -71,45 +84,63 @@ function getLowestLocationCode(location: DataBlockLocation) {
 }
 
 class MapBlock extends Component<MapProps, MapState> {
-  private mapRef = createRef<Map>();
+  private readonly mapRef = createRef<Map>();
+
+  private readonly geoJsonRef = createRef<GeoJSON>();
 
   public constructor(props: MapProps) {
     super(props);
 
-    const { meta, data, indicators } = props;
+    const { indicators } = props;
 
     this.state = {
-      meta,
-      data,
-      indicators,
-      selectedIndicator: indicators[0],
-      locationOptions: [],
+      selected: {
+        indicator: indicators[0],
+        location: '',
+        results: [],
+      },
+      options: {
+        location: [],
+      },
       geometry: undefined,
-      selectedLocation: '',
+      legend: [],
     };
-
-    this.mapRef = React.createRef<Map>();
   }
 
   public componentDidMount(): void {
-    const { data, meta, selectedIndicator } = this.state;
+    const { data, meta } = this.props;
+    const { selected } = this.state;
 
-    const locationOptions = MapBlock.getLocationsForIndicator(
+    const {
+      geometry,
+      legend,
+    } = MapBlock.generateGeometryAndLegendForSelectedOptions(
       data,
       meta,
-      selectedIndicator,
-    );
-
-    const geometry = MapBlock.getGeometryForOptions(
-      data,
-      meta,
-      selectedIndicator,
+      selected.indicator,
     );
 
     this.setState({
-      locationOptions,
+      options: {
+        location: MapBlock.getLocationsForIndicator(
+          data,
+          meta,
+          selected.indicator,
+        ),
+      },
       geometry,
+      legend,
     });
+
+    const forceRefresh = () => {
+      if (this.mapRef.current) {
+        this.mapRef.current.leafletElement.invalidateSize();
+      } else {
+        window.requestAnimationFrame(forceRefresh);
+      }
+    };
+
+    window.requestAnimationFrame(forceRefresh);
   }
 
   private static getLocationsForIndicator(
@@ -145,46 +176,18 @@ class MapBlock extends Component<MapProps, MapState> {
   }
 
   private static getGeometryForOptions(
-    data: DataBlockData,
-    meta: DataBlockMetadata,
-    selectedIndicator: string,
+    sourceData: {
+      location: DataBlockLocationMetadata;
+      selectedMeasure: number;
+      measures: Dictionary<string>;
+    }[],
+    min: number,
+    scale: number,
   ) {
-    const selectedYear = 2016;
-    const displayedFilter = +selectedIndicator;
-
-    const resultsFilteredByYear = data.result.filter(
-      result => result.year === selectedYear,
-    );
-
-    const sourceData = resultsFilteredByYear
-      .map(result => ({
-        location:
-          meta.locations[
-            result.location.localAuthority.new_la_code ||
-              result.location.region.region_code ||
-              result.location.country.country_code
-          ],
-        selectedMeasure: +result.measures[displayedFilter],
-        measures: result.measures,
-      }))
-      .filter(
-        r => r.location !== undefined && r.location.geoJson !== undefined,
-      );
-
-    const { min, max } = sourceData.reduce(
-      // eslint-disable-next-line no-shadow
-      ({ min, max }, { selectedMeasure }) => ({
-        min: selectedMeasure < min ? selectedMeasure : min,
-        max: selectedMeasure > max ? selectedMeasure : max,
-      }),
-      { min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY },
-    );
-
-    const range = max - min;
-    const scale = 4.0 / range;
-
     const calculateColorStyle = (value: number) =>
-      styles[`rate${Math.floor((value - min) * scale)}`];
+      styles[
+        `rate${Math.min(Math.floor((value - min) / scale), 4).toFixed(0)}`
+      ];
 
     const value: FeatureCollection<Geometry, DataBlockGeoJsonProperties> = {
       type: 'FeatureCollection',
@@ -202,7 +205,81 @@ class MapBlock extends Component<MapProps, MapState> {
     return value;
   }
 
-  private getFeatureElementById(id: string) {
+  private static generateGeometryAndLegendForSelectedOptions(
+    data: DataBlockData,
+    meta: DataBlockMetadata,
+    selectedIndicator: string,
+    selectedYear: number = 2016,
+  ) {
+    const displayedFilter = +selectedIndicator;
+
+    const sourceData = this.calculateSourceData(
+      data,
+      selectedYear,
+      meta,
+      displayedFilter,
+    );
+
+    const { min, scale } = this.calculateMinAndScaleForSourceData(sourceData);
+
+    const legend: LegendEntry[] = [...Array(5)].map((_, idx) => {
+      return {
+        min: (min + idx * scale).toFixed(1),
+        max: (min + (idx + 1) * scale).toFixed(1),
+        idx,
+      };
+    });
+
+    const geometry = this.getGeometryForOptions(sourceData, min, scale);
+
+    return { geometry, legend };
+  }
+
+  private static calculateMinAndScaleForSourceData(
+    sourceData: { selectedMeasure: number }[],
+  ) {
+    const { min, max } = sourceData.reduce(
+      // eslint-disable-next-line no-shadow
+      ({ min, max }, { selectedMeasure }) => ({
+        min: selectedMeasure < min ? selectedMeasure : min,
+        max: selectedMeasure > max ? selectedMeasure : max,
+      }),
+      { min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY },
+    );
+
+    if (min === max) {
+      return { min, scale: 0 };
+    }
+
+    const range = max - min;
+    const scale = range / 5.0;
+    return { min, scale };
+  }
+
+  private static calculateSourceData(
+    data: DataBlockData,
+    selectedYear: number,
+    meta: DataBlockMetadata,
+    displayedFilter: number,
+  ) {
+    const resultsFilteredByYear = data.result.filter(
+      result => result.year === selectedYear,
+    );
+
+    return resultsFilteredByYear
+      .map(result => ({
+        location: meta.locations[getLowestLocationCode(result.location)],
+        selectedMeasure: +result.measures[displayedFilter],
+        measures: result.measures,
+      }))
+      .filter(
+        r => r.location !== undefined && r.location.geoJson !== undefined,
+      );
+  }
+
+  private getFeatureElementById(
+    id: string,
+  ): { element?: Element; layer?: Path; feature?: Feature } {
     const { geometry } = this.state;
 
     if (geometry) {
@@ -213,49 +290,78 @@ class MapBlock extends Component<MapProps, MapState> {
       if (selectedFeature) {
         const selectedLayer: Path = selectedFeature.properties.layer as Path;
 
-        return { element: selectedLayer.getElement(), layer: selectedLayer };
+        return {
+          element: selectedLayer.getElement(),
+          layer: selectedLayer,
+          feature: selectedFeature,
+        };
       }
     }
 
-    return { element: undefined, layer: undefined };
+    return { element: undefined, layer: undefined, feature: undefined };
   }
 
   private updateGeometryForOptions = () => {
-    const { data, meta, selectedIndicator } = this.state;
+    const { data, meta } = this.props;
+    const { selected } = this.state;
 
     this.setState({
-      geometry: MapBlock.getGeometryForOptions(data, meta, selectedIndicator),
+      ...MapBlock.generateGeometryAndLegendForSelectedOptions(
+        data,
+        meta,
+        selected.indicator,
+      ),
     });
   };
 
   private onSelectIndicator = (newSelectedIndicator: string) => {
-    const { data, meta } = this.state;
+    const { data, meta } = this.props;
+    const { selected, options } = this.state;
+
+    const {
+      geometry,
+      legend,
+    } = MapBlock.generateGeometryAndLegendForSelectedOptions(
+      data,
+      meta,
+      newSelectedIndicator,
+    );
+
+    this.updateGeojsonGeometry(geometry);
 
     this.setState({
-      selectedIndicator: newSelectedIndicator,
-      geometry: MapBlock.getGeometryForOptions(
-        data,
-        meta,
-        newSelectedIndicator,
-      ),
-      locationOptions: MapBlock.getLocationsForIndicator(
-        data,
-        meta,
-        newSelectedIndicator,
-      ),
+      selected: { ...selected, indicator: newSelectedIndicator },
+
+      geometry,
+      legend,
+
+      options: {
+        ...options,
+        location: MapBlock.getLocationsForIndicator(
+          data,
+          meta,
+          newSelectedIndicator,
+        ),
+      },
     });
   };
 
-  private updateSelectedLocation = (value: string) => {
-    this.setState({ selectedLocation: value });
-  };
+  private updateGeojsonGeometry(
+    geometry: FeatureCollection<Geometry, DataBlockGeoJsonProperties>,
+  ) {
+    if (this.geoJsonRef.current) {
+      this.geoJsonRef.current.leafletElement.clearLayers();
+      this.geoJsonRef.current.leafletElement.addData(geometry);
+    }
+  }
 
   private selectLocationOption(locationValue: string) {
-    const { selectedLocation } = this.state;
+    const { selected } = this.state;
+    let results: IdValue[] = [];
 
     const {
       element: currentSelectedLocationElement,
-    } = this.getFeatureElementById(selectedLocation);
+    } = this.getFeatureElementById(selected.location);
 
     if (currentSelectedLocationElement) {
       currentSelectedLocationElement.classList.remove(styles.selected);
@@ -264,9 +370,10 @@ class MapBlock extends Component<MapProps, MapState> {
     const {
       layer: selectedLayer,
       element: selectedLocationElement,
+      feature: selectedFeature,
     } = this.getFeatureElementById(locationValue);
 
-    if (selectedLocationElement && selectedLayer) {
+    if (selectedLocationElement && selectedLayer && selectedFeature) {
       selectedLocationElement.classList.add(styles.selected);
 
       // @ts-ignore
@@ -274,9 +381,27 @@ class MapBlock extends Component<MapProps, MapState> {
         padding: [200, 200],
       });
       selectedLayer.bringToFront();
+
+      const { properties } = selectedFeature;
+
+      if (properties) {
+        // eslint-disable-next-line prefer-destructuring
+        const measures: { [key: string]: string } = properties.measures;
+
+        results = Object.entries(measures).reduce(
+          (r: IdValue[], [id, value]) => [...r, { id, value }],
+          [],
+        );
+      }
     }
 
-    this.updateSelectedLocation(locationValue);
+    this.setState({
+      selected: {
+        ...selected,
+        location: locationValue,
+        results,
+      },
+    });
   }
 
   private updateSelectedGroupOption(group: GroupOption, value: string) {
@@ -286,13 +411,23 @@ class MapBlock extends Component<MapProps, MapState> {
   }
 
   private onEachFeature = (feature: MapFeature, featureLayer: Path) => {
-    const { meta } = this.state;
+    const { meta } = this.props;
+    const { selected } = this.state;
 
-    featureLayer.bindTooltip(layer => {
+    if (feature.properties) {
+      // eslint-disable-next-line no-param-reassign
+      feature.properties.layer = featureLayer;
+    }
+
+    featureLayer.setStyle({
+      className: classNames(
+        feature.properties && feature.properties.className,
+        { [styles.selected]: feature.id === selected.location },
+      ),
+    });
+
+    featureLayer.bindTooltip(() => {
       if (feature.properties) {
-        // eslint-disable-next-line no-param-reassign
-        feature.properties.layer = featureLayer;
-
         const content = Object.entries(feature.properties.measures).map(
           ([id, value]) =>
             `${meta.indicators[id].label} : ${value}${
@@ -322,26 +457,17 @@ class MapBlock extends Component<MapProps, MapState> {
       position = { lat: 53.00986, lng: -3.2524038 },
       width,
       height,
-      dataGroupings = [],
+      meta,
+      indicators,
     } = this.props;
 
-    const {
-      meta,
-      data,
-      indicators,
-      selectedIndicator,
-      selectedLocation,
-      locationOptions,
-      geometry,
-    } = this.state;
+    const { selected, options, geometry, legend } = this.state;
 
-    const locationGeoJSON = Object.values(meta.locations)
-      .map(({ geoJson }) => geoJson)
-      .filter(gj => gj !== undefined)
-      .map(geojsonArray => geojsonArray[0]);
+    const groupOptions: GroupOption[] = [];
 
-    const groupOptions: GroupOption[] = dataGroupings.map(
-      ({ timePeriod }, index) => {
+    /*
+    dataGroupings.map(
+      ({timePeriod}, index) => {
         if (timePeriod) {
           return {
             id: `groupOption_year_${index}`,
@@ -350,7 +476,7 @@ class MapBlock extends Component<MapProps, MapState> {
             selected: `${data.result[0].year}`,
             options: Object.values<SelectOption>(
               data.result.reduce(
-                (result: Dictionary<TimePeriod>, { year, timeIdentifier }) => {
+                (result: Dictionary<TimePeriod>, {year, timeIdentifier}) => {
                   return {
                     ...result,
                     [`${year}${timeIdentifier}`]: new TimePeriod(
@@ -376,6 +502,7 @@ class MapBlock extends Component<MapProps, MapState> {
         };
       },
     );
+    */
 
     const uk = UKGeoJson.UK;
 
@@ -391,7 +518,7 @@ class MapBlock extends Component<MapProps, MapState> {
                 name="selectedIndicator"
                 id="selectedIndicator"
                 label="Select data to view"
-                value={selectedIndicator}
+                value={selected.indicator}
                 onChange={e => this.onSelectIndicator(e.currentTarget.value)}
                 order={null}
                 options={indicators.map(
@@ -405,10 +532,10 @@ class MapBlock extends Component<MapProps, MapState> {
                 name="selectedLocation"
                 id="selectedLocation"
                 label="Select a location"
-                value={selectedLocation}
+                value={selected.location}
                 onChange={e => this.selectLocationOption(e.currentTarget.value)}
                 order={null}
-                options={locationOptions}
+                options={options.location}
               />
             </div>
 
@@ -435,70 +562,55 @@ class MapBlock extends Component<MapProps, MapState> {
             ))}
           </form>
 
-          {/*
-        <div>
-          <div className="dfe-dash-tiles__tile govuk-!-margin-bottom-6">
-            <h3 className="govuk-heading-m dfe-dash-tiles__heading">
-              Overall absence
-            </h3>
-            <p
-              className="govuk-heading-xl govuk-!-margin-bottom-2"
-              aria-label="Overall absence"
-            >
-              <span> ---% </span>
-            </p>
-            <Details summary="What is overall absence?">
-              Overall absence is the adipisicing elit. Dolorum hic nobis
-              voluptas quidem fugiat enim ipsa reprehenderit nulla.
-            </Details>
-          </div>
-          <div className="dfe-dash-tiles__tile govuk-!-margin-bottom-6">
-            <h3 className="govuk-heading-m dfe-dash-tiles__heading">
-              Authorised absence
-            </h3>
-            <p
-              className="govuk-heading-xl govuk-!-margin-bottom-2"
-              aria-label="Authorised absence"
-            >
-              <span> ---% </span>
-            </p>
-            <Details summary="What is authorised absence?">
-              Authorised absence is the adipisicing elit. Dolorum hic nobis
-              voluptas quidem fugiat enim ipsa reprehenderit nulla.
-            </Details>
-          </div>
-          <div className="dfe-dash-tiles__tile govuk-!-margin-bottom-6">
-            <h3 className="govuk-heading-m dfe-dash-tiles__heading">
-              Unauthorised absence
-            </h3>
-            <p
-              className="govuk-heading-xl govuk-!-margin-bottom-2"
-              aria-label="Unauthorised absence"
-            >
-              <span> ---% </span>
-            </p>
-            <Details summary="What is unauthorised absence?">
-              Unauthorised absence is the adipisicing elit. Dolorum hic
-              nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
-            </Details>
-          </div>
-        </div>
-        */}
+          {selected.results.length > 0 ? (
+            <div>
+              {selected.results.map(result => (
+                <div
+                  key={result.id}
+                  className="dfe-dash-tiles__tile govuk-!-margin-bottom-6"
+                >
+                  <h3 className="govuk-heading-m dfe-dash-tiles__heading">
+                    {meta.indicators[result.id].label}
+                  </h3>
+                  <p
+                    className="govuk-heading-xl govuk-!-margin-bottom-2"
+                    aria-label={meta.indicators[result.id].label}
+                  >
+                    <span>
+                      {' '}
+                      {result.value}
+                      {meta.indicators[result.id].unit}{' '}
+                    </span>
+                  </p>
+                  <Details
+                    summary={`What is ${meta.indicators[result.id].label}?`}
+                  >
+                    Description for {meta.indicators[result.id].label}
+                  </Details>
+                </div>
+              ))}
+            </div>
+          ) : (
+            ''
+          )}
 
-          {/*
-        <div className={classNames('')}>
-          <h3 className="govuk-heading-s">Key to overall absence rate</h3>
-          <dl className="govuk-list">
-            {legend &&
-            legend.map(({min, max, idx}) => (
-              <dd key={idx}>
-                <span className={styles[`rate${idx}`]}>&nbsp;</span> {min}%
-                to {max}%{' '}
-              </dd>
-            ))}
-          </dl>
-        </div>
-        */}
+          {
+            <div>
+              <h3 className="govuk-heading-s">
+                Key to {meta.indicators[selected.indicator].label}
+              </h3>
+              <dl className="govuk-list">
+                {legend &&
+                  legend.map(({ min, max, idx }) => (
+                    <dd className={styles.legend} key={idx}>
+                      <span className={styles[`rate${idx}`]}>&nbsp;</span> {min}
+                      {meta.indicators[selected.indicator].unit}&nbsp; to {max}
+                      {meta.indicators[selected.indicator].unit}{' '}
+                    </dd>
+                  ))}
+              </dl>
+            </div>
+          }
         </div>
 
         <div className={classNames('govuk-grid-column-two-thirds')}>
@@ -519,13 +631,17 @@ class MapBlock extends Component<MapProps, MapState> {
 
             {geometry ? (
               <GeoJSON
+                ref={this.geoJsonRef}
                 data={geometry}
                 onEachFeature={this.onEachFeature}
                 style={(feature?: Feature) => ({
-                  className:
-                    feature &&
+                  className: `${feature &&
                     feature.properties &&
-                    feature.properties.className,
+                    feature.properties.className} ${
+                    feature && feature.id === selected.location
+                      ? styles.selected
+                      : 'hello'
+                  } `,
                 })}
                 onclick={this.onClick}
                 // style={this.styleFeature}
