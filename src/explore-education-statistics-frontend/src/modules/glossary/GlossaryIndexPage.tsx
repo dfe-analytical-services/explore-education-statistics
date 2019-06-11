@@ -155,7 +155,8 @@ function GlossaryIndexPage() {
           </p>
           <p>
             This total includes exclusions from previous schools covered by the
-            exclusion legislation.
+            exclusion legislation so pupils with repeat exclusions can inflate
+            fixed-period exclusion rates.
           </p>
           <h3 id="foundation-degrees">foundation degrees</h3>
           <p>INSERT DEFINITION - TBC.</p>
