@@ -437,7 +437,7 @@ const PublicationPageExclusions = () => {
             <p>
               The number of pupils with{' '}
               <a href="/glossary#one-or-more-fixed-period-exclusion">
-                1 or more fixed-period exclusion
+                one or more fixed-period exclusion
               </a>
               has increased across state-funded primary, secondary and special
               schools to 183,475 (2.29% of pupils) up from 167,125 (2.11% of
@@ -528,19 +528,29 @@ const PublicationPageExclusions = () => {
           <strong>Age, national curriculum year group and gender</strong>
           <ul className="govuk-list-bullet">
             <li>
-              Over half of all permanent (57.2%) and fixed-period (52.6 %)
-              exclusions occur in national curriculum year 9 or above.
+              more than half of all{' '}
+              <a href="/glossary#permanent-exclusion">permanent exclusions</a>
+              (57.2%) and{' '}
+              <a href="/glossary#fixed-period-exclusion">
+                fixed-period exclusions
+              </a>{' '}
+              (52.6 %) occur in national curriculum year 9 or above
             </li>
             <li>
-              A quarter (25.0%) of all permanent exclusions were for pupils aged
-              14, and pupils of this age group also had the highest rate of
-              fixed-period exclusion, and the highest rate of pupils receiving
-              one or more fixed-period exclusion.
+              a quarter (25%) of all permanent exclusions were for pupils aged
+              14 - who also had the highest rates for fixed-period exclusion and
+              pupils receiving{' '}
+              <a href="/glossary#one-or-more-fixed-period-exclusion">
+                one or more fixed-period exclusion
+              </a>
             </li>
             <li>
-              The permanent exclusion rate for boys (0.15%) was over three times
-              higher than that for girls (0.04%) and the fixed-period exclusion
-              rate was almost three times higher (6.91 compared with 2.53%).
+              the permanent exclusion rate for boys (0.15%) was more than 3
+              times higher than for girls (0.04%)
+            </li>
+            <li>
+              the fixed-period exclusion rate for boys (6.91%) was almost 3
+              times higher than for girls (2.53%)
             </li>
           </ul>
           <strong>Free school meals (FSM) eligibility</strong>
