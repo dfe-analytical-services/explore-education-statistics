@@ -646,25 +646,33 @@ const PublicationPageExclusions = () => {
         </AccordionSection>
         <AccordionSection heading="Regional and local authority (LA) breakdown">
           <p>
-            There is considerable variation in the permanent and fixed-period
-            exclusion rate at local authority level (see accompanying maps on
-            the web page).
+            There's considerable variation in the{' '}
+            <a href="/glossary#permanent-exclusion">permanent exclusion</a>
+            and{' '}
+            <a href="/glossary#fixed-period-exclusion">
+              fixed period exclusion
+            </a>{' '}
+            rate at the LA level.
           </p>
+          <h3 className="govuk-heading-s">Permanent exclusion</h3>
           <p>
-            The regions with the highest overall rates of permanent exclusion
-            across state-funded primary, secondary and special schools are the
-            West Midlands and the North West (at 0.14%). The regions with the
-            lowest rates are the South East (at 0.06%) and Yorkshire and the
-            Humber (at 0.07%).
+            Similar to 2015/16, the regions with the joint-highest rates across
+            all school types were:
           </p>
+          <ul className="govuk-list-bullet">
+            <li>North West - 0.14%</li>
+            <li>North West - 0.14%</li>
+          </ul>
+          <p>Similar to 2015/16, the regions with the lowest rates were:</p>
+          <ul className="govuk-list-bullet">
+            <li>the South East - 0.06%</li>
+            <li>Yorkshire and the Humber - 0.07%</li>
+          </ul>
+          <h3 className="govuk-heading-s">Fixed-period exclusion</h3>
           <p>
-            The region with the highest fixed-period exclusion rate is Yorkshire
-            and the Humber (at 7.22%), whilst the lowest rate was seen in Outer
-            London (3.49%).
-          </p>
-          <p>
-            These regions also had the highest and lowest rates of exclusion in
-            the previous academic year.
+            Similar to 2015/16, the region with the highest rates across all
+            school types was Yorkshire and the Humber at 7.22% while the lowest
+            rate was in Outer London (3.49%).
           </p>
         </AccordionSection>
       </Accordion>
