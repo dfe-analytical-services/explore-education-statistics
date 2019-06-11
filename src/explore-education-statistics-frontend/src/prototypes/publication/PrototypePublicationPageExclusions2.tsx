@@ -512,13 +512,19 @@ const PublicationPageExclusions = () => {
         </AccordionSection>
         <AccordionSection heading="Exclusions by pupil characteristics">
           <p>
-            In 2016/17 we saw a similar pattern by pupil characteristics to
-            previous years. The groups that we usually expect to have higher
-            rates are the ones that have increased exclusions since last year
-            e.g. boys, pupils with special educational needs, pupils known to be
-            eligible for and claiming free school meals and national curriculum
-            years 9 and 10.
+            We saw a similar pattern to previous years where the following
+            groups (ones where we usually expect to see higher exclusion rates)
+            showing an increase in exclusions since 2015/16:
           </p>
+          <ul className="govuk-list-bullet">
+            <li>boys</li>
+            <li>national curriculum years 9 and 10</li>
+            <li>pupils with special educational needs (SEN)</li>
+            <li>
+              pupils known to be eligible for and claiming free school meals
+              (FSM)
+            </li>
+          </ul>
           <strong>Age, national curriculum year group and gender</strong>
           <ul className="govuk-list-bullet">
             <li>
