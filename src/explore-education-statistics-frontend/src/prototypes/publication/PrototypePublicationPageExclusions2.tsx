@@ -317,19 +317,25 @@ const PublicationPageExclusions = () => {
           />
 
           <p>
-            Most (83%) permanent exclusions occurred in secondary schools. The
-            rate of permanent exclusions in secondary schools increased from
-            0.17% in 2015/16 to 0.20% in 2016/17, which is equivalent to around
-            20 pupils per 10,000.
+            Most occurred in secondary schools which accounted for 83% of all
+            permanent exclusions.
           </p>
           <p>
-            The rate of permanent exclusions also rose in primary schools, at
-            0.03%, but decreased in special schools from 0.08% in 2015/16 to
-            0.07% in 2016/17. Looking at longer-term trends, the rate of
-            permanent exclusions across all state-funded primary, secondary and
-            special schools followed a generally downward trend from 2006/07
-            when the rate was 0.12% until 2012/13, and has been rising again
-            since then, although rates are still lower now than in 2006/07.
+            The <a href="/glossary#permanent-exclusion">permanent exclusion</a>
+            rate in secondary schools increased 0.20% - up from from 0.17% in
+            2015/16 - which is equivalent to 20 pupils per 10,000.
+          </p>
+          <p>
+            The rate also rose in primary schools to 0.03% but decreased in
+            special schools to 0.07% - down from from 0.08% in 2015/16.
+          </p>
+          <p>
+            The rate generally followed a downward trend after 2006/07 - when it
+            stood at 0.12%.
+          </p>
+          <p>
+            However, since 2012/13 it has been on the rise although rates are
+            still lower now than in 2006/07.
           </p>
         </AccordionSection>
 
