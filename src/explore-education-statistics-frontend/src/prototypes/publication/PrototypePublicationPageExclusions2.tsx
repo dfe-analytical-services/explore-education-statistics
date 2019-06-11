@@ -525,7 +525,9 @@ const PublicationPageExclusions = () => {
               (FSM)
             </li>
           </ul>
-          <strong>Age, national curriculum year group and gender</strong>
+          <h3 className="govuk-heading-s">
+            Age, national curriculum year group and gender
+          </h3>
           <ul className="govuk-list-bullet">
             <li>
               more than half of all{' '}
@@ -553,7 +555,9 @@ const PublicationPageExclusions = () => {
               times higher than for girls (2.53%)
             </li>
           </ul>
-          <strong>Free school meals (FSM) eligibility</strong>
+          <h3 className="govuk-heading-s">
+            Free school meals (FSM) eligibility
+          </h3>
           <ul className="govuk-list-bullet">
             <li>
               Pupils known to be eligible for and claiming free school meals
