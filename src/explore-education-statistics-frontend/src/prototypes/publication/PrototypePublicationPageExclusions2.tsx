@@ -619,18 +619,29 @@ const PublicationPageExclusions = () => {
           </p>
         </AccordionSection>
         <AccordionSection heading="Pupil referral unit exclusions">
+          <h3 className="govuk-heading-s">Permanent exlcusion</h3>
           <p>
-            The rate of permanent exclusion in pupil referral units decreased
-            from 0.14% in 2015/16 to 0.13 in 2016/17. After an increase from
-            2013/14 to 2014/15, permanent exclusions rates have remained fairly
-            steady. There were 25,815 fixed-period exclusions in pupil referral
-            units in 2016/17, up from 23,400 in 2015/16. The fixed period
-            exclusion rate has been steadily increasing since 2013/14.
+            The <a href="/glossary#permanent-exclusion">permanent exclusion</a>
+            rate in{' '}
+            <a href="/glossary#pupil-referral-unit">pupil referral units</a>
+            decreased to 0.13 - down from 0.14% in 2015/16.
           </p>
           <p>
-            The percentage of pupil enrolments in pupil referral units who one
-            or more fixed-period exclusion was 59.17% in 2016/17, up from 58.15%
-            in 2015/16.
+            Permanent exclusions rates have remained fairly steady following an
+            increase between 2013/14 and 2014/15.
+          </p>
+          <h3 className="govuk-heading-s">Fixed-period exlcusion</h3>
+          <p>
+            The{' '}
+            <a href="/glossary#fixed-period-exclusion">
+              fixed period exclusion
+            </a>{' '}
+            rate has been steadily increasing since 2013/14.
+          </p>
+          <p>
+            The percentage of pupils in pupil referral units who 1 or more
+            fixed-period exclusion increased to 59.17% - up from 58.15% in
+            2015/16.
           </p>
         </AccordionSection>
         <AccordionSection heading="Regional and local authority (LA) breakdown">
