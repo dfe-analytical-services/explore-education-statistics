@@ -261,8 +261,8 @@ const PublicationPageExclusions = () => {
         <AccordionSection heading="Secondary applications and offers">
           <h3 className="govuk-heading-s">Secondary applications</h3>
           <p className="govuk-body">
-            A total of 582,761 applications were received for secondary school
-            places - an increase of 3.6% since 2017. This follows a 2.6%
+            The number of applications received for secondary school places
+            increased to 582,761 - up 3.6% since 2017. This follows a 2.6%
             increase between 2016 and 2017.
           </p>
           <p>
@@ -285,13 +285,15 @@ const PublicationPageExclusions = () => {
             preferred schools also decreased slightly to 95.5% - down from 96.1%
             in 2017.
           </p>
-          <h3 className="govuk-heading-s">National offer day</h3>
+          <h3 className="govuk-heading-s">Secondary National Offer Day</h3>
           <p>
             These statistics come from the process undertaken by local
             authorities (LAs) which enabled them to send out offers of secondary
             school places to all applicants on the{' '}
-            <a href="/glossary#national-offer-day">National Offer Day</a> of 1
-            March 2018.
+            <a href="/glossary#national-offer-day">
+              Secondary National Offer Day
+            </a>{' '}
+            of 1 March 2018.
           </p>
           <p>
             The secondary figures have been collected since 2008 and can be
@@ -380,24 +382,42 @@ const PublicationPageExclusions = () => {
         </AccordionSection>
 
         <AccordionSection heading="Primary applications and offers ">
-          <h3 className="govuk-heading-s">
-            Enrolments with one or more fixed-period exclusion definition
-          </h3>{' '}
+          <h3 className="govuk-heading-s">Primary applications</h3>
           <p>
-            The primary table is based on the offers made by local authorities
-            on the primary national offer day of 16 April 2018. This national
-            offer day was introduced in 2014, which was the first year that
-            primary application and offer data were collected and published. A
-            timeseries of the key figures has been provided below. The number of
-            applications for a primary school place in 2018 was 608,180, 2.0%
-            lower than in 2017 (620,330). This decrease is a result of the
-            notable drop in births in 2013, which is now feeding into primary
-            school applications. The number of applications is the lowest seen
-            in the five years that this data has been collected. The proportion
-            of applicants receiving their first preference offer has risen to
-            91.0%, up 1.0 percentage point on 2017. The proportion receiving an
-            offer of any of their preferences has also increased slightly, from
-            97.7% (2017) to 98.1%.
+            The number of applications received for primary school places
+            decreased to 608,180 - down 2% on 2017 (620,330).
+          </p>
+          <p>
+            This is the result of a notable fall in births since 2013 which is
+            now feeding into primary school applications.
+          </p>
+          <p>
+            The number of primary applications is the lowest seen since 2013 -
+            when this data was first collected.
+          </p>
+          <h3 className="govuk-heading-s">Primary offers</h3>
+          <p>
+            The proportion of primary applicants receiving an offer of their
+            first-choice school has increased to 91% - up from 90% in 2017.
+          </p>
+          <p>
+            The proportion of applicants who received an offer of any of their
+            offer of any of their preferences has also increased slightly to
+            98.1% - up from 97.7% in 2017.
+          </p>
+          <h3 className="govuk-heading-s">Primary National Offer Day</h3>
+          <p>
+            These statistics come from the process undertaken by local
+            authorities (LAs) which enabled them to send out offers of primary
+            school places to all applicants on the{' '}
+            <a href="/glossary#national-offer-day">
+              Primary National Offer Day
+            </a>{' '}
+            of 16 April 2018.
+          </p>
+          <p>
+            The primary figures have been collected and published since 2014 and
+            can be viewed as a time series in the following table.
           </p>
           <p>
             INSERT - Table B: Timeseries of key primary preference rates,
