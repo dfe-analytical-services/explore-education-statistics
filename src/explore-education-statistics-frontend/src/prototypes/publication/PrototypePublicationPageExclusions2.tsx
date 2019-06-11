@@ -818,3 +818,5 @@ const PublicationPageExclusions = () => {
     </PrototypePage>
   );
 };
+
+export default PublicationPageExclusions;
