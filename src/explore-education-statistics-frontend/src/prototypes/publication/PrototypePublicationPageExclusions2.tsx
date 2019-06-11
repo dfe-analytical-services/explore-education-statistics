@@ -556,52 +556,57 @@ const PublicationPageExclusions = () => {
             </li>
           </ul>
           <h3 className="govuk-heading-s">
-            Free school meals (FSM) eligibility
+            Pupils eligible for and claiming free school meals (FSM)
           </h3>
           <ul className="govuk-list-bullet">
             <li>
-              Pupils known to be eligible for and claiming free school meals
-              (FSM) had a permanent exclusion rate of 0.28% and fixed period
-              exclusion rate of 12.54% - around four times higher than those who
-              are not eligible (0.07 and 3.50% respectively).
+              had a permanent exclusion rate of 0.28% and fixed period exclusion
+              rate of 12.54% - around 4 times higher than those not eligible for
+              FSM at 0.07% and 3.50% respectively
             </li>
             <li>
-              Pupils known to be eligible for and claiming free school meals
-              (FSM) accounted for 40.0% of all permanent exclusions and 36.7% of
-              all fixed-period exclusions. Special educational need (SEN)
-            </li>
-            <li>
-              Pupils with identified special educational needs (SEN) accounted
-              for around half of all permanent exclusions (46.7%) and
-              fixed-period exclusions (44.9%).
-            </li>
-            <li>
-              Pupils with SEN support had the highest permanent exclusion rate
-              at 0.35%. This was six times higher than the rate for pupils with
-              no SEN (0.06%).
-            </li>
-            <li>
-              Pupils with an Education, Health and Care (EHC) plan or with a
-              statement of SEN had the highest fixed-period exclusion rate at
-              15.93% - over five times higher than pupils with no SEN (3.06%).
+              accounted for 40% of all permanent exclusions and 36.7% of all
+              fixed-period exclusions
             </li>
           </ul>
-          <strong>Ethnic group</strong>
+          <h3 className="govuk-heading-s">
+            Special educational needs (SEN) pupils
+          </h3>
           <ul className="govuk-list-bullet">
             <li>
-              Pupils of Gypsy/Roma and Traveller of Irish Heritage ethnic groups
-              had the highest rates of both permanent and fixed-period
-              exclusions, but as the population is relatively small these
-              figures should be treated with some caution.
+              accounted for around half of all permanent exclusions (46.7%) and
+              fixed-period exclusions (44.9%)
             </li>
             <li>
-              Black Caribbean pupils had a permanent exclusion rate nearly three
-              times higher (0.28%) than the school population as a whole
-              (0.10%). Pupils of Asian ethnic groups had the lowest rates of
-              permanent and fixed-period exclusion.
+              had the highest permanent exclusion rate (0.35%0 - 6 times higher
+              than the rate for pupils with no SEN (0.06%)
+            </li>
+            <li>
+              pupils with a statement of SEN or education, health and care (EHC)
+              plan had the highest fixed-period exclusion rate at 15.93% - more
+              than 5 times higher than pupils with no SEN (3.06%)
+            </li>
+          </ul>
+          <h3 className="govuk-heading-s">Ethnic group</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              pupils of Gypsy/Roma and Traveller of Irish Heritage ethnic groups
+              had the highest rates of permanent and fixed-period exclusions -
+              but as the population is relatively small these figures should be
+              treated with some caution
+            </li>
+            <li>
+              pupils from a Black Caribbean background had a permanent exclusion
+              rate nearly 3 times higher (0.28%) than the school population as a
+              whole (0.10%)
+            </li>
+            <li>
+              pupils of Asian ethnic groups had the lowest permanent and
+              fixed-period exclusion rates
             </li>
           </ul>
         </AccordionSection>
+
         <AccordionSection heading="Independent exclusion reviews">
           <p>
             Independent review Panel definition: Parents (and pupils if aged
