@@ -609,20 +609,13 @@ const PublicationPageExclusions = () => {
 
         <AccordionSection heading="Independent exclusion reviews">
           <p>
-            Independent review Panel definition: Parents (and pupils if aged
-            over 18) are able to request a review of a permanent exclusion. An
-            independent review panel’s role is to review the decision of the
-            governing body not to reinstate a permanently excluded pupil. The
-            panel must consider the interests and circumstances of the excluded
-            pupil, including the circumstances in which the pupil was excluded
-            and have regard to the interests of other pupils and people working
-            at the school.
-          </p>
-          <p>
-            In 2016/17 in maintained primary, secondary and special schools and
-            academies there were 560 reviews lodged with independent review
-            panels of which 525 (93.4%) were determined and 45 (8.0%) resulted
-            in an offer of reinstatement.
+            There were 560 reviews lodged with{' '}
+            <a href="/glossary#independent-review-panels">
+              independent review panels
+            </a>
+            in maintained primary, secondary and special schools and academies
+            of which 525 (93.4%) were determined and 45 (8.0%) resulted in an
+            offer of reinstatement.
           </p>
         </AccordionSection>
         <AccordionSection heading="Pupil referral unit exclusions">
