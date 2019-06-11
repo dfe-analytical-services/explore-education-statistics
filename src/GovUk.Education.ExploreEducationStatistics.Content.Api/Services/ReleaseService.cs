@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                 }));
                 
                 var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-                //releaseViewModel.DataFiles = ListFiles(release);
+                releaseViewModel.DataFiles = ListFiles(release);
                 return releaseViewModel;
             }
 
