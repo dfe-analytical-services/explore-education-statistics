@@ -259,25 +259,40 @@ const PublicationPageExclusions = () => {
 
       <Accordion id="contents-exclusions-sections">
         <AccordionSection heading="Secondary applications and offers">
-          <h3 className="govuk-heading-s">SOME SORT OF HEADLINE???</h3>{' '}
+          <h3 className="govuk-heading-s">SOME SORT OF HEADLINE???</h3>
           <p className="govuk-body">
-            These figures come from the application and offer process undertaken
-            by local authorities to enable them to send out offers of a place in
-            a secondary school to all applicants on the national offer day of 1
-            March 2018. The secondary figures have been collected since 2008 and
-            a time series of the key figures has been provided below. 582,761
-            applications were received for a place at secondary school in 2018,
-            a 3.6% increase on 2017. This continues the increase first seen
-            since 2013, when the rise in births which began in the previous
-            decade started to reach secondary school age, and follows a 2.6%
-            increase between 2016 and 2017. Since 2013, when secondary
-            applications were at their lowest, there has been a 16.6% increase
-            in the number of parents applying for a secondary school place for
-            their child. The proportion of secondary applicants receiving an
-            offer of their first choice school has dropped from 83.5% in 2017 to
-            82.1% in 2018. The proportion of applicants who received an offer of
-            any of their preferred schools also dropped slightly to 95.5% in
-            2018 (from 96.1%).
+            A total of 582,761 applications were received for secondary school
+            places - an increase of 3.6% since 2017. This follows a 2.6%
+            increase between 2016 and 2017.
+          </p>
+          <p>
+            This continues the increase in secondary applications seen since
+            2013 which came on the back of a rise in births which began in the
+            previous decade.
+          </p>
+          <p>
+            Since 2013, when secondary applications were at their lowest, there
+            has been a 16.6% increase in the number of applications.
+          </p>
+          <p>
+            However, the proportion of secondary applicants receiving an offer
+            of their first-choice school has decreased to 82.1% - down from
+            83.5% in 2017.
+          </p>
+          <p>
+            The proportion of applicants who received an offer of any of their
+            preferred schools also decreased slightly to 95.5% - down from 96.1%
+            in 2017.
+          </p>
+          <p>
+            These statistics come from the process undertaken by local
+            authorities (LAs) which enabled them to send out offers of secondary
+            school places to all applicants on the national offer day of 1 March
+            2018.
+          </p>
+          <p>
+            The secondary figures have been collected since 2008 and can be
+            viewed as a time series in the following table.
           </p>
           <p>
             INSERT - Table A: Timeseries of key secondary preference rates,
