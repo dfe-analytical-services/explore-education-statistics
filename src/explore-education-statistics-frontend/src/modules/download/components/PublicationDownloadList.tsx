@@ -1,3 +1,4 @@
+import { baseUrl } from '@common/services/api';
 import Link from '@frontend/components/Link';
 import React from 'react';
 
@@ -6,6 +7,12 @@ export interface Publication {
   slug: string;
   summary: string;
   title: string;
+  dataFiles: {
+    extension: string;
+    name: string;
+    path: string;
+    size: string;
+  }[];
 }
 
 interface Props {
@@ -16,29 +23,21 @@ function PublicationList({ publications }: Props) {
   return (
     <>
       {publications.length > 0 ? (
-        publications.map(({ id, slug, title }) => (
+        publications.map(({ id, title, dataFiles }) => (
           <div className="govuk-!-margin-bottom-9" key={id}>
             <h3 className="govuk-heading-s">Download files for: {title}</h3>
-            <p>
-              <Link
-                to={`/statistics/downloads?publication=${slug}`}
-                as={`/statistics/downloads/${slug}`}
-                data-testid={`download-stats-${slug}`}
-              >
-                Example download file 1
-              </Link>{' '}
-              (csv, 100mb)
-            </p>
-            <p>
-              <Link
-                to={`/statistics/downloads?publication=${slug}`}
-                as={`/statistics/downloads/${slug}`}
-                data-testid={`download-stats-${slug}`}
-              >
-                Example download file 2
-              </Link>{' '}
-              (csv, 100mb)
-            </p>
+            {dataFiles.map(({ extension, name, path, size }) => (
+              <p key={path}>
+                <Link
+                  to={`${baseUrl.data}/api/download/${path}`}
+                  className="govuk-link"
+                  data-testid={`download-stats-${path}`}
+                >
+                  {name}
+                </Link>
+                {` `}({extension}, {size})
+              </p>
+            ))}
           </div>
         ))
       ) : (
