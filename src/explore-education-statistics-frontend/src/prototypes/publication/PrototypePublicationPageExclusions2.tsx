@@ -341,19 +341,18 @@ const PublicationPageExclusions = () => {
 
         <AccordionSection heading="Fixed-period exclusions">
           <div className="govuk-inset-text">
-            <h3 className="govuk-heading-s">
-              Fixed-period exclusion rate definition
-            </h3>{' '}
-            <p className="govuk-body">
-              Fixed-period exclusion refers to a pupil who is excluded from a
-              school for a set period of time. A fixed-period exclusion can
-              involve a part of the school day and it does not have to be for a
-              continuous period. A pupil may be excluded for one or more fixed
-              periods up to a maximum of 45 school days in a single academic
-              year. This total includes exclusions from previous schools covered
-              by the exclusion legislation. A pupil may receive more than one
-              fixed-period exclusion, so pupils with repeat exclusions can
-              inflate fixed-period exclusion rates.
+            <p>
+              The number of{' '}
+              <a href="/glossary#fixed-period-exclusion">
+                {' '}
+                fixed-period exclusions
+              </a>
+              has increased across all state-funded primary, secondary and
+              special schools to 381,865 - up from 339,360 in 2015/16.
+            </p>
+            <p>
+              This works out to around 2,010 fixed-period exclusions per day -
+              up from an 1,786 per day in 2015/16.
             </p>
           </div>
           <PrototypeDataSample
@@ -395,36 +394,37 @@ const PublicationPageExclusions = () => {
             ]}
             chartDataKeys={['primary', 'secondary', 'primary and secondary']}
           />
-          <p>
-            The number of fixed-period exclusions across all state-funded
-            primary, secondary and special schools has increased from 339,360 in
-            2015/16 to 381,865 in 2016/17. This corresponds to around 2,010
-            fixed-period exclusions per day1 in 2016/17, up from an average of
-            1,786 per day in 2015/16.
-          </p>
-          <p>
-            There were increases in the number and rate of fixed-period
-            exclusions for state-funded primary and secondary schools and
-            special schools:
-          </p>
+          <h3 className="govuk-heading-s">Primary schools</h3>
           <ul className="govuk-list-bullet">
             <li>
-              in state-funded primary schools, the number of fixed-period
-              exclusions increased from 55,740 in 2015/16 to 64,340 in 2016/17,
-              whilst the rate of fixed-period exclusions increased from 1.21 per
-              cent to 1.37%
+              fixed-period exclusions numbers increased to 64,340 - up from
+              55,740 in 2015/16
             </li>
             <li>
-              in state-funded secondary schools, the number of fixed-period
-              exclusions increased from 270,135 in 2015/16 to 302,890 in
-              2016/17, which corresponded to an increase in the rate of fixed
-              period exclusions from 8.46% to 9.4%
+              fixed-period exclusions rate increased to 1.37% - up from 1.21% in
+              2015/16
+            </li>
+          </ul>
+          <h3 className="govuk-heading-s">Secondary schools</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              fixed-period exclusions numbers increased to 302,890 - up from
+              270,135 in 2015/16
             </li>
             <li>
-              in special schools, the number of fixed-period exclusions
-              increased in special schools from 13,485 in 2015/16 to 14,635 in
-              2016/17, an increase in the rate of fixed-period exclusions from
-              12.53% to 13.03%
+              fixed-period exclusions rate increased to 9.4% - up from 8.46% in
+              2015/16
+            </li>
+          </ul>
+          <h3 className="govuk-heading-s">Special schools</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              fixed-period exclusions numbers increased to 14,635 - up from
+              13,485 in 2015/16
+            </li>
+            <li>
+              fixed-period exclusions rate increased to 13.03% - up from 12.53%
+              in 2015/16
             </li>
           </ul>
         </AccordionSection>
@@ -744,15 +744,15 @@ const PublicationPageExclusions = () => {
           </h4>
           <p className="govuk-!-margin-top-0">
             If you have a general enquiry about the Department for Education
-            (DfE) or education:
+            (DfE) or education
           </p>
           <p>
-            Telephone <br />
+            Telephone
+            <br />
             0370 000 2288
           </p>
         </AccordionSection>
       </Accordion>
-
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
         Create your own tables online
       </h2>
@@ -768,5 +768,3 @@ const PublicationPageExclusions = () => {
     </PrototypePage>
   );
 };
-
-export default PublicationPageExclusions;
