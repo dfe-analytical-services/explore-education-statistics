@@ -260,17 +260,20 @@ const PublicationPageExclusions = () => {
       <Accordion id="contents-exclusions-sections">
         <AccordionSection heading="Permanent exclusions">
           <div className="govuk-inset-text">
-            <h3 className="govuk-heading-s">
-              Permanent exclusion rate definition
-            </h3>{' '}
-            <p className="govuk-body">
-              A permanent exclusion refers to a pupil who is excluded and who
-              will not come back to that school (unless the exclusion is
-              overturned). The number of permanent exclusions across all
-              state-funded primary, secondary and special schools has increased
-              from 6,685 in 2015/16 to 7,720 in 2016/17. This corresponds to
-              around 40.6 permanent exclusions per day in 2016/17, up from an
-              average of 35.2 per day in 2015/16.
+            <p>
+              The number of{' '}
+              <a href="/glossary#permanent-exclusion">permanent exclusions</a>
+              has increased across all state-funded primary, secondary and
+              special schools to 7,720 - up from 6,685 in 2015/16.
+            </p>
+            <p>
+              This works out to an average 40.6 permanent exclusions per day -
+              up from an 35.2 per day in 2015/16.
+            </p>
+            <p>
+              The permanent exclusion rate has also increased to 0.10% of pupils
+              - up from from 0.08% in 2015/16 - which is equivalent to around 10
+              pupils per 10,000.
             </p>
           </div>
           <PrototypeDataSample
@@ -312,12 +315,7 @@ const PublicationPageExclusions = () => {
             ]}
             chartDataKeys={['primary', 'secondary', 'primary and secondary']}
           />
-          <p>
-            The rate of permanent exclusions across all state-funded primary,
-            secondary and special schools has also increased from 0.08% to 0.10%
-            of pupil enrolments, which is equivalent to around 10 pupils per
-            10,000.
-          </p>
+
           <p>
             Most (83%) permanent exclusions occurred in secondary schools. The
             rate of permanent exclusions in secondary schools increased from
