@@ -256,6 +256,8 @@ function GlossaryIndexPage() {
           <p>INSERT DEFINITION - TBC.</p>
           <h3 id="national-curriculum-tests">national curriculum tests</h3>
           <p>Not SATs - INSERT DEFINITION - TBC.</p>
+          <h3 id="national-offer-day">National Offer Day</h3>
+          <p>INSERT DEFINITION - TBC.</p>
           <h3 id="national-pupil-database">national pupil database</h3>
           <p>INSERT DEFINITION - TBC.</p>
           <h3 id="national-scholarship-fund">national scholarship fund</h3>
