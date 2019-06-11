@@ -51,7 +51,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                     Path = file.Name,
                     Extension = GetExtension(file),
                     Size = GetSize(file)
-                });
+                })
+                .OrderBy(info => info.Name);
         }
 
         private static bool IsFileReleased(CloudBlob blob)

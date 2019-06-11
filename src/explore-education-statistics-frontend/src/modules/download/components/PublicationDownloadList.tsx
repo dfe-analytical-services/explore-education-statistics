@@ -24,21 +24,23 @@ function PublicationList({ publications }: Props) {
     <>
       {publications.length > 0 ? (
         publications.map(({ id, title, dataFiles }) => (
-          <div className="govuk-!-margin-bottom-9" key={id}>
+          <>
             <h3 className="govuk-heading-s">Download files for: {title}</h3>
-            {dataFiles.map(({ extension, name, path, size }) => (
-              <p key={path}>
-                <Link
-                  to={`${baseUrl.data}/api/download/${path}`}
-                  className="govuk-link"
-                  data-testid={`download-stats-${path}`}
-                >
-                  {name}
-                </Link>
-                {` `}({extension}, {size})
-              </p>
-            ))}
-          </div>
+            <ul className="govuk-list govuk-list--bullet">
+              {dataFiles.map(({ extension, name, path, size }) => (
+                <li key={path}>
+                  <Link
+                    to={`${baseUrl.data}/api/download/${path}`}
+                    className="govuk-link"
+                    data-testid={`download-stats-${path}`}
+                  >
+                    {name}
+                  </Link>
+                  {` `}({extension}, {size})
+                </li>
+              ))}
+            </ul>
+          </>
         ))
       ) : (
         <></>
