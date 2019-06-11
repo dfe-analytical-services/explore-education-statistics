@@ -263,6 +263,14 @@ function GlossaryIndexPage() {
           <p>INSERT DEFINITION - TBC.</p>
         </AccordionSection>
         <AccordionSection heading="O">
+          <h3 id="one-or-more-fixed-period-exclusion">
+            one or more fixed-period exclusion
+          </h3>
+          <p>
+            Pupils who have had at least 1 fixed-period excluions across a full
+            academic year.
+          </p>
+          <p>Includes those with repeated fixed-period exclusions.</p>
           <h3 id="overall-absence">overall absence</h3>
           <p>
             The total number of all authorised and unauthorised absences from
