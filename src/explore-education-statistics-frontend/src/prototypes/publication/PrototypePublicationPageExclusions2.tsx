@@ -473,33 +473,41 @@ const PublicationPageExclusions = () => {
         </AccordionSection>
         <AccordionSection heading="Reasons for exclusions">
           <p>
-            Persistent disruptive behaviour remained the most common reason for
-            permanent exclusions in state-funded primary, secondary and special
-            schools - accounting for 2,755 (35.7%) of all permanent exclusions
-            in 2016/17. This is equivalent to 3 permanent exclusions per 10,000
-            pupils. However, in special schools alone, the most common reason
-            for exclusion was physical assault against and adult, which made up
-            37.8% of all permanent exclusions and 28.1 per cent of all
-            fixed-period exclusions.
+            All reasons (except bullying and theft) saw an increase in{' '}
+            <a href="/glossary#permanent-exclusion">permanent exclusions</a>{' '}
+            since 2015/16.
+          </p>
+          <p>The following most common reasons saw the largest increases:</p>
+          <ul className="govuk-list-bullet">
+            <li>physical assault against a pupil</li>
+            <li>persistent disruptive behaviour</li>
+            <li>other reasons</li>
+          </ul>
+          <h3 className="govuk-heading-s">Persistent disruptive behaviour</h3>
+          <p>
+            Remained the most common reason for permanent exclusions accounting
+            for 2,755 (35.7%) of all permanent exclusions - which is equivalent
+            to 3 permanent exclusions per 10,000 pupils.
           </p>
           <p>
-            All reasons except bullying and theft saw an increase in permanent
-            exclusions since last year. The most common reasons - persistent
-            disruptive behaviour, physical assault against a pupil and other
-            reasons had the largest increases.
+            However, in special schools the most common reason for exclusion was
+            physical assault against an adult - accounting for 37.8% of all
+            permanent exclusions and 28.1% of all
+            <a href="/glossary#fixed-period-exclusion">
+              fixed-period exclusions
+            </a>
+            .
           </p>
           <p>
             Persistent disruptive behaviour is also the most common reason for
-            fixed-period exclusions. The 108,640 fixed-period exclusions for
-            persistent disruptive behaviour in state-funded primary, secondary
-            and special schools made up 28.4% of all fixed-period exclusions, up
-            from 27.7% in 2015/16. This is equivalent to around 135 fixed-period
-            exclusions per 10,000 pupils.
+            fixed-period exclusions accounting for 108,640 %) of all
+            fixed-period exclusions - up from 27.7% in 2015/16. This is
+            equivalent to around 135 fixed-period exclusions per 10,000 pupils.
           </p>
           <p>
-            All reasons saw an increase in fixed-period exclusions since last
-            year. Persistent disruptive behaviour and other reasons saw the
-            biggest increases.
+            All reasons saw an increase in fixed-period exclusions since
+            2015/16. Persistent disruptive behaviour and other reasons saw the
+            largest increases.
           </p>
         </AccordionSection>
         <AccordionSection heading="Exclusions by pupil characteristics">
