@@ -285,11 +285,13 @@ const PublicationPageExclusions = () => {
             preferred schools also decreased slightly to 95.5% - down from 96.1%
             in 2017.
           </p>
+          <h3 className="govuk-heading-s">National offer day</h3>
           <p>
             These statistics come from the process undertaken by local
             authorities (LAs) which enabled them to send out offers of secondary
-            school places to all applicants on the national offer day of 1 March
-            2018.
+            school places to all applicants on the{' '}
+            <a href="/glossary#national-offer-day">National Offer Day</a> of 1
+            March 2018.
           </p>
           <p>
             The secondary figures have been collected since 2008 and can be
@@ -302,38 +304,79 @@ const PublicationPageExclusions = () => {
         </AccordionSection>
 
         <AccordionSection heading="Secondary geographical variation">
-          <p className="govuk-body">
-            At local authority level Northumberland (98.1%), East Riding of
-            Yorkshire (96.7%) and Bedford (96.4%) achieved the three best first
-            preference rates in 2018. Northumberland has been the top performer
-            in this measure for the last three years. As in previous years, the
-            lowest first preference rates at secondary level are all in London.
-            Omitting City of London (which has a tiny number of application and
-            has no secondary schools), Hammersmith & Fulham (51.4%), Kensington
-            & Chelsea (54.3%) and Lambeth (55.2%) achieved the lowest rates in
-            2018. Hammersmith & Fulham has had the lowest first preference rate
-            for the last three years. The higher number of practical options
-            available to London applicants and ability to name six preferences
-            may encourage parents to make more speculative choices for their top
-            preferences. There is much less regional variation in the
-            proportions receiving any preferred offer compared to those for
-            receiving a first preference (see chart below).
+          <h3 className="govuk-heading-s">First preference rates</h3>
+          <p>
+            At local authority (LA) level, the 3 highest first preference rates
+            were achieved by the following local authorities:
+          </p>
+          <ul className="govuk-list-bullet">
+            <li>Northumberland - 98.1%</li>
+            <li>East Riding of Yorkshire - 96.7%</li>
+            <li>Bedford - 96.4%</li>
+          </ul>
+          <p>
+            Northumberland has been the top performer in this measure since
+            2016.
+          </p>
+          <p>
+            As in previous years, the lowest first preference rates at secondary
+            level were all in London.
+          </p>
+          <ul className="govuk-list-bullet">
+            <li>Hammersmith and Fulham - 51.4%</li>
+            <li>Kensington and Chelsea - 54.3%</li>
+            <li>Lambeth - 55.2%</li>
+          </ul>
+          <p>
+            These figures do not include City of London which has a tiny number
+            of applications and no secondary schools.
+          </p>
+          <p>
+            Hammersmith and Fulham has had the lowest first preference rate
+            since 2016.
+          </p>
+          <p>
+            The higher number of practical options available to London
+            applicants and ability to name 6 preferences may encourage parents
+            to make more speculative choices for their top preferences.
+          </p>
+          <h3 className="govuk-heading-s">Regional variation</h3>
+          <p>
+            There's much less regional variation in the proportions receiving
+            any preferred offer compared to those for receiving a first
+            preference as shown in the following chart.
           </p>
           <p>INSERT CHART IN HERE!!!</p>
           <p>
             An applicant can apply for any school, including those situated in
-            another local authority. Their authority liaises with the requested
-            school, to ensure the applicant is considered under the admissions
-            criteria, and makes the offer. In 2018 91.6% of secondary offers
-            made were of schools inside the home authority. This figure has been
-            stable for the past few years. This release concentrates on the
-            headline figures for the proportion of children receiving their
-            first preference or a preferred offer. However, the main tables
-            provide more information such as the number of places available, the
-            proportion of children for whom a preferred offer was not received
-            and whether the applicants were provided with offers within or
-            outside their home authority.
+            another local authority (LA).
           </p>
+          <p>
+            Their authority liaises with the requested school (to make sure the
+            applicant is considered under the admissions criteria) and makes the
+            offer.
+          </p>
+          <h3 className="govuk-heading-s">Secondary offers</h3>
+          <p>
+            In 2018, 91.6% of secondary offers made were from schools inside the
+            home authority. This figure has been stable for the past few years.
+          </p>
+          <p>
+            This release concentrates on the headline figures for the proportion
+            of children receiving their first preference or a preferred offer.
+          </p>
+          <p>However, the main tables provide more information including:</p>
+          <ul className="govuk-list-bullet">
+            <li>the number of places available</li>
+            <li>
+              the proportion of children for whom a preferred offer was not
+              received
+            </li>
+            <li>
+              whether applicants were provided with offers inside or outside
+              their home authority
+            </li>
+          </ul>
         </AccordionSection>
 
         <AccordionSection heading="Primary applications and offers ">
