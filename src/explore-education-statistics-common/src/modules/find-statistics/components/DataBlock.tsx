@@ -113,6 +113,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
     }
 
     if (summary) {
+      // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
       newState.summary = {
         ...summary,
         data: json,
