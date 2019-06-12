@@ -95,15 +95,6 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
             ...tables[0],
           },
         ];
-      } else {
-        // TODO: remove when data is updated
-        newState.tables = [
-          {
-            data,
-            meta,
-            indicators: Object.keys(response.result[0].measures),
-          },
-        ];
       }
     }
 

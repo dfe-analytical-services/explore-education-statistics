@@ -183,7 +183,7 @@ const PublicationPageExclusions = () => {
               <span className="govuk-caption-m">Next update: </span>June 2019
             </h3>
             <p className="govuk-caption-m govuk-!-margin-top-0">
-              <a href="#">Notify me</a>
+              <a href="#">Sign up for updates</a>
             </p>
 
             <h2
@@ -259,25 +259,45 @@ const PublicationPageExclusions = () => {
 
       <Accordion id="contents-exclusions-sections">
         <AccordionSection heading="Secondary applications and offers">
-          <h3 className="govuk-heading-s">SOME SORT OF HEADLINE???</h3>{' '}
+          <h3 className="govuk-heading-s">Secondary applications</h3>
           <p className="govuk-body">
-            These figures come from the application and offer process undertaken
-            by local authorities to enable them to send out offers of a place in
-            a secondary school to all applicants on the national offer day of 1
-            March 2018. The secondary figures have been collected since 2008 and
-            a time series of the key figures has been provided below. 582,761
-            applications were received for a place at secondary school in 2018,
-            a 3.6% increase on 2017. This continues the increase first seen
-            since 2013, when the rise in births which began in the previous
-            decade started to reach secondary school age, and follows a 2.6%
-            increase between 2016 and 2017. Since 2013, when secondary
-            applications were at their lowest, there has been a 16.6% increase
-            in the number of parents applying for a secondary school place for
-            their child. The proportion of secondary applicants receiving an
-            offer of their first choice school has dropped from 83.5% in 2017 to
-            82.1% in 2018. The proportion of applicants who received an offer of
-            any of their preferred schools also dropped slightly to 95.5% in
-            2018 (from 96.1%).
+            The number of applications received for secondary school places
+            increased to 582,761 - up 3.6% since 2017. This follows a 2.6%
+            increase between 2016 and 2017.
+          </p>
+          <p>
+            This continues the increase in secondary applications seen since
+            2013 which came on the back of a rise in births which began in the
+            previous decade.
+          </p>
+          <p>
+            Since 2013, when secondary applications were at their lowest, there
+            has been a 16.6% increase in the number of applications.
+          </p>
+          <h3 className="govuk-heading-s">Secondary offers</h3>
+          <p>
+            The proportion of secondary applicants receiving an offer of their
+            first-choice school has decreased to 82.1% - down from 83.5% in
+            2017.
+          </p>
+          <p>
+            The proportion of applicants who received an offer of any of their
+            preferred schools also decreased slightly to 95.5% - down from 96.1%
+            in 2017.
+          </p>
+          <h3 className="govuk-heading-s">Secondary National Offer Day</h3>
+          <p>
+            These statistics come from the process undertaken by local
+            authorities (LAs) which enabled them to send out offers of secondary
+            school places to all applicants on the{' '}
+            <a href="/glossary#national-offer-day">
+              Secondary National Offer Day
+            </a>{' '}
+            of 1 March 2018.
+          </p>
+          <p>
+            The secondary figures have been collected since 2008 and can be
+            viewed as a time series in the following table.
           </p>
           <p>
             INSERT - Table A: Timeseries of key secondary preference rates,
@@ -286,59 +306,118 @@ const PublicationPageExclusions = () => {
         </AccordionSection>
 
         <AccordionSection heading="Secondary geographical variation">
-          <p className="govuk-body">
-            At local authority level Northumberland (98.1%), East Riding of
-            Yorkshire (96.7%) and Bedford (96.4%) achieved the three best first
-            preference rates in 2018. Northumberland has been the top performer
-            in this measure for the last three years. As in previous years, the
-            lowest first preference rates at secondary level are all in London.
-            Omitting City of London (which has a tiny number of application and
-            has no secondary schools), Hammersmith & Fulham (51.4%), Kensington
-            & Chelsea (54.3%) and Lambeth (55.2%) achieved the lowest rates in
-            2018. Hammersmith & Fulham has had the lowest first preference rate
-            for the last three years. The higher number of practical options
-            available to London applicants and ability to name six preferences
-            may encourage parents to make more speculative choices for their top
-            preferences. There is much less regional variation in the
-            proportions receiving any preferred offer compared to those for
-            receiving a first preference (see chart below).
+          <h3 className="govuk-heading-s">First preference rates</h3>
+          <p>
+            At local authority (LA) level, the 3 highest first preference rates
+            were achieved by the following local authorities:
+          </p>
+          <ul className="govuk-list-bullet">
+            <li>Northumberland - 98.1%</li>
+            <li>East Riding of Yorkshire - 96.7%</li>
+            <li>Bedford - 96.4%</li>
+          </ul>
+          <p>
+            Northumberland has been the top performer in this measure since
+            2015.
+          </p>
+          <p>
+            As in previous years, the lowest first preference rates were all in
+            London.
+          </p>
+          <ul className="govuk-list-bullet">
+            <li>Hammersmith and Fulham - 51.4%</li>
+            <li>Kensington and Chelsea - 54.3%</li>
+            <li>Lambeth - 55.2%</li>
+          </ul>
+          <p>
+            These figures do not include City of London which has a tiny number
+            of applications and no secondary schools.
+          </p>
+          <p>
+            Hammersmith and Fulham has had the lowest first preference rate
+            since 2015.
+          </p>
+          <p>
+            The higher number of practical options available to London
+            applicants and ability to name 6 preferences may encourage parents
+            to make more speculative choices for their top preferences.
+          </p>
+          <h3 className="govuk-heading-s">Regional variation</h3>
+          <p>
+            There's much less regional variation in the proportions receiving
+            any preferred offer compared to those for receiving a first
+            preference as shown in the following chart.
           </p>
           <p>INSERT CHART IN HERE!!!</p>
           <p>
             An applicant can apply for any school, including those situated in
-            another local authority. Their authority liaises with the requested
-            school, to ensure the applicant is considered under the admissions
-            criteria, and makes the offer. In 2018 91.6% of secondary offers
-            made were of schools inside the home authority. This figure has been
-            stable for the past few years. This release concentrates on the
-            headline figures for the proportion of children receiving their
-            first preference or a preferred offer. However, the main tables
-            provide more information such as the number of places available, the
-            proportion of children for whom a preferred offer was not received
-            and whether the applicants were provided with offers within or
-            outside their home authority.
+            another local authority (LA).
           </p>
+          <p>
+            Their authority liaises with the requested school (to make sure the
+            applicant is considered under the admissions criteria) and makes the
+            offer.
+          </p>
+          <h3 className="govuk-heading-s">Secondary offers</h3>
+          <p>
+            In 2018, 91.6% of secondary offers made were from schools inside the
+            home authority. This figure has been stable for the past few years.
+          </p>
+          <p>
+            This release concentrates on the headline figures for the proportion
+            of children receiving their first preference or a preferred offer.
+          </p>
+          <p>However, the main tables provide more information including:</p>
+          <ul className="govuk-list-bullet">
+            <li>the number of places available</li>
+            <li>
+              the proportion of children for whom a preferred offer was not
+              received
+            </li>
+            <li>
+              whether applicants were provided with offers inside or outside
+              their home authority
+            </li>
+          </ul>
         </AccordionSection>
 
         <AccordionSection heading="Primary applications and offers ">
-          <h3 className="govuk-heading-s">
-            Enrolments with one or more fixed-period exclusion definition
-          </h3>{' '}
+          <h3 className="govuk-heading-s">Primary applications</h3>
           <p>
-            The primary table is based on the offers made by local authorities
-            on the primary national offer day of 16 April 2018. This national
-            offer day was introduced in 2014, which was the first year that
-            primary application and offer data were collected and published. A
-            timeseries of the key figures has been provided below. The number of
-            applications for a primary school place in 2018 was 608,180, 2.0%
-            lower than in 2017 (620,330). This decrease is a result of the
-            notable drop in births in 2013, which is now feeding into primary
-            school applications. The number of applications is the lowest seen
-            in the five years that this data has been collected. The proportion
-            of applicants receiving their first preference offer has risen to
-            91.0%, up 1.0 percentage point on 2017. The proportion receiving an
-            offer of any of their preferences has also increased slightly, from
-            97.7% (2017) to 98.1%.
+            The number of applications received for primary school places
+            decreased to 608,180 - down 2% on 2017 (620,330).
+          </p>
+          <p>
+            This is the result of a notable fall in births since 2013 which is
+            now feeding into primary school applications.
+          </p>
+          <p>
+            The number of primary applications is the lowest seen since 2013 -
+            when this data was first collected.
+          </p>
+          <h3 className="govuk-heading-s">Primary offers</h3>
+          <p>
+            The proportion of primary applicants receiving an offer of their
+            first-choice school has increased to 91% - up from 90% in 2017.
+          </p>
+          <p>
+            The proportion of applicants who received an offer of any of their
+            offer of any of their preferences has also increased slightly to
+            98.1% - up from 97.7% in 2017.
+          </p>
+          <h3 className="govuk-heading-s">Primary National Offer Day</h3>
+          <p>
+            These statistics come from the process undertaken by local
+            authorities (LAs) which enabled them to send out offers of primary
+            school places to all applicants on the{' '}
+            <a href="/glossary#national-offer-day">
+              Primary National Offer Day
+            </a>{' '}
+            of 16 April 2018.
+          </p>
+          <p>
+            The primary figures have been collected and published since 2014 and
+            can be viewed as a time series in the following table.
           </p>
           <p>
             INSERT - Table B: Timeseries of key primary preference rates,
@@ -346,28 +425,55 @@ const PublicationPageExclusions = () => {
           </p>
         </AccordionSection>
         <AccordionSection heading="Primary geographical variation ">
+          <h3 className="govuk-heading-s">First preference rates</h3>
           <p>
-            At local authority level East Riding of Yorkshire (97.6%),
-            Northumberland (97.4%) and Rutland (97.4%) achieved the best first
-            preference rates in 2018. All these authorities are in the top three
-            for the first time in the last three years. The local authorities
-            with the worst first preference rates in 2018 were Kensington &
-            Chelsea with 68.4%, Camden (76.5%) and Hammersmith & Fulham (76.6%).
-            Both Kensington & Chelsea and Hammersmith & Fulham have been in the
-            bottom three performers in this measure for the last three years.
-            Although overall results are better at primary level than at
-            secondary, for London local authorities the improvement is much more
-            marked. In 2018, for London as a whole, the first preference rate at
-            primary level was 86.6% (85.9% in 2017), compared to 66.0% at
-            secondary level (68.2% in 2017).
+            At local authority (LA) level, the 3 highest first preference rates
+            were achieved by the following local authorities:
           </p>
+          <ul className="govuk-list-bullet">
+            <li>East Riding of Yorkshire - 97.6%</li>
+            <li>Northumberland - 97.4%</li>
+            <li>Rutland - 97.4%</li>
+          </ul>
+          <p>
+            These authorities are in the top 3 for the first time since 2015.
+          </p>
+          <p>The lowest first preference rates were all in London.</p>
+          <ul className="govuk-list-bullet">
+            <li>Kensington and Chelsea - 68.4%</li>
+            <li>Camden - 76.5%</li>
+            <li>Hammersmith and Fulham - 76.6%</li>
+          </ul>
+          <p>
+            Hammersmith and Fulham and Kensington and Chelsea have both been in
+            the bottom 3 since 2015.
+          </p>
+          <p>
+            Although overall results are better at primary level than at
+            secondary, for London as a whole the improvement is much more
+            marked:
+          </p>
+          <ul className="govuk-list-bullet">
+            <li>
+              primary first preference rate increased to 86.6% - up from 85.9%
+              in 2017
+            </li>
+            <li>
+              secondary first preference rate decreased to 66% - down from 68.%
+              in 2017
+            </li>
+          </ul>
           <p>INSERT CHART HERE!!!</p>
+          <h3 className="govuk-heading-s">Primary offers</h3>
+          <p>
+            In 2018, 97.1% of pimary offers made were from schools inside the
+            home authority. This figure has been stable since 2014 when this
+            data was first collected and published.
+          </p>
           <p>
             As in previous years, at primary level a smaller proportion of
-            offers were made of schools outside the applicant’s local authority
-            compared to secondary level. In 2018 97.1% of offers were inside the
-            home authority. This has remained stable for the five years for
-            which primary data is available.
+            offers were made of schools outside the applicant’s home authority
+            compared to secondary level.
           </p>
         </AccordionSection>
       </Accordion>
@@ -391,35 +497,20 @@ const PublicationPageExclusions = () => {
 
         <AccordionSection heading="About these statistics">
           <p className="govuk-body">
-            The statistics and data cover permanent and fixed period exclusions
-            and school-level exclusions during the 2016/17 academic year in the
-            following state-funded school types as reported in the school
-            census:
+            The statistics and data cover the number of offers made to
+            applicants for primary and secondary school places and the
+            proportion which have received their preferred offers.
           </p>
-          <ul className="govuk-list-bullet">
-            <li>primary schools</li>
-            <li>secondary schools</li>
-            <li>special schools</li>
-          </ul>
           <p className="govuk-body">
-            They also include national-level information on permanent and
-            fixed-period exclusions for{' '}
-            <a href="/glossary#pupil-referral-unit">pupil referral units</a>.
+            The data was collected from local authorities (LAs) where it was
+            produced as part of the annual applications and offers process for
+            applicants requiring a primary or secondary school place in
+            September 2018.
           </p>
           <p>
-            All figures are based on unrounded data so constituent parts may not
-            add up due to rounding.
-          </p>
-          <p>
-            This statistical release provides the number of offers made to
-            applicants for both secondary and primary school places and the
-            proportion which have received preferred offers (1st, 2nd, 3rd
-            preference etc). The data is collected from local authorities, where
-            it is produced as part of the annual application and offer process
-            for applicants requiring a place to start at secondary or at primary
-            school in September 2018. The offers were made, and data collected,
-            based on the national offer days of 1 March 2018 (secondary) and 16
-            April 2018 (primary).
+            The offers were made, and data collected, based on the National
+            Offer Days of 1 March 2018 for secondary schools and 16 April 2018
+            for primary schools.
           </p>
         </AccordionSection>
 
