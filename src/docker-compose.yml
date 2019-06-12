@@ -13,6 +13,7 @@ services:
       ASPNETCORE_ConnectionStrings__StatisticsDb: Server=db;Database=master;User=SA;Password=Your_Password123;Connection Timeout=1000;
     depends_on:
     - db
+    - data-storage
   content-api:
     container_name: ees-content
     build: 
@@ -23,6 +24,8 @@ services:
     - "5011:5011"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+    depends_on:
+    - data-storage
 #  frontend:
 #    container_name: ees-frontend
 #    build: explore-education-statistics-frontend

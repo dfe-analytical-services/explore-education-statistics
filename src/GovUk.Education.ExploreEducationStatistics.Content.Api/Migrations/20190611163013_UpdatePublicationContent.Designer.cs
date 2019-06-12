@@ -3,46 +3,20 @@ using System;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190611163013_UpdatePublicationContent")]
+    partial class UpdatePublicationContent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.2.3-servicing-35854");
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Contact", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("ContactName");
-
-                    b.Property<string>("ContactTelNo");
-
-                    b.Property<string>("TeamEmail");
-
-                    b.Property<string>("TeamName");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Contacts");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("11bb7387-e85e-4571-9669-8a760dcb004f"),
-                            ContactName = "Simon Shakespeare",
-                            ContactTelNo = "0114 262 1619",
-                            TeamEmail = "teamshakes@gmail.com",
-                            TeamName = "Simon's Team"
-                        });
-                });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Link", b =>
                 {
@@ -260,8 +234,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<Guid>("ContactId");
-
                     b.Property<string>("DataSource");
 
                     b.Property<string>("Description");
@@ -281,8 +253,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContactId");
-
                     b.HasIndex("TopicId");
 
                     b.ToTable("Publications");
@@ -291,7 +261,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("d63daa75-5c3e-48bf-a232-f232e0d13898"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-childcare-and-early-years#30-hours-free-childcare",
                             Slug = "30-hours-free-childcare",
                             Summary = "",
@@ -301,7 +270,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("79a08466-dace-4ff0-94b6-59c5528c9262"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-providers-survey",
                             Slug = "childcare-and-early-years-provider-survey",
                             Summary = "",
@@ -311,7 +279,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("060c5376-35d8-420b-8266-517a9339b7bc"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-providers-survey",
                             Slug = "childcare-and-early-years-survey-of-parents",
                             Summary = "",
@@ -321,7 +288,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("0ce6a6c6-5451-4967-8dd4-2f4fa8131982"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-childcare-and-early-years#provision-for-children-under-5-years-of-age-in-england",
                             Slug = "education-provision-children-under-5",
                             Summary = "",
@@ -331,7 +297,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("89869bba-0c00-40f7-b7d6-e28cb904ad37"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-children-in-need#characteristics-of-children-in-need",
                             Slug = "characteristics-of-children-in-need",
                             Summary = "",
@@ -341,7 +306,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("d8baee79-3c88-45f4-b12a-07b91e9b5c11"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-childrens-social-care-workforce#statutory-collection",
                             Slug = "childrens-social-work-workforce",
                             Summary = "",
@@ -351,7 +315,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("fcda2962-82a6-4052-afa2-ea398c53c85f"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-early-years-foundation-stage-profile#results-at-national-and-local-authority-level",
                             Slug = "early-years-foundation-stage-profile-results",
                             Summary = "",
@@ -361,7 +324,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("3260801d-601a-48c6-93b7-cf51680323d1"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-looked-after-children#looked-after-children",
                             Slug = "children-looked-after-in-england-including-adoptions",
                             Summary = "",
@@ -371,7 +333,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("f51895df-c682-45e6-b23e-3138ddbfdaeb"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-looked-after-children#outcomes-for-looked-after-children",
                             Slug = "outcomes-for-children-looked-after-by-las",
                             Summary = "",
@@ -381,7 +342,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("d7bd5d9d-dc65-4b1d-99b1-4d815b7369a3"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-secure-children-s-homes",
                             Slug = "children-accommodated-in-secure-childrens-homes",
                             Summary = "",
@@ -391,7 +351,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("8a92c6a5-8110-4c9c-87b1-e15f1c80c66a"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-destinations#destinations-after-key-stage-4-and-5",
                             Slug = "destinations-of-ks4-and-ks5-pupils",
                             Summary = "",
@@ -401,7 +360,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("42a888c4-9ee7-40fd-9128-f5de546780b3"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/graduate-labour-market-quarterly-statistics#documents",
                             Slug = "graduate-labour-markets",
                             Summary = "",
@@ -411,7 +369,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("a0eb117e-44a8-4732-adf1-8fbc890cbb62"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-neet#participation-in-education",
                             Slug = "participation-in-education-training-and-employement",
                             Summary = "",
@@ -421,7 +378,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("2e510281-ca8c-41bf-bbe0-fd15fcc81aae"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-neet#neet:-2016-to-2017-data-",
                             Slug = "neet-statistics-quarterly-brief",
                             Summary = "",
@@ -431,7 +387,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("8ab47806-e36f-4226-9988-1efe23156872"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-local-authority-school-finance-data#academy-spending",
                             Slug = "income-and-expenditure-in-academies-in-england",
                             Summary = "",
@@ -441,7 +396,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("dcb8b32b-4e50-4fe2-a539-58f9b6b3a366"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-local-authority-school-finance-data#local-authority-and-school-finance",
                             Slug = "la-and-school-expenditure",
                             Summary = "",
@@ -451,7 +405,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("94d16c6e-1e5f-48d5-8195-8ea770f1b0d4"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-local-authority-school-finance-data#planned-local-authority-and-school-spending-",
                             Slug = "planned-la-and-school-expenditure",
                             Summary = "",
@@ -461,7 +414,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("fd68e147-b7ee-464f-8b02-dcd917dc362d"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-student-loan-forecasts#documents",
                             Slug = "student-loan-forecasts-for-england",
                             Summary = "",
@@ -471,7 +423,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("75568912-25ba-499a-8a96-6161b54994db"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/further-education#advanced-learner-loans-applications-2017-to-2018",
                             Slug = "advanced-learner-loans-applications",
                             Summary = "",
@@ -481,7 +432,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("f00a784b-52e8-475b-b8ee-dbe730382ba8"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/fe-choices#employer-satisfaction-survey-data",
                             Slug = "fe-choices-employer-satisfaction-survey",
                             Summary = "",
@@ -491,7 +441,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("657b1484-0369-4a0e-873a-367b79a48c35"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/fe-choices#learner-satisfaction-survey-data",
                             Slug = "fe-choices-learner-satisfaction-survey",
                             Summary = "",
@@ -501,7 +450,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("d24783b6-24a7-4ef3-8304-fd07eeedff92"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#apprenticeships-and-levy---older-data",
                             Slug = "apprenticeship-and-levy-statistics",
                             Summary = "",
@@ -511,7 +459,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("cf0ec981-3583-42a5-b21b-3f2f32008f1b"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#apprenticeships-and-traineeships---older-data",
                             Slug = "apprenticeships-and-traineeships",
                             Summary = "",
@@ -521,7 +468,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("13b81bcb-e8cd-4431-9807-ca588fd1d02a"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/further-education-and-skills-statistical-first-release-sfr#fe-and-skills---older-data",
                             Slug = "further-education-and-skills",
                             Summary = "",
@@ -531,7 +477,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("ce6098a6-27b6-44b5-8e63-36df3a659e69"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/further-education-for-benefit-claimants#documents",
                             Slug = "further-education-and-benefits-claimants",
                             Summary = "",
@@ -541,7 +486,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("7a57d4c0-5233-4d46-8e27-748fbc365715"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/sfa-national-success-rates-tables#national-achievement-rates-tables",
                             Slug = "national-achievement-rates-tables",
                             Summary = "",
@@ -551,7 +495,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("4d29c28c-efd1-4245-a80c-b55c6a50e3f7"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-higher-education-graduate-employment-and-earnings#documents",
                             Slug = "graduate-outcomes",
                             Summary = "",
@@ -561,7 +504,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("d4b9551b-d92c-4f98-8731-847780d3c9fa"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/official-statistics-releases#destinations-of-higher-education-leavers",
                             Slug = "higher-education-destinations-of-leavers",
                             Summary = "",
@@ -571,7 +513,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("14cfd218-5480-4ba1-a051-5b1e6be14b46"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/official-statistics-releases#higher-education-enrolments-and-qualifications",
                             Slug = "higher-education-enrolments-and-qualifications",
                             Summary = "",
@@ -581,7 +522,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("b83f55db-73fc-46fc-9fda-9b59f5896e9d"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/official-statistics-releases#performance-indicators",
                             Slug = "performance-indicators-in-higher-education",
                             Summary = "",
@@ -591,7 +531,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("6c25a3e9-fc96-472f-895c-9ae4492dd2a4"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/official-statistics-releases#staff-at-higher-education",
                             Slug = "staff-at-higher-education-providers-in-the-uk",
                             Summary = "",
@@ -601,7 +540,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("0c67bbdb-4eb0-41cf-a62e-2589cee58538"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-on-higher-education-initial-participation-rates#participation-rates-in-higher-education-for-england",
                             Slug = "participation-rates-in-higher-education",
                             Summary = "",
@@ -611,7 +549,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("c28f7aca-f1e8-4916-8ce3-fc177b140695"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/widening-participation-in-higher-education#documents",
                             Slug = "widening-participation-in-higher-education",
                             Summary = "",
@@ -621,7 +558,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("123461ab-50be-45d9-8523-c5241a2c9c5b"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-admission-appeals#documents",
                             Slug = "admission-appeals-in-england",
                             Summary = "",
@@ -631,7 +567,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             Slug = "permanent-and-fixed-period-exclusions-in-england",
                             Summary = "",
                             Title = "Permanent and fixed-period exclusions in England",
@@ -640,7 +575,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                            ContactId = new Guid("11bb7387-e85e-4571-9669-8a760dcb004f"),
                             DataSource = "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)",
                             NextUpdate = new DateTime(2018, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Slug = "pupil-absence-in-schools-in-england",
@@ -651,7 +585,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("6c388293-d027-4f74-8d74-29a42e02231c"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-pupil-absence#autumn-term-release",
                             Slug = "pupil-absence-in-schools-in-england-autumn-term",
                             Summary = "",
@@ -661,7 +594,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("14953fda-02ff-45ed-9573-3a7a0ad8cb10"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-pupil-absence#combined-autumn--and-spring-term-release",
                             Slug = "pupil-absence-in-schools-in-england-autumn-and-spring",
                             Summary = "",
@@ -671,7 +603,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("86af24dc-67c4-47f0-a849-e94c7a1cfe9b"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/parental-responsibility-measures#official-statistics",
                             Slug = "parental-responsibility-measures",
                             Summary = "",
@@ -681,7 +612,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("aa545525-9ffe-496c-a5b3-974ace56746e"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-pupil-projections#documents",
                             Slug = "national-pupil-projections",
                             Summary = "",
@@ -691,7 +621,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-school-and-pupil-numbers",
                             Slug = "school-pupils-and-their-characteristics",
                             Summary = "",
@@ -701,7 +630,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             Slug = "secondary-and-primary-schools-applications-and-offers",
                             Summary = "",
                             Title = "Secondary and primary schools applications and offers",
@@ -710,7 +638,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("fa591a15-ae37-41b5-98f6-4ce06e5225f4"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-school-capacity#school-capacity-data:-by-academic-year",
                             Slug = "school-capacity",
                             Summary = "",
@@ -720,7 +647,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("f657afb4-8f4a-427d-a683-15f11a2aefb5"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#national-statistics-on-special-educational-needs-in-england",
                             Slug = "special-educational-needs-in-england",
                             Summary = "",
@@ -730,7 +656,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("30874b87-483a-427e-8916-43cf9020d9a1"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#analysis-of-children-with-special-educational-needs",
                             Slug = "special-educational-needs-analysis-and-summary-of-data-sources",
                             Summary = "",
@@ -740,7 +665,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("88312cc0-fe1d-4ab5-81df-33fd708185cb"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#statements-of-special-educational-needs-(sen)-and-education,-health-and-care-(ehc)-plans",
                             Slug = "statements-on-sen-and-ehc-plans",
                             Summary = "",
@@ -750,7 +674,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("1b2fb05c-eb2c-486b-80be-ebd772eda4f1"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-attainment-at-19-years#16-to-18-school-and-college-performance-tables",
                             Slug = "16-to-18-school-and-college-performance-tables",
                             Summary = "",
@@ -760,7 +683,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("3f3a66ec-5777-42ee-b427-8102a14ce0c5"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-attainment-at-19-years#a-levels-and-other-16-to-18-results",
                             Slug = "a-level-and-other-16-to-18-results",
                             Summary = "",
@@ -770,7 +692,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("2e95f880-629c-417b-981f-0901e97776ff"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-attainment-at-19-years#level-2-and-3-attainment",
                             Slug = "level-2-and-3-attainment-by-young-people-aged-19",
                             Summary = "",
@@ -780,7 +701,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("bfdcaae1-ce6b-4f63-9b2b-0a1f3942887f"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#gcse-and-equivalent-results",
                             Slug = "gcse-and-equivalent-results",
                             Summary = "",
@@ -790,7 +710,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("1d0e4263-3d70-433e-bd95-f29754db5888"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#multi-academy-trust-performance-measures",
                             Slug = "multi-academy-trust-performance-measures",
                             Summary = "",
@@ -800,7 +719,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("c8756008-ed50-4632-9b96-01b5ca002a43"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#gcse-and-equivalent-results,-including-pupil-characteristics",
                             Slug = "revised-gcse-and-equivalent-results-in-england",
                             Summary = "",
@@ -810,7 +728,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("9e7e9d5c-b761-43a4-9685-4892392200b7"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#secondary-school-performance-tables",
                             Slug = "secondary-school-performance-tables",
                             Summary = "",
@@ -820,7 +737,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("441a13f6-877c-4f18-828f-119dbd401a5b"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-key-stage-1#phonics-screening-check-and-key-stage-1-assessment",
                             Slug = "phonics-screening-check-and-ks1-assessments",
                             Summary = "",
@@ -830,7 +746,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("7ecea655-7b22-4832-b697-26e86769399a"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-key-stage-2#key-stage-2-national-curriculum-tests:-review-outcomes",
                             Slug = "ks2-national-curriculum-test-review-outcomes",
                             Summary = "",
@@ -840,7 +755,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("eab51107-4ef0-4926-8f8b-c8bd7f5a21d5"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-key-stage-2#national-curriculum-assessments-at-key-stage-2",
                             Slug = "multi-academy-trust-performance-measures",
                             Summary = "",
@@ -850,7 +764,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("10370062-93b0-4dde-9097-5a56bf5b3064"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-key-stage-2#national-curriculum-assessments-at-key-stage-2",
                             Slug = "national-curriculum-assessments-at-ks2",
                             Summary = "",
@@ -860,7 +773,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("2434335f-f8e1-41fb-8d6e-4a11bc62b14a"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-key-stage-2#primary-school-performance-tables",
                             Slug = "primary-school-performance-tables",
                             Summary = "",
@@ -870,7 +782,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("8b12776b-3d36-4475-8115-00974d7de1d0"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-outcome-based-success-measures#statistics",
                             Slug = "further-education-outcome-based-success-measures",
                             Summary = "",
@@ -880,7 +791,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("bddcd4b8-db0d-446c-b6e9-03d4230c6927"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-performance-tables#primary-school-(key-stage-2)",
                             Slug = "primary-school-performance-tables-2",
                             Summary = "",
@@ -890,7 +800,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("263e10d2-b9c3-4e90-a6aa-b52b86de1f5f"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-performance-tables#school-and-college:-post-16-(key-stage-5)",
                             Slug = "school-and-college-performance-tables",
                             Summary = "",
@@ -900,7 +809,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("28aabfd4-a3fb-45e1-bb34-21ca3b7d1aec"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-performance-tables#secondary-school-(key-stage-4)",
                             Slug = "secondary-school-performance-tables",
                             Summary = "",
@@ -910,7 +818,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("d34978d5-0317-46bc-9258-13412270ac4d"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-teacher-training#performance-data",
                             Slug = "initial-teacher-training-performance-profiles",
                             Summary = "",
@@ -920,7 +827,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("9cc08298-7370-499f-919a-7d203ba21415"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-teacher-training#census-data",
                             Slug = "initial-teacher-training-trainee-number-census",
                             Summary = "",
@@ -930,7 +836,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("3ceb43d0-e705-4cb9-aeb9-cb8638fcbf3d"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-teacher-training#teacher-supply-model-and-itt-allocations",
                             Slug = "tsm-and-initial-teacher-training-allocations",
                             Summary = "",
@@ -940,7 +845,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("b318967f-2931-472a-93f2-fbed1e181e6a"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-school-workforce#documents",
                             Slug = "school-workforce-in-england",
                             Summary = "",
@@ -950,7 +854,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("d0b47c96-d7de-4d80-9ff7-3bff135d2636"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/teacher-workforce-statistics-and-analysis#documents",
                             Slug = "teacher-analysis-compendium",
                             Summary = "",
@@ -960,7 +863,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("2ffbc8d3-eb53-4c4b-a6fb-219a5b95ebc8"),
-                            ContactId = new Guid("00000000-0000-0000-0000-000000000000"),
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-education-and-training#documents",
                             Slug = "education-and-training-statistics-for-the-uk",
                             Summary = "",
@@ -1002,7 +904,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         {
                             Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Content = "[{\"Order\":1,\"Heading\":\"About these statistics\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"The statistics and data cover the absence of pupils of compulsory school age during the 2016/17 academic year in the following state-funded school types:\\n\\n- primary schools\\n- secondary schools\\n- special schools\\n\\nThey also includes information fo [pupil referral units](../glossary#pupil-referral-unit) and pupils aged 4 years.\\n\\nWe use the key measures of [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) to monitor pupil absence and also include [absence by reason](#contents-section-heading-4) and [pupil characteristics](#contents-section-heading-6).\\n\\nThe statistics and data are available at national, regional, local authority (LA) and school level and are used by LAs and schools to compare their local absence rates to regional and national averages for different pupil groups.\\n\\nThey're also used for policy development as key indicators in behaviour and school attendance policy.\\n\"}]},{\"Order\":2,\"Heading\":\"Pupil absence rates\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"**Overall absence**\\n\\nThe [overall absence](../glossary#overall-absence) rate has increased across state-funded primary, secondary and special schools between 2015/16 and 2016/17 driven by an increase in the unauthorised absence rate.\\n\\nIt increased from 4.6% to 4.7% over this period while the [unauthorised absence](../glossary#unauthorised-absence) rate increased from 1.1% to 1.3%.\\n\\nThe rate stayed the same at 4% in primary schools but increased from 5.2% to 5.4% for secondary schools. However, in special schools it was much higher and rose to 9.7%.\\n\\nThe overall and [authorised absence](../glossary#authorised-absence) rates have been fairly stable over recent years after gradually decreasing between 2006/07 and 2013/14.\"},{\"Type\":\"DataBlock\",\"Heading\":null,\"DataBlockRequest\":{\"subjectId\":1,\"geographicLevel\":\"National\",\"countries\":null,\"localAuthorities\":null,\"regions\":null,\"startYear\":\"2012\",\"endYear\":\"2016\",\"filters\":[\"1\",\"2\"],\"indicators\":[\"23\",\"26\",\"28\"]},\"Charts\":[{\"Indicators\":[\"23\",\"26\",\"28\"],\"XAxis\":{\"title\":\"School Year\"},\"YAxis\":{\"title\":\"Absence Rate\"},\"Type\":\"line\"}],\"Summary\":null,\"Tables\":[{\"indicators\":[\"23\",\"26\",\"28\"]}]},{\"Type\":\"MarkDownBlock\",\"Body\":\"**Unauthorised absence**\\n\\nThe [unauthorised absence](../glossary#unauthorised-absence) rate has not varied much since 2006/07 but is at its highest since records began - 1.3%.\\n\\nThis is due to an increase in absence due to family holidays not agreed by schools.\\n\\n**Authorised absence**\\n\\nThe [authorised absence](../glossary#authorised-absence) rate has stayed at 3.4% since 2015/16 but has been decreasing in recent years within primary schools.\\n\\n**Total number of days missed**\\n\\nThe total number of days missed for [overall absence](../glossary#overall-absence) across state-funded primary, secondary and special schools has increased to 56.7 million from 54.8 million in 2015/16.\\n\\nThis partly reflects a rise in the total number of pupils with the average number of days missed per pupil slightly increased to 8.2 days from 8.1 days in 2015/16.\\n\\nIn 2016/17, 91.8% of primary, secondary and special school pupils missed at least 1 session during the school year - similar to the 91.7% figure from 2015/16.\"}]},{\"Order\":3,\"Heading\":\"Persistent absence\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"The [persistent absence](../glossary#persistent-absence) rate increased to and accounted for 37.6% of all absence - up from 36.6% in 2015 to 16 but still down from 43.3% in 2011 to 12.\\n\\nIt also accounted for almost a third (31.6%) of all [authorised absence](../glossary#authorised-absence) and more than half (53.8%) of all [unauthorised absence](../glossary#unauthorised-absence).\\n\\nOverall, it's increased across primary and secondary schools to 10.8% - up from 10.5% in 2015 to 16.\"},{\"Type\":\"DataBlock\",\"Heading\":null,\"DataBlockRequest\":{\"subjectId\":1,\"geographicLevel\":\"National\",\"countries\":null,\"localAuthorities\":null,\"regions\":null,\"startYear\":\"2012\",\"endYear\":\"2016\",\"filters\":[\"1\",\"2\"],\"indicators\":[\"23\",\"26\",\"28\"]},\"Charts\":[{\"Indicators\":[\"23\",\"26\",\"28\"],\"XAxis\":{\"title\":\"School Year\"},\"YAxis\":{\"title\":\"Absence Rate\"},\"Type\":\"line\"}],\"Summary\":null,\"Tables\":[{\"indicators\":[\"23\",\"26\",\"28\"]}]},{\"Type\":\"MarkDownBlock\",\"Body\":\"**Persistent absentees**\\n\\nThe [overall absence](../glossary#overall-absence) rate for persistent absentees across all schools increased to 18.1% - nearly 4 times higher than the rate for all pupils. This is slightly up from 17.6% in 2015/16.\\n\\n**Illness absence rate**\\n\\nThe illness absence rate is almost 4 times higher for persistent absentees at 7.6% compared to 2% for other pupils.\"}]},{\"Order\":4,\"Heading\":\"Reasons for absence\",\"Caption\":\"\",\"Content\":[{\"Type\":\"InsetTextBlock\",\"Heading\":null,\"Body\":\"These have been broken down into the following:\\n\\n* distribution of absence by reason - the proportion of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of absences\\n\\n* rate of absence by reason - the rate of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of possible sessions\\n\\n* one or more sessions missed due to each reason - the number of pupils missing at least 1 session due to each reason\"},{\"Type\":\"DataBlock\",\"Heading\":null,\"DataBlockRequest\":{\"subjectId\":1,\"geographicLevel\":\"National\",\"countries\":null,\"localAuthorities\":null,\"regions\":null,\"startYear\":\"2012\",\"endYear\":\"2016\",\"filters\":[\"1\",\"2\"],\"indicators\":[\"23\",\"26\",\"28\"]},\"Charts\":[{\"Indicators\":[\"23\",\"26\",\"28\"],\"XAxis\":{\"title\":\"School Year\"},\"YAxis\":{\"title\":\"Absence Rate\"},\"Type\":\"line\"}],\"Summary\":null,\"Tables\":[{\"indicators\":[\"23\",\"26\",\"28\"]}]},{\"Type\":\"MarkDownBlock\",\"Body\":\"**Illness**\\n\\nThis is the main driver behind [overall absence](../glossary#overall-absence) and accounted for 55.3% of all absence - down from 57.3% in 2015/16 and 60.1% in 2014/15.\\n\\nWhile the overall absence rate has slightly increased since 2015/16 the illness rate has stayed the same at 2.6%.\\n\\nThe absence rate due to other unauthorised circumstances has also stayed the same since 2015/16 at 0.7%.\\n\\n**Absence due to family holiday**\\n\\nThe unauthorised holiday absence rate has increased gradually since 2006/07 while authorised holiday absence rates are much lower than in 2006/07 and remained steady over recent years.\\n\\nThe percentage of pupils who missed at least 1 session due to family holiday increased to 16.9% - up from 14.7% in 2015/16.\\n\\nThe absence rate due to family holidays agreed by the school stayed at 0.1%.\\n\\nMeanwhile, the percentage of all possible sessions missed due to unauthorised family holidays increased to 0.4% - up from 0.3% in 2015/16.\\n\\n**Regulation amendment**\\n\\nA regulation amendment in September 2013 stated that term-time leave could only be granted in exceptional circumstances which explains the sharp fall in authorised holiday absence between 2012/13 and 2013/14.\\n\\nThese statistics and data relate to the period after the [Isle of Wight Council v Jon Platt High Court judgment (May 2016)](https://commonslibrary.parliament.uk/insights/term-time-holidays-supreme-court-judgment/) where the High Court supported a local magistrates’ ruling that there was no case to answer.\\n\\nThey also partially relate to the period after the April 2017 Supreme Court judgment where it unanimously agreed that no children should be taken out of school without good reason and clarified that 'regularly' means 'in accordance with the rules prescribed by the school'.\"}]},{\"Order\":5,\"Heading\":\"Distribution of absence\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"Nearly half of all pupils (48.9%) were absent for 5 days or less across primary, secondary and special schools - down from 49.1% in 2015/16.\\n\\nThe average total absence for primary school pupils was 7.2 days compared to 16.9 days for special school and 9.3 day for secondary school pupils.\\n\\nThe rate of pupils who had more than 25 days of absence stayed the same as in 2015/16 at 4.3%.\\n\\nThese pupils accounted for 23.5% of days missed while 8.2% of pupils had no absence.\\n\\n**Absence by term**\\n\\nAcross all schools:\\n\\n* [overall absence](../glossary#overall-absence) - highest in summer and lowest in autumn\\n\\n* [authorised absence](../glossary#authorised-absence) - highest in spring and lowest in summer\\n\\n* [unauthorised absence](../glossary#unauthorised-absence) - highest in summer\"}]},{\"Order\":6,\"Heading\":\"Absence by pupil characteristics\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"The [overall absence](../glossary#overall-absence) and [persistent absence](..glossary#persistent-absence) patterns for pupils with different characteristics have been consistent over recent years.\\n\\n**Ethnic groups**\\n\\nOverall absence rate:\\n\\n* Travellers of Irish heritage and Gypsy / Roma pupils - highest at 18.1% and 12.9% respectively\\n\\n* Chinese and Black African ethnicity pupils - substantially lower than the national average of 4.7% at 2.4% and 2.9% respectively\\n\\nPersistent absence rate:\\n\\n* Travellers of Irish heritage pupils - highest at 64%\\n\\n* Chinese pupils - lowest at 3.1%\\n\\n**Free school meals (FSM) eligibility**\\n\\nOverall absence rate:\\n\\n* pupils known to be eligible for and claiming FSM - higher at 7.3% compared to 4.2% for non-FSM pupils\\n\\nPersistent absence rate:\\n\\n* pupils known to be eligible for and claiming FSM - more than double the rate of non-FSM pupils\\n\\n**Gender**\\n\\nOverall absence rate:\\n\\n* boys and girls - very similar at 4.7% and 4.6% respectively\\n\\nPersistent absence rate:\\n\\n* boys and girls - similar at 10.9% and 10.6% respectively\\n\\n**National curriculum year group**\\n\\nOverall absence rate:\\n\\n* pupils in national curriculum year groups 3 and 4 - lowest at 3.9% and 4% respectively\\n\\n* pupils in national curriculum year groups 10 and 11 - highest at 6.1% and 6.2% respectively\\n\\nThis trend is repeated for the persistent absence rate.\\n\\n**Special educational need (SEN)**\\n\\nOverall absence rate:\\n\\n* pupils with a SEN statement or education healthcare (EHC) plan - 8.2% compared to 4.3% for those with no identified SEN\\n\\nPersistent absence rate:\\n\\n* pupils with a SEN statement or education healthcare (EHC) plan - more than 2 times higher than pupils with no identified SEN\"}]},{\"Order\":7,\"Heading\":\"Absence for 4-year-olds\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"The [overall absence](../glossary#overall-absence) rate decreased to 5.1% - down from 5.2% for the previous 2 years.\\n\\nAbsence recorded for 4-year-olds is not treated as authorised or unauthorised and only reported as overall absence.\"}]},{\"Order\":8,\"Heading\":\"Pupil referral unit absence\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"The [overall absence](../glossary#overall-absence) rate increased to 33.9% - up from 32.6% in 2015/16.\\n\\nThe [persistent absence](../glossary#persistent-absence) rate increased to 73.9% - up from 72.5% in 2015/16.\"}]},{\"Order\":9,\"Heading\":\"Regional and local authority (LA) breakdown\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"MAP GOES HERE\"},{\"Type\":\"MarkDownBlock\",\"Body\":\"[Overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) rates vary across primary, secondary and special schools by region and local authority (LA).\\n\\n**Overall absence**\\n\\nSimilar to 2015/16, the 3 regions with the highest rates across all school types were:\\n\\n* North East - 4.9%\\n\\n* Yorkshire and the Humber - 4.9%\\n\\n* South West - 4.8%\\n\\nMeanwhile, Inner and Outer London had the lowest rates at 4.4%.\\n\\n**Persistent absence**\\n\\nThe region with the highest persistent absence rate was Yorkshire and the Humber with 11.9% while Outer London had the lowest rate at 10%.\\n\\n**Local authority (LA) level data**\\n\\nDownload data in the following formats or access our data via our API:\\n\\n[Download .csv files]('#')\\n\\n[Download Excel files]('#')\\n\\n[Download pdf files]('#')\\n\\n[Access API]('#') - [What is an API?]('../glossary#what-is-an-api')\"}]}]",
-                            KeyStatistics = "{\"Type\":\"DataBlock\",\"Heading\":null,\"DataBlockRequest\":{\"subjectId\":1,\"geographicLevel\":\"National\",\"countries\":null,\"localAuthorities\":null,\"regions\":null,\"startYear\":\"2012\",\"endYear\":\"2016\",\"filters\":[\"1\",\"2\"],\"indicators\":[\"23\",\"26\",\"28\"]},\"Charts\":null,\"Summary\":{\"dataKeys\":[\"23\",\"26\",\"28\"],\"dataSummary\":[\"Up from 40.1 in 2015/16\",\"Down from 40.1 in 2015/16\",\"Up from 40.1 in 2015/16\"],\"description\":{\"Type\":\"MarkDownBlock\",\"Body\":\" * pupils missed on average 8.2 school days\\n * overall and unauthorised absence rates up on 2015/16\\n * unauthorised absence rise due to higher rates of unauthorised holidays\\n * 10% of pupils persistently absent during 2016/17\"}},\"Tables\":null}",
+                            KeyStatistics = "{\"Type\":\"DataBlock\",\"Heading\":null,\"DataBlockRequest\":{\"subjectId\":1,\"geographicLevel\":\"National\",\"countries\":null,\"localAuthorities\":null,\"regions\":null,\"startYear\":\"2012\",\"endYear\":\"2016\",\"filters\":[\"1\",\"2\"],\"indicators\":[\"23\",\"26\",\"28\"]},\"Charts\":null,\"Summary\":{\"dataKeys\":[\"23\",\"26\",\"28\"],\"description\":{\"Type\":\"MarkDownBlock\",\"Body\":\" * pupils missed on average 8.2 school days\\n * overall and unauthorised absence rates up on 2015/16\\n * unauthorised absence rise due to higher rates of unauthorised holidays\\n * 10% of pupils persistently absent during 2016/17\"}},\"Tables\":null}",
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             Published = new DateTime(2018, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "2016 to 2017",
@@ -1020,7 +922,7 @@ Find out how and why these statistics are collected and published - [Pupil absen
                         {
                             Id = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"),
                             Content = "[{\"Order\":1,\"Heading\":\"About this release\",\"Caption\":\"\",\"Content\":null},{\"Order\":2,\"Heading\":\"Absence rates\",\"Caption\":\"\",\"Content\":null},{\"Order\":3,\"Heading\":\"Persistent absence\",\"Caption\":\"\",\"Content\":null},{\"Order\":4,\"Heading\":\"Distribution of absence\",\"Caption\":\"\",\"Content\":null},{\"Order\":5,\"Heading\":\"Absence for four year olds\",\"Caption\":\"\",\"Content\":null},{\"Order\":6,\"Heading\":\"Pupil referral unit absence\",\"Caption\":\"\",\"Content\":null},{\"Order\":7,\"Heading\":\"Pupil absence by local authority\",\"Caption\":\"\",\"Content\":null}]",
-                            KeyStatistics = "{\"Type\":\"DataBlock\",\"Heading\":null,\"DataBlockRequest\":null,\"Charts\":null,\"Summary\":{\"dataKeys\":[\"--\",\"--\",\"--\"],\"dataSummary\":[\"\",\"\",\"\"],\"description\":{\"Type\":\"MarkDownBlock\",\"Body\":\"\"}},\"Tables\":null}",
+                            KeyStatistics = "{\"Type\":\"DataBlock\",\"Heading\":null,\"DataBlockRequest\":null,\"Charts\":null,\"Summary\":{\"dataKeys\":[\"--\",\"--\",\"--\"],\"description\":{\"Type\":\"MarkDownBlock\",\"Body\":\"\"}},\"Tables\":null}",
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             Published = new DateTime(2016, 3, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "2015 to 2016",
@@ -1032,7 +934,7 @@ Find out how and why these statistics are collected and published - [Pupil absen
                         {
                             Id = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Content = "[{\"Order\":1,\"Heading\":\"About this release\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"The statistics and data cover permanent and fixed period exclusions and school-level exclusions during the 2016/17 academic year in the following state-funded school types as reported in the school census:\\n\\n* primary schools\\n\\n* secondary schools\\n\\n* special schools\\n\\nThey also include national-level information on permanent and fixed-period exclusions for [pupil referral units](../glossary#pupil-referral-unit).\\n\\nAll figures are based on unrounded data so constituent parts may not add up due to rounding.\"}]},{\"Order\":2,\"Heading\":\"Permanent exclusions\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"The number of [permanent exclusions](../glossary#permanent-exclusion) has increased across all state-funded primary, secondary and special schools to 7,720 - up from 6,685 in 2015/16.\\n\\nThis works out to an average 40.6 permanent exclusions per day - up from an 35.2 per day in 2015/16.\\n\\nThe permanent exclusion rate has also increased to 0.10% of pupils - up from from 0.08% in 2015/16 - which is equivalent to around 10 pupils per 10,000.\"},{\"Type\":\"DataBlock\",\"Heading\":\"Chart showing permanent exclusions in England\",\"DataBlockRequest\":null,\"Charts\":null,\"Summary\":null,\"Tables\":null},{\"Type\":\"MarkDownBlock\",\"Body\":\"Most occurred in secondary schools which accounted for 83% of all permanent exclusions.\\n\\nThe [permanent exclusion](../glossary#permanent-exclusion) rate in secondary schools increased 0.20% - up from from 0.17% in 2015/16 - which is equivalent to 20 pupils per 10,000.\\n\\nThe rate also rose in primary schools to 0.03% but decreased in special schools to 0.07% - down from from 0.08% in 2015/16.\\n\\nThe rate generally followed a downward trend after 2006/07 - when it stood at 0.12%.\\n\\nHowever, since 2012/13 it has been on the rise although rates are still lower now than in 2006/07.\"}]},{\"Order\":3,\"Heading\":\"Fixed-period exclusions\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"The number of fixed-period exclusionshas increased across all state-funded primary, secondary and special schools to 381,865 - up from 339,360 in 2015/16.\\n\\nThis works out to around 2,010 fixed-period exclusions per day - up from an 1,786 per day in 2015/16.\"},{\"Type\":\"DataBlock\",\"Heading\":\"Chart showing fixed-period exclusions in England\",\"DataBlockRequest\":null,\"Charts\":null,\"Summary\":null,\"Tables\":null},{\"Type\":\"MarkDownBlock\",\"Body\":\"**Primary schools**\\n\\n* fixed-period exclusions numbers increased to 64,340 - up from 55,740 in 2015/16\\n\\n* fixed-period exclusions rate increased to 1.37% - up from 1.21% in 2015/16\\n\\n**Secondary schools**\\n\\n* fixed-period exclusions numbers increased to 302,890 - up from 270,135 in 2015/16\\n\\n* fixed-period exclusions rate increased to 9.4% - up from 8.46% in 2015/16\\n\\n**Special schools**\\n\\n* fixed-period exclusions numbers increased to 14,635 - up from 13,485 in 2015/16\\n\\n* fixed-period exclusions rate increased to 13.03% - up from 12.53% in 2015/16\"}]},{\"Order\":4,\"Heading\":\"Number and length of fixed-period exclusions\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"**Pupils with one or more fixed-period exclusion definition**\\n\\nThe number of pupils with one or more [fixed-period exclusion](../glossary#one-or-more-fixed-period-exclusion) has increased across state-funded primary, secondary and special schools to 183,475 (2.29% of pupils) up from 167,125 (2.11% of pupils) in 2015/16.\\n\\nOf these kinds of pupils, 59.1% excluded on only 1 occasion while 1.5% received 10 or more fixed-period exclusions during the year.\\n\\nThe percentage of pupils who went on to receive a [permanent exclusion](../glossary#permanent-exclusion) was 3.5%.\\n\\nThe average length of [fixed-period exclusions](../glossary#fixed-period-exclusions) across schools decreased to 2.1 days - slightly shorter than in 2015/16.\\n\\nThe highest proportion of fixed-period exclusions (46.6%) lasted for only 1 day.\\n\\nOnly 2.0% of fixed-period exclusions lasted for longer than 1 week and longer fixed-period exclusions were more prevalent in secondary schools.\"}]},{\"Order\":5,\"Heading\":\"Reasons for exclusions\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"All reasons (except bullying and theft) saw an increase in [permanent exclusions](../glossary#permanent-exclusion) since 2015/16.\\n\\nThe following most common reasons saw the largest increases:\\n\\n* physical assault against a pupil\\n\\n* persistent disruptive behaviour\\n\\n* other reasons\\n\\n**Persistent disruptive behaviour**\\n\\nRemained the most common reason for permanent exclusions accounting for 2,755 (35.7%) of all permanent exclusions - which is equivalent to 3 permanent exclusions per 10,000 pupils.\\n\\nHowever, in special schools the most common reason for exclusion was physical assault against an adult - accounting for 37.8% of all permanent exclusions and 28.1% of all [fixed-period exclusions](../glossary#fixed-period-exclusion).\\n\\nPersistent disruptive behaviour is also the most common reason for fixed-period exclusions accounting for 108,640 %) of all fixed-period exclusions - up from 27.7% in 2015/16. This is equivalent to around 135 fixed-period exclusions per 10,000 pupils.\\n\\nAll reasons saw an increase in fixed-period exclusions since 2015/16. Persistent disruptive behaviour and other reasons saw the largest increases.\"}]},{\"Order\":6,\"Heading\":\"Exclusions by pupil characteristics\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"We saw a similar pattern to previous years where the following groups (ones where we usually expect to see higher exclusion rates) showing an increase in exclusions since 2015/16:\\n\\n* boys\\n\\n* national curriculum years 9 and 10\\n\\n* pupils with special educational needs (SEN)\\n\\n* pupils known to be eligible for and claiming free school meals (FSM)\\n\\n**Age, national curriculum year group and gender**\\n\\n* more than half of all [permanent exclusions](../glossary#permanent-exclusion) (57.2%) and [fixed-period exclusions](../glossary#fixed-period-exclusion) (52.6 %) occur in national curriculum year 9 or above\\n\\n* a quarter (25%) of all permanent exclusions were for pupils aged 14 - who also had the highest rates for fixed-period exclusion and pupils receiving [one or more fixed-period exclusion](../glossary#one-or-more-fixed-period-exclusion)\\n\\n* the permanent exclusion rate for boys (0.15%) was more than 3 times higher than for girls (0.04%)\\n\\n* the fixed-period exclusion rate for boys (6.91%) was almost 3 times higher than for girls (2.53%)\\n\\n**Pupils eligible for and claiming free school meals (FSM)**\\n\\n* had a permanent exclusion rate of 0.28% and fixed period exclusion rate of 12.54% - around 4 times higher than those not eligible for FSM at 0.07% and 3.50% respectively\\n\\n* accounted for 40% of all permanent exclusions and 36.7% of all fixed-period exclusions\\n\\n**Special educational needs (SEN) pupils**\\n\\n* accounted for around half of all permanent exclusions (46.7%) and fixed-period exclusions (44.9%)\\n\\n* had the highest permanent exclusion rate (0.35%0 - 6 times higher than the rate for pupils with no SEN (0.06%)\\n\\n* pupils with a statement of SEN or education, health and care (EHC) plan had the highest fixed-period exclusion rate at 15.93% - more than 5 times higher than pupils with no SEN (3.06%)\\n\\n**Ethnic group**\\n\\n* pupils of Gypsy/Roma and Traveller of Irish Heritage ethnic groups had the highest rates of permanent and fixed-period exclusions - but as the population is relatively small these figures should be treated with some caution\\n\\n* pupils from a Black Caribbean background had a permanent exclusion rate nearly 3 times higher (0.28%) than the school population as a whole (0.10%)\\n\\n* pupils of Asian ethnic groups had the lowest permanent and fixed-period exclusion rates\"}]},{\"Order\":7,\"Heading\":\"Independent exclusion reviews\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"There were 560 reviews lodged with [independent review panels](../glossary#independent-review-panels) in maintained primary, secondary and special schools and academies of which 525 (93.4%) were determined and 45 (8.0%) resulted in an offer of reinstatement.\"}]},{\"Order\":8,\"Heading\":\"Pupil referral units exclusions\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"**Permanent exclusion**\\n\\nThe [permanent exclusion](../glossary#permanent-exclusion) rate in [pupil referral units](../glossary#pupil-referral-unit) decreased to 0.13 - down from 0.14% in 2015/16.\\n\\nPermanent exclusions rates have remained fairly steady following an increase between 2013/14 and 2014/15.\\n\\n**Fixed-period exclusion**\\n\\nThe [fixed period exclusion](../glossary#fixed-period-exclusion) rate has been steadily increasing since 2013/14.\\n\\nThe percentage of pupils in pupil referral units who 1 or more fixed-period exclusion increased to 59.17% - up from 58.15% in 2015/16.\"}]},{\"Order\":9,\"Heading\":\"Regional and local authority (LA) breakdown\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"There's considerable variation in the [permanent exclusion](../glossary#permanent-exclusion) and [fixed-period exclusion](../glossary#fixed-period-exclusion) rate at the LA level.\\n\\n**Permanent exclusion**\\n\\nSimilar to 2015/16, the regions with the joint-highest rates across all school types were:\\n\\n* North West - 0.14%\\n\\n* North West - 0.14%\\n\\nSimilar to 2015/16, the regions with the lowest rates were:\\n\\n* the South East - 0.06%\\n\\n* Yorkshire and the Humber - 0.07%\\n\\n**Fixed-period exclusion**\\n\\nSimilar to 2015/16, the region with the highest rates across all school types was Yorkshire and the Humber at 7.22% while the lowest rate was in Outer London (3.49%).\"}]}]",
-                            KeyStatistics = "{\"Type\":\"DataBlock\",\"Heading\":null,\"DataBlockRequest\":{\"subjectId\":12,\"geographicLevel\":\"National\",\"countries\":null,\"localAuthorities\":null,\"regions\":null,\"startYear\":\"2012\",\"endYear\":\"2016\",\"filters\":[\"727\"],\"indicators\":[\"153\",\"154\",\"155\",\"156\",\"158\"]},\"Charts\":null,\"Summary\":{\"dataKeys\":[\"155\",\"156\",\"158\"],\"dataSummary\":[\"Up from 40.1 in 2015/16\",\"Down from 40.1 in 2015/16\",\"Up from 40.1 in 2015/16\"],\"description\":{\"Type\":\"MarkDownBlock\",\"Body\":\" * overall permanent exclusions rate has increased to 0.10% - up from 0.08% in 2015/16\\n * number of exclusions increased to 7,720 - up from 6,685 in 2015/16\\n * overall fixed-period exclusions rate increased to 4.76% - up from 4.29% in 2015/16\\n * number of exclusions increased to 381,865 - up from 339,360 in 2015/16\\n\"}},\"Tables\":null}",
+                            KeyStatistics = "{\"Type\":\"DataBlock\",\"Heading\":null,\"DataBlockRequest\":{\"subjectId\":12,\"geographicLevel\":\"National\",\"countries\":null,\"localAuthorities\":null,\"regions\":null,\"startYear\":\"2012\",\"endYear\":\"2016\",\"filters\":[\"727\"],\"indicators\":[\"153\",\"154\",\"155\",\"156\",\"158\"]},\"Charts\":null,\"Summary\":{\"dataKeys\":[\"155\",\"156\",\"158\"],\"description\":{\"Type\":\"MarkDownBlock\",\"Body\":\" * overall permanent exclusions rate has increased to 0.10% - up from 0.08% in 2015/16\\n * number of exclusions increased to 7,720 - up from 6,685 in 2015/16\\n * overall fixed-period exclusions rate increased to 4.76% - up from 4.29% in 2015/16\\n * number of exclusions increased to 381,865 - up from 339,360 in 2015/16\\n\"}},\"Tables\":null}",
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             Published = new DateTime(2018, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "2016 to 2017",
@@ -1050,7 +952,7 @@ Find out how and why these statistics are collected and published - [Permanent a
                         {
                             Id = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                             Content = "[{\"Order\":1,\"Heading\":\"About this release\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"The statistics and data cover the number of offers made to applicants for primary and secondary school places and the proportion which have received their preferred offers.\\n\\nThe data was collected from local authorities (LAs) where it was produced as part of the annual applications and offers process for applicants requiring a primary or secondary school place in September 2018.\\n\\nThe offers were made, and data collected, based on the National Offer Days of 1 March 2018 for secondary schools and 16 April 2018 for primary schools.\"}]},{\"Order\":2,\"Heading\":\"Secondary applications and offers\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"**Secondary applications**\\n\\nThe number of applications received for secondary school places increased to 582,761 - up 3.6% since 2017. This follows a 2.6% increase between 2016 and 2017.\\n\\nThis continues the increase in secondary applications seen since 2013 which came on the back of a rise in births which began in the previous decade.\\n\\nSince 2013, when secondary applications were at their lowest, there has been a 16.6% increase in the number of applications.\\n\\n**Secondary offers**\\n\\nThe proportion of secondary applicants receiving an offer of their first-choice school has decreased to 82.1% - down from 83.5% in 2017.\\n\\nThe proportion of applicants who received an offer of any of their preferred schools also decreased slightly to 95.5% - down from 96.1% in 2017.\\n\\n**Secondary National Offer Day**\\n\\nThese statistics come from the process undertaken by local authorities (LAs) which enabled them to send out offers of secondary school places to all applicants on the [Secondary National Offer Day](../glossary#national-offer-day) of 1 March 2018.\\n\\nThe secondary figures have been collected since 2008 and can be viewed as a time series in the following table.\"},{\"Type\":\"DataBlock\",\"Heading\":\"Table of Timeseries of key secondary preference rates, England\",\"DataBlockRequest\":null,\"Charts\":null,\"Summary\":null,\"Tables\":null}]},{\"Order\":3,\"Heading\":\"Secondary geographical variation\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"**First preference rates**\\n\\nAt local authority (LA) level, the 3 highest first preference rates were achieved by the following local authorities:\\n\\n* Northumberland - 98.1%\\n\\n* East Riding of Yorkshire - 96.7%\\n\\n* Bedford - 96.4%\\n\\nNorthumberland has been the top performer in this measure since 2015.\\n\\nAs in previous years, the lowest first preference rates were all in London.\\n\\n* Hammersmith and Fulham - 51.4%\\n\\n* Kensington and Chelsea - 54.3%\\n\\n* Lambeth - 55.2%\\n\\nThese figures do not include City of London which has a tiny number of applications and no secondary schools.\\n\\nHammersmith and Fulham has had the lowest first preference rate since 2015.\\n\\nThe higher number of practical options available to London applicants and ability to name 6 preferences may encourage parents to make more speculative choices for their top preferences.\\n\\n**Regional variation**\\n\\nThere's much less regional variation in the proportions receiving any preferred offer compared to those for receiving a first preference as shown in the following chart.\"},{\"Type\":\"DataBlock\",\"Heading\":\"Chart showing Secondary school preferences by region, 2018\",\"DataBlockRequest\":null,\"Charts\":null,\"Summary\":null,\"Tables\":null},{\"Type\":\"MarkDownBlock\",\"Body\":\"An applicant can apply for any school, including those situated in another local authority (LA).\\n\\nTheir authority liaises with the requested school (to make sure the applicant is considered under the admissions criteria) and makes the offer.\\n\\n**Secondary offers**\\n\\nIn 2018, 91.6% of secondary offers made were from schools inside the home authority. This figure has been stable for the past few years.\\n\\nThis release concentrates on the headline figures for the proportion of children receiving their first preference or a preferred offer.\\n\\nHowever, the main tables provide more information including:\\n\\n* the number of places available\\n\\n* the proportion of children for whom a preferred offer was not received\\n\\n* whether applicants were provided with offers inside or outside their home authority\"}]},{\"Order\":4,\"Heading\":\"Primary applications and offers\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"**Primary applications**\\n\\nThe number of applications received for primary school places decreased to 608,180 - down 2% on 2017 (620,330).\\n\\nThis is the result of a notable fall in births since 2013 which is now feeding into primary school applications.\\n\\nThe number of primary applications is the lowest seen since 2013 - when this data was first collected.\\n\\n**Primary offers**\\n\\nThe proportion of primary applicants receiving an offer of their first-choice school has increased to 91% - up from 90% in 2017.\\n\\nThe proportion of applicants who received an offer of any of their offer of any of their preferences has also increased slightly to 98.1% - up from 97.7% in 2017.\\n\\n**Primary National Offer Day**\\n\\nThese statistics come from the process undertaken by local authorities (LAs) which enabled them to send out offers of primary school places to all applicants on the Primary National Offer Day of 16 April 2018.\\n\\nThe primary figures have been collected and published since 2014 and can be viewed as a time series in the following table.\"},{\"Type\":\"DataBlock\",\"Heading\":\"Table showing Timeseries of key primary preference rates, England Entry into academic year\",\"DataBlockRequest\":null,\"Charts\":null,\"Summary\":null,\"Tables\":null}]},{\"Order\":5,\"Heading\":\"Primary geographical variation\",\"Caption\":\"\",\"Content\":[{\"Type\":\"MarkDownBlock\",\"Body\":\"**First preference rates**\\n\\nAt local authority (LA) level, the 3 highest first preference rates were achieved by the following local authorities:\\n\\n* East Riding of Yorkshire - 97.6%\\n\\n* Northumberland - 97.4%\\n\\n* Rutland - 97.4%\\n\\nThese authorities are in the top 3 for the first time since 2015.\\n\\nThe lowest first preference rates were all in London.\\n\\n* Kensington and Chelsea - 68.4%\\n\\n* Camden - 76.5%\\n\\n* Hammersmith and Fulham - 76.6%\\n\\nHammersmith and Fulham and Kensington and Chelsea have both been in the bottom 3 since 2015.\\n\\nAlthough overall results are better at primary level than at secondary, for London as a whole the improvement is much more marked:\\n\\n* primary first preference rate increased to 86.6% - up from 85.9% in 2017\\n\\n* secondary first preference rate decreased to 66% - down from 68.% in 2017\"},{\"Type\":\"DataBlock\",\"Heading\":\"Chart showing Primary school preferences by region, 2018\",\"DataBlockRequest\":null,\"Charts\":null,\"Summary\":null,\"Tables\":null},{\"Type\":\"MarkDownBlock\",\"Body\":\"**Primary offers**\\n\\nIn 2018, 97.1% of pimary offers made were from schools inside the home authority. This figure has been stable since 2014 when this data was first collected and published.\\n\\nAs in previous years, at primary level a smaller proportion of offers were made of schools outside the applicant’s home authority compared to secondary level.\"}]}]",
-                            KeyStatistics = "{\"Type\":\"DataBlock\",\"Heading\":null,\"DataBlockRequest\":{\"subjectId\":17,\"geographicLevel\":\"National\",\"countries\":null,\"localAuthorities\":null,\"regions\":null,\"startYear\":\"2014\",\"endYear\":\"2018\",\"filters\":[\"845\"],\"indicators\":[\"193\"]},\"Charts\":null,\"Summary\":{\"dataKeys\":[\"193\"],\"dataSummary\":null,\"description\":{\"Type\":\"MarkDownBlock\",\"Body\":\"* majority of applicants received a preferred offer\\n* percentage of applicants receiving secondary first choice offers decreases as applications increase\\n* slight proportional increase in applicants receiving primary first choice offer as applications decrease\\n\"}},\"Tables\":null}",
+                            KeyStatistics = "{\"Type\":\"DataBlock\",\"Heading\":null,\"DataBlockRequest\":{\"subjectId\":17,\"geographicLevel\":\"National\",\"countries\":null,\"localAuthorities\":null,\"regions\":null,\"startYear\":\"2014\",\"endYear\":\"2018\",\"filters\":[\"845\"],\"indicators\":[\"193\"]},\"Charts\":null,\"Summary\":{\"dataKeys\":[\"193\"],\"description\":{\"Type\":\"MarkDownBlock\",\"Body\":\"* majority of applicants received a preferred offer\\n* percentage of applicants receiving secondary first choice offers decreases as applications increase\\n* slight proportional increase in applicants receiving primary first choice offer as applications decrease\\n\"}},\"Tables\":null}",
                             PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
                             Published = new DateTime(2018, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "2018",
@@ -1601,11 +1503,6 @@ Find out how and why these statistics are collected and published - [Secondary a
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Contact", "Contact")
-                        .WithMany()
-                        .HasForeignKey("ContactId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", "Topic")
                         .WithMany("Publications")
                         .HasForeignKey("TopicId")
