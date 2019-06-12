@@ -7,6 +7,8 @@ export default function findAllByText<T extends HTMLElement = HTMLElement>(
   selector: string,
 ): T[] {
   return Array.from(document.querySelectorAll(selector)).filter(element =>
-    element.innerHTML.toLocaleLowerCase().includes(text.toLocaleLowerCase()),
+    (element.textContent || '')
+      .toLocaleLowerCase()
+      .includes(text.toLocaleLowerCase()),
   ) as T[];
 }
