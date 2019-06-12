@@ -24,7 +24,7 @@ function PublicationList({ publications }: Props) {
     <>
       {publications.length > 0 ? (
         publications.map(({ id, title, dataFiles }) => (
-          <>
+          <React.Fragment key={id}>
             <h3 className="govuk-heading-s">Download files for: {title}</h3>
             <ul className="govuk-list govuk-list--bullet">
               {dataFiles.map(({ extension, name, path, size }) => (
@@ -36,11 +36,11 @@ function PublicationList({ publications }: Props) {
                   >
                     {name}
                   </Link>
-                  {` `}({extension}, {size})
+                  {` (${extension}, ${size})`}
                 </li>
               ))}
             </ul>
-          </>
+          </React.Fragment>
         ))
       ) : (
         <></>
