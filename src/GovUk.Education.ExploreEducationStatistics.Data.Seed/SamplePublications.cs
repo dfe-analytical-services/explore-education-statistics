@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                             new Publication
                             {
                                 Id = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                                Title = "Pupil absence data and statistics for schools in England",
+                                Title = "Pupil absence in schools in England",
                                 Slug = "pupil-absence-in-schools-in-england",
                                 Releases = new[]
                                 {
@@ -210,7 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                             new Publication
                             {
                                 Id = new Guid("fcda2962-82a6-4052-afa2-ea398c53c85f"),
-                                Title = "Early years foundation stage profile data",
+                                Title = "Early years foundation stage profile results",
                                 Slug = "early-years-foundation-stage-profile-results",
                                 Releases = new[]
                                 {
