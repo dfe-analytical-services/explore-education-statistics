@@ -41,6 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
             var blobClient = storageAccount.CreateCloudBlobClient();
             var blobContainer = blobClient.GetContainerReference(containerName);
+            blobContainer.CreateIfNotExists();
 
             return blobContainer.ListBlobs($"{publication}/{release}", true, BlobListingDetails.Metadata)
                 .OfType<CloudBlockBlob>()
