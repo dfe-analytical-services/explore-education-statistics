@@ -19,16 +19,24 @@ interface SearchResult {
   location: string;
 }
 
+interface Props {
+  elementSelectors: string[];
+}
+
 interface State {
   currentlyHighlighted?: number;
   searchResults: SearchResult[];
   searchValue: string;
 }
 
-class SearchForm extends Component<{}, State> {
+class SearchForm extends Component<Props, State> {
   public state: State = {
     searchResults: [],
     searchValue: '',
+  };
+
+  public static defaultProps = {
+    elementSelectors: ['p', 'li > strong', 'h2', 'h3', 'h4'],
   };
 
   private boundPerformSearch = debounce(this.performSearch, 1000);
@@ -61,13 +69,14 @@ class SearchForm extends Component<{}, State> {
   }
 
   private performSearch() {
+    const { elementSelectors } = this.props;
     const { searchValue } = this.state;
 
     if (searchValue.length <= 3) {
       return;
     }
 
-    const elements = findAllByText(searchValue, 'p');
+    const elements = findAllByText(searchValue, elementSelectors.join(', '));
 
     const searchResults: SearchResult[] = elements.map(element => {
       const location = SearchForm.getLocationText(element);
