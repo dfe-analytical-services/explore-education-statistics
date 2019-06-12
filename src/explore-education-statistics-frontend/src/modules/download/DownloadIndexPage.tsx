@@ -82,13 +82,7 @@ class DownloadIndexPage extends Component<Props> {
                   {topics.map(
                     ({ id: topicId, title: topicTitle, publications }) => (
                       <Details key={topicId} summary={topicTitle}>
-                        <div className="govuk-!-margin-top-0 govuk-!-padding-top-0">
-                          <ul className="govuk-bulllet-list govuk-!-margin-bottom-9">
-                            <PublicationDownloadList
-                              publications={publications}
-                            />
-                          </ul>
-                        </div>
+                        <PublicationDownloadList publications={publications} />
                       </Details>
                     ),
                   )}
