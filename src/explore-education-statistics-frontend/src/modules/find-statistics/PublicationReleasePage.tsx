@@ -116,7 +116,7 @@ class PublicationReleasePage extends Component<Props> {
             <Details summary="Download data files">
               <ul className="govuk-list govuk-list--bullet">
                 {data.dataFiles.map(({ extension, name, path, size }) => (
-                  <li key={path} data-testid="item-download">
+                  <li key={path}>
                     <Link
                       to={`${baseUrl.data}/api/download/${path}`}
                       className="govuk-link"
