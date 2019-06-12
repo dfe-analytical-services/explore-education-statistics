@@ -514,10 +514,7 @@ const PublicationPageExclusions = () => {
           </p>
         </AccordionSection>
 
-        <AccordionSection
-          heading="Official OR National Statistics"
-          headingTag="h3"
-        >
+        <AccordionSection heading="Official Statistics" headingTag="h3">
           <p className="govuk-body">
             The{' '}
             <a href="https://www.statisticsauthority.gov.u">
