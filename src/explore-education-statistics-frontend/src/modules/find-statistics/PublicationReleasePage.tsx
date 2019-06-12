@@ -123,7 +123,7 @@ class PublicationReleasePage extends Component<Props> {
                     >
                       {name}
                     </Link>
-                    {` `}({extension}, {size})
+                    {` (${extension}, ${size})`}
                   </li>
                 ))}
               </ul>
