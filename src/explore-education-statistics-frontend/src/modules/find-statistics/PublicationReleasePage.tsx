@@ -138,9 +138,7 @@ class PublicationReleasePage extends Component<Props> {
               </Link>
             </Details>
 
-            <div className="govuk-!-margin-top-3 govuk-!-margin-bottom-3">
-              <SearchForm />
-            </div>
+            <SearchForm className="govuk-!-margin-top-3 govuk-!-margin-bottom-3" />
           </div>
 
           <div className="govuk-grid-column-one-third">

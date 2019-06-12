@@ -7,6 +7,7 @@ import { openAllParentTabSections } from '@common/components/TabsSection';
 import findAllByText from '@common/lib/dom/findAllByText';
 import findParent from '@common/lib/dom/findParent';
 import findPreviousSibling from '@common/lib/dom/findPreviousSibling';
+import classNames from 'classnames';
 import debounce from 'lodash/debounce';
 import React, { ChangeEvent, Component, ReactNode } from 'react';
 import Highlighter from 'react-highlight-words';
@@ -20,6 +21,7 @@ interface SearchResult {
 }
 
 interface Props {
+  className?: string;
   elementSelectors: string[];
 }
 
@@ -133,11 +135,12 @@ class SearchForm extends Component<Props, State> {
   };
 
   public render() {
+    const { className } = this.props;
     const { searchResults, currentlyHighlighted, searchValue } = this.state;
 
     return (
       <form
-        className={styles.container}
+        className={classNames(styles.container, className)}
         onSubmit={e => e.preventDefault()}
         autoComplete="off"
         role="search"

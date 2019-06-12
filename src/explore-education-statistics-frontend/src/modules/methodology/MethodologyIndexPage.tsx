@@ -1,6 +1,7 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import RelatedInformation from '@common/components/RelatedInformation';
+import SearchForm from '@common/components/SearchForm';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
@@ -23,6 +24,8 @@ function MethodologyIndexPage() {
             Browse to find out about the methodology behind specific education
             statistics and data and how and why they're collected and published.
           </p>
+
+          <SearchForm />
         </div>
         <div className="govuk-grid-column-one-third">
           <RelatedInformation>
