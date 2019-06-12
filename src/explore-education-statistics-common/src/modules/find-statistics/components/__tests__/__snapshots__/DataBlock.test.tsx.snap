@@ -46,14 +46,14 @@ exports[`DataBlock datablock renders map 1`] = `
                       id="selectedIndicator"
                       name="selectedIndicator"
               >
-                <option value="23">
-                  Unauthorised absence rate
+                <option value="28">
+                  Authorised absence rate
                 </option>
                 <option value="26">
                   Overall absence rate
                 </option>
-                <option value="28">
-                  Authorised absence rate
+                <option value="23">
+                  Unauthorised absence rate
                 </option>
               </select>
             </div>
@@ -67,49 +67,49 @@ exports[`DataBlock datablock renders map 1`] = `
                       id="selectedLocation"
                       name="selectedLocation"
               >
-                <option value>
-                  select...
-                </option>
                 <option value="E92000001">
                   England
+                </option>
+                <option value>
+                  select...
                 </option>
               </select>
             </div>
           </form>
           <div>
             <h3 class="govuk-heading-s">
-              Key to Unauthorised absence rate
+              Key to Authorised absence rate
             </h3>
             <dl class="govuk-list">
               <dd class="legend">
                 <span class="rate0">
                   &nbsp;
                 </span>
-                NaN%&nbsp; to NaN%
+                5.0%&nbsp; to 5.0%
               </dd>
               <dd class="legend">
                 <span class="rate1">
                   &nbsp;
                 </span>
-                NaN%&nbsp; to NaN%
+                5.0%&nbsp; to 5.0%
               </dd>
               <dd class="legend">
                 <span class="rate2">
                   &nbsp;
                 </span>
-                NaN%&nbsp; to NaN%
+                5.0%&nbsp; to 5.0%
               </dd>
               <dd class="legend">
                 <span class="rate3">
                   &nbsp;
                 </span>
-                NaN%&nbsp; to NaN%
+                5.0%&nbsp; to 5.0%
               </dd>
               <dd class="legend">
                 <span class="rate4">
                   &nbsp;
                 </span>
-                NaN%&nbsp; to NaN%
+                5.0%&nbsp; to 5.0%
               </dd>
             </dl>
           </div>
@@ -144,6 +144,18 @@ exports[`DataBlock datablock renders map 1`] = `
                           fill-opacity="0.2"
                           fill-rule="evenodd"
                           d="M-3 3L-3 -3L3 -3L3 3z"
+                    >
+                    </path>
+                    <path class="rateNaN leaflet-interactive"
+                          stroke="#3388ff"
+                          stroke-opacity="1"
+                          stroke-width="3"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          fill="#3388ff"
+                          fill-opacity="0.2"
+                          fill-rule="evenodd"
+                          d="M0 0"
                     >
                     </path>
                   </g>

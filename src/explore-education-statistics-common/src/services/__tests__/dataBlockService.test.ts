@@ -1,6 +1,5 @@
 /* eslint-disable prefer-destructuring */
 import dataBlockService, {
-  DataBlockGeoJSON,
   DataBlockRequest,
   GeographicLevel,
 } from '@common/services/dataBlockService';
@@ -33,7 +32,7 @@ describe('dataBlockService', () => {
     indicators: ['23', '26', '28'],
   };
 
-  test('Call datablock service', async () => {
+  test('calls API /Data endpoint', async () => {
     const result = await dataBlockService.getDataBlockForSubject(
       dataBlockRequest,
     );
@@ -41,27 +40,5 @@ describe('dataBlockService', () => {
     expect(dataApi.post).toBeCalledWith('/Data', dataBlockRequest);
 
     expect(result).toMatchSnapshot(result);
-  });
-
-  test('DataBlock service returns geojson data', async () => {
-    const result = await dataBlockService.getDataBlockForSubject(
-      dataBlockRequest,
-    );
-
-    expect(dataApi.post).toBeCalledWith('/Data', dataBlockRequest);
-
-    expect(result.metaData.locations).not.toBeUndefined();
-
-    expect(result.metaData.locations.E92000001).not.toBeUndefined();
-
-    // @ts-ignore
-    const geoJson: DataBlockGeoJSON[] =
-      result.metaData.locations.E92000001.geoJson;
-
-    expect(geoJson.length).toBe(1);
-
-    expect(geoJson[0].geometry).not.toBeUndefined();
-
-    expect(geoJson[0].properties).not.toBeUndefined();
   });
 });

@@ -3,8 +3,6 @@ import React from 'react';
 
 import { render, wait } from 'react-testing-library';
 
-import domUtil from '@common-test/domUtil';
-
 import testData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
 import MapBlock from '../MapBlock';
 import { DataBlockGeoJSON } from '@common/services/dataBlockService';
@@ -20,12 +18,7 @@ describe('MapBlock', () => {
       testData.AbstractChartProps.meta.locations.E92000001.geoJson;
 
     const { container } = render(
-      <MapBlock
-        {...testData.AbstractChartProps}
-        height={600}
-        width={900}
-        geometry={geoJson}
-      />,
+      <MapBlock {...testData.AbstractChartProps} height={600} width={900} />,
     );
 
     await wait();

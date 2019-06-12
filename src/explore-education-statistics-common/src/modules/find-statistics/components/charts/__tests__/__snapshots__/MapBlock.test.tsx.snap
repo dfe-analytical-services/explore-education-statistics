@@ -25,9 +25,9 @@ exports[`MapBlock MapBlock renders 1`] = `
             name="selectedIndicator"
           >
             <option
-              value="23"
+              value="28"
             >
-              Unauthorised absence rate
+              Authorised absence rate
             </option>
             <option
               value="26"
@@ -35,9 +35,9 @@ exports[`MapBlock MapBlock renders 1`] = `
               Overall absence rate
             </option>
             <option
-              value="28"
+              value="23"
             >
-              Authorised absence rate
+              Unauthorised absence rate
             </option>
           </select>
         </div>
@@ -56,14 +56,14 @@ exports[`MapBlock MapBlock renders 1`] = `
             name="selectedLocation"
           >
             <option
-              value=""
-            >
-              select...
-            </option>
-            <option
               value="E92000001"
             >
               England
+            </option>
+            <option
+              value=""
+            >
+              select...
             </option>
           </select>
         </div>
@@ -74,7 +74,7 @@ exports[`MapBlock MapBlock renders 1`] = `
           class="govuk-heading-s"
         >
           Key to 
-          Unauthorised absence rate
+          Authorised absence rate
         </h3>
         <dl
           class="govuk-list"
@@ -88,10 +88,10 @@ exports[`MapBlock MapBlock renders 1`] = `
                
             </span>
              
-            NaN
+            5.0
             %
               to 
-            NaN
+            5.0
             %
              
           </dd>
@@ -104,10 +104,10 @@ exports[`MapBlock MapBlock renders 1`] = `
                
             </span>
              
-            NaN
+            5.0
             %
               to 
-            NaN
+            5.0
             %
              
           </dd>
@@ -120,10 +120,10 @@ exports[`MapBlock MapBlock renders 1`] = `
                
             </span>
              
-            NaN
+            5.0
             %
               to 
-            NaN
+            5.0
             %
              
           </dd>
@@ -136,10 +136,10 @@ exports[`MapBlock MapBlock renders 1`] = `
                
             </span>
              
-            NaN
+            5.0
             %
               to 
-            NaN
+            5.0
             %
              
           </dd>
@@ -152,10 +152,10 @@ exports[`MapBlock MapBlock renders 1`] = `
                
             </span>
              
-            NaN
+            5.0
             %
               to 
-            NaN
+            5.0
             %
              
           </dd>
@@ -194,6 +194,18 @@ exports[`MapBlock MapBlock renders 1`] = `
                 <path
                   class="uk leaflet-interactive"
                   d="M-3 3L-3 -3L3 -3L3 3z"
+                  fill="#3388ff"
+                  fill-opacity="0.2"
+                  fill-rule="evenodd"
+                  stroke="#3388ff"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-opacity="1"
+                  stroke-width="3"
+                />
+                <path
+                  class="rateNaN leaflet-interactive"
+                  d="M0 0"
                   fill="#3388ff"
                   fill-opacity="0.2"
                   fill-rule="evenodd"

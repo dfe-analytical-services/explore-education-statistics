@@ -19,9 +19,8 @@ import { FormSelect } from '@common/components/form';
 import classNames from 'classnames';
 import { SelectOption } from '@common/components/form/FormSelect';
 import { Dictionary } from '@common/types/util';
-import UKGeoJson from '@common/services/UKGeoJson';
 
-import { Layer, LeafletMouseEvent, Path } from 'leaflet';
+import { Layer, LeafletMouseEvent, Path, Polyline } from 'leaflet';
 import Details from '@common/components/Details';
 import styles from './MapBlock.module.scss';
 
@@ -44,9 +43,12 @@ interface MapState {
 
   selected: {
     indicator: string;
+    timePeriod: number;
     location: string;
     results: IdValue[];
   };
+
+  ukGeometry?: FeatureCollection;
 
   geometry: FeatureCollection<Geometry, DataBlockGeoJsonProperties> | undefined;
   legend: LegendEntry[];
@@ -88,28 +90,36 @@ class MapBlock extends Component<MapProps, MapState> {
 
   private readonly geoJsonRef = createRef<GeoJSON>();
 
-  public constructor(props: MapProps) {
-    super(props);
+  public state: MapState = {
+    selected: {
+      indicator: '',
+      timePeriod: 0,
+      location: '',
+      results: [],
+    },
+    options: {
+      location: [],
+    },
+    geometry: undefined,
+    legend: [],
+  };
 
-    const { indicators } = props;
-
-    this.state = {
-      selected: {
-        indicator: indicators[0],
-        location: '',
-        results: [],
-      },
-      options: {
-        location: [],
-      },
-      geometry: undefined,
-      legend: [],
-    };
-  }
-
-  public componentDidMount(): void {
+  public async componentDidMount() {
     const { data, meta } = this.props;
-    const { selected } = this.state;
+    let { selected } = this.state;
+
+    const sortedMeasures = Object.values(meta.indicators).sort((a, b) =>
+      a.label.localeCompare(b.label),
+    );
+
+    // TODO, if required, allow range of years to be selected
+    const firstTimePeriod = data.result[0].year;
+
+    selected = {
+      ...selected,
+      indicator: sortedMeasures[0].value,
+      timePeriod: firstTimePeriod,
+    };
 
     const {
       geometry,
@@ -118,9 +128,13 @@ class MapBlock extends Component<MapProps, MapState> {
       data,
       meta,
       selected.indicator,
+      selected.timePeriod,
     );
 
+    const imported = await import('@common/services/UKGeoJson');
+
     this.setState({
+      selected,
       options: {
         location: MapBlock.getLocationsForIndicator(
           data,
@@ -130,6 +144,7 @@ class MapBlock extends Component<MapProps, MapState> {
       },
       geometry,
       legend,
+      ukGeometry: imported.default,
     });
 
     const forceRefresh = () => {
@@ -183,13 +198,13 @@ class MapBlock extends Component<MapProps, MapState> {
     }[],
     min: number,
     scale: number,
-  ) {
+  ): FeatureCollection<Geometry, DataBlockGeoJsonProperties> {
     const calculateColorStyle = (value: number) =>
       styles[
         `rate${Math.min(Math.floor((value - min) / scale), 4).toFixed(0)}`
       ];
 
-    const value: FeatureCollection<Geometry, DataBlockGeoJsonProperties> = {
+    return {
       type: 'FeatureCollection',
       features: sourceData.map(({ location, selectedMeasure, measures }) => ({
         ...location.geoJson[0],
@@ -201,23 +216,21 @@ class MapBlock extends Component<MapProps, MapState> {
         },
       })),
     };
-
-    return value;
   }
 
   private static generateGeometryAndLegendForSelectedOptions(
     data: DataBlockData,
     meta: DataBlockMetadata,
     selectedIndicator: string,
-    selectedYear: number = 2016,
+    selectedYear: number,
   ) {
     const displayedFilter = +selectedIndicator;
 
     const sourceData = this.calculateSourceData(
       data,
-      selectedYear,
       meta,
       displayedFilter,
+      selectedYear,
     );
 
     const { min, scale } = this.calculateMinAndScaleForSourceData(sourceData);
@@ -258,9 +271,9 @@ class MapBlock extends Component<MapProps, MapState> {
 
   private static calculateSourceData(
     data: DataBlockData,
-    selectedYear: number,
     meta: DataBlockMetadata,
     displayedFilter: number,
+    selectedYear: number,
   ) {
     const resultsFilteredByYear = data.result.filter(
       result => result.year === selectedYear,
@@ -298,7 +311,7 @@ class MapBlock extends Component<MapProps, MapState> {
       }
     }
 
-    return { element: undefined, layer: undefined, feature: undefined };
+    return {};
   }
 
   private updateGeometryForOptions = () => {
@@ -310,6 +323,7 @@ class MapBlock extends Component<MapProps, MapState> {
         data,
         meta,
         selected.indicator,
+        selected.timePeriod,
       ),
     });
   };
@@ -325,6 +339,7 @@ class MapBlock extends Component<MapProps, MapState> {
       data,
       meta,
       newSelectedIndicator,
+      selected.timePeriod,
     );
 
     this.updateGeojsonGeometry(geometry);
@@ -376,11 +391,14 @@ class MapBlock extends Component<MapProps, MapState> {
     if (selectedLocationElement && selectedLayer && selectedFeature) {
       selectedLocationElement.classList.add(styles.selected);
 
-      // @ts-ignore
-      this.mapRef.current.leafletElement.fitBounds(selectedLayer.getBounds(), {
-        padding: [200, 200],
-      });
-      selectedLayer.bringToFront();
+      if (this.mapRef.current) {
+        const polyLine: Polyline = selectedLayer as Polyline;
+
+        this.mapRef.current.leafletElement.fitBounds(polyLine.getBounds(), {
+          padding: [200, 200],
+        });
+        selectedLayer.bringToFront();
+      }
 
       const { properties } = selectedFeature;
 
@@ -435,8 +453,11 @@ class MapBlock extends Component<MapProps, MapState> {
             }`,
         );
 
-        // @ts-ignore
-        content.unshift(`<strong>${meta.locations[feature.id].label}</strong>`);
+        if (feature.id) {
+          content.unshift(
+            `<strong>${meta.locations[feature.id].label}</strong>`,
+          );
+        }
 
         return content.join('<br />');
       }
@@ -461,8 +482,9 @@ class MapBlock extends Component<MapProps, MapState> {
       indicators,
     } = this.props;
 
-    const { selected, options, geometry, legend } = this.state;
+    const { selected, options, geometry, legend, ukGeometry } = this.state;
 
+    // TODO if filters are ever wanted to be included in the Maps
     const groupOptions: GroupOption[] = [];
 
     /*
@@ -504,8 +526,6 @@ class MapBlock extends Component<MapProps, MapState> {
     );
     */
 
-    const uk = UKGeoJson.UK;
-
     return (
       <div className="govuk-grid-row">
         <div
@@ -520,7 +540,6 @@ class MapBlock extends Component<MapProps, MapState> {
                 label="Select data to view"
                 value={selected.indicator}
                 onChange={e => this.onSelectIndicator(e.currentTarget.value)}
-                order={null}
                 options={indicators.map(
                   indicator => meta.indicators[indicator],
                 )}
@@ -534,7 +553,6 @@ class MapBlock extends Component<MapProps, MapState> {
                 label="Select a location"
                 value={selected.location}
                 onChange={e => this.selectLocationOption(e.currentTarget.value)}
-                order={null}
                 options={options.location}
               />
             </div>
@@ -555,7 +573,6 @@ class MapBlock extends Component<MapProps, MapState> {
                       e.currentTarget.value,
                     )
                   }
-                  order={null}
                   options={grouping.options}
                 />
               </div>
@@ -594,7 +611,7 @@ class MapBlock extends Component<MapProps, MapState> {
             ''
           )}
 
-          {
+          {selected.indicator !== '' ? (
             <div>
               <h3 className="govuk-heading-s">
                 Key to {meta.indicators[selected.indicator].label}
@@ -610,7 +627,9 @@ class MapBlock extends Component<MapProps, MapState> {
                   ))}
               </dl>
             </div>
-          }
+          ) : (
+            ''
+          )}
         </div>
 
         <div className={classNames('govuk-grid-column-two-thirds')}>
@@ -627,7 +646,11 @@ class MapBlock extends Component<MapProps, MapState> {
             // zoomSnap={0.5}
             // maxBounds={this.state.maxBounds}
           >
-            {uk ? <GeoJSON data={uk} className={styles.uk} /> : ''}
+            {ukGeometry ? (
+              <GeoJSON data={ukGeometry} className={styles.uk} />
+            ) : (
+              ''
+            )}
 
             {geometry ? (
               <GeoJSON
@@ -640,7 +663,7 @@ class MapBlock extends Component<MapProps, MapState> {
                     feature.properties.className} ${
                     feature && feature.id === selected.location
                       ? styles.selected
-                      : 'hello'
+                      : ''
                   } `,
                 })}
                 onclick={this.onClick}

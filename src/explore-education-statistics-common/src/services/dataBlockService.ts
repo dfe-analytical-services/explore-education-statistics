@@ -3,8 +3,6 @@ import TimePeriod, { TimePeriodCode } from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import { Feature, Geometry } from 'geojson';
 
-// import LocationService from './temporaryLocationService';
-
 export enum GeographicLevel {
   Establishment = 'Establishment',
   LocalAuthority = 'Local_Authority',

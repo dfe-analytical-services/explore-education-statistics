@@ -2,7 +2,6 @@ import React from 'react';
 
 import { render } from 'react-testing-library';
 
-import domUtil from '@common-test/domUtil';
 import HorzontalBarBlock from '../HorizontalBarBlock';
 
 import testData from './__data__/testBlockData';
@@ -19,28 +18,22 @@ describe('HorzontalBarBlock', () => {
     );
 
     expect(
-      domUtil.elementContainingText(
-        container,
-        '.xAxis text tspan',
-        'test x axis',
-      ).length,
-    ).toBe(1);
+      container.querySelector('.xAxis text.recharts-label tspan'),
+    ).toHaveTextContent('test x axis');
+    expect(
+      container.querySelector('.yAxis text.recharts-label tspan'),
+    ).toHaveTextContent('test y axis');
 
     expect(
-      domUtil.elementContainingText(
-        container,
-        '.yAxis text tspan',
-        'test y axis',
-      ).length,
-    ).toBe(1);
-
+      container.querySelector(
+        '.yAxis .recharts-cartesian-axis-tick:nth-child(1) text tspan',
+      ),
+    ).toHaveTextContent('2014/15');
     expect(
-      domUtil.elementContainingText(container, 'text tspan', '2014/15').length,
-    ).toBe(1);
-
-    expect(
-      domUtil.elementContainingText(container, 'text tspan', '2015/16').length,
-    ).toBe(1);
+      container.querySelector(
+        '.yAxis .recharts-cartesian-axis-tick:nth-child(2) text tspan',
+      ),
+    ).toHaveTextContent('2015/16');
 
     expect(container).toMatchSnapshot();
   });

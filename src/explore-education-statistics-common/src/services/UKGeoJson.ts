@@ -13851,6 +13851,4 @@ const UK: FeatureCollection = {
   ],
 };
 
-export default {
-  UK,
-};
+export default UK;

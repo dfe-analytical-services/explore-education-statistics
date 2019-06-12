@@ -145,7 +145,7 @@ export const newChartsApiDataBlock: DataBlockProps = {
     localAuthorities: [],
     countries: [],
     geographicLevel: GeographicLevel.LocalAuthorityDistrict,
-    startYear: '2014',
+    startYear: '2016',
     endYear: '2017',
     indicators: ['23', '26', '28', '27'],
     filters: ['1', '2'],
