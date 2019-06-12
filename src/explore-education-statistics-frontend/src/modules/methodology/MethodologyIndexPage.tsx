@@ -27,7 +27,7 @@ class DownloadIndexPage extends Component<Props> {
   };
 
   public static async getInitialProps() {
-    const themes = await contentApi.get('/Content/tree');
+    const themes = await contentApi.get('/Download/tree');
     return { themes };
   }
 
