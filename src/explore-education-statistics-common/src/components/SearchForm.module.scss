@@ -4,16 +4,11 @@
   margin-bottom: govuk-spacing(0);
   position: relative;
 
-  @include govuk-media-query($until: tablet) {
-    button {
-      margin-top: govuk-spacing(2);
-    }
-  }
-
-  .dfeSearchButton {
+  .searchButton {
     background: $govuk-link-colour url('/static/images/search-button.png') 1px -17px;
     border: 2px solid $govuk-input-border-colour;
     box-sizing: content-box;
+    cursor: pointer;
     height: 36px;
     padding: 0;
     position: absolute;
@@ -22,8 +17,8 @@
     width: 36px;
   }
 
-  .dfeSearchButton:focus,
-  .dfeSearchButton:hover {
+  .searchButton:focus,
+  .searchButton:hover {
     background: $govuk-link-hover-colour url('/static/images/search-button.png')
       1px -17px;
     border: 2px solid $govuk-focus-colour;
@@ -48,7 +43,7 @@
 
 .results li {
   margin: 0;
-  padding: 5px;
+  padding: govuk-spacing(1);
 
   &:focus,
   &:hover {

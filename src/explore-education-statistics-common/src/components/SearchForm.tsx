@@ -170,9 +170,9 @@ class SearchForm extends Component<{}, State> {
             onInput={this.onChange}
             onChange={this.onChange}
           />
-          <input
+          <button
             type="submit"
-            className={styles.dfeSearchButton}
+            className={styles.searchButton}
             value="Search this page"
             onClick={() => this.performSearch()}
           />
