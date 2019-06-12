@@ -8,14 +8,14 @@ import findAllByText from '@common/lib/dom/findAllByText';
 import findParent from '@common/lib/dom/findParent';
 import findPreviousSibling from '@common/lib/dom/findPreviousSibling';
 import debounce from 'lodash/debounce';
-import truncate from 'lodash/truncate';
-import React, { ChangeEvent, Component } from 'react';
+import React, { ChangeEvent, Component, ReactNode } from 'react';
+import Highlighter from 'react-highlight-words';
 import styles from './SearchForm.module.scss';
 
 interface SearchResult {
   element: Element;
   scrollIntoView: () => void;
-  text: string;
+  text: ReactNode;
   location: string;
 }
 
@@ -91,7 +91,12 @@ class SearchForm extends Component<{}, State> {
         element,
         location,
         scrollIntoView,
-        text: truncate(element.textContent || ''),
+        text: (
+          <Highlighter
+            searchWords={[searchValue]}
+            textToHighlight={element.textContent || ''}
+          />
+        ),
       };
     });
 
@@ -191,10 +196,8 @@ class SearchForm extends Component<{}, State> {
                   }
                   onClick={result.scrollIntoView}
                 >
-                  <span className={styles.resultHeader}>{result.text}</span>
-                  <span className={styles.resultLocation}>
-                    {result.location}
-                  </span>
+                  <div className={styles.resultHeader}>{result.text}</div>
+                  <div className={styles.resultLocation}>{result.location}</div>
                 </li>
               );
             })}

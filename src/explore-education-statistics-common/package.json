@@ -132,5 +132,8 @@
   "jest-junit": {
     "ancestorSeparator": " › "
   },
-  "dependencies": {}
+  "dependencies": {
+    "@types/react-highlight-words": "^0.16.0",
+    "react-highlight-words": "^0.16.0"
+  }
 }
