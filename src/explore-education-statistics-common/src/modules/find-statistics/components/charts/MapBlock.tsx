@@ -545,6 +545,7 @@ class MapBlock extends Component<MapProps, MapState> {
                 options={indicators.map(
                   indicator => meta.indicators[indicator],
                 )}
+                order={[]}
               />
             </div>
 
@@ -556,6 +557,7 @@ class MapBlock extends Component<MapProps, MapState> {
                 value={selected.location}
                 onChange={e => this.selectLocationOption(e.currentTarget.value)}
                 options={options.location}
+                order={[]}
               />
             </div>
 
@@ -569,6 +571,7 @@ class MapBlock extends Component<MapProps, MapState> {
                   id={grouping.id}
                   label={grouping.title}
                   value={grouping.selected}
+                  order={[]}
                   onChange={e =>
                     this.updateSelectedGroupOption(
                       grouping,
@@ -596,9 +599,7 @@ class MapBlock extends Component<MapProps, MapState> {
                     aria-label={meta.indicators[result.id].label}
                   >
                     <span>
-                      {' '}
-                      {result.value}
-                      {meta.indicators[result.id].unit}{' '}
+                      {` ${result.value}${meta.indicators[result.id].unit} `}
                     </span>
                   </p>
                   <Details
@@ -648,32 +649,28 @@ class MapBlock extends Component<MapProps, MapState> {
             // zoomSnap={0.5}
             // maxBounds={this.state.maxBounds}
           >
-            {ukGeometry ? (
-              <GeoJSON data={ukGeometry} className={styles.uk} />
-            ) : (
-              ''
-            )}
+            {ukGeometry && <GeoJSON data={ukGeometry} className={styles.uk} />}
 
-            {geometry ? (
+            {geometry && (
               <GeoJSON
                 ref={this.geoJsonRef}
                 data={geometry}
                 onEachFeature={this.onEachFeature}
                 style={(feature?: Feature) => ({
-                  className: `${feature &&
-                    feature.properties &&
-                    feature.properties.className} ${
-                    feature && feature.id === selected.location
-                      ? styles.selected
-                      : ''
-                  } `,
+                  className: classNames(
+                    feature &&
+                      feature.properties &&
+                      feature.properties.className,
+                    {
+                      [styles.selected]:
+                        feature && feature.id === selected.location,
+                    },
+                  ),
                 })}
                 onclick={this.onClick}
                 // style={this.styleFeature}
                 // onClick={this.handleClick}
               />
-            ) : (
-              ''
             )}
           </Map>
         </div>

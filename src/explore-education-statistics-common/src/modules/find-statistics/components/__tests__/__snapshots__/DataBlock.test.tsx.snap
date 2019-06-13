@@ -46,14 +46,14 @@ exports[`DataBlock datablock renders map 1`] = `
                       id="selectedIndicator"
                       name="selectedIndicator"
               >
-                <option value="28">
-                  Authorised absence rate
+                <option value="23">
+                  Unauthorised absence rate
                 </option>
                 <option value="26">
                   Overall absence rate
                 </option>
-                <option value="23">
-                  Unauthorised absence rate
+                <option value="28">
+                  Authorised absence rate
                 </option>
               </select>
             </div>
@@ -67,11 +67,11 @@ exports[`DataBlock datablock renders map 1`] = `
                       id="selectedLocation"
                       name="selectedLocation"
               >
-                <option value="E92000001">
-                  England
-                </option>
                 <option value>
                   select...
+                </option>
+                <option value="E92000001">
+                  England
                 </option>
               </select>
             </div>
