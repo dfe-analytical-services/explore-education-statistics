@@ -200,7 +200,7 @@ class PublicationReleasePage extends Component<Props> {
                   </Details>
                 </dd>
               </dl>
-              {/* <h2
+              <h2
                 className="govuk-heading-m govuk-!-margin-top-6"
                 id="related-content"
               >
@@ -209,10 +209,13 @@ class PublicationReleasePage extends Component<Props> {
               <nav role="navigation" aria-labelledby="related-content">
                 <ul className="govuk-list">
                   <li>
+                    <Link to={`/methodology/${data.publication.slug}`}>
+                      {`${data.publication.title}: methodology`}
+                    </Link>
                     [Link to relevant methodology section here]
                   </li>
                 </ul>
-              </nav> */}
+              </nav>
             </RelatedAside>
           </div>
         </div>
