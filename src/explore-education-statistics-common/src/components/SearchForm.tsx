@@ -7,9 +7,16 @@ import { openAllParentTabSections } from '@common/components/TabsSection';
 import findAllByText from '@common/lib/dom/findAllByText';
 import findParent from '@common/lib/dom/findParent';
 import findPreviousSibling from '@common/lib/dom/findPreviousSibling';
+import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import debounce from 'lodash/debounce';
-import React, { ChangeEvent, Component, ReactNode } from 'react';
+import React, {
+  ChangeEvent,
+  Component,
+  createRef,
+  KeyboardEvent,
+  ReactNode,
+} from 'react';
 import Highlighter from 'react-highlight-words';
 import styles from './SearchForm.module.scss';
 
@@ -26,13 +33,14 @@ interface Props {
 }
 
 interface State {
-  currentlyHighlighted?: number;
+  selectedResult: number;
   searchResults: SearchResult[];
   searchValue: string;
 }
 
 class SearchForm extends Component<Props, State> {
   public state: State = {
+    selectedResult: -1,
     searchResults: [],
     searchValue: '',
   };
@@ -42,6 +50,10 @@ class SearchForm extends Component<Props, State> {
   };
 
   private boundPerformSearch = debounce(this.performSearch, 1000);
+
+  private readonly resultsRef = createRef<HTMLUListElement>();
+
+  private optionsRefs: Dictionary<HTMLLIElement> = {};
 
   private static getLocationText(element: HTMLElement): string {
     const location = [];
@@ -70,6 +82,76 @@ class SearchForm extends Component<Props, State> {
     return location.join(' > ');
   }
 
+  private selectNextResult = (event: KeyboardEvent<HTMLElement>) => {
+    event.persist();
+    event.preventDefault();
+
+    const { selectedResult, searchResults } = this.state;
+
+    if (!searchResults.length) {
+      return -1;
+    }
+
+    let nextSelectedResult = selectedResult;
+
+    switch (event.key) {
+      case 'ArrowUp':
+        if (selectedResult <= 0) {
+          nextSelectedResult = searchResults.length - 1;
+        } else {
+          nextSelectedResult = selectedResult - 1;
+        }
+        break;
+      case 'ArrowDown':
+        if (selectedResult >= searchResults.length - 1) {
+          nextSelectedResult = 0;
+        } else {
+          nextSelectedResult = selectedResult + 1;
+        }
+        break;
+      default:
+        return selectedResult;
+    }
+
+    this.setState({ selectedResult: nextSelectedResult }, () => {
+      this.adjustResultScroll(event);
+    });
+
+    return nextSelectedResult;
+  };
+
+  private adjustResultScroll = (event: KeyboardEvent<HTMLElement>) => {
+    if (!this.resultsRef.current) {
+      return;
+    }
+
+    const { selectedResult, searchResults } = this.state;
+
+    const optionEl = this.optionsRefs[selectedResult];
+
+    if (!optionEl) {
+      return;
+    }
+
+    switch (event.key) {
+      case 'ArrowUp':
+        if (selectedResult === searchResults.length - 1) {
+          this.resultsRef.current.scrollTop = this.resultsRef.current.scrollHeight;
+        } else {
+          this.resultsRef.current.scrollTop -= optionEl.offsetHeight;
+        }
+        break;
+      case 'ArrowDown':
+        if (selectedResult === 0) {
+          this.resultsRef.current.scrollTop = 0;
+        } else {
+          this.resultsRef.current.scrollTop += optionEl.offsetHeight;
+        }
+        break;
+      default:
+    }
+  };
+
   private performSearch() {
     const { elementSelectors } = this.props;
     const { searchValue } = this.state;
@@ -77,6 +159,8 @@ class SearchForm extends Component<Props, State> {
     if (searchValue.length <= 3) {
       return;
     }
+
+    this.optionsRefs = {};
 
     const elements = findAllByText(searchValue, elementSelectors.join(', '));
 
@@ -116,19 +200,19 @@ class SearchForm extends Component<Props, State> {
 
   private resetSearch() {
     this.setState({
-      currentlyHighlighted: undefined,
+      selectedResult: -1,
       searchResults: [],
       searchValue: '',
     });
   }
 
-  private onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    e.persist();
+  private onChange = (event: ChangeEvent<HTMLInputElement>) => {
+    event.persist();
 
     this.setState({
-      searchValue: e.currentTarget.value,
+      selectedResult: -1,
       searchResults: [],
-      currentlyHighlighted: undefined,
+      searchValue: event.currentTarget.value,
     });
 
     this.boundPerformSearch();
@@ -136,7 +220,7 @@ class SearchForm extends Component<Props, State> {
 
   public render() {
     const { className } = this.props;
-    const { searchResults, currentlyHighlighted, searchValue } = this.state;
+    const { searchResults, selectedResult, searchValue } = this.state;
 
     return (
       <form
@@ -156,31 +240,12 @@ class SearchForm extends Component<Props, State> {
             placeholder="Search this page"
             type="search"
             value={searchValue}
-            onKeyDown={e => {
-              let { currentlyHighlighted: nextHighlighted } = this.state;
+            onKeyDown={event => {
+              if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+                this.selectNextResult(event);
 
-              if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-                const direction = e.key === 'ArrowUp' ? -1 : 1;
-
-                const len = searchResults.length;
-
-                if (nextHighlighted !== undefined) {
-                  nextHighlighted =
-                    ((nextHighlighted || 0) + direction + len) % len;
-                } else if (direction === -1) {
-                  nextHighlighted = len - 1;
-                } else {
-                  nextHighlighted = 0;
-                }
-
-                this.setState({ currentlyHighlighted: nextHighlighted });
-              }
-
-              if (e.key === 'Enter') {
-                if (nextHighlighted !== undefined) {
-                  searchResults[nextHighlighted].scrollIntoView();
-
-                  e.preventDefault();
+                if (this.resultsRef.current) {
+                  this.resultsRef.current.focus();
                 }
               }
             }}
@@ -195,18 +260,37 @@ class SearchForm extends Component<Props, State> {
           />
         </div>
         {searchResults.length > 0 && (
-          <ul className={styles.results}>
+          <ul
+            className={styles.results}
+            ref={this.resultsRef}
+            role="listbox"
+            tabIndex={-1}
+            onKeyDown={event => {
+              const nextSelectedResult = this.selectNextResult(event);
+
+              if (event.key === 'Enter') {
+                if (searchResults[nextSelectedResult]) {
+                  searchResults[nextSelectedResult].scrollIntoView();
+                }
+              }
+            }}
+          >
             {searchResults.map((result: SearchResult, index) => {
-              const key = `search_result_${index}`;
+              const key = index;
 
               return (
-                // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions,jsx-a11y/click-events-have-key-events
+                // eslint-disable-next-line jsx-a11y/click-events-have-key-events
                 <li
+                  aria-selected={selectedResult === index}
                   key={key}
-                  className={
-                    currentlyHighlighted === index ? styles.highlighted : ''
-                  }
+                  className={selectedResult === index ? styles.highlighted : ''}
                   onClick={result.scrollIntoView}
+                  role="option"
+                  ref={el => {
+                    if (el) {
+                      this.optionsRefs[key] = el;
+                    }
+                  }}
                 >
                   <div className={styles.resultHeader}>{result.text}</div>
                   <div className={styles.resultLocation}>{result.location}</div>
