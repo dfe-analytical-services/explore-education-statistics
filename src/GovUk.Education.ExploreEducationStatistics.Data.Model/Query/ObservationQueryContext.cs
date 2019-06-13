@@ -20,7 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
         public IEnumerable<string> MayoralCombinedAuthorities { get; set; }
         public IEnumerable<string> OpportunityAreas { get; set; }
         public IEnumerable<string> ParliamentaryConstituencies { get; set; }
-        public IEnumerable<string> Providers { get; set; }
         public IEnumerable<string> Regions { get; set; }
         public IEnumerable<string> RscRegions { get; set; }
         public IEnumerable<string> Wards { get; set; }
@@ -44,7 +43,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
                 MayoralCombinedAuthorities = MayoralCombinedAuthorities,
                 OpportunityAreas = OpportunityAreas,
                 ParliamentaryConstituencies = ParliamentaryConstituencies,
-                Providers = Providers,
                 Regions = Regions,
                 RscRegions = RscRegions,
                 Wards = Wards

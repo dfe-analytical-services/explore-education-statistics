@@ -24,7 +24,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
         public IEnumerable<string> MayoralCombinedAuthorities { get; set; }
         public IEnumerable<string> OpportunityAreas { get; set; }
         public IEnumerable<string> ParliamentaryConstituencies { get; set; }
-        public IEnumerable<string> Providers { get; set; }
         public IEnumerable<string> Regions { get; set; }
         public IEnumerable<string> RscRegions { get; set; }
         public IEnumerable<string> Wards { get; set; }
@@ -98,12 +97,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
             {
                 predicate = predicate.And(observation =>
                     ParliamentaryConstituencies.Contains(observation.Location.ParliamentaryConstituency.Code));
-            }
-
-            if (Providers != null && Providers.Any())
-            {
-                predicate = predicate.And(observation =>
-                    Providers.Contains(observation.Location.Provider.Code));
             }
 
             if (Regions != null && Regions.Any())

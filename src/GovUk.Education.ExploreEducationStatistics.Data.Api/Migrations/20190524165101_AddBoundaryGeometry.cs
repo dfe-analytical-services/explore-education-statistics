@@ -7,8 +7,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
     [ExcludeFromCodeCoverage]
     public partial class AddBoundaryGeometry : Migration
     {
-        private readonly string _migrationsPath = "Migrations/";
-        
+        private const string _migrationsPath = "Migrations/";
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             ExecuteFile(migrationBuilder, _migrationsPath + "20190524165101_Create_geometry_columns.sql");

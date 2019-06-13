@@ -10,6 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public GeographicLevel GeographicLevel { get; set; }
         public Location Location { get; set; }
         public long LocationId { get; set; }
+        public Provider Provider { get; set; }
+        public string ProviderUrn { get; set; }
         public School School { get; set; }
         public string SchoolLaEstab { get; set; }
         public int Year { get; set; }
