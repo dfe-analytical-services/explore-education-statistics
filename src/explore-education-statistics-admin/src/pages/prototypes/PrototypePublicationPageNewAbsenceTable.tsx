@@ -306,7 +306,7 @@ const PublicationDataPage = () => {
             to="publication-create-new-absence-table?status=step5"
             className="govuk-button govuk-!-margin-right-5"
           >
-            Uodate table
+            Update table
           </Link>
           <Link
             to="publication-create-new-absence-table?status=step3"
@@ -320,41 +320,30 @@ const PublicationDataPage = () => {
       <h2 className="govuk-heading-m">5. View and save table</h2>
       {['?status=step5'].includes(window.location.search) && (
         <div className="govuk-width-container">
-          <PrototypeAdminExampleTables />
-          <FormGroup>
-            <label htmlFor="footnotes" className="govuk-label">
-              Foot notes
-            </label>
-            <textarea
-              name="footnotes"
-              id="footnotes"
-              className="govuk-textarea"
-            />
-          </FormGroup>
-          <FormGroup>
-            <FormTextInput
-              id="source"
-              name="source"
-              label="Source"
-              value="Education Prototype Statistics"
-              width={20}
-            />
-          </FormGroup>
+          <PrototypeAdminExampleTables task="edit" />
+
           <FormGroup>
             <FormTextInput
               id="save-table"
               name="save-table"
-              label="Save table as"
+              label="Save as"
               value="Table for absence highlights panel"
               width={20}
             />
           </FormGroup>
 
           <Link
+            to="/prototypes/publication-create-new-absence-table?status=step1"
+            className="govuk-button govuk-!-margin-right-3"
+          >
+            Save and create another table
+          </Link>
+
+          <Link
             to="publication-create-new-absence-view-table"
             className="govuk-button govuk-!-margin-right-3"
           >
-            Save table
+            Save and continue
           </Link>
         </div>
       )}
