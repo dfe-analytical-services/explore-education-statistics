@@ -1404,7 +1404,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = "",
                             Content = new List<IContentBlock>
                             {                                
-                                new DataBlock {                                    
+                                new DataBlock {                                         
                                     DataBlockRequest = new DataBlockRequest {
                                         subjectId = 1,
                                         geographicLevel = "Local_Authority",
