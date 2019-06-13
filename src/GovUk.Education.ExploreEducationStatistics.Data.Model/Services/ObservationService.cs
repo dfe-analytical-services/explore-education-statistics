@@ -27,14 +27,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var geographicLevelParam = new SqlParameter("geographicLevel", query.GeographicLevel.GetEnumValue());
             var yearsListParam = CreateIdListType("yearList", yearsRange);
             var countriesListParam = CreateIdListType("countriesList", query.Countries);
-            var regionsListParam = CreateIdListType("regionsList", query.Regions);
+            var institutionListParam =
+                CreateIdListType("institutionList", query.Institutions);
             var localAuthorityListParam = CreateIdListType("localAuthorityList", query.LocalAuthorities);
             var localAuthorityDistrictListParam =
                 CreateIdListType("localAuthorityDistrictList", query.LocalAuthorityDistricts);
             var localEnterprisePartnershipListParam =
                 CreateIdListType("localEnterprisePartnershipList", query.LocalEnterprisePartnerships);
-            var institutionListParam =
-                CreateIdListType("institutionList", query.Institutions);
             var matListParam =
                 CreateIdListType("matList", query.Mats);
             var mayoralCombinedAuthorityListParam =
@@ -45,6 +44,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 CreateIdListType("parliamentaryConstituencyList", query.ParliamentaryConstituencies);
             var providerListParam =
                 CreateIdListType("providerList", query.Providers);
+            var regionsListParam = CreateIdListType("regionsList", query.Regions);
+            var rscRegionListParam = CreateIdListType("rscRegionsList", query.RscRegions);
             var wardListParam =
                 CreateIdListType("wardList", query.Wards);
             var filtersListParam = CreateIdListType("filtersList", query.Filters);
@@ -55,32 +56,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                          "@geographicLevel," +
                          "@yearList," +
                          "@countriesList," +
-                         "@regionsList," +
+                         "@institutionList," +
                          "@localAuthorityList," +
                          "@localAuthorityDistrictList," +
                          "@localEnterprisePartnershipList," +
-                         "@institutionList," +
                          "@matList," +
                          "@mayoralCombinedAuthorityList," +
                          "@opportunityAreaList," +
                          "@parliamentaryConstituencyList," +
                          "@providerList," +
+                         "@regionsList," +
+                         "@rscRegionsList," +
                          "@wardList," +
                          "@filtersList",
                     subjectIdParam,
                     geographicLevelParam,
                     yearsListParam,
                     countriesListParam,
-                    regionsListParam,
+                    institutionListParam,
                     localAuthorityListParam,
                     localAuthorityDistrictListParam,
                     localEnterprisePartnershipListParam,
-                    institutionListParam,
                     matListParam,
                     mayoralCombinedAuthorityListParam,
                     opportunityAreaListParam,
                     parliamentaryConstituencyListParam,
                     providerListParam,
+                    regionsListParam,
+                    rscRegionListParam,
                     wardListParam,
                     filtersListParam);
 

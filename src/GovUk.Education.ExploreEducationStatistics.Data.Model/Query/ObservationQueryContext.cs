@@ -12,16 +12,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
         public GeographicLevel GeographicLevel { get; set; }
         public IEnumerable<long> Indicators { get; set; }
         public IEnumerable<string> Countries { get; set; }
+        public IEnumerable<string> Institutions { get; set; }
         public IEnumerable<string> LocalAuthorities { get; set; }
         public IEnumerable<string> LocalAuthorityDistricts { get; set; }
-        public IEnumerable<string> Regions { get; set; }
         public IEnumerable<string> LocalEnterprisePartnerships { get; set; }
-        public IEnumerable<string> Institutions { get; set; }
         public IEnumerable<string> Mats { get; set; }
         public IEnumerable<string> MayoralCombinedAuthorities { get; set; }
         public IEnumerable<string> OpportunityAreas { get; set; }
         public IEnumerable<string> ParliamentaryConstituencies { get; set; }
         public IEnumerable<string> Providers { get; set; }
+        public IEnumerable<string> Regions { get; set; }
+        public IEnumerable<string> RscRegions { get; set; }
         public IEnumerable<string> Wards { get; set; }
 
         public SubjectMetaQueryContext ToSubjectMetaQueryContext()
@@ -35,16 +36,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
                 GeographicLevel = GeographicLevel,
                 Indicators = Indicators,
                 Countries = Countries,
+                Institutions = Institutions,
                 LocalAuthorities = LocalAuthorities,
                 LocalAuthorityDistricts = LocalAuthorityDistricts,
-                Regions = Regions,
                 LocalEnterprisePartnerships = LocalEnterprisePartnerships,
-                Institutions = Institutions,
                 Mats = Mats,
                 MayoralCombinedAuthorities = MayoralCombinedAuthorities,
                 OpportunityAreas = OpportunityAreas,
                 ParliamentaryConstituencies = ParliamentaryConstituencies,
                 Providers = Providers,
+                Regions = Regions,
+                RscRegions = RscRegions,
                 Wards = Wards
             };
         }

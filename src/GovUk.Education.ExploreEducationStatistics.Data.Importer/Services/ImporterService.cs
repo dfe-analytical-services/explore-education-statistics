@@ -176,16 +176,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             return _importerLocationService.Find(
                 GetCountry(line, headers),
-                GetRegion(line, headers),
+                GetInstitution(line, headers),
                 GetLocalAuthority(line, headers),
                 GetLocalAuthorityDistrict(line, headers),
                 GetLocalEnterprisePartnership(line, headers),
-                GetInstitution(line, headers),
                 GetMat(line, headers),
                 GetMayoralCombinedAuthority(line, headers),
                 GetOpportunityArea(line, headers),
                 GetParliamentaryConstituency(line, headers),
                 GetProvider(line, headers),
+                GetRegion(line, headers),
+                GetRscRegion(line, headers),
                 GetWard(line, headers)
             ).Id;
         }
@@ -220,11 +221,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 new Country(values[0], values[1]));
         }
 
-        private static Region GetRegion(IReadOnlyList<string> line, List<string> headers)
+        private static Institution GetInstitution(IReadOnlyList<string> line,
+            List<string> headers)
         {
-            var columns = new[] {"region_code", "region_name"};
+            var columns = new[] {"institution_id", "institution_name"};
             return CsvUtil.BuildType(line, headers, columns, values =>
-                new Region(values[0], values[1]));
+                new Institution(values[0], values[1]));
         }
 
         private static LocalAuthority GetLocalAuthority(IReadOnlyList<string> line, List<string> headers)
@@ -250,18 +252,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 new LocalEnterprisePartnership(values[0], values[1]));
         }
 
-        private static Institution GetInstitution(IReadOnlyList<string> line,
-            List<string> headers)
-        {
-            var columns = new[] {"institution_id", "institution_name"};
-            return CsvUtil.BuildType(line, headers, columns, values =>
-                new Institution(values[0], values[1]));
-        }
-
         private static Mat GetMat(IReadOnlyList<string> line,
             List<string> headers)
         {
-            var columns = new[] {"mat_chain_id", "mat_chain_name"};
+            var columns = new[] {"mat_id", "mat_name"};
             return CsvUtil.BuildType(line, headers, columns, values =>
                 new Mat(values[0], values[1]));
         }
@@ -296,6 +290,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             var columns = new[] {"provider_urn", "provider_ukprn", "provider_upin", "provider_name"};
             return CsvUtil.BuildType(line, headers, columns, values =>
                 new Provider(values[0], values[1], values[2], values[3]));
+        }
+
+        private static Region GetRegion(IReadOnlyList<string> line, List<string> headers)
+        {
+            var columns = new[] {"region_code", "region_name"};
+            return CsvUtil.BuildType(line, headers, columns, values =>
+                new Region(values[0], values[1]));
+        }
+
+        private static RscRegion GetRscRegion(IReadOnlyList<string> line, List<string> headers)
+        {
+            return CsvUtil.BuildType(line, headers, "rsc_region_lead_name", value => new RscRegion(value));
         }
 
         private static Ward GetWard(IReadOnlyList<string> line,

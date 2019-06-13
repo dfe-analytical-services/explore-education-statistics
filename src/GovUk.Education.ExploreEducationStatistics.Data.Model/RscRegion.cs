@@ -2,30 +2,31 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    public class Mat : IObservationalUnit
+    /**
+     * Regional School Commissioner Region
+     */
+    public class RscRegion : IObservationalUnit
     {
-        [JsonProperty(PropertyName = "mat_id")]
-        public string Code { get; set; }
+        [JsonIgnore] public string Code { get; set; }
 
-        [JsonProperty(PropertyName = "mat_name")]
-        public string Name { get; set; }
+        [JsonProperty(PropertyName = "rsc_region_lead_name")]
+        public string Name => Code;
 
-        private Mat()
-        {
-        }
-
-        public Mat(string code, string name)
+        public RscRegion(string code)
         {
             Code = code;
-            Name = name;
         }
 
-        public static Mat Empty()
+        private RscRegion()
         {
-            return new Mat(null, null);
         }
 
-        protected bool Equals(Mat other)
+        public static RscRegion Empty()
+        {
+            return new RscRegion(null);
+        }
+
+        protected bool Equals(RscRegion other)
         {
             return string.Equals(Code, other.Code);
         }
@@ -35,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Mat) obj);
+            return Equals((RscRegion) obj);
         }
 
         public override int GetHashCode()
