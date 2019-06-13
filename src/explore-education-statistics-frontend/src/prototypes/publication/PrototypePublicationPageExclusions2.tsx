@@ -512,9 +512,9 @@ const PublicationPageExclusions = () => {
         </AccordionSection>
         <AccordionSection heading="Exclusions by pupil characteristics">
           <p>
-            We saw a similar pattern to previous years where the following
-            groups (ones where we usually expect to see higher exclusion rates)
-            showing an increase in exclusions since 2015/16:
+            There was a similar pattern to previous years with the following
+            groups (where higher exclusion rates are expected) showing an
+            increase in exclusions since 2015/16:
           </p>
           <ul className="govuk-list-bullet">
             <li>boys</li>
@@ -665,7 +665,7 @@ const PublicationPageExclusions = () => {
           </ul>
           <p>Similar to 2015/16, the regions with the lowest rates were:</p>
           <ul className="govuk-list-bullet">
-            <li>the South East - 0.06%</li>
+            <li>South East - 0.06%</li>
             <li>Yorkshire and the Humber - 0.07%</li>
           </ul>
           <h3 className="govuk-heading-s">Fixed-period exclusion</h3>
