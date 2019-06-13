@@ -24,8 +24,8 @@ export interface Publication {
   topic: {
     theme: {
       title: string;
-    }
-  }
+    };
+  };
   contact: {
     teamName: string;
     teamEmail: string;
