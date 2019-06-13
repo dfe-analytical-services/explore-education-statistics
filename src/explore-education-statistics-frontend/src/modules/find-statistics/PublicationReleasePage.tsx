@@ -298,6 +298,16 @@ class PublicationReleasePage extends Component<Props> {
             </ul>
           </AccordionSection>
           <AccordionSection heading="Contact us" headingTag="h3">
+            <div className="govuk-warning-text">
+              <span className="govuk-warning-text__icon" aria-hidden="true">
+                !
+              </span>
+              <strong className="govuk-warning-text__text">
+                <span className="govuk-warning-text__assistive">Warning</span>
+                The following contact details are example/placeholder content
+                during unmoderated testing.
+              </strong>
+            </div>
             <p>
               If you have a specific enquiry about [[ THEME ]] statistics and
               data:
@@ -307,9 +317,9 @@ class PublicationReleasePage extends Component<Props> {
             </h4>
             <p className="govuk-!-margin-top-0">
               Email <br />
-              <a href="mailto:schools.statistics@education.gov.uk">
-                [[ TEAM EMAIL ADDRESS ]]
-              </a>
+              {/* <a href="mailto:schools.statistics@education.gov.uk"> */}
+              [[ TEAM EMAIL ADDRESS ]]
+              {/* </a> */}
             </p>
             <p>
               Telephone: [[ LEAD STATISTICIAN NAME ]] <br /> [[ LEAD
@@ -321,7 +331,7 @@ class PublicationReleasePage extends Component<Props> {
             <p className="govuk-!-margin-top-0">If you have a media enquiry:</p>
             <p>
               Telephone <br />
-              020 7925 6789
+              [[ PRESS OFFICE TEL NO. ]]
             </p>
             <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
               Public enquiries
@@ -332,7 +342,7 @@ class PublicationReleasePage extends Component<Props> {
             </p>
             <p>
               Telephone <br />
-              037 0000 2288
+              [[ DEPT. FOR EDUCATION TEL NO. ]]
             </p>
           </AccordionSection>
         </Accordion>
