@@ -398,6 +398,17 @@ export default class PrototypePublicationService {
         nextUpdate: '2018-03-22T00:00:00',
         releases: [],
         legacyReleases: [],
+        contact: {
+          contactName: 'Mr Smith',
+          contactTelNo: '01228 76762',
+          teamEmail: 'team@email.com',
+          teamName: 'Team A',
+        },
+        topic: {
+          theme: {
+            title: 'Pupil absence',
+          },
+        },
       },
       updates: [],
       content: [
