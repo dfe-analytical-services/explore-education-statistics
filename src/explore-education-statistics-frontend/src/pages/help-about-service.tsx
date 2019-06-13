@@ -9,7 +9,6 @@ function HelpSupportPage() {
       <p>
         If you need help and support or have a question about education
         statistics and data contact:
-        <a href="">how to manage cookies.</a>
       </p>
 
       <p>
@@ -17,9 +16,7 @@ function HelpSupportPage() {
       </p>
 
       <p>Email</p>
-      <p>
-        <a href="/help-about-service">About the service</a>
-      </p>
+      <p />
     </Page>
   );
 }
