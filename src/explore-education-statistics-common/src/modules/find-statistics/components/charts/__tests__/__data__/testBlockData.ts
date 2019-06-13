@@ -78,6 +78,74 @@ const data: DataBlockData = {
   ],
 };
 
+const multipleData: DataBlockData = {
+  publicationId: 'test',
+  releaseDate: new Date(),
+  releaseId: 1,
+  subjectId: 1,
+  geographicLevel: GeographicLevel.National,
+  result: [
+    {
+      filters: [1, 2],
+      location: {
+        country: {
+          country_code: 'E92000001',
+          country_name: 'England',
+        },
+        region: {
+          region_code: '',
+          region_name: '',
+        },
+        localAuthority: {
+          new_la_code: '',
+          old_la_code: '',
+          la_name: '',
+        },
+        localAuthorityDistrict: {
+          sch_lad_code: '',
+          sch_lad_name: '',
+        },
+      },
+      measures: {
+        '28': '5',
+        '26': '10',
+        '23': '3',
+      },
+      timeIdentifier: 'HT6',
+      year: 2015,
+    },
+    {
+      filters: [1, 2],
+      location: {
+        country: {
+          country_code: 'S92000001',
+          country_name: 'Scotland',
+        },
+        region: {
+          region_code: '',
+          region_name: '',
+        },
+        localAuthority: {
+          new_la_code: '',
+          old_la_code: '',
+          la_name: '',
+        },
+        localAuthorityDistrict: {
+          sch_lad_code: '',
+          sch_lad_name: '',
+        },
+      },
+      measures: {
+        '28': '10',
+        '26': '20',
+        '23': '4',
+      },
+      timeIdentifier: 'HT6',
+      year: 2015,
+    },
+  ],
+};
+
 const labels = {
   '28': 'Authorised absence rate',
   '26': 'Overall absence rate',
@@ -130,6 +198,11 @@ const metaData: DataBlockMetadata = {
       value: 'E92000001',
       label: 'England',
       geoJson: [Features.E92000001],
+    },
+    S92000001: {
+      value: 'S92000001',
+      label: 'Scotland',
+      geoJson: [Features.S92000001],
     },
   },
 };
@@ -2739,6 +2812,15 @@ const AbstractChartProps: ChartProps = {
   yAxis: { title: 'test y axis' },
 };
 
+const AbstractMultipleChartProps: ChartProps = {
+  data: multipleData,
+  meta: metaData,
+  labels,
+  indicators: ['23', '26', '28'],
+  xAxis: { title: 'test x axis' },
+  yAxis: { title: 'test y axis' },
+};
+
 const response: DataBlockResponse = {
   ...data,
   metaData,
@@ -2746,6 +2828,7 @@ const response: DataBlockResponse = {
 
 export default {
   AbstractChartProps,
+  AbstractMultipleChartProps,
   testBlockData: data,
   testBlockMetaData: responseMetadata,
   labels,

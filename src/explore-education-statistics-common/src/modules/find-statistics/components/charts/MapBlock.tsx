@@ -133,14 +133,16 @@ class MapBlock extends Component<MapProps, MapState> {
 
     const imported = await import('@common/services/UKGeoJson');
 
+    const location = MapBlock.getLocationsForIndicator(
+      data,
+      meta,
+      selected.indicator,
+    );
+
     this.setState({
       selected,
       options: {
-        location: MapBlock.getLocationsForIndicator(
-          data,
-          meta,
-          selected.indicator,
-        ),
+        location,
       },
       geometry,
       legend,

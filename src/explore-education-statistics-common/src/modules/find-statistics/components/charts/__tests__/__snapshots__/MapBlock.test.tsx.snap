@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MapBlock MapBlock renders 1`] = `
+exports[`MapBlock renders 1`] = `
 <div>
   <div
     class="govuk-grid-row"
@@ -61,6 +61,11 @@ exports[`MapBlock MapBlock renders 1`] = `
               England
             </option>
             <option
+              value="S92000001"
+            >
+              Scotland
+            </option>
+            <option
               value=""
             >
               select...
@@ -91,7 +96,7 @@ exports[`MapBlock MapBlock renders 1`] = `
             5.0
             %
               to 
-            5.0
+            6.0
             %
              
           </dd>
@@ -104,10 +109,10 @@ exports[`MapBlock MapBlock renders 1`] = `
                
             </span>
              
-            5.0
+            6.0
             %
               to 
-            5.0
+            7.0
             %
              
           </dd>
@@ -120,10 +125,10 @@ exports[`MapBlock MapBlock renders 1`] = `
                
             </span>
              
-            5.0
+            7.0
             %
               to 
-            5.0
+            8.0
             %
              
           </dd>
@@ -136,10 +141,10 @@ exports[`MapBlock MapBlock renders 1`] = `
                
             </span>
              
-            5.0
+            8.0
             %
               to 
-            5.0
+            9.0
             %
              
           </dd>
@@ -152,10 +157,10 @@ exports[`MapBlock MapBlock renders 1`] = `
                
             </span>
              
-            5.0
+            9.0
             %
               to 
-            5.0
+            10.0
             %
              
           </dd>
@@ -204,7 +209,19 @@ exports[`MapBlock MapBlock renders 1`] = `
                   stroke-width="3"
                 />
                 <path
-                  class="rateNaN leaflet-interactive"
+                  class="rate0 leaflet-interactive"
+                  d="M0 0"
+                  fill="#3388ff"
+                  fill-opacity="0.2"
+                  fill-rule="evenodd"
+                  stroke="#3388ff"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-opacity="1"
+                  stroke-width="3"
+                />
+                <path
+                  class="rate4 leaflet-interactive"
                   d="M0 0"
                   fill="#3388ff"
                   fill-opacity="0.2"
