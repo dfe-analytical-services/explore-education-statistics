@@ -10,8 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
             migrationBuilder.AddColumn<Guid>(
                 name: "ContactId",
                 table: "Publications",
-                nullable: true,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+                nullable: true);
 
             migrationBuilder.CreateTable(
                 name: "Contacts",
@@ -79,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                 column: "ContactId",
                 principalTable: "Contacts",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

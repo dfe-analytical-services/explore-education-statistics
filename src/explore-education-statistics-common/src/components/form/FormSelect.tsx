@@ -54,7 +54,10 @@ const FormSelect = ({
         onChange={onChange}
         value={value}
       >
-        {orderBy(options, order, orderDirection).map(option => (
+        {(order === undefined
+          ? options
+          : orderBy(options, order, orderDirection)
+        ).map(option => (
           <option value={option.value} key={`${option.value}-${option.label}`}>
             {option.label}
           </option>

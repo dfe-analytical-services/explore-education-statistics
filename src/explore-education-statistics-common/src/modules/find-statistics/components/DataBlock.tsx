@@ -12,8 +12,8 @@ import TableRenderer, {
 } from '@common/modules/find-statistics/components/TableRenderer';
 import DataBlockService, {
   DataBlockData,
-  DataBlockMetadata,
   DataBlockRequest,
+  DataBlockResponse,
 } from '@common/services/dataBlockService';
 import {
   Chart,
@@ -22,7 +22,7 @@ import {
   Table,
 } from '@common/services/publicationService';
 import React, { Component, ReactNode } from 'react';
-import { MapFeature } from './charts/MapBlock';
+
 import DownloadDetails from './DownloadDetails';
 
 export interface DataBlockProps {
@@ -68,7 +68,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
         dataBlockRequest,
       );
 
-      this.parseDataResponse(result.data, result.metaData);
+      this.parseDataResponse(result);
     } else {
       // this.parseDataResponse(data, meta);
     }
@@ -78,26 +78,21 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
     this.query = undefined;
   }
 
-  private parseDataResponse(
-    json: DataBlockData,
-    jsonMeta: DataBlockMetadata,
-  ): void {
-    const newState: DataBlockState = {
-      isLoading: false,
-    };
+  private parseDataResponse(response: DataBlockResponse): void {
+    const newState: DataBlockState = { isLoading: false };
+
+    const data: DataBlockData = response;
+    const meta = response.metaData;
 
     const { charts, summary, tables } = this.props;
 
-    if (json.result.length > 0) {
+    if (response.result.length > 0) {
       if (tables) {
-        newState.tables = [{ data: json, meta: jsonMeta, ...tables[0] }];
-      } else {
-        // TODO: remove when data is updated
         newState.tables = [
           {
-            data: json,
-            meta: jsonMeta,
-            indicators: Object.keys(json.result[0].measures),
+            data,
+            meta,
+            ...tables[0],
           },
         ];
       }
@@ -105,18 +100,21 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
     if (charts) {
       newState.charts = charts.map(chart => ({
+        xAxis: { title: '' },
+        yAxis: { title: '' },
+
         ...chart,
-        geometry: chart.geometry as MapFeature,
-        data: json,
-        meta: jsonMeta,
+
+        data,
+        meta,
       }));
     }
 
     if (summary) {
       newState.summary = {
         ...summary,
-        data: json,
-        meta: jsonMeta,
+        data,
+        meta,
       };
     }
     this.setState(newState);

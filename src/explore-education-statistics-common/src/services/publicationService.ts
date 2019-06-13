@@ -1,6 +1,4 @@
-import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
 import { DataBlockRequest } from '@common/services/dataBlockService';
-import { FeatureCollection } from 'geojson';
 import { contentApi } from './api';
 
 export interface Publication {
@@ -56,13 +54,19 @@ export interface Axis {
 
 export type ChartType = 'line' | 'verticalbar' | 'horizontalbar' | 'map';
 
+export interface ChartDataGroup {
+  filters?: string[];
+  location?: string[];
+  timePeriod?: boolean;
+}
+
 export interface Chart {
   type: ChartType;
   indicators: string[];
+  dataGroupings?: ChartDataGroup[];
   xAxis?: Axis;
   yAxis?: Axis;
   stacked?: boolean;
-  geometry?: MapFeature | FeatureCollection;
   referenceLines?: ReferenceLine[];
   width?: number;
   height?: number;

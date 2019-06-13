@@ -514,24 +514,10 @@ const PublicationPageExclusions = () => {
           </p>
         </AccordionSection>
 
-        <AccordionSection
-          heading="Official OR National Statistics"
-          headingTag="h3"
-        >
+        <AccordionSection heading="Official Statistics" headingTag="h3">
           <p className="govuk-body">
-            The{' '}
-            <a href="https://www.statisticsauthority.gov.u">
-              UK Statistics Authority
-            </a>{' '}
-            designated these statistics as National Statistics in [INSERT MONTH
-            YEAR] in accordance with the{' '}
-            <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
-              Statistics and Registration Service Act 2007
-            </a>
-            .
-          </p>
-          <p className="govuk-body">
-            Designation signifies their compliance with the authority's{' '}
+            These are Official Statistics and have been produced in line with
+            the{' '}
             <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
               Code of Practice for Statistics
             </a>{' '}
@@ -544,17 +530,13 @@ const PublicationPageExclusions = () => {
             <li>well-explained and readily accessible</li>
           </ul>
           <p className="govuk-body">
-            Once designated as National Statistics it's a statutory requirement
-            for statistics to ffollow and comply with the Code of Practice for
-            Statistics.
+            Once statistics have been designated as Official Statistics it is a
+            statutory requirement that the Code of Practice shall continue to be
+            observed.
           </p>
           <p>
-            Find out more about the standards we follow to produce these
-            statistics through our{' '}
-            <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
-              Standards for official statistics published by DfE
-            </a>{' '}
-            guidance.
+            The Department for Education (DfE) has a set of statistical policies
+            in line with the Code of Practice for Statistics.
           </p>
         </AccordionSection>
 
