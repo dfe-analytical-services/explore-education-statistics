@@ -61,7 +61,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             {
                 release = _context.Releases.Include(x => x.Updates)
                     .Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
-                    .Include(x => x.Publication).ThenInclude(x => x.Contact)
                     .Include(x => x.Publication).ThenInclude(p => p.Topic.Theme)
                     .Include(x => x.Updates).OrderBy(x => x.Published)
                     .Last(t => t.PublicationId == newGuid);
@@ -69,11 +68,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             else
             {
                 release = _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
-                    .Include(x => x.Publication).ThenInclude(x => x.Contact)
                     .Include(x => x.Publication).ThenInclude(p => p.Topic.Theme)
                     .Include(x => x.Updates).OrderBy(x => x.Published).Last(t => t.Publication.Slug == id);
             }
 
+            if (release.Publication.ContactId != null)
+            {
+                release.Publication.Contact =
+                    _context.Contacts.FirstOrDefault(contact => contact.Id == release.Publication.ContactId);
+            }
 
             if (release != null)
             {

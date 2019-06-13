@@ -12,139 +12,164 @@ exports[`DataBlock renders summary 1`] = `
   <h3>
     Summary
   </h3>
-  <div>
+  <div
+    class="keyStatsContainer"
+  >
     <div
-      class="dfe-dash-tiles dfe-dash-tiles--3-in-row"
+      class="keyStatTile"
     >
       <div
-        class="dfe-dash-tiles__tile"
+        class="keyStat"
       >
         <h3
-          class="govuk-heading-m dfe-dash-tiles__heading"
+          class="govuk-heading-s"
         >
           Unauthorised absence rate
         </h3>
         <p
-          class="govuk-heading-xl govuk-!-margin-bottom-2"
+          class="govuk-heading-xl"
           data-testid="tile Unauthorised absence rate"
         >
           3
           %
         </p>
-        <details
-          class="govuk-details"
-          role="group"
+        <p
+          class="govuk-body-s"
         >
-          <summary
-            aria-controls="details-content-4"
-            aria-expanded="false"
-            class="govuk-details__summary"
-            role="button"
-            tabindex="0"
-          >
-            <span
-              class="govuk-details__summary-text"
-              data-testid="details--expand"
-            >
-              What is Unauthorised absence rate?
-            </span>
-          </summary>
-          <div
-            aria-hidden="true"
-            class="govuk-details__text"
-            id="details-content-4"
-          >
-            Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
-          </div>
-        </details>
+          up 10%
+        </p>
       </div>
+      <details
+        class="govuk-details"
+        role="group"
+      >
+        <summary
+          aria-controls="details-content-4"
+          aria-expanded="false"
+          class="govuk-details__summary"
+          role="button"
+          tabindex="0"
+        >
+          <span
+            class="govuk-details__summary-text"
+            data-testid="details--expand"
+          >
+            What is Unauthorised absence rate?
+          </span>
+        </summary>
+        <div
+          aria-hidden="true"
+          class="govuk-details__text"
+          id="details-content-4"
+        >
+          Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
+        </div>
+      </details>
+    </div>
+    <div
+      class="keyStatTile"
+    >
       <div
-        class="dfe-dash-tiles__tile"
+        class="keyStat"
       >
         <h3
-          class="govuk-heading-m dfe-dash-tiles__heading"
+          class="govuk-heading-s"
         >
           Overall absence rate
         </h3>
         <p
-          class="govuk-heading-xl govuk-!-margin-bottom-2"
+          class="govuk-heading-xl"
           data-testid="tile Overall absence rate"
         >
           10
           %
         </p>
-        <details
-          class="govuk-details"
-          role="group"
+        <p
+          class="govuk-body-s"
         >
-          <summary
-            aria-controls="details-content-5"
-            aria-expanded="false"
-            class="govuk-details__summary"
-            role="button"
-            tabindex="0"
-          >
-            <span
-              class="govuk-details__summary-text"
-              data-testid="details--expand"
-            >
-              What is Overall absence rate?
-            </span>
-          </summary>
-          <div
-            aria-hidden="true"
-            class="govuk-details__text"
-            id="details-content-5"
-          >
-            Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
-          </div>
-        </details>
+          down 10%
+        </p>
       </div>
+      <details
+        class="govuk-details"
+        role="group"
+      >
+        <summary
+          aria-controls="details-content-5"
+          aria-expanded="false"
+          class="govuk-details__summary"
+          role="button"
+          tabindex="0"
+        >
+          <span
+            class="govuk-details__summary-text"
+            data-testid="details--expand"
+          >
+            What is Overall absence rate?
+          </span>
+        </summary>
+        <div
+          aria-hidden="true"
+          class="govuk-details__text"
+          id="details-content-5"
+        >
+          Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
+        </div>
+      </details>
+    </div>
+    <div
+      class="keyStatTile"
+    >
       <div
-        class="dfe-dash-tiles__tile"
+        class="keyStat"
       >
         <h3
-          class="govuk-heading-m dfe-dash-tiles__heading"
+          class="govuk-heading-s"
         >
           Authorised absence rate
         </h3>
         <p
-          class="govuk-heading-xl govuk-!-margin-bottom-2"
+          class="govuk-heading-xl"
           data-testid="tile Authorised absence rate"
         >
           5
           %
         </p>
-        <details
-          class="govuk-details"
-          role="group"
+        <p
+          class="govuk-body-s"
         >
-          <summary
-            aria-controls="details-content-6"
-            aria-expanded="false"
-            class="govuk-details__summary"
-            role="button"
-            tabindex="0"
-          >
-            <span
-              class="govuk-details__summary-text"
-              data-testid="details--expand"
-            >
-              What is Authorised absence rate?
-            </span>
-          </summary>
-          <div
-            aria-hidden="true"
-            class="govuk-details__text"
-            id="details-content-6"
-          >
-            Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
-          </div>
-        </details>
+          up 11%
+        </p>
       </div>
+      <details
+        class="govuk-details"
+        role="group"
+      >
+        <summary
+          aria-controls="details-content-6"
+          aria-expanded="false"
+          class="govuk-details__summary"
+          role="button"
+          tabindex="0"
+        >
+          <span
+            class="govuk-details__summary-text"
+            data-testid="details--expand"
+          >
+            What is Authorised absence rate?
+          </span>
+        </summary>
+        <div
+          aria-hidden="true"
+          class="govuk-details__text"
+          id="details-content-6"
+        >
+          Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
+        </div>
+      </details>
     </div>
-    &lt;div&gt;test&lt;/div&gt;
   </div>
+  &lt;div&gt;test&lt;/div&gt;
 </section>
 `;
 
