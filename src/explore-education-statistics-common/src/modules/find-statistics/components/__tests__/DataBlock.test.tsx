@@ -5,8 +5,8 @@ import _dataBlockService, {
 } from '@common/services/dataBlockService';
 import React from 'react';
 import { render, wait } from 'react-testing-library';
-import DataBlock from '../DataBlock';
 import { SummaryRendererProps } from '@common/modules/find-statistics/components/SummaryRenderer';
+import DataBlock from '../DataBlock';
 
 jest.mock('@common/services/dataBlockService');
 
@@ -143,7 +143,6 @@ describe('DataBlock', () => {
         type="databock"
         dataBlockRequest={dataBlockRequest}
         showTables={false}
-        // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
         summary={
           {
             dataKeys: ['23', '26', '28'],
@@ -152,7 +151,7 @@ describe('DataBlock', () => {
               type: 'MarkDownBlock',
               body: `<div>test</div>`,
             },
-          } as SummaryRendererProps
+          }
         }
       />,
     );
