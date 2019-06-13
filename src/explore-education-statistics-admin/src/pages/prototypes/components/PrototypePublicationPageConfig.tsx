@@ -183,13 +183,13 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
 
             <button
               type="submit"
-              className="govuk-button"
+              className="govuk-button govuk-!-margin-right-3"
               formAction="publication-confirm-new"
             >
               Create new publication
             </button>
 
-            <Link to="/prototypes/admin-dashboard">Cancel update</Link>
+            <Link to="/prototypes/admin-dashboard">Cancel publication</Link>
           </div>
         )}
         {sectionId === 'editPublication' && (

@@ -427,7 +427,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                   name="schedule-year"
                   type="number"
                   pattern="[0-9]*"
-                  value="2019"
+                  value="2020"
                 />
               </div>
             </div>
