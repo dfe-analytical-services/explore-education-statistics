@@ -55,6 +55,8 @@ class SearchForm extends Component<Props, State> {
 
   private boundPerformSearch = debounce(this.performSearch, 1000);
 
+  private readonly inputRef = createRef<HTMLInputElement>();
+
   private readonly resultsRef = createRef<HTMLUListElement>();
 
   private optionsRefs: Dictionary<HTMLLIElement> = {};
@@ -264,6 +266,7 @@ class SearchForm extends Component<Props, State> {
             placeholder="Search this page"
             type="search"
             value={searchValue}
+            ref={this.inputRef}
             onKeyDown={event => {
               if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
                 this.selectNextResult(event);
@@ -299,6 +302,36 @@ class SearchForm extends Component<Props, State> {
                   tabIndex={-1}
                   onKeyDown={event => {
                     const nextSelectedResult = this.selectNextResult(event);
+
+                    const inputEl = this.inputRef.current;
+
+                    if (inputEl) {
+                      if (
+                        event.key === 'ArrowLeft' ||
+                        event.key === 'ArrowRight'
+                      ) {
+                        const directionChange =
+                          event.key === 'ArrowLeft' ? -1 : 1;
+
+                        inputEl.selectionStart = inputEl.selectionStart
+                          ? inputEl.selectionStart + directionChange
+                          : 0;
+                        inputEl.selectionEnd = inputEl.selectionStart;
+                        inputEl.focus();
+                      }
+
+                      if (event.key === 'Home') {
+                        inputEl.selectionStart = 0;
+                        inputEl.selectionEnd = 0;
+                        inputEl.focus();
+                      }
+
+                      if (event.key === 'End') {
+                        inputEl.selectionStart = inputEl.value.length;
+                        inputEl.selectionEnd = inputEl.selectionStart;
+                        inputEl.focus();
+                      }
+                    }
 
                     if (event.key === 'Enter') {
                       if (searchResults[nextSelectedResult]) {
