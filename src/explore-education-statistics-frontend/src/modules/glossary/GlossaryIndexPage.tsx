@@ -29,7 +29,7 @@ function GlossaryIndexPage() {
       </div>
       <Accordion id="a-z">
         <AccordionSection heading="A">
-          <h3 id="absence">absence</h3>
+          <h3 id="absence">Absence</h3>
           <p>
             When a pupil misses (or is absent from) at least 1 possible school
             session.
@@ -52,17 +52,17 @@ function GlossaryIndexPage() {
               <a href="/glossary#unauthorised-absence">unauthorised absence</a>
             </li>
           </ul>
-          <h3 id="academic-year">academic year</h3>
+          <h3 id="academic-year">Academic year</h3>
           <p>
             Lasts from 31 August to 31 July. Generally broken into 3 terms -
             autumn, spring and summer.
           </p>
-          <h3 id="academic-year">ad hoc statistics</h3>
+          <h3 id="academic-year">Ad hoc statistics</h3>
           <p>
             Releases of statistics which are not part of DfE's regular annual
             official statistical release calendar.
           </p>
-          <h3 id="authorised-absence">authorised absence</h3>
+          <h3 id="authorised-absence">Authorised absence</h3>
           <p>
             When a pupil misses (or is absent from) at least 1 possible school
             sessionf with the permission of a teacher or other authorised school
@@ -73,29 +73,23 @@ function GlossaryIndexPage() {
           </p>
         </AccordionSection>
         <AccordionSection heading="B">
-          <h3 id="btec-national-diploma">BTEC National Diploma</h3>
-          <p>INSERT DEFINITION - TBC</p>
+          <h3 id="bbb-bbb">TBC</h3>
         </AccordionSection>
         <AccordionSection heading="C">
-          <h3 id="chair-of-governors">chair of governors</h3>
-          <p>INSERT DEFINITION - TBC.</p>
-          <h3 id="children-in-need">Children in Need</h3>
-          <p>INSERT DEFINITION - TBC.</p>
+          <h3 id="ccc-ccc">TBC</h3>
         </AccordionSection>
         <AccordionSection heading="D">
-          <h3 id="dedicated-schools-grant">dedicated schools grant</h3>
-          <p>INSERT DEFINITION - TBC.</p>
-          <h3 id="dual-main-registered-pupils">dual main registered pupils</h3>
+          <h3 id="dual-main-registered-pupils">Dual main registered pupils</h3>
           <p>
             Dual registered pupils who are enrolled at more than 1 school have a
             dual main registration (at their main school) and 1 or more
             subsidiary registrations (at their additional schools).
           </p>
           <p>
-            See also <a href="dual-registered-pupils">dual registered pupils</a>
+            See also <a href="dual-registered-pupils">Dual registered pupils</a>
             .
           </p>
-          <h3 id="dual-registered-pupils">dual registered pupils</h3>
+          <h3 id="dual-registered-pupils">Dual registered pupils</h3>
           <p>Pupils who are enrolled at more than 1 school.</p>
           <p>
             See also{' '}
@@ -106,13 +100,7 @@ function GlossaryIndexPage() {
           </p>
         </AccordionSection>
         <AccordionSection heading="E">
-          <h3 id="early-years">early years</h3>
-          <p>INSERT DEFINITION - TBC.</p>
-          <h3 id="early-years-foundation-stage-eyfs">
-            early years foundation stage (EYFS)
-          </h3>
-          <p>INSERT DEFINITION - TBC.</p>
-          <h3 id="exclusion">exclusion</h3>
+          <h3 id="exclusion">Exclusion</h3>
           <p>
             When a pupil is not allowed to attend (or is excluded from) a
             school.
@@ -128,19 +116,19 @@ function GlossaryIndexPage() {
               <a href="/glossary#permanent-exclusion">permanent exclusion</a>
             </li>
           </ul>
-          <h3 id="exclusion-rate">exclusion rate</h3>
+          <h3 id="exclusion-rate">Exclusion rate</h3>
           <p>
             The number of exclusions as a percentage of the overall school
             population.
           </p>
-          <h3 id="exclusion-review-panel">exclusion review panel</h3>
+          <h3 id="exclusion-review-panel">Exclusion review panel</h3>
           <p>
             The process by which parents (and pupils aged over 18 years) can
             request a review of a permanent exclusion.
           </p>
         </AccordionSection>
         <AccordionSection heading="F">
-          <h3 id="fixed-period-exclusion">fixed-period exclusion</h3>
+          <h3 id="fixed-period-exclusion">Fixed-period exclusion</h3>
           <p>
             When a pupil is not allowed to attend (or is excluded from) a school
             for a set period of time.
@@ -158,19 +146,7 @@ function GlossaryIndexPage() {
             exclusion legislation so pupils with repeat exclusions can inflate
             fixed-period exclusion rates.
           </p>
-          <h3 id="foundation-degrees">foundation degrees</h3>
-          <p>INSERT DEFINITION - TBC.</p>
-          <h3 id="foundation-schools">foundation schools</h3>
-          <p>INSERT DEFINITION - TBC.</p>
-          <h3 id="foundation-stage--foundation-subjects">
-            foundation stage / foundation subjects
-          </h3>
-          <p>INSERT DEFINITION - TBC.</p>
-          <h3 id="free-school">free school</h3>
-          <p>INSERT DEFINITION - TBC.</p>
-          <h3 id="free-school-meals">free school meals</h3>
-          <p>INSERT DEFINITION - TBC.</p>
-          <h3 id="further-education-fe">further education (FE)</h3>
+          <h3 id="free-school-meals">Free school meals (FSM)</h3>
           <p>INSERT DEFINITION - TBC.</p>
         </AccordionSection>
         <AccordionSection heading="G">
