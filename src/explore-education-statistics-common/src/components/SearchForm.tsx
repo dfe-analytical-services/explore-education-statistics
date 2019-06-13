@@ -29,11 +29,13 @@ interface SearchResult {
 
 interface Props {
   className?: string;
+  id?: string;
   elementSelectors: string[];
 }
 
 interface State {
   selectedResult: number;
+  searchCompleted: boolean;
   searchResults: SearchResult[];
   searchValue: string;
 }
@@ -41,12 +43,14 @@ interface State {
 class SearchForm extends Component<Props, State> {
   public state: State = {
     selectedResult: -1,
+    searchCompleted: false,
     searchResults: [],
     searchValue: '',
   };
 
   public static defaultProps = {
     elementSelectors: ['p', 'li > strong', 'h2', 'h3', 'h4'],
+    id: 'pageSearchForm',
   };
 
   private boundPerformSearch = debounce(this.performSearch, 1000);
@@ -195,12 +199,13 @@ class SearchForm extends Component<Props, State> {
       };
     });
 
-    this.setState({ searchResults });
+    this.setState({ searchResults, searchCompleted: true });
   }
 
   private resetSearch() {
     this.setState({
       selectedResult: -1,
+      searchCompleted: false,
       searchResults: [],
       searchValue: '',
     });
@@ -211,6 +216,7 @@ class SearchForm extends Component<Props, State> {
 
     this.setState({
       selectedResult: -1,
+      searchCompleted: false,
       searchResults: [],
       searchValue: event.currentTarget.value,
     });
@@ -219,8 +225,13 @@ class SearchForm extends Component<Props, State> {
   };
 
   public render() {
-    const { className } = this.props;
-    const { searchResults, selectedResult, searchValue } = this.state;
+    const { className, id } = this.props;
+    const {
+      searchCompleted,
+      searchResults,
+      selectedResult,
+      searchValue,
+    } = this.state;
 
     return (
       <form
@@ -229,14 +240,27 @@ class SearchForm extends Component<Props, State> {
         autoComplete="off"
         role="search"
       >
-        <div className="govuk-form-group govuk-!-margin-bottom-0">
-          <label className="govuk-label govuk-visually-hidden" htmlFor="search">
+        <div
+          aria-expanded={searchResults.length > 0}
+          aria-owns={`${id}-results`}
+          aria-haspopup="listbox"
+          className="govuk-form-group govuk-!-margin-bottom-0"
+          // eslint-disable-next-line jsx-a11y/role-has-required-aria-props
+          role="combobox"
+        >
+          <label
+            className="govuk-label govuk-visually-hidden"
+            htmlFor={`${id}-search`}
+          >
             Find on this page
           </label>
 
           <input
+            aria-autocomplete="list"
+            aria-activedescendant={`${id}-result-${selectedResult}`}
+            aria-controls={`${id}-results`}
             className="govuk-input"
-            id="search"
+            id={`${id}-search`}
             placeholder="Search this page"
             type="search"
             value={searchValue}
@@ -258,47 +282,63 @@ class SearchForm extends Component<Props, State> {
             value="Search this page"
             onClick={() => this.performSearch()}
           />
-        </div>
-        {searchResults.length > 0 && (
-          <ul
-            className={styles.results}
-            ref={this.resultsRef}
-            role="listbox"
-            tabIndex={-1}
-            onKeyDown={event => {
-              const nextSelectedResult = this.selectNextResult(event);
 
-              if (event.key === 'Enter') {
-                if (searchResults[nextSelectedResult]) {
-                  searchResults[nextSelectedResult].scrollIntoView();
-                }
-              }
-            }}
-          >
-            {searchResults.map((result: SearchResult, index) => {
-              const key = index;
+          {searchCompleted && (
+            <div className={styles.resultsContainer}>
+              <div id={`${id}-resultsLabel`} className={styles.resultsLabel}>
+                Found <strong>{searchResults.length}</strong> results
+              </div>
 
-              return (
-                // eslint-disable-next-line jsx-a11y/click-events-have-key-events
-                <li
-                  aria-selected={selectedResult === index}
-                  key={key}
-                  className={selectedResult === index ? styles.highlighted : ''}
-                  onClick={result.scrollIntoView}
-                  role="option"
-                  ref={el => {
-                    if (el) {
-                      this.optionsRefs[key] = el;
+              {searchResults.length > 0 && (
+                <ul
+                  aria-labelledby={`${id}-resultsLabel`}
+                  className={styles.results}
+                  id={`${id}-results`}
+                  ref={this.resultsRef}
+                  role="listbox"
+                  tabIndex={-1}
+                  onKeyDown={event => {
+                    const nextSelectedResult = this.selectNextResult(event);
+
+                    if (event.key === 'Enter') {
+                      if (searchResults[nextSelectedResult]) {
+                        searchResults[nextSelectedResult].scrollIntoView();
+                      }
                     }
                   }}
                 >
-                  <div className={styles.resultHeader}>{result.text}</div>
-                  <div className={styles.resultLocation}>{result.location}</div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+                  {searchResults.map((result: SearchResult, index) => {
+                    const key = index;
+
+                    return (
+                      // eslint-disable-next-line jsx-a11y/click-events-have-key-events
+                      <li
+                        aria-selected={selectedResult === index}
+                        key={key}
+                        id={`${id}-result-${index}`}
+                        className={
+                          selectedResult === index ? styles.highlighted : ''
+                        }
+                        onClick={result.scrollIntoView}
+                        role="option"
+                        ref={el => {
+                          if (el) {
+                            this.optionsRefs[key] = el;
+                          }
+                        }}
+                      >
+                        <div className={styles.resultHeader}>{result.text}</div>
+                        <div className={styles.resultLocation}>
+                          {result.location}
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          )}
+        </div>
       </form>
     );
   }
