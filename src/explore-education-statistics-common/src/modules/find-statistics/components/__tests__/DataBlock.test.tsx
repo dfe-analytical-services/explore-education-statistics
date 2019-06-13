@@ -143,16 +143,14 @@ describe('DataBlock', () => {
         type="databock"
         dataBlockRequest={dataBlockRequest}
         showTables={false}
-        summary={
-          {
-            dataKeys: ['23', '26', '28'],
-            dataSummary: ['up 10%', 'down 10%', 'up 11%'],
-            description: {
-              type: 'MarkDownBlock',
-              body: `<div>test</div>`,
-            },
-          }
-        }
+        summary={{
+          dataKeys: ['23', '26', '28'],
+          dataSummary: ['up 10%', 'down 10%', 'up 11%'],
+          description: {
+            type: 'MarkDownBlock',
+            body: `<div>test</div>`,
+          },
+        }}
       />,
     );
 
