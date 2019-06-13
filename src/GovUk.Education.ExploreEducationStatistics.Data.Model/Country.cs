@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
     {
         [JsonProperty(PropertyName = "country_code")]
         public string Code { get; set; }
-
+        
         [JsonProperty(PropertyName = "country_name")]
         public string Name { get; set; }
 
