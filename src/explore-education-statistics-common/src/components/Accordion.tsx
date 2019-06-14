@@ -38,7 +38,20 @@ class Accordion extends Component<AccordionProps, State> {
 
   public componentWillUnmount(): void {
     window.removeEventListener('hashchange', this.goToHash);
+    this.clearSectionStateFromSessionStorage();
   }
+
+  private clearSectionStateFromSessionStorage = () => {
+    // removes each sections' state from sessionStorage
+    const { children, id } = this.props;
+    let sectionCounter = 0;
+    React.Children.map(children, () => {
+      sectionCounter += 1;
+
+      const contentId = `${id}-content-${sectionCounter}`;
+      return window.sessionStorage.removeItem(contentId);
+    });
+  };
 
   private goToHash = () => {
     if (this.ref.current && window.location.hash) {
