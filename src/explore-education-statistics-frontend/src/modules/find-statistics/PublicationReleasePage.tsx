@@ -127,7 +127,7 @@ class PublicationReleasePage extends Component<Props> {
                   </li>
                 ))}
               </ul>
-              <h2 className="govuk-heading-m govuk-!-margin-top-9">
+              {/* <h2 className="govuk-heading-m govuk-!-margin-top-9">
                 Explore and edit this data online
               </h2>
 
@@ -135,7 +135,7 @@ class PublicationReleasePage extends Component<Props> {
 
               <Link to="/table-tool/" className="govuk-button">
                 Explore data
-              </Link>
+              </Link> */}
             </Details>
 
             <div className="govuk-!-margin-top-3 govuk-!-margin-bottom-3">
