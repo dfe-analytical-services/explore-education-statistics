@@ -212,7 +212,6 @@ class PublicationReleasePage extends Component<Props> {
                     <Link to={`/methodology/${data.publication.slug}`}>
                       {`${data.publication.title}: methodology`}
                     </Link>
-                    [Link to relevant methodology section here]
                   </li>
                 </ul>
               </nav>
