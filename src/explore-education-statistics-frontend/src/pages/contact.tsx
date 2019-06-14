@@ -15,8 +15,9 @@ function ContactPage() {
         <strong>Explore education statistics team</strong>
       </p>
 
-      <p>Email</p>
       <p>
+        Email
+        <br />
         <a href="mailto:explore.statistics@education.gov.uk">
           explore.statistics@education.gov.uk
         </a>

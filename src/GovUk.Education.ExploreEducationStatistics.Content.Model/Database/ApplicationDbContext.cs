@@ -1423,7 +1423,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new DataBlock {                                         
                                     DataBlockRequest = new DataBlockRequest {
                                         subjectId = 1,
-                                        geographicLevel = "Local_Authority",
+                                        geographicLevel = "Local_Authority_District",
                                         startYear = "2016",
                                         endYear = "2017",
                                         indicators = new List<string> { "23" , "26" , "28" },
@@ -1727,6 +1727,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = "",
                             Content = new List<IContentBlock>
                             {
+                                new DataBlock {                                         
+                                    DataBlockRequest = new DataBlockRequest {
+                                        subjectId = 12,
+                                        geographicLevel = "Local_Authority",
+                                        startYear = "2016",
+                                        endYear = "2017",
+                                        indicators = new List<string> { "155" , "156" , "158" },
+                                        filters = new List<string> { "727" }
+                                    },         
+                                    Charts = new List<IContentBlockChart> {
+                                        new MapChart {
+                                            Indicators = new List<string> { "155" , "156" , "158" }
+                                        }
+                                    }
+                                        
+                                },
                                 new MarkDownBlock
                                 {
                                     Body =
@@ -2141,6 +2157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                       Caption = "",
                       Content = new List<IContentBlock>
                       {
+                      
                         new MarkDownBlock
                         {
                           Body =
@@ -2162,7 +2179,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new DataBlock
                         {
-                          Heading = "Chart showing Secondary school preferences by region, 2018"
+                          Heading = "Chart showing Secondary school preferences by region, 2018",
+                          DataBlockRequest = new DataBlockRequest {
+                              subjectId = 17,
+                              geographicLevel = "Local_Authority",
+                              startYear = "2017",
+                              endYear = "2018",
+                              indicators = new List<string> { "193" },
+                              filters = new List<string> { "848" }
+                          },         
+                          Charts = new List<IContentBlockChart> {
+                              new MapChart {
+                                  Indicators = new List<string> { "193" }
+                              }
+                          }
                         },
                         new MarkDownBlock
                         {
@@ -2231,7 +2261,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new DataBlock
                         {
-                          Heading = "Chart showing Primary school preferences by region, 2018"
+                          Heading = "Chart showing Primary school preferences by region, 2018",
+                          DataBlockRequest = new DataBlockRequest {
+                              subjectId = 17,
+                              geographicLevel = "Local_Authority",
+                              startYear = "2017",
+                              endYear = "2018",
+                              indicators = new List<string> { "193" },
+                              filters = new List<string> { "845" }
+                          },         
+                          Charts = new List<IContentBlockChart> {
+                              new MapChart {
+                                  Indicators = new List<string> { "193" }
+                              }
+                          }
                         },
                         new MarkDownBlock
                         {
