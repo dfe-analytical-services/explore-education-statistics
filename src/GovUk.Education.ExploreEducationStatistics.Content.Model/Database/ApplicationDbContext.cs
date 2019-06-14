@@ -1405,7 +1405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new DataBlock {                                         
                                     DataBlockRequest = new DataBlockRequest {
                                         subjectId = 1,
-                                        geographicLevel = "Local_Authority",
+                                        geographicLevel = "Local_Authority_District",
                                         startYear = "2016",
                                         endYear = "2017",
                                         indicators = new List<string> { "23" , "26" , "28" },
