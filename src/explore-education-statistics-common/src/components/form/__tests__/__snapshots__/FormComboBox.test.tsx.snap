@@ -1,0 +1,85 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormComboBox renders correctly with options in correct order 1`] = `
+
+<div class="container">
+  <div aria-expanded="true"
+       aria-owns="test-combobox-options"
+       aria-haspopup="listbox"
+       class="govuk-form-group"
+       role="combobox"
+  >
+    <label class="govuk-label"
+           for="test-combobox-input"
+    >
+      Choose option
+    </label>
+    <input type="text"
+           aria-autocomplete="list"
+           aria-controls="test-combobox-options"
+           class="govuk-input"
+           id="test-combobox-input"
+           value
+    >
+    <div class="optionsContainer">
+      <ul class="options"
+          id="test-combobox-options"
+          role="listbox"
+          tabindex="-1"
+      >
+        <li aria-selected="false"
+            id="test-combobox-option-0"
+            role="option"
+        >
+          Option 1
+        </li>
+        <li aria-selected="false"
+            id="test-combobox-option-1"
+            role="option"
+        >
+          Option 2
+        </li>
+        <li aria-selected="false"
+            id="test-combobox-option-2"
+            role="option"
+        >
+          Option 3
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+`;
+
+exports[`FormComboBox renders selected option correctly 1`] = `
+<ul
+  class="options"
+  id="test-combobox-options"
+  role="listbox"
+  tabindex="-1"
+>
+  <li
+    aria-selected="true"
+    class="selected"
+    id="test-combobox-option-0"
+    role="option"
+  >
+    Option 1
+  </li>
+  <li
+    aria-selected="false"
+    id="test-combobox-option-1"
+    role="option"
+  >
+    Option 2
+  </li>
+  <li
+    aria-selected="false"
+    id="test-combobox-option-2"
+    role="option"
+  >
+    Option 3
+  </li>
+</ul>
+`;

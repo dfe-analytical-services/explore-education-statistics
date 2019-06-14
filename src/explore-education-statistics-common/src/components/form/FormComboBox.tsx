@@ -1,26 +1,23 @@
 import { Dictionary } from '@common/types';
+import classNames from 'classnames';
 import React, {
   ChangeEventHandler,
   InputHTMLAttributes,
   KeyboardEvent,
-  LiHTMLAttributes,
   ReactNode,
   useRef,
   useState,
 } from 'react';
 import styles from './FormComboBox.module.scss';
 
-interface ListBoxItem {
-  content: ReactNode;
-  props?: LiHTMLAttributes<HTMLLIElement>;
-}
-
 interface Props {
-  id: string;
-  inputLabel?(): ReactNode;
-  inputProps?: InputHTMLAttributes<HTMLInputElement>;
   afterInput?(props: { value: string; selectedItem: number }): ReactNode;
-  listBoxItems?: ListBoxItem[];
+  classes?: Partial<Record<'inputLabel', string>>;
+  id: string;
+  inputLabel: ReactNode;
+  inputProps?: InputHTMLAttributes<HTMLInputElement>;
+  initialOption?: number;
+  listBoxItems?: ReactNode[];
   listBoxLabel?(props: { value: string; selectedItem: number }): ReactNode;
   listBoxLabelId?: string;
   onInputChange: ChangeEventHandler<HTMLInputElement>;
@@ -28,10 +25,12 @@ interface Props {
 }
 
 const FormComboBox = ({
+  afterInput,
+  classes = {},
   id,
   inputLabel,
   inputProps,
-  afterInput,
+  initialOption = -1,
   listBoxItems,
   listBoxLabel,
   listBoxLabelId,
@@ -43,7 +42,7 @@ const FormComboBox = ({
   const itemRefs = useRef<Dictionary<HTMLLIElement>>({});
 
   const [value, setValue] = useState('');
-  const [selectedItem, setSelectedItem] = useState(-1);
+  const [selectedItem, setSelectedItem] = useState(initialOption);
 
   const adjustListBoxScroll = (
     event: KeyboardEvent<HTMLElement>,
@@ -123,13 +122,12 @@ const FormComboBox = ({
         // eslint-disable-next-line jsx-a11y/role-has-required-aria-props
         role="combobox"
       >
-        {inputLabel ? (
-          inputLabel()
-        ) : (
-          <label className="govuk-label" htmlFor={`${id}-input`}>
-            {inputLabel}
-          </label>
-        )}
+        <label
+          className={classNames('govuk-label', classes.inputLabel)}
+          htmlFor={`${id}-input`}
+        >
+          {inputLabel}
+        </label>
 
         <input
           type="text"
@@ -214,18 +212,17 @@ const FormComboBox = ({
                   }
                 }}
               >
-                {listBoxItems.map(({ content, props = {} }, index) => {
+                {listBoxItems.map((item, index) => {
                   const key = index;
 
                   return (
                     // eslint-disable-next-line jsx-a11y/click-events-have-key-events
                     <li
-                      {...props}
                       aria-selected={selectedItem === index}
                       key={key}
                       id={`${id}-option-${index}`}
                       className={
-                        selectedItem === index ? styles.highlighted : ''
+                        selectedItem === index ? styles.selected : undefined
                       }
                       role="option"
                       ref={el => {
@@ -233,8 +230,9 @@ const FormComboBox = ({
                           itemRefs.current[key] = el;
                         }
                       }}
+                      onClick={() => onSelect(index)}
                     >
-                      {content}
+                      {item}
                     </li>
                   );
                 })}

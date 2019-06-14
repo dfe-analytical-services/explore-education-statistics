@@ -129,20 +129,14 @@ class PageSearchForm extends Component<Props, State> {
         role="search"
       >
         <FormComboBox
+          classes={{
+            inputLabel: 'govuk-visually-hidden',
+          }}
           id={id}
           inputProps={{
             placeholder: 'Search this page',
           }}
-          inputLabel={() => {
-            return (
-              <label
-                className="govuk-label govuk-visually-hidden"
-                htmlFor={`${id}-search`}
-              >
-                Find on this page
-              </label>
-            );
-          }}
+          inputLabel="Find on this page"
           afterInput={({ value }) => (
             <button
               type="submit"
@@ -151,6 +145,7 @@ class PageSearchForm extends Component<Props, State> {
               onClick={() => this.search(value)}
             />
           )}
+          listBoxLabelId={`${id}-resultsLabel`}
           listBoxLabel={() => (
             <div id={`${id}-resultsLabel`} className={styles.resultsLabel}>
               Found <strong>{searchResults.length}</strong> results
@@ -159,19 +154,14 @@ class PageSearchForm extends Component<Props, State> {
           listBoxItems={
             searchComplete
               ? searchResults.map(result => {
-                  return {
-                    content: (
-                      <>
-                        <div className={styles.resultHeader}>{result.text}</div>
-                        <div className={styles.resultLocation}>
-                          {result.location}
-                        </div>
-                      </>
-                    ),
-                    props: {
-                      onClick: result.scrollIntoView,
-                    },
-                  };
+                  return (
+                    <>
+                      <div className={styles.resultHeader}>{result.text}</div>
+                      <div className={styles.resultLocation}>
+                        {result.location}
+                      </div>
+                    </>
+                  );
                 })
               : undefined
           }
