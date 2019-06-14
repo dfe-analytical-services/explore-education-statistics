@@ -304,8 +304,7 @@ class PublicationReleasePage extends Component<Props> {
               </span>
               <strong className="govuk-warning-text__text">
                 <span className="govuk-warning-text__assistive">Warning</span>
-                The following contact details are example/placeholder content
-                during unmoderated testing.
+                The following details are an example/placeholder.
               </strong>
             </div>
             <p>
