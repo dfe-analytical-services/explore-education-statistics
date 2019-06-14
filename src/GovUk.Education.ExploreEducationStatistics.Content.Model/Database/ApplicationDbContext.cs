@@ -1429,13 +1429,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         "* South West - 4.8%\n\n" +
                                         "Meanwhile, Inner and Outer London had the lowest rates at 4.4%.\n\n" +
                                         "**Persistent absence**\n\n" +
-                                        "The region with the highest persistent absence rate was Yorkshire and the Humber with 11.9% while Outer London had the lowest rate at 10%.\n\n" +
-                                        "**Local authority (LA) level data**\n\n" +
-                                        "Download data in the following formats or access our data via our API:\n\n" +
-                                        "[Download .csv files]('#')\n\n" +
-                                        "[Download Excel files]('#')\n\n" +
-                                        "[Download pdf files]('#')\n\n" +
-                                        "[Access API]('#') - [What is an API?]('../glossary#what-is-an-api')"
+                                        "The region with the highest persistent absence rate was Yorkshire and the Humber with 11.9% while Outer London had the lowest rate at 10%.\n\n" 
                                 }
                             }
                         }
