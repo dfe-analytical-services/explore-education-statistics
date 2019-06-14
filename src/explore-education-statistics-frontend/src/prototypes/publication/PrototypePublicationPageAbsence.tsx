@@ -42,60 +42,44 @@ const PublicationPage = () => {
                 Read national statistical summaries, view charts and tables and
                 download data files.
               </p>
-
-              <p className="govuk-inset-text">
-                View a regional breakdown of statistics and data under the{' '}
-                <a href="#contents-sections-heading-9">
-                  Regional and local authority (LA) breakdown
-                </a>{' '}
-                section
-              </p>
-
-              <p>
-                Find out how and why these statistics are collected and
-                published -{' '}
-                <Link to="/prototypes/methodology-absence">
-                  Pupil absence statistics: methodology
-                </Link>
-              </p>
-            </div>
-            <div className="govuk-grid-column-one-quarter">
-              <img
-                src="/static/images/UKSA-quality-mark.jpg"
-                alt="UK statistics authority quality mark"
-                height="130"
-              />
             </div>
           </div>
 
           <Details summary="Download data files">
-            <p>
-              You can customise and download data as Excel or .csv files. Our
-              data can also be accessed via an API.
-            </p>
             <ul className="govuk-list">
               <li>
                 <a href="#" className="govuk-link">
-                  Download .csv files
+                  Download data file 1 (.csv)
                 </a>
               </li>
               <li>
                 <a href="#" className="govuk-link">
-                  Download Excel files
+                  Download data file 2 (.csv)
                 </a>
               </li>
               <li>
                 <a href="#" className="govuk-link">
-                  Download pdf files
+                  Download data file 3 (.csv)
                 </a>
               </li>
               <li>
                 <a href="#" className="govuk-link">
-                  Access API
-                </a>{' '}
-                -{' '}
+                  Download data file 4 (.csv)
+                </a>
+              </li>
+              <li>
                 <a href="#" className="govuk-link">
-                  What is an API?
+                  Download data file 5 (.csv)
+                </a>
+              </li>
+              <li>
+                <a href="#" className="govuk-link">
+                  Download data file 6 (.csv)
+                </a>
+              </li>
+              <li>
+                <a href="#" className="govuk-link">
+                  Download data file 7 (.csv)
                 </a>
               </li>
             </ul>
@@ -112,7 +96,7 @@ const PublicationPage = () => {
               <span className="govuk-caption-m govuk-caption-inline">
                 For school year:{' '}
               </span>
-              2016 to 2017 (latest data)
+              2016 to 2017
             </h3>
 
             <Details summary="See previous 7 releases">
@@ -176,15 +160,6 @@ const PublicationPage = () => {
                 <p>First published.</p>
               </div>
             </Details>
-
-            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <span className="govuk-caption-m">Next update: </span>22 March
-              2019
-            </h3>
-            <p className="govuk-caption-m govuk-!-margin-top-0">
-              <a href="#">Notify me</a>
-            </p>
-
             <h2
               className="govuk-heading-m govuk-!-margin-top-6"
               id="related-content"
@@ -205,7 +180,7 @@ const PublicationPage = () => {
       </div>
       <hr />
       <h2 className="govuk-heading-l">
-        Headline facts and figures - 2016 to 2017
+        Headline facts and figures - 2016 to 2017 school year
       </h2>
       <PrototypeDataSample
         sectionId="headlines"
@@ -248,38 +223,6 @@ const PublicationPage = () => {
       />
 
       <Accordion id="contents-sections">
-        <AccordionSection heading="About these statistics">
-          <p className="govuk-body">
-            The statistics and data show the absence of pupils of compulsory
-            school age during the 2016/17 academic year in the following
-            state-funded school types:
-          </p>
-          <ul className="govuk-list">
-            <li>primary schools</li>
-            <li>secondary schools</li>
-            <li>special schools</li>
-          </ul>
-          <p>
-            The statistics and data also includes information on absence in
-            pupil referral units and for pupils aged 4.
-          </p>
-          <p>
-            We use the key measures of 'overall' and 'persistent' absence to
-            monitor pupil absence while 'absence by reason' and 'pupil
-            characteristics' are also included.
-          </p>
-          <p>
-            The statistics and data are available at national, regional, local
-            authority (LA) and school level and are used by LAs and schools to
-            compare their local absence rates to regional and national averages
-            for different pupil groups.
-          </p>
-          <p>
-            The statistics and data are also used for policy development as key
-            indicators in behaviour and school attendance policy.
-          </p>
-        </AccordionSection>
-
         <AccordionSection heading="Pupil absence rates">
           <Details summary="Overall absence rate definition">
             The total number of overall absence sessions for all pupils as a
@@ -745,24 +688,46 @@ const PublicationPage = () => {
           caption="How we collect and process statistics and data"
           headingTag="h3"
         >
-          <ul className="govuk-list">
-            <li>
-              <a href="/prototypes/methodology-absence" className="govuk-link">
-                How we collect statistics and data?
-              </a>
-            </li>
-            <li>
-              <a href="/prototypes/methodology-absence" className="govuk-link">
-                What do we do with statistics and data?
-              </a>
-            </li>
-            <li>
-              <a href="/prototypes/methodology-absence" className="govuk-link">
-                Related policies
-              </a>
-            </li>
-          </ul>
+          <p>
+            Read our{' '}
+            <a href="/prototypes/methodology-absence">
+              Pupil absence statistics: methodology
+            </a>{' '}
+            guidance.
+          </p>
         </AccordionSection>
+        <AccordionSection heading="About these statistics">
+          <p className="govuk-body">
+            The statistics and data show the absence of pupils of compulsory
+            school age during the 2016/17 academic year in the following
+            state-funded school types:
+          </p>
+          <ul className="govuk-list-bullet">
+            <li>primary schools</li>
+            <li>secondary schools</li>
+            <li>special schools</li>
+          </ul>
+          <p>
+            The statistics and data also includes information on absence in
+            pupil referral units and for pupils aged 4.
+          </p>
+          <p>
+            We use the key measures of 'overall' and 'persistent' absence to
+            monitor pupil absence while 'absence by reason' and 'pupil
+            characteristics' are also included.
+          </p>
+          <p>
+            The statistics and data are available at national, regional, local
+            authority (LA) and school level and are used by LAs and schools to
+            compare their local absence rates to regional and national averages
+            for different pupil groups.
+          </p>
+          <p>
+            The statistics and data are also used for policy development as key
+            indicators in behaviour and school attendance policy.
+          </p>
+        </AccordionSection>
+
         <AccordionSection heading="National Statistics" headingTag="h3">
           <p className="govuk-body">
             The United Kingdom Statistics Authority designated these statistics
@@ -791,25 +756,6 @@ const PublicationPage = () => {
             their compliance with the Code of Practice are provided in this{' '}
             <a href="#">accompanying document</a>
           </p>
-        </AccordionSection>
-        <AccordionSection heading="Feedback and questions" headingTag="h3">
-          <ul className="govuk-list">
-            <li>
-              <a href="#" className="govuk-link">
-                Feedback on this page
-              </a>
-            </li>
-            <li>
-              <a href="#" className="govuk-link">
-                Make a suggestion
-              </a>
-            </li>
-            <li>
-              <a href="#" className="govuk-link">
-                Ask a question
-              </a>
-            </li>
-          </ul>
         </AccordionSection>
         <AccordionSection heading="Contact us" headingTag="h3">
           <p>
