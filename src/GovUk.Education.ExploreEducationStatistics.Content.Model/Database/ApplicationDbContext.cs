@@ -1551,6 +1551,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new DataBlock
                                 {
                                     Heading = "Chart showing permanent exclusions in England",
+                                    DataBlockRequest = new DataBlockRequest
+                                    {
+                                        subjectId = 12,
+                                        geographicLevel = "National",
+                                        startYear = "2012",
+                                        endYear = "2016",
+                                        filters = new List<string> { "727" },
+                                        indicators = new List<string> { "156", "154", "155" }
+                                    },
+                                    
+                                    Tables = new List<Table>
+                                    {
+                                        new Table
+                                        {
+                                            indicators = new List<string> { "154", "155", "156"  }
+                                        }
+                                    },
+   
+                                    Charts = new List<IContentBlockChart> {
+                                        new LineChart
+                                        {
+                                            XAxis = new Axis
+                                            {
+                                                title = "School Year"
+                                            },
+                                            YAxis = new Axis
+                                            {
+                                                title = ""
+                                            },
+                                            Indicators = new List<string>
+                                            {
+                                                "156"
+                                            },
+                                        }
+                                    }
+                                    
                                 },
                                 new MarkDownBlock
                                 {
@@ -1577,6 +1613,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new DataBlock
                                 {
                                     Heading = "Chart showing fixed-period exclusions in England",
+                                    DataBlockRequest = new DataBlockRequest
+                                    {
+                                        subjectId = 12,
+                                        geographicLevel = "National",
+                                        startYear = "2012",
+                                        endYear = "2016",
+                                        filters = new List<string> { "727" },
+                                        indicators = new List<string> { "158","154","157" }
+                                    },
+                                    
+                                    Tables = new List<Table>
+                                    {
+                                        new Table
+                                        {
+                                            indicators = new List<string> { "154", "157", "158"  }
+                                        }
+                                    },
+   
+                                    Charts = new List<IContentBlockChart> {
+                                        new LineChart
+                                        {
+                                            XAxis = new Axis
+                                            {
+                                                title = "School Year"
+                                            },
+                                            YAxis = new Axis
+                                            {
+                                                title = ""
+                                            },
+                                            Indicators = new List<string>
+                                            {
+                                                "158"
+                                            },
+                                        }
+                                    }
                                 },
                                 new MarkDownBlock
                                 {
