@@ -50,26 +50,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            var connectionString = Configuration.GetConnectionString("ContentDb");
-
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                const string connection = "Data Source=../GovUk.Education.ExploreEducationStatistics.Content.Api/dfe-meta.db";
-
-                services.AddDbContext<ApplicationDbContext>(options =>
-                    options
-                        .UseSqlite(connection,
-                            builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
-                        .EnableSensitiveDataLogging()
-                );
-            }
-            else
-            {
-                services.AddDbContext<ApplicationDbContext>(options =>
-                    options
-                        .UseSqlServer(connectionString,
-                            builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName)));
-            }
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options
+                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
+                    .EnableSensitiveDataLogging()
+            );
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

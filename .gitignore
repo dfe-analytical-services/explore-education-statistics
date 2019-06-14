@@ -10,7 +10,7 @@
 ## Application
 bin
 obj
-/data/
+/data/ees-mssql
 dfe-meta.db
 
 ## CSharp
