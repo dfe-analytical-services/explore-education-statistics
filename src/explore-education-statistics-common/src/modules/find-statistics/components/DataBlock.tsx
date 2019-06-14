@@ -23,6 +23,7 @@ import {
 } from '@common/services/publicationService';
 import React, { Component, ReactNode } from 'react';
 
+import DataSource from '@common/modules/find-statistics/components/DataSource';
 import DownloadDetails from './DownloadDetails';
 
 export interface DataBlockProps {
@@ -152,6 +153,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
                   return (
                     <React.Fragment key={key}>
                       <TableRenderer {...table} />
+                      <DataSource />
                       <DownloadDetails />
                     </React.Fragment>
                   );
@@ -173,6 +175,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
                   return (
                     <React.Fragment key={key}>
                       <ChartRenderer {...chart} height={height} />
+                      <DataSource />
                       <DownloadDetails />
                     </React.Fragment>
                   );
