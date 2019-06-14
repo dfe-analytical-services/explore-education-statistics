@@ -1698,6 +1698,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = "",
                             Content = new List<IContentBlock>
                             {
+                                new DataBlock {                                         
+                                    DataBlockRequest = new DataBlockRequest {
+                                        subjectId = 12,
+                                        geographicLevel = "Local_Authority",
+                                        startYear = "2016",
+                                        endYear = "2017",
+                                        indicators = new List<string> { "155" , "156" , "158" },
+                                        filters = new List<string> { "727" }
+                                    },         
+                                    Charts = new List<IContentBlockChart> {
+                                        new MapChart {
+                                            Indicators = new List<string> { "155" , "156" , "158" }
+                                        }
+                                    }
+                                        
+                                },
                                 new MarkDownBlock
                                 {
                                     Body =
