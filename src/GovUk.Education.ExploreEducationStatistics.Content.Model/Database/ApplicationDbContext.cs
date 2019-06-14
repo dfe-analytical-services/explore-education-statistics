@@ -1074,8 +1074,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "2016-17",
                     Summary =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
-                        "All figures refer to the **2016/17 academic year** - unless otherwise stated.\n\n" +
-                        "> [View regional and local authority (LA) breakdowns](#contents-sections-heading-9)\n\n" +
                         "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england).",
 
                     KeyStatistics = new DataBlock
@@ -1267,7 +1265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Order = 4, Heading = "Reasons for absence", Caption = "",
                             Content = new List<IContentBlock>
                             {
-                                new InsetTextBlock
+                                new MarkDownBlock()
                                 {
                                     Body =
                                     "These have been broken down into the following:\n\n" +
@@ -1449,13 +1447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         "* South West - 4.8%\n\n" +
                                         "Meanwhile, Inner and Outer London had the lowest rates at 4.4%.\n\n" +
                                         "**Persistent absence**\n\n" +
-                                        "The region with the highest persistent absence rate was Yorkshire and the Humber with 11.9% while Outer London had the lowest rate at 10%.\n\n" +
-                                        "**Local authority (LA) level data**\n\n" +
-                                        "Download data in the following formats or access our data via our API:\n\n" +
-                                        "[Download .csv files]('#')\n\n" +
-                                        "[Download Excel files]('#')\n\n" +
-                                        "[Download pdf files]('#')\n\n" +
-                                        "[Access API]('#') - [What is an API?]('../glossary#what-is-an-api')"
+                                        "The region with the highest persistent absence rate was Yorkshire and the Humber with 11.9% while Outer London had the lowest rate at 10%.\n\n" 
                                 }
                             }
                         }
@@ -1518,8 +1510,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "2016-17",
                     Summary =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
-                        "All figures refer to the **2016/17 academic year** - unless otherwise stated.\n\n" +
-                        "> [View regional and local authority (LA) breakdowns]('#contents-exclusions-sections-heading-9')\n\n" +
                         "Find out how and why these statistics are collected and published - [Permanent and fixed-period exclusion statistics: methodology](../methodology/permanent-and-fixed-period-exclusions-in-england)",
                     KeyStatistics = new DataBlock
                     {
@@ -2075,8 +2065,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Slug = "2018",
                   Summary =
                     "Read national statistical summaries, view charts and tables and download data files.\n\n" +
-                    "All figures refer to the **March and April 2018** release - unless otherwise stated.\n\n" +
-                    "> [View regional and local authority (LA) breakdowns](#)\n\n" +
                     "Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](../methodology/secondary-and-primary-schools-applications-and-offers)",
                   KeyStatistics = new DataBlock
                   {

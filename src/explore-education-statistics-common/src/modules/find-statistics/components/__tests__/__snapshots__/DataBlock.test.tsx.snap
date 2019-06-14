@@ -206,6 +206,11 @@ exports[`DataBlock datablock renders map 1`] = `
           </div>
         </div>
       </div>
+      <div>
+        <p class="govuk-body-s">
+          Source: Department for Education
+        </p>
+      </div>
     </section>
   </div>
 </div>
