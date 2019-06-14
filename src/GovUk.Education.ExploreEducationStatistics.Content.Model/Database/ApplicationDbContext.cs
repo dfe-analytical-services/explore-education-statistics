@@ -1249,7 +1249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Order = 4, Heading = "Reasons for absence", Caption = "",
                             Content = new List<IContentBlock>
                             {
-                                new InsetTextBlock
+                                new MarkDownBlock()
                                 {
                                     Body =
                                     "These have been broken down into the following:\n\n" +
