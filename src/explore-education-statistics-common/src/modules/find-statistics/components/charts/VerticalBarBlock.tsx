@@ -15,15 +15,15 @@ import { colours } from './Charts';
 
 export default function VerticalBarBlock({
   data,
-  chartDataKeys,
+  indicators,
   height,
   xAxis,
   yAxis,
   width,
   meta,
 }: ChartProps) {
-  const chartData = data.result.map(({ measures, year }) => ({
-    name: `${meta.timePeriods[year].label}`,
+  const chartData = data.result.map(({ measures, year, timeIdentifier }) => ({
+    name: `${meta.timePeriods[`${year}_${timeIdentifier}`].label}`,
     ...measures,
   }));
 
@@ -46,7 +46,7 @@ export default function VerticalBarBlock({
         <Tooltip />
         <Legend />
 
-        {chartDataKeys.map((dataKey, index) => {
+        {indicators.map((dataKey, index) => {
           return (
             <Bar
               key={dataKey}

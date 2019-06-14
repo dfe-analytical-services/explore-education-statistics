@@ -30,27 +30,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            ConfigureGeoJson(modelBuilder);
-            ConfigureObservationFilterItem(modelBuilder);
-            ConfigureUnit(modelBuilder);
-            ConfigurePublication(modelBuilder);
-            ConfigureMeasures(modelBuilder);
-            ConfigureTimePeriod(modelBuilder);
-            ConfigureGeographicLevel(modelBuilder);
-            ConfigureCountry(modelBuilder);
-            ConfigureLocalAuthority(modelBuilder);
-            ConfigureLocalAuthorityDistrict(modelBuilder);
-            ConfigureRegion(modelBuilder);
-            ConfigureInstitution(modelBuilder);
-            ConfigureLocalEnterprisePartnership(modelBuilder);
-            ConfigureMat(modelBuilder);
-            ConfigureMayoralCombinedAuthority(modelBuilder);
-            ConfigureOpportunityArea(modelBuilder);
-            ConfigureParliamentaryConstituency(modelBuilder);
-            ConfigureProvider(modelBuilder);
-            ConfigureWard(modelBuilder);
             ConfigureAdditionalTypes(modelBuilder);
+            ConfigureData(modelBuilder);
+            ConfigureGeographicLevel(modelBuilder);
+            ConfigureGeoJson(modelBuilder);
+            ConfigureLocation(modelBuilder);
+            ConfigureMeasures(modelBuilder);
+            ConfigureObservationFilterItem(modelBuilder);
+            ConfigurePublication(modelBuilder);
+            ConfigureTimePeriod(modelBuilder);
+            ConfigureUnit(modelBuilder);
+        }
 
+        private static void ConfigureData(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<Theme>().HasData(new List<Theme>
             {
                 new Theme
@@ -274,6 +267,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             });
         }
 
+        private static void ConfigureLocation(ModelBuilder modelBuilder)
+        {
+            ConfigureCountry(modelBuilder);
+            ConfigureInstitution(modelBuilder);
+            ConfigureLocalAuthority(modelBuilder);
+            ConfigureLocalAuthorityDistrict(modelBuilder);
+            ConfigureLocalEnterprisePartnership(modelBuilder);
+            ConfigureMat(modelBuilder);
+            ConfigureMayoralCombinedAuthority(modelBuilder);
+            ConfigureOpportunityArea(modelBuilder);
+            ConfigureParliamentaryConstituency(modelBuilder);
+            ConfigureProvider(modelBuilder);
+            ConfigureRegion(modelBuilder);
+            ConfigureRscRegion(modelBuilder);
+            ConfigureWard(modelBuilder);
+        }
+
         private static void ConfigureObservationFilterItem(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ObservationFilterItem>()
@@ -365,13 +375,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     builder => builder.HasIndex(localAuthorityDistrict => localAuthorityDistrict.Code));
         }
 
-        private static void ConfigureRegion(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.Region,
-                    builder => builder.HasIndex(region => region.Code));
-        }
-
         private static void ConfigureInstitution(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
@@ -419,6 +422,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.Provider,
                     builder => builder.HasIndex(provider => provider.Code));
+        }
+
+        private static void ConfigureRegion(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Location>()
+                .OwnsOne(level => level.Region,
+                    builder => builder.HasIndex(region => region.Code));
+        }
+
+        private static void ConfigureRscRegion(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Location>()
+                .OwnsOne(level => level.RscRegion,
+                    builder => builder.HasIndex(rscRegion => rscRegion.Code));
         }
 
         private static void ConfigureWard(ModelBuilder modelBuilder)

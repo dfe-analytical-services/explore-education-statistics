@@ -1403,11 +1403,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         {
                             Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = "",
                             Content = new List<IContentBlock>
-                            {
-                                // TODO: ADD LA MAP
-                                new MarkDownBlock
-                                {
-                                    Body = "MAP GOES HERE"
+                            {                                
+                                new DataBlock {                                         
+                                    DataBlockRequest = new DataBlockRequest {
+                                        subjectId = 1,
+                                        geographicLevel = "Local_Authority",
+                                        startYear = "2016",
+                                        endYear = "2017",
+                                        indicators = new List<string> { "23" , "26" , "28" },
+                                        filters = new List<string> { "1", "2"}
+                                    },         
+                                    Charts = new List<IContentBlockChart> {
+                                        new MapChart {
+                                            Indicators = new List<string> { "23" , "26", "28" }
+                                        }
+                                    }
+                                        
                                 },
                                 new MarkDownBlock
                                 {
