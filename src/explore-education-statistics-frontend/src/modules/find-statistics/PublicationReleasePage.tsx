@@ -127,15 +127,6 @@ class PublicationReleasePage extends Component<Props> {
                   </li>
                 ))}
               </ul>
-              {/* <h2 className="govuk-heading-m govuk-!-margin-top-9">
-                Explore and edit this data online
-              </h2>
-
-              <p>Use our table tool to add and remove data for this table.</p>
-
-              <Link to="/table-tool/" className="govuk-button">
-                Explore data
-              </Link> */}
             </Details>
 
             <div className="govuk-!-margin-top-3 govuk-!-margin-bottom-3">
