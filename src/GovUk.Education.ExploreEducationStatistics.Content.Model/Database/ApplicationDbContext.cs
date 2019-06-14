@@ -1061,8 +1061,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "2016-17",
                     Summary =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
-                        "All figures refer to the **2016/17 academic year** - unless otherwise stated.\n\n" +
-                        "> [View regional and local authority (LA) breakdowns](#contents-sections-heading-9)\n\n" + 
                         "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england).",
 
                     KeyStatistics = new DataBlock
@@ -1495,8 +1493,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "2016-17",
                     Summary =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
-                        "All figures refer to the **2016/17 academic year** - unless otherwise stated.\n\n" +
-                        "> [View regional and local authority (LA) breakdowns]('#contents-exclusions-sections-heading-9')\n\n" +
                         "Find out how and why these statistics are collected and published - [Permanent and fixed-period exclusion statistics: methodology](../methodology/permanent-and-fixed-period-exclusions-in-england)",
                     KeyStatistics = new DataBlock
                     {
@@ -2036,8 +2032,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Slug = "2018",
                   Summary = 
                     "Read national statistical summaries, view charts and tables and download data files.\n\n" +
-                    "All figures refer to the **March and April 2018** release - unless otherwise stated.\n\n" +
-                    "> [View regional and local authority (LA) breakdowns](#)\n\n" +
                     "Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](../methodology/secondary-and-primary-schools-applications-and-offers)",
                   KeyStatistics = new DataBlock
                   {
