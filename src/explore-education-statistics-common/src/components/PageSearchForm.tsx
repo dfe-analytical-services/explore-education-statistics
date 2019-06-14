@@ -4,7 +4,6 @@ import {
 } from '@common/components/AccordionSection';
 import { openAllParentDetails } from '@common/components/Details';
 import FormComboBox from '@common/components/form/FormComboBox';
-import styles from '@common/components/SearchForm.module.scss';
 import { openAllParentTabSections } from '@common/components/TabsSection';
 import findAllByText from '@common/lib/dom/findAllByText';
 import findParent from '@common/lib/dom/findParent';
@@ -13,6 +12,7 @@ import classNames from 'classnames';
 import debounce from 'lodash/debounce';
 import React, { Component, ReactNode } from 'react';
 import Highlighter from 'react-highlight-words';
+import styles from './PageSearchForm.module.scss';
 
 interface SearchResult {
   element: Element;

@@ -1,8 +1,8 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
+import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedInformation from '@common/components/RelatedInformation';
-import SearchForm from '@common/components/SearchForm';
 import { contentApi } from '@common/services/api';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -59,7 +59,7 @@ class FindStatisticsPage extends Component<Props> {
               </li>
             </ul>
 
-            <SearchForm />
+            <PageSearchForm />
           </div>
           <div className="govuk-grid-column-one-third">
             <RelatedInformation>

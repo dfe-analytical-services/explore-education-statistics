@@ -2,9 +2,9 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
+import PageSearchForm from '@common/components/PageSearchForm';
 import PrintThisPage from '@common/components/PrintThisPage';
 import RelatedAside from '@common/components/RelatedAside';
-import SearchForm from '@common/components/SearchForm';
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import { baseUrl } from '@common/services/api';
 import publicationService, {
@@ -138,7 +138,7 @@ class PublicationReleasePage extends Component<Props> {
               </Link>
             </Details>
 
-            <SearchForm className="govuk-!-margin-top-3 govuk-!-margin-bottom-3" />
+            <PageSearchForm className="govuk-!-margin-top-3 govuk-!-margin-bottom-3" />
           </div>
 
           <div className="govuk-grid-column-one-third">

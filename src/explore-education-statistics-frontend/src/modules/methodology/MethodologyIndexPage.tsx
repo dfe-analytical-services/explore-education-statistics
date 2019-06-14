@@ -1,7 +1,7 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedInformation from '@common/components/RelatedInformation';
-import SearchForm from '@common/components/SearchForm';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
@@ -25,7 +25,7 @@ function MethodologyIndexPage() {
             statistics and data and how and why they're collected and published.
           </p>
 
-          <SearchForm />
+          <PageSearchForm />
         </div>
         <div className="govuk-grid-column-one-third">
           <RelatedInformation>
