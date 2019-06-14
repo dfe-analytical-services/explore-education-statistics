@@ -65,7 +65,7 @@ function GlossaryIndexPage() {
           <h3 id="authorised-absence">Authorised absence</h3>
           <p>
             When a pupil misses (or is absent from) at least 1 possible school
-            sessionf with the permission of a teacher or other authorised school
+            session with the permission of a teacher or other authorised school
             representative.
           </p>
           <p>
@@ -128,6 +128,8 @@ function GlossaryIndexPage() {
           </p>
         </AccordionSection>
         <AccordionSection heading="F">
+          <h3 id="first-preference-offer">First preference offer</h3>
+          <p>INSERT DEFINITION - TBC</p>
           <h3 id="fixed-period-exclusion">Fixed-period exclusion</h3>
           <p>
             When a pupil is not allowed to attend (or is excluded from) a school
@@ -225,8 +227,8 @@ function GlossaryIndexPage() {
             possible school sessions for all pupils.
           </p>
           <p>
-            Expressed as a percentage of the total number of possible sessions
-            for all pupils.
+            Expressed as a percentage of the total number of possible school
+            sessions for all pupils.
           </p>
           <p>
             Counted in sessions, where 1 session is equivalent to half-a-day.
