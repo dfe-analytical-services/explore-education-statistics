@@ -132,16 +132,16 @@ function HomePage() {
               Contact Us
             </a>
           </h4>
-          <p>
+          <p className="govuk-caption-m govuk-!-margin-top-1">
             If you need help and support or have a question about education
             statistics and data contact:
           </p>
 
-          <p>
+          <p className="govuk-caption-m govuk-!-margin-top-1">
             <strong>Explore education statistics team</strong>
           </p>
 
-          <p>
+          <p className="govuk-caption-m govuk-!-margin-top-1">
             Email
             <br />
             <a href="mailto:explore.statistics@education.gov.uk">
