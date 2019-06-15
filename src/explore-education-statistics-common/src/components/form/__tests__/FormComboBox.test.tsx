@@ -596,6 +596,35 @@ describe('FormComboBox', () => {
       expect(onSelect).toHaveBeenCalledWith(2);
     });
 
+    test('clicking option hides all options', () => {
+      const { container, getByLabelText } = render(
+        <FormComboBox
+          id="test-combobox"
+          inputLabel="Choose option"
+          onInputChange={() => {}}
+          onSelect={() => {}}
+          options={['Option 1', 'Option 2', 'Option 3']}
+        />,
+      );
+
+      const input = getByLabelText('Choose option') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
+
+      const listBox = container.querySelector(
+        '[role="listbox"]',
+      ) as HTMLElement;
+
+      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+      fireEvent.keyDown(listBox, { key: 'Enter' });
+
+      expect(container.querySelectorAll('[role="option"]')).toHaveLength(0);
+    });
+
     test('pressing Escape on list box options clears them and focuses input field', () => {
       const { container, getByLabelText } = render(
         <FormComboBox
@@ -684,6 +713,30 @@ describe('FormComboBox', () => {
       fireEvent.click(getByText('Option 2'));
 
       expect(onSelect).toHaveBeenCalledWith(1);
+    });
+
+    test('clicking option hides all options', () => {
+      const { container, getByText, getByLabelText } = render(
+        <FormComboBox
+          id="test-combobox"
+          inputLabel="Choose option"
+          onInputChange={() => {}}
+          onSelect={() => {}}
+          options={['Option 1', 'Option 2', 'Option 3']}
+        />,
+      );
+
+      const input = getByLabelText('Choose option') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
+
+      fireEvent.click(getByText('Option 2'));
+
+      expect(container.querySelectorAll('[role="option"]')).toHaveLength(0);
     });
   });
 });

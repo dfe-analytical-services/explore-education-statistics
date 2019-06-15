@@ -218,6 +218,7 @@ const FormComboBox = ({
 
                       case 'Enter':
                         onSelect(selectedOption);
+                        toggleShowOptions(false);
                         break;
 
                       case 'Home':
@@ -261,7 +262,10 @@ const FormComboBox = ({
                           optionRefs.current[key] = el;
                         }
                       }}
-                      onClick={() => onSelect(index)}
+                      onClick={() => {
+                        onSelect(index);
+                        toggleShowOptions(false);
+                      }}
                     >
                       {item}
                     </li>
