@@ -12,7 +12,7 @@ import styles from './FormComboBox.module.scss';
 
 interface ComboBoxRenderProps {
   value: string;
-  selectedItem: number;
+  selectedOption: number;
 }
 
 interface Props {
@@ -26,7 +26,7 @@ interface Props {
   listBoxLabelId?: string;
   options?: ReactNode[] | ((props: ComboBoxRenderProps) => ReactNode[]);
   onInputChange: ChangeEventHandler<HTMLInputElement>;
-  onSelect(selectedItem: number): void;
+  onSelect(selectedOption: number): void;
 }
 
 const FormComboBox = ({
@@ -44,23 +44,25 @@ const FormComboBox = ({
 }: Props) => {
   const listBoxRef = useRef<HTMLUListElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const itemRefs = useRef<Dictionary<HTMLLIElement>>({});
+  const optionRefs = useRef<Dictionary<HTMLLIElement>>({});
 
   const [value, setValue] = useState('');
-  const [selectedItem, setSelectedItem] = useState(initialOption);
+  const [selectedOption, setSelectedOption] = useState(initialOption);
 
   const renderedOptions =
-    typeof options === 'function' ? options({ selectedItem, value }) : options;
+    typeof options === 'function'
+      ? options({ selectedOption, value })
+      : options;
 
   const adjustListBoxScroll = (
     event: KeyboardEvent<HTMLElement>,
-    nextSelectedItem: number,
+    nextSelectedOption: number,
   ) => {
-    if (!renderedOptions || !listBoxRef.current || !itemRefs.current) {
+    if (!renderedOptions || !listBoxRef.current || !optionRefs.current) {
       return;
     }
 
-    const optionEl = itemRefs.current[nextSelectedItem];
+    const optionEl = optionRefs.current[nextSelectedOption];
 
     if (!optionEl) {
       return;
@@ -68,14 +70,14 @@ const FormComboBox = ({
 
     switch (event.key) {
       case 'ArrowUp':
-        if (nextSelectedItem === renderedOptions.length - 1) {
+        if (nextSelectedOption === renderedOptions.length - 1) {
           listBoxRef.current.scrollTop = listBoxRef.current.scrollHeight;
         } else {
           listBoxRef.current.scrollTop -= optionEl.offsetHeight;
         }
         break;
       case 'ArrowDown':
-        if (nextSelectedItem === 0) {
+        if (nextSelectedOption === 0) {
           listBoxRef.current.scrollTop = 0;
         } else {
           listBoxRef.current.scrollTop += optionEl.offsetHeight;
@@ -85,7 +87,7 @@ const FormComboBox = ({
     }
   };
 
-  const selectNextItem = (event: KeyboardEvent<HTMLElement>) => {
+  const selectNextOption = (event: KeyboardEvent<HTMLElement>) => {
     event.persist();
     event.preventDefault();
 
@@ -93,31 +95,31 @@ const FormComboBox = ({
       return -1;
     }
 
-    let nextSelectedItem = selectedItem;
+    let nextSelectedOption = selectedOption;
 
     switch (event.key) {
       case 'ArrowUp':
-        if (selectedItem <= 0) {
-          nextSelectedItem = renderedOptions.length - 1;
+        if (selectedOption <= 0) {
+          nextSelectedOption = renderedOptions.length - 1;
         } else {
-          nextSelectedItem = selectedItem - 1;
+          nextSelectedOption = selectedOption - 1;
         }
         break;
       case 'ArrowDown':
-        if (selectedItem >= renderedOptions.length - 1) {
-          nextSelectedItem = 0;
+        if (selectedOption >= renderedOptions.length - 1) {
+          nextSelectedOption = 0;
         } else {
-          nextSelectedItem = selectedItem + 1;
+          nextSelectedOption = selectedOption + 1;
         }
         break;
       default:
-        return selectedItem;
+        return selectedOption;
     }
 
-    setSelectedItem(nextSelectedItem);
-    adjustListBoxScroll(event, nextSelectedItem);
+    setSelectedOption(nextSelectedOption);
+    adjustListBoxScroll(event, nextSelectedOption);
 
-    return nextSelectedItem;
+    return nextSelectedOption;
   };
 
   return (
@@ -142,7 +144,7 @@ const FormComboBox = ({
           {...inputProps}
           aria-autocomplete="list"
           aria-activedescendant={
-            selectedItem > -1 ? `${id}-option-${selectedItem}` : undefined
+            selectedOption > -1 ? `${id}-option-${selectedOption}` : undefined
           }
           aria-controls={`${id}-options`}
           className="govuk-input"
@@ -153,13 +155,13 @@ const FormComboBox = ({
             event.persist();
 
             setValue(event.target.value);
-            itemRefs.current = {};
+            optionRefs.current = {};
 
             onInputChange(event);
           }}
           onKeyDown={event => {
             if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-              selectNextItem(event);
+              selectNextOption(event);
 
               if (listBoxRef.current) {
                 listBoxRef.current.focus();
@@ -169,13 +171,13 @@ const FormComboBox = ({
         />
 
         {typeof afterInput === 'function'
-          ? afterInput({ selectedItem, value })
+          ? afterInput({ selectedOption, value })
           : afterInput}
 
         {renderedOptions && (
           <div className={styles.optionsContainer}>
             {typeof listBoxLabel === 'function'
-              ? listBoxLabel({ selectedItem, value })
+              ? listBoxLabel({ selectedOption, value })
               : listBoxLabel}
 
             {renderedOptions.length > 0 && (
@@ -187,7 +189,7 @@ const FormComboBox = ({
                 role="listbox"
                 tabIndex={-1}
                 onKeyDown={event => {
-                  selectNextItem(event);
+                  selectNextOption(event);
 
                   const inputEl = inputRef.current;
 
@@ -219,7 +221,11 @@ const FormComboBox = ({
                     }
 
                     if (event.key === 'Enter') {
-                      onSelect(selectedItem);
+                      onSelect(selectedOption);
+                    }
+
+                    if (event.key === 'Escape') {
+                      setValue('');
                     }
                   }
                 }}
@@ -230,16 +236,16 @@ const FormComboBox = ({
                   return (
                     // eslint-disable-next-line jsx-a11y/click-events-have-key-events
                     <li
-                      aria-selected={selectedItem === index}
+                      aria-selected={selectedOption === index}
                       key={key}
                       id={`${id}-option-${index}`}
                       className={
-                        selectedItem === index ? styles.selected : undefined
+                        selectedOption === index ? styles.selected : undefined
                       }
                       role="option"
                       ref={el => {
                         if (el) {
-                          itemRefs.current[key] = el;
+                          optionRefs.current[key] = el;
                         }
                       }}
                       onClick={() => onSelect(index)}
