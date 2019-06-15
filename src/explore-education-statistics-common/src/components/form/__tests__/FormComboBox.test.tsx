@@ -10,7 +10,7 @@ describe('FormComboBox', () => {
         inputLabel="Choose option"
         onInputChange={() => {}}
         onSelect={() => {}}
-        listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+        options={['Option 1', 'Option 2', 'Option 3']}
       />,
     );
 
@@ -32,7 +32,7 @@ describe('FormComboBox', () => {
         initialOption={0}
         onInputChange={() => {}}
         onSelect={() => {}}
-        listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+        options={['Option 1', 'Option 2', 'Option 3']}
       />,
     );
 
@@ -52,7 +52,7 @@ describe('FormComboBox', () => {
           inputLabel="Choose option"
           onInputChange={() => {}}
           onSelect={() => {}}
-          listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+          options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
 
@@ -72,7 +72,7 @@ describe('FormComboBox', () => {
           inputLabel="Choose option"
           onInputChange={() => {}}
           onSelect={() => {}}
-          listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+          options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
 
@@ -98,7 +98,7 @@ describe('FormComboBox', () => {
           inputLabel="Choose option"
           onInputChange={() => {}}
           onSelect={() => {}}
-          listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+          options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
 
@@ -118,7 +118,7 @@ describe('FormComboBox', () => {
           inputLabel="Choose option"
           onInputChange={() => {}}
           onSelect={() => {}}
-          listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+          options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
 
@@ -146,7 +146,7 @@ describe('FormComboBox', () => {
           inputLabel="Choose option"
           onInputChange={() => {}}
           onSelect={() => {}}
-          listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+          options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
 
@@ -194,7 +194,7 @@ describe('FormComboBox', () => {
           inputLabel="Choose option"
           onInputChange={() => {}}
           onSelect={() => {}}
-          listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+          options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
 
@@ -228,7 +228,7 @@ describe('FormComboBox', () => {
           inputLabel="Choose option"
           onInputChange={() => {}}
           onSelect={() => {}}
-          listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+          options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
 
@@ -276,7 +276,7 @@ describe('FormComboBox', () => {
           inputLabel="Choose option"
           onInputChange={() => {}}
           onSelect={() => {}}
-          listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+          options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
 
@@ -310,7 +310,7 @@ describe('FormComboBox', () => {
           inputLabel="Choose option"
           onInputChange={() => {}}
           onSelect={() => {}}
-          listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+          options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
 
@@ -332,7 +332,7 @@ describe('FormComboBox', () => {
           inputLabel="Choose option"
           onInputChange={() => {}}
           onSelect={() => {}}
-          listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+          options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
 
@@ -359,7 +359,7 @@ describe('FormComboBox', () => {
           inputLabel="Choose option"
           onInputChange={() => {}}
           onSelect={() => {}}
-          listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+          options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
 
@@ -381,7 +381,7 @@ describe('FormComboBox', () => {
           inputLabel="Choose option"
           onInputChange={() => {}}
           onSelect={() => {}}
-          listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+          options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
 
@@ -408,7 +408,7 @@ describe('FormComboBox', () => {
           inputLabel="Choose option"
           onInputChange={() => {}}
           onSelect={() => {}}
-          listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+          options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
 
@@ -436,7 +436,7 @@ describe('FormComboBox', () => {
           inputLabel="Choose option"
           onInputChange={() => {}}
           onSelect={() => {}}
-          listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+          options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
 
@@ -466,7 +466,7 @@ describe('FormComboBox', () => {
           inputLabel="Choose option"
           onInputChange={() => {}}
           onSelect={onSelect}
-          listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+          options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
 
@@ -491,7 +491,7 @@ describe('FormComboBox', () => {
           inputLabel="Choose option"
           onInputChange={() => {}}
           onSelect={onSelect}
-          listBoxItems={['Option 1', 'Option 2', 'Option 3']}
+          options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
 

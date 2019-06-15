@@ -151,7 +151,7 @@ class PageSearchForm extends Component<Props, State> {
               Found <strong>{searchResults.length}</strong> results
             </div>
           )}
-          listBoxItems={
+          options={
             searchComplete
               ? searchResults.map(result => {
                   return (

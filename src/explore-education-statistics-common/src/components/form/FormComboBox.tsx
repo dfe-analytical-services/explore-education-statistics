@@ -10,16 +10,21 @@ import React, {
 } from 'react';
 import styles from './FormComboBox.module.scss';
 
+interface ComboBoxRenderProps {
+  value: string;
+  selectedItem: number;
+}
+
 interface Props {
-  afterInput?(props: { value: string; selectedItem: number }): ReactNode;
+  afterInput?: ReactNode | ((props: ComboBoxRenderProps) => ReactNode);
   classes?: Partial<Record<'inputLabel', string>>;
   id: string;
   inputLabel: ReactNode;
   inputProps?: InputHTMLAttributes<HTMLInputElement>;
   initialOption?: number;
-  listBoxItems?: ReactNode[];
-  listBoxLabel?(props: { value: string; selectedItem: number }): ReactNode;
+  listBoxLabel?: ReactNode | ((props: ComboBoxRenderProps) => ReactNode);
   listBoxLabelId?: string;
+  options?: ReactNode[] | ((props: ComboBoxRenderProps) => ReactNode[]);
   onInputChange: ChangeEventHandler<HTMLInputElement>;
   onSelect(selectedItem: number): void;
 }
@@ -31,7 +36,7 @@ const FormComboBox = ({
   inputLabel,
   inputProps,
   initialOption = -1,
-  listBoxItems,
+  options,
   listBoxLabel,
   listBoxLabelId,
   onInputChange,
@@ -44,11 +49,14 @@ const FormComboBox = ({
   const [value, setValue] = useState('');
   const [selectedItem, setSelectedItem] = useState(initialOption);
 
+  const renderedOptions =
+    typeof options === 'function' ? options({ selectedItem, value }) : options;
+
   const adjustListBoxScroll = (
     event: KeyboardEvent<HTMLElement>,
     nextSelectedItem: number,
   ) => {
-    if (!listBoxItems || !listBoxRef.current || !itemRefs.current) {
+    if (!renderedOptions || !listBoxRef.current || !itemRefs.current) {
       return;
     }
 
@@ -60,7 +68,7 @@ const FormComboBox = ({
 
     switch (event.key) {
       case 'ArrowUp':
-        if (nextSelectedItem === listBoxItems.length - 1) {
+        if (nextSelectedItem === renderedOptions.length - 1) {
           listBoxRef.current.scrollTop = listBoxRef.current.scrollHeight;
         } else {
           listBoxRef.current.scrollTop -= optionEl.offsetHeight;
@@ -81,7 +89,7 @@ const FormComboBox = ({
     event.persist();
     event.preventDefault();
 
-    if (!listBoxItems || !listBoxItems.length) {
+    if (!renderedOptions || !renderedOptions.length) {
       return -1;
     }
 
@@ -90,13 +98,13 @@ const FormComboBox = ({
     switch (event.key) {
       case 'ArrowUp':
         if (selectedItem <= 0) {
-          nextSelectedItem = listBoxItems.length - 1;
+          nextSelectedItem = renderedOptions.length - 1;
         } else {
           nextSelectedItem = selectedItem - 1;
         }
         break;
       case 'ArrowDown':
-        if (selectedItem >= listBoxItems.length - 1) {
+        if (selectedItem >= renderedOptions.length - 1) {
           nextSelectedItem = 0;
         } else {
           nextSelectedItem = selectedItem + 1;
@@ -115,7 +123,7 @@ const FormComboBox = ({
   return (
     <div className={styles.container}>
       <div
-        aria-expanded={listBoxItems ? listBoxItems.length > 0 : undefined}
+        aria-expanded={renderedOptions ? renderedOptions.length > 0 : undefined}
         aria-owns={`${id}-options`}
         aria-haspopup="listbox"
         className="govuk-form-group"
@@ -160,13 +168,17 @@ const FormComboBox = ({
           }}
         />
 
-        {afterInput && afterInput({ selectedItem, value })}
+        {typeof afterInput === 'function'
+          ? afterInput({ selectedItem, value })
+          : afterInput}
 
-        {listBoxItems && (
+        {renderedOptions && (
           <div className={styles.optionsContainer}>
-            {listBoxLabel && listBoxLabel({ selectedItem, value })}
+            {typeof listBoxLabel === 'function'
+              ? listBoxLabel({ selectedItem, value })
+              : listBoxLabel}
 
-            {listBoxItems.length > 0 && (
+            {renderedOptions.length > 0 && (
               <ul
                 aria-labelledby={listBoxLabelId}
                 className={styles.options}
@@ -212,7 +224,7 @@ const FormComboBox = ({
                   }
                 }}
               >
-                {listBoxItems.map((item, index) => {
+                {renderedOptions.map((item, index) => {
                   const key = index;
 
                   return (
