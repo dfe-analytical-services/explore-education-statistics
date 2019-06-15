@@ -482,6 +482,68 @@ describe('FormComboBox', () => {
       expect(onSelect).toHaveBeenCalledWith(2);
     });
 
+    test('pressing Escape on list box options clears them and focuses input field', () => {
+      const { container, getByLabelText } = render(
+        <FormComboBox
+          id="test-combobox"
+          inputLabel="Choose option"
+          onInputChange={() => {}}
+          onSelect={() => {}}
+          options={['Option 1', 'Option 2', 'Option 3']}
+        />,
+      );
+
+      const input = getByLabelText('Choose option') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          value: 'Test value',
+        },
+      });
+
+      const listBox = container.querySelector(
+        '[role="listbox"]',
+      ) as HTMLElement;
+
+      expect(input).toHaveAttribute('value', 'Test value');
+      expect(input).not.toHaveFocus();
+      expect(container.querySelectorAll('[role="option"]')).toHaveLength(3);
+
+      fireEvent.keyDown(listBox, { key: 'Escape' });
+
+      expect(input).toHaveAttribute('value', '');
+      expect(input).toHaveFocus();
+      expect(container.querySelectorAll('[role="option"]')).toHaveLength(0);
+    });
+
+    test('pressing Escape on input field clears it and clears the list box options', () => {
+      const { container, getByLabelText } = render(
+        <FormComboBox
+          id="test-combobox"
+          inputLabel="Choose option"
+          onInputChange={() => {}}
+          onSelect={() => {}}
+          options={['Option 1', 'Option 2', 'Option 3']}
+        />,
+      );
+
+      const input = getByLabelText('Choose option') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          value: 'Test value',
+        },
+      });
+
+      expect(input).toHaveAttribute('value', 'Test value');
+      expect(container.querySelectorAll('[role="option"]')).toHaveLength(3);
+
+      fireEvent.keyDown(input, { key: 'Escape' });
+
+      expect(input).toHaveAttribute('value', '');
+      expect(container.querySelectorAll('[role="option"]')).toHaveLength(0);
+    });
+
     test('clicking option calls `onSelect` handler', () => {
       const onSelect = jest.fn();
 

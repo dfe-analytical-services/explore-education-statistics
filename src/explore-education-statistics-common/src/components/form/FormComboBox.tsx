@@ -1,3 +1,4 @@
+import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React, {
@@ -48,6 +49,7 @@ const FormComboBox = ({
 
   const [value, setValue] = useState('');
   const [selectedOption, setSelectedOption] = useState(initialOption);
+  const [showOptions, toggleShowOptions] = useToggle(false);
 
   const renderedOptions =
     typeof options === 'function'
@@ -158,6 +160,7 @@ const FormComboBox = ({
             optionRefs.current = {};
 
             onInputChange(event);
+            toggleShowOptions(true);
           }}
           onKeyDown={event => {
             if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
@@ -167,6 +170,11 @@ const FormComboBox = ({
                 listBoxRef.current.focus();
               }
             }
+
+            if (event.key === 'Escape') {
+              setValue('');
+              toggleShowOptions(false);
+            }
           }}
         />
 
@@ -174,7 +182,7 @@ const FormComboBox = ({
           ? afterInput({ selectedOption, value })
           : afterInput}
 
-        {renderedOptions && (
+        {showOptions && renderedOptions && (
           <div className={styles.optionsContainer}>
             {typeof listBoxLabel === 'function'
               ? listBoxLabel({ selectedOption, value })
@@ -194,38 +202,43 @@ const FormComboBox = ({
                   const inputEl = inputRef.current;
 
                   if (inputEl) {
-                    if (
-                      event.key === 'ArrowLeft' ||
-                      event.key === 'ArrowRight'
-                    ) {
-                      const directionChange =
-                        event.key === 'ArrowLeft' ? -1 : 1;
+                    switch (event.key) {
+                      case 'ArrowLeft':
+                      case 'ArrowRight': {
+                        const directionChange =
+                          event.key === 'ArrowLeft' ? -1 : 1;
 
-                      inputEl.selectionStart = inputEl.selectionStart
-                        ? inputEl.selectionStart + directionChange
-                        : 0;
-                      inputEl.selectionEnd = inputEl.selectionStart;
-                      inputEl.focus();
-                    }
+                        inputEl.selectionStart = inputEl.selectionStart
+                          ? inputEl.selectionStart + directionChange
+                          : 0;
+                        inputEl.selectionEnd = inputEl.selectionStart;
+                        inputEl.focus();
+                        break;
+                      }
 
-                    if (event.key === 'Home') {
-                      inputEl.selectionStart = 0;
-                      inputEl.selectionEnd = 0;
-                      inputEl.focus();
-                    }
+                      case 'Enter':
+                        onSelect(selectedOption);
+                        break;
 
-                    if (event.key === 'End') {
-                      inputEl.selectionStart = inputEl.value.length;
-                      inputEl.selectionEnd = inputEl.selectionStart;
-                      inputEl.focus();
-                    }
+                      case 'Home':
+                        inputEl.selectionStart = 0;
+                        inputEl.selectionEnd = 0;
+                        inputEl.focus();
+                        break;
 
-                    if (event.key === 'Enter') {
-                      onSelect(selectedOption);
-                    }
+                      case 'End':
+                        inputEl.selectionStart = inputEl.value.length;
+                        inputEl.selectionEnd = inputEl.selectionStart;
+                        inputEl.focus();
+                        break;
 
-                    if (event.key === 'Escape') {
-                      setValue('');
+                      case 'Escape':
+                        setValue('');
+                        toggleShowOptions(false);
+                        inputEl.focus();
+                        break;
+
+                      default:
                     }
                   }
                 }}
