@@ -6,7 +6,7 @@ import { openAllParentDetails } from '@common/components/Details';
 import FormComboBox from '@common/components/form/FormComboBox';
 import { openAllParentTabSections } from '@common/components/TabsSection';
 import findAllByText from '@common/lib/dom/findAllByText';
-import findParent from '@common/lib/dom/findParent';
+import findAllParents from '@common/lib/dom/findAllParents';
 import findPreviousSibling from '@common/lib/dom/findPreviousSibling';
 import classNames from 'classnames';
 import debounce from 'lodash/debounce';
@@ -43,40 +43,46 @@ class PageSearchForm extends Component<Props, State> {
     id: 'pageSearchForm',
   };
 
-  private debouncedSearch = debounce(this.search, 1000);
-
   private static getLocationText(element: HTMLElement): string {
-    const location = [];
+    const location: string[] = [];
 
-    const locationHeaderElement = findPreviousSibling(element, 'h2, h3, h4');
+    const prependNearestHeading = (currentElement: HTMLElement) => {
+      const elementTag = currentElement.tagName.toLowerCase();
 
-    if (locationHeaderElement) {
-      location.unshift(locationHeaderElement.textContent || '');
-    }
-
-    const accordionSection = findParent(
-      element,
-      `.${accordionSectionClasses.section}`,
-    );
-
-    if (accordionSection) {
-      const accordionHeader = accordionSection.querySelector(
-        `.${accordionSectionClasses.sectionButton}`,
-      );
-
-      if (accordionHeader) {
-        location.unshift(accordionHeader.textContent || '');
+      if (['h2', 'h3', 'h4'].includes(elementTag)) {
+        return;
       }
-    }
+
+      const headingEl = findPreviousSibling(currentElement, `h2, h3, h4`);
+
+      if (headingEl) {
+        location.unshift(headingEl.textContent || '');
+      }
+    };
+
+    prependNearestHeading(element);
+
+    findAllParents(element, '*').forEach(parent => {
+      prependNearestHeading(parent);
+
+      if (
+        parent.parentElement &&
+        parent.parentElement.classList.contains(accordionSectionClasses.section)
+      ) {
+        const accordionHeader = parent.parentElement.querySelector(
+          `.${accordionSectionClasses.sectionButton}`,
+        );
+
+        if (accordionHeader) {
+          location.unshift(accordionHeader.textContent || '');
+        }
+      }
+    });
 
     return location.join(' > ');
   }
 
-  private resetSearch() {
-    this.setState({ searchResults: [], searchComplete: false });
-  }
-
-  private search(value: string) {
+  private search = (value: string) => {
     const { elementSelectors } = this.props;
 
     if (value.length <= 3) {
@@ -105,16 +111,40 @@ class PageSearchForm extends Component<Props, State> {
           this.resetSearch();
 
           setTimeout(() => {
+            // Bit of a hack, but hopefully screen readers will
+            // still change focus to the selected element even if we
+            // proceed to remove the tabindex shortly afterwards
+            // TODO: Verify this works
+            const previousTabIndex = element.getAttribute('tabindex');
+
+            if (!previousTabIndex) {
+              element.setAttribute('tabindex', '-1');
+            }
+
+            element.focus();
             element.scrollIntoView({
               behavior: 'smooth',
               block: 'start',
             });
+
+            if (previousTabIndex) {
+              element.setAttribute('tabindex', previousTabIndex);
+            } else {
+              element.removeAttribute('tabindex');
+            }
           });
         },
       };
     });
 
     this.setState({ searchResults, searchComplete: true });
+  };
+
+  // eslint-disable-next-line react/sort-comp
+  private debouncedSearch = debounce(this.search, 1000);
+
+  private resetSearch() {
+    this.setState({ searchResults: [], searchComplete: false });
   }
 
   public render() {
@@ -148,7 +178,8 @@ class PageSearchForm extends Component<Props, State> {
           listBoxLabelId={`${id}-resultsLabel`}
           listBoxLabel={() => (
             <div id={`${id}-resultsLabel`} className={styles.resultsLabel}>
-              Found <strong>{searchResults.length}</strong> results
+              Found <strong>{searchResults.length}</strong>
+              {` ${searchResults.length === 1 ? 'result' : 'results'}`}
             </div>
           )}
           options={
@@ -157,9 +188,11 @@ class PageSearchForm extends Component<Props, State> {
                   return (
                     <>
                       <div className={styles.resultHeader}>{result.text}</div>
-                      <div className={styles.resultLocation}>
-                        {result.location}
-                      </div>
+                      {result.location && (
+                        <div className={styles.resultLocation}>
+                          {result.location}
+                        </div>
+                      )}
                     </>
                   );
                 })
