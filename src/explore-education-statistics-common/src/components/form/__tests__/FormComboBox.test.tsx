@@ -3,7 +3,7 @@ import { fireEvent, render } from 'react-testing-library';
 import FormComboBox from '../FormComboBox';
 
 describe('FormComboBox', () => {
-  test('renders correctly with options in correct order', () => {
+  test('renders with no options by default', () => {
     const { container } = render(
       <FormComboBox
         id="test-combobox"
@@ -16,32 +16,37 @@ describe('FormComboBox', () => {
 
     const options = container.querySelectorAll('[role="option"]');
 
-    expect(options).toHaveLength(3);
-    expect(options[0]).toHaveTextContent('Option 1');
-    expect(options[1]).toHaveTextContent('Option 2');
-    expect(options[2]).toHaveTextContent('Option 3');
-
+    expect(options).toHaveLength(0);
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('renders selected option correctly', () => {
-    const { container, getByText } = render(
+  test('renders with options in correct order when input changes', () => {
+    const { container, getByLabelText } = render(
       <FormComboBox
         id="test-combobox"
         inputLabel="Choose option"
-        initialOption={0}
         onInputChange={() => {}}
         onSelect={() => {}}
         options={['Option 1', 'Option 2', 'Option 3']}
       />,
     );
 
-    expect(getByText('Option 1')).toHaveClass('selected');
-    expect(getByText('Option 1')).toHaveAttribute('aria-selected', 'true');
+    const input = getByLabelText('Choose option') as HTMLInputElement;
 
-    const listbox = container.querySelector('[role="listbox"]');
+    fireEvent.change(input, {
+      target: {
+        value: 'Test',
+      },
+    });
 
-    expect(listbox).toMatchSnapshot();
+    const options = container.querySelectorAll('[role="option"]');
+
+    expect(options).toHaveLength(3);
+    expect(options[0]).toHaveTextContent('Option 1');
+    expect(options[1]).toHaveTextContent('Option 2');
+    expect(options[2]).toHaveTextContent('Option 3');
+
+    expect(container.innerHTML).toMatchSnapshot();
   });
 
   describe('input field', () => {
@@ -55,6 +60,14 @@ describe('FormComboBox', () => {
           options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
+
+      const input = getByLabelText('Choose option') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
 
       const listBox = container.querySelector('[role="listbox"]');
 
@@ -75,6 +88,14 @@ describe('FormComboBox', () => {
           options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
+
+      const input = getByLabelText('Choose option') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
 
       const option1 = getByText('Option 1');
       const option2 = getByText('Option 2');
@@ -102,6 +123,14 @@ describe('FormComboBox', () => {
         />,
       );
 
+      const input = getByLabelText('Choose option') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
+
       const listBox = container.querySelector('[role="listbox"]');
 
       expect(listBox).not.toHaveFocus();
@@ -122,6 +151,14 @@ describe('FormComboBox', () => {
         />,
       );
 
+      const input = getByLabelText('Choose option') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
+
       const option1 = getByText('Option 1');
       const option2 = getByText('Option 2');
       const option3 = getByText('Option 3');
@@ -140,7 +177,7 @@ describe('FormComboBox', () => {
 
   describe('list box', () => {
     test('pressing ArrowUp will cycle the selected item through the entire list', () => {
-      const { container, getByText } = render(
+      const { container, getByText, getByLabelText } = render(
         <FormComboBox
           id="test-combobox"
           inputLabel="Choose option"
@@ -149,6 +186,14 @@ describe('FormComboBox', () => {
           options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
+
+      const input = getByLabelText('Choose option') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
 
       const listBox = container.querySelector(
         '[role="listbox"]',
@@ -188,7 +233,7 @@ describe('FormComboBox', () => {
     });
 
     test('pressing ArrowUp adjusts scroll correctly', () => {
-      const { container, getByText } = render(
+      const { container, getByText, getByLabelText } = render(
         <FormComboBox
           id="test-combobox"
           inputLabel="Choose option"
@@ -197,6 +242,14 @@ describe('FormComboBox', () => {
           options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
+
+      const input = getByLabelText('Choose option') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
 
       const listBox = container.querySelector(
         '[role="listbox"]',
@@ -222,7 +275,7 @@ describe('FormComboBox', () => {
     });
 
     test('pressing ArrowDown will cycle the selected item through the entire list', () => {
-      const { container, getByText } = render(
+      const { container, getByText, getByLabelText } = render(
         <FormComboBox
           id="test-combobox"
           inputLabel="Choose option"
@@ -231,6 +284,14 @@ describe('FormComboBox', () => {
           options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
+
+      const input = getByLabelText('Choose option') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
 
       const listBox = container.querySelector(
         '[role="listbox"]',
@@ -270,7 +331,7 @@ describe('FormComboBox', () => {
     });
 
     test('pressing ArrowDown adjusts scroll correctly', () => {
-      const { container, getByText } = render(
+      const { container, getByText, getByLabelText } = render(
         <FormComboBox
           id="test-combobox"
           inputLabel="Choose option"
@@ -279,6 +340,14 @@ describe('FormComboBox', () => {
           options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
+
+      const input = getByLabelText('Choose option') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
 
       const listBox = container.querySelector(
         '[role="listbox"]',
@@ -314,6 +383,14 @@ describe('FormComboBox', () => {
         />,
       );
 
+      const input = getByLabelText('Choose option') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
+
       expect(getByLabelText('Choose option')).not.toHaveFocus();
 
       const listBox = container.querySelector(
@@ -338,7 +415,12 @@ describe('FormComboBox', () => {
 
       const input = getByLabelText('Choose option') as HTMLInputElement;
 
-      input.value = 'Test';
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
+
       input.selectionStart = 2;
       input.selectionEnd = 2;
 
@@ -363,7 +445,15 @@ describe('FormComboBox', () => {
         />,
       );
 
-      expect(getByLabelText('Choose option')).not.toHaveFocus();
+      const input = getByLabelText('Choose option') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
+
+      expect(input).not.toHaveFocus();
 
       const listBox = container.querySelector(
         '[role="listbox"]',
@@ -387,7 +477,12 @@ describe('FormComboBox', () => {
 
       const input = getByLabelText('Choose option') as HTMLInputElement;
 
-      input.value = 'Test';
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
+
       input.selectionStart = 2;
       input.selectionEnd = 2;
 
@@ -413,6 +508,12 @@ describe('FormComboBox', () => {
       );
 
       const input = getByLabelText('Choose option') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
 
       input.value = 'Test';
       input.selectionStart = 2;
@@ -442,7 +543,12 @@ describe('FormComboBox', () => {
 
       const input = getByLabelText('Choose option') as HTMLInputElement;
 
-      input.value = 'Test';
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
+
       input.selectionStart = 2;
       input.selectionEnd = 2;
 
@@ -460,7 +566,7 @@ describe('FormComboBox', () => {
     test('pressing Enter calls `onSelect` handler with selected item index', () => {
       const onSelect = jest.fn();
 
-      const { container } = render(
+      const { container, getByLabelText } = render(
         <FormComboBox
           id="test-combobox"
           inputLabel="Choose option"
@@ -469,6 +575,14 @@ describe('FormComboBox', () => {
           options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
+
+      const input = getByLabelText('Choose option') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
 
       expect(onSelect).not.toHaveBeenCalled();
 
@@ -497,7 +611,7 @@ describe('FormComboBox', () => {
 
       fireEvent.change(input, {
         target: {
-          value: 'Test value',
+          value: 'Test',
         },
       });
 
@@ -505,7 +619,7 @@ describe('FormComboBox', () => {
         '[role="listbox"]',
       ) as HTMLElement;
 
-      expect(input).toHaveAttribute('value', 'Test value');
+      expect(input).toHaveAttribute('value', 'Test');
       expect(input).not.toHaveFocus();
       expect(container.querySelectorAll('[role="option"]')).toHaveLength(3);
 
@@ -531,11 +645,11 @@ describe('FormComboBox', () => {
 
       fireEvent.change(input, {
         target: {
-          value: 'Test value',
+          value: 'Test',
         },
       });
 
-      expect(input).toHaveAttribute('value', 'Test value');
+      expect(input).toHaveAttribute('value', 'Test');
       expect(container.querySelectorAll('[role="option"]')).toHaveLength(3);
 
       fireEvent.keyDown(input, { key: 'Escape' });
@@ -547,7 +661,7 @@ describe('FormComboBox', () => {
     test('clicking option calls `onSelect` handler', () => {
       const onSelect = jest.fn();
 
-      const { getByText } = render(
+      const { getByText, getByLabelText } = render(
         <FormComboBox
           id="test-combobox"
           inputLabel="Choose option"
@@ -556,6 +670,14 @@ describe('FormComboBox', () => {
           options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
+
+      const input = getByLabelText('Choose option') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          value: 'Test',
+        },
+      });
 
       expect(onSelect).not.toHaveBeenCalled();
 
