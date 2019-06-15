@@ -1,5 +1,5 @@
 /**
- * Find a parent element matching the given
+ * Find all parent elements matching the given
  * {@param selector} for an {@param element}.
  */
 export default function findAllParents<T extends HTMLElement = HTMLElement>(
