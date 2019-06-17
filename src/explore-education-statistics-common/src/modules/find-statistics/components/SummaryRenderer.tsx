@@ -75,6 +75,8 @@ export default function SummaryRenderer({
                 </p>
                 {dataSummary && (
                   <p className="govuk-body-s">{dataSummary[index]}</p>
+                ) : (
+                  ''
                 )}
               </div>
               <Details summary={`What is ${meta.indicators[key].label}?`}>

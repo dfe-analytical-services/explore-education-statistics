@@ -253,14 +253,15 @@ class PublicationReleasePage extends Component<Props> {
             <p className="govuk-body">
               The{' '}
               <a href="https://www.statisticsauthority.gov.uk/">
-                UK Statistics Authority
+                United Kindom Statistics Authority
               </a>{' '}
-              designated these statistics as National Statistics in [INSERT
-              MONTH YEAR] in accordance with the{' '}
+              designated these statistics as National Statistics in accordance
+              with the{' '}
               <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
                 Statistics and Registration Service Act 2007
-              </a>
-              .
+              </a>{' '}
+              and signifying compliance with the Code of Practice for
+              Statistics.
             </p>
             <p className="govuk-body">
               Designation signifying their compliance with the authority's{' '}
