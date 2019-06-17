@@ -127,15 +127,6 @@ class PublicationReleasePage extends Component<Props> {
                   </li>
                 ))}
               </ul>
-              <h2 className="govuk-heading-m govuk-!-margin-top-9">
-                Explore and edit this data online
-              </h2>
-
-              <p>Use our table tool to add and remove data for this table.</p>
-
-              <Link to="/table-tool/" className="govuk-button">
-                Explore data
-              </Link>
             </Details>
 
             <div className="govuk-!-margin-top-3 govuk-!-margin-bottom-3">
@@ -200,7 +191,7 @@ class PublicationReleasePage extends Component<Props> {
                   </Details>
                 </dd>
               </dl>
-              {/* <h2
+              <h2
                 className="govuk-heading-m govuk-!-margin-top-6"
                 id="related-content"
               >
@@ -209,10 +200,12 @@ class PublicationReleasePage extends Component<Props> {
               <nav role="navigation" aria-labelledby="related-content">
                 <ul className="govuk-list">
                   <li>
-                    [Link to relevant methodology section here]
+                    <Link to={`/methodology/${data.publication.slug}`}>
+                      {`${data.publication.title}: methodology`}
+                    </Link>
                   </li>
                 </ul>
-              </nav> */}
+              </nav>
             </RelatedAside>
           </div>
         </div>
@@ -256,32 +249,46 @@ class PublicationReleasePage extends Component<Props> {
               </li>
             </ul>
           </AccordionSection>
-          <AccordionSection heading="National statistics" headingTag="h3">
+          <AccordionSection heading="National Statistics" headingTag="h3">
             <p className="govuk-body">
-              The United Kingdom Statistics Authority designated these
-              statistics as National Statistics in <a href="#">Month Year</a> in
-              accordance with the Statistics and Registration Service Act 2007
-              and signifying compliance with the Code of Practice for
-              Statistics.
+              The{' '}
+              <a href="https://www.statisticsauthority.gov.uk/">
+                UK Statistics Authority
+              </a>{' '}
+              designated these statistics as National Statistics in [INSERT
+              MONTH YEAR] in accordance with the{' '}
+              <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
+                Statistics and Registration Service Act 2007
+              </a>
+              .
             </p>
             <p className="govuk-body">
-              Designation can be broadly interpreted to mean that the
-              statistics:
+              Designation signifying their compliance with the authority's{' '}
+              <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
+                Code of Practice for Statistics
+              </a>{' '}
+              which broadly means these statistics are:
             </p>
             <ul className="govuk-list govuk-list--bullet">
-              <li>meet identified user needs;</li>
-              <li>are well explained and readily accessible;</li>
-              <li>are produced according to sound methods, and</li>
               <li>
-                are managed impartially and objectively in the public interest
+                managed impartially and objectively in the public interest
               </li>
+              <li>meet identified user needs</li>
+              <li>produced according to sound methods</li>
+              <li>well explained and readily accessible</li>
             </ul>
             <p className="govuk-body">
-              Once statistics have been designated as National Statistics it is
-              a statutory requirement that the Code of Practice shall continue
-              to be observed. Information on improvements made to these
-              statistics to continue their compliance with the Code of Practice
-              are provided in this <a href="#">accompanying document</a>
+              Once designated as National Statistics it's a statutory
+              requirement for statistics to follow and comply with the Code of
+              Practice for Statistics. to be observed.
+            </p>
+            <p className="govuk-body">
+              Find out more about the standards we follow to produce these
+              statistics through our{' '}
+              <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
+                Standards for official statistics published by DfE
+              </a>{' '}
+              guidance.
             </p>
           </AccordionSection>
           <AccordionSection heading="Feedback and questions" headingTag="h3">
@@ -298,6 +305,15 @@ class PublicationReleasePage extends Component<Props> {
             </ul>
           </AccordionSection>
           <AccordionSection heading="Contact us" headingTag="h3">
+            <div className="govuk-warning-text">
+              <span className="govuk-warning-text__icon" aria-hidden="true">
+                !
+              </span>
+              <strong className="govuk-warning-text__text">
+                <span className="govuk-warning-text__assistive">Warning</span>
+                The following details are an example/placeholder.
+              </strong>
+            </div>
             <p>
               If you have a specific enquiry about [[ THEME ]] statistics and
               data:
@@ -307,9 +323,9 @@ class PublicationReleasePage extends Component<Props> {
             </h4>
             <p className="govuk-!-margin-top-0">
               Email <br />
-              <a href="mailto:schools.statistics@education.gov.uk">
-                [[ TEAM EMAIL ADDRESS ]]
-              </a>
+              {/* <a href="mailto:schools.statistics@education.gov.uk"> */}
+              [[ TEAM EMAIL ADDRESS ]]
+              {/* </a> */}
             </p>
             <p>
               Telephone: [[ LEAD STATISTICIAN NAME ]] <br /> [[ LEAD
@@ -321,7 +337,7 @@ class PublicationReleasePage extends Component<Props> {
             <p className="govuk-!-margin-top-0">If you have a media enquiry:</p>
             <p>
               Telephone <br />
-              020 7925 6789
+              [[ PRESS OFFICE TEL NO. ]]
             </p>
             <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
               Public enquiries
@@ -332,7 +348,7 @@ class PublicationReleasePage extends Component<Props> {
             </p>
             <p>
               Telephone <br />
-              037 0000 2288
+              [[ DEPT. FOR EDUCATION TEL NO. ]]
             </p>
           </AccordionSection>
         </Accordion>

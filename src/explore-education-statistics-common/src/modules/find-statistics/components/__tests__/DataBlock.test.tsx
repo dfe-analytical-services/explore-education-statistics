@@ -5,6 +5,7 @@ import _dataBlockService, {
 } from '@common/services/dataBlockService';
 import React from 'react';
 import { render, wait } from 'react-testing-library';
+import { SummaryRendererProps } from '@common/modules/find-statistics/components/SummaryRenderer';
 import DataBlock from '../DataBlock';
 
 jest.mock('@common/services/dataBlockService');
@@ -144,6 +145,7 @@ describe('DataBlock', () => {
         showTables={false}
         summary={{
           dataKeys: ['23', '26', '28'],
+          dataSummary: ['up 10%', 'down 10%', 'up 11%'],
           description: {
             type: 'MarkDownBlock',
             body: `<div>test</div>`,

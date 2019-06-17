@@ -29,14 +29,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             MayoralCombinedAuthority mayoralCombinedAuthority = null,
             OpportunityArea opportunityArea = null,
             ParliamentaryConstituency parliamentaryConstituency = null,
-            Provider provider = null,
             Region region = null,
             RscRegion rscRegion = null,
             Ward ward = null)
         {
             var cacheKey = GetCacheKey(country, institution, localAuthority, localAuthorityDistrict,
                 localEnterprisePartnership, mat, mayoralCombinedAuthority, opportunityArea, parliamentaryConstituency,
-                provider, region, rscRegion, ward);
+                region, rscRegion, ward);
 
             if (_cache.TryGetValue(cacheKey, out Location location))
             {
@@ -45,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
             location = LookupOrCreate(country, institution, localAuthority, localAuthorityDistrict,
                 localEnterprisePartnership, mat, mayoralCombinedAuthority, opportunityArea, parliamentaryConstituency,
-                provider, region, rscRegion, ward);
+                region, rscRegion, ward);
             _cache.Set(cacheKey, location,
                 new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
 
@@ -61,7 +60,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             MayoralCombinedAuthority mayoralCombinedAuthority,
             OpportunityArea opportunityArea,
             ParliamentaryConstituency parliamentaryConstituency,
-            Provider provider,
             Region region,
             RscRegion rscRegion,
             Ward ward)
@@ -112,11 +110,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 stringBuilder.Append(separator).Append(opportunityArea.Code);
             }
 
-            if (provider != null)
-            {
-                stringBuilder.Append(separator).Append(provider.Code);
-            }
-
             if (region != null)
             {
                 stringBuilder.Append(separator).Append(region.Code);
@@ -144,7 +137,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             MayoralCombinedAuthority mayoralCombinedAuthority = null,
             OpportunityArea opportunityArea = null,
             ParliamentaryConstituency parliamentaryConstituency = null,
-            Provider provider = null,
             Region region = null,
             RscRegion rscRegion = null,
             Ward ward = null)
@@ -159,7 +151,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 mayoralCombinedAuthority,
                 opportunityArea,
                 parliamentaryConstituency,
-                provider,
                 region,
                 rscRegion,
                 ward);
@@ -177,7 +168,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     MayoralCombinedAuthority = mayoralCombinedAuthority ?? MayoralCombinedAuthority.Empty(),
                     OpportunityArea = opportunityArea ?? OpportunityArea.Empty(),
                     ParliamentaryConstituency = parliamentaryConstituency ?? ParliamentaryConstituency.Empty(),
-                    Provider = provider ?? Provider.Empty(),
                     Region = region ?? Region.Empty(),
                     RscRegion = rscRegion ?? RscRegion.Empty(),
                     Ward = ward ?? Ward.Empty()
@@ -199,7 +189,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             MayoralCombinedAuthority mayoralCombinedAuthority = null,
             OpportunityArea opportunityArea = null,
             ParliamentaryConstituency parliamentaryConstituency = null,
-            Provider provider = null,
             Region region = null,
             RscRegion rscRegion = null,
             Ward ward = null)
@@ -238,10 +227,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             predicateBuilder = predicateBuilder.And(location =>
                 location.ParliamentaryConstituency.Code ==
                 (parliamentaryConstituency != null ? parliamentaryConstituency.Code : null));
-
-            predicateBuilder = predicateBuilder.And(location =>
-                location.Provider.Code ==
-                (provider != null ? provider.Code : null));
 
             predicateBuilder = predicateBuilder.And(location =>
                 location.Region.Code ==
