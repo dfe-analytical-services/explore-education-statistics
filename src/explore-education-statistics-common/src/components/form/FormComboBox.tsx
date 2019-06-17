@@ -127,7 +127,7 @@ const FormComboBox = ({
   return (
     <div className={styles.container}>
       <div
-        aria-expanded={renderedOptions ? renderedOptions.length > 0 : undefined}
+        aria-expanded={renderedOptions ? renderedOptions.length > 0 : false}
         aria-owns={`${id}-options`}
         aria-haspopup="listbox"
         className="govuk-form-group"
@@ -187,64 +187,66 @@ const FormComboBox = ({
             {typeof listBoxLabel === 'function'
               ? listBoxLabel({ selectedOption, value })
               : listBoxLabel}
+            <ul
+              aria-labelledby={listBoxLabelId}
+              className={classNames(styles.options, {
+                [styles.optionsNoFocus]: renderedOptions.length === 0,
+              })}
+              id={`${id}-options`}
+              ref={listBoxRef}
+              role="listbox"
+              tabIndex={-1}
+              onKeyDown={event => {
+                selectNextOption(event);
 
-            {renderedOptions.length > 0 && (
-              <ul
-                aria-labelledby={listBoxLabelId}
-                className={styles.options}
-                id={`${id}-options`}
-                ref={listBoxRef}
-                role="listbox"
-                tabIndex={-1}
-                onKeyDown={event => {
-                  selectNextOption(event);
+                const inputEl = inputRef.current;
 
-                  const inputEl = inputRef.current;
+                if (inputEl) {
+                  switch (event.key) {
+                    case 'ArrowLeft':
+                    case 'ArrowRight': {
+                      const directionChange =
+                        event.key === 'ArrowLeft' ? -1 : 1;
 
-                  if (inputEl) {
-                    switch (event.key) {
-                      case 'ArrowLeft':
-                      case 'ArrowRight': {
-                        const directionChange =
-                          event.key === 'ArrowLeft' ? -1 : 1;
-
-                        inputEl.selectionStart = inputEl.selectionStart
-                          ? inputEl.selectionStart + directionChange
-                          : 0;
-                        inputEl.selectionEnd = inputEl.selectionStart;
-                        inputEl.focus();
-                        break;
-                      }
-
-                      case 'Enter':
-                        onSelect(selectedOption);
-                        toggleShowOptions(false);
-                        break;
-
-                      case 'Home':
-                        inputEl.selectionStart = 0;
-                        inputEl.selectionEnd = 0;
-                        inputEl.focus();
-                        break;
-
-                      case 'End':
-                        inputEl.selectionStart = inputEl.value.length;
-                        inputEl.selectionEnd = inputEl.selectionStart;
-                        inputEl.focus();
-                        break;
-
-                      case 'Escape':
-                        setValue('');
-                        toggleShowOptions(false);
-                        inputEl.focus();
-                        break;
-
-                      default:
+                      inputEl.selectionStart = inputEl.selectionStart
+                        ? inputEl.selectionStart + directionChange
+                        : 0;
+                      inputEl.selectionEnd = inputEl.selectionStart;
+                      inputEl.focus();
+                      break;
                     }
+
+                    case 'Enter':
+                      onSelect(selectedOption);
+                      toggleShowOptions(false);
+                      break;
+
+                    case 'Home':
+                      inputEl.selectionStart = 0;
+                      inputEl.selectionEnd = 0;
+                      inputEl.focus();
+                      break;
+
+                    case 'End':
+                      inputEl.selectionStart = inputEl.value.length;
+                      inputEl.selectionEnd = inputEl.selectionStart;
+                      inputEl.focus();
+                      break;
+
+                    case 'Escape':
+                      setValue('');
+                      toggleShowOptions(false);
+                      inputEl.focus();
+                      break;
+
+                    default:
                   }
-                }}
-              >
-                {renderedOptions.map((item, index) => {
+                }
+              }}
+            >
+              {renderedOptions &&
+                renderedOptions.length > 0 &&
+                renderedOptions.map((item, index) => {
                   const key = index;
 
                   return (
@@ -271,8 +273,7 @@ const FormComboBox = ({
                     </li>
                   );
                 })}
-              </ul>
-            )}
+            </ul>
           </div>
         )}
       </div>
