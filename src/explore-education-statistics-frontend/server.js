@@ -106,6 +106,12 @@ async function startServer(port = process.env.PORT || 3000) {
     });
   });
 
+  server.get('/table-tool/:publicationId?', (req, res) => {
+    return app.render(req, res, '/table-tool', {
+      publicationId: req.params.publicationId,
+    });
+  });
+
   server.get('*', (req, res) => handleRequest(req, res));
 
   server.listen(port, err => {

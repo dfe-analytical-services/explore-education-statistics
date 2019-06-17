@@ -1,3 +1,4 @@
+import { NextContext } from 'next';
 import { ConfirmContextProvider } from '@common/context/ConfirmContext';
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import tableBuilderService, {
@@ -48,6 +49,9 @@ export interface PublicationOptions {
 
 interface Props {
   themeMeta: ThemeMeta[];
+  query: {
+    publicationId: string;
+  };
 }
 
 interface State {
@@ -85,9 +89,9 @@ class TableToolPage extends Component<Props, State> {
     tableData: [],
   };
 
-  public static async getInitialProps() {
+  public static async getInitialProps({ query }: NextContext) {
     const themeMeta = await tableBuilderService.getThemes();
-    return { themeMeta };
+    return { themeMeta, query };
   }
 
   private handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
@@ -180,7 +184,7 @@ class TableToolPage extends Component<Props, State> {
   };
 
   public render() {
-    const { themeMeta } = this.props;
+    const { themeMeta, query } = this.props;
     const {
       filters,
       indicators,
@@ -225,6 +229,9 @@ class TableToolPage extends Component<Props, State> {
                   {stepProps => (
                     <PublicationForm
                       {...stepProps}
+                      publicationId={
+                        query.publicationId ? query.publicationId : ''
+                      }
                       options={themeMeta}
                       onSubmit={this.handlePublicationFormSubmit}
                     />
