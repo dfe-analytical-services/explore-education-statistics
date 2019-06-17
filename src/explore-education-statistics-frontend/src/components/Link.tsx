@@ -4,6 +4,8 @@ import { UrlLike } from 'next-server/router';
 import RouterLink from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
 
+import { SetLinkRenderer } from '@common/components/Link';
+
 type Props = {
   as?: string | UrlLike;
   children: ReactNode;
@@ -41,4 +43,5 @@ const Link = ({
   );
 };
 
+SetLinkRenderer(Link);
 export default Link;
