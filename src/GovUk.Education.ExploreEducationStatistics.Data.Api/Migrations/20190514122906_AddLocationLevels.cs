@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
-    [ExcludeFromCodeCoverage] 
+    [ExcludeFromCodeCoverage]
     public partial class AddLocationLevels : Migration
     {
-        private readonly string _migrationsPath = "Migrations/";
-        
+        private const string _migrationsPath = "Migrations/";
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
@@ -142,7 +142,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 column: "Ward_Code");
             
             // Add this version of the stored proc
-            migrationBuilder.Sql("DROP PROCEDURE dbo.FilteredObservations");
             ExecuteFile(migrationBuilder, _migrationsPath + "20190514122906_FilteredObservations.sql");
         }
 

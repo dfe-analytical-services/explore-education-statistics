@@ -1,4 +1,4 @@
-CREATE PROCEDURE FilteredObservations
+ALTER PROCEDURE  FilteredObservations
     @subjectId int,
     @geographicLevel varchar(max),
     @yearList IdListIntegerType READONLY,

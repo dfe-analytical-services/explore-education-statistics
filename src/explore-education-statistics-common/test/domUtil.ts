@@ -8,4 +8,13 @@ export default {
       element => element.textContent && element.textContent.trim() === text,
     );
   },
+
+  filterElementsContainingText(
+    elements: NodeListOf<HTMLElement>,
+    text: string,
+  ) {
+    return Array.from(elements).filter(
+      element => element.textContent && element.textContent.trim() === text,
+    );
+  },
 };

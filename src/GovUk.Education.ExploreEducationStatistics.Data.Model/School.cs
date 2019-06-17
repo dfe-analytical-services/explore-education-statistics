@@ -12,13 +12,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         [JsonProperty(PropertyName = "acad_type")]
         public string AcademyType { get; set; }
 
-        [JsonProperty(PropertyName = "estab")] public string Estab { get; set; }
+        [JsonProperty(PropertyName = "school_estab")]
+        public string Estab { get; set; }
 
         [Key]
-        [JsonProperty(PropertyName = "laestab")]
+        [JsonProperty(PropertyName = "school_laestab")]
         public string LaEstab { get; set; }
 
-        [JsonProperty(PropertyName = "urn")] public string Urn { get; set; }
+        [JsonProperty(PropertyName = "school_name")]
+        public string Name { get; set; }
+
+        [JsonProperty(PropertyName = "school_postcode")]
+        public string Postcode { get; set; }
+
+        [JsonProperty(PropertyName = "school_urn")]
+        public string Urn { get; set; }
 
         public IEnumerable<Observation> Observations { get; set; }
     }

@@ -29,7 +29,7 @@ Validate URL
 
 Validate Published date
     [Tags]     HappyPath
-    user checks element contains  css:[data-testid="published-date"]   22 March 2017
+    user checks element contains  css:[data-testid="published-date"]   22 March 2018
 
 Validate "About these statistics" -- "For school year"
     [Documentation]  DFE-197
@@ -82,15 +82,15 @@ Validate Key Statistics data block -- Summary tab
 
 Validate Contents section headings
     [Tags]  HappyPath
-    user waits until page contains element  css:[data-testid="SectionHeader About this release"]
-    user waits until page contains element  css:[data-testid="SectionHeader Absence rates"]
+    user waits until page contains element  css:[data-testid="SectionHeader About these statistics"]
+    user waits until page contains element  css:[data-testid="SectionHeader Pupil absence rates"]
     user waits until page contains element  css:[data-testid="SectionHeader Persistent absence"]
     user waits until page contains element  css:[data-testid="SectionHeader Reasons for absence"]
     user waits until page contains element  css:[data-testid="SectionHeader Distribution of absence"]
     user waits until page contains element  css:[data-testid="SectionHeader Absence by pupil characteristics"]
-    user waits until page contains element  css:[data-testid="SectionHeader Absence for four year olds"]
+    user waits until page contains element  css:[data-testid="SectionHeader Absence for 4-year-olds"]
     user waits until page contains element  css:[data-testid="SectionHeader Pupil referral unit absence"]
-    user waits until page contains element  css:[data-testid="SectionHeader Pupil absence by local authority"]
+    user waits until page contains element  css:[data-testid="SectionHeader Regional and local authority (LA) breakdown"]
 
 Validate Extra Information section headings
     [Tags]  HappyPath

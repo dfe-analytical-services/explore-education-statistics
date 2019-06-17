@@ -5,6 +5,7 @@ import _dataBlockService, {
 } from '@common/services/dataBlockService';
 import React from 'react';
 import { render, wait } from 'react-testing-library';
+import { SummaryRendererProps } from '@common/modules/find-statistics/components/SummaryRenderer';
 import DataBlock from '../DataBlock';
 
 jest.mock('@common/services/dataBlockService');
@@ -144,6 +145,7 @@ describe('DataBlock', () => {
         showTables={false}
         summary={{
           dataKeys: ['23', '26', '28'],
+          dataSummary: ['up 10%', 'down 10%', 'up 11%'],
           description: {
             type: 'MarkDownBlock',
             body: `<div>test</div>`,
@@ -159,5 +161,38 @@ describe('DataBlock', () => {
     expect(
       container.querySelector('#datablock_test_summary'),
     ).toMatchSnapshot();
+  });
+
+  test('datablock renders map', async () => {
+    const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
+      (_: DataBlockRequest) => {
+        return Promise.resolve(testData.response);
+      },
+    );
+
+    const { container } = render(
+      <DataBlock
+        id="test"
+        type="datablock"
+        dataBlockRequest={dataBlockRequest}
+        showTables={false}
+        charts={[
+          {
+            type: 'map',
+            indicators: ['23', '26', '28'],
+            xAxis: { title: 'test x axis' },
+            yAxis: { title: 'test y axis' },
+            width: 800,
+            height: 600,
+          },
+        ]}
+      />,
+    );
+
+    await wait();
+
+    expect(getDataBlockForSubject).toBeCalledWith(dataBlockRequest);
+
+    expect(container.innerHTML).toMatchSnapshot();
   });
 });

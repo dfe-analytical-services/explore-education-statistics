@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
+    [ExcludeFromCodeCoverage]
     public partial class RenameReleaseId : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
