@@ -5,6 +5,8 @@ import Router from 'next/router';
 import React from 'react';
 import Helmet from 'react-helmet';
 import './_app.scss';
+import Link from '@frontend/components/Link';
+import { RegisterLinkRenderer } from 'explore-education-statistics-common/src/components/Link';
 
 process.env.APP_ROOT_ID = '__next';
 
@@ -22,6 +24,8 @@ class App extends BaseApp {
   public componentDidMount() {
     logPageView();
     initHotJar();
+
+    RegisterLinkRenderer(Link);
 
     if (Router.router !== null) {
       Router.router.events.on('routeChangeComplete', logPageView);

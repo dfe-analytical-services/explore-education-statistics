@@ -26,7 +26,7 @@ const Link: FunctionComponent<Props> = (props: Props) => {
   return <Renderer {...props} />;
 };
 
-export function SetLinkRenderer<Props>(component: RendererType) {
+export function RegisterLinkRenderer<Props>(component: RendererType) {
   Renderer = component;
   return component;
 }
