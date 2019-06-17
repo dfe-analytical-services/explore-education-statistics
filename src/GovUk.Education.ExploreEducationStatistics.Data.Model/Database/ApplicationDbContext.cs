@@ -278,7 +278,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureMayoralCombinedAuthority(modelBuilder);
             ConfigureOpportunityArea(modelBuilder);
             ConfigureParliamentaryConstituency(modelBuilder);
-            ConfigureProvider(modelBuilder);
             ConfigureRegion(modelBuilder);
             ConfigureRscRegion(modelBuilder);
             ConfigureWard(modelBuilder);
@@ -415,13 +414,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.ParliamentaryConstituency,
                     builder => builder.HasIndex(parliamentaryConstituency => parliamentaryConstituency.Code));
-        }
-
-        private static void ConfigureProvider(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.Provider,
-                    builder => builder.HasIndex(provider => provider.Code));
         }
 
         private static void ConfigureRegion(ModelBuilder modelBuilder)

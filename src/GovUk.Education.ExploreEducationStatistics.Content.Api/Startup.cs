@@ -38,26 +38,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                     options.SerializerSettings.Converters.Add(new ContentBlockConverter());
                 });
 
-            var connectionString = Configuration.GetConnectionString("ContentDb");
-            
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                const string connection = "Data Source=dfe-meta.db";
-                
-                services.AddDbContext<ApplicationDbContext>(options =>
-                    options
-                        .UseSqlite(connection,
-                            builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
-                        .EnableSensitiveDataLogging()
-                );
-            }
-            else
-            {
-                services.AddDbContext<ApplicationDbContext>(options =>
-                    options
-                        .UseSqlServer(connectionString,
-                            builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName)));
-            }
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options
+                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
+                    .EnableSensitiveDataLogging()
+            );
 
             // Adds Brotli and Gzip compressing
             services.AddResponseCompression();

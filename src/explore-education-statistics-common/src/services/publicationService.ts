@@ -19,6 +19,17 @@ export interface Publication {
     description: string;
     url: string;
   }[];
+  topic: {
+    theme: {
+      title: string;
+    };
+  };
+  contact: {
+    teamName: string;
+    teamEmail: string;
+    contactName: string;
+    contactTelNo: string;
+  };
 }
 
 export interface DataQuery {
@@ -67,6 +78,7 @@ export interface Table {
 
 export interface Summary {
   dataKeys: string[];
+  dataSummary: string[];
   description: { type: string; body: string };
 }
 

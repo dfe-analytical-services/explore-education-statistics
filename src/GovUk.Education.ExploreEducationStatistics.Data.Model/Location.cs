@@ -14,7 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public MayoralCombinedAuthority MayoralCombinedAuthority { get; set; }
         public OpportunityArea OpportunityArea { get; set; }
         public ParliamentaryConstituency ParliamentaryConstituency { get; set; }
-        public Provider Provider { get; set; }
         public Region Region { get; set; }
         public RscRegion RscRegion { get; set; }
         public Ward Ward { get; set; }

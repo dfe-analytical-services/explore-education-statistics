@@ -680,9 +680,9 @@ const PublicationPageExclusions = () => {
         <AccordionSection heading="National Statistics" headingTag="h3">
           <p className="govuk-body">
             The United Kingdom Statistics Authority designated these statistics
-            as National Statistics in <a href="#">Month Year</a> in accordance
-            with the Statistics and Registration Service Act 2007 and signifying
-            compliance with the Code of Practice for Statistics.
+            as National Statistics in 2011 in accordance with the Statistics and
+            Registration Service Act 2007 and signifying compliance with the
+            Code of Practice for Statistics.
           </p>
           <p className="govuk-body">
             Designation can be broadly interpreted to mean that the statistics:

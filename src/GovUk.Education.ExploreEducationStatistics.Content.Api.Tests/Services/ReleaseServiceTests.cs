@@ -36,10 +36,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             
             using (var context = new ApplicationDbContext(options))
             {
+                var contact = new Contact
+                {
+                    Id = new Guid("9bf9cc0b-e85f-466b-b90f-354944dcc82e")
+                };
+                var topic = new Topic
+                {
+                    Id = new Guid("7b781f47-d305-4204-b7cd-ea49c23273fa"),
+                    Theme = new Theme {
+                        Id = new Guid("1982dec8-b724-4e15-887d-f473fe667826"),
+                        Title = "Title X"
+                    }
+                };
+                
                 var publications = new List<Publication>
                 {
-                    new Publication { Id = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Title = "Publication A"},
-                    new Publication {Id = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"), Title = "Publication B"},
+  
+                    new Publication
+                    {
+                        Id = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), 
+                        Title = "Publication A",
+                        Contact = contact,
+                        Topic = topic
+                    },
+                    new Publication {Id = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
+                        Title = "Publication B",
+                        Contact = contact,
+                        Topic = topic
+                    },
                 };
                 
                 var releases = new List<Release>

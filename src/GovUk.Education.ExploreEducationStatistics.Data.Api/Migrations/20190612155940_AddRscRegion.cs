@@ -7,8 +7,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
     [ExcludeFromCodeCoverage]
     public partial class AddRscRegion : Migration
     {
-        private readonly string _migrationsPath = "Migrations/";
-        
+        private const string _migrationsPath = "Migrations/";
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(

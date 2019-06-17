@@ -1,4 +1,4 @@
-@import '~explore-education-statistics-common/src/styles/govuk-base';
+@import '../../../../src/styles/govuk-base';
 
 .keyStatsContainer {
   display: flex;
@@ -8,10 +8,10 @@
 
 .keyStatTile {
   display: flex;
-  flex: 1 0 32%;
+  flex: 1 0 32.3%;
   flex-direction: column;
   margin: 0.5% 0.5% 1.5%;
-  max-width: 32%;
+  max-width: 32.3;
 
   @include govuk-media-query($until: tablet) {
     flex: 0 0 100%;
@@ -52,19 +52,4 @@
     margin: 0 0.5rem 0 0;
     padding-top: 0.5rem;
   }
-
-  hr {
-    margin: auto 0 0.5rem;
-  }
-}
-
-.keyStatHeading {
-  font-size: 1.1rem;
-  margin: 0;
-}
-
-.keyStatLarge {
-  font-size: 2.4rem;
-  font-weight: bold;
-  margin: 0;
 }
