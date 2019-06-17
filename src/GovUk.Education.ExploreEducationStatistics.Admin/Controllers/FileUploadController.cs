@@ -17,15 +17,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IFileStorageService _fileStorageService;
-        private readonly IImportService _importService;
 
         public FileUploadController(ApplicationDbContext context,
-            IFileStorageService fileStorageService,
-            IImportService importService)
+            IFileStorageService fileStorageService)
         {
             _context = context;
             _fileStorageService = fileStorageService;
-            _importService = _importService;
         }
 
         public IActionResult Upload()

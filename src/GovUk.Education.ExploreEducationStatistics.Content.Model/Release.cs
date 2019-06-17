@@ -27,5 +27,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public List<ContentSection> Content { get; set; }
         
         public DataBlock KeyStatistics { get; set; }
+
+        protected bool Equals(Release other)
+        {
+            return Id.Equals(other.Id);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Release) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
     }
 }
