@@ -1,5 +1,6 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -16,6 +17,8 @@ function GlossaryIndexPage() {
             Browse our A to Z list of definitions for terms used across
             education statistics and data.
           </p>
+
+          <PageSearchForm />
         </div>
         <div className="govuk-grid-column-one-third">
           <RelatedInformation>
