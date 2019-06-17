@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
                 .Returns(filesReleaseB);
 
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            builder.UseInMemoryDatabase("FindPublication");
+            builder.UseInMemoryDatabase("FileControllerList");
 
             var options = builder.Options;
 

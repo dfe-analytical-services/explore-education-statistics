@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
+using Assert = Xunit.Assert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 {
@@ -23,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             var fileStorageService = new Mock<IFileStorageService>();
 
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            builder.UseInMemoryDatabase("FindPublication");
+            builder.UseInMemoryDatabase("FileUploadGet");
 
             var options = builder.Options;
 
@@ -63,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
         public async Task Post_UploadsTheFileAndRedirects()
         {
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            builder.UseInMemoryDatabase("FindPublication");
+            builder.UseInMemoryDatabase("FileUploadPost");
 
             var options = builder.Options;
 
