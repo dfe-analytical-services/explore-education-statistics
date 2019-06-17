@@ -65,10 +65,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                         GroupByObservationalUnit(locations, location => location.ParliamentaryConstituency)
                     },
                     {
-                        GeographicLevel.Provider,
-                        GroupByObservationalUnit(locations, location => location.Provider)
-                    },
-                    {
                         GeographicLevel.Regional,
                         GroupByObservationalUnit(locations, location => location.Region)
                     },

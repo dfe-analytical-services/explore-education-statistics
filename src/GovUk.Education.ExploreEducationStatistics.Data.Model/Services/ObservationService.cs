@@ -42,8 +42,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 CreateIdListType("opportunityAreaList", query.OpportunityAreas);
             var parliamentaryConstituencyListParam =
                 CreateIdListType("parliamentaryConstituencyList", query.ParliamentaryConstituencies);
-            var providerListParam =
-                CreateIdListType("providerList", query.Providers);
             var regionsListParam = CreateIdListType("regionsList", query.Regions);
             var rscRegionListParam = CreateIdListType("rscRegionsList", query.RscRegions);
             var wardListParam =
@@ -64,7 +62,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                          "@mayoralCombinedAuthorityList," +
                          "@opportunityAreaList," +
                          "@parliamentaryConstituencyList," +
-                         "@providerList," +
                          "@regionsList," +
                          "@rscRegionsList," +
                          "@wardList," +
@@ -81,7 +78,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                     mayoralCombinedAuthorityListParam,
                     opportunityAreaListParam,
                     parliamentaryConstituencyListParam,
-                    providerListParam,
                     regionsListParam,
                     rscRegionListParam,
                     wardListParam,

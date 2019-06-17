@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
     [ExcludeFromCodeCoverage] 
     public partial class AddObservationQuery : Migration
     {
-        private readonly string _migrationsPath = "Migrations/";
+        private const string _migrationsPath = "Migrations/";
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {

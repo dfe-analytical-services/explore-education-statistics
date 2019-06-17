@@ -22,11 +22,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             new Dictionary<string, TimeIdentifier>
             {
                 {"academic year", TimeIdentifier.AY},
+                {"academic year q1", TimeIdentifier.AYQ1},
+                {"academic year q2", TimeIdentifier.AYQ2},
+                {"academic year q3", TimeIdentifier.AYQ3},
+                {"academic year q4", TimeIdentifier.AYQ4},
+                {"academic year q1-q2", TimeIdentifier.AYQ1Q2},
+                {"academic year q1-q3", TimeIdentifier.AYQ1Q3},
+                {"academic year q1-q4", TimeIdentifier.AYQ1Q4},
+                {"academic year q2-q3", TimeIdentifier.AYQ2Q3},
+                {"academic year q2-q4", TimeIdentifier.AYQ2Q4},
+                {"academic year q3-q4", TimeIdentifier.AYQ3Q4},
                 {"calendar year", TimeIdentifier.CY},
-                {"up until 31st march", TimeIdentifier.EOM},
+                {"calendar year q1", TimeIdentifier.CYQ1},
+                {"calendar year q2", TimeIdentifier.CYQ2},
+                {"calendar year q3", TimeIdentifier.CYQ3},
+                {"calendar year q4", TimeIdentifier.CYQ4},
+                {"calendar year q1-q2", TimeIdentifier.CYQ1Q2},
+                {"calendar year q1-q3", TimeIdentifier.CYQ1Q3},
+                {"calendar year q1-q4", TimeIdentifier.CYQ1Q4},
+                {"calendar year q2-q3", TimeIdentifier.CYQ2Q3},
+                {"calendar year q2-q4", TimeIdentifier.CYQ2Q4},
+                {"calendar year q3-q4", TimeIdentifier.CYQ3Q4},
                 {"financial year", TimeIdentifier.FY},
+                {"financial year q1", TimeIdentifier.FYQ1},
+                {"financial year q2", TimeIdentifier.FYQ2},
+                {"financial year q3", TimeIdentifier.FYQ3},
+                {"financial year q4", TimeIdentifier.FYQ4},
+                {"financial year q1-q2", TimeIdentifier.FYQ1Q2},
+                {"financial year q1-q3", TimeIdentifier.FYQ1Q3},
+                {"financial year q1-q4", TimeIdentifier.FYQ1Q4},
+                {"financial year q2-q3", TimeIdentifier.FYQ2Q3},
+                {"financial year q2-q4", TimeIdentifier.FYQ2Q4},
+                {"financial year q3-q4", TimeIdentifier.FYQ3Q4},
+                {"tax year", TimeIdentifier.TY},
+                {"tax year q1", TimeIdentifier.TYQ1},
+                {"tax year q2", TimeIdentifier.TYQ2},
+                {"tax year q3", TimeIdentifier.TYQ3},
+                {"tax year q4", TimeIdentifier.TYQ4},
+                {"tax year q1-q2", TimeIdentifier.TYQ1Q2},
+                {"tax year q1-q3", TimeIdentifier.TYQ1Q3},
+                {"tax year q1-q4", TimeIdentifier.TYQ1Q4},
+                {"tax year q2-q3", TimeIdentifier.TYQ2Q3},
+                {"tax year q2-q4", TimeIdentifier.TYQ2Q4},
+                {"tax year q3-q4", TimeIdentifier.TYQ3Q4},
                 {"five half terms", TimeIdentifier.HT5},
                 {"six half terms", TimeIdentifier.HT6},
+                {"up until 31st march", TimeIdentifier.EOM},
+                {"autumn term", TimeIdentifier.T1},
+                {"autumn and spring term", TimeIdentifier.T1T2},
+                {"spring term", TimeIdentifier.T2},
+                {"summer term", TimeIdentifier.T3},
                 {"january", TimeIdentifier.M1},
                 {"february", TimeIdentifier.M2},
                 {"march", TimeIdentifier.M3},
@@ -38,17 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 {"september", TimeIdentifier.M9},
                 {"october", TimeIdentifier.M10},
                 {"november", TimeIdentifier.M11},
-                {"december", TimeIdentifier.M12},
-                {"q1", TimeIdentifier.Q1},
-                {"q1-q2", TimeIdentifier.Q1Q2},
-                {"q1-q3", TimeIdentifier.Q1Q3},
-                {"q2", TimeIdentifier.Q2},
-                {"q3", TimeIdentifier.Q3},
-                {"q4", TimeIdentifier.Q4},
-                {"autumn term", TimeIdentifier.T1},
-                {"autumn and spring term", TimeIdentifier.T1T2},
-                {"spring term", TimeIdentifier.T2},
-                {"summer term", TimeIdentifier.T3}
+                {"december", TimeIdentifier.M12}
             };
 
         public ImporterService(
@@ -127,6 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 GeographicLevel = GetGeographicLevel(line, headers),
                 LocationId = GetLocationId(line, headers),
                 Measures = GetMeasures(line, headers, subjectMeta.Indicators),
+                Provider = GetProvider(line, headers),
                 School = GetSchool(line, headers),
                 Subject = subject,
                 TimeIdentifier = GetTimeIdentifier(line, headers),
@@ -184,7 +220,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 GetMayoralCombinedAuthority(line, headers),
                 GetOpportunityArea(line, headers),
                 GetParliamentaryConstituency(line, headers),
-                GetProvider(line, headers),
                 GetRegion(line, headers),
                 GetRscRegion(line, headers),
                 GetWard(line, headers)
@@ -193,14 +228,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         private static School GetSchool(IReadOnlyList<string> line, List<string> headers)
         {
-            var columns = new[] {"estab", "laestab", "academy_open_date", "academy_type", "urn"};
+            var columns = new[]
+                {"academy_open_date", "academy_type", "estab", "laestab", "school_name", "school_postcode", "urn"};
             return CsvUtil.BuildType(line, headers, columns, values => new School
             {
-                Estab = values[0],
-                LaEstab = values[1],
-                AcademyOpenDate = values[2],
-                AcademyType = values[3],
-                Urn = values[4]
+                AcademyOpenDate = values[0],
+                AcademyType = values[1],
+                Estab = values[2],
+                LaEstab = values[3],
+                Name = values[4],
+                Postcode = values[5],
+                Urn = values[6]
             });
         }
 
