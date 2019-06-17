@@ -9,14 +9,11 @@ interface Props {
 const PrototypeAdminNavigation = ({ sectionId, task }: Props) => {
   return (
     <>
-      {task !== 'editRelease' && (
-        <>
-          <h1 className="govuk-heading-l">
-            Pupil absence statistics and data for schools in England{' '}
-            <span className="govuk-caption-l">Create new release</span>
-          </h1>
-        </>
-      )}
+      <h1 className="govuk-heading-l">
+        Pupil absence statistics and data for schools in England{' '}
+        <span className="govuk-caption-l">Create new release</span>
+      </h1>
+
       <nav className="app-navigation govuk-!-margin-bottom-9">
         <ul className="app-navigation__list govuk-!-margin-bottom-0">
           <li
