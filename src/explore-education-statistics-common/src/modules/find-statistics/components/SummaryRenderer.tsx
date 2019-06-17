@@ -13,7 +13,7 @@ export interface SummaryRendererProps {
   data: DataBlockData;
   meta: DataBlockMetadata;
   dataKeys: string[];
-  dataSummary?: string[];
+  dataSummary: string[];
   description: { type: string; body: string };
 }
 
