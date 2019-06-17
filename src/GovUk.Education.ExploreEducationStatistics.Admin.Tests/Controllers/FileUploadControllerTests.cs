@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
-using Assert = Xunit.Assert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 {
@@ -87,29 +86,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 
             var fileStorageService = new Mock<IFileStorageService>();
 
+            var dataFile = MockFile("datafile.csv");
+            var metaFile = MockFile("metafile.csv");
+
             fileStorageService.Setup(service =>
-                service.UploadFileAsync(publication.Slug, release.Slug, "test.csv", It.IsAny<string>(),
-                    "Subject name")).Returns(Task.CompletedTask);
+                    service.UploadFilesAsync(publication.Slug, release.Slug, dataFile, metaFile, "Subject name"))
+                .Returns(Task.CompletedTask);
 
             using (var context = new ApplicationDbContext(options))
             {
                 var controller = new FileUploadController(context, fileStorageService.Object);
 
-                var actionResult = await controller.Post(release.Id, "Subject name", TestFile());
+                var actionResult = await controller.Post(release.Id, "Subject name", dataFile, metaFile);
 
                 var redirect = Assert.IsAssignableFrom<RedirectToActionResult>(actionResult);
-                
+
                 Assert.Equal("File", redirect.ControllerName);
                 Assert.Equal("List", redirect.ActionName);
             }
         }
 
-        private static IFormFile TestFile()
+        private static IFormFile MockFile(string fileName)
         {
             var fileMock = new Mock<IFormFile>();
 
             const string content = "test content";
-            const string fileName = "test.csv";
 
             var ms = new MemoryStream();
             var writer = new StreamWriter(ms);

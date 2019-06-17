@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IFileStorageService
     {
-        Task UploadFilesAsync(string publication, string release, IFormFile file, IFormFile metaFile, string name);
+        Task UploadFilesAsync(string publication, string release, IFormFile dataFile, IFormFile metaFile, string name);
         IEnumerable<FileInfo> ListFiles(string publication, string release);
     }
 }

@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _storageConnectionString = config.GetConnectionString("AzureStorage");
         }
 
-        public async Task UploadFilesAsync(string publication, string release, IFormFile file, IFormFile metaFile,
+        public async Task UploadFilesAsync(string publication, string release, IFormFile dataFile, IFormFile metaFile,
             string name)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
@@ -51,14 +51,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
             await blobContainer.SetPermissionsAsync(permissions);
 
-            UploadFileAsync(blobContainer, publication, release, file, new List<KeyValuePair<string, string>>
+            UploadFileAsync(blobContainer, publication, release, dataFile, new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("name", name),
                 new KeyValuePair<string, string>("metafile", metaFile.FileName)
             });
             UploadFileAsync(blobContainer, publication, release, metaFile, new List<KeyValuePair<string, string>>
             {
-                new KeyValuePair<string, string>("dataFile", file.FileName)
+                new KeyValuePair<string, string>("datafile", dataFile.FileName)
             });
         }
 
