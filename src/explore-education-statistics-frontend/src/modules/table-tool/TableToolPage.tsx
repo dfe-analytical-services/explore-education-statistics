@@ -89,7 +89,7 @@ class TableToolPage extends Component<Props, State> {
 
   public static async getInitialProps({ query }: NextContext) {
     const themeMeta = await tableBuilderService.getThemes();
-    return { themeMeta, publicationId: { query } };
+    return { themeMeta, publicationId: query.publicationId };
   }
 
   private handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
@@ -194,6 +194,8 @@ class TableToolPage extends Component<Props, State> {
       subjects,
       tableData,
     } = this.state;
+
+    console.log(this.props);
 
     return (
       <Page breadcrumbs={[{ name: 'Create your own tables online' }]} wide>
