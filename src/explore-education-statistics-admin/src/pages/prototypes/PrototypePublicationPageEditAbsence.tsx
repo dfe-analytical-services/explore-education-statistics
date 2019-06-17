@@ -94,7 +94,10 @@ class PublicationPage extends Component<{}, State> {
 
         <hr />
         <div className="govuk-width-container">
-          <EditablePublicationPage editing={editing} data={data} />
+          <EditablePublicationPage
+            editing={editing}
+            data={PrototypePublicationService.getNewPublication()}
+          />
         </div>
       </PrototypePage>
     );
