@@ -98,7 +98,7 @@ class PublicationReleasePage extends Component<Props> {
                   to={`/subscriptions?slug=${data.publication.slug}`}
                   data-testid={`subsciption-${data.publication.slug}`}
                 >
-                  Subscribe to email updates
+                  Sign up for email alerts
                 </Link>
               </div>
               <div className="govuk-grid-column-one-quarter">
