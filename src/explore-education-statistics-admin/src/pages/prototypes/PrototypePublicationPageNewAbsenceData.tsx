@@ -234,7 +234,7 @@ const PublicationDataPage = () => {
           </form>
         </TabsSection>
         <TabsSection id="file-upload" title="File uploads">
-          <div className="govuk-table">
+          <table className="govuk-table">
             <caption className="govuk-table__caption govuk-heading-m">
               File uploads available for this release
             </caption>
@@ -260,7 +260,7 @@ const PublicationDataPage = () => {
             </thead>
             <tbody>
               <tr className="govuk-table__row">
-                <td className="govuk-table__cell">Graphic example</td>
+                <td className="govuk-table__cell">Example graphic</td>
                 <td className="govuk-table__cell">
                   <a href="#">example-graphics.png</a>
                 </td>
@@ -275,7 +275,7 @@ const PublicationDataPage = () => {
                 </td>
               </tr>
             </tbody>
-          </div>
+          </table>
 
           <form>
             <fieldset className="govuk-fieldset">

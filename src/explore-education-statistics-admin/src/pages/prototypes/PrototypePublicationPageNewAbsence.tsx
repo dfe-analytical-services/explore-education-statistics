@@ -10,7 +10,7 @@ interface State {
 
 class PublicationPage extends Component<{}, State> {
   public state = {
-    editing: false,
+    editing: true,
   };
 
   public render() {
@@ -30,7 +30,7 @@ class PublicationPage extends Component<{}, State> {
         <PrototypeAdminNavigation sectionId="addContent" task="editRelease" />
 
         <div className="govuk-form-group govuk-width-container">
-          <fieldset className="govuk-fieldset">
+          <fieldset className="govuk-fieldset dfe-toggle-edit">
             <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
               <h1 className="govuk-fieldset__heading">Set page view</h1>
             </legend>
@@ -43,23 +43,6 @@ class PublicationPage extends Component<{}, State> {
                   id="edit"
                   value="edit"
                   defaultChecked
-                  onChange={() => this.setState({ editing: false })}
-                />
-                <label
-                  className="govuk-label govuk-radios__label"
-                  htmlFor="edit"
-                >
-                  Preview content
-                </label>
-              </div>
-
-              <div className="govuk-radios__item">
-                <input
-                  className="govuk-radios__input"
-                  type="radio"
-                  name="status"
-                  id="edit"
-                  value="edit"
                   onChange={() => this.setState({ editing: true })}
                 />
                 <label
@@ -67,6 +50,22 @@ class PublicationPage extends Component<{}, State> {
                   htmlFor="edit"
                 >
                   Edit content
+                </label>
+              </div>
+              <div className="govuk-radios__item">
+                <input
+                  className="govuk-radios__input"
+                  type="radio"
+                  name="status"
+                  id="edit"
+                  value="edit"
+                  onChange={() => this.setState({ editing: false })}
+                />
+                <label
+                  className="govuk-label govuk-radios__label"
+                  htmlFor="edit"
+                >
+                  Preview content
                 </label>
               </div>
             </div>

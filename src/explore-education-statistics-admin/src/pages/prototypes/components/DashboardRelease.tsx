@@ -87,16 +87,20 @@ const DashboardRelease = ({
           <dd className="govuk-summary-list__value">
             {lead && (
               <span>
-                {lead}, email:{' '}
-                <a href="mailto:email@example.com">email@example.com</a>, tel:
+                {lead}
+                <br />
+                <a href="mailto:email@example.com">email@example.com</a>
+                <br />
                 07654 653762
               </span>
             )}
             {!lead && (
               <span>
-                John Smith, email:{' '}
-                <a href="mailto:js@example.com">js@example.com</a>, tel: 07654
-                653763
+                John Smith
+                <br />
+                <a href="mailto:js@example.com">js@example.com</a>
+                <br />
+                07654 653763
               </span>
             )}
           </dd>

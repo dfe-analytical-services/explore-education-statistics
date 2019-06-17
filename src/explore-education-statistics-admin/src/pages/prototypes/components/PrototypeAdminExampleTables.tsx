@@ -6,8 +6,11 @@ import {
   FormSelect,
   // FormRadioGroup,
 } from '@common/components/form';
+import Button from '@common/components/Button';
+import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import useToggle from '@common/hooks/useToggle';
 import Link from '../../../components/Link';
 
 interface Props {
@@ -16,6 +19,9 @@ interface Props {
 }
 
 const PrototypeExampleTable = ({ task }: Props) => {
+  const [showEditModal, toggleEditModal] = useToggle(false);
+  const [showDeleteModal, toggleDeleteModal] = useToggle(false);
+
   return (
     <div className="govuk-width-container">
       <Tabs>
@@ -150,9 +156,19 @@ const PrototypeExampleTable = ({ task }: Props) => {
             Edit this table
           </Link>
 
-          <Link to="#" className="govuk-button govuk-button--warning">
+          <Button variant="warning" onClick={() => toggleDeleteModal(true)}>
             Delete this table
-          </Link>
+          </Button>
+
+          <ModalConfirm
+            mounted={showDeleteModal}
+            title="Confirm delete table"
+            onExit={() => toggleDeleteModal(false)}
+            onConfirm={() => toggleDeleteModal(false)}
+            onCancel={() => toggleDeleteModal(false)}
+          >
+            <p>Are you sure you want to delete the table?</p>
+          </ModalConfirm>
         </>
       )}
     </div>
