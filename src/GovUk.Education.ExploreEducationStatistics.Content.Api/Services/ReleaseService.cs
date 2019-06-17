@@ -59,16 +59,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
             if (Guid.TryParse(id, out var newGuid))
             {
-                release = _context.Releases.Include(x => x.Updates).Include(x => x.Publication)
-                    .ThenInclude(x => x.LegacyReleases).Include(x => x.Updates).OrderBy(x => x.Published)
+                release = _context.Releases
+                    .Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
+                    .Include(x => x.Publication).ThenInclude(p => p.Topic.Theme)
+                    .Include(x => x.Publication).ThenInclude(p => p.Contact)
+                    .Include(x => x.Updates).OrderBy(x => x.Published)
                     .Last(t => t.PublicationId == newGuid);
             }
             else
             {
-                release = _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
-                    .Include(x => x.Updates).OrderBy(x => x.Published).Last(t => t.Publication.Slug == id);
+                release = _context.Releases
+                    .Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
+                    .Include(x => x.Publication).ThenInclude(p => p.Topic.Theme)
+                    .Include(x => x.Publication).ThenInclude(p => p.Contact)
+                    .Include(x => x.Updates).OrderBy(x => x.Published)
+                    .Last(t => t.Publication.Slug == id);
             }
-
 
             if (release != null)
             {

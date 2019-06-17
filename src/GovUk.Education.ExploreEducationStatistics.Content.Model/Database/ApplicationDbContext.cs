@@ -21,6 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Publication> Publications { get; set; }
         public DbSet<Release> Releases { get; set; }
+        public DbSet<Contact> Contacts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -434,6 +435,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
               }
             );
 
+            modelBuilder.Entity<Contact>().HasData(
+              new Contact
+              {
+                  Id = new Guid("11bb7387-e85e-4571-9669-8a760dcb004f"),
+                  TeamName = "Simon's Team",
+                  TeamEmail = "teamshakes@gmail.com",
+                  ContactName = "Simon Shakespeare",
+                  ContactTelNo = "0114 262 1619"
+              }
+            );
+
             modelBuilder.Entity<Publication>().HasData(
               new Publication
               {
@@ -758,7 +770,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Slug = "pupil-absence-in-schools-in-england",
                   NextUpdate = new DateTime(2018, 3, 22),
                   DataSource =
-                    "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)"
+                    "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)",
+                  ContactId = new Guid("11bb7387-e85e-4571-9669-8a760dcb004f")
               },
               new Publication
               {
@@ -1083,7 +1096,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 "26",
                                 "28"
                             },
-
+                            dataSummary = new List<string>
+                            {
+                                "Up from 40.1 in 2015/16",
+                                "Down from 40.1 in 2015/16",
+                                "Up from 40.1 in 2015/16"
+                            },
                             description = new MarkDownBlock
                             {
                                 Body = " * pupils missed on average 8.2 school days\n" +
@@ -1169,7 +1187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 },
                                 new MarkDownBlock
                                 {
-                                    Body = 
+                                    Body =
                                       "**Unauthorised absence**\n\n" +
                                       "The [unauthorised absence](../glossary#unauthorised-absence) rate has not varied much since 2006/07 but is at its highest since records began - 1.3%.\n\n" +
                                       "This is due to an increase in absence due to family holidays not agreed by schools.\n\n" +
@@ -1187,7 +1205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Order = 3, Heading = "Persistent absence", Caption = "",
                             Content = new List<IContentBlock>
                             {
-                                new MarkDownBlock 
+                                new MarkDownBlock
                                 {
                                     Body =
                                     "The [persistent absence](../glossary#persistent-absence) rate increased to and accounted for 37.6% of all absence - up from 36.6% in 2015 to 16 but still down from 43.3% in 2011 to 12.\n\n" +
@@ -1456,7 +1474,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 "--",
                                 "--"
                             },
-
+                            dataSummary = new List<string>
+                            {
+                                "",
+                                "",
+                                ""
+                            },
                             description = new MarkDownBlock
                             {
                                 Body = ""
@@ -1506,6 +1529,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 "155",
                                 "156",
                                 "158"
+                            },
+                            dataSummary = new List<string>
+                            {
+                                "Up from 40.1 in 2015/16",
+                                "Down from 40.1 in 2015/16",
+                                "Up from 40.1 in 2015/16"
                             },
                             description = new MarkDownBlock
                             {
@@ -1756,7 +1785,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 "--",
                                 "--"
                             },
-
+                            dataSummary = new List<string>
+                            {
+                                "",
+                                "",
+                                ""
+                            },
                             description = new MarkDownBlock
                             {
                                 Body = ""
@@ -1780,7 +1814,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     }
                 },
                 */
-                /*  
+                /*
                 // // GCSE / KS4
                 new Release
                 {
@@ -1807,7 +1841,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 "--",
                                 "--"
                             },
-
+                            dataSummary = new List<string>
+                            {
+                                "",
+                                "",
+                                ""
+                            },
                             description = new MarkDownBlock
                             {
                                 Body =
@@ -2040,7 +2079,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
                   Published = new DateTime(2018, 6, 14),
                   Slug = "2018",
-                  Summary = 
+                  Summary =
                     "Read national statistical summaries, view charts and tables and download data files.\n\n" +
                     "Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](../methodology/secondary-and-primary-schools-applications-and-offers)",
                   KeyStatistics = new DataBlock
@@ -2062,7 +2101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                       },
                       description = new MarkDownBlock
                       {
-                        Body = 
+                        Body =
                           "* majority of applicants received a preferred offer\n" +
                           "* percentage of applicants receiving secondary first choice offers decreases as applications increase\n" +
                           "* slight proportional increase in applicants receiving primary first choice offer as applications decrease\n"
@@ -2079,7 +2118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                       {
                         new MarkDownBlock
                         {
-                          Body = 
+                          Body =
                             "The statistics and data cover the number of offers made to applicants for primary and secondary school places and the proportion which have received their preferred offers.\n\n" +
                             "The data was collected from local authorities (LAs) where it was produced as part of the annual applications and offers process for applicants requiring a primary or secondary school place in September 2018.\n\n" +
                             "The offers were made, and data collected, based on the National Offer Days of 1 March 2018 for secondary schools and 16 April 2018 for primary schools."
@@ -2094,7 +2133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                       {
                         new MarkDownBlock
                         {
-                          Body = 
+                          Body =
                             "**Secondary applications**\n\n" +
                             "The number of applications received for secondary school places increased to 582,761 - up 3.6% since 2017. This follows a 2.6% increase between 2016 and 2017.\n\n" +
                             "This continues the increase in secondary applications seen since 2013 which came on the back of a rise in births which began in the previous decade.\n\n" +
@@ -2121,7 +2160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                       
                         new MarkDownBlock
                         {
-                          Body = 
+                          Body =
                             "**First preference rates**\n\n" +
                             "At local authority (LA) level, the 3 highest first preference rates were achieved by the following local authorities:\n\n" +
                             "* Northumberland - 98.1%\n\n" +
@@ -2157,7 +2196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new MarkDownBlock
                         {
-                          Body = 
+                          Body =
                             "An applicant can apply for any school, including those situated in another local authority (LA).\n\n" +
                             "Their authority liaises with the requested school (to make sure the applicant is considered under the admissions criteria) and makes the offer.\n\n" +
                             "**Secondary offers**\n\n" +
@@ -2178,7 +2217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                       {
                         new MarkDownBlock
                         {
-                          Body = 
+                          Body =
                             "**Primary applications**\n\n" +
                             "The number of applications received for primary school places decreased to 608,180 - down 2% on 2017 (620,330).\n\n" +
                             "This is the result of a notable fall in births since 2013 which is now feeding into primary school applications.\n\n" +
@@ -2204,7 +2243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                       {
                         new MarkDownBlock
                         {
-                          Body = 
+                          Body =
                             "**First preference rates**\n\n" +
                             "At local authority (LA) level, the 3 highest first preference rates were achieved by the following local authorities:\n\n" +
                             "* East Riding of Yorkshire - 97.6%\n\n" +
