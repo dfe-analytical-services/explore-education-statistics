@@ -1,10 +1,14 @@
 import React from 'react';
+import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import useToggle from '@common/hooks/useToggle';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
 
 const PublicationDataPage = () => {
+  const [showReplaceDataModal, toggleReplaceDataModal] = useToggle(false);
+  const [showDeleteFilesModal, toggleDeleteFilesModal] = useToggle(false);
   return (
     <PrototypePage
       wide
@@ -67,10 +71,14 @@ const PublicationDataPage = () => {
                   <a href="#">meta_absence_geoglevels.csv</a>
                 </td>
                 <td className="govuk-table__cell">
-                  <a href="#">Delete files</a>
+                  <a href="#" onClick={() => toggleDeleteFilesModal(true)}>
+                    Delete files
+                  </a>
                 </td>
                 <td className="govuk-table__cell">
-                  <a href="#">Replace data</a>
+                  <a href="#" onClick={() => toggleReplaceDataModal(true)}>
+                    Replace data
+                  </a>
                 </td>
                 <td className="govuk-table__cell">
                   <a href="#">Replace metadata</a>
@@ -319,6 +327,26 @@ const PublicationDataPage = () => {
           </form>
         </TabsSection>
       </Tabs>
+
+      <ModalConfirm
+        mounted={showReplaceDataModal}
+        title="Confirm replace data file"
+        onExit={() => toggleReplaceDataModal(false)}
+        onConfirm={() => toggleReplaceDataModal(false)}
+        onCancel={() => toggleReplaceDataModal(false)}
+      >
+        <p>Please ensure supporting meta data file is still correct</p>
+      </ModalConfirm>
+
+      <ModalConfirm
+        mounted={showDeleteFilesModal}
+        title="Confirm deletion of selected data files"
+        onExit={() => toggleDeleteFilesModal(false)}
+        onConfirm={() => toggleDeleteFilesModal(false)}
+        onCancel={() => toggleDeleteFilesModal(false)}
+      >
+        <p>This data will no longer be available for use in this release</p>
+      </ModalConfirm>
     </PrototypePage>
   );
 };

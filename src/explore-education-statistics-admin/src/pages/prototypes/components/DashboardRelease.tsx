@@ -65,7 +65,7 @@ const DashboardRelease = ({
           )}
           {!isNew && (
             <React.Fragment>
-              <dt className="govuk-summary-list__key">Published to live</dt>
+              <dt className="govuk-summary-list__key">Publish date</dt>
               <dd className="govuk-summary-list__value">
                 {format(published, 'd MMMM yyyy')}
               </dd>
