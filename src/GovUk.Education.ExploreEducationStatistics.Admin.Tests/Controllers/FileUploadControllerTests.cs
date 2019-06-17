@@ -21,6 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
         public async Task Upload_ReturnsAViewResult_ForUploadingFiles()
         {
             var fileStorageService = new Mock<IFileStorageService>();
+            var importService = new Mock<IImportService>();
 
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
             builder.UseInMemoryDatabase("FileUploadGet");
@@ -47,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 
             using (var context = new ApplicationDbContext(options))
             {
-                var controller = new FileUploadController(context, fileStorageService.Object);
+                var controller = new FileUploadController(context, fileStorageService.Object, importService.Object);
 
                 var actionResult = controller.Upload();
                 var viewResult = Assert.IsType<ViewResult>(actionResult);
@@ -85,6 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             }
 
             var fileStorageService = new Mock<IFileStorageService>();
+            var importService = new Mock<IImportService>();
 
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
@@ -95,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 
             using (var context = new ApplicationDbContext(options))
             {
-                var controller = new FileUploadController(context, fileStorageService.Object);
+                var controller = new FileUploadController(context, fileStorageService.Object, importService.Object);
 
                 var actionResult = await controller.Post(release.Id, "Subject name", dataFile, metaFile);
 

@@ -1,10 +1,9 @@
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IImportService
     {
-        bool SendImportNotification(ImportViewModel model);
-
+        void SendImportNotification(Guid releaseId, string dataFileName, string metaFileName);
     }
 }

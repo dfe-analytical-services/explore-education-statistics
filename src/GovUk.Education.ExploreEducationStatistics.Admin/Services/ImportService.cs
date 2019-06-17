@@ -1,3 +1,4 @@
+using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -20,33 +21,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _logger = logger;
         }
 
-        public bool SendImportNotification(ImportViewModel model)
+        public void SendImportNotification(Guid releaseId, string dataFileName, string metaFileName)
         {
-            if (CloudStorageAccount.TryParse(_storageConnectionString, out var storageAccount))
+            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
+            var client = storageAccount.CreateCloudQueueClient();
+            var queue = client.GetQueueReference("imports-pending");
+            queue.CreateIfNotExists();
+
+            var content = JsonConvert.SerializeObject(new ImportMessagePayload
             {
-                try
-                {
-                    var client = storageAccount.CreateCloudQueueClient();
+                ReleaseId = releaseId,
+                DataFileName = dataFileName,
+                MetaFileName = metaFileName
+            });
 
-                    var queue = client.GetQueueReference("imports-pending");
-                    queue.CreateIfNotExists();
-                    
-                    var body = JsonConvert.SerializeObject(model);
-                    
-                    var message = new CloudQueueMessage(body);
-                    queue.AddMessage(message);
+            var message = new CloudQueueMessage(content);
+            queue.AddMessage(message);
 
-                }
-                catch (StorageException ex)
-                {
-                    _logger.LogError("Error returned when adding import notification to queue: {0}", ex.Message);
-                    return false;
-                }
-            }
-            
-            _logger.LogTrace("Sent files import notification for {0} ({1})", model.PublicationName, model.PublicationId);
-
-            return true;
+            _logger.LogTrace("Sent import notification: {0}", content);
         }
     }
 }
