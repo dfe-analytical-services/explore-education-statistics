@@ -13,7 +13,7 @@ const PreviousStepModalConfirm = () => {
       onCancel={cancel}
       mounted={isConfirming}
     >
-      <p>You will lose any changes you have made in the current step.</p>
+      <p>You'll need to reselect some of the options you've already chosen.</p>
     </ModalConfirm>
   );
 };

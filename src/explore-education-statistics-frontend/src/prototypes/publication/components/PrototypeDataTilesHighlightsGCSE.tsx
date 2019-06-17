@@ -15,9 +15,10 @@ const PrototypeDataTileHighlights = () => (
     </div>
     <div className="dfe-dash-tiles__tile">
       <h3 className="govuk-heading-s dfe-dash-tiles__heading">
-        English / Maths 5+
+        English / Maths 5+ TEST
       </h3>
       <p className="govuk-heading-l govuk-!-margin-bottom-2">43.3%</p>
+      <p className="govuk-body-s">An increase from 1% in 2017/18</p>
       <Details summary="What is this?">
         <p className="govuk-body-s">
           measures the percentage of pupils achieving a grade 5 or above in both

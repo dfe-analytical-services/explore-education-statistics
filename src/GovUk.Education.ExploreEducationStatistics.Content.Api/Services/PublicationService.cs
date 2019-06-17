@@ -3,6 +3,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {
@@ -19,7 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public PublicationViewModel GetPublication(string slug)
         {
-
             return _mapper.Map<PublicationViewModel>(_context.Publications.FirstOrDefault(t => t.Slug == slug));
         }
     }

@@ -20,16 +20,24 @@ async function startServer(port = process.env.PORT || 3000) {
     process.exit(1);
   }
 
-  let cspScriptSrc = [
+  const cspConnectSrc = [
     "'self'",
-    "https://www.google-analytics.com/",
-    "https://static.hotjar.com/",
-  ]
-
-  if (process.env.NODE_ENV !== 'production') {
-   cspScriptSrc.push("'unsafe-inline'");
-   cspScriptSrc.push("'unsafe-eval'");
-  };
+    process.env.CONTENT_API_BASE_URL,
+    process.env.DATA_API_BASE_URL,
+    process.env.FUNCTION_API_BASE_URL,
+    'http://*.hotjar.com:*',
+    'https://*.hotjar.com:*',
+    'https://vc.hotjar.io:*',
+    'wss://*.hotjar.com',
+  ];
+  const cspScriptSrc = [
+    "'self'",
+    'https://www.google-analytics.com/',
+    'https://static.hotjar.com/',
+    'https://script.hotjar.com',
+    "'unsafe-inline'",
+    "'unsafe-eval'",
+  ];
 
   const server = express();
 
@@ -41,11 +49,20 @@ async function startServer(port = process.env.PORT || 3000) {
       directives: {
         defaultSrc: ["'self'"],
         scriptSrc: cspScriptSrc,
-        styleSrc: ["'self'"],
-        imgSrc: ["'self'", 'data:', "https://www.google-analytics.com/"],
-        fontSrc: ["'self'"],
-        frameSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: [
+          "'self'",
+          'data:',
+          'https://www.google-analytics.com/',
+          'https://insights.hotjar.com',
+          'https://static.hotjar.com',
+        ],
+        fontSrc: ["'self'", 'https://static.hotjar.com'],
+        connectSrc:
+          process.env.NODE_ENV !== 'production' ? ['*'] : cspConnectSrc,
+        frameSrc: ["'self'", 'https://vars.hotjar.com '],
         frameAncestors: ["'self'"],
+        childSrc: ["'self'", 'https://vars.hotjar.com'],
       },
     }),
   );
@@ -53,7 +70,6 @@ async function startServer(port = process.env.PORT || 3000) {
     helmet.featurePolicy({
       features: {
         fullscreen: ["'self'"],
-        vibrate: ["'none'"],
       },
     }),
   );

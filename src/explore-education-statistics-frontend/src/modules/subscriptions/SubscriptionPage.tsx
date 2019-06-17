@@ -92,6 +92,16 @@ class SubscriptionPage extends Component<Props> {
       >
         <PageTitle title={`${data.title}`} caption="Notify me" />
 
+        <div className="govuk-warning-text">
+          <span className="govuk-warning-text__icon" aria-hidden="true">
+            !
+          </span>
+          <strong className="govuk-warning-text__text">
+            <span className="govuk-warning-text__assistive">Warning</span>
+            This feature is not currently available for use.
+          </strong>
+        </div>
+
         <p>Subscribe to receive updates when:</p>
         <ul className="govuk-list govuk-list--bullet">
           <li>new statistics and data are released</li>

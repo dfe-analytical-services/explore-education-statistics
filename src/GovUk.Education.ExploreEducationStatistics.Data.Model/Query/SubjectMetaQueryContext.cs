@@ -16,16 +16,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
         public GeographicLevel? GeographicLevel { get; set; }
         public IEnumerable<long> Indicators { get; set; }
         public IEnumerable<string> Countries { get; set; }
+        public IEnumerable<string> Institutions { get; set; }
         public IEnumerable<string> LocalAuthorities { get; set; }
         public IEnumerable<string> LocalAuthorityDistricts { get; set; }
-        public IEnumerable<string> Regions { get; set; }
         public IEnumerable<string> LocalEnterprisePartnerships { get; set; }
-        public IEnumerable<string> Institutions { get; set; }
         public IEnumerable<string> Mats { get; set; }
         public IEnumerable<string> MayoralCombinedAuthorities { get; set; }
         public IEnumerable<string> OpportunityAreas { get; set; }
         public IEnumerable<string> ParliamentaryConstituencies { get; set; }
-        public IEnumerable<string> Providers { get; set; }
+        public IEnumerable<string> Regions { get; set; }
+        public IEnumerable<string> RscRegions { get; set; }
         public IEnumerable<string> Wards { get; set; }
 
         public Expression<Func<Observation, bool>> ObservationPredicate()
@@ -51,10 +51,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
                     Countries.Contains(observation.Location.Country.Code));
             }
 
-            if (Regions != null && Regions.Any())
+            if (Institutions != null && Institutions.Any())
             {
                 predicate = predicate.And(observation =>
-                    Regions.Contains(observation.Location.Region.Code));
+                    Institutions.Contains(observation.Location.Institution.Code));
             }
 
             if (LocalAuthorities != null && LocalAuthorities.Any())
@@ -73,12 +73,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
             {
                 predicate = predicate.And(observation =>
                     LocalEnterprisePartnerships.Contains(observation.Location.LocalEnterprisePartnership.Code));
-            }
-
-            if (Institutions != null && Institutions.Any())
-            {
-                predicate = predicate.And(observation =>
-                    Institutions.Contains(observation.Location.Institution.Code));
             }
 
             if (Mats != null && Mats.Any())
@@ -105,10 +99,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
                     ParliamentaryConstituencies.Contains(observation.Location.ParliamentaryConstituency.Code));
             }
 
-            if (Providers != null && Providers.Any())
+            if (Regions != null && Regions.Any())
             {
                 predicate = predicate.And(observation =>
-                    Providers.Contains(observation.Location.Provider.Code));
+                    Regions.Contains(observation.Location.Region.Code));
+            }
+
+            if (RscRegions != null && RscRegions.Any())
+            {
+                predicate = predicate.And(observation =>
+                    RscRegions.Contains(observation.Location.RscRegion.Code));
             }
 
             if (Wards != null && Wards.Any())

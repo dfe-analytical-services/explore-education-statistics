@@ -1,6 +1,4 @@
-import { MapFeature } from '@common/modules/find-statistics/components/charts/MapBlock';
 import { DataBlockRequest } from '@common/services/dataBlockService';
-import { FeatureCollection } from 'geojson';
 import { contentApi } from './api';
 
 export interface Publication {
@@ -21,6 +19,17 @@ export interface Publication {
     description: string;
     url: string;
   }[];
+  topic: {
+    theme: {
+      title: string;
+    };
+  };
+  contact: {
+    teamName: string;
+    teamEmail: string;
+    contactName: string;
+    contactTelNo: string;
+  };
 }
 
 export interface DataQuery {
@@ -45,13 +54,19 @@ export interface Axis {
 
 export type ChartType = 'line' | 'verticalbar' | 'horizontalbar' | 'map';
 
+export interface ChartDataGroup {
+  filters?: string[];
+  location?: string[];
+  timePeriod?: boolean;
+}
+
 export interface Chart {
   type: ChartType;
   indicators: string[];
+  dataGroupings?: ChartDataGroup[];
   xAxis?: Axis;
   yAxis?: Axis;
   stacked?: boolean;
-  geometry?: MapFeature | FeatureCollection;
   referenceLines?: ReferenceLine[];
   width?: number;
   height?: number;
@@ -63,6 +78,7 @@ export interface Table {
 
 export interface Summary {
   dataKeys: string[];
+  dataSummary: string[];
   description: { type: string; body: string };
 }
 
@@ -100,6 +116,12 @@ export interface Release {
     content: ContentBlock[];
   }[];
   keyStatistics: ContentBlock;
+  dataFiles: {
+    extension: string;
+    name: string;
+    path: string;
+    size: string;
+  }[];
 }
 
 export default {

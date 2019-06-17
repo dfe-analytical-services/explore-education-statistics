@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
     public class Publication
     {
-        [Key] [Required] public Guid Id { get; set; }
+        public Guid Id { get; set; }
 
         public string Slug { get; set; }
 
@@ -31,5 +31,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid TopicId { get; set; }
 
         public Topic Topic { get; set; }
+        
+        public Guid? ContactId { get; set; }
+
+        public Contact Contact { get; set; }
     }
 }

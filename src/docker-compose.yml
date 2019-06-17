@@ -13,6 +13,7 @@ services:
       ASPNETCORE_ConnectionStrings__StatisticsDb: Server=db;Database=master;User=SA;Password=Your_Password123;Connection Timeout=1000;
     depends_on:
     - db
+    - data-storage
   content-api:
     container_name: ees-content
     build: 
@@ -21,19 +22,10 @@ services:
     ports:
     - "5010:5010"
     - "5011:5011"
-#  frontend:
-#    container_name: ees-frontend
-#    build: explore-education-statistics-frontend
-#    volumes:
-#      - './explore-education-statistics-frontend:/usr/src/app'
-#      - '/usr/src/app/node_modules'
-#    ports:
-#      - '3000:3000'
-#    environment:
-#      - NODE_ENV=development
-#    depends_on:
-#      - data-api
-#      - content-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    depends_on:
+    - data-storage
   data-storage:
     container_name: ees-storage
     build:
@@ -48,6 +40,21 @@ services:
       - "1433:1433"
     volumes:
       - ../data/ees-mssql:/var/opt/mssql/data
+      - ../data/sql-scripts:/scripts/
     environment:
       SA_PASSWORD: "Your_Password123"
       ACCEPT_EULA: "Y"
+    command:
+      - /bin/bash
+      - -c 
+      - |
+        # Launch MSSQL and send to background
+        /opt/mssql/bin/sqlservr &
+        # Wait 30 seconds for it to be available
+        sleep 30
+
+        # Run the setup script to create the two databases
+        /opt/mssql-tools/bin/sqlcmd -U sa -P $$SA_PASSWORD -l 30 -e -i /scripts/setup-db.sql
+
+        # So that the container doesn't shut down, sleep this thread
+        sleep infinity

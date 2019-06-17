@@ -7,6 +7,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
     public static class CsvUtil
     {
+        public static T BuildType<T>(IReadOnlyList<string> line, List<string> headers, string column,
+            Func<string, T> func)
+        {
+            var value = Value(line, headers, column);
+            return value == null ? default(T) : func(value);
+        }
+
         public static T BuildType<T>(IReadOnlyList<string> line, List<string> headers, IEnumerable<string> columns,
             Func<string[], T> func)
         {
@@ -21,8 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         public static string Value(IReadOnlyList<string> line, List<string> headers, string column)
         {
-            return headers.Contains(column) ? 
-                line[headers.FindIndex(h => h.Equals(column))].NullIfWhiteSpace() : null;
+            return headers.Contains(column) ? line[headers.FindIndex(h => h.Equals(column))].NullIfWhiteSpace() : null;
         }
     }
 }

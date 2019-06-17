@@ -51,7 +51,9 @@ function HomePage() {
       </div>
 
       <hr />
-      <h3 className="govuk-heading-l govuk-!-margin-top-9">Help and support</h3>
+      <h3 className="govuk-heading-l govuk-!-margin-top-9">
+        Supporting information
+      </h3>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-half">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
@@ -122,6 +124,29 @@ function HomePage() {
           <p className="govuk-caption-m govuk-!-margin-top-1">
             Compare your school's income and expenditure with other schools in
             England.
+          </p>
+        </div>
+        <div className="govuk-grid-column-one-half">
+          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+            <a className="govuk-link" href="/contact/">
+              Contact Us
+            </a>
+          </h4>
+          <p className="govuk-caption-m govuk-!-margin-top-1">
+            If you need help and support or have a question about education
+            statistics and data contact:
+          </p>
+
+          <p className="govuk-caption-m govuk-!-margin-top-1">
+            <strong>Explore education statistics team</strong>
+          </p>
+
+          <p className="govuk-caption-m govuk-!-margin-top-1">
+            Email
+            <br />
+            <a href="mailto:explore.statistics@education.gov.uk">
+              explore.statistics@education.gov.uk
+            </a>
           </p>
         </div>
       </div>

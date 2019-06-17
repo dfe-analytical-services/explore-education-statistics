@@ -33,8 +33,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                         GroupByObservationalUnit(locations, location => location.Country)
                     },
                     {
-                        GeographicLevel.Regional,
-                        GroupByObservationalUnit(locations, location => location.Region)
+                        GeographicLevel.Institution,
+                        GroupByObservationalUnit(locations, location => location.Institution)
                     },
                     {
                         GeographicLevel.Local_Authority,
@@ -47,10 +47,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                     {
                         GeographicLevel.Local_Enterprise_Partnerships,
                         GroupByObservationalUnit(locations, location => location.LocalEnterprisePartnership)
-                    },
-                    {
-                        GeographicLevel.Institution,
-                        GroupByObservationalUnit(locations, location => location.Institution)
                     },
                     {
                         GeographicLevel.MAT_Or_Sponsor,
@@ -69,8 +65,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                         GroupByObservationalUnit(locations, location => location.ParliamentaryConstituency)
                     },
                     {
-                        GeographicLevel.Provider,
-                        GroupByObservationalUnit(locations, location => location.Provider)
+                        GeographicLevel.Regional,
+                        GroupByObservationalUnit(locations, location => location.Region)
+                    },
+                    {
+                        GeographicLevel.RSC_Region,
+                        GroupByObservationalUnit(locations, location => location.RscRegion)
                     },
                     {
                         GeographicLevel.Ward,

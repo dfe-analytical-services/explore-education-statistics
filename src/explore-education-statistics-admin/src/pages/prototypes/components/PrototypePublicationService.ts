@@ -324,6 +324,57 @@ export default class PrototypePublicationService {
           },
         },
       },
+      dataFiles: [
+        {
+          extension: 'csv',
+          name: 'Absence by characteristic',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_by_characteristic.csv',
+          size: '58 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence by geographic level',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_by_geographic_level.csv',
+          size: '63 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence by term',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_by_term.csv',
+          size: '2 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence for four year olds',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_for_four_year_olds.csv',
+          size: '13 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence in prus',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_in_prus.csv',
+          size: '141 Kb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence number missing at least one session by reason',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_number_missing_at_least_one_session_by_reason.csv',
+          size: '19 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence rate percent bands',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_rate_percent_bands.csv',
+          size: '198 Kb',
+        },
+      ],
     });
   }
 
@@ -347,6 +398,17 @@ export default class PrototypePublicationService {
         nextUpdate: '2018-03-22T00:00:00',
         releases: [],
         legacyReleases: [],
+        contact: {
+          contactName: 'Mr Smith',
+          contactTelNo: '01228 76762',
+          teamEmail: 'team@email.com',
+          teamName: 'Team A',
+        },
+        topic: {
+          theme: {
+            title: 'Pupil absence',
+          },
+        },
       },
       updates: [],
       content: [
@@ -406,6 +468,57 @@ export default class PrototypePublicationService {
           },
         },
       },
+      dataFiles: [
+        {
+          extension: 'csv',
+          name: 'Absence by characteristic',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_by_characteristic.csv',
+          size: '58 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence by geographic level',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_by_geographic_level.csv',
+          size: '63 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence by term',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_by_term.csv',
+          size: '2 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence for four year olds',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_for_four_year_olds.csv',
+          size: '13 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence in prus',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_in_prus.csv',
+          size: '141 Kb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence number missing at least one session by reason',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_number_missing_at_least_one_session_by_reason.csv',
+          size: '19 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence rate percent bands',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_rate_percent_bands.csv',
+          size: '198 Kb',
+        },
+      ],
     };
   }
 }

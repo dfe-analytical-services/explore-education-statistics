@@ -4,10 +4,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class Mat : IObservationalUnit
     {
-        [JsonProperty(PropertyName = "mat_chain_id")]
+        [JsonProperty(PropertyName = "mat_id")]
         public string Code { get; set; }
 
-        [JsonProperty(PropertyName = "mat_chain_name")]
+        [JsonProperty(PropertyName = "mat_name")]
         public string Name { get; set; }
 
         private Mat()

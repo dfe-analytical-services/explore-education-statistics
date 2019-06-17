@@ -10,7 +10,7 @@
 ## Application
 bin
 obj
-/data/
+/data/ees-mssql
 dfe-meta.db
 
 ## CSharp
@@ -31,6 +31,10 @@ junit.xml
 /tests/robot-tests/webdriver
 /tests/robot-tests/.env.*
 /tests/robot-tests/.pabotsuitenames
+
+## Data API Seed CSV data
+
+src/GovUk.Education.ExploreEducationStatistics.Data.Seed/Files/
 
 ## Misc
 

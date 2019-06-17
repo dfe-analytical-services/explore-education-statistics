@@ -42,62 +42,44 @@ const PublicationPage = () => {
                 Read national statistical summaries, view charts and tables and
                 download data files.
               </p>
-              <p>
-                All figures refer to the <strong>2016/17 academic year</strong>{' '}
-                - unless otherwise stated.
-              </p>
-
-              <p className="govuk-inset-text">
-                <a href="#contents-sections-heading-8">
-                  View regional and local authority (LA) breakdowns
-                </a>
-              </p>
-
-              <p>
-                Find out how and why these statistics are collected and
-                published -{' '}
-                <Link to="/prototypes/methodology-absence">
-                  Pupil absence statistics: methodology
-                </Link>
-              </p>
-            </div>
-            <div className="govuk-grid-column-one-quarter">
-              <img
-                src="/static/images/UKSA-quality-mark.jpg"
-                alt="UK statistics authority quality mark"
-                height="130"
-              />
             </div>
           </div>
 
           <Details summary="Download data files">
-            <p>
-              Download data in the following formats or access our data via our
-              API:
-            </p>
-            <ul className="govuk-list-bullet">
+            <ul className="govuk-list">
               <li>
                 <a href="#" className="govuk-link">
-                  Download .csv files
+                  Download data file 1 (.csv)
                 </a>
               </li>
               <li>
                 <a href="#" className="govuk-link">
-                  Download Excel files
+                  Download data file 2 (.csv)
                 </a>
               </li>
               <li>
                 <a href="#" className="govuk-link">
-                  Download pdf files
+                  Download data file 3 (.csv)
                 </a>
               </li>
               <li>
                 <a href="#" className="govuk-link">
-                  Access API
-                </a>{' '}
-                -{' '}
-                <a href="/glossary#what-is-an-api" className="govuk-link">
-                  What is an API?
+                  Download data file 4 (.csv)
+                </a>
+              </li>
+              <li>
+                <a href="#" className="govuk-link">
+                  Download data file 5 (.csv)
+                </a>
+              </li>
+              <li>
+                <a href="#" className="govuk-link">
+                  Download data file 6 (.csv)
+                </a>
+              </li>
+              <li>
+                <a href="#" className="govuk-link">
+                  Download data file 7 (.csv)
                 </a>
               </li>
             </ul>
@@ -112,9 +94,9 @@ const PublicationPage = () => {
 
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <span className="govuk-caption-m govuk-caption-inline">
-                For academic year:{' '}
-              </span>
-              2016/17 (latest data)
+                For school year:{' '}
+              </span>{' '}
+              2016 to 2017
             </h3>
 
             <Details summary="See previous 7 releases">
@@ -179,14 +161,6 @@ const PublicationPage = () => {
               </div>
             </Details>
 
-            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <span className="govuk-caption-m">Next update: </span>22 March
-              2019
-            </h3>
-            <p className="govuk-caption-m govuk-!-margin-top-0">
-              <a href="#">Notify me</a>
-            </p>
-
             <h2
               className="govuk-heading-m govuk-!-margin-top-6"
               id="related-content"
@@ -207,7 +181,7 @@ const PublicationPage = () => {
       </div>
       <hr />
       <h2 className="govuk-heading-l">
-        Headline facts and figures - 2016/17 academic year
+        Headline facts and figures - 2016 to 2017 school year
       </h2>
       <PrototypeDataSample
         sectionId="headlines"

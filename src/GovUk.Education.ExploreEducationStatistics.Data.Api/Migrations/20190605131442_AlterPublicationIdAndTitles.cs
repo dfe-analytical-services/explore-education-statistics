@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
+    [ExcludeFromCodeCoverage]
     public partial class AlterPublicationIdAndTitles : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

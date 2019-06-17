@@ -1,48 +1,66 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {
     public class DownloadService : IDownloadService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFileStorageService _fileStorageService;
+        private readonly ILogger _logger;
 
-        public DownloadService(
-            ApplicationDbContext context)
+
+        public DownloadService(ApplicationDbContext context,
+            IFileStorageService fileStorageService,
+            ILogger<DownloadService> logger)
         {
             _context = context;
+            _fileStorageService = fileStorageService;
+            _logger = logger;
         }
 
-        // TODO: Include the list of downloadable files
-        public List<ThemeTree> GetTree()
+        public IEnumerable<ThemeTree> GetDownloadTree()
         {
-            var tree = _context.Themes.Select(t => new ThemeTree
+            var config = new MapperConfiguration(cfg =>
             {
-                Id = t.Id,
-                Title = t.Title,
-                Topics = t.Topics.Select(x => new TopicTree
-                {
-                    Id = x.Id,
-                    Title = x.Title,
-                    Summary = x.Summary,
-                    Publications = x.Publications.Where(p => p.Releases.Any())
-                        .Select(p => new PublicationTree
-                        {
-                            Id = p.Id,
-                            Title = p.Title,
-                            Summary = p.Summary,
-                            Slug = p.Slug
-                        })
-                        .OrderBy(publication => publication.Title).ToList()
-                }).Where(topic => topic.Publications.Any()).OrderBy(topic => topic.Title).ToList()
-            }).Where(theme => theme.Topics.Any()).OrderBy(theme => theme.Title).ToList();
+                cfg.CreateMap<Publication, PublicationTree>()
+                    .ForMember(
+                        dest => dest.DataFiles, m => m.MapFrom(publication =>
+                            ListFiles(publication.Slug, GetLatestRelease(publication).Slug)));
+            });
 
-            return tree;
+            var mapper = config.CreateMapper();
+
+            var themes = GetReleases()
+                .GroupBy(release => release.Publication.Topic.Theme)
+                .Select(grouping => grouping.Key);
+
+            return mapper.Map<IEnumerable<ThemeTree>>(themes);
+        }
+
+        private static Release GetLatestRelease(Publication publication)
+        {
+            return publication.Releases.ToList()
+                .OrderByDescending(release => release.Published)
+                .FirstOrDefault();
+        }
+
+        private IEnumerable<Release> GetReleases()
+        {
+            return _context.Releases.Include(release => release.Publication.Topic.Theme);
+        }
+
+        private IEnumerable<FileInfo> ListFiles(string publication, string release)
+        {
+            return _fileStorageService.ListFiles(publication, release);
         }
     }
 }
