@@ -12,7 +12,7 @@ export interface SummaryRendererProps {
   data: DataBlockData;
   meta: DataBlockMetadata;
   dataKeys: string[];
-  dataSummary?: string[];
+  dataSummary: string[];
   description: { type: string; body: string };
 }
 
@@ -75,8 +75,6 @@ export default function SummaryRenderer({
                 </p>
                 {dataSummary && (
                   <p className="govuk-body-s">{dataSummary[index]}</p>
-                ) : (
-                  ''
                 )}
               </div>
               <Details summary={`What is ${meta.indicators[key].label}?`}>
