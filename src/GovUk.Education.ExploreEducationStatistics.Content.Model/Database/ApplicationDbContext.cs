@@ -1127,7 +1127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         "- secondary schools\n" +
                                         "- special schools\n\n" +
                                         "They also includes information fo [pupil referral units](../glossary#pupil-referral-unit) and pupils aged 4 years.\n\n" +
-                                        "We use the key measures of [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) to monitor pupil absence and also include [absence by reason](#contents-section-heading-4) and [pupil characteristics](#contents-section-heading-6).\n\n" +
+                                        "We use the key measures of [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) to monitor pupil absence and also include [absence by reason](#contents-sections-heading-4) and [pupil characteristics](#contents-sections-heading-6).\n\n" +
                                         "The statistics and data are available at national, regional, local authority (LA) and school level and are used by LAs and schools to compare their local absence rates to regional and national averages for different pupil groups.\n\n" +
                                         "They're also used for policy development as key indicators in behaviour and school attendance policy.\n"
                                 }
@@ -1265,7 +1265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Order = 4, Heading = "Reasons for absence", Caption = "",
                             Content = new List<IContentBlock>
                             {
-                                new MarkDownBlock()
+                                new MarkDownBlock
                                 {
                                     Body =
                                     "These have been broken down into the following:\n\n" +
@@ -1358,7 +1358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                      "The [overall absence](../glossary#overall-absence) and [persistent absence](..glossary#persistent-absence) patterns for pupils with different characteristics have been consistent over recent years.\n\n" +
+                                      "The [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) patterns for pupils with different characteristics have been consistent over recent years.\n\n" +
                                       "**Ethnic groups**\n\n" +
                                       "Overall absence rate:\n\n" +
                                       "* Travellers of Irish heritage and Gypsy / Roma pupils - highest at 18.1% and 12.9% respectively\n\n" +
@@ -1447,7 +1447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         "* South West - 4.8%\n\n" +
                                         "Meanwhile, Inner and Outer London had the lowest rates at 4.4%.\n\n" +
                                         "**Persistent absence**\n\n" +
-                                        "The region with the highest persistent absence rate was Yorkshire and the Humber with 11.9% while Outer London had the lowest rate at 10%.\n\n" 
+                                        "The region with the highest persistent absence rate was Yorkshire and the Humber with 11.9% while Outer London had the lowest rate at 10%."
                                 }
                             }
                         }
@@ -1669,7 +1669,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                      "We saw a similar pattern to previous years where the following groups (ones where we usually expect to see higher exclusion rates) showing an increase in exclusions since 2015/16:\n\n" +
+                                      "There was a similar pattern to previous years where the following groups (where higher exclusion rates are expected) showing an increase in exclusions since 2015/16:\n\n" +
                                       "* boys\n\n" +
                                       "* national curriculum years 9 and 10\n\n" +
                                       "* pupils with special educational needs (SEN)\n\n" +
@@ -1752,7 +1752,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                       "* North West - 0.14%\n\n" +
                                       "* North West - 0.14%\n\n" +
                                       "Similar to 2015/16, the regions with the lowest rates were:\n\n" +
-                                      "* the South East - 0.06%\n\n" +
+                                      "* South East - 0.06%\n\n" +
                                       "* Yorkshire and the Humber - 0.07%\n\n" +
                                       "**Fixed-period exclusion**\n\n" +
                                       "Similar to 2015/16, the region with the highest rates across all school types was Yorkshire and the Humber at 7.22% while the lowest rate was in Outer London (3.49%)."
@@ -2091,13 +2091,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                       startYear = "2014",
                       endYear = "2018",
                       filters = new List<string> { "845" /*, "848"*/ },
-                      indicators = new List<string> { "193" }
+                      indicators = new List<string> { "189", "193", "194" }
                     },
                     Summary = new Summary
                     {
                       dataKeys = new List<string>
                       {
-                        "193"
+                        "189", "193", "194"
                       },
                       description = new MarkDownBlock
                       {
@@ -2112,7 +2112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   {
                     new ContentSection
                     {
-                      Order = 1, Heading = "About this release",
+                      Order = 1, Heading = "About these statistics",
                       Caption = "",
                       Content = new List<IContentBlock>
                       {
@@ -2226,7 +2226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             "The proportion of primary applicants receiving an offer of their first-choice school has increased to 91% - up from 90% in 2017.\n\n" +
                             "The proportion of applicants who received an offer of any of their offer of any of their preferences has also increased slightly to 98.1% - up from 97.7% in 2017.\n\n" +
                             "**Primary National Offer Day**\n\n" +
-                            "These statistics come from the process undertaken by local authorities (LAs) which enabled them to send out offers of primary school places to all applicants on the Primary National Offer Day of 16 April 2018.\n\n" +
+                            "These statistics come from the process undertaken by local authorities (LAs) which enabled them to send out offers of primary school places to all applicants on the [Primary National Offer Day](../glossary#national-offer-day) of 16 April 2018.\n\n" +
                             "The primary figures have been collected and published since 2014 and can be viewed as a time series in the following table."
                         },
                         new DataBlock
@@ -2280,7 +2280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         {
                           Body =
                             "**Primary offers**\n\n" +
-                            "In 2018, 97.1% of pimary offers made were from schools inside the home authority. This figure has been stable since 2014 when this data was first collected and published.\n\n" +
+                            "In 2018, 97.1% of primary offers made were from schools inside the home authority. This figure has been stable since 2014 when this data was first collected and published.\n\n" +
                             "As in previous years, at primary level a smaller proportion of offers were made of schools outside the applicant’s home authority compared to secondary level."
                         }
                       }

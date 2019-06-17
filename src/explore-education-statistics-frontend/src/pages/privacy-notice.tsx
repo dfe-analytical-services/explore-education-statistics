@@ -178,7 +178,7 @@ function PrivacyNoticePage() {
         <h3>Contact information</h3>
         <p>
           If you have any questions about how your personal information will be
-          used contact the explore education statistics service at
+          used contact the explore education statistics service at{' '}
           <a href="mailto:explore.statistics@education.gov.uk">
             explore.statistics@education.gov.uk
           </a>{' '}

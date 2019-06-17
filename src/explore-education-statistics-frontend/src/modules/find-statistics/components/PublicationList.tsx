@@ -40,7 +40,7 @@ function PublicationList({ publications }: Props) {
                 <div className="govuk-grid-column-one-third">
                   <Link
                     className="govuk-link"
-                    to={`/table-tool/${slug}`}
+                    to="/table-tool"
                     data-testid={`create-table-${slug}`}
                   >
                     Create your own tables online
