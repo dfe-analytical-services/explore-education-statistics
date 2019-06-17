@@ -11,10 +11,12 @@
     <thead class="govuk-table__head">
     <tr class="govuk-table__row">
         <th class="govuk-table__header" scope="col">Release</th>
-        <th class="govuk-table__header" scope="col">Name</th>
-        <th class="govuk-table__header" scope="col">Path</th>
-        <th class="govuk-table__header" scope="col">Size</th>
+        <th class="govuk-table__header" scope="col">Subject title</th>
+        <th class="govuk-table__header" scope="col">Data file path</th>
+        <th class="govuk-table__header" scope="col">Metadata file name</th>
+        <th class="govuk-table__header" scope="col">Filesize</th>
         <th class="govuk-table__header" scope="col">Extension</th>
+
     </tr>
     </thead>
     <tbody class="govuk-table__body">
@@ -36,6 +38,7 @@
                 secondRowOrHigher = true;
                 <td class="govuk-table__cell">@file.Name</td>
                 <td class="govuk-table__cell">@file.Path</td>
+                <td class="govuk-table__cell">@file.MetaFileName</td>
                 <td class="govuk-table__cell">@file.Size</td>
                 <td class="govuk-table__cell">@file.Extension</td>
                 @:</tr>

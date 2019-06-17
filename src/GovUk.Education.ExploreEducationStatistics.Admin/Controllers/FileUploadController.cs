@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -33,30 +32,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 
         [HttpPost]
         [RequestSizeLimit(200 * 1024 * 1024)]
-        public async Task<IActionResult> Post(Guid releaseId, string name, IFormFile file)
+        public async Task<IActionResult> Post(Guid releaseId, string name, IFormFile file, IFormFile metaFile)
         {
             var release = _context.Releases
                 .Where(r => r.Id.Equals(releaseId))
                 .Include(r => r.Publication)
                 .FirstOrDefault();
 
-            var path = Path.GetTempFileName();
-            await UploadFileAsync(release.Publication.Slug, release.Slug, file, path, name);
+            await _fileStorageService.UploadFilesAsync(release.Publication.Slug, release.Slug, file, metaFile, name);
 
             return RedirectToAction("List", "File");
-        }
-
-        private async Task UploadFileAsync(string publication, string release, IFormFile file, string path, string name)
-        {
-            if (file.Length > 0)
-            {
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-            }
-
-            await _fileStorageService.UploadFileAsync(publication, release, file.FileName, path, name);
         }
     }
 }
