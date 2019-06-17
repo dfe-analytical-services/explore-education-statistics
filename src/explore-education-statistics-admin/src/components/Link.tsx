@@ -1,7 +1,6 @@
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import { Link as RouterLink, LinkProps } from 'react-router-dom';
-import { SetLinkRenderer } from '@common/components/Link';
 
 type Props = {
   children: ReactNode;
@@ -32,7 +31,5 @@ const Link = ({
     </RouterLink>
   );
 };
-
-SetLinkRenderer(Link);
 
 export default Link;
