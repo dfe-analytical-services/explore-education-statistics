@@ -28,7 +28,7 @@ export type PublicationFormSubmitHandler = (values: FormValues) => void;
 interface Props {
   onSubmit: PublicationFormSubmitHandler;
   options: ThemeMeta[];
-  publicationId: string;
+  publicationId?: string;
 }
 
 const PublicationForm = (props: Props & InjectedWizardProps) => {
@@ -48,7 +48,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
     <Formik<FormValues>
       enableReinitialize
       initialValues={{
-        publicationId,
+        publicationId: publicationId || '',
       }}
       onSubmit={async values => {
         await onSubmit(values);
