@@ -1,29 +1,46 @@
-﻿@model List<FileViewModel>
+﻿@model Dictionary<GovUk.Education.ExploreEducationStatistics.Content.Model.Release, IEnumerable<FileInfo>>
 @{
     ViewData["Title"] = "Files";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1 class="govuk-heading-l">Files</h1>
+<h1 class="govuk-heading-l">List files</h1>
 
 <table class="govuk-table">
     <caption class="govuk-table__caption">Uploaded files</caption>
     <thead class="govuk-table__head">
     <tr class="govuk-table__row">
-        <th class="govuk-table__header" scope="col">Upload</th>
-        <th class="govuk-table__header" scope="col">File</th>
-        <th class="govuk-table__header" scope="col">Link</th>
+        <th class="govuk-table__header" scope="col">Release</th>
+        <th class="govuk-table__header" scope="col">Name</th>
+        <th class="govuk-table__header" scope="col">Path</th>
+        <th class="govuk-table__header" scope="col">Size</th>
+        <th class="govuk-table__header" scope="col">Extension</th>
     </tr>
     </thead>
     <tbody class="govuk-table__body">
-    @foreach (var file in Model)
+    @foreach (var release in Model.Keys)
     {
-        <tr class="govuk-table__row">
-            <th class="govuk-table__cell">@file.UploadId</th>
-            <td class="govuk-table__cell">@file.FileName</td>
-            <td class="govuk-table__cell"><a class="govuk-link" href="@file.Path">link</a></td>
+        var files = Model[release].ToList();
+        if (files.Any())
+        {
+            @:<tr class="govuk-table__row">
+            var secondRowOrHigher = false;
 
-        </tr>
+            @:<th class="govuk-table__header" scope="rowgroup" rowspan="@files.Count">@release.Title</th>
+            foreach (var file in files)
+            {
+                if (secondRowOrHigher)
+                {
+                    @:<tr>
+                }
+                secondRowOrHigher = true;
+                <td class="govuk-table__cell">@file.Name</td>
+                <td class="govuk-table__cell">@file.Path</td>
+                <td class="govuk-table__cell">@file.Size</td>
+                <td class="govuk-table__cell">@file.Extension</td>
+                @:</tr>
+            }
+        }
     }
     </tbody>
 </table>
