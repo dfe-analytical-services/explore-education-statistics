@@ -253,7 +253,7 @@ class PublicationReleasePage extends Component<Props> {
             <p className="govuk-body">
               The{' '}
               <a href="https://www.statisticsauthority.gov.uk/">
-                United Kindom Statistics Authority
+                United Kindgom Statistics Authority
               </a>{' '}
               designated these statistics as National Statistics in accordance
               with the{' '}
@@ -281,7 +281,7 @@ class PublicationReleasePage extends Component<Props> {
             <p className="govuk-body">
               Once designated as National Statistics it's a statutory
               requirement for statistics to follow and comply with the Code of
-              Practice for Statistics. to be observed.
+              Practice for Statistics to be observed.
             </p>
             <p className="govuk-body">
               Find out more about the standards we follow to produce these
