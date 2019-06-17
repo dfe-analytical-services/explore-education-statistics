@@ -1,0 +1,32 @@
+.chartContainer {
+  display: flex;
+}
+
+.chart {
+  border: 2px solid #777;
+  flex-basis: 25%;
+  height: 256px;
+  margin: 4px;
+
+  &.line {
+    background: url('./charts/line-chart.png');
+  }
+
+  &.horizontal {
+    background: url('./charts/horizontal-bar.png');
+  }
+
+  &.vertical {
+    background: url('./charts/vertical-bar.png');
+  }
+
+  &.map {
+    background: url('./charts/map.png');
+  }
+}
+
+.title {
+  background-color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  width: 100%;
+}

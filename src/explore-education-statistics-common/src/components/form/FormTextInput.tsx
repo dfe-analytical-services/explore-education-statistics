@@ -17,6 +17,7 @@ export interface FormTextInputProps {
   onKeyPress?: KeyboardEventHandler<HTMLInputElement>;
   width?: 20 | 10 | 5 | 4 | 3 | 2;
   value?: string;
+  defaultValue?: string;
 }
 
 const FormTextInput = ({
