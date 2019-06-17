@@ -1580,6 +1580,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new DataBlock
                                 {
                                     Heading = "Chart showing permanent exclusions in England",
+                                    DataBlockRequest = new DataBlockRequest
+                                    {
+                                        subjectId = 12,
+                                        geographicLevel = "National",
+                                        startYear = "2012",
+                                        endYear = "2016",
+                                        filters = new List<string> { "727" },
+                                        indicators = new List<string> { "156", "154", "155" }
+                                    },
+                                    
+                                    Tables = new List<Table>
+                                    {
+                                        new Table
+                                        {
+                                            indicators = new List<string> { "154", "155", "156"  }
+                                        }
+                                    },
+   
+                                    Charts = new List<IContentBlockChart> {
+                                        new LineChart
+                                        {
+                                            XAxis = new Axis
+                                            {
+                                                title = "School Year"
+                                            },
+                                            YAxis = new Axis
+                                            {
+                                                title = ""
+                                            },
+                                            Indicators = new List<string>
+                                            {
+                                                "156"
+                                            },
+                                        }
+                                    }
+                                    
                                 },
                                 new MarkDownBlock
                                 {
@@ -1606,6 +1642,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new DataBlock
                                 {
                                     Heading = "Chart showing fixed-period exclusions in England",
+                                    DataBlockRequest = new DataBlockRequest
+                                    {
+                                        subjectId = 12,
+                                        geographicLevel = "National",
+                                        startYear = "2012",
+                                        endYear = "2016",
+                                        filters = new List<string> { "727" },
+                                        indicators = new List<string> { "158","154","157" }
+                                    },
+                                    
+                                    Tables = new List<Table>
+                                    {
+                                        new Table
+                                        {
+                                            indicators = new List<string> { "154", "157", "158"  }
+                                        }
+                                    },
+   
+                                    Charts = new List<IContentBlockChart> {
+                                        new LineChart
+                                        {
+                                            XAxis = new Axis
+                                            {
+                                                title = "School Year"
+                                            },
+                                            YAxis = new Axis
+                                            {
+                                                title = ""
+                                            },
+                                            Indicators = new List<string>
+                                            {
+                                                "158"
+                                            },
+                                        }
+                                    }
                                 },
                                 new MarkDownBlock
                                 {
@@ -2148,6 +2219,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         new DataBlock
                         {
                           Heading = "Table of Timeseries of key secondary preference rates, England",
+                          DataBlockRequest = new DataBlockRequest
+                          {
+                              subjectId = 17,
+                              geographicLevel = "National",
+                              startYear = "2014",
+                              endYear = "2018",
+                              filters = new List<string> { "848" },
+                              indicators = new List<string> { "197", "198", "199" }
+                          },
+                          Charts = new List<IContentBlockChart>
+                          {
+                              new LineChart
+                              {
+                                  Indicators = new List<string>{  "197", "198", "199"  },
+                                  XAxis = new Axis{ title = "year"},
+                                  YAxis = new Axis{ title = ""}
+                              }
+                          },
+                          Tables = new List<Table>
+                          {
+                              new Table { indicators = new List<string> { "197","198", "199"}}
+                          }
                         },
                       }
                     },
@@ -2185,12 +2278,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                               geographicLevel = "Local_Authority",
                               startYear = "2017",
                               endYear = "2018",
-                              indicators = new List<string> { "193" },
+                              indicators = new List<string> { "192" },
                               filters = new List<string> { "848" }
                           },         
                           Charts = new List<IContentBlockChart> {
                               new MapChart {
-                                  Indicators = new List<string> { "193" }
+                                  Indicators = new List<string> { "192" }
                               }
                           }
                         },
@@ -2231,7 +2324,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new DataBlock
                         {
-                          Heading = "Table showing Timeseries of key primary preference rates, England Entry into academic year"
+                          Heading = "Table showing Timeseries of key primary preference rates, England Entry into academic year",
+                          DataBlockRequest = new DataBlockRequest
+                          {
+                              subjectId = 17,
+                              geographicLevel = "National",
+                              startYear = "2014",
+                              endYear = "2018",
+                              filters = new List<string> { "845" },
+                              indicators = new List<string> { "197", "198", "199" }
+                          },
+                          Charts = new List<IContentBlockChart>
+                          {
+                              new LineChart
+                              {
+                                  Indicators = new List<string>{  "197", "198", "199"  },
+                                  XAxis = new Axis{ title = "year"},
+                                  YAxis = new Axis{ title = ""}
+                              }
+                          },
+                          Tables = new List<Table>
+                          {
+                              new Table { indicators = new List<string> { "197","198", "199"}}
+                          }
                         }
                       }
                     },

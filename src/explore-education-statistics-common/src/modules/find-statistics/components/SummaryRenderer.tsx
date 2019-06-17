@@ -73,10 +73,8 @@ export default function SummaryRenderer({
                   {measures[key]}
                   {meta.indicators[key].unit}
                 </p>
-                {dataSummary ? (
+                {dataSummary && (
                   <p className="govuk-body-s">{dataSummary[index]}</p>
-                ) : (
-                  ''
                 )}
               </div>
               <Details summary={`What is ${meta.indicators[key].label}?`}>
