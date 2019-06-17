@@ -49,9 +49,7 @@ export interface PublicationOptions {
 
 interface Props {
   themeMeta: ThemeMeta[];
-  query: {
-    publicationId: string;
-  };
+  publicationId: string;
 }
 
 interface State {
@@ -91,7 +89,7 @@ class TableToolPage extends Component<Props, State> {
 
   public static async getInitialProps({ query }: NextContext) {
     const themeMeta = await tableBuilderService.getThemes();
-    return { themeMeta, query };
+    return { themeMeta, publicationId: { query } };
   }
 
   private handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
@@ -184,7 +182,7 @@ class TableToolPage extends Component<Props, State> {
   };
 
   public render() {
-    const { themeMeta, query } = this.props;
+    const { themeMeta, publicationId } = this.props;
     const {
       filters,
       indicators,
@@ -229,9 +227,7 @@ class TableToolPage extends Component<Props, State> {
                   {stepProps => (
                     <PublicationForm
                       {...stepProps}
-                      publicationId={
-                        query.publicationId ? query.publicationId : ''
-                      }
+                      publicationId={publicationId}
                       options={themeMeta}
                       onSubmit={this.handlePublicationFormSubmit}
                     />

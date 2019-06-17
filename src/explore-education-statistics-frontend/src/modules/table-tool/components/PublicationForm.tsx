@@ -32,7 +32,13 @@ interface Props {
 }
 
 const PublicationForm = (props: Props & InjectedWizardProps) => {
-  const { options, onSubmit, isActive, goToNextStep, publicationId } = props;
+  const {
+    options,
+    onSubmit,
+    isActive,
+    goToNextStep,
+    publicationId = '',
+  } = props;
   const [publicationName, setPublicationName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -48,7 +54,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
     <Formik<FormValues>
       enableReinitialize
       initialValues={{
-        publicationId: publicationId || '',
+        publicationId,
       }}
       onSubmit={async values => {
         await onSubmit(values);
