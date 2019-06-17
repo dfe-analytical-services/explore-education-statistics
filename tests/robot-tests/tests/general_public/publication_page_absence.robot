@@ -95,7 +95,6 @@ Validate Contents section headings
 Validate Extra Information section headings
     [Tags]  HappyPath
     user waits until page contains element  css:[data-testid="extra-information"]+div [data-testid="SectionHeader Where does this data come from"]
-    user waits until page contains element  css:[data-testid="extra-information"]+div [data-testid="SectionHeader Feedback and questions"]
     user waits until page contains element  css:[data-testid="extra-information"]+div [data-testid="SectionHeader Contact us"]
 
 Clicking "Go to top" move user to the top of the page
