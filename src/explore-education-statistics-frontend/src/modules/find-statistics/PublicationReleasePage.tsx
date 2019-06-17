@@ -255,8 +255,8 @@ class PublicationReleasePage extends Component<Props> {
               <a href="https://www.statisticsauthority.gov.uk/">
                 United Kindgom Statistics Authority
               </a>{' '}
-              designated these statistics as National Statistics in 2011 in
-              accordance with the{' '}
+              designated these statistics as National Statistics in accordance
+              with the{' '}
               <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
                 Statistics and Registration Service Act 2007
               </a>{' '}
