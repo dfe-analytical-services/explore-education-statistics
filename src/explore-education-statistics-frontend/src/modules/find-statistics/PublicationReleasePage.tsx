@@ -292,19 +292,6 @@ class PublicationReleasePage extends Component<Props> {
               guidance.
             </p>
           </AccordionSection>
-          <AccordionSection heading="Feedback and questions" headingTag="h3">
-            <ul className="govuk-list">
-              <li>
-                <a href="#">Feedback on this page</a>
-              </li>
-              <li>
-                <a href="#">Make a suggestion</a>
-              </li>
-              <li>
-                <a href="#">Ask a question</a>
-              </li>
-            </ul>
-          </AccordionSection>
           <AccordionSection heading="Contact us" headingTag="h3">
             <div className="govuk-warning-text">
               <span className="govuk-warning-text__icon" aria-hidden="true">
