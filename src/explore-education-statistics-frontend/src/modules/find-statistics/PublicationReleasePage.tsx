@@ -76,14 +76,14 @@ class PublicationReleasePage extends Component<Props> {
                   </strong>
                 )}
                 <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
-                  <dt className="govuk-caption-m">Published: </dt>
+                  <dt className="govuk-caption-m">Published:</dt>
                   <dd>
                     <strong>
                       <FormattedDate>{data.published}</FormattedDate>{' '}
                     </strong>
                   </dd>
                   <div>
-                    <dt className="govuk-caption-m">Next update: </dt>
+                    <dt className="govuk-caption-m">Next update:</dt>
                     <dd>
                       <strong>
                         <FormattedDate>
@@ -139,7 +139,7 @@ class PublicationReleasePage extends Component<Props> {
               <h3>About these statistics</h3>
 
               <dl className="dfe-meta-content" data-testid="release-period">
-                <dt className="govuk-caption-m">For school year: </dt>
+                <dt className="govuk-caption-m">For school year:</dt>
                 <dd>
                   <strong>{data.releaseName}</strong>
                 </dd>
@@ -174,7 +174,7 @@ class PublicationReleasePage extends Component<Props> {
                 </dd>
               </dl>
               <dl className="dfe-meta-content" data-testid="last-updated">
-                <dt className="govuk-caption-m">Last updated: </dt>
+                <dt className="govuk-caption-m">Last updated:</dt>
                 <dd>
                   <strong>
                     <FormattedDate>{data.updates[0].on}</FormattedDate>
@@ -218,11 +218,28 @@ class PublicationReleasePage extends Component<Props> {
 
         {data.content.length > 0 && (
           <Accordion id="contents-sections">
-            {data.content.map(({ heading, caption, order, content }) => (
-              <AccordionSection heading={heading} caption={caption} key={order}>
-                <ContentBlock content={content} id={`content_${order}`} />
-              </AccordionSection>
-            ))}
+            {data.content.map(({ heading, caption, order, content }) => {
+              let refreshCallback: () => void;
+
+              return (
+                <AccordionSection
+                  heading={heading}
+                  caption={caption}
+                  key={order}
+                  onToggle={open => {
+                    if (open && refreshCallback) refreshCallback();
+                  }}
+                >
+                  <ContentBlock
+                    content={content}
+                    id={`content_${order}`}
+                    refreshCallback={callback => {
+                      refreshCallback = callback;
+                    }}
+                  />
+                </AccordionSection>
+              );
+            })}
           </Accordion>
         )}
         <h2
