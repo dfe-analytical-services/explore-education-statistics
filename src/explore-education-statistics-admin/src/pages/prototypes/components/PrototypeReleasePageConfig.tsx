@@ -21,9 +21,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
       {sectionId === 'setup' && (
         <h2 className="govuk-heading-m">Edit release setup</h2>
       )}
-      <h3 className="govuk-heading-l">
-        Pupil absence statistics and data for schools in England
-      </h3>
+
       <form action="/prototypes/publication-create-new-absence-config">
         <FormGroup>
           <FormRadioGroup
