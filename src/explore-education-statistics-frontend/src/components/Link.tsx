@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { UrlLike } from 'next-server/router';
 import RouterLink from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
+import { registerLinkRenderer } from 'explore-education-statistics-common/src/components/Link';
 
 type Props = {
   as?: string | UrlLike;
@@ -41,4 +42,5 @@ const Link = ({
   );
 };
 
+registerLinkRenderer(Link);
 export default Link;

@@ -6,7 +6,6 @@ import {
   DataBlockMetadata,
   Result,
 } from '@common/services/dataBlockService';
-import Link from '@common/components/Link';
 import styles from './SummaryRenderer.module.scss';
 
 export interface SummaryRendererProps {
@@ -84,12 +83,12 @@ export default function SummaryRenderer({
                     meta.indicators[key].label
                   } is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.`}
                 </p>
-                <Link
+                <a
                   className="govuk-details__summary-text"
-                  to={`/glossary#${meta.indicators[key].label}`}
+                  href={`/glossary#${meta.indicators[key].label}`}
                 >
                   More &gt;&gt;&gt;
-                </Link>
+                </a>
               </Details>
             </div>
           );
