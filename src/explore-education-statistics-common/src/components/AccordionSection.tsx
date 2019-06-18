@@ -1,3 +1,4 @@
+import findAllParents from '@common/lib/dom/findAllParents';
 import classNames from 'classnames';
 import React, { createElement, ReactNode } from 'react';
 import GoToTopLink from './GoToTopLink';
@@ -18,12 +19,14 @@ export interface AccordionSectionProps {
   onToggle?: (open: boolean) => void;
 }
 
-export const classes = {
+const classes = {
   section: 'govuk-accordion__section',
   sectionButton: 'govuk-accordion__section-button',
   sectionContent: 'govuk-accordion__section-content',
   expanded: 'govuk-accordion__section--expanded',
 };
+
+export const accordionSectionClasses = classes;
 
 const AccordionSection = ({
   caption,
@@ -81,3 +84,17 @@ const AccordionSection = ({
 };
 
 export default AccordionSection;
+
+export const openAllParentAccordionSections = (target: HTMLElement) => {
+  const sections = findAllParents(target, `.${classes.section}`);
+
+  sections.forEach(section => {
+    const button = section.querySelector<HTMLElement>(
+      `.${classes.sectionButton}`,
+    );
+
+    if (button && button.getAttribute('aria-expanded') === 'false') {
+      button.click();
+    }
+  });
+};
