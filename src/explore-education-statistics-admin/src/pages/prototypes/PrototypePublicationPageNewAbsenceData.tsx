@@ -5,6 +5,7 @@ import TabsSection from '@common/components/TabsSection';
 import useToggle from '@common/hooks/useToggle';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
+import Link from '../../components/Link';
 
 const PublicationDataPage = () => {
   const [showReplaceDataModal, toggleReplaceDataModal] = useToggle(false);
@@ -347,6 +348,19 @@ const PublicationDataPage = () => {
       >
         <p>This data will no longer be available for use in this release</p>
       </ModalConfirm>
+
+      <div className="govuk-grid-row govuk-!-margin-top-9">
+        <div className="govuk-grid-column-one-half ">
+          <Link to="/prototypes/publication-create-new-absence-config">
+            Previous step, release setup
+          </Link>
+        </div>
+        <div className="govuk-grid-column-one-half dfe-align--right">
+          <Link to="/prototypes/publication-create-new-absence-table?status=step1">
+            Next step, build tables
+          </Link>
+        </div>
+      </div>
     </PrototypePage>
   );
 };

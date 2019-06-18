@@ -5,7 +5,6 @@ import {
   FormTextInput,
   FormSelect,
   FormRadioGroup,
-  Form,
 } from '@common/components/form';
 import Link from '../../../components/Link';
 
@@ -22,9 +21,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
       {sectionId === 'setup' && (
         <h2 className="govuk-heading-m">Edit release setup</h2>
       )}
-      <h3 className="govuk-heading-l">
-        Pupil absence statistics and data for schools in England
-      </h3>
+
       <form action="/prototypes/publication-create-new-absence-config">
         <FormGroup>
           <FormRadioGroup
@@ -288,29 +285,6 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
           />
         </FormGroup>
 
-        <FormGroup>
-          <FormFieldset id="lead" legend="Statistician">
-            <FormSelect
-              id="select-lead-statisician"
-              label="Select lead statistician"
-              name="select-lead-statisician"
-              options={[
-                { label: 'Mark Pearson', value: 'mark-pearson' },
-                { label: 'Alex Miller', value: 'alex-miller' },
-              ]}
-            />
-          </FormFieldset>
-        </FormGroup>
-        <dl className="govuk-summary-list govuk-width-container">
-          <div className="govuk-summary-list__row">
-            <dt className="govuk-summary-list__key">Email:</dt>
-            <dd className="govuk-summary-list__value">example@email.co.uk</dd>
-          </div>
-          <div className="govuk-summary-list__row">
-            <dt className="govuk-summary-list__key">Telephone:</dt>
-            <dd className="govuk-summary-list__value">07954 765423</dd>
-          </div>
-        </dl>
         <fieldset className="govuk-fieldset">
           <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
             Schedule publish date
@@ -485,20 +459,6 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
               },
             ]}
           />
-        </FormGroup>
-
-        <FormGroup>
-          <FormFieldset id="lead-statisician" legend="Lead statistician">
-            <FormSelect
-              id="select-lead-statisician"
-              label="Select lead statistician"
-              name="select-lead-statisician"
-              options={[
-                { label: 'Mark Pearson', value: 'mark-pearson' },
-                { label: 'Alex Miller', value: 'alex-miller' },
-              ]}
-            />
-          </FormFieldset>
         </FormGroup>
 
         {!sectionId && (

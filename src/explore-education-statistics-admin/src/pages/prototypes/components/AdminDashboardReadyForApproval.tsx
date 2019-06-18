@@ -31,6 +31,9 @@ const AdminDashboardReadyForApproval = () => {
             lastEdited={new Date('2019-03-20 17:37')}
             lastEditor={{ id: 'me', name: 'me', permissions: [] }}
             published={new Date('2019-09-20 09:30')}
+            nextRelease={new Date('2020-09-20 09:30')}
+            showComments
+            dataType="Revised"
           />
         </>
       )}

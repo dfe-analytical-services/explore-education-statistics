@@ -188,8 +188,9 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
             >
               Create new publication
             </button>
-
-            <Link to="/prototypes/admin-dashboard">Cancel publication</Link>
+            <div className="govuk-!-margin-top-6">
+              <Link to="/prototypes/admin-dashboard">Cancel publication</Link>
+            </div>
           </div>
         )}
         {sectionId === 'editPublication' && (
