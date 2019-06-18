@@ -271,7 +271,7 @@ exports[`DataBlock renders summary 1`] = `
             class="govuk-details__summary-text"
             data-testid="details--expand"
           >
-            What is Unauthorised absence rate?
+            Define 'Unauthorised absence rate'
           </span>
         </summary>
         <div
@@ -279,7 +279,15 @@ exports[`DataBlock renders summary 1`] = `
           class="govuk-details__text"
           id="details-content-4"
         >
-          Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
+          <p>
+            Unauthorised absence rate is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
+          </p>
+          <a
+            class="govuk-details__summary-text"
+            href="/glossary#Unauthorised absence rate"
+          >
+            More &gt;&gt;&gt;
+          </a>
         </div>
       </details>
     </div>
@@ -322,7 +330,7 @@ exports[`DataBlock renders summary 1`] = `
             class="govuk-details__summary-text"
             data-testid="details--expand"
           >
-            What is Overall absence rate?
+            Define 'Overall absence rate'
           </span>
         </summary>
         <div
@@ -330,7 +338,15 @@ exports[`DataBlock renders summary 1`] = `
           class="govuk-details__text"
           id="details-content-5"
         >
-          Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
+          <p>
+            Overall absence rate is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
+          </p>
+          <a
+            class="govuk-details__summary-text"
+            href="/glossary#Overall absence rate"
+          >
+            More &gt;&gt;&gt;
+          </a>
         </div>
       </details>
     </div>
@@ -373,7 +389,7 @@ exports[`DataBlock renders summary 1`] = `
             class="govuk-details__summary-text"
             data-testid="details--expand"
           >
-            What is Authorised absence rate?
+            Define 'Authorised absence rate'
           </span>
         </summary>
         <div
@@ -381,7 +397,15 @@ exports[`DataBlock renders summary 1`] = `
           class="govuk-details__text"
           id="details-content-6"
         >
-          Overall absence is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
+          <p>
+            Authorised absence rate is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
+          </p>
+          <a
+            class="govuk-details__summary-text"
+            href="/glossary#Authorised absence rate"
+          >
+            More &gt;&gt;&gt;
+          </a>
         </div>
       </details>
     </div>
