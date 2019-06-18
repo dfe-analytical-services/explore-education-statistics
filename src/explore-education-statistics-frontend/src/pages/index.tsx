@@ -81,7 +81,7 @@ function HomePage() {
         Use these services to find specific performance and other information
         about schools and colleges in England:
       </p>
-      <div className="govuk-grid-row govuk-!-margin-bottom-9">
+      <div className="govuk-grid-row govuk-!-margin-bottom-3">
         <div className="govuk-grid-column-one-half">
           <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
             <a
@@ -126,30 +126,25 @@ function HomePage() {
             England.
           </p>
         </div>
-        <div className="govuk-grid-column-one-half">
-          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <a className="govuk-link" href="/contact/">
-              Contact Us
-            </a>
-          </h4>
-          <p className="govuk-caption-m govuk-!-margin-top-1">
-            If you need help and support or have a question about education
-            statistics and data contact:
-          </p>
-
-          <p className="govuk-caption-m govuk-!-margin-top-1">
-            <strong>Explore education statistics team</strong>
-          </p>
-
-          <p className="govuk-caption-m govuk-!-margin-top-1">
-            Email
-            <br />
-            <a href="mailto:explore.statistics@education.gov.uk">
-              explore.statistics@education.gov.uk
-            </a>
-          </p>
-        </div>
       </div>
+      <hr />
+      <h3 className="govuk-heading-l govuk-!-margin-top-9">Contact Us</h3>
+      <p className="govuk-body govuk-!-margin-top-1">
+        If you need help and support or have a question about education
+        statistics and data contact:
+      </p>
+
+      <p className="govuk-body govuk-!-margin-top-1">
+        <strong>Explore education statistics team</strong>
+      </p>
+
+      <p className="govuk-caption-m govuk-!-margin-top-1">
+        Email
+        <br />
+        <a href="mailto:explore.statistics@education.gov.uk">
+          explore.statistics@education.gov.uk
+        </a>
+      </p>
     </Page>
   );
 }

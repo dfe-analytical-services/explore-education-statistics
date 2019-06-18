@@ -2,9 +2,9 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
+import PageSearchForm from '@common/components/PageSearchForm';
 import PrintThisPage from '@common/components/PrintThisPage';
 import RelatedAside from '@common/components/RelatedAside';
-import SearchForm from '@common/components/SearchForm';
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import { baseUrl } from '@common/services/api';
 import publicationService, {
@@ -76,14 +76,14 @@ class PublicationReleasePage extends Component<Props> {
                   </strong>
                 )}
                 <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
-                  <dt className="govuk-caption-m">Published: </dt>
+                  <dt className="govuk-caption-m">Published:</dt>
                   <dd>
                     <strong>
                       <FormattedDate>{data.published}</FormattedDate>{' '}
                     </strong>
                   </dd>
                   <div>
-                    <dt className="govuk-caption-m">Next update: </dt>
+                    <dt className="govuk-caption-m">Next update:</dt>
                     <dd>
                       <strong>
                         <FormattedDate>
@@ -98,7 +98,7 @@ class PublicationReleasePage extends Component<Props> {
                   to={`/subscriptions?slug=${data.publication.slug}`}
                   data-testid={`subsciption-${data.publication.slug}`}
                 >
-                  Subscribe to email updates
+                  Sign up for email alerts
                 </Link>
               </div>
               <div className="govuk-grid-column-one-quarter">
@@ -129,9 +129,7 @@ class PublicationReleasePage extends Component<Props> {
               </ul>
             </Details>
 
-            <div className="govuk-!-margin-top-3 govuk-!-margin-bottom-3">
-              <SearchForm />
-            </div>
+            <PageSearchForm className="govuk-!-margin-top-3 govuk-!-margin-bottom-3" />
           </div>
 
           <div className="govuk-grid-column-one-third">
@@ -139,7 +137,7 @@ class PublicationReleasePage extends Component<Props> {
               <h3>About these statistics</h3>
 
               <dl className="dfe-meta-content" data-testid="release-period">
-                <dt className="govuk-caption-m">For school year: </dt>
+                <dt className="govuk-caption-m">For school year:</dt>
                 <dd>
                   <strong>{data.releaseName}</strong>
                 </dd>
@@ -174,7 +172,7 @@ class PublicationReleasePage extends Component<Props> {
                 </dd>
               </dl>
               <dl className="dfe-meta-content" data-testid="last-updated">
-                <dt className="govuk-caption-m">Last updated: </dt>
+                <dt className="govuk-caption-m">Last updated:</dt>
                 <dd>
                   <strong>
                     <FormattedDate>{data.updates[0].on}</FormattedDate>
@@ -218,49 +216,63 @@ class PublicationReleasePage extends Component<Props> {
 
         {data.content.length > 0 && (
           <Accordion id="contents-sections">
-            {data.content.map(({ heading, caption, order, content }) => (
-              <AccordionSection heading={heading} caption={caption} key={order}>
-                <ContentBlock content={content} id={`content_${order}`} />
-              </AccordionSection>
-            ))}
+            {data.content.map(({ heading, caption, order, content }) => {
+              let refreshCallback: () => void;
+
+              return (
+                <AccordionSection
+                  heading={heading}
+                  caption={caption}
+                  key={order}
+                  onToggle={open => {
+                    if (open && refreshCallback) refreshCallback();
+                  }}
+                >
+                  <ContentBlock
+                    content={content}
+                    id={`content_${order}`}
+                    refreshCallback={callback => {
+                      refreshCallback = callback;
+                    }}
+                  />
+                </AccordionSection>
+              );
+            })}
           </Accordion>
         )}
         <h2
           className="govuk-heading-m govuk-!-margin-top-9"
           data-testid="extra-information"
         >
-          Supporting information
+          Help and support
         </h2>
         <Accordion id="extra-information-sections">
           <AccordionSection
-            heading="Where does this data come from"
-            caption="How we collect and process the data"
+            heading={`${data.title}: methodology`}
+            caption="Find out how and why we collect, process and publish these statistics"
             headingTag="h3"
           >
-            <ul className="govuk-list">
-              <li>
-                <a href="#">How do we collect it?</a>
-              </li>
-              <li>
-                <a href="#">What do we do with it?</a>
-              </li>
-              <li>
-                <a href="#">Related policies</a>
-              </li>
-            </ul>
+            <p>
+              Read our{' '}
+              <Link to={`/methodology/${data.publication.slug}`}>
+                {`${data.publication.title}: methodology`}
+              </Link>{' '}
+              guidance.
+            </p>
           </AccordionSection>
           <AccordionSection heading="National Statistics" headingTag="h3">
             <p className="govuk-body">
               The{' '}
               <a href="https://www.statisticsauthority.gov.uk/">
-                UK Statistics Authority
+                United Kindgom Statistics Authority
               </a>{' '}
-              designated these statistics as National Statistics in [INSERT
-              MONTH YEAR] in accordance with the{' '}
+              designated these statistics as National Statistics in accordance
+              with the{' '}
               <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
                 Statistics and Registration Service Act 2007
-              </a>
-              .
+              </a>{' '}
+              and signifying compliance with the Code of Practice for
+              Statistics.
             </p>
             <p className="govuk-body">
               Designation signifying their compliance with the authority's{' '}
@@ -280,7 +292,7 @@ class PublicationReleasePage extends Component<Props> {
             <p className="govuk-body">
               Once designated as National Statistics it's a statutory
               requirement for statistics to follow and comply with the Code of
-              Practice for Statistics. to be observed.
+              Practice for Statistics to be observed.
             </p>
             <p className="govuk-body">
               Find out more about the standards we follow to produce these
@@ -290,19 +302,6 @@ class PublicationReleasePage extends Component<Props> {
               </a>{' '}
               guidance.
             </p>
-          </AccordionSection>
-          <AccordionSection heading="Feedback and questions" headingTag="h3">
-            <ul className="govuk-list">
-              <li>
-                <a href="#">Feedback on this page</a>
-              </li>
-              <li>
-                <a href="#">Make a suggestion</a>
-              </li>
-              <li>
-                <a href="#">Ask a question</a>
-              </li>
-            </ul>
           </AccordionSection>
           <AccordionSection heading="Contact us" headingTag="h3">
             <div className="govuk-warning-text">

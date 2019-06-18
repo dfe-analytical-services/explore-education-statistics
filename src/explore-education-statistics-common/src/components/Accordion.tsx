@@ -3,8 +3,8 @@ import classNames from 'classnames';
 import React, { cloneElement, Component, createRef, ReactNode } from 'react';
 import styles from './Accordion.module.scss';
 import AccordionSection, {
+  accordionSectionClasses,
   AccordionSectionProps,
-  classes,
 } from './AccordionSection';
 
 export interface AccordionProps {
@@ -38,7 +38,20 @@ class Accordion extends Component<AccordionProps, State> {
 
   public componentWillUnmount(): void {
     window.removeEventListener('hashchange', this.goToHash);
+    this.clearSectionStateFromSessionStorage();
   }
+
+  private clearSectionStateFromSessionStorage = () => {
+    // removes each sections' state from sessionStorage
+    const { children, id } = this.props;
+    let sectionCounter = 0;
+    React.Children.map(children, () => {
+      sectionCounter += 1;
+
+      const contentId = `${id}-content-${sectionCounter}`;
+      return window.sessionStorage.removeItem(contentId);
+    });
+  };
 
   private goToHash = () => {
     if (this.ref.current && window.location.hash) {
@@ -51,11 +64,13 @@ class Accordion extends Component<AccordionProps, State> {
       }
 
       if (locationHashEl) {
-        const sectionEl = locationHashEl.closest(`.${classes.section}`);
+        const sectionEl = locationHashEl.closest(
+          `.${accordionSectionClasses.section}`,
+        );
 
         if (sectionEl) {
           const contentEl = sectionEl.querySelector(
-            `.${classes.sectionContent}`,
+            `.${accordionSectionClasses.sectionContent}`,
           );
 
           if (contentEl) {

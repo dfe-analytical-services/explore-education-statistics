@@ -1070,7 +1070,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Title = "Pupil absence data and statistics for schools in England",
                     ReleaseName = "2016 to 2017",
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Published = new DateTime(2018, 3, 22),
+                    Published = new DateTime(2017, 3, 22),
                     Slug = "2016-17",
                     Summary =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
@@ -1358,7 +1358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                      "The [overall absence](../glossary#overall-absence) and [persistent absence](..glossary#persistent-absence) patterns for pupils with different characteristics have been consistent over recent years.\n\n" +
+                                      "The [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) patterns for pupils with different characteristics have been consistent over recent years.\n\n" +
                                       "**Ethnic groups**\n\n" +
                                       "Overall absence rate:\n\n" +
                                       "* Travellers of Irish heritage and Gypsy / Roma pupils - highest at 18.1% and 12.9% respectively\n\n" +
@@ -1447,7 +1447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         "* South West - 4.8%\n\n" +
                                         "Meanwhile, Inner and Outer London had the lowest rates at 4.4%.\n\n" +
                                         "**Persistent absence**\n\n" +
-                                        "The region with the highest persistent absence rate was Yorkshire and the Humber with 11.9% while Outer London had the lowest rate at 10%.\n\n" 
+                                        "The region with the highest persistent absence rate was Yorkshire and the Humber with 11.9% while Outer London had the lowest rate at 10%."
                                 }
                             }
                         }
@@ -1489,7 +1489,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
                     Content = new List<ContentSection>
                     {
-                        new ContentSection {Order = 1, Heading = "About this release", Caption = ""},
+                        new ContentSection {Order = 1, Heading = "About these statistics", Caption = ""},
                         new ContentSection {Order = 2, Heading = "Absence rates", Caption = ""},
                         new ContentSection {Order = 3, Heading = "Persistent absence", Caption = ""},
                         new ContentSection {Order = 4, Heading = "Distribution of absence", Caption = ""},
@@ -1580,6 +1580,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new DataBlock
                                 {
                                     Heading = "Chart showing permanent exclusions in England",
+                                    DataBlockRequest = new DataBlockRequest
+                                    {
+                                        subjectId = 12,
+                                        geographicLevel = "National",
+                                        startYear = "2012",
+                                        endYear = "2016",
+                                        filters = new List<string> { "727" },
+                                        indicators = new List<string> { "156", "154", "155" }
+                                    },
+                                    
+                                    Tables = new List<Table>
+                                    {
+                                        new Table
+                                        {
+                                            indicators = new List<string> { "154", "155", "156"  }
+                                        }
+                                    },
+   
+                                    Charts = new List<IContentBlockChart> {
+                                        new LineChart
+                                        {
+                                            XAxis = new Axis
+                                            {
+                                                title = "School Year"
+                                            },
+                                            YAxis = new Axis
+                                            {
+                                                title = ""
+                                            },
+                                            Indicators = new List<string>
+                                            {
+                                                "156"
+                                            },
+                                        }
+                                    }
+                                    
                                 },
                                 new MarkDownBlock
                                 {
@@ -1606,6 +1642,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new DataBlock
                                 {
                                     Heading = "Chart showing fixed-period exclusions in England",
+                                    DataBlockRequest = new DataBlockRequest
+                                    {
+                                        subjectId = 12,
+                                        geographicLevel = "National",
+                                        startYear = "2012",
+                                        endYear = "2016",
+                                        filters = new List<string> { "727" },
+                                        indicators = new List<string> { "158","154","157" }
+                                    },
+                                    
+                                    Tables = new List<Table>
+                                    {
+                                        new Table
+                                        {
+                                            indicators = new List<string> { "154", "157", "158"  }
+                                        }
+                                    },
+   
+                                    Charts = new List<IContentBlockChart> {
+                                        new LineChart
+                                        {
+                                            XAxis = new Axis
+                                            {
+                                                title = "School Year"
+                                            },
+                                            YAxis = new Axis
+                                            {
+                                                title = ""
+                                            },
+                                            Indicators = new List<string>
+                                            {
+                                                "158"
+                                            },
+                                        }
+                                    }
                                 },
                                 new MarkDownBlock
                                 {
@@ -1669,7 +1740,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                      "We saw a similar pattern to previous years where the following groups (ones where we usually expect to see higher exclusion rates) showing an increase in exclusions since 2015/16:\n\n" +
+                                      "There was a similar pattern to previous years where the following groups (where higher exclusion rates are expected) showed an increase in exclusions since 2015/16:\n\n" +
                                       "* boys\n\n" +
                                       "* national curriculum years 9 and 10\n\n" +
                                       "* pupils with special educational needs (SEN)\n\n" +
@@ -1727,22 +1798,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = "",
                             Content = new List<IContentBlock>
                             {
-                                new DataBlock {                                         
-                                    DataBlockRequest = new DataBlockRequest {
-                                        subjectId = 12,
-                                        geographicLevel = "Local_Authority",
-                                        startYear = "2016",
-                                        endYear = "2017",
-                                        indicators = new List<string> { "155" , "156" , "158" },
-                                        filters = new List<string> { "727" }
-                                    },         
-                                    Charts = new List<IContentBlockChart> {
-                                        new MapChart {
-                                            Indicators = new List<string> { "155" , "156" , "158" }
-                                        }
-                                    }
+                                // new DataBlock {
+                                //     DataBlockRequest = new DataBlockRequest {
+                                //         subjectId = 12,
+                                //         geographicLevel = "Local_Authority",
+                                //         startYear = "2016",
+                                //         endYear = "2017",
+                                //         indicators = new List<string> { "155" , "156" , "158" },
+                                //         filters = new List<string> { "727" }
+                                //     },
+                                //     Charts = new List<IContentBlockChart> {
+                                //         new MapChart {
+                                //             Indicators = new List<string> { "155" , "156" , "158" }
+                                //         }
+                                //     }
                                         
-                                },
+                                // },
                                 new MarkDownBlock
                                 {
                                     Body =
@@ -1752,7 +1823,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                       "* North West - 0.14%\n\n" +
                                       "* North West - 0.14%\n\n" +
                                       "Similar to 2015/16, the regions with the lowest rates were:\n\n" +
-                                      "* the South East - 0.06%\n\n" +
+                                      "* South East - 0.06%\n\n" +
                                       "* Yorkshire and the Humber - 0.07%\n\n" +
                                       "**Fixed-period exclusion**\n\n" +
                                       "Similar to 2015/16, the region with the highest rates across all school types was Yorkshire and the Humber at 7.22% while the lowest rate was in Outer London (3.49%)."
@@ -2090,14 +2161,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                       geographicLevel = "National",
                       startYear = "2014",
                       endYear = "2018",
-                      filters = new List<string> { "845" /*, "848"*/ },
-                      indicators = new List<string> { "193" }
+                      filters = new List<string> { "845" },
+                      indicators = new List<string> { "189", "193", "194" }
                     },
                     Summary = new Summary
                     {
                       dataKeys = new List<string>
                       {
-                        "193"
+                        "189", "193", "194"
+                      },
+                      dataSummary = new List<string>
+                      {
+                        "put content here 1",
+                        "put content here 2",
+                        "put content here 3"
                       },
                       description = new MarkDownBlock
                       {
@@ -2148,6 +2225,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         new DataBlock
                         {
                           Heading = "Table of Timeseries of key secondary preference rates, England",
+                          DataBlockRequest = new DataBlockRequest
+                          {
+                              subjectId = 17,
+                              geographicLevel = "National",
+                              startYear = "2014",
+                              endYear = "2018",
+                              filters = new List<string> { "848" },
+                              indicators = new List<string> { "197", "198", "199" }
+                          },
+                          Charts = new List<IContentBlockChart>
+                          {
+                              new LineChart
+                              {
+                                  Indicators = new List<string>{  "197", "198", "199"  },
+                                  XAxis = new Axis{ title = "year"},
+                                  YAxis = new Axis{ title = ""}
+                              }
+                          },
+                          Tables = new List<Table>
+                          {
+                              new Table { indicators = new List<string> { "197","198", "199"}}
+                          }
                         },
                       }
                     },
@@ -2177,23 +2276,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             "**Regional variation**\n\n" +
                             "There's much less regional variation in the proportions receiving any preferred offer compared to those for receiving a first preference as shown in the following chart."
                         },
-                        new DataBlock
-                        {
-                          Heading = "Chart showing Secondary school preferences by region, 2018",
-                          DataBlockRequest = new DataBlockRequest {
-                              subjectId = 17,
-                              geographicLevel = "Local_Authority",
-                              startYear = "2017",
-                              endYear = "2018",
-                              indicators = new List<string> { "193" },
-                              filters = new List<string> { "848" }
-                          },         
-                          Charts = new List<IContentBlockChart> {
-                              new MapChart {
-                                  Indicators = new List<string> { "193" }
-                              }
-                          }
-                        },
+                        // new DataBlock
+                        // {
+                        //   Heading = "Chart showing Secondary school preferences by region, 2018",
+                        //   DataBlockRequest = new DataBlockRequest {
+                        //       subjectId = 17,
+                        //       geographicLevel = "Local_Authority",
+                        //       startYear = "2017",
+                        //       endYear = "2018",
+                        //       indicators = new List<string> { "192" },
+                        //       filters = new List<string> { "848" }
+                        //   },
+                        //   Charts = new List<IContentBlockChart> {
+                        //       new MapChart {
+                        //           Indicators = new List<string> { "192" }
+                        //       }
+                        //   }
+                        // },
                         new MarkDownBlock
                         {
                           Body =
@@ -2231,7 +2330,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new DataBlock
                         {
-                          Heading = "Table showing Timeseries of key primary preference rates, England Entry into academic year"
+                          Heading = "Table showing Timeseries of key primary preference rates, England Entry into academic year",
+                          DataBlockRequest = new DataBlockRequest
+                          {
+                              subjectId = 17,
+                              geographicLevel = "National",
+                              startYear = "2014",
+                              endYear = "2018",
+                              filters = new List<string> { "845" },
+                              indicators = new List<string> { "197", "198", "199" }
+                          },
+                          Charts = new List<IContentBlockChart>
+                          {
+                              new LineChart
+                              {
+                                  Indicators = new List<string>{  "197", "198", "199"  },
+                                  XAxis = new Axis{ title = "year"},
+                                  YAxis = new Axis{ title = ""}
+                              }
+                          },
+                          Tables = new List<Table>
+                          {
+                              new Table { indicators = new List<string> { "197","198", "199"}}
+                          }
                         }
                       }
                     },
@@ -2259,28 +2380,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             "* primary first preference rate increased to 86.6% - up from 85.9% in 2017\n\n" +
                             "* secondary first preference rate decreased to 66% - down from 68.% in 2017"
                         },
-                        new DataBlock
-                        {
-                          Heading = "Chart showing Primary school preferences by region, 2018",
-                          DataBlockRequest = new DataBlockRequest {
-                              subjectId = 17,
-                              geographicLevel = "Local_Authority",
-                              startYear = "2017",
-                              endYear = "2018",
-                              indicators = new List<string> { "193" },
-                              filters = new List<string> { "845" }
-                          },         
-                          Charts = new List<IContentBlockChart> {
-                              new MapChart {
-                                  Indicators = new List<string> { "193" }
-                              }
-                          }
-                        },
+                        // new DataBlock
+                        // {
+                        //   Heading = "Chart showing Primary school preferences by region, 2018",
+                        //   DataBlockRequest = new DataBlockRequest {
+                        //       subjectId = 17,
+                        //       geographicLevel = "Local_Authority",
+                        //       startYear = "2017",
+                        //       endYear = "2018",
+                        //       indicators = new List<string> { "193" },
+                        //       filters = new List<string> { "845" }
+                        //   },
+                        //   Charts = new List<IContentBlockChart> {
+                        //       new MapChart {
+                        //           Indicators = new List<string> { "193" }
+                        //       }
+                        //   }
+                        // },
                         new MarkDownBlock
                         {
                           Body =
                             "**Primary offers**\n\n" +
-                            "In 2018, 97.1% of pimary offers made were from schools inside the home authority. This figure has been stable since 2014 when this data was first collected and published.\n\n" +
+                            "In 2018, 97.1% of primary offers made were from schools inside the home authority. This figure has been stable since 2014 when this data was first collected and published.\n\n" +
                             "As in previous years, at primary level a smaller proportion of offers were made of schools outside the applicant’s home authority compared to secondary level."
                         }
                       }

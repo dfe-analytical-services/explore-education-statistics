@@ -48,9 +48,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                 .Where(IsFileReleased)
                 .Select(file => new FileInfo
                 {
+                    Extension = GetExtension(file),
                     Name = GetName(file),
                     Path = file.Name,
-                    Extension = GetExtension(file),
                     Size = GetSize(file)
                 })
                 .OrderBy(info => info.Name);

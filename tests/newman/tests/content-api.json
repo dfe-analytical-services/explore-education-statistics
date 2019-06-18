@@ -213,7 +213,7 @@
 									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
 									"});",
 									"",
-									"pm.test(\"Should be more than eight themes\", function () { pm.expect(pm.response.json().length).to.be.above(8); });"
+									"pm.test(\"Should be more than one theme\", function () { pm.expect(pm.response.json().length).to.be.above(0); });"
 								],
 								"type": "text/javascript"
 							}
