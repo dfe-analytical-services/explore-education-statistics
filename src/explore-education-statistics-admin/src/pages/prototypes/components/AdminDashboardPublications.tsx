@@ -56,6 +56,7 @@ const AdminDashboardPublications = () => {
                         published={new Date('2019-09-20 09:30')}
                         nextRelease={new Date('2020-09-20 09:30')}
                         dataType="Revised"
+                        showComments
                       />
                     </li>
                   )}

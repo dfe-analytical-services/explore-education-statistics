@@ -20,6 +20,7 @@ interface Props {
   published: Date;
   nextRelease?: Date;
   dataType?: string;
+  showComments?: boolean;
 }
 
 const DashboardRelease = ({
@@ -37,6 +38,7 @@ const DashboardRelease = ({
   published,
   nextRelease,
   dataType,
+  showComments,
 }: Props) => {
   return (
     <Details
@@ -110,6 +112,32 @@ const DashboardRelease = ({
           <div className="govuk-summary-list__row">
             <dt className="govuk-summary-list__key">Data type</dt>
             <dd className="govuk-summary-list__value">{dataType}</dd>
+            <dd className="govuk-summary-list__actions" />
+          </div>
+        )}
+        {showComments && (
+          <div className="govuk-summary-list__row">
+            <dt className="govuk-summary-list__key">Comments</dt>
+            <dd className="govuk-summary-list__value">
+              <Details
+                summary="Ann Evans, 17 June 2018, 17:35"
+                className="govuk-!-margin-bottom-0"
+              >
+                <p>
+                  Lorem ipsum, dolor sit amet consectetur adipisicing elit.
+                  Fugit rem, optio sunt dolorum corrupti harum labore quia
+                  repellat! Quae voluptatem illo soluta optio ducimus at
+                  possimus quisquam doloremque veritatis provident!
+                </p>
+              </Details>
+              <Details summary="Stephen Doherty, 17 June 2018, 13:15">
+                <p>
+                  Corrupti harum labore quia repellat! Quae voluptatem illo
+                  soluta optio ducimus at possimus quisquam doloremque veritatis
+                  provident!
+                </p>
+              </Details>
+            </dd>
             <dd className="govuk-summary-list__actions" />
           </div>
         )}
