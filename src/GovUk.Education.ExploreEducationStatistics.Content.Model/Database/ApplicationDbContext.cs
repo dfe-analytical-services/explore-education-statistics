@@ -1212,7 +1212,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     "It also accounted for almost a third (31.6%) of all [authorised absence](../glossary#authorised-absence) and more than half (53.8%) of all [unauthorised absence](../glossary#unauthorised-absence).\n\n" +
                                     "Overall, it's increased across primary and secondary schools to 10.8% - up from 10.5% in 2015 to 16."
                                 },
-                                new DataBlock
+/*                                new DataBlock
                                 {
                                     Heading = null,
                                     DataBlockRequest = new DataBlockRequest
@@ -1249,7 +1249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             },
                                         }
                                     }
-                                },
+                                },*/
                                 new MarkDownBlock
                                 {
                                     Body =
@@ -1273,7 +1273,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     "* rate of absence by reason - the rate of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of possible sessions\n\n" +
                                     "* one or more sessions missed due to each reason - the number of pupils missing at least 1 session due to each reason"
                                 },
-                                new DataBlock
+/*                                new DataBlock
                                 {
                                     Heading = null,
                                     DataBlockRequest = new DataBlockRequest
@@ -1310,7 +1310,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             },
                                         }
                                     }
-                                },
+                                },*/
                                 new MarkDownBlock
                                 {
                                     Body =
