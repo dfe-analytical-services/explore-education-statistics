@@ -3,8 +3,8 @@ import classNames from 'classnames';
 import React, { cloneElement, Component, createRef, ReactNode } from 'react';
 import styles from './Accordion.module.scss';
 import AccordionSection, {
+  accordionSectionClasses,
   AccordionSectionProps,
-  classes,
 } from './AccordionSection';
 
 export interface AccordionProps {
@@ -64,11 +64,13 @@ class Accordion extends Component<AccordionProps, State> {
       }
 
       if (locationHashEl) {
-        const sectionEl = locationHashEl.closest(`.${classes.section}`);
+        const sectionEl = locationHashEl.closest(
+          `.${accordionSectionClasses.section}`,
+        );
 
         if (sectionEl) {
           const contentEl = sectionEl.querySelector(
-            `.${classes.sectionContent}`,
+            `.${accordionSectionClasses.sectionContent}`,
           );
 
           if (contentEl) {
