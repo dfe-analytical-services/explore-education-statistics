@@ -76,14 +76,14 @@ class PublicationReleasePage extends Component<Props> {
                   </strong>
                 )}
                 <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
-                  <dt className="govuk-caption-m">Published: </dt>
+                  <dt className="govuk-caption-m">Published:</dt>
                   <dd>
                     <strong>
                       <FormattedDate>{data.published}</FormattedDate>{' '}
                     </strong>
                   </dd>
                   <div>
-                    <dt className="govuk-caption-m">Next update: </dt>
+                    <dt className="govuk-caption-m">Next update:</dt>
                     <dd>
                       <strong>
                         <FormattedDate format="MMMM yyyy">
@@ -147,26 +147,34 @@ class PublicationReleasePage extends Component<Props> {
                       className="govuk-list"
                       data-testid="previous-releases-list"
                     >
-                      {data.publication.releases
-                        .slice(1)
-                        .map(({ id, slug, releaseName }) => (
-                          <li key={id} data-testid="item-internal">
-                            <Link
-                              to={`/statistics/${
-                                data.publication.slug
-                              }/${slug}`}
-                            >
-                              {releaseName}
-                            </Link>
-                          </li>
-                        ))}
-                      {data.publication.legacyReleases.map(
-                        ({ id, description, url }) => (
-                          <li key={id} data-testid="item-external">
-                            <a href={url}>{description}</a>
-                          </li>
+                      {[
+                        ...data.publication.releases
+                          .slice(1)
+                          .map(({ id, slug, releaseName }) => [
+                            releaseName,
+                            <li key={id} data-testid="item-internal">
+                              <Link
+                                to={`/statistics/${
+                                  data.publication.slug
+                                }/${slug}`}
+                              >
+                                {releaseName}
+                              </Link>
+                            </li>,
+                          ]),
+                        ...data.publication.legacyReleases.map(
+                          ({ id, description, url }) => [
+                            description,
+                            <li key={id} data-testid="item-external">
+                              <a href={url}>{description}</a>
+                            </li>,
+                          ],
                         ),
-                      )}
+                      ]
+                        .sort((a, b) =>
+                          b[0].toString().localeCompare(a[0].toString()),
+                        )
+                        .map(items => items[1])}
                     </ul>
                   </Details>
                 </dd>
