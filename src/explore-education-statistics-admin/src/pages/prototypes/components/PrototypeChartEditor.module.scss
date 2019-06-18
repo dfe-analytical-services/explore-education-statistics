@@ -3,30 +3,48 @@
 }
 
 .chart {
-  border: 2px solid #777;
-  flex-basis: 25%;
-  height: 256px;
+  align-items: center;
+  display: flex;
+  flex-basis: 128px;
+  flex-direction: column;
   margin: 4px;
+  padding: 8px;
 
-  &.line {
-    background: url('./charts/line-chart.png');
+  &:hover {
+    background-color: #00a599;
+    color: #fff;
   }
 
-  &.horizontal {
-    background: url('./charts/horizontal-bar.png');
-  }
-
-  &.vertical {
-    background: url('./charts/vertical-bar.png');
-  }
-
-  &.map {
-    background: url('./charts/map.png');
+  &.selected {
+    background-color: #005ea5;
   }
 }
 
-.title {
-  background-color: rgba(255, 255, 255, 0.85);
-  text-align: center;
-  width: 100%;
+.chart .img {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: 2px solid #777;
+  height: 128px;
+  width: 128px;
+}
+
+.chart .title {
+  font-weight: bold;
+}
+
+.line {
+  background: url('./charts/line-chart.png');
+}
+
+.horizontal {
+  background: url('./charts/horizontal-bar.png');
+}
+
+.vertical {
+  background: url('./charts/vertical-bar.png');
+}
+
+.map {
+  background: url('./charts/map.png');
 }

@@ -5,14 +5,24 @@ import {
 } from '@common/components/form';
 import Link from '@admin/components/Link';
 import React from 'react';
+import { PrototypeTable } from '@admin/pages/prototypes/PrototypeData';
 
-const PrototypeTableContent = ({ task }: { task?: string }) => {
+const PrototypeTableContent = ({
+  task,
+  table,
+}: {
+  task?: string;
+  table?: PrototypeTable;
+}) => {
+  const title =
+    (table && table.title) ||
+    "Table showing 'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17";
+
   return (
     <>
       <table className="govuk-table">
         <caption className="govuk-table__caption govuk-!-margin-bottom-6">
-          Table showing 'Absence by characteristic' from 'Pupil absence' in
-          England between 2012/13 and 2016/17
+          {title}
         </caption>
         <thead className="govuk-table__head">
           <tr>
@@ -82,7 +92,7 @@ const PrototypeTableContent = ({ task }: { task?: string }) => {
                 id="table-title"
                 name="table-title"
                 label="Table title"
-                value="Table showing 'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17"
+                defaultValue="Table showing 'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17"
               />
             </FormGroup>
             <FormGroup>
@@ -90,7 +100,7 @@ const PrototypeTableContent = ({ task }: { task?: string }) => {
                 id="source"
                 name="source"
                 label="Source"
-                value="DfE prototype example statistics"
+                defaultValue="DfE prototype example statistics"
                 width={20}
               />
             </FormGroup>

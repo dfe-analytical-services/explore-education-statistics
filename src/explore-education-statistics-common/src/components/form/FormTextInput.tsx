@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import React, {
   ChangeEventHandler,
   KeyboardEventHandler,
+  MouseEventHandler,
   ReactNode,
 } from 'react';
 import ErrorMessage from '../ErrorMessage';
@@ -15,6 +16,7 @@ export interface FormTextInputProps {
   name: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   onKeyPress?: KeyboardEventHandler<HTMLInputElement>;
+  onClick?: MouseEventHandler<HTMLInputElement>;
   width?: 20 | 10 | 5 | 4 | 3 | 2;
   value?: string;
   defaultValue?: string;

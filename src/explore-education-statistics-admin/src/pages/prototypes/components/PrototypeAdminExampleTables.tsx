@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import { FormGroup, FormTextInput } from '@common/components/form';
 import Button from '@common/components/Button';
@@ -8,14 +9,15 @@ import useToggle from '@common/hooks/useToggle';
 import PrototypeTableContent from '@admin/pages/prototypes/components/PrototypeTableContent';
 import PrototypeChartEditor from '@admin/pages/prototypes/components/PrototypeChartEditor';
 import Link from '../../../components/Link';
+import { PrototypeTable } from '../PrototypeData';
 
 interface Props {
   // tableId?: string;
   task?: string;
+  table?: PrototypeTable;
 }
 
-const PrototypeExampleTable = ({ task }: Props) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+const PrototypeExampleTable = ({ task, table }: Props) => {
   const [showEditModal, toggleEditModal] = useToggle(false);
   const [showDeleteModal, toggleDeleteModal] = useToggle(false);
 
@@ -23,7 +25,7 @@ const PrototypeExampleTable = ({ task }: Props) => {
     <div className="govuk-width-container">
       <Tabs>
         <TabsSection id="table-preview" title="Table preview">
-          <PrototypeTableContent task={task} />
+          <PrototypeTableContent table={table} task={task} />
         </TabsSection>
         <TabsSection id="add-chart" title="Add a chart">
           <PrototypeChartEditor />
@@ -39,6 +41,12 @@ const PrototypeExampleTable = ({ task }: Props) => {
               hint="Copy this URL to view a standalone verion of this table"
               defaultValue="http://dfe-url.gov.uk/example-permalink"
               width={20}
+              onClick={e =>
+                e.currentTarget.setSelectionRange(
+                  0,
+                  e.currentTarget.value.length,
+                )
+              }
             />
           </FormGroup>
           <Link
