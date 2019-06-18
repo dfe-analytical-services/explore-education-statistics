@@ -759,7 +759,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Title = "Permanent and fixed-period exclusions in England",
                   Summary = "",
                   TopicId = new Guid("77941b7d-bbd6-4069-9107-565af89e2dec"),
-                  Slug = "permanent-and-fixed-period-exclusions-in-england"
+                  Slug = "permanent-and-fixed-period-exclusions-in-england",
+                  NextUpdate = new DateTime(2019, 7, 19)
               },
               new Publication
               {
@@ -768,7 +769,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Summary = "",
                   TopicId = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460"),
                   Slug = "pupil-absence-in-schools-in-england",
-                  NextUpdate = new DateTime(2018, 3, 22),
+                  NextUpdate = new DateTime(2019, 3, 22),
                   DataSource =
                     "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)",
                   ContactId = new Guid("11bb7387-e85e-4571-9669-8a760dcb004f")
@@ -825,6 +826,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Summary = "",
                   TopicId = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
                   Slug = "secondary-and-primary-schools-applications-and-offers",
+                  NextUpdate = new DateTime(2019, 6, 14),
               },
               new Publication
               {
@@ -1070,7 +1072,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Title = "Pupil absence data and statistics for schools in England",
                     ReleaseName = "2016 to 2017",
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Published = new DateTime(2017, 3, 22),
+                    Published = new DateTime(2018, 3, 22),
                     Slug = "2016-17",
                     Summary =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
@@ -1092,15 +1094,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         {
                             dataKeys = new List<string>
                             {
-                                "23",
                                 "26",
-                                "28"
+                                "28",
+                                "23"
                             },
                             dataSummary = new List<string>
                             {
-                                "Up from 40.1 in 2015/16",
-                                "Down from 40.1 in 2015/16",
-                                "Up from 40.1 in 2015/16"
+                                "Up from 4.6% in 2015/16",
+                                "Similar to previous years",
+                                "Up from 1.1% in 2015/16"
                             },
                             description = new MarkDownBlock
                             {
@@ -1212,7 +1214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     "It also accounted for almost a third (31.6%) of all [authorised absence](../glossary#authorised-absence) and more than half (53.8%) of all [unauthorised absence](../glossary#unauthorised-absence).\n\n" +
                                     "Overall, it's increased across primary and secondary schools to 10.8% - up from 10.5% in 2015 to 16."
                                 },
-                                new DataBlock
+/*                                new DataBlock
                                 {
                                     Heading = null,
                                     DataBlockRequest = new DataBlockRequest
@@ -1249,7 +1251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             },
                                         }
                                     }
-                                },
+                                },*/
                                 new MarkDownBlock
                                 {
                                     Body =
@@ -1273,7 +1275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     "* rate of absence by reason - the rate of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of possible sessions\n\n" +
                                     "* one or more sessions missed due to each reason - the number of pupils missing at least 1 session due to each reason"
                                 },
-                                new DataBlock
+/*                                new DataBlock
                                 {
                                     Heading = null,
                                     DataBlockRequest = new DataBlockRequest
@@ -1310,7 +1312,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             },
                                         }
                                     }
-                                },
+                                },*/
                                 new MarkDownBlock
                                 {
                                     Body =
@@ -1506,7 +1508,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Title = "Permanent and fixed-period exclusions statistics for schools in England",
                     ReleaseName = "2016 to 2017",
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                    Published = new DateTime(2018, 3, 22),
+                    Published = new DateTime(2018, 7, 19),
                     Slug = "2016-17",
                     Summary =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
@@ -1526,15 +1528,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         {
                             dataKeys = new List<string>
                             {
-                                "155",
                                 "156",
-                                "158"
+                                "158",
+                                "155"
                             },
                             dataSummary = new List<string>
                             {
-                                "Up from 40.1 in 2015/16",
-                                "Down from 40.1 in 2015/16",
-                                "Up from 40.1 in 2015/16"
+                                "Up from 0.08 in 2015/16",
+                                "Up from 4.29% in 2015/16",
+                                "Up from 6,685 in 2015/16"
                             },
                             description = new MarkDownBlock
                             {
@@ -2159,7 +2161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                       subjectId = 17,
                       geographicLevel = "National",
-                      startYear = "2014",
+                      startYear = "2018",
                       endYear = "2018",
                       filters = new List<string> { "845" },
                       indicators = new List<string> { "189", "193", "194" }
@@ -2172,9 +2174,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                       },
                       dataSummary = new List<string>
                       {
-                        "put content here 1",
-                        "put content here 2",
-                        "put content here 3"
+                        "Down from 620,330 in 2017",
+                        "Down from 558,411 in 2017",
+                        "Down from 34,792 in 2017"
                       },
                       description = new MarkDownBlock
                       {
@@ -2233,15 +2235,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                               endYear = "2018",
                               filters = new List<string> { "848" },
                               indicators = new List<string> { "197", "198", "199" }
-                          },
-                          Charts = new List<IContentBlockChart>
-                          {
-                              new LineChart
-                              {
-                                  Indicators = new List<string>{  "197", "198", "199"  },
-                                  XAxis = new Axis{ title = "year"},
-                                  YAxis = new Axis{ title = ""}
-                              }
                           },
                           Tables = new List<Table>
                           {
@@ -2339,15 +2332,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                               endYear = "2018",
                               filters = new List<string> { "845" },
                               indicators = new List<string> { "197", "198", "199" }
-                          },
-                          Charts = new List<IContentBlockChart>
-                          {
-                              new LineChart
-                              {
-                                  Indicators = new List<string>{  "197", "198", "199"  },
-                                  XAxis = new Axis{ title = "year"},
-                                  YAxis = new Axis{ title = ""}
-                              }
                           },
                           Tables = new List<Table>
                           {

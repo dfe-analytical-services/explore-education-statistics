@@ -77,17 +77,17 @@ class PublicationReleasePage extends Component<Props> {
                   </strong>
                 )}
                 <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
-                  <dt className="govuk-caption-m">Published:</dt>
+                  <dt className="govuk-caption-m">Published: </dt>
                   <dd>
                     <strong>
                       <FormattedDate>{data.published}</FormattedDate>{' '}
                     </strong>
                   </dd>
                   <div>
-                    <dt className="govuk-caption-m">Next update:</dt>
+                    <dt className="govuk-caption-m">Next update: </dt>
                     <dd>
                       <strong>
-                        <FormattedDate>
+                        <FormattedDate format="MMMM yyyy">
                           {data.publication.nextUpdate}
                         </FormattedDate>
                       </strong>
