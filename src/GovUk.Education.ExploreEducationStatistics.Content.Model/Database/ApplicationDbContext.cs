@@ -1092,15 +1092,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         {
                             dataKeys = new List<string>
                             {
-                                "23",
                                 "26",
-                                "28"
+                                "28",
+                                "23"
                             },
                             dataSummary = new List<string>
                             {
-                                "Up from 40.1 in 2015/16",
-                                "Down from 40.1 in 2015/16",
-                                "Up from 40.1 in 2015/16"
+                                "Up from 4.6% in 2015/16",
+                                "Similar to previous years",
+                                "Up from 1.1% in 2015/16"
                             },
                             description = new MarkDownBlock
                             {
@@ -1526,15 +1526,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         {
                             dataKeys = new List<string>
                             {
-                                "155",
                                 "156",
-                                "158"
+                                "158",
+                                "155"
                             },
                             dataSummary = new List<string>
                             {
-                                "Up from 40.1 in 2015/16",
-                                "Down from 40.1 in 2015/16",
-                                "Up from 40.1 in 2015/16"
+                                "Up from 0.08 in 2015/16",
+                                "Up from 4.29% in 2015/16",
+                                "Up from 6,685 in 2015/16"
                             },
                             description = new MarkDownBlock
                             {
@@ -2159,7 +2159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                       subjectId = 17,
                       geographicLevel = "National",
-                      startYear = "2014",
+                      startYear = "2018",
                       endYear = "2018",
                       filters = new List<string> { "845" },
                       indicators = new List<string> { "189", "193", "194" }
@@ -2172,9 +2172,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                       },
                       dataSummary = new List<string>
                       {
-                        "put content here 1",
-                        "put content here 2",
-                        "put content here 3"
+                        "Down from 620,330 in 2017",
+                        "Down from 558,411 in 2017",
+                        "Down from 34,792 in 2017"
                       },
                       description = new MarkDownBlock
                       {
