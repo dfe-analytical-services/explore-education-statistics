@@ -39,6 +39,7 @@ export interface DataBlockProps {
   height?: number;
   showTables?: boolean;
   additionalTabContent?: ReactNode;
+  refreshCallback?: (callback: () => void) => void;
 }
 
 interface DataBlockState {
@@ -78,6 +79,8 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
   public async componentWillUnmount() {
     this.query = undefined;
   }
+
+  // eslint-disable-next-line class-methods-use-this
 
   private parseDataResponse(response: DataBlockResponse): void {
     const newState: DataBlockState = { isLoading: false };
@@ -128,6 +131,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       showTables,
       additionalTabContent,
       id,
+      refreshCallback,
     } = this.props;
     const { charts, summary, tables, isLoading } = this.state;
 
@@ -174,7 +178,11 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
                   return (
                     <React.Fragment key={key}>
-                      <ChartRenderer {...chart} height={height} />
+                      <ChartRenderer
+                        {...chart}
+                        height={height}
+                        refreshCallback={refreshCallback}
+                      />
                       <DataSource />
                       <DownloadDetails />
                     </React.Fragment>
