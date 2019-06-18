@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 foreach (IListBlobItem item in results.Results.Where(
                     r => Path.GetFileName(r.Uri.AbsolutePath).EndsWith(".csv")
-                                      && !Path.GetFileName(r.Uri.AbsolutePath).StartsWith("meta")))
+                         && !Path.GetFileName(r.Uri.AbsolutePath).StartsWith("meta")))
                 {
                     var sName = GetSubjectName(item);
 
@@ -89,8 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         CsvMetaDataBlob = blobContainer.GetBlockBlobReference(directory + "/meta_" + sName + ".csv")
                     });
                 }
-            }
-            while (blobContinuationToken != null); // Loop while the continuation token is not null.
+            } while (blobContinuationToken != null); // Loop while the continuation token is not null.
 
             return list.ToArray();
         }

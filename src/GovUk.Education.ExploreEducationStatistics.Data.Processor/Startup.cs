@@ -28,7 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddDbContext<ApplicationDbContext>(options =>
                     options
                         .UseSqlServer(connectionString))
-
                 .AddTransient<IBlobService, BlobService>()
                 .AddTransient<ISeedService, SeedService>()
                 .AddTransient<IProcessorService, ProcessorService>()

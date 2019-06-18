@@ -15,7 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 await srcBlob.DownloadToStreamAsync(memoryStream);
 
-                destBlob = destContainer.GetBlockBlobReference(destFolder + "/" + Path.GetFileName(srcBlob.Uri.AbsolutePath));
+                destBlob = destContainer.GetBlockBlobReference(
+                    destFolder + "/" + Path.GetFileName(srcBlob.Uri.AbsolutePath));
 
                 await destBlob.StartCopyAsync(srcBlob);
             }

@@ -21,8 +21,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
         [FunctionName("FilesProcessor")]
         public void FilesProcessorFunc(
-            [QueueTrigger("imports-pending", Connection = "")] JObject fNotifyIn,
-            [Queue("imports-processed", Connection = "")] out JObject fNotifyOut,
+            [QueueTrigger("imports-pending", Connection = "")]
+            JObject fNotifyIn,
+            [Queue("imports-processed", Connection = "")]
+            out JObject fNotifyOut,
             ILogger logger,
             ExecutionContext context)
         {
@@ -32,7 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             var config = LoadAppSettings(context);
             var blobStorageConnectionStr = config.GetConnectionString(StorageConnectionName);
 
-            _processorService.ProcessFiles(filesProcessorNotification, ContainerName, blobStorageConnectionStr, UploadsDir);
+            _processorService.ProcessFiles(filesProcessorNotification, ContainerName, blobStorageConnectionStr,
+                UploadsDir);
 
             logger.LogInformation("Completed files processing");
 
