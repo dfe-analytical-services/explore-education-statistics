@@ -1,85 +1,75 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
+import { FormGroup, FormTextInput } from '@common/components/form';
+import Button from '@common/components/Button';
+import ModalConfirm from '@common/components/ModalConfirm';
+import Tabs from '@common/components/Tabs';
+import TabsSection from '@common/components/TabsSection';
+import useToggle from '@common/hooks/useToggle';
+import PrototypeTableContent from '@admin/pages/prototypes/components/PrototypeTableContent';
+import PrototypeChartEditor from '@admin/pages/prototypes/components/PrototypeChartEditor';
 import Link from '../../../components/Link';
+import { PrototypeTable } from '../PrototypeData';
 
 interface Props {
   // tableId?: string;
   task?: string;
+  table?: PrototypeTable;
 }
 
-const PrototypeExampleTable = ({ task }: Props) => {
+const PrototypeExampleTable = ({ task, table }: Props) => {
+  const [showEditModal, toggleEditModal] = useToggle(false);
+  const [showDeleteModal, toggleDeleteModal] = useToggle(false);
+
   return (
     <div className="govuk-width-container">
-      <table className="govuk-table">
-        <caption className="govuk-table__caption govuk-!-margin-bottom-6">
-          Table showing 'Absence by characteristic' from 'Pupil absence' in
-          England between 2012/13 and 2016/17
-        </caption>
-        <thead className="govuk-table__head">
-          <tr>
-            <th colSpan={2} />
-            <th scope="col" className="govuk-table__header--numeric">
-              2012/13
-            </th>
-            <th scope="col" className="govuk-table__header--numeric">
-              2013/14
-            </th>
-            <th scope="col" className="govuk-table__header--numeric">
-              2014/15
-            </th>
-            <th scope="col" className="govuk-table__header--numeric">
-              2015/16
-            </th>
-            <th scope="col" className="govuk-table__header--numeric">
-              2016/17
-            </th>
-          </tr>
-        </thead>
-        <tbody className="govuk-table__body">
-          <tr>
-            <th rowSpan={4} scope="row">
-              All schools
-            </th>
-            <th scope="row">Number of pupil enrolments</th>
-            <td className="govuk-table__cell--numeric">6,477,725</td>
-            <td className="govuk-table__cell--numeric">6,554,005</td>
-            <td className="govuk-table__cell--numeric">6,642,755</td>
-            <td className="govuk-table__cell--numeric">6,737,190</td>
-            <td className="govuk-table__cell--numeric">6,899,770</td>
-          </tr>
-          <tr>
-            <th scope="row">Authorised absence rate</th>
-            <td className="govuk-table__cell--numeric">4.2%</td>
-            <td className="govuk-table__cell--numeric">3.5%</td>
-            <td className="govuk-table__cell--numeric">3.5%</td>
-            <td className="govuk-table__cell--numeric">3.4%</td>
-            <td className="govuk-table__cell--numeric">3.4%</td>
-          </tr>
-          <tr>
-            <th scope="row">Unuthorised absence rate</th>
-            <td className="govuk-table__cell--numeric">1.1%</td>
-            <td className="govuk-table__cell--numeric">1.1%</td>
-            <td className="govuk-table__cell--numeric">1.1%</td>
-            <td className="govuk-table__cell--numeric">1.1%</td>
-            <td className="govuk-table__cell--numeric">1.3%</td>
-          </tr>
-          <tr>
-            <th scope="row">Overall absence rate</th>
-            <td className="govuk-table__cell--numeric">5.3%</td>
-            <td className="govuk-table__cell--numeric">4.5%</td>
-            <td className="govuk-table__cell--numeric">4.6%</td>
-            <td className="govuk-table__cell--numeric">4.6%</td>
-            <td className="govuk-table__cell--numeric">4.7%</td>
-          </tr>
-        </tbody>
-      </table>
-      <p className="govuk-body-s">Source: DfE prototype example statistics</p>
+      <Tabs>
+        <TabsSection id="table-preview" title="Table preview">
+          <PrototypeTableContent table={table} task={task} />
+        </TabsSection>
+        <TabsSection id="add-chart" title="Add a chart">
+          <PrototypeChartEditor />
+        </TabsSection>
+      </Tabs>
       {task === 'view' && (
-        <Link
-          className="govuk-button"
-          to="/prototypes/publication-create-new-absence-table?status=step5"
-        >
-          Edit this table
-        </Link>
+        <>
+          <FormGroup>
+            <FormTextInput
+              id="permalink"
+              name="permalink"
+              label="Permalink"
+              hint="Copy this URL to view a standalone verion of this table"
+              defaultValue="http://dfe-url.gov.uk/example-permalink"
+              width={20}
+              onClick={e =>
+                e.currentTarget.setSelectionRange(
+                  0,
+                  e.currentTarget.value.length,
+                )
+              }
+            />
+          </FormGroup>
+          <Link
+            className="govuk-button govuk-!-margin-right-3"
+            to="/prototypes/publication-create-new-absence-table?status=step5"
+          >
+            Edit this table
+          </Link>
+
+          <Button variant="warning" onClick={() => toggleDeleteModal(true)}>
+            Delete this table
+          </Button>
+
+          <ModalConfirm
+            mounted={showDeleteModal}
+            title="Confirm delete table"
+            onExit={() => toggleDeleteModal(false)}
+            onConfirm={() => toggleDeleteModal(false)}
+            onCancel={() => toggleDeleteModal(false)}
+          >
+            <p>Are you sure you want to delete the table?</p>
+          </ModalConfirm>
+        </>
       )}
     </div>
   );

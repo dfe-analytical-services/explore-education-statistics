@@ -1,5 +1,6 @@
 import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
 import PrototypeChartSample from '@admin/pages/prototypes/publication/components/PrototypeChartSample';
+import Button from '@common/components/Button';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import PrototypeDataTilesHighlights from '@common/prototypes/publication/components/PrototypeDataTilesHighlights';
@@ -7,6 +8,7 @@ import PrototypeTableSample from '@common/prototypes/publication/components/Prot
 import React from 'react';
 
 interface Props {
+  editing?: boolean;
   sectionId?: string;
   chartTitle?: string;
   xAxisLabel?: string;
@@ -16,6 +18,7 @@ interface Props {
 }
 
 const PrototypeDataSample = ({
+  editing,
   sectionId,
   chartTitle,
   xAxisLabel,
@@ -29,7 +32,9 @@ const PrototypeDataSample = ({
         {sectionId === 'headlines' && (
           <TabsSection id={`${sectionId}SummaryData`} title="Summary">
             <PrototypeDataTilesHighlights />
+            {editing && <Button>Add another key indicator</Button>}
             <PrototypeEditableContent
+              editable={editing}
               content={`
             <ul className="govuk-list govuk-list--bullet">
               <li>pupils missed on average 8.2 school days</li>
@@ -56,33 +61,6 @@ const PrototypeDataSample = ({
             chartData={chartData}
             chartDataKeys={chartDataKeys}
           />
-        </TabsSection>
-        <TabsSection id={`${sectionId}Downloads`} title="Data downloads">
-          <h2 className="govuk-heading-s">
-            Download overall absence data files
-          </h2>
-          <ul className="govuk-list">
-            <li>
-              <a className="govuk-link" href="#">
-                Excel table
-              </a>
-            </li>
-            <li>
-              <a className="govuk-link" href="#">
-                csv
-              </a>
-            </li>
-            <li>
-              <a className="govuk-link" href="#">
-                json
-              </a>
-            </li>
-            <li>
-              <a className="govuk-link" href="#">
-                API
-              </a>
-            </li>
-          </ul>
         </TabsSection>
       </Tabs>
     </>
