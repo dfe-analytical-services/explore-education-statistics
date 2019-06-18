@@ -202,6 +202,23 @@
       ]
     },
     {
+      "apiVersion": "2016-08-01",
+      "type": "Microsoft.Web/sites/slots",
+      "name": "[concat(variables('dataAppName'), '/deploy')]",
+      "kind": "app",
+      "location": "[resourceGroup().location]",
+      "comments": "This specifies the web app slots.",
+      "tags": {
+        "displayName": "WebAppSlots"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('dataPlanName'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
+      ]
+    },
+    {
       "type": "Microsoft.Web/serverfarms",
       "sku": {
         "Tier": "[first(skip(split(parameters('skuData'), ' '), 1))]",
@@ -300,23 +317,6 @@
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
         "[resourceId('microsoft.insights/components/', variables('contentAppInsights'))]"
-      ]
-    },
-    {
-      "apiVersion": "2016-08-01",
-      "type": "Microsoft.Web/sites/slots",
-      "name": "[concat(variables('contentAppName'), '/deploy')]",
-      "kind": "app",
-      "location": "[resourceGroup().location]",
-      "comments": "This specifies the web app slots.",
-      "tags": {
-        "displayName": "WebAppSlots"
-      },
-      "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('contentPlanName'))]"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
       ]
     },
     {
