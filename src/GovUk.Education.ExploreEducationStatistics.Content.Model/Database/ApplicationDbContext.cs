@@ -759,7 +759,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Title = "Permanent and fixed-period exclusions in England",
                   Summary = "",
                   TopicId = new Guid("77941b7d-bbd6-4069-9107-565af89e2dec"),
-                  Slug = "permanent-and-fixed-period-exclusions-in-england"
+                  Slug = "permanent-and-fixed-period-exclusions-in-england",
+                  NextUpdate = new DateTime(2019, 7, 19)
               },
               new Publication
               {
@@ -768,7 +769,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Summary = "",
                   TopicId = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460"),
                   Slug = "pupil-absence-in-schools-in-england",
-                  NextUpdate = new DateTime(2018, 3, 22),
+                  NextUpdate = new DateTime(2019, 3, 22),
                   DataSource =
                     "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)",
                   ContactId = new Guid("11bb7387-e85e-4571-9669-8a760dcb004f")
@@ -825,6 +826,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Summary = "",
                   TopicId = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
                   Slug = "secondary-and-primary-schools-applications-and-offers",
+                  NextUpdate = new DateTime(2019, 6, 14),
               },
               new Publication
               {
@@ -1070,7 +1072,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Title = "Pupil absence data and statistics for schools in England",
                     ReleaseName = "2016 to 2017",
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Published = new DateTime(2017, 3, 22),
+                    Published = new DateTime(2018, 3, 22),
                     Slug = "2016-17",
                     Summary =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
@@ -1506,7 +1508,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Title = "Permanent and fixed-period exclusions statistics for schools in England",
                     ReleaseName = "2016 to 2017",
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                    Published = new DateTime(2018, 3, 22),
+                    Published = new DateTime(2018, 7, 19),
                     Slug = "2016-17",
                     Summary =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
