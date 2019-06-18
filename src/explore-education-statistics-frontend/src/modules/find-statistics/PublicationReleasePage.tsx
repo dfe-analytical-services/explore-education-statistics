@@ -244,25 +244,21 @@ class PublicationReleasePage extends Component<Props> {
           className="govuk-heading-m govuk-!-margin-top-9"
           data-testid="extra-information"
         >
-          Supporting information
+          Help and support
         </h2>
         <Accordion id="extra-information-sections">
           <AccordionSection
-            heading="Where does this data come from"
-            caption="How we collect and process the data"
+            heading={`${data.title}: methodology`}
+            caption="Find out how and why we collect, process and publish these statistics"
             headingTag="h3"
           >
-            <ul className="govuk-list">
-              <li>
-                <a href="#">How do we collect it?</a>
-              </li>
-              <li>
-                <a href="#">What do we do with it?</a>
-              </li>
-              <li>
-                <a href="#">Related policies</a>
-              </li>
-            </ul>
+            <p>
+              Read our{' '}
+              <Link to={`/methodology/${data.publication.slug}`}>
+                {`${data.publication.title}: methodology`}
+              </Link>{' '}
+              guidance.
+            </p>
           </AccordionSection>
           <AccordionSection heading="National Statistics" headingTag="h3">
             <p className="govuk-body">
