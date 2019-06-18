@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   FormGroup,
-  FormFieldset,
   FormTextInput,
   FormSelect,
   FormRadioGroup,
@@ -11,7 +10,6 @@ import Link from '../../components/Link';
 
 const PublicationPage = () => {
   const [value, setValue] = useState('academic-year');
-  const sectionId = 'assignMethodology';
   return (
     <PrototypePage
       wide
