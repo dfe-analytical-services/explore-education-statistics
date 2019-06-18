@@ -1,80 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+﻿using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 {
     [Authorize]
     public class FileController : Controller
     {
-        private IFileStorageService _fileStorageService;
-        private readonly ILogger _logger;
+        private readonly ApplicationDbContext _context;
+        private readonly IFileStorageService _fileStorageService;
 
-        public FileController(ILogger<FileController> logger, IFileStorageService fileStorageService)
+        public FileController(ApplicationDbContext context,
+            IFileStorageService fileStorageService)
         {
-            _logger = logger;
+            _context = context;
             _fileStorageService = fileStorageService;
         }
 
-        public async Task<IActionResult> List()
+        public IActionResult List()
         {
-            var files = _fileStorageService.ListFiles("releases");
-            
-            var model = new List<FileViewModel>();
+            var releases = _context.Releases
+                .Include(r => r.Publication)
+                .ToDictionary(r => r, r => _fileStorageService.ListFiles(r.Publication.Slug, r.Slug));
 
-            foreach (var file in files)
-            {
-                model.Add(new FileViewModel
-                {
-                    Path = file,
-                    FileName = file.Split('/').Last(),
-                    UploadId = file.Split('/').SkipLast(1).Last()
-                });
-            }
-            return View(model);
-        }
-
-        public async Task<IActionResult> Upload()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [RequestSizeLimit(200 * 1024 * 1024)]
-        public async Task<IActionResult> Post(List<IFormFile> files)
-        {
-            _logger.LogInformation("Received files for upload");
-
-            long size = files.Sum(f => f.Length);
-
-            var filePath = Path.GetTempFileName();
-
-            var releaseId = Guid.NewGuid();
-
-            foreach (var file in files)
-            {
-                if (file.Length > 0)
-                {
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await file.CopyToAsync(stream);
-                    }
-                }
-
-                await _fileStorageService.UploadFileAsync(filePath, file.FileName, releaseId);
-            }
-
-            return RedirectToAction("List");
+            return View(releases);
         }
     }
 }

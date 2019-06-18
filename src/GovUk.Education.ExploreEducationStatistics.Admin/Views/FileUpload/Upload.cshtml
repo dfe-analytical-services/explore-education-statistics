@@ -1,0 +1,38 @@
+﻿@{
+    ViewData["Title"] = "Upload file";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form method="post" enctype="multipart/form-data" asp-controller="FileUpload" asp-action="Post">
+    <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+            <h1 class="govuk-fieldset__heading">
+                Upload file
+            </h1>
+        </legend>
+
+        <div class="govuk-form-group">
+            <label for="release" class="govuk-label govuk-label--s">Release</label>
+            <select class="govuk-select" id="release" name="releaseId" asp-items="ViewBag.ReleaseId"></select>
+        </div>
+
+        <div class="govuk-form-group">
+            <label for="name" class="govuk-label govuk-label--s">Name</label>
+            <input id="name" name="name" class="govuk-input"/>
+        </div>
+
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-label--s" for="file">Upload data</label>
+            <input class="govuk-file-upload" type="file" name="file"/>
+        </div>
+
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-label--s" for="metaFile">Upload metadata</label>
+            <input class="govuk-file-upload" type="file" name="metaFile"/>
+        </div>
+        
+        <div class="form-group">
+            <input type="submit" class="govuk-button" value="Upload data files"/>
+        </div>
+    </fieldset>
+</form>

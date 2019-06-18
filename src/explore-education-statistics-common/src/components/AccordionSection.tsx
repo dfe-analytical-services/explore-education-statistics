@@ -22,7 +22,7 @@ export const classes = {
   section: 'govuk-accordion__section',
   sectionButton: 'govuk-accordion__section-button',
   sectionContent: 'govuk-accordion__section-content',
-  expanded: 'goveuk-accordion__section--expanded',
+  expanded: 'govuk-accordion__section--expanded',
 };
 
 const AccordionSection = ({
@@ -41,15 +41,11 @@ const AccordionSection = ({
     <div
       onClick={event => {
         if (onToggle) {
-          onToggle(
-            event.currentTarget.classList.contains(
-              'govuk-accordion__section--expanded',
-            ),
-          );
+          onToggle(event.currentTarget.classList.contains(classes.expanded));
         }
       }}
       className={classNames(classes.section, className, {
-        'govuk-accordion__section--expanded': open,
+        [classes.expanded]: open,
       })}
       role="presentation"
     >
