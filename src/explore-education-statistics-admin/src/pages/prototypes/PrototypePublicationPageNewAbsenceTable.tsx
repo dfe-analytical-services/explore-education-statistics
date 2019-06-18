@@ -348,6 +348,18 @@ const PublicationDataPage = () => {
         </div>
       )}
       <hr />
+      <div className="govuk-grid-row govuk-!-margin-top-9">
+        <div className="govuk-grid-column-one-half ">
+          <Link to="/prototypes/publication-create-new-absence-data">
+            Previous step, add / edit data
+          </Link>
+        </div>
+        <div className="govuk-grid-column-one-half dfe-align--right">
+          <Link to="/prototypes/publication-create-new-absence-view-table">
+            Next step, view / edit tables
+          </Link>
+        </div>
+      </div>
     </PrototypePage>
   );
 };

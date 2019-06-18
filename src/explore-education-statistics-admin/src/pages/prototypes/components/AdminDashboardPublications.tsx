@@ -31,7 +31,9 @@ const AdminDashboardPublications = () => {
                 <Link to="#">A guide to absence statistics</Link>
               </dd>
               <dd className="govuk-summary-list__actions">
-                <Link to="#">Edit methodology</Link>
+                <Link to="/prototypes/publication-assign-methodology">
+                  Edit methodology
+                </Link>
               </dd>
             </div>
           </dl>
@@ -144,7 +146,9 @@ const AdminDashboardPublications = () => {
                 <Link to="#">A guide to absence statistics</Link>
               </dd>
               <dd className="govuk-summary-list__actions">
-                <Link to="#">Edit methodology</Link>
+                <Link to="/prototypes/publication-assign-methodology">
+                  Edit methodology
+                </Link>
               </dd>
             </div>
           </dl>
@@ -207,7 +211,9 @@ const AdminDashboardPublications = () => {
                 <Link to="#">A guide to absence statistics</Link>
               </dd>
               <dd className="govuk-summary-list__actions">
-                <Link to="#">Edit methodology</Link>
+                <Link to="/prototypes/publication-assign-methodology">
+                  Edit methodology
+                </Link>
               </dd>
             </div>
           </dl>
@@ -271,7 +277,9 @@ const AdminDashboardPublications = () => {
                   No methodology available
                 </dd>
                 <dd className="govuk-summary-list__actions">
-                  <Link to="#">Add methodology</Link>
+                  <Link to="/prototypes/publication-assign-methodology">
+                    Add methodology
+                  </Link>
                 </dd>
               </div>
             </dl>

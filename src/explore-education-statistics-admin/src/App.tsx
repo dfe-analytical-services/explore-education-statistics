@@ -9,6 +9,7 @@ import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentatio
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
 
 import PublicationCreateNew from './pages/prototypes/PrototypePublicationPageCreateNew';
+import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
 import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
 import PublicationEditNew from './pages/prototypes/PrototypePublicationPageEditNew';
 import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
@@ -55,6 +56,11 @@ function App() {
           exact
           path="/prototypes/publication-create-new"
           component={PublicationCreateNew}
+        />
+        <Route
+          exact
+          path="/prototypes/publication-assign-methodology"
+          component={PublicationAssignMethodology}
         />
         <Route
           exact
