@@ -4,7 +4,7 @@ import { UrlLike } from 'next-server/router';
 import RouterLink from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
 
-type Props = {
+export type LinkProps = {
   as?: string | UrlLike;
   children: ReactNode;
   className?: string;
@@ -22,7 +22,7 @@ const Link = ({
   href,
   unvisited = false,
   ...props
-}: Props) => {
+}: LinkProps) => {
   return (
     <RouterLink href={href || to} as={as} prefetch={prefetch}>
       <a
