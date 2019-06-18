@@ -2234,15 +2234,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                               filters = new List<string> { "848" },
                               indicators = new List<string> { "197", "198", "199" }
                           },
-                          Charts = new List<IContentBlockChart>
-                          {
-                              new LineChart
-                              {
-                                  Indicators = new List<string>{  "197", "198", "199"  },
-                                  XAxis = new Axis{ title = "year"},
-                                  YAxis = new Axis{ title = ""}
-                              }
-                          },
                           Tables = new List<Table>
                           {
                               new Table { indicators = new List<string> { "197","198", "199"}}
@@ -2339,15 +2330,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                               endYear = "2018",
                               filters = new List<string> { "845" },
                               indicators = new List<string> { "197", "198", "199" }
-                          },
-                          Charts = new List<IContentBlockChart>
-                          {
-                              new LineChart
-                              {
-                                  Indicators = new List<string>{  "197", "198", "199"  },
-                                  XAxis = new Axis{ title = "year"},
-                                  YAxis = new Axis{ title = ""}
-                              }
                           },
                           Tables = new List<Table>
                           {
