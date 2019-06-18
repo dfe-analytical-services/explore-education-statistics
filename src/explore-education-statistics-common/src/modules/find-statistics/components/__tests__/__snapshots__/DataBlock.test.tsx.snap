@@ -280,14 +280,8 @@ exports[`DataBlock renders summary 1`] = `
           id="details-content-4"
         >
           <p>
-            Unauthorised absence rate is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
+            This service is not yet available
           </p>
-          <a
-            class="govuk-details__summary-text"
-            href="/glossary#Unauthorised absence rate"
-          >
-            More &gt;&gt;&gt;
-          </a>
         </div>
       </details>
     </div>
@@ -339,14 +333,8 @@ exports[`DataBlock renders summary 1`] = `
           id="details-content-5"
         >
           <p>
-            Overall absence rate is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
+            This service is not yet available
           </p>
-          <a
-            class="govuk-details__summary-text"
-            href="/glossary#Overall absence rate"
-          >
-            More &gt;&gt;&gt;
-          </a>
         </div>
       </details>
     </div>
@@ -398,14 +386,8 @@ exports[`DataBlock renders summary 1`] = `
           id="details-content-6"
         >
           <p>
-            Authorised absence rate is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
+            This service is not yet available
           </p>
-          <a
-            class="govuk-details__summary-text"
-            href="/glossary#Authorised absence rate"
-          >
-            More &gt;&gt;&gt;
-          </a>
         </div>
       </details>
     </div>
