@@ -1,4 +1,3 @@
-import { NextContext } from 'next';
 import { ConfirmContextProvider } from '@common/context/ConfirmContext';
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import tableBuilderService, {
@@ -15,6 +14,7 @@ import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
 import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
 import mapValues from 'lodash/mapValues';
+import { NextContext } from 'next';
 import React, { Component } from 'react';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
 import LocationFiltersForm, {
@@ -89,7 +89,16 @@ class TableToolPage extends Component<Props, State> {
 
   public static async getInitialProps({ query }: NextContext) {
     const themeMeta = await tableBuilderService.getThemes();
-    return { themeMeta, publicationId: query.publicationId };
+
+    const publication = themeMeta
+      .flatMap(option => option.topics)
+      .flatMap(option => option.publications)
+      .find(option => option.slug === query.publicationSlug);
+
+    return {
+      themeMeta,
+      publicationId: publication ? publication.id : '',
+    };
   }
 
   private handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
@@ -194,8 +203,6 @@ class TableToolPage extends Component<Props, State> {
       subjects,
       tableData,
     } = this.state;
-
-    console.log(this.props);
 
     return (
       <Page breadcrumbs={[{ name: 'Create your own tables online' }]} wide>

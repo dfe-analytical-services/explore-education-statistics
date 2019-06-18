@@ -360,8 +360,8 @@ class PublicationReleasePage extends Component<Props> {
         </p>
         <Link
           prefetch
-          as={`/table-tool/${data.publication.id}`}
-          href={`/table-tool?publicationId=${data.publication.id}`}
+          as={`/table-tool/${data.publication.slug}`}
+          href={`/table-tool?publicationSlug=${data.publication.slug}`}
           className="govuk-button"
         >
           Create tables

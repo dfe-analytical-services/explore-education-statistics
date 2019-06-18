@@ -1,3 +1,5 @@
+require('core-js/fn/array/flat-map');
+
 const basicAuth = require('express-basic-auth');
 const express = require('express');
 const helmet = require('helmet');
@@ -106,9 +108,9 @@ async function startServer(port = process.env.PORT || 3000) {
     });
   });
 
-  server.get('/table-tool/:publicationId?', (req, res) => {
+  server.get('/table-tool/:publicationSlug?', (req, res) => {
     return app.render(req, res, '/table-tool', {
-      publicationId: req.params.publicationId,
+      publicationSlug: req.params.publicationSlug,
     });
   });
 
