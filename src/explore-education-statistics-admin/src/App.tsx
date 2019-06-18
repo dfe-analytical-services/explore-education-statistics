@@ -4,7 +4,7 @@ import { Route } from 'react-router';
 import './App.scss';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 import { BrowserRouter } from 'react-router-dom';
-import AdminDashboardPage from './pages/prototypes/PrototypeAdminDashboard';
+import AdminDashboardPage from './pages/AdminDashboard';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
 
@@ -37,11 +37,7 @@ function App() {
       <LoginContext.Provider value={PrototypeLoginService.getUser('user1')}>
         <Route exact path="/prototypes/" component={PrototypesIndexPage} />
 
-        <Route
-          exact
-          path="/prototypes/admin-dashboard"
-          component={AdminDashboardPage}
-        />
+        <Route exact path="/admin-dashboard" component={AdminDashboardPage} />
         <Route
           exact
           path="/prototypes/publication-edit"

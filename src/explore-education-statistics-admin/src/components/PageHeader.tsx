@@ -44,6 +44,41 @@ const PageHeader = ({ wide }: Props) => (
           >
             Explore education statistics
           </a>
+
+          <button
+            type="button"
+            className="govuk-header__menu-button js-header-toggle"
+            aria-controls="navigation"
+            aria-label="Show or hide Top Level Navigation"
+          >
+            Menu
+          </button>
+          <nav>
+            <ul
+              id="navigation"
+              className="govuk-header__navigation "
+              aria-label="Top Level Navigation"
+            >
+              <li className="govuk-header__navigation-item">
+                <a
+                  className="govuk-header__link"
+                  href="/prototypes/documentation"
+                >
+                  Administrators' guide
+                </a>
+              </li>
+              <li className="govuk-header__navigation-item">
+                <a className="govuk-header__link" href="#">
+                  John Smith
+                </a>
+              </li>
+              <li className="govuk-header__navigation-item">
+                <a className="govuk-header__link" href="#">
+                  Sign out
+                </a>
+              </li>
+            </ul>
+          </nav>
         </div>
       </div>
     </header>

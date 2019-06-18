@@ -19,7 +19,7 @@ const AdminDashboardPublications = () => {
       </Link>
       <Accordion id="pupil-absence">
         <AccordionSection
-          heading="Pupil absense statistics and data for schools in England"
+          heading="Pupil absence statistics and data for schools in England"
           caption=""
         >
           <dl className="govuk-summary-list govuk-!-margin-bottom-0">
@@ -135,7 +135,7 @@ const AdminDashboardPublications = () => {
           </Link>
         </AccordionSection>
         <AccordionSection
-          heading=" Pupil absense statistics and data for schools in England: autumn term"
+          heading=" Pupil absence statistics and data for schools in England: autumn term"
           caption=""
         >
           <dl className="govuk-summary-list govuk-!-margin-bottom-0">
@@ -199,7 +199,7 @@ const AdminDashboardPublications = () => {
           </Link>
         </AccordionSection>
         <AccordionSection
-          heading="Pupil absense statistics and data for schools in England: autumn and
+          heading="Pupil absence statistics and data for schools in England: autumn and
         spring terms"
           caption=""
         >
@@ -266,7 +266,7 @@ const AdminDashboardPublications = () => {
         </AccordionSection>
         {window.location.search === '?status=newPublication' && (
           <AccordionSection
-            heading="Pupil absense statistics and data for schools in England: summer term"
+            heading="Pupil absence statistics and data for schools in England: summer term"
             caption="New publication, requires release adding"
           >
             <dl className="govuk-summary-list">

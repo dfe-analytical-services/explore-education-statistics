@@ -10,7 +10,7 @@ const AdminDashboardInProgress = () => {
           <ul className="govuk-list-bullet  govuk-!-margin-bottom-9">
             <li>
               <DashboardRelease
-                title="Pupil absense statistics and data for schools in England"
+                title="Pupil absence statistics and data for schools in England"
                 years="2017 to 2018"
                 editing={window.location.search === '?status=editNewRelease'}
                 isNew

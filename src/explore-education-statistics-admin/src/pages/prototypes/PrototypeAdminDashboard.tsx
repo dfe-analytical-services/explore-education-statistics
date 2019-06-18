@@ -10,7 +10,7 @@ import { RouteChildrenProps } from 'react-router';
 import Link from '../../components/Link';
 import PrototypePage from './components/PrototypePage';
 
-const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
+const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
   return (
     <PrototypePage wide breadcrumbs={[{ text: 'Administrator dashboard' }]}>
       <div className="govuk-grid-row">
@@ -281,4 +281,4 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
   );
 };
 
-export default BrowseReleasesPage;
+export default PrototypeBrowseReleasesPage;
