@@ -10,6 +10,7 @@ import { baseUrl } from '@common/services/api';
 import publicationService, {
   Release,
 } from '@common/services/publicationService';
+import ButtonLink from '@frontend/components/ButtonLink';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
@@ -231,6 +232,7 @@ class PublicationReleasePage extends Component<Props> {
                   <ContentBlock
                     content={content}
                     id={`content_${order}`}
+                    publication={data.publication}
                     refreshCallback={callback => {
                       refreshCallback = callback;
                     }}
@@ -358,14 +360,13 @@ class PublicationReleasePage extends Component<Props> {
           Use our tool to build tables using our range of national and regional
           data.
         </p>
-        <Link
+        <ButtonLink
           prefetch
           as={`/table-tool/${data.publication.slug}`}
           href={`/table-tool?publicationSlug=${data.publication.slug}`}
-          className="govuk-button"
         >
           Create tables
-        </Link>
+        </ButtonLink>
 
         <PrintThisPage />
       </Page>
