@@ -10,7 +10,9 @@ function PrototypesIndexPage() {
       <h3>Prototypes</h3>
       <ul>
         <li>
-          <Link to="/admin-dashboard">Administrators' dashboard page</Link>
+          <Link to="/prototypes/admin-dashboard">
+            Administrators' dashboard page
+          </Link>
         </li>
       </ul>
 
