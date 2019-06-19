@@ -1,3 +1,4 @@
+import useClickAway from '@common/hooks/useClickAway';
 import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
@@ -43,6 +44,7 @@ const FormComboBox = ({
   onInputChange,
   onSelect,
 }: Props) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const listBoxRef = useRef<HTMLUListElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const optionRefs = useRef<Dictionary<HTMLLIElement>>({});
@@ -50,6 +52,10 @@ const FormComboBox = ({
   const [value, setValue] = useState('');
   const [selectedOption, setSelectedOption] = useState(initialOption);
   const [showOptions, toggleShowOptions] = useToggle(false);
+
+  useClickAway(containerRef, () => {
+    toggleShowOptions(false);
+  });
 
   const renderedOptions =
     typeof options === 'function'
@@ -124,8 +130,26 @@ const FormComboBox = ({
     return nextSelectedOption;
   };
 
+  const handleContainerInteraction = () => {
+    if (showOptions) {
+      return;
+    }
+
+    // Re-show options if they have been hidden
+    // e.g. when the user clicks away from the combobox
+    if (renderedOptions) {
+      toggleShowOptions(true);
+    }
+  };
+
   return (
-    <div className={styles.container}>
+    <div
+      className={styles.container}
+      role="none"
+      onClick={handleContainerInteraction}
+      onKeyDown={handleContainerInteraction}
+      ref={containerRef}
+    >
       <div
         aria-expanded={renderedOptions ? renderedOptions.length > 0 : false}
         aria-owns={`${id}-options`}
