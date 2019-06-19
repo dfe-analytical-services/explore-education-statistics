@@ -56,7 +56,7 @@ class PublicationReleasePage extends Component<Props> {
       data.publication.releases.slice(1).length +
       data.publication.legacyReleases.length;
 
-    let openAllRefreshCallback = () => {};
+    let openAllRefreshCallback: () => void;
 
     return (
       <Page
@@ -250,10 +250,14 @@ class PublicationReleasePage extends Component<Props> {
                     publication={data.publication}
                     refreshCallback={callback => {
                       const originalOpenAllRefreshCallback = openAllRefreshCallback;
-                      openAllRefreshCallback = () => {
-                        callback();
-                        originalOpenAllRefreshCallback();
-                      };
+
+                      openAllRefreshCallback = originalOpenAllRefreshCallback
+                        ? () => {
+                            callback();
+                            originalOpenAllRefreshCallback();
+                          }
+                        : callback;
+
                       refreshCallback = callback;
                     }}
                   />
