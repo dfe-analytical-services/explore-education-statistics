@@ -1,6 +1,9 @@
 @import '../styles/govuk-base';
 
 .button {
+  @include govuk-link-common;
+  @include govuk-link-style-default;
+  @include govuk-link-print-friendly;
   @include govuk-focusable-fill;
 
   background: none;
@@ -8,10 +11,10 @@
   color: govuk-colour('blue');
   cursor: pointer;
   display: inline-block;
-  margin-bottom: govuk-spacing(2);
-  padding: govuk-spacing(1) 0;
+  padding: 0;
+  text-decoration: underline;
+}
 
-  &:hover {
-    text-decoration: underline;
-  }
+.noUnderline {
+  text-decoration: none;
 }
