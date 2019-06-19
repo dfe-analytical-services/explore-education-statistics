@@ -25,6 +25,7 @@ interface Props {
   className?: string;
   elementSelectors: string[];
   id: string;
+  minInput: number;
 }
 
 interface State {
@@ -41,6 +42,7 @@ class PageSearchForm extends Component<Props, State> {
   public static defaultProps = {
     elementSelectors: ['p', 'li > strong', 'h2', 'h3', 'h4'],
     id: 'pageSearchForm',
+    minInput: 3,
   };
 
   private static getLocationText(element: HTMLElement): string {
@@ -83,9 +85,9 @@ class PageSearchForm extends Component<Props, State> {
   }
 
   private search = (value: string) => {
-    const { elementSelectors } = this.props;
+    const { elementSelectors, minInput } = this.props;
 
-    if (value.length <= 3) {
+    if (value.length < minInput) {
       return;
     }
 

@@ -8,6 +8,108 @@ import { fireEvent, render, wait } from 'react-testing-library';
 import PageSearchForm from '../PageSearchForm';
 
 describe('PageSearchForm', () => {
+  test('does not render results if input is less than default 3 characters', () => {
+    jest.useFakeTimers();
+
+    const { container, getByLabelText } = render(
+      <div>
+        <PageSearchForm />
+
+        <div>
+          <p>Not me</p>
+          <p>To 1</p>
+        </div>
+
+        <div>
+          <h2>Not me</h2>
+          <h2>To 2</h2>
+        </div>
+
+        <div>
+          <h3>Not me</h3>
+          <h3>To 3</h3>
+        </div>
+
+        <div>
+          <h4>Not me</h4>
+          <h4>To 4</h4>
+        </div>
+
+        <ul>
+          <li>Not me</li>
+          <li>
+            <strong>To 5</strong>
+          </li>
+        </ul>
+      </div>,
+    );
+
+    fireEvent.change(getByLabelText('Find on this page'), {
+      target: {
+        value: 'To',
+      },
+    });
+
+    jest.runOnlyPendingTimers();
+
+    expect(container.querySelector('#pageSearchForm-resultsLabel')).toBeNull();
+
+    const options = container.querySelectorAll('[role="option"]');
+
+    expect(options).toHaveLength(0);
+  });
+
+  test('does not render results if input is less the custom `minInput` prop', () => {
+    jest.useFakeTimers();
+
+    const { container, getByLabelText } = render(
+      <div>
+        <PageSearchForm minInput={5} />
+
+        <div>
+          <p>Not me</p>
+          <p>Testing 1</p>
+        </div>
+
+        <div>
+          <h2>Not me</h2>
+          <h2>Testing 2</h2>
+        </div>
+
+        <div>
+          <h3>Not me</h3>
+          <h3>Testing 3</h3>
+        </div>
+
+        <div>
+          <h4>Not me</h4>
+          <h4>Testing 4</h4>
+        </div>
+
+        <ul>
+          <li>Testing me</li>
+          <li>
+            <strong>Testing 5</strong>
+          </li>
+        </ul>
+      </div>,
+    );
+
+    fireEvent.change(getByLabelText('Find on this page'), {
+      target: {
+        value: 'Test',
+      },
+    });
+
+    jest.runOnlyPendingTimers();
+
+    expect(container.querySelector('#pageSearchForm-resultsLabel')).toBeNull();
+
+    const options = container.querySelectorAll('[role="option"]');
+
+    expect(options).toHaveLength(0);
+  });
+
   test('renders results found in default elements', async () => {
     jest.useFakeTimers();
 
