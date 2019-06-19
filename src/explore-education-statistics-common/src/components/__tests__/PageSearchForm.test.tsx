@@ -110,6 +110,116 @@ describe('PageSearchForm', () => {
     expect(options).toHaveLength(0);
   });
 
+  test('renders correct results when input is an acronym', () => {
+    jest.useFakeTimers();
+
+    const { container, getByLabelText } = render(
+      <div>
+        <PageSearchForm />
+
+        <div>
+          <p>Not me</p>
+          <p>Testing 1</p>
+        </div>
+
+        <div>
+          <h2>Not me</h2>
+          <h2>TESTING 2</h2>
+        </div>
+
+        <div>
+          <h3>Not me</h3>
+          <h3>TEST 3</h3>
+        </div>
+
+        <div>
+          <h4>Not me</h4>
+          <h4>Testing 4</h4>
+        </div>
+
+        <ul>
+          <li>Testing me</li>
+          <li>
+            <strong>Testing 5</strong>
+          </li>
+        </ul>
+      </div>,
+    );
+
+    fireEvent.change(getByLabelText('Find on this page'), {
+      target: {
+        value: 'TEST',
+      },
+    });
+
+    jest.runOnlyPendingTimers();
+
+    expect(
+      container.querySelector('#pageSearchForm-resultsLabel'),
+    ).toHaveTextContent('Found 2 results');
+
+    const options = container.querySelectorAll('[role="option"]');
+
+    expect(options).toHaveLength(2);
+    expect(options[0]).toHaveTextContent('TESTING 2');
+    expect(options[1]).toHaveTextContent('TEST 3');
+  });
+
+  test('renders correct results when input is an acronym and is below `minInput`', () => {
+    jest.useFakeTimers();
+
+    const { container, getByLabelText } = render(
+      <div>
+        <PageSearchForm minInput={5} />
+
+        <div>
+          <p>Not me</p>
+          <p>Testing 1</p>
+        </div>
+
+        <div>
+          <h2>Not me</h2>
+          <h2>TESTING 2</h2>
+        </div>
+
+        <div>
+          <h3>Not me</h3>
+          <h3>TEST 3</h3>
+        </div>
+
+        <div>
+          <h4>Not me</h4>
+          <h4>Testing 4</h4>
+        </div>
+
+        <ul>
+          <li>Testing me</li>
+          <li>
+            <strong>Testing 5</strong>
+          </li>
+        </ul>
+      </div>,
+    );
+
+    fireEvent.change(getByLabelText('Find on this page'), {
+      target: {
+        value: 'TE',
+      },
+    });
+
+    jest.runOnlyPendingTimers();
+
+    expect(
+      container.querySelector('#pageSearchForm-resultsLabel'),
+    ).toHaveTextContent('Found 2 results');
+
+    const options = container.querySelectorAll('[role="option"]');
+
+    expect(options).toHaveLength(2);
+    expect(options[0]).toHaveTextContent('TESTING 2');
+    expect(options[1]).toHaveTextContent('TEST 3');
+  });
+
   test('renders results found in default elements', async () => {
     jest.useFakeTimers();
 

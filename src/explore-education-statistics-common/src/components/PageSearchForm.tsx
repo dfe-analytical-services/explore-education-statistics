@@ -87,11 +87,18 @@ class PageSearchForm extends Component<Props, State> {
   private search = (value: string) => {
     const { elementSelectors, minInput } = this.props;
 
-    if (value.length < minInput) {
+    const isAcronym = value === value.toUpperCase() && value.length > 1;
+
+    if (!isAcronym && value.length < minInput) {
+      this.resetSearch();
       return;
     }
 
-    const elements = findAllByText(value, elementSelectors.join(', '));
+    const elements = findAllByText(
+      isAcronym ? value : value.toLocaleLowerCase(),
+      elementSelectors.join(', '),
+      !isAcronym,
+    );
 
     const searchResults = elements.map(element => {
       const location = PageSearchForm.getLocationText(element);

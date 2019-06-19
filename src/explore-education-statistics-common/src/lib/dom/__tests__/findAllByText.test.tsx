@@ -58,4 +58,16 @@ describe('findAllByText', () => {
 
     expect(elements).toHaveLength(0);
   });
+
+  test('optionally matches lowercase text', () => {
+    render(
+      <div>
+        <p className="test-1">Test</p>
+        <p className="test-2">Test</p>
+      </div>,
+    );
+
+    expect(findAllByText('test', 'p', false)).toHaveLength(0);
+    expect(findAllByText('test', 'p', true)).toHaveLength(2);
+  });
 });
