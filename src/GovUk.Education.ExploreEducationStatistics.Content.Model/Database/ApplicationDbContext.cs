@@ -1155,7 +1155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         "- secondary schools\n" +
                                         "- special schools\n\n" +
                                         "They also includes information fo [pupil referral units](../glossary#pupil-referral-unit) and pupils aged 4 years.\n\n" +
-                                        "We use the key measures of [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) to monitor pupil absence and also include [absence by reason](#contents-section-heading-4) and [pupil characteristics](#contents-section-heading-6).\n\n" +
+                                        "We use the key measures of [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) to monitor pupil absence and also include [absence by reason](#contents-sections-heading-4) and [pupil characteristics](#contents-sections-heading-6).\n\n" +
                                         "The statistics and data are available at national, regional, local authority (LA) and school level and are used by LAs and schools to compare their local absence rates to regional and national averages for different pupil groups.\n\n" +
                                         "They're also used for policy development as key indicators in behaviour and school attendance policy.\n"
                                 }
@@ -1755,10 +1755,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 {
                                     Body =
                                       "**Pupils with one or more fixed-period exclusion definition**\n\n" +
-                                      "The number of pupils with one or more [fixed-period exclusion](../glossary#one-or-more-fixed-period-exclusion) has increased across state-funded primary, secondary and special schools to 183,475 (2.29% of pupils) up from 167,125 (2.11% of pupils) in 2015/16.\n\n" +
+                                      "The number of pupils with [one or more fixed-period exclusion](../glossary#one-or-more-fixed-period-exclusion) has increased across state-funded primary, secondary and special schools to 183,475 (2.29% of pupils) up from 167,125 (2.11% of pupils) in 2015/16.\n\n" +
                                       "Of these kinds of pupils, 59.1% excluded on only 1 occasion while 1.5% received 10 or more fixed-period exclusions during the year.\n\n" +
                                       "The percentage of pupils who went on to receive a [permanent exclusion](../glossary#permanent-exclusion) was 3.5%.\n\n" +
-                                      "The average length of [fixed-period exclusions](../glossary#fixed-period-exclusions) across schools decreased to 2.1 days - slightly shorter than in 2015/16.\n\n" +
+                                      "The average length of [fixed-period exclusion](../glossary#fixed-period-exclusion) across schools decreased to 2.1 days - slightly shorter than in 2015/16.\n\n" +
                                       "The highest proportion of fixed-period exclusions (46.6%) lasted for only 1 day.\n\n" +
                                       "Only 2.0% of fixed-period exclusions lasted for longer than 1 week and longer fixed-period exclusions were more prevalent in secondary schools."
                                 }
@@ -1825,7 +1825,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                      "There were 560 reviews lodged with [independent review panels](../glossary#independent-review-panels) in maintained primary, secondary and special schools and academies of which 525 (93.4%) were determined and 45 (8.0%) resulted in an offer of reinstatement."
+                                      "There were 560 reviews lodged with [independent review panels](../glossary#independent-review-panel) in maintained primary, secondary and special schools and academies of which 525 (93.4%) were determined and 45 (8.0%) resulted in an offer of reinstatement."
                                 }
                             }
                         },
