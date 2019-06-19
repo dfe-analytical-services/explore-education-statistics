@@ -52,3 +52,5 @@ if (!Element.prototype.closest) {
     return null;
   };
 }
+
+require('intersection-observer');

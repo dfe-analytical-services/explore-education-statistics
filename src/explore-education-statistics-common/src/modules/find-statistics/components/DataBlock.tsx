@@ -39,7 +39,6 @@ export interface DataBlockProps {
   height?: number;
   showTables?: boolean;
   additionalTabContent?: ReactNode;
-  refreshCallback?: (callback: () => void) => void;
 }
 
 interface DataBlockState {
@@ -131,7 +130,6 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       showTables,
       additionalTabContent,
       id,
-      refreshCallback,
     } = this.props;
     const { charts, summary, tables, isLoading } = this.state;
 
@@ -178,11 +176,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
                   return (
                     <React.Fragment key={key}>
-                      <ChartRenderer
-                        {...chart}
-                        height={height}
-                        refreshCallback={refreshCallback}
-                      />
+                      <ChartRenderer {...chart} height={height} />
                       <DataSource />
                       <DownloadDetails />
                     </React.Fragment>

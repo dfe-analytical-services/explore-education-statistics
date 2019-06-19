@@ -4,6 +4,7 @@
   "description": "",
   "devDependencies": {
     "@types/classnames": "^2.2.8",
+    "@types/element-resize-event": "^2.0.0",
     "@types/jest": "^24.0.13",
     "@types/lodash": "^4.14.133",
     "@types/memoizee": "^0.4.2",
@@ -134,6 +135,7 @@
   },
   "dependencies": {
     "@types/react-highlight-words": "^0.16.0",
+    "intersection-observer": "^0.7.0",
     "react-highlight-words": "^0.16.0"
   }
 }

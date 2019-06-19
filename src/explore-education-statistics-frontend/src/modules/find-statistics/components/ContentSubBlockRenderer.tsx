@@ -7,16 +7,10 @@ import ReactMarkdown from 'react-markdown';
 interface Props {
   block: ContentBlock;
   id: string;
-  refreshCallback?: (callback: () => void) => void;
   publication: Publication;
 }
 
-const ContentSubBlockRenderer = ({
-  block,
-  id,
-  refreshCallback,
-  publication,
-}: Props) => {
+const ContentSubBlockRenderer = ({ block, id, publication }: Props) => {
   switch (block.type) {
     case 'MarkDownBlock':
       return <ReactMarkdown className="govuk-body" source={block.body} />;
@@ -35,7 +29,6 @@ const ContentSubBlockRenderer = ({
         <DataBlock
           {...block}
           id={`${id}_datablock`}
-          refreshCallback={refreshCallback}
           additionalTabContent={
             <>
               <h2 className="govuk-heading-m">
