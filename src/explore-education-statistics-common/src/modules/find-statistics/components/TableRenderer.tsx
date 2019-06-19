@@ -21,15 +21,20 @@ const TableHeading = ({ data, meta, indicators }: Props) => {
     <thead className="govuk-table__head">
       <tr>
         <th className="govuk-table__header" />
-        {data.result.map(result => (
-          <th
-            key={result.year}
-            className="govuk-table__header govuk-table__cell--numeric"
-            scope="col"
-          >
-            {meta.timePeriods[`${result.year}_${result.timeIdentifier}`].label}
-          </th>
-        ))}
+        {[...data.result]
+          .sort((a, b) => a.year - b.year)
+          .map(result => (
+            <th
+              key={result.year}
+              className="govuk-table__header govuk-table__cell--numeric"
+              scope="col"
+            >
+              {
+                meta.timePeriods[`${result.year}_${result.timeIdentifier}`]
+                  .label
+              }
+            </th>
+          ))}
       </tr>
     </thead>
   );
@@ -43,14 +48,16 @@ const TableBody = ({ data, meta, indicators }: Props) => {
           <th className="govuk-table__header">
             {meta.indicators[indicator].label}
           </th>
-          {data.result.map(result => (
-            <td
-              key={`${indicator}_${result.year}`}
-              className="govuk-table__cell govuk-table__cell--numeric"
-            >
-              {result.measures[indicator]}
-            </td>
-          ))}
+          {[...data.result]
+            .sort((a, b) => a.year - b.year)
+            .map(result => (
+              <td
+                key={`${indicator}_${result.year}`}
+                className="govuk-table__cell govuk-table__cell--numeric"
+              >
+                {result.measures[indicator]}
+              </td>
+            ))}
         </tr>
       ))}
     </tbody>

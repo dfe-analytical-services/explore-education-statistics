@@ -33,6 +33,7 @@ export interface ChartRendererProps {
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
   dataGroupings?: ChartDataGroup[];
+  refreshCallback?: (callback: () => void) => void;
 }
 
 function ChartRenderer(props: ChartRendererProps) {
@@ -48,6 +49,7 @@ function ChartRenderer(props: ChartRendererProps) {
     xAxis = { title: '' },
     yAxis = { title: '' },
     dataGroupings,
+    refreshCallback,
   } = props;
 
   const labels = Object.entries(meta.indicators).reduce(
@@ -124,6 +126,7 @@ function ChartRenderer(props: ChartRendererProps) {
           height={height}
           width={width}
           dataGroupings={dataGroupings}
+          refreshCallback={refreshCallback}
         />
       );
     default:

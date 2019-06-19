@@ -29,6 +29,7 @@ export type MapFeature = Feature<Geometry, GeoJsonProperties>;
 interface MapProps extends ChartProps {
   position?: { lat: number; lng: number };
   maxBounds?: LatLngBounds;
+  refreshCallback?: (callback: () => void) => void;
 }
 
 interface IdValue {
@@ -105,7 +106,7 @@ class MapBlock extends Component<MapProps, MapState> {
   };
 
   public async componentDidMount() {
-    const { data, meta } = this.props;
+    const { data, meta, refreshCallback } = this.props;
     let { selected } = this.state;
 
     const sortedMeasures = Object.values(meta.indicators).sort((a, b) =>
@@ -158,6 +159,10 @@ class MapBlock extends Component<MapProps, MapState> {
     };
 
     window.requestAnimationFrame(forceRefresh);
+
+    if (refreshCallback) {
+      refreshCallback(() => forceRefresh());
+    }
   }
 
   private static getLocationsForIndicator(

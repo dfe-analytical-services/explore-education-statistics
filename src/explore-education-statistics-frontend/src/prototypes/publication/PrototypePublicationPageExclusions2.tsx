@@ -344,9 +344,8 @@ const PublicationPageExclusions = () => {
             <p>
               The number of{' '}
               <a href="/glossary#fixed-period-exclusion">
-                {' '}
                 fixed-period exclusions
-              </a>
+              </a>{' '}
               has increased across all state-funded primary, secondary and
               special schools to 381,865 - up from 339,360 in 2015/16.
             </p>
@@ -438,7 +437,7 @@ const PublicationPageExclusions = () => {
               The number of pupils with{' '}
               <a href="/glossary#one-or-more-fixed-period-exclusion">
                 one or more fixed-period exclusion
-              </a>
+              </a>{' '}
               has increased across state-funded primary, secondary and special
               schools to 183,475 (2.29% of pupils) up from 167,125 (2.11% of
               pupils) in 2015/16.
@@ -449,14 +448,14 @@ const PublicationPageExclusions = () => {
             </p>
             <p>
               The percentage of pupils who went on to receive a{' '}
-              <a href="/glossary#permanent-exclusion">permanent exclusion</a>
+              <a href="/glossary#permanent-exclusion">permanent exclusion</a>{' '}
               was 3.5%.
             </p>
             <p>
               The average length of{' '}
               <a href="/glossary#fixed-period-exclusion">
                 fixed-period exclusions
-              </a>
+              </a>{' '}
               across schools decreased to 2.1 days - slightly shorter than in
               2015/16.
             </p>
@@ -492,7 +491,7 @@ const PublicationPageExclusions = () => {
           <p>
             However, in special schools the most common reason for exclusion was
             physical assault against an adult - accounting for 37.8% of all
-            permanent exclusions and 28.1% of all
+            permanent exclusions and 28.1% of all{' '}
             <a href="/glossary#fixed-period-exclusion">
               fixed-period exclusions
             </a>
@@ -612,7 +611,7 @@ const PublicationPageExclusions = () => {
             There were 560 reviews lodged with{' '}
             <a href="/glossary#independent-review-panels">
               independent review panels
-            </a>
+            </a>{' '}
             in maintained primary, secondary and special schools and academies
             of which 525 (93.4%) were determined and 45 (8.0%) resulted in an
             offer of reinstatement.
@@ -621,9 +620,9 @@ const PublicationPageExclusions = () => {
         <AccordionSection heading="Pupil referral unit exclusions">
           <h3 className="govuk-heading-s">Permanent exlcusion</h3>
           <p>
-            The <a href="/glossary#permanent-exclusion">permanent exclusion</a>
+            The <a href="/glossary#permanent-exclusion">permanent exclusion</a>{' '}
             rate in{' '}
-            <a href="/glossary#pupil-referral-unit">pupil referral units</a>
+            <a href="/glossary#pupil-referral-unit">pupil referral units</a>{' '}
             decreased to 0.13 - down from 0.14% in 2015/16.
           </p>
           <p>
@@ -647,8 +646,7 @@ const PublicationPageExclusions = () => {
         <AccordionSection heading="Regional and local authority (LA) breakdown">
           <p>
             There's considerable variation in the{' '}
-            <a href="/glossary#permanent-exclusion">permanent exclusion</a>
-            and{' '}
+            <a href="/glossary#permanent-exclusion">permanent exclusion</a> and{' '}
             <a href="/glossary#fixed-period-exclusion">
               fixed period exclusion
             </a>{' '}

@@ -2,14 +2,15 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
+import PageSearchForm from '@common/components/PageSearchForm';
 import PrintThisPage from '@common/components/PrintThisPage';
 import RelatedAside from '@common/components/RelatedAside';
-import SearchForm from '@common/components/SearchForm';
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import { baseUrl } from '@common/services/api';
 import publicationService, {
   Release,
 } from '@common/services/publicationService';
+import ButtonLink from '@frontend/components/ButtonLink';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
@@ -76,17 +77,17 @@ class PublicationReleasePage extends Component<Props> {
                   </strong>
                 )}
                 <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
-                  <dt className="govuk-caption-m">Published: </dt>
+                  <dt className="govuk-caption-m">Published:</dt>
                   <dd>
                     <strong>
                       <FormattedDate>{data.published}</FormattedDate>{' '}
                     </strong>
                   </dd>
                   <div>
-                    <dt className="govuk-caption-m">Next update: </dt>
+                    <dt className="govuk-caption-m">Next update:</dt>
                     <dd>
                       <strong>
-                        <FormattedDate>
+                        <FormattedDate format="MMMM yyyy">
                           {data.publication.nextUpdate}
                         </FormattedDate>
                       </strong>
@@ -129,9 +130,7 @@ class PublicationReleasePage extends Component<Props> {
               </ul>
             </Details>
 
-            <div className="govuk-!-margin-top-3 govuk-!-margin-bottom-3">
-              <SearchForm />
-            </div>
+            <PageSearchForm className="govuk-!-margin-top-3 govuk-!-margin-bottom-3" />
           </div>
 
           <div className="govuk-grid-column-one-third">
@@ -139,7 +138,7 @@ class PublicationReleasePage extends Component<Props> {
               <h3>About these statistics</h3>
 
               <dl className="dfe-meta-content" data-testid="release-period">
-                <dt className="govuk-caption-m">For school year: </dt>
+                <dt className="govuk-caption-m">For school year:</dt>
                 <dd>
                   <strong>{data.releaseName}</strong>
                 </dd>
@@ -149,32 +148,40 @@ class PublicationReleasePage extends Component<Props> {
                       className="govuk-list"
                       data-testid="previous-releases-list"
                     >
-                      {data.publication.releases
-                        .slice(1)
-                        .map(({ id, slug, releaseName }) => (
-                          <li key={id} data-testid="item-internal">
-                            <Link
-                              to={`/statistics/${
-                                data.publication.slug
-                              }/${slug}`}
-                            >
-                              {releaseName}
-                            </Link>
-                          </li>
-                        ))}
-                      {data.publication.legacyReleases.map(
-                        ({ id, description, url }) => (
-                          <li key={id} data-testid="item-external">
-                            <a href={url}>{description}</a>
-                          </li>
+                      {[
+                        ...data.publication.releases
+                          .slice(1)
+                          .map(({ id, slug, releaseName }) => [
+                            releaseName,
+                            <li key={id} data-testid="item-internal">
+                              <Link
+                                to={`/statistics/${
+                                  data.publication.slug
+                                }/${slug}`}
+                              >
+                                {releaseName}
+                              </Link>
+                            </li>,
+                          ]),
+                        ...data.publication.legacyReleases.map(
+                          ({ id, description, url }) => [
+                            description,
+                            <li key={id} data-testid="item-external">
+                              <a href={url}>{description}</a>
+                            </li>,
+                          ],
                         ),
-                      )}
+                      ]
+                        .sort((a, b) =>
+                          b[0].toString().localeCompare(a[0].toString()),
+                        )
+                        .map(items => items[1])}
                     </ul>
                   </Details>
                 </dd>
               </dl>
               <dl className="dfe-meta-content" data-testid="last-updated">
-                <dt className="govuk-caption-m">Last updated: </dt>
+                <dt className="govuk-caption-m">Last updated:</dt>
                 <dd>
                   <strong>
                     <FormattedDate>{data.updates[0].on}</FormattedDate>
@@ -218,36 +225,50 @@ class PublicationReleasePage extends Component<Props> {
 
         {data.content.length > 0 && (
           <Accordion id="contents-sections">
-            {data.content.map(({ heading, caption, order, content }) => (
-              <AccordionSection heading={heading} caption={caption} key={order}>
-                <ContentBlock content={content} id={`content_${order}`} />
-              </AccordionSection>
-            ))}
+            {data.content.map(({ heading, caption, order, content }) => {
+              let refreshCallback: () => void;
+
+              return (
+                <AccordionSection
+                  heading={heading}
+                  caption={caption}
+                  key={order}
+                  onToggle={open => {
+                    if (open && refreshCallback) refreshCallback();
+                  }}
+                >
+                  <ContentBlock
+                    content={content}
+                    id={`content_${order}`}
+                    publication={data.publication}
+                    refreshCallback={callback => {
+                      refreshCallback = callback;
+                    }}
+                  />
+                </AccordionSection>
+              );
+            })}
           </Accordion>
         )}
         <h2
           className="govuk-heading-m govuk-!-margin-top-9"
           data-testid="extra-information"
         >
-          Supporting information
+          Help and support
         </h2>
         <Accordion id="extra-information-sections">
           <AccordionSection
-            heading="Where does this data come from"
-            caption="How we collect and process the data"
+            heading={`${data.title}: methodology`}
+            caption="Find out how and why we collect, process and publish these statistics"
             headingTag="h3"
           >
-            <ul className="govuk-list">
-              <li>
-                <a href="#">How do we collect it?</a>
-              </li>
-              <li>
-                <a href="#">What do we do with it?</a>
-              </li>
-              <li>
-                <a href="#">Related policies</a>
-              </li>
-            </ul>
+            <p>
+              Read our{' '}
+              <Link to={`/methodology/${data.publication.slug}`}>
+                {`${data.publication.title}: methodology`}
+              </Link>{' '}
+              guidance.
+            </p>
           </AccordionSection>
           <AccordionSection heading="National Statistics" headingTag="h3">
             <p className="govuk-body">
@@ -347,12 +368,13 @@ class PublicationReleasePage extends Component<Props> {
           Use our tool to build tables using our range of national and regional
           data.
         </p>
-        <Link
-          to={`/table-tool/${data.publication.slug}`}
-          className="govuk-button"
+        <ButtonLink
+          prefetch
+          as={`/table-tool/${data.publication.slug}`}
+          href={`/table-tool?publicationSlug=${data.publication.slug}`}
         >
           Create tables
-        </Link>
+        </ButtonLink>
 
         <PrintThisPage />
       </Page>
