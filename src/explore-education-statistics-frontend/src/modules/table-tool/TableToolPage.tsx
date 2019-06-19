@@ -10,8 +10,10 @@ import tableBuilderService, {
 } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
+import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
+import DownloadDataCsv from '@frontend/modules/table-tool/components/DownloadDataCsv';
 import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
 import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
@@ -147,7 +149,7 @@ class TableToolPage extends Component<Props, State> {
     this.setState({
       locations: mapValuesWithKeys(
         values.locations,
-        ([locationLevel, locations]) =>
+        (locationLevel, locations) =>
           locations.map(
             location =>
               subjectMeta.locations[locationLevel].options.find(
@@ -182,7 +184,7 @@ class TableToolPage extends Component<Props, State> {
     );
 
     this.setState({
-      filters: mapValuesWithKeys(filters, ([filterGroup, selectedFilters]) =>
+      filters: mapValuesWithKeys(filters, (filterGroup, selectedFilters) =>
         selectedFilters.map(filter => filtersByValue[filterGroup][filter]),
       ),
       indicators: indicators.map(indicator => indicatorsByValue[indicator]),
