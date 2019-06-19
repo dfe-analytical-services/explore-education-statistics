@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import Breadcrumbs, { BreadcrumbsProps } from './Breadcrumbs';
 import PrototypePageBanner from './PageBanner';
-import PrototypePageHeader from './PageHeader';
+import PageHeader from './PageHeader';
 
 type Props = {
   children: ReactNode;
@@ -13,7 +13,7 @@ type Props = {
 const Page = ({ breadcrumbs = [], children, wide }: Props) => {
   return (
     <>
-      <PrototypePageHeader wide={wide} />
+      <PageHeader wide={wide} />
 
       <div
         className={classNames('govuk-width-container', {

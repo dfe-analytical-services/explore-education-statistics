@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import logo from 'govuk-frontend/assets/images/govuk-logotype-crown.png';
 import React from 'react';
 import { LoginContext } from '@admin/components/Login';
+import { Authentication, User } from '@admin/services/PrototypeLoginService';
 
 interface Props {
   wide?: boolean;
@@ -70,20 +71,13 @@ const PageHeader = ({ wide }: Props) => (
               </li>
               <LoginContext.Consumer>
                 {loginContext =>
-                  loginContext && (
-                    <li className="govuk-header__navigation-item">
-                      <a className="govuk-header__link" href="#">
-                        {loginContext.name}
-                      </a>
-                    </li>
+                  loginContext.user ? (
+                    <LoggedInLinks user={loginContext.user} />
+                  ) : (
+                    <NotLoggedInLinks />
                   )
                 }
               </LoginContext.Consumer>
-              <li className="govuk-header__navigation-item">
-                <a className="govuk-header__link" href="#">
-                  Sign out
-                </a>
-              </li>
             </ul>
           </nav>
         </div>
@@ -92,6 +86,29 @@ const PageHeader = ({ wide }: Props) => (
   </>
 );
 
-PageHeader.contextTypes = LoginContext;
+const LoggedInLinks = ({ user }: Authentication) => (
+  <>
+    <li className="govuk-header__navigation-item">
+      <a className="govuk-header__link" href="#">
+        {user ? user.name : ''}
+      </a>
+    </li>
+    <li className="govuk-header__navigation-item">
+      <a className="govuk-header__link" href="#">
+        Sign out
+      </a>
+    </li>
+  </>
+);
+
+const NotLoggedInLinks = () => (
+  <>
+    <li className="govuk-header__navigation-item">
+      <a className="govuk-header__link" href="#">
+        Sign in
+      </a>
+    </li>
+  </>
+);
 
 export default PageHeader;

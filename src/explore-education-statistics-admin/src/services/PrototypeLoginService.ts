@@ -4,6 +4,10 @@ export interface User {
   permissions: string[];
 }
 
+export interface Authentication {
+  user?: User;
+}
+
 export class PrototypeLoginService {
   private static currentUser: User;
 
@@ -21,5 +25,15 @@ export class PrototypeLoginService {
 
   public static getUser(userId: string) {
     return PrototypeLoginService.USERS.filter(_ => _.id === userId)[0];
+  }
+
+  public static getAuthentication(userId: string) {
+    return {
+      user: PrototypeLoginService.getUser(userId),
+    };
+  }
+
+  public static getNoLoggedInUser() {
+    return {};
   }
 }

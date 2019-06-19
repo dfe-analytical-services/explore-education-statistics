@@ -7,6 +7,8 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React from 'react';
 import { RouteChildrenProps } from 'react-router';
+import { LoginContext } from '@admin/components/Login';
+import { Authentication, User } from '@admin/services/PrototypeLoginService';
 import Link from '../components/Link';
 import Page from '../components/Page';
 
@@ -15,13 +17,13 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <span className="govuk-caption-xl">Welcome</span>
-          <h1 className="govuk-heading-xl">
-            John Smith{' '}
-            <span className="govuk-body-s">
-              Not you? <Link to="#">Sign out</Link>
-            </span>
-          </h1>
+          <LoginContext.Consumer>
+            {loginContext =>
+              loginContext.user ? (
+                <UserGreeting user={loginContext.user} />
+              ) : null
+            }
+          </LoginContext.Consumer>
         </div>
         <div className="govuk-grid-column-one-third">
           <RelatedInformation heading="Help and guidance">
@@ -57,5 +59,18 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
     </Page>
   );
 };
+
+const UserGreeting = ({ user }: Authentication) => (
+  <>
+    <span className="govuk-caption-xl">Welcome</span>
+
+    <h1 className="govuk-heading-xl">
+      {user ? user.name : ''}{' '}
+      <span className="govuk-body-s">
+        Not you? <Link to="#">Sign out</Link>
+      </span>
+    </h1>
+  </>
+);
 
 export default BrowseReleasesPage;
