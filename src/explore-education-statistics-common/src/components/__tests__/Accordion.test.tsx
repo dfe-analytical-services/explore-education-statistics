@@ -163,4 +163,28 @@ describe('Accordion', () => {
 
     expect(element.scrollIntoView).toHaveBeenCalled();
   });
+
+  test('open all click causes toggleall to fire', async () => {
+    const toggleAll = jest.fn();
+
+    const { getByText } = render(
+      <Accordion id="test-sections" onToggleAll={toggleAll}>
+        <AccordionSection heading="Test heading">
+          <p>Test content</p>
+        </AccordionSection>
+      </Accordion>,
+    );
+
+    await wait();
+
+    const button = getByText('Open all');
+
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+
+    fireEvent.click(button);
+
+    expect(button).toHaveAttribute('aria-expanded', 'true');
+
+    expect(toggleAll).toHaveBeenCalledWith(true);
+  });
 });
