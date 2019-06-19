@@ -56,6 +56,8 @@ class PublicationReleasePage extends Component<Props> {
       data.publication.releases.slice(1).length +
       data.publication.legacyReleases.length;
 
+    let openAllRefreshCallback = () => {};
+
     return (
       <Page
         breadcrumbs={[
@@ -224,7 +226,12 @@ class PublicationReleasePage extends Component<Props> {
         )}
 
         {data.content.length > 0 && (
-          <Accordion id="contents-sections">
+          <Accordion
+            id="contents-sections"
+            onToggleAll={open => {
+              if (open) openAllRefreshCallback();
+            }}
+          >
             {data.content.map(({ heading, caption, order, content }) => {
               let refreshCallback: () => void;
 
@@ -242,6 +249,11 @@ class PublicationReleasePage extends Component<Props> {
                     id={`content_${order}`}
                     publication={data.publication}
                     refreshCallback={callback => {
+                      const originalOpenAllRefreshCallback = openAllRefreshCallback;
+                      openAllRefreshCallback = () => {
+                        callback();
+                        originalOpenAllRefreshCallback();
+                      };
                       refreshCallback = callback;
                     }}
                   />
