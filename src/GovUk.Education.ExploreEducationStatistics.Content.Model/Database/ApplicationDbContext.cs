@@ -1111,6 +1111,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                        " * unauthorised absence rise due to higher rates of unauthorised holidays\n" +
                                        " * 10% of pupils persistently absent during 2016/17"
                             }
+                        },
+                        
+                        Tables = new List<Table>
+                        {
+                            new Table
+                            {
+                                indicators = new List<string> {"23", "26", "28"}
+                            }
+                        },
+                        Charts = new List<IContentBlockChart>
+                        {
+                            new LineChart
+                            {
+                                XAxis = new Axis
+                                {
+                                    title = "School Year"
+                                },
+                                YAxis = new Axis
+                                {
+                                    title = "Absence Rate"
+                                },
+                                Indicators = new List<string>
+                                {
+                                    "23", "26", "28"
+                                },
+                            }
                         }
                     },
 
@@ -1522,7 +1548,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             startYear = "2012",
                             endYear = "2016",
                             filters = new List<string> { "727" },
-                            indicators = new List<string> { "153", "154", "155", "156", "158" }
+                            indicators = new List<string> { "153", "154", "155", "156", "157", "158", "160" }
                         },
                         Summary = new Summary
                         {
@@ -1545,6 +1571,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     " * number of exclusions increased to 7,720 - up from 6,685 in 2015/16\n" +
                                     " * overall fixed-period exclusions rate increased to 4.76% - up from 4.29% in 2015/16\n" +
                                     " * number of exclusions increased to 381,865 - up from 339,360 in 2015/16\n"
+                            }
+                        },
+                        Tables = new List<Table>
+                        {
+                            new Table
+                            {
+                                indicators = new List<string> { "156", "158", "155"  }
+                            }
+                        },
+   
+                        Charts = new List<IContentBlockChart> {
+                            new LineChart
+                            {
+                                XAxis = new Axis
+                                {
+                                    title = "School Year"
+                                },
+                                YAxis = new Axis
+                                {
+                                    title = ""
+                                },
+                                Indicators = new List<string>
+                                {
+                                    "158", "160"
+                                },
                             }
                         }
                     },
@@ -2161,10 +2212,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                       subjectId = 17,
                       geographicLevel = "National",
-                      startYear = "2018",
+                      startYear = "2014",
                       endYear = "2018",
                       filters = new List<string> { "845" },
-                      indicators = new List<string> { "189", "193", "194" }
+                      indicators = new List<string> { "189", "193", "194", "195", "196", "197", "198", "199" }
                     },
                     Summary = new Summary
                     {
@@ -2184,8 +2235,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                           "* majority of applicants received a preferred offer\n" +
                           "* percentage of applicants receiving secondary first choice offers decreases as applications increase\n" +
                           "* slight proportional increase in applicants receiving primary first choice offer as applications decrease\n"
-                      }
+                      },
+                      
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string> { "189", "193", "194", "195", "198", "199"   }
+                        }
                     }
+   
+                    /*
+                    Charts = new List<IContentBlockChart> {
+                        new LineChart
+                        {
+                            XAxis = new Axis
+                            {
+                                title = "School Year"
+                            },
+                            YAxis = new Axis
+                            {
+                                title = ""
+                            },
+                            Indicators = new List<string>
+                            {
+                                "189", "196", "197"
+                            },
+                        }
+                    }
+                    */
                   },
                   Content = new List<ContentSection>
                   {
