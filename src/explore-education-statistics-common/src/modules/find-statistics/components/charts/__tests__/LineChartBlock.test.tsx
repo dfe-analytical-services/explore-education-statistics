@@ -5,6 +5,8 @@ import LineChartBlock from '../LineChartBlock';
 
 import testData from './__data__/testBlockData';
 
+jest.mock('recharts/lib/util/LogUtils');
+
 describe('LineChartBlock', () => {
   test('renders with correct output', () => {
     const { container } = render(

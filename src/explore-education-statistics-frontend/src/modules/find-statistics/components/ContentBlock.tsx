@@ -5,11 +5,10 @@ import ContentSubBlockRenderer from './ContentSubBlockRenderer';
 interface Props {
   content: Release['content'][0]['content'];
   id: string;
-  refreshCallback?: (callback: () => void) => void;
   publication: Publication;
 }
 
-const ContentBlock = ({ content, id, refreshCallback, publication }: Props) => {
+const ContentBlock = ({ content, id, publication }: Props) => {
   return content.length > 0 ? (
     <>
       {content.map((block, index) => {
@@ -19,7 +18,6 @@ const ContentBlock = ({ content, id, refreshCallback, publication }: Props) => {
             id={id}
             block={block}
             key={key}
-            refreshCallback={refreshCallback}
             publication={publication}
           />
         );

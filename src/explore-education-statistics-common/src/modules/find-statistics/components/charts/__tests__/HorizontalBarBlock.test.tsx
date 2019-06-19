@@ -6,6 +6,8 @@ import HorzontalBarBlock from '../HorizontalBarBlock';
 
 import testData from './__data__/testBlockData';
 
+jest.mock('recharts/lib/util/LogUtils');
+
 describe('HorzontalBarBlock', () => {
   test('renders with correct output', () => {
     const { container } = render(
