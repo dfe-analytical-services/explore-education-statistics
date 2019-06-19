@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import logo from 'govuk-frontend/assets/images/govuk-logotype-crown.png';
 import React from 'react';
+import { LoginContext } from '@admin/components/Login';
 
 interface Props {
   wide?: boolean;
@@ -67,11 +68,17 @@ const PageHeader = ({ wide }: Props) => (
                   Administrators' guide
                 </a>
               </li>
-              <li className="govuk-header__navigation-item">
-                <a className="govuk-header__link" href="#">
-                  John Smith
-                </a>
-              </li>
+              <LoginContext.Consumer>
+                {loginContext =>
+                  loginContext && (
+                    <li className="govuk-header__navigation-item">
+                      <a className="govuk-header__link" href="#">
+                        {loginContext.name}
+                      </a>
+                    </li>
+                  )
+                }
+              </LoginContext.Consumer>
               <li className="govuk-header__navigation-item">
                 <a className="govuk-header__link" href="#">
                   Sign out
@@ -84,5 +91,7 @@ const PageHeader = ({ wide }: Props) => (
     </header>
   </>
 );
+
+PageHeader.contextTypes = LoginContext;
 
 export default PageHeader;
