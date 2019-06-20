@@ -19,8 +19,8 @@ const DashboardReleaseList = ({ releases }: DashboardReleaseListProps) => (
             {window.location.search === '?status=readyApproval' && (
               <li>
                 <DashboardRelease
-                  title="Academic year,"
-                  years="2018 to 2019"
+                  releaseName="2018 to 2019"
+                  timePeriodCoverage="Academic year"
                   tag="Ready to review"
                   review
                   lastEdited={new Date('2019-03-20 17:37')}
@@ -35,8 +35,8 @@ const DashboardReleaseList = ({ releases }: DashboardReleaseListProps) => (
             {window.location.search === '?status=editNewRelease' && (
               <li>
                 <DashboardRelease
-                  title="Academic year,"
-                  years="2018 to 2019"
+                  releaseName="2018 to 2019"
+                  timePeriodCoverage="Academic year"
                   tag="New release in progress"
                   editing={window.location.search === '?status=editNewRelease'}
                   isNew
@@ -50,8 +50,8 @@ const DashboardReleaseList = ({ releases }: DashboardReleaseListProps) => (
             )}
             <li>
               <DashboardRelease
-                title="Academic year,"
-                years="2017 to 2018"
+                releaseName="2017 to 2018"
+                timePeriodCoverage="Academic year"
                 tag={
                   window.location.search === '?status=editLiveRelease'
                     ? 'Editing in progress'
@@ -68,8 +68,8 @@ const DashboardReleaseList = ({ releases }: DashboardReleaseListProps) => (
             </li>
             <li>
               <DashboardRelease
-                title="Academic year,"
-                years="2016 to 2017"
+                releaseName="2016 to 2017"
+                timePeriodCoverage="Academic year"
                 isLive
                 editing={window.location.search === '?status=editLiveRelease'}
                 lastEdited={new Date('2018-03-20 14:23')}
@@ -80,8 +80,8 @@ const DashboardReleaseList = ({ releases }: DashboardReleaseListProps) => (
             </li>
             <li>
               <DashboardRelease
-                title="Academic year,"
-                years="2015 to 2016"
+                releaseName="2015 to 2016"
+                timePeriodCoverage="Academic year"
                 isLive
                 editing={window.location.search === '?status=editLiveRelease'}
                 lastEdited={new Date('2017-03-20 16:15')}

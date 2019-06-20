@@ -6,6 +6,8 @@ import { User } from '@admin/services/PrototypeLoginService';
 import Details from '@common/components/Details';
 
 interface Props {
+  releaseName: string;
+  timePeriodCoverage: string;
   title?: string;
   tag?: string;
   lead?: string;
@@ -14,7 +16,6 @@ interface Props {
   isLive?: boolean;
   editing?: boolean;
   review?: boolean;
-  years: string;
   lastEdited: Date;
   lastEditor: User;
   published: Date;
@@ -24,7 +25,8 @@ interface Props {
 }
 
 const DashboardRelease = ({
-  title,
+  releaseName,
+  timePeriodCoverage,
   tag,
   lead,
   isNew,
@@ -32,7 +34,6 @@ const DashboardRelease = ({
   isLive,
   editing,
   review,
-  years,
   lastEdited,
   lastEditor,
   published,
@@ -43,9 +44,9 @@ const DashboardRelease = ({
   return (
     <Details
       className="govuk-!-margin-bottom-0"
-      summary={`${title} ${years} ${isLive ? '(Live)' : ''} ${
-        isLatest ? '(Live - Latest release)' : ''
-      }`}
+      summary={`${timePeriodCoverage}, ${releaseName} ${
+        isLive ? '(Live)' : ''
+      } ${isLatest ? '(Live - Latest release)' : ''}`}
       tag={tag}
     >
       <dl className="govuk-summary-list govuk-!-margin-bottom-3">

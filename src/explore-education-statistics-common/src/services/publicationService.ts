@@ -17,9 +17,25 @@ export interface Topic {
   theme: Theme;
 }
 
+export interface TimePeriodTerm {
+  id: string;
+  title: string;
+}
+
+export interface TimePeriodAcademicYear {
+  yearStarting: number;
+  timePeriod: TimePeriodTerm;
+  termsPerYear: number;
+}
+
+export interface TimePeriodCalendarYear {
+  year: number;
+}
+
 export interface ReleaseSummary {
   id: string;
   releaseName: string;
+  timePeriodCoverage: TimePeriodAcademicYear | TimePeriodCalendarYear;
   slug: string;
 }
 

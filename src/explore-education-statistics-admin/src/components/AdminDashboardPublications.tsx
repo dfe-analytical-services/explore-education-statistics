@@ -74,8 +74,8 @@ const AdminDashboardPublications = ({
                 <ul className="govuk-list">
                   <li>
                     <DashboardRelease
-                      title="Autumn term, academic year, "
-                      years="2017 to 2018"
+                      releaseName="2017 to 2018"
+                      timePeriodCoverage="Autumn term, academic year, "
                       isLatest
                       editing={
                         window.location.search === '?status=editLiveRelease'
@@ -89,8 +89,8 @@ const AdminDashboardPublications = ({
 
                   <li>
                     <DashboardRelease
-                      title="Autumn term, academic year, "
-                      years="2016 to 2017"
+                      releaseName="2016 to 2017"
+                      timePeriodCoverage="Autumn term, academic year, "
                       isLive
                       lastEdited={new Date('2019-04-24 16:55')}
                       lastEditor={{
@@ -139,8 +139,8 @@ const AdminDashboardPublications = ({
                 <ul className="govuk-list">
                   <li>
                     <DashboardRelease
-                      title="Autumn and spring terms, academic year, "
-                      years="2017 to 2018"
+                      releaseName="2017 to 2018"
+                      timePeriodCoverage="Autumn and spring terms, academic year, "
                       isLatest
                       editing={
                         window.location.search === '?status=editLiveRelease'
@@ -154,8 +154,8 @@ const AdminDashboardPublications = ({
 
                   <li>
                     <DashboardRelease
-                      title="Autumn and spring terms, academic year, "
-                      years="2016 to 2017"
+                      releaseName="2016 to 2017"
+                      timePeriodCoverage="Autumn and spring terms, academic year, "
                       editing
                       isLive
                       lastEdited={new Date('2017-09-23 16:55')}
