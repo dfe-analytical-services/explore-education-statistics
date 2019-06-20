@@ -57,7 +57,7 @@ const PrototypeChartEditor = (props: {}) => {
         summary="Select data to display on chart"
         open={currentStep >= 1}
       >
-        {selectedChartType ? (
+        {selectedChartType && (
           <div>
             <FormCheckboxGroup
               legend="Indicators"
@@ -82,39 +82,38 @@ const PrototypeChartEditor = (props: {}) => {
               }}
             />
           </div>
-        ) : (
-          undefined
         )}
       </Details>
 
-      <Details
-        summary="Select axis and grouping options"
-        open={currentStep >= 2}
-      >
-        {selectedChartType && selectedIndicators.length > 0 ? (
-          <div>
-            <FormFieldset legend="Axis" id="axis">
-              <FormSelect
-                id="axis"
-                label={`Select ${selectedChartType.axis}`}
-                name="Axis"
-                order={[]}
-                options={[
-                  {
-                    value: '',
-                    label: `Select a filter to use for the ${
+      {selectedChartType && selectedChartType.axis.length > 0 && (
+        <Details
+          summary="Select axis and grouping options"
+          open={currentStep >= 2}
+        >
+          {selectedIndicators.length > 0 &&
+            selectedChartType.axis.map((axis, index) => (
+              <div key={axis}>
+                <FormFieldset legend={axis} id={`${axis}_fieldset`}>
+                  <FormSelect
+                    id={axis}
+                    label={`Select a filter to use for the ${
                       selectedChartType.axis
-                    }`,
-                  },
-                  ...Object.values(Data.filters),
-                ]}
-              />
-            </FormFieldset>
-          </div>
-        ) : (
-          undefined
-        )}
-      </Details>
+                    } ${index === 0 ? '(required)' : '(optional)'}`}
+                    name={axis}
+                    order={[]}
+                    options={[
+                      {
+                        value: '',
+                        label: `Select...`,
+                      },
+                      ...Object.values(Data.filters),
+                    ]}
+                  />
+                </FormFieldset>
+              </div>
+            ))}
+        </Details>
+      )}
     </div>
   );
 };

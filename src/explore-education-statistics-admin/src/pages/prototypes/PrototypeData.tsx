@@ -5,28 +5,34 @@ export interface ChartType {
   type: string;
   title: string;
 
-  axis?: string;
+  axis: string[];
+  hasLegend: boolean;
 }
 
 const chartTypes: ChartType[] = [
   {
     type: 'line',
     title: 'Line Chart',
-    axis: 'X axis',
+    axis: ['X Axis', 'Group fields'],
+    hasLegend: true,
   },
   {
     type: 'horizontal',
     title: 'Horizontal bar',
-    axis: 'Y axis',
+    axis: ['Y Axis', 'Group fields'],
+    hasLegend: true,
   },
   {
     type: 'vertical',
     title: 'Vertical bar',
-    axis: 'X axis',
+    axis: ['X Axis', 'Group fields'],
+    hasLegend: true,
   },
   {
     type: 'map',
     title: 'Map',
+    axis: [],
+    hasLegend: false,
   },
 ];
 
