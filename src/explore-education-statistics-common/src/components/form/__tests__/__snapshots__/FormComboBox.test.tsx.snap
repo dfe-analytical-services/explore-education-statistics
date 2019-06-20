@@ -2,7 +2,9 @@
 
 exports[`FormComboBox renders with no options by default 1`] = `
 
-<div class="container">
+<div class="container"
+     role="none"
+>
   <div aria-expanded="true"
        aria-owns="test-combobox-options"
        aria-haspopup="listbox"
@@ -28,7 +30,9 @@ exports[`FormComboBox renders with no options by default 1`] = `
 
 exports[`FormComboBox renders with options in correct order when input changes 1`] = `
 
-<div class="container">
+<div class="container"
+     role="none"
+>
   <div aria-expanded="true"
        aria-owns="test-combobox-options"
        aria-haspopup="listbox"
