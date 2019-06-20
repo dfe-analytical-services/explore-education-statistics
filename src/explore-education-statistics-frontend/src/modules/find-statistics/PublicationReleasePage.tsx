@@ -226,24 +226,16 @@ class PublicationReleasePage extends Component<Props> {
         {data.content.length > 0 && (
           <Accordion id="contents-sections">
             {data.content.map(({ heading, caption, order, content }) => {
-              let refreshCallback: () => void;
-
               return (
                 <AccordionSection
                   heading={heading}
                   caption={caption}
                   key={order}
-                  onToggle={open => {
-                    if (open && refreshCallback) refreshCallback();
-                  }}
                 >
                   <ContentBlock
                     content={content}
                     id={`content_${order}`}
                     publication={data.publication}
-                    refreshCallback={callback => {
-                      refreshCallback = callback;
-                    }}
                   />
                 </AccordionSection>
               );

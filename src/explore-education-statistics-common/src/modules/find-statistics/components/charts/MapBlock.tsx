@@ -29,7 +29,6 @@ export type MapFeature = Feature<Geometry, GeoJsonProperties>;
 interface MapProps extends ChartProps {
   position?: { lat: number; lng: number };
   maxBounds?: LatLngBounds;
-  refreshCallback?: (callback: () => void) => void;
 }
 
 interface IdValue {
@@ -91,6 +90,8 @@ class MapBlock extends Component<MapProps, MapState> {
 
   private readonly geoJsonRef = createRef<GeoJSON>();
 
+  private readonly container = createRef<HTMLDivElement>();
+
   public state: MapState = {
     selected: {
       indicator: '',
@@ -105,8 +106,10 @@ class MapBlock extends Component<MapProps, MapState> {
     legend: [],
   };
 
+  private intersectionObserver!: IntersectionObserver;
+
   public async componentDidMount() {
-    const { data, meta, refreshCallback } = this.props;
+    const { data, meta } = this.props;
     let { selected } = this.state;
 
     const sortedMeasures = Object.values(meta.indicators).sort((a, b) =>
@@ -150,18 +153,12 @@ class MapBlock extends Component<MapProps, MapState> {
       ukGeometry: imported.default,
     });
 
-    const forceRefresh = () => {
-      if (this.mapRef.current) {
-        this.mapRef.current.leafletElement.invalidateSize();
-      } else {
-        window.requestAnimationFrame(forceRefresh);
-      }
-    };
+    this.registerResizingCheck();
+  }
 
-    window.requestAnimationFrame(forceRefresh);
-
-    if (refreshCallback) {
-      refreshCallback(() => forceRefresh());
+  public componentWillUnmount(): void {
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
     }
   }
 
@@ -334,6 +331,30 @@ class MapBlock extends Component<MapProps, MapState> {
       ),
     });
   };
+
+  private registerResizingCheck() {
+    if (this.container.current && this.container.current.parentElement) {
+      this.intersectionObserver = new IntersectionObserver(
+        entries => {
+          if (entries.length > 0) {
+            if (entries[0].intersectionRatio > 0) {
+              if (this.mapRef.current) {
+                const { current } = this.mapRef;
+                requestAnimationFrame(() => {
+                  current.leafletElement.invalidateSize();
+                });
+              }
+            }
+          }
+        },
+        {
+          threshold: 0.00001,
+        },
+      );
+
+      this.intersectionObserver.observe(this.container.current);
+    }
+  }
 
   private onSelectIndicator = (newSelectedIndicator: string) => {
     const { data, meta } = this.props;
@@ -534,7 +555,7 @@ class MapBlock extends Component<MapProps, MapState> {
     */
 
     return (
-      <div className="govuk-grid-row">
+      <div className="govuk-grid-row" ref={this.container}>
         <div
           className={classNames('govuk-grid-column-one-third')}
           aria-live="assertive"

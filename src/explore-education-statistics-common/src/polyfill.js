@@ -52,3 +52,7 @@ if (!Element.prototype.closest) {
     return null;
   };
 }
+
+if (!window.IntersectionObserver) {
+  require('intersection-observer');
+}
