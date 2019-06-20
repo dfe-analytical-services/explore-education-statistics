@@ -3,22 +3,15 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedInformation from '@common/components/RelatedInformation';
-import { contentApi } from '@common/services/api';
+import methodologyService, { Theme } from '@common/services/methodologyService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
 import React, { Component } from 'react';
 import MethodologyList from './components/MethodologyList';
-import { Topic } from './components/TopicList';
 
 interface Props {
-  themes: {
-    id: string;
-    slug: string;
-    title: string;
-    summary: string;
-    topics: Topic[];
-  }[];
+  themes: Theme[];
 }
 
 class MethodologyIndexPage extends Component<Props> {
@@ -27,7 +20,7 @@ class MethodologyIndexPage extends Component<Props> {
   };
 
   public static async getInitialProps() {
-    const themes = await contentApi.get('/Download/tree');
+    const themes = await methodologyService.getMethodologies();
     return { themes };
   }
 

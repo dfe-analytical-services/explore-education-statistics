@@ -1,15 +1,8 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import React from 'react';
-import MethodologyList, { Publication } from './MethodologyList';
-
-export interface Topic {
-  id: string;
-  slug: string;
-  summary: string;
-  title: string;
-  publications: Publication[];
-}
+import { Topic } from '@common/services/methodologyService';
+import MethodologyList from './MethodologyList';
 
 interface Props {
   theme: string;

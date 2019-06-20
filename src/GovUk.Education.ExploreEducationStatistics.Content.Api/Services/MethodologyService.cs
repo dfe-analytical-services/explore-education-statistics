@@ -28,6 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             {
                 Id = t.Id,
                 Title = t.Title,
+                Summary = t.Summary,
                 Topics = t.Topics.Select(x => new TopicTree
                 {
                     Id = x.Id,

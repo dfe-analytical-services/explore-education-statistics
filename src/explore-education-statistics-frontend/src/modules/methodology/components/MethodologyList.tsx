@@ -1,12 +1,6 @@
 import Link from '@frontend/components/Link';
 import React from 'react';
-
-export interface Publication {
-  id: string;
-  slug: string;
-  summary: string;
-  title: string;
-}
+import { Publication } from '@common/services/methodologyService';
 
 interface Props {
   publications: Publication[];
@@ -14,27 +8,17 @@ interface Props {
 
 function MethodologyList({ publications }: Props) {
   return (
-    <>
+    <ul className="govuk-list govuk-list--bullet">
       {publications.length > 0 ? (
-        publications.map(({ id, title }) => (
+        publications.map(({ id, title, slug }) => (
           <>
-            <ul className="govuk-list govuk-list--bullet">
-              <li>
-                <Link to="#">Example methodology 1</Link>
-              </li>
-              <li>
-                <Link to="#">Example methodology 2</Link>
-              </li>
-              <li>
-                <Link to="#">Example methodology 3</Link>
-              </li>
-            </ul>
+            <Link to={`/methodology/${slug}`}>{title}</Link>{' '}
           </>
         ))
       ) : (
         <></>
       )}
-    </>
+    </ul>
   );
 }
 
