@@ -5,6 +5,8 @@ import VerticalBarBlock from '../VerticalBarBlock';
 
 import testData from './__data__/testBlockData';
 
+jest.mock('recharts/lib/util/LogUtils');
+
 describe('VerticalBarBlock', () => {
   test('renders with correct output', () => {
     const { container } = render(

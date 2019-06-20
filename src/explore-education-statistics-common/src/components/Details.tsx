@@ -1,5 +1,6 @@
 import useMounted from '@common/hooks/useMounted';
 import useToggle from '@common/hooks/useToggle';
+import findAllParents from '@common/lib/dom/findAllParents';
 import classNames from 'classnames';
 import React, { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 
@@ -125,3 +126,17 @@ const Details = ({
 };
 
 export default Details;
+
+export const openAllParentDetails = (target: HTMLElement) => {
+  const textContainers = findAllParents(target, '.govuk-details__text');
+
+  textContainers.forEach(textContainer => {
+    const summary = document.querySelector<HTMLElement>(
+      `summary[aria-controls="${textContainer.id}"]`,
+    );
+
+    if (summary && summary.getAttribute('aria-expanded') === 'false') {
+      summary.click();
+    }
+  });
+};

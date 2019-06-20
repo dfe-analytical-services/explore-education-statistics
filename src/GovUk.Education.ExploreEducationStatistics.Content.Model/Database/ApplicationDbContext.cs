@@ -759,7 +759,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Title = "Permanent and fixed-period exclusions in England",
                   Summary = "",
                   TopicId = new Guid("77941b7d-bbd6-4069-9107-565af89e2dec"),
-                  Slug = "permanent-and-fixed-period-exclusions-in-england"
+                  Slug = "permanent-and-fixed-period-exclusions-in-england",
+                  NextUpdate = new DateTime(2019, 7, 19)
               },
               new Publication
               {
@@ -768,7 +769,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Summary = "",
                   TopicId = new Guid("67c249de-1cca-446e-8ccb-dcdac542f460"),
                   Slug = "pupil-absence-in-schools-in-england",
-                  NextUpdate = new DateTime(2018, 3, 22),
+                  NextUpdate = new DateTime(2019, 3, 22),
                   DataSource =
                     "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)",
                   ContactId = new Guid("11bb7387-e85e-4571-9669-8a760dcb004f")
@@ -825,6 +826,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                   Summary = "",
                   TopicId = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
                   Slug = "secondary-and-primary-schools-applications-and-offers",
+                  NextUpdate = new DateTime(2019, 6, 14),
               },
               new Publication
               {
@@ -1092,15 +1094,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         {
                             dataKeys = new List<string>
                             {
-                                "23",
                                 "26",
-                                "28"
+                                "28",
+                                "23"
                             },
                             dataSummary = new List<string>
                             {
-                                "Up from 40.1 in 2015/16",
-                                "Down from 40.1 in 2015/16",
-                                "Up from 40.1 in 2015/16"
+                                "Up from 4.6% in 2015/16",
+                                "Similar to previous years",
+                                "Up from 1.1% in 2015/16"
                             },
                             description = new MarkDownBlock
                             {
@@ -1108,6 +1110,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                        " * overall and unauthorised absence rates up on 2015/16\n" +
                                        " * unauthorised absence rise due to higher rates of unauthorised holidays\n" +
                                        " * 10% of pupils persistently absent during 2016/17"
+                            }
+                        },
+                        
+                        Tables = new List<Table>
+                        {
+                            new Table
+                            {
+                                indicators = new List<string> {"23", "26", "28"}
+                            }
+                        },
+                        Charts = new List<IContentBlockChart>
+                        {
+                            new LineChart
+                            {
+                                XAxis = new Axis
+                                {
+                                    title = "School Year"
+                                },
+                                YAxis = new Axis
+                                {
+                                    title = "Absence Rate"
+                                },
+                                Indicators = new List<string>
+                                {
+                                    "23", "26", "28"
+                                },
                             }
                         }
                     },
@@ -1127,7 +1155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         "- secondary schools\n" +
                                         "- special schools\n\n" +
                                         "They also includes information fo [pupil referral units](../glossary#pupil-referral-unit) and pupils aged 4 years.\n\n" +
-                                        "We use the key measures of [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) to monitor pupil absence and also include [absence by reason](#contents-section-heading-4) and [pupil characteristics](#contents-section-heading-6).\n\n" +
+                                        "We use the key measures of [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) to monitor pupil absence and also include [absence by reason](#contents-sections-heading-4) and [pupil characteristics](#contents-sections-heading-6).\n\n" +
                                         "The statistics and data are available at national, regional, local authority (LA) and school level and are used by LAs and schools to compare their local absence rates to regional and national averages for different pupil groups.\n\n" +
                                         "They're also used for policy development as key indicators in behaviour and school attendance policy.\n"
                                 }
@@ -1212,7 +1240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     "It also accounted for almost a third (31.6%) of all [authorised absence](../glossary#authorised-absence) and more than half (53.8%) of all [unauthorised absence](../glossary#unauthorised-absence).\n\n" +
                                     "Overall, it's increased across primary and secondary schools to 10.8% - up from 10.5% in 2015 to 16."
                                 },
-                                new DataBlock
+/*                                new DataBlock
                                 {
                                     Heading = null,
                                     DataBlockRequest = new DataBlockRequest
@@ -1249,7 +1277,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             },
                                         }
                                     }
-                                },
+                                },*/
                                 new MarkDownBlock
                                 {
                                     Body =
@@ -1273,7 +1301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     "* rate of absence by reason - the rate of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of possible sessions\n\n" +
                                     "* one or more sessions missed due to each reason - the number of pupils missing at least 1 session due to each reason"
                                 },
-                                new DataBlock
+/*                                new DataBlock
                                 {
                                     Heading = null,
                                     DataBlockRequest = new DataBlockRequest
@@ -1310,7 +1338,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             },
                                         }
                                     }
-                                },
+                                },*/
                                 new MarkDownBlock
                                 {
                                     Body =
@@ -1358,7 +1386,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                      "The [overall absence](../glossary#overall-absence) and [persistent absence](..glossary#persistent-absence) patterns for pupils with different characteristics have been consistent over recent years.\n\n" +
+                                      "The [overall absence](../glossary#overall-absence) and [persistent absence](../glossary#persistent-absence) patterns for pupils with different characteristics have been consistent over recent years.\n\n" +
                                       "**Ethnic groups**\n\n" +
                                       "Overall absence rate:\n\n" +
                                       "* Travellers of Irish heritage and Gypsy / Roma pupils - highest at 18.1% and 12.9% respectively\n\n" +
@@ -1447,7 +1475,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         "* South West - 4.8%\n\n" +
                                         "Meanwhile, Inner and Outer London had the lowest rates at 4.4%.\n\n" +
                                         "**Persistent absence**\n\n" +
-                                        "The region with the highest persistent absence rate was Yorkshire and the Humber with 11.9% while Outer London had the lowest rate at 10%.\n\n" 
+                                        "The region with the highest persistent absence rate was Yorkshire and the Humber with 11.9% while Outer London had the lowest rate at 10%."
                                 }
                             }
                         }
@@ -1489,7 +1517,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
                     Content = new List<ContentSection>
                     {
-                        new ContentSection {Order = 1, Heading = "About this release", Caption = ""},
+                        new ContentSection {Order = 1, Heading = "About these statistics", Caption = ""},
                         new ContentSection {Order = 2, Heading = "Absence rates", Caption = ""},
                         new ContentSection {Order = 3, Heading = "Persistent absence", Caption = ""},
                         new ContentSection {Order = 4, Heading = "Distribution of absence", Caption = ""},
@@ -1506,7 +1534,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Title = "Permanent and fixed-period exclusions statistics for schools in England",
                     ReleaseName = "2016 to 2017",
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                    Published = new DateTime(2018, 3, 22),
+                    Published = new DateTime(2018, 7, 19),
                     Slug = "2016-17",
                     Summary =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
@@ -1520,21 +1548,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             startYear = "2012",
                             endYear = "2016",
                             filters = new List<string> { "727" },
-                            indicators = new List<string> { "153", "154", "155", "156", "158" }
+                            indicators = new List<string> { "153", "154", "155", "156", "157", "158", "160" }
                         },
                         Summary = new Summary
                         {
                             dataKeys = new List<string>
                             {
-                                "155",
                                 "156",
-                                "158"
+                                "158",
+                                "155"
                             },
                             dataSummary = new List<string>
                             {
-                                "Up from 40.1 in 2015/16",
-                                "Down from 40.1 in 2015/16",
-                                "Up from 40.1 in 2015/16"
+                                "Up from 0.08 in 2015/16",
+                                "Up from 4.29% in 2015/16",
+                                "Up from 6,685 in 2015/16"
                             },
                             description = new MarkDownBlock
                             {
@@ -1543,6 +1571,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     " * number of exclusions increased to 7,720 - up from 6,685 in 2015/16\n" +
                                     " * overall fixed-period exclusions rate increased to 4.76% - up from 4.29% in 2015/16\n" +
                                     " * number of exclusions increased to 381,865 - up from 339,360 in 2015/16\n"
+                            }
+                        },
+                        Tables = new List<Table>
+                        {
+                            new Table
+                            {
+                                indicators = new List<string> { "156", "158", "155"  }
+                            }
+                        },
+   
+                        Charts = new List<IContentBlockChart> {
+                            new LineChart
+                            {
+                                XAxis = new Axis
+                                {
+                                    title = "School Year"
+                                },
+                                YAxis = new Axis
+                                {
+                                    title = ""
+                                },
+                                Indicators = new List<string>
+                                {
+                                    "158", "160"
+                                },
                             }
                         }
                     },
@@ -1702,10 +1755,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 {
                                     Body =
                                       "**Pupils with one or more fixed-period exclusion definition**\n\n" +
-                                      "The number of pupils with one or more [fixed-period exclusion](../glossary#one-or-more-fixed-period-exclusion) has increased across state-funded primary, secondary and special schools to 183,475 (2.29% of pupils) up from 167,125 (2.11% of pupils) in 2015/16.\n\n" +
+                                      "The number of pupils with [one or more fixed-period exclusion](../glossary#one-or-more-fixed-period-exclusion) has increased across state-funded primary, secondary and special schools to 183,475 (2.29% of pupils) up from 167,125 (2.11% of pupils) in 2015/16.\n\n" +
                                       "Of these kinds of pupils, 59.1% excluded on only 1 occasion while 1.5% received 10 or more fixed-period exclusions during the year.\n\n" +
                                       "The percentage of pupils who went on to receive a [permanent exclusion](../glossary#permanent-exclusion) was 3.5%.\n\n" +
-                                      "The average length of [fixed-period exclusions](../glossary#fixed-period-exclusions) across schools decreased to 2.1 days - slightly shorter than in 2015/16.\n\n" +
+                                      "The average length of [fixed-period exclusion](../glossary#fixed-period-exclusion) across schools decreased to 2.1 days - slightly shorter than in 2015/16.\n\n" +
                                       "The highest proportion of fixed-period exclusions (46.6%) lasted for only 1 day.\n\n" +
                                       "Only 2.0% of fixed-period exclusions lasted for longer than 1 week and longer fixed-period exclusions were more prevalent in secondary schools."
                                 }
@@ -1740,7 +1793,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                      "We saw a similar pattern to previous years where the following groups (ones where we usually expect to see higher exclusion rates) showing an increase in exclusions since 2015/16:\n\n" +
+                                      "There was a similar pattern to previous years where the following groups (where higher exclusion rates are expected) showed an increase in exclusions since 2015/16:\n\n" +
                                       "* boys\n\n" +
                                       "* national curriculum years 9 and 10\n\n" +
                                       "* pupils with special educational needs (SEN)\n\n" +
@@ -1772,7 +1825,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new MarkDownBlock
                                 {
                                     Body =
-                                      "There were 560 reviews lodged with [independent review panels](../glossary#independent-review-panels) in maintained primary, secondary and special schools and academies of which 525 (93.4%) were determined and 45 (8.0%) resulted in an offer of reinstatement."
+                                      "There were 560 reviews lodged with [independent review panels](../glossary#independent-review-panel) in maintained primary, secondary and special schools and academies of which 525 (93.4%) were determined and 45 (8.0%) resulted in an offer of reinstatement."
                                 }
                             }
                         },
@@ -1798,22 +1851,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = "",
                             Content = new List<IContentBlock>
                             {
-                                new DataBlock {                                         
-                                    DataBlockRequest = new DataBlockRequest {
-                                        subjectId = 12,
-                                        geographicLevel = "Local_Authority",
-                                        startYear = "2016",
-                                        endYear = "2017",
-                                        indicators = new List<string> { "155" , "156" , "158" },
-                                        filters = new List<string> { "727" }
-                                    },         
-                                    Charts = new List<IContentBlockChart> {
-                                        new MapChart {
-                                            Indicators = new List<string> { "155" , "156" , "158" }
-                                        }
-                                    }
+                                // new DataBlock {
+                                //     DataBlockRequest = new DataBlockRequest {
+                                //         subjectId = 12,
+                                //         geographicLevel = "Local_Authority",
+                                //         startYear = "2016",
+                                //         endYear = "2017",
+                                //         indicators = new List<string> { "155" , "156" , "158" },
+                                //         filters = new List<string> { "727" }
+                                //     },
+                                //     Charts = new List<IContentBlockChart> {
+                                //         new MapChart {
+                                //             Indicators = new List<string> { "155" , "156" , "158" }
+                                //         }
+                                //     }
                                         
-                                },
+                                // },
                                 new MarkDownBlock
                                 {
                                     Body =
@@ -1823,7 +1876,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                       "* North West - 0.14%\n\n" +
                                       "* North West - 0.14%\n\n" +
                                       "Similar to 2015/16, the regions with the lowest rates were:\n\n" +
-                                      "* the South East - 0.06%\n\n" +
+                                      "* South East - 0.06%\n\n" +
                                       "* Yorkshire and the Humber - 0.07%\n\n" +
                                       "**Fixed-period exclusion**\n\n" +
                                       "Similar to 2015/16, the region with the highest rates across all school types was Yorkshire and the Humber at 7.22% while the lowest rate was in Outer London (3.49%)."
@@ -2161,14 +2214,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                       geographicLevel = "National",
                       startYear = "2014",
                       endYear = "2018",
-                      filters = new List<string> { "845" /*, "848"*/ },
-                      indicators = new List<string> { "193" }
+                      filters = new List<string> { "845" },
+                      indicators = new List<string> { "189", "193", "194", "195", "196", "197", "198", "199" }
                     },
                     Summary = new Summary
                     {
                       dataKeys = new List<string>
                       {
-                        "193"
+                        "189", "193", "194"
+                      },
+                      dataSummary = new List<string>
+                      {
+                        "Down from 620,330 in 2017",
+                        "Down from 558,411 in 2017",
+                        "Down from 34,792 in 2017"
                       },
                       description = new MarkDownBlock
                       {
@@ -2176,8 +2235,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                           "* majority of applicants received a preferred offer\n" +
                           "* percentage of applicants receiving secondary first choice offers decreases as applications increase\n" +
                           "* slight proportional increase in applicants receiving primary first choice offer as applications decrease\n"
-                      }
+                      },
+                      
+                    },
+                    Tables = new List<Table>
+                    {
+                        new Table
+                        {
+                            indicators = new List<string> { "189", "193", "194", "195", "198", "199"   }
+                        }
                     }
+   
+                    /*
+                    Charts = new List<IContentBlockChart> {
+                        new LineChart
+                        {
+                            XAxis = new Axis
+                            {
+                                title = "School Year"
+                            },
+                            YAxis = new Axis
+                            {
+                                title = ""
+                            },
+                            Indicators = new List<string>
+                            {
+                                "189", "196", "197"
+                            },
+                        }
+                    }
+                    */
                   },
                   Content = new List<ContentSection>
                   {
@@ -2226,16 +2313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                               startYear = "2014",
                               endYear = "2018",
                               filters = new List<string> { "848" },
-                              indicators = new List<string> { "197", "198", "199" }
-                          },
-                          Charts = new List<IContentBlockChart>
-                          {
-                              new LineChart
-                              {
-                                  Indicators = new List<string>{  "197", "198", "199"  },
-                                  XAxis = new Axis{ title = "year"},
-                                  YAxis = new Axis{ title = ""}
-                              }
+                              indicators = new List<string> { "197", "198", "199", "200" }
                           },
                           Tables = new List<Table>
                           {
@@ -2270,23 +2348,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             "**Regional variation**\n\n" +
                             "There's much less regional variation in the proportions receiving any preferred offer compared to those for receiving a first preference as shown in the following chart."
                         },
-                        new DataBlock
-                        {
-                          Heading = "Chart showing Secondary school preferences by region, 2018",
-                          DataBlockRequest = new DataBlockRequest {
-                              subjectId = 17,
-                              geographicLevel = "Local_Authority",
-                              startYear = "2017",
-                              endYear = "2018",
-                              indicators = new List<string> { "192" },
-                              filters = new List<string> { "848" }
-                          },         
-                          Charts = new List<IContentBlockChart> {
-                              new MapChart {
-                                  Indicators = new List<string> { "192" }
-                              }
-                          }
-                        },
+                        // new DataBlock
+                        // {
+                        //   Heading = "Chart showing Secondary school preferences by region, 2018",
+                        //   DataBlockRequest = new DataBlockRequest {
+                        //       subjectId = 17,
+                        //       geographicLevel = "Local_Authority",
+                        //       startYear = "2017",
+                        //       endYear = "2018",
+                        //       indicators = new List<string> { "192" },
+                        //       filters = new List<string> { "848" }
+                        //   },
+                        //   Charts = new List<IContentBlockChart> {
+                        //       new MapChart {
+                        //           Indicators = new List<string> { "192" }
+                        //       }
+                        //   }
+                        // },
                         new MarkDownBlock
                         {
                           Body =
@@ -2332,16 +2410,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                               startYear = "2014",
                               endYear = "2018",
                               filters = new List<string> { "845" },
-                              indicators = new List<string> { "197", "198", "199" }
-                          },
-                          Charts = new List<IContentBlockChart>
-                          {
-                              new LineChart
-                              {
-                                  Indicators = new List<string>{  "197", "198", "199"  },
-                                  XAxis = new Axis{ title = "year"},
-                                  YAxis = new Axis{ title = ""}
-                              }
+                              indicators = new List<string> { "197", "198", "199", "200" }
                           },
                           Tables = new List<Table>
                           {
@@ -2374,28 +2443,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             "* primary first preference rate increased to 86.6% - up from 85.9% in 2017\n\n" +
                             "* secondary first preference rate decreased to 66% - down from 68.% in 2017"
                         },
-                        new DataBlock
-                        {
-                          Heading = "Chart showing Primary school preferences by region, 2018",
-                          DataBlockRequest = new DataBlockRequest {
-                              subjectId = 17,
-                              geographicLevel = "Local_Authority",
-                              startYear = "2017",
-                              endYear = "2018",
-                              indicators = new List<string> { "193" },
-                              filters = new List<string> { "845" }
-                          },         
-                          Charts = new List<IContentBlockChart> {
-                              new MapChart {
-                                  Indicators = new List<string> { "193" }
-                              }
-                          }
-                        },
+                        // new DataBlock
+                        // {
+                        //   Heading = "Chart showing Primary school preferences by region, 2018",
+                        //   DataBlockRequest = new DataBlockRequest {
+                        //       subjectId = 17,
+                        //       geographicLevel = "Local_Authority",
+                        //       startYear = "2017",
+                        //       endYear = "2018",
+                        //       indicators = new List<string> { "193" },
+                        //       filters = new List<string> { "845" }
+                        //   },
+                        //   Charts = new List<IContentBlockChart> {
+                        //       new MapChart {
+                        //           Indicators = new List<string> { "193" }
+                        //       }
+                        //   }
+                        // },
                         new MarkDownBlock
                         {
                           Body =
                             "**Primary offers**\n\n" +
-                            "In 2018, 97.1% of pimary offers made were from schools inside the home authority. This figure has been stable since 2014 when this data was first collected and published.\n\n" +
+                            "In 2018, 97.1% of primary offers made were from schools inside the home authority. This figure has been stable since 2014 when this data was first collected and published.\n\n" +
                             "As in previous years, at primary level a smaller proportion of offers were made of schools outside the applicant’s home authority compared to secondary level."
                         }
                       }

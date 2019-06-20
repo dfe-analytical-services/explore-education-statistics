@@ -77,9 +77,23 @@ export default function SummaryRenderer({
                   <p className="govuk-body-s">{dataSummary[index]}</p>
                 )}
               </div>
-              <Details summary={`What is ${meta.indicators[key].label}?`}>
-                Overall absence is the adipisicing elit. Dolorum hic nobis
-                voluptas quidem fugiat enim ipsa reprehenderit nulla.
+              <Details summary={`Define '${meta.indicators[key].label}'`}>
+                <p>
+                  This service is not yet available
+                  {/*
+                  {`${
+                    meta.indicators[key].label
+                  } is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.`}
+                  */}
+                </p>
+                {/*
+                <a
+                  className="govuk-details__summary-text"
+                  href={`/glossary#${meta.indicators[key].label}`}
+                >
+                  More &gt;&gt;&gt;
+                </a>
+                */}
               </Details>
             </div>
           );

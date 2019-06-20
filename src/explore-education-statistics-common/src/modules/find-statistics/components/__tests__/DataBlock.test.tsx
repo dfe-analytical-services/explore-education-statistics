@@ -5,10 +5,11 @@ import _dataBlockService, {
 } from '@common/services/dataBlockService';
 import React from 'react';
 import { render, wait } from 'react-testing-library';
-import { SummaryRendererProps } from '@common/modules/find-statistics/components/SummaryRenderer';
 import DataBlock from '../DataBlock';
 
 jest.mock('@common/services/dataBlockService');
+
+jest.mock('recharts/lib/util/LogUtils');
 
 const dataBlockService = _dataBlockService as jest.Mocked<
   typeof _dataBlockService

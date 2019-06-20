@@ -132,5 +132,9 @@
   "jest-junit": {
     "ancestorSeparator": " › "
   },
-  "dependencies": {}
+  "dependencies": {
+    "@types/react-highlight-words": "^0.16.0",
+    "intersection-observer": "^0.7.0",
+    "react-highlight-words": "^0.16.0"
+  }
 }

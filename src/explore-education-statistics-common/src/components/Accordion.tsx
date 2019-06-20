@@ -1,15 +1,22 @@
 import isComponentType from '@common/lib/type-guards/components/isComponentType';
 import classNames from 'classnames';
-import React, { cloneElement, Component, createRef, ReactNode } from 'react';
+import React, {
+  cloneElement,
+  Component,
+  createRef,
+  MouseEvent,
+  ReactNode,
+} from 'react';
 import styles from './Accordion.module.scss';
 import AccordionSection, {
+  accordionSectionClasses,
   AccordionSectionProps,
-  classes,
 } from './AccordionSection';
 
 export interface AccordionProps {
   children: ReactNode;
   id: string;
+  onToggleAll?: (open: boolean) => void;
 }
 
 interface State {
@@ -64,11 +71,13 @@ class Accordion extends Component<AccordionProps, State> {
       }
 
       if (locationHashEl) {
-        const sectionEl = locationHashEl.closest(`.${classes.section}`);
+        const sectionEl = locationHashEl.closest(
+          `.${accordionSectionClasses.section}`,
+        );
 
         if (sectionEl) {
           const contentEl = sectionEl.querySelector(
-            `.${classes.sectionContent}`,
+            `.${accordionSectionClasses.sectionContent}`,
           );
 
           if (contentEl) {
@@ -92,6 +101,18 @@ class Accordion extends Component<AccordionProps, State> {
     }
   };
 
+  public onClick = (e: MouseEvent) => {
+    const target = e.target as Element;
+    if (target.classList.contains('govuk-accordion__open-all')) {
+      const open = target.getAttribute('aria-expanded') === 'true';
+
+      const { onToggleAll } = this.props;
+      if (onToggleAll) {
+        onToggleAll(open);
+      }
+    }
+  };
+
   public render() {
     const { children, id } = this.props;
     const { openSectionId } = this.state;
@@ -103,6 +124,8 @@ class Accordion extends Component<AccordionProps, State> {
         className={classNames('govuk-accordion', styles.accordionPrint)}
         ref={this.ref}
         id={id}
+        onClick={this.onClick}
+        role="none"
       >
         {React.Children.map(children, child => {
           if (isComponentType(child, AccordionSection)) {
