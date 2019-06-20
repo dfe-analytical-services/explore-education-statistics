@@ -20,7 +20,7 @@ export enum GeographicLevel {
   Ward = 'Ward',
 }
 
-interface Country {
+export interface Country {
   country_code: string;
   country_name: string;
 }

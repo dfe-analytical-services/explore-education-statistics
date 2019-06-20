@@ -8,6 +8,9 @@ import {
   FormCheckboxGroup,
   FormFieldset,
 } from '@common/components/form';
+import useToggle from '@common/hooks/useToggle';
+import ChartRenderer from '@common/modules/find-statistics/components/ChartRenderer';
+import { Axis } from '@common/services/publicationService';
 import styles from './PrototypeChartEditor.module.scss';
 import Data, { ChartType } from '../PrototypeData';
 
@@ -27,6 +30,53 @@ const PrototypeChartEditor = (props: {}) => {
   const indicatorOptions = Object.values(Data.indicators).map(
     ({ value, label }) => ({ value, label, checked: false }),
   );
+
+  const [selectedAxes, updateSelectedAxes] = React.useState<string[]>([]);
+
+  const [useLegend, setUseLegend] = useToggle(false);
+
+  const isValidChartOptions = () => {
+    if (selectedChartType) {
+      if (selectedIndicators.length === 0) {
+        return false;
+      }
+
+      if (selectedChartType.axis.length > 0) {
+        return (
+          selectedAxes && selectedAxes.length > 0 && selectedAxes[0] !== ''
+        );
+      }
+
+      return true;
+    }
+
+    return false;
+  };
+
+  const renderDataChart = () => {
+    if (selectedChartType) {
+      const xAxis: Axis = {
+        title: '',
+      };
+
+      const yAxis: Axis = {
+        title: '',
+      };
+
+      return (
+        <ChartRenderer
+          type={selectedChartType.type}
+          data={Data.responseData}
+          meta={Data.responseData.metaData}
+          indicators={selectedIndicators}
+          xAxis={xAxis}
+          yAxis={yAxis}
+        />
+      );
+    }
+
+    return <div>Chart is not set up correctly</div>;
+  };
 
   return (
     <div className={styles.editor}>
@@ -96,9 +146,9 @@ const PrototypeChartEditor = (props: {}) => {
                 <FormFieldset legend={axis} id={`${axis}_fieldset`}>
                   <FormSelect
                     id={axis}
-                    label={`Select a filter to use for the ${
-                      selectedChartType.axis
-                    } ${index === 0 ? '(required)' : '(optional)'}`}
+                    label={`Select a filter to use for the ${axis} ${
+                      index === 0 ? '(required)' : '(optional)'
+                    }`}
                     name={axis}
                     order={[]}
                     options={[
@@ -108,10 +158,22 @@ const PrototypeChartEditor = (props: {}) => {
                       },
                       ...Object.values(Data.filters),
                     ]}
+                    value={selectedAxes[index]}
+                    onChange={e => {
+                      const newAxis = [...selectedAxes];
+                      newAxis.splice(index, 1, e.currentTarget.value);
+                      updateSelectedAxes(newAxis);
+                    }}
                   />
                 </FormFieldset>
               </div>
             ))}
+        </Details>
+      )}
+
+      {isValidChartOptions() && (
+        <Details summary="Preview" open>
+          {renderDataChart()}
         </Details>
       )}
     </div>
