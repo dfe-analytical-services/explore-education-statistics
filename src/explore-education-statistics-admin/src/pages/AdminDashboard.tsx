@@ -1,6 +1,6 @@
 import AdminDashboardApprovedForPublication from '@admin/pages/prototypes/components/AdminDashboardApprovedForPublication';
 import AdminDashboardNeedsWork from '@admin/pages/prototypes/components/AdminDashboardNeedsWork';
-import AdminDashboardPublications from '@admin/pages/prototypes/components/AdminDashboardPublications';
+import PrototypeAdminDashboardPublications from '@admin/pages/prototypes/components/PrototypeAdminDashboardPublications';
 import AdminDashboardReadyForApproval from '@admin/pages/prototypes/components/AdminDashboardReadyForApproval';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
@@ -9,6 +9,8 @@ import React from 'react';
 import { RouteChildrenProps } from 'react-router';
 import { LoginContext } from '@admin/components/Login';
 import { Authentication, User } from '@admin/services/PrototypeLoginService';
+import AdminDashboardPublications from '@admin/components/AdminDashboardPublications';
+import PrototypeData from '@admin/pages/prototypes/PrototypeData';
 import Link from '../components/Link';
 import Page from '../components/Page';
 
@@ -39,7 +41,9 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
       </div>
       <Tabs>
         <TabsSection id="publications" title="Publications">
-          <AdminDashboardPublications />
+          <AdminDashboardPublications
+            publication={PrototypeData.publications[0]}
+          />
         </TabsSection>
         <TabsSection
           id="task-ready-approval1"

@@ -1,6 +1,6 @@
 import AdminDashboardApprovedForPublication from '@admin/pages/prototypes/components/AdminDashboardApprovedForPublication';
 import AdminDashboardNeedsWork from '@admin/pages/prototypes/components/AdminDashboardNeedsWork';
-import AdminDashboardPublications from '@admin/pages/prototypes/components/AdminDashboardPublications';
+import PrototypeAdminDashboardPublications from '@admin/pages/prototypes/components/PrototypeAdminDashboardPublications';
 import AdminDashboardReadyForApproval from '@admin/pages/prototypes/components/AdminDashboardReadyForApproval';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
@@ -37,7 +37,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
       </div>
       <Tabs>
         <TabsSection id="publications" title="Publications">
-          <AdminDashboardPublications />
+          <PrototypeAdminDashboardPublications />
         </TabsSection>
         {/* <TabsSection
           id="task-in-progress"

@@ -1,4 +1,4 @@
-import DashboardRelease from '@admin/pages/prototypes/components/DashboardRelease';
+import PrototypeDashboardRelease from '@admin/pages/prototypes/components/PrototypeDashboardRelease';
 import React from 'react';
 
 const AdminDashboardInProgress = () => {
@@ -9,7 +9,7 @@ const AdminDashboardInProgress = () => {
           <h2 className="govuk-heading-m">New releases in progress</h2>
           <ul className="govuk-list-bullet  govuk-!-margin-bottom-9">
             <li>
-              <DashboardRelease
+              <PrototypeDashboardRelease
                 title="Pupil absence statistics and data for schools in England"
                 years="2017 to 2018"
                 editing={window.location.search === '?status=editNewRelease'}
@@ -25,7 +25,7 @@ const AdminDashboardInProgress = () => {
       <h2 className="govuk-heading-m">Editing current releases</h2>
       <ul className="govuk-list-bullet">
         <li>
-          <DashboardRelease
+          <PrototypeDashboardRelease
             title="Permanent and fixed-period exclusions statistics"
             years="2017 to 2018"
             editing

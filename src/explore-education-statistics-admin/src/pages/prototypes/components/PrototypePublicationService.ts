@@ -405,9 +405,16 @@ export default class PrototypePublicationService {
           teamName: 'Team A',
         },
         topic: {
+          id: 'topic-1',
+          title: 'Pupil absence',
           theme: {
-            title: 'Pupil absence',
+            id: 'theme-1',
+            title: 'Pupils and schools',
           },
+        },
+        methodology: {
+          id: 'methodology-1',
+          title: 'A guide to absence statistics',
         },
       },
       updates: [],
