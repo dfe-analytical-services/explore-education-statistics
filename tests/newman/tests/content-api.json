@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "faa4cc80-ed1e-40c4-85b7-59da8657c39e",
+		"_postman_id": "fd9a0739-ac15-4b7c-90bc-e94413ca473f",
 		"name": "Dfe Content API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -33,12 +33,29 @@
 											"    pm.response.to.have.status(200); ",
 											"});",
 											"",
+											"pm.test(\"Response should have publication.releases, updates, content, and keyStatistics\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"publication.releases\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"updates\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"keyStatistics\"));",
+											"});",
+											"",
 											"pm.test(\"Should be latest publication\", function () {",
 											"   pm.expect(pm.response.json().slug).to.equal(\"2016-17\"); ",
 											"});",
 											"",
 											"pm.test(\"Publication slug matches the publication requested\", function () { ",
 											"    pm.expect(pm.response.json().publication.slug).to.equal(\"pupil-absence-in-schools-in-england\");",
+											"});",
+											"",
+											"(pm.environment.get(\"content_api_url\") === \"http://localhost:5010/api\" ? pm.test.skip : pm.test)(\"Should have correct number of dataFiles\", function () {",
+											"    pm.expect(pm.response.json().dataFiles.length).to.be.above(6) ",
+											"});",
+											"",
+											"pm.test(\"All dataFiles should have extension \\\"csv\\\" or \\\"docx\\\"\", function () {",
+											"    for(var i = 0; i < pm.response.json().dataFiles.length; i++) {",
+											"        pm.expect(pm.response.json().dataFiles[i].extension).to.be.oneOf([\"csv\", \"docx\"]); ",
+											"    }",
 											"});"
 										],
 										"type": "text/javascript"
@@ -81,9 +98,17 @@
 									"script": {
 										"id": "9e15d6ea-ffcb-4c8e-9b64-06688bc8eb62",
 										"exec": [
-											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200);",
+											"});",
 											"",
-											"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().id).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });"
+											"pm.test(\"Publication id matches the publication requested\", function () { ",
+											"    pm.expect(pm.response.json().id).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\");",
+											"});",
+											"",
+											"pm.test(\"Title should match requested publication\", function () {",
+											"    pm.expect(pm.response.json().title).to.equal(\"Pupil absence in schools in England\"); ",
+											"});"
 										],
 										"type": "text/javascript"
 									}
@@ -172,7 +197,75 @@
 									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
 									"});",
 									"",
-									"pm.test(\"Should be more than eight themes\", function () { pm.expect(pm.response.json().length).to.be.above(8); });"
+									"pm.test(\"Should be more than eight themes\", function () { pm.expect(pm.response.json().length).to.be.above(8); });",
+									"",
+									"pm.test(\"Response should contain \\\"Pupils and schools\\\"\", function () {",
+									"   var foundPupilsAndSchools = false;",
+									"   for(var i = 0; i < pm.response.json().length; i++) {",
+									"       if(pm.response.json()[i].title === \"Pupils and schools\") foundPupilsAndSchools = true;",
+									"   }",
+									"   pm.expect(foundPupilsAndSchools).to.equal(true);",
+									"});",
+									"",
+									"pm.test(\"Response should contain \\\"Further education\\\"\", function () {",
+									"   var foundFurtherEducation = false;",
+									"   for(var i = 0; i < pm.response.json().length; i++) {",
+									"       if(pm.response.json()[i].title === \"Further education\") foundFurtherEducation = true;",
+									"   }",
+									"   pm.expect(foundFurtherEducation).to.equal(true);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{content_api_url}}/content/tree",
+							"host": [
+								"{{content_api_url}}"
+							],
+							"path": [
+								"content",
+								"tree"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Downloads tree",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+									"});",
+									"",
+									"pm.test(\"Should be more than eight themes\", function () { pm.expect(pm.response.json().length).to.be.above(8); });",
+									"",
+									"pm.test(\"Response should contain \\\"Pupils and schools\\\"\", function () {",
+									"   var foundPupilsAndSchools = false;",
+									"   for(var i = 0; i < pm.response.json().length; i++) {",
+									"       if(pm.response.json()[i].title === \"Pupils and schools\") foundPupilsAndSchools = true;",
+									"   }",
+									"   pm.expect(foundPupilsAndSchools).to.equal(true);",
+									"});",
+									"",
+									"pm.test(\"Response should contain \\\"Further education\\\"\", function () {",
+									"   var foundFurtherEducation = false;",
+									"   for(var i = 0; i < pm.response.json().length; i++) {",
+									"       if(pm.response.json()[i].title === \"Further education\") foundFurtherEducation = true;",
+									"   }",
+									"   pm.expect(foundFurtherEducation).to.equal(true);",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -213,7 +306,15 @@
 									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
 									"});",
 									"",
-									"pm.test(\"Should be more than one theme\", function () { pm.expect(pm.response.json().length).to.be.above(0); });"
+									"pm.test(\"Should be more than one theme\", function () { pm.expect(pm.response.json().length).to.be.above(0); });",
+									"",
+									"pm.test(\"Response should contain \\\"Pupils and schools\\\"\", function () {",
+									"   var foundPupilsAndSchools = false;",
+									"   for(var i = 0; i < pm.response.json().length; i++) {",
+									"       if(pm.response.json()[i].title === \"Pupils and schools\") foundPupilsAndSchools = true;",
+									"   }",
+									"   pm.expect(foundPupilsAndSchools).to.equal(true);",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -245,6 +346,15 @@
 								"exec": [
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
+									"pm.test(\"Response should have id, summary, published, content, annexes, publication\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"published\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"annexes\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"publication\"));",
+									"});",
+									"",
+									"",
 									"pm.test(\"Title should be correct\", function () {",
 									"    pm.expect(pm.response.json().title).to.equal(\"Pupil absence statistics: methodology\"); ",
 									"});",
@@ -274,6 +384,28 @@
 					"response": []
 				}
 			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "9964e6a7-623a-4c90-b6a0-4b75da2c77d8",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "94bd45dc-1e81-44ef-87c7-35583cecf5fc",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }
