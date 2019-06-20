@@ -2313,7 +2313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                               startYear = "2014",
                               endYear = "2018",
                               filters = new List<string> { "848" },
-                              indicators = new List<string> { "197", "198", "199" }
+                              indicators = new List<string> { "197", "198", "199", "200" }
                           },
                           Tables = new List<Table>
                           {
@@ -2410,7 +2410,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                               startYear = "2014",
                               endYear = "2018",
                               filters = new List<string> { "845" },
-                              indicators = new List<string> { "197", "198", "199" }
+                              indicators = new List<string> { "197", "198", "199", "200" }
                           },
                           Tables = new List<Table>
                           {
