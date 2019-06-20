@@ -10,9 +10,9 @@ function MethodologyList({ publications }: Props) {
   return (
     <ul className="govuk-list govuk-list--bullet">
       {publications.length > 0 ? (
-        publications.map(({ id, title, slug }) => (
+        publications.map(({ title, slug }) => (
           <>
-            <Link to={`/methodology/${slug}`}>{title}</Link>{' '}
+            <Link to={`/methodologies/${slug}`}>{title}</Link>{' '}
           </>
         ))
       ) : (

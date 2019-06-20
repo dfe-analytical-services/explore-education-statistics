@@ -71,7 +71,7 @@ function HelpSupportPage() {
         To find out about the methodology behind the specific statistics and
         data set currently published via the service and how and why they're
         collected and published browse our{' '}
-        <a href="/methodology">Education statistics: methodology</a> section.
+        <a href="/methodologies">Education statistics: methodology</a> section.
       </p>
       <p>
         For a list of definitions and terms used across education statistics and
