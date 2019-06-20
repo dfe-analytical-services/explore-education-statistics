@@ -739,4 +739,66 @@ describe('FormComboBox', () => {
       expect(container.querySelectorAll('[role="option"]')).toHaveLength(0);
     });
   });
+
+  test('clicking outside of combobox hides options', () => {
+    const { container, getByText, getByLabelText } = render(
+      <div>
+        <p id="outside">Target</p>
+
+        <FormComboBox
+          id="test-combobox"
+          inputLabel="Choose option"
+          onInputChange={() => {}}
+          onSelect={() => {}}
+          options={['Option 1', 'Option 2', 'Option 3']}
+        />
+      </div>,
+    );
+
+    const input = getByLabelText('Choose option') as HTMLInputElement;
+
+    fireEvent.change(input, {
+      target: {
+        value: 'Test',
+      },
+    });
+
+    expect(container.querySelectorAll('[role="option"]')).toHaveLength(3);
+
+    fireEvent.click(getByText('Target'));
+
+    expect(container.querySelectorAll('[role="option"]')).toHaveLength(0);
+  });
+
+  test('re-clicking combobox re-renders options', () => {
+    const { container, getByText, getByLabelText } = render(
+      <div>
+        <p id="outside">Target</p>
+
+        <FormComboBox
+          id="test-combobox"
+          inputLabel="Choose option"
+          onInputChange={() => {}}
+          onSelect={() => {}}
+          options={['Option 1', 'Option 2', 'Option 3']}
+        />
+      </div>,
+    );
+
+    const input = getByLabelText('Choose option') as HTMLInputElement;
+
+    fireEvent.change(input, {
+      target: {
+        value: 'Test',
+      },
+    });
+
+    fireEvent.click(getByText('Target'));
+
+    expect(container.querySelectorAll('[role="option"]')).toHaveLength(0);
+
+    fireEvent.click(getByLabelText('Choose option'));
+
+    expect(container.querySelectorAll('[role="option"]')).toHaveLength(3);
+  });
 });
