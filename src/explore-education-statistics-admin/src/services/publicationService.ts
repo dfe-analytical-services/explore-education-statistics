@@ -40,8 +40,13 @@ export interface TimePeriodCoverage {
   };
 }
 
-export interface ReleasePublicationStatus {
-  title: string;
+export enum ApprovalStatus {
+  Approved,
+  ReadyToReview,
+}
+
+export interface ReleaseStatus {
+  approvalStatus: ApprovalStatus;
   isNew: boolean;
   isLive: boolean;
   isLatest: boolean;
@@ -69,7 +74,7 @@ export interface Release {
   releaseName: string;
   timePeriodCoverage: TimePeriodCoverage;
   slug: string;
-  status: ReleasePublicationStatus;
+  status: ReleaseStatus;
   meta: ReleaseMeta;
 }
 

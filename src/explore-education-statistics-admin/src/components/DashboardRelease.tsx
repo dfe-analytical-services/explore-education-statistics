@@ -4,7 +4,10 @@ import { format } from 'date-fns';
 import Details from '@common/components/Details';
 import { User } from '@admin/services/PrototypeLoginService';
 import { LoginContext } from '@admin/components/Login';
-import { TeamContact } from '@admin/services/publicationService';
+import {
+  ApprovalStatus,
+  TeamContact,
+} from '@admin/services/publicationService';
 
 const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive && isLatest) {
@@ -13,13 +16,20 @@ const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive) {
     return '(Live)';
   }
-  return null;
+  return undefined;
+};
+
+const getTag = (approvalStatus: ApprovalStatus) => {
+  if (ApprovalStatus.ReadyToReview === approvalStatus) {
+    return 'Ready to review';
+  }
+  return undefined;
 };
 
 interface Props {
   releaseName: string;
   timePeriodCoverage: string;
-  status: string;
+  approvalStatus: ApprovalStatus;
   lead: TeamContact;
   isNew: boolean;
   isLatest: boolean;
@@ -37,7 +47,7 @@ interface Props {
 const DashboardRelease = ({
   releaseName,
   timePeriodCoverage,
-  status,
+  approvalStatus,
   lead,
   isNew,
   isLatest,
@@ -58,7 +68,7 @@ const DashboardRelease = ({
         isLive,
         isLatest,
       )}`}
-      tag={status}
+      tag={getTag(approvalStatus)}
     >
       <dl className="govuk-summary-list govuk-!-margin-bottom-3">
         <div className="govuk-summary-list__row">

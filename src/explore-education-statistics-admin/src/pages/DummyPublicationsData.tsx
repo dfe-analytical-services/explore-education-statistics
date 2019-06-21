@@ -1,12 +1,13 @@
 import React from 'react';
 import {
+  ApprovalStatus,
   Methodology,
-  ReleaseDataType,
+  Publication,
   Release,
+  ReleaseDataType,
   Theme,
   TimePeriod,
   Topic,
-  Publication,
 } from '@admin/services/publicationService';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 
@@ -42,26 +43,6 @@ const timePeriodTermFullAcademicYear: TimePeriod = {
   title: 'Full academic year',
 };
 
-const timePeriodTermSpring: TimePeriod = {
-  id: 'term-spring',
-  title: 'Spring term',
-};
-
-const timePeriodTermSummer: TimePeriod = {
-  id: 'term-summer',
-  title: 'Summer term',
-};
-
-const dataTypeFinal: ReleaseDataType = {
-  id: 'data-type-final',
-  title: 'Final',
-};
-
-const dataTypeProvisional: ReleaseDataType = {
-  id: 'data-type-provisional',
-  title: 'Provisional',
-};
-
 const dataTypeRevised: ReleaseDataType = {
   id: 'data-type-revised',
   title: 'Revised',
@@ -80,7 +61,7 @@ const releaseTemplate: Release = {
     },
   },
   status: {
-    title: 'Ready to review',
+    approvalStatus: ApprovalStatus.Approved,
     isLive: true,
     isLatest: false,
     isNew: false,

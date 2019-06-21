@@ -23,7 +23,7 @@ const DashboardReleaseList = ({ releases }: DashboardReleaseListProps) => (
                     <DashboardRelease
                       releaseName={release.releaseName}
                       timePeriodCoverage={release.timePeriodCoverage.label}
-                      status={release.status.title}
+                      approvalStatus={release.status.approvalStatus}
                       review={release.meta.review}
                       lastEdited={release.status.lastEdited}
                       lastEditor={release.status.lastEditor}
