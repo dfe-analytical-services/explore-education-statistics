@@ -9,6 +9,7 @@ export type SelectChangeEventHandler = ChangeEventHandler<HTMLSelectElement>;
 export interface SelectOption {
   label: string;
   value: string | number;
+  selected?: boolean;
 }
 
 export interface FormSelectProps {
@@ -24,6 +25,7 @@ export interface FormSelectProps {
     | ((option: SelectOption) => SelectOption[keyof SelectOption])[];
   orderDirection?: ('asc' | 'desc')[];
   value?: string | number;
+  multiple?: boolean;
 }
 
 const FormSelect = ({
@@ -37,6 +39,7 @@ const FormSelect = ({
   order = ['label'],
   orderDirection = ['asc'],
   value,
+  multiple = false,
 }: FormSelectProps) => {
   return (
     <>
@@ -53,12 +56,17 @@ const FormSelect = ({
         onBlur={onBlur}
         onChange={onChange}
         value={value}
+        multiple={multiple}
       >
         {(order === undefined
           ? options
           : orderBy(options, order, orderDirection)
         ).map(option => (
-          <option value={option.value} key={`${option.value}-${option.label}`}>
+          <option
+            value={option.value}
+            key={`${option.value}-${option.label}`}
+            selected={option.selected}
+          >
             {option.label}
           </option>
         ))}

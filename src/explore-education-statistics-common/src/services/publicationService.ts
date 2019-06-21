@@ -46,7 +46,7 @@ export interface ReferenceLine {
 
 export interface Axis {
   title: string;
-  key?: string;
+  key?: string[];
   min?: number;
   max?: number;
   size?: number;

@@ -48,3 +48,11 @@
 .map {
   background: url('./charts/map.png');
 }
+
+.formselect {
+  height: 200px;
+
+  select {
+    height: 100% !important;
+  }
+}

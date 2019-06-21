@@ -49,7 +49,16 @@ export default class LineChartBlock extends Component<ChartProps> {
   public render() {
     const { data, indicators, height, xAxis, yAxis, labels, meta } = this.props;
 
-    const chartData = data.result.map(result => {
+    const filteredData = data.result.filter(result => {
+      if (xAxis.key) {
+        return Array.from(result.filters).every(
+          filter => xAxis.key && xAxis.key.includes(filter),
+        );
+      }
+      return true;
+    });
+
+    const chartData = filteredData.map(result => {
       return indicators.reduce(
         (v, indicatorName) => {
           return {

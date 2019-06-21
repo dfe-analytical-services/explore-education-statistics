@@ -1,21 +1,33 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 
 import classnames from 'classnames';
 
 import Details from '@common/components/Details';
 import {
-  FormSelect,
   FormCheckboxGroup,
   FormFieldset,
+  FormSelect,
 } from '@common/components/form';
 import useToggle from '@common/hooks/useToggle';
 import ChartRenderer from '@common/modules/find-statistics/components/ChartRenderer';
 import { Axis } from '@common/services/publicationService';
+import DataBlockService, {
+  GeographicLevel,
+  DataBlockResponse,
+} from '@common/services/dataBlockService';
+import { CheckboxOption } from '@common/components/form/FormCheckboxGroup';
+import { Dictionary } from '@common/types';
+import { SelectOption } from '@common/components/form/FormSelect';
 import styles from './PrototypeChartEditor.module.scss';
-import Data, { ChartType } from '../PrototypeData';
+import ConstData, { ChartType } from '../PrototypeData';
 
 const PrototypeChartEditor = (props: {}) => {
-  const { chartTypes } = Data;
+  const [Data, updateData] = React.useState<DataBlockResponse | undefined>(
+    undefined,
+  );
+
+  const { chartTypes } = ConstData;
 
   const [currentStep, setStep] = React.useState(0);
 
@@ -27,13 +39,81 @@ const PrototypeChartEditor = (props: {}) => {
     new Array<string>(),
   );
 
-  const indicatorOptions = Object.values(Data.indicators).map(
-    ({ value, label }) => ({ value, label, checked: false }),
-  );
+  const [indicatorOptions, setIndicatorOptions] = React.useState<
+    CheckboxOption[]
+  >([]);
 
-  const [selectedAxes, updateSelectedAxes] = React.useState<string[]>([]);
+  const [selectedAxes, updateSelectedAxes] = React.useState<string[][]>([]);
 
   const [useLegend, setUseLegend] = useToggle(false);
+
+  const showMixedUnits = (): boolean => {
+    if (Data && selectedIndicators) {
+      return (
+        new Set(
+          selectedIndicators.map(
+            selected => Data.metaData.indicators[selected].unit,
+          ),
+        ).size > 1
+      );
+    }
+    return false;
+  };
+
+  interface AllowedFilter extends SelectOption {
+    ids: string[];
+  }
+
+  const [allowedFilters, setAllowedFilters] = React.useState<AllowedFilter[]>();
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const newData = await DataBlockService.getDataBlockForSubject({
+        subjectId: 1,
+        startYear: '2012',
+        endYear: '2016',
+        filters: ['2', '71', '72', '73'],
+        geographicLevel: GeographicLevel.National,
+        indicators: ['23', '26', '28'],
+      });
+      updateData(newData);
+
+      const uniqueFilterIds: string[][] = Object.values(
+        newData.result.reduce((filterSet, result) => {
+          const filterIds = Array.from(result.filters);
+
+          return {
+            ...filterSet,
+            [filterIds.join('_')]: filterIds,
+          };
+        }, {}),
+      );
+
+      const filters = uniqueFilterIds.map(ids => {
+        const allFilters = ids.map(
+          (id: string) => newData.metaData.filters[id].label,
+        );
+
+        return {
+          ids,
+          label: allFilters.join(','),
+          value: ids.join(','),
+        };
+      });
+
+      setAllowedFilters(filters);
+
+      setIndicatorOptions(
+        Object.values(newData.metaData.indicators).map(({ value, label }) => ({
+          value,
+          label,
+          checked: false,
+        })),
+      );
+    };
+
+    fetchData();
+  }, []);
 
   const isValidChartOptions = () => {
     if (selectedChartType) {
@@ -41,9 +121,11 @@ const PrototypeChartEditor = (props: {}) => {
         return false;
       }
 
-      if (selectedChartType.axis.length > 0) {
+      if (selectedChartType.dataOptions.length > 0) {
         return (
-          selectedAxes && selectedAxes.length > 0 && selectedAxes[0] !== ''
+          selectedAxes &&
+          selectedAxes.length > 0 &&
+          selectedAxes[0].length !== 0
         );
       }
 
@@ -54,20 +136,50 @@ const PrototypeChartEditor = (props: {}) => {
   };
 
   const renderDataChart = () => {
-    if (selectedChartType) {
+    if (Data && selectedChartType) {
       const xAxis: Axis = {
         title: '',
+        key: [],
       };
 
       const yAxis: Axis = {
         title: '',
+        key: [],
       };
+
+      const mappingFunctions: Dictionary<(value: string[]) => void> = {
+        xaxis: (value: string[]) => {
+          // @ts-ignore
+          return xAxis.key.add(value);
+        },
+        yaxis: (value: string[]) => {
+          // @ts-ignore
+          return yAxis.key.add(value);
+        },
+        geojson: (value: string[]) => {},
+      };
+
+      const { dataMapping } = selectedChartType;
+
+      selectedAxes.forEach((axis: string[], index) => {
+        const mapping =
+          index < dataMapping.length
+            ? dataMapping[index]
+            : dataMapping[dataMapping.length - 1];
+
+        if (mappingFunctions[mapping.mapTo]) {
+          //          const
+          //        if (axis) axis.forEach( entry => mappingFunctions[mapping.mapTo](new Set(entry.split(",") ) ));
+        }
+      });
+
+      console.log(xAxis, yAxis);
 
       return (
         <ChartRenderer
           type={selectedChartType.type}
-          data={Data.responseData}
-          meta={Data.responseData.metaData}
+          data={Data}
+          meta={Data.metaData}
           indicators={selectedIndicators}
           xAxis={xAxis}
           yAxis={yAxis}
@@ -131,18 +243,25 @@ const PrototypeChartEditor = (props: {}) => {
                 }
               }}
             />
+            {showMixedUnits() && (
+              <div>
+                Warning: Indicators with different unit types are selected. This
+                will cause unexpected results.
+              </div>
+            )}
           </div>
         )}
       </Details>
 
-      {selectedChartType && selectedChartType.axis.length > 0 && (
+      {Data && selectedChartType && selectedChartType.dataOptions.length > 0 && (
         <Details
           summary="Select axis and grouping options"
           open={currentStep >= 2}
         >
-          {selectedIndicators.length > 0 &&
-            selectedChartType.axis.map((axis, index) => (
-              <div key={axis}>
+          {allowedFilters &&
+            selectedIndicators.length > 0 &&
+            selectedChartType.dataOptions.map((axis, index) => (
+              <div key={axis} className={styles.formselect}>
                 <FormFieldset legend={axis} id={`${axis}_fieldset`}>
                   <FormSelect
                     id={axis}
@@ -156,12 +275,19 @@ const PrototypeChartEditor = (props: {}) => {
                         value: '',
                         label: `Select...`,
                       },
-                      ...Object.values(Data.filters),
+                      ...allowedFilters,
                     ]}
-                    value={selectedAxes[index]}
+                    multiple
                     onChange={e => {
                       const newAxis = [...selectedAxes];
-                      newAxis.splice(index, 1, e.currentTarget.value);
+                      newAxis.splice(
+                        index,
+                        1,
+                        Array.from(e.currentTarget.options)
+                          .filter(_ => _.selected)
+                          .map(_ => _.value),
+                      );
+
                       updateSelectedAxes(newAxis);
                     }}
                   />
@@ -174,6 +300,10 @@ const PrototypeChartEditor = (props: {}) => {
       {isValidChartOptions() && (
         <Details summary="Preview" open>
           {renderDataChart()}
+
+          <FormFieldset id="chartoptions" legend="Select chart options">
+            options
+          </FormFieldset>
         </Details>
       )}
     </div>
