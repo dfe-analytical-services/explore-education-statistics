@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var queue = client.GetQueueReference("publication-queue");
                     queue.CreateIfNotExists();
 
-                    var message = BuildNotifySubscribersMessage(publicationId);
+                    var message = BuildMessage(publicationId);
                     queue.AddMessage(message);
                 }
                 catch (StorageException ex)
@@ -47,23 +47,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }
             }
 
-            _logger.LogTrace("Sent notify subscribers message for publication: {0}", publicationId);
+            _logger.LogTrace($"Sent notify subscribers message for publication: {publicationId}");
 
             return true;
         }
 
-        private CloudQueueMessage BuildNotifySubscribersMessage(Guid publicationId)
+        private CloudQueueMessage BuildMessage(Guid publicationId)
         {
-            var notifySubscribersMessage = _context.Publications
+            var message = _context.Publications
                 .Where(p => p.Id.Equals(publicationId))
-                .Select(p => new PublicationNotification
+                .Select(p => new NotifySubscribersMessage
                 {
                     Name = p.Title,
                     Slug = p.Slug,
                     PublicationId = p.Id.ToString()
                 }).FirstOrDefault();
 
-            return new CloudQueueMessage(JsonConvert.SerializeObject(notifySubscribersMessage));
+            return new CloudQueueMessage(JsonConvert.SerializeObject(message));
         }
     }
 }

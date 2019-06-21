@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 {
-    public class PublicationNotification
+    public class NotifySubscribersMessage
     {
         public string Name { get; set; }
         public string PublicationId { get; set; }
