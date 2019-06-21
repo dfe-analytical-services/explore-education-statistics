@@ -1,5 +1,10 @@
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using System;
+using System.Linq;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
@@ -10,43 +15,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ImportService : IImportService
     {
+        private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
         private readonly string _storageConnectionString;
+
 
         private readonly ILogger _logger;
 
-        public ImportService(ILogger<ImportService> logger, IConfiguration config)
+        public ImportService(ApplicationDbContext applicationDbContext,
+            IMapper mapper,
+            ILogger<ImportService> logger,
+            IConfiguration config)
         {
-            _storageConnectionString = config.GetConnectionString("NotificationService");
+            _context = applicationDbContext;
+            _mapper = mapper;
+            _storageConnectionString = config.GetConnectionString("AzureStorage");
             _logger = logger;
         }
 
-        public bool SendImportNotification(ImportViewModel model)
+        public void SendImportNotification(string dataFileName, Guid releaseId)
         {
-            if (CloudStorageAccount.TryParse(_storageConnectionString, out var storageAccount))
+            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
+            var client = storageAccount.CreateCloudQueueClient();
+            var queue = client.GetQueueReference("imports-pending");
+            queue.CreateIfNotExists();
+
+            var message = BuildImportMessage(dataFileName, releaseId);
+            queue.AddMessage(message);
+
+            _logger.LogTrace($"Sent import notification for data file: {dataFileName}, releaseId: {releaseId}");
+        }
+
+        private CloudQueueMessage BuildImportMessage(string dataFileName, Guid releaseId)
+        {
+            var release = _context.Releases
+                .Where(r => r.Id.Equals(releaseId))
+                .Include(r => r.Publication)
+                .ThenInclude(p => p.Topic)
+                .ThenInclude(t => t.Theme)
+                .FirstOrDefault();
+
+            var importMessageRelease = _mapper.Map<Release>(release);
+            var importMessage = new ImportMessage
             {
-                try
-                {
-                    var client = storageAccount.CreateCloudQueueClient();
+                DataFileName = dataFileName,
+                Release = importMessageRelease
+            };
 
-                    var queue = client.GetQueueReference("imports-pending");
-                    queue.CreateIfNotExists();
-                    
-                    var body = JsonConvert.SerializeObject(model);
-                    
-                    var message = new CloudQueueMessage(body);
-                    queue.AddMessage(message);
-
-                }
-                catch (StorageException ex)
-                {
-                    _logger.LogError("Error returned when adding import notification to queue: {0}", ex.Message);
-                    return false;
-                }
-            }
-            
-            _logger.LogTrace("Sent files import notification for {0} ({1})", model.PublicationName, model.PublicationId);
-
-            return true;
+            return new CloudQueueMessage(JsonConvert.SerializeObject(importMessage));
         }
     }
 }
