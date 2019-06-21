@@ -1,7 +1,6 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
-import SearchForm from '@common/components/SearchForm';
 import React from 'react';
 import Link from '../components/Link';
 import PrototypeDownloadDropdown from './components/PrototypeDownloadDropdown';
@@ -29,7 +28,6 @@ const BrowseReleasesPage = () => {
               regional statistical data and trends
             </li>
           </ul>
-          <SearchForm />
         </div>
         <div className="govuk-grid-column-one-third">
           <aside className="app-related-items">

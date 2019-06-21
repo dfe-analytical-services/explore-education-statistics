@@ -25,3 +25,5 @@ global.document.createElementNS = function(namespaceURI, qualifiedName) {
   // eslint-disable-next-line prefer-rest-params
   return createElementNSOrig.apply(this, arguments);
 };
+
+require('intersection-observer');

@@ -14,6 +14,7 @@ import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
 import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
 import mapValues from 'lodash/mapValues';
+import { NextContext } from 'next';
 import React, { Component } from 'react';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
 import LocationFiltersForm, {
@@ -48,6 +49,7 @@ export interface PublicationOptions {
 
 interface Props {
   themeMeta: ThemeMeta[];
+  publicationId: string;
 }
 
 interface State {
@@ -85,9 +87,18 @@ class TableToolPage extends Component<Props, State> {
     tableData: [],
   };
 
-  public static async getInitialProps() {
+  public static async getInitialProps({ query }: NextContext) {
     const themeMeta = await tableBuilderService.getThemes();
-    return { themeMeta };
+
+    const publication = themeMeta
+      .flatMap(option => option.topics)
+      .flatMap(option => option.publications)
+      .find(option => option.slug === query.publicationSlug);
+
+    return {
+      themeMeta,
+      publicationId: publication ? publication.id : '',
+    };
   }
 
   private handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
@@ -180,7 +191,7 @@ class TableToolPage extends Component<Props, State> {
   };
 
   public render() {
-    const { themeMeta } = this.props;
+    const { themeMeta, publicationId } = this.props;
     const {
       filters,
       indicators,
@@ -225,6 +236,7 @@ class TableToolPage extends Component<Props, State> {
                   {stepProps => (
                     <PublicationForm
                       {...stepProps}
+                      publicationId={publicationId}
                       options={themeMeta}
                       onSubmit={this.handlePublicationFormSubmit}
                     />

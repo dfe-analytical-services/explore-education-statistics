@@ -693,37 +693,6 @@ const PublicationPage = () => {
             and the Humber with 11.9% while Outer London had the lowest rate at
             10%.
           </p>
-          <h3 className="govuk-heading-s">Local authority (LA) level data</h3>
-          <p>
-            Download data in the following formats or access our data via our
-            API:
-          </p>
-          <ul className="govuk-list-bullet">
-            <li>
-              <a href="#" className="govuk-link">
-                Download .csv files
-              </a>
-            </li>
-            <li>
-              <a href="#" className="govuk-link">
-                Download Excel files
-              </a>
-            </li>
-            <li>
-              <a href="#" className="govuk-link">
-                Download pdf files
-              </a>
-            </li>
-            <li>
-              <a href="#" className="govuk-link">
-                Access API
-              </a>{' '}
-              -{' '}
-              <a href="/glossary#what-is-an-api" className="govuk-link">
-                What is an API?
-              </a>
-            </li>
-          </ul>
         </AccordionSection>
       </Accordion>
       <h2 className="govuk-heading-m govuk-!-margin-top-9">Help and support</h2>
