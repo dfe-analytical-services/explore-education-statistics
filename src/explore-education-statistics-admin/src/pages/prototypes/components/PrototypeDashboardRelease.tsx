@@ -51,7 +51,7 @@ const PrototypeDashboardRelease = ({
       <dl className="govuk-summary-list govuk-!-margin-bottom-3">
         <div className="govuk-summary-list__row">
           {isNew && (
-            <React.Fragment>
+            <>
               <dt className="govuk-summary-list__key">
                 Scheduled publish date
               </dt>
@@ -63,26 +63,26 @@ const PrototypeDashboardRelease = ({
                   Set status
                 </Link>
               </dd>
-            </React.Fragment>
+            </>
           )}
           {!isNew && (
-            <React.Fragment>
+            <>
               <dt className="govuk-summary-list__key">Publish date</dt>
               <dd className="govuk-summary-list__value">
                 {format(published, 'd MMMM yyyy')}
               </dd>
               <dd className="govuk-summary-list__actions" />
-            </React.Fragment>
+            </>
           )}
         </div>
         {nextRelease && (
-          <React.Fragment>
+          <>
             <dt className="govuk-summary-list__key">Next release</dt>
             <dd className="govuk-summary-list__value">
               {format(nextRelease, 'd MMMM yyyy')}
             </dd>
             <dd className="govuk-summary-list__actions" />
-          </React.Fragment>
+          </>
         )}
         <div className="govuk-summary-list__row">
           <dt className="govuk-summary-list__key">Lead statistician</dt>

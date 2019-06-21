@@ -58,9 +58,10 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
           <Accordion id="pupil-absence">
             {DummyPublicationsData.publications.map(publication => {
               return (
-                <>
-                  <AdminDashboardPublications publication={publication} />
-                </>
+                <AdminDashboardPublications
+                  key={publication.id}
+                  publication={publication}
+                />
               );
             })}
           </Accordion>
