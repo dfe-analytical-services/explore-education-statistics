@@ -1,8 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Dictionary } from '@common/types';
-import AdminDashboardPublications from '@admin/components/AdminDashboardPublications';
-import React from 'react';
-import { Methodology, Theme, Topic } from '@common/services/publicationService';
 
 export interface ChartType {
   type: string;
@@ -101,54 +98,9 @@ const filters = {
   },
 };
 
-const methodologies: Methodology[] = [
-  {
-    id: 'methodology-1',
-    title: 'A guide to absence statistics',
-  },
-];
-
-const themes: Theme[] = [
-  {
-    id: 'theme-1',
-    title: 'Pupils and schools',
-  },
-];
-
-const topics: Topic[] = [
-  {
-    id: 'topic-1',
-    title: 'pupil absence',
-    theme: themes[0],
-  },
-];
-
-const publications = [
-  {
-    id: 'publication-1',
-    slug: 'pupil-absence-statistics-and-data-for-schools-in-england',
-    title: 'Pupil absence statistics and data for schools in England',
-    description: '',
-    dataSource: '',
-    summary: '',
-    nextUpdate: '',
-    releases: [],
-    legacyReleases: [],
-    topic: topics[0],
-    contact: {
-      teamName: '',
-      teamEmail: '',
-      contactName: '',
-      contactTelNo: '',
-    },
-    methodology: methodologies[0],
-  },
-];
-
 export default {
   chartTypes,
   tables,
   indicators,
   filters,
-  publications,
 };

@@ -1,10 +1,10 @@
-import { ReleaseSummary } from '@common/services/publicationService';
 import DashboardRelease from '@admin/components/DashboardRelease';
 import Link from '@admin/components/Link';
 import React from 'react';
+import { Release } from '@admin/services/publicationService';
 
 export interface DashboardReleaseListProps {
-  releases: ReleaseSummary[];
+  releases: Release[];
 }
 
 const DashboardReleaseList = ({ releases }: DashboardReleaseListProps) => (
@@ -16,80 +16,31 @@ const DashboardReleaseList = ({ releases }: DashboardReleaseListProps) => (
         </dt>
         <dd className="govuk-summary-list__value">
           <ul className="govuk-list dfe-admin">
-            {window.location.search === '?status=readyApproval' && (
-              <li>
-                <DashboardRelease
-                  releaseName="2018 to 2019"
-                  timePeriodCoverage="Academic year"
-                  tag="Ready to review"
-                  review
-                  lastEdited={new Date('2019-03-20 17:37')}
-                  lastEditor={{ id: 'me', name: 'me', permissions: [] }}
-                  published={new Date('2019-09-20 09:30')}
-                  nextRelease={new Date('2020-09-20 09:30')}
-                  dataType="Revised"
-                  showComments
-                />
-              </li>
-            )}
-            {window.location.search === '?status=editNewRelease' && (
-              <li>
-                <DashboardRelease
-                  releaseName="2018 to 2019"
-                  timePeriodCoverage="Academic year"
-                  tag="New release in progress"
-                  editing={window.location.search === '?status=editNewRelease'}
-                  isNew
-                  lastEdited={new Date('2019-03-20 17:37')}
-                  lastEditor={{ id: 'me', name: 'me', permissions: [] }}
-                  published={new Date('2019-09-24 09:30')}
-                  nextRelease={new Date('2020-09-25 09:30')}
-                  dataType="Provisional"
-                />
-              </li>
-            )}
-            <li>
-              <DashboardRelease
-                releaseName="2017 to 2018"
-                timePeriodCoverage="Academic year"
-                tag={
-                  window.location.search === '?status=editLiveRelease'
-                    ? 'Editing in progress'
-                    : ''
-                }
-                isLatest
-                editing={window.location.search === '?status=editLiveRelease'}
-                lastEdited={new Date('2018-03-20 17:37')}
-                lastEditor={{ id: 'me', name: 'me', permissions: [] }}
-                published={new Date('2018-09-24 09:30')}
-                nextRelease={new Date('2019-09-23 09:30')}
-                dataType="Final"
-              />
-            </li>
-            <li>
-              <DashboardRelease
-                releaseName="2016 to 2017"
-                timePeriodCoverage="Academic year"
-                isLive
-                editing={window.location.search === '?status=editLiveRelease'}
-                lastEdited={new Date('2018-03-20 14:23')}
-                lastEditor={{ id: 'me', name: 'me', permissions: [] }}
-                published={new Date('2017-09-25 09:30')}
-                dataType="Final"
-              />
-            </li>
-            <li>
-              <DashboardRelease
-                releaseName="2015 to 2016"
-                timePeriodCoverage="Academic year"
-                isLive
-                editing={window.location.search === '?status=editLiveRelease'}
-                lastEdited={new Date('2017-03-20 16:15')}
-                lastEditor={{ id: 'me', name: 'me', permissions: [] }}
-                published={new Date('2016-03-26 09:30')}
-                dataType="Final"
-              />
-            </li>
+            {releases.map(release => {
+              return (
+                <>
+                  <li>
+                    <DashboardRelease
+                      releaseName={release.releaseName}
+                      timePeriodCoverage={release.timePeriodCoverage.label}
+                      status={release.status.title}
+                      review={release.meta.review}
+                      lastEdited={release.status.lastEdited}
+                      lastEditor={release.status.lastEditor}
+                      published={release.status.published}
+                      nextRelease={release.status.nextRelease}
+                      dataType={release.meta.dataType.title}
+                      showComments={release.meta.showComments}
+                      editing={release.meta.editing}
+                      isLatest={release.status.isLatest}
+                      isLive={release.status.isLive}
+                      isNew={release.status.isNew}
+                      lead={release.meta.lead}
+                    />
+                  </li>
+                </>
+              );
+            })}
           </ul>
         </dd>
       </div>

@@ -1,50 +1,6 @@
 import { DataBlockRequest } from '@common/services/dataBlockService';
 import { contentApi } from './api';
 
-export interface Methodology {
-  id: string;
-  title: string;
-}
-
-export interface Theme {
-  id: string;
-  title: string;
-}
-
-export interface Topic {
-  id: string;
-  title: string;
-  theme: Theme;
-}
-
-export interface TimePeriodTerm {
-  id: string;
-  title: string;
-}
-
-export interface TimePeriodAcademicYear {
-  yearStarting: number;
-  timePeriod: TimePeriodTerm;
-  termsPerYear: number;
-}
-
-export interface TimePeriodCalendarYear {
-  year: number;
-}
-
-export interface ReleaseSummary {
-  id: string;
-  releaseName: string;
-  timePeriodCoverage: TimePeriodAcademicYear | TimePeriodCalendarYear;
-  slug: string;
-}
-
-export interface LegacyRelease {
-  id: string;
-  description: string;
-  url: string;
-}
-
 export interface Publication {
   id: string;
   slug: string;
@@ -53,16 +9,27 @@ export interface Publication {
   dataSource: string;
   summary: string;
   nextUpdate: string;
-  releases: ReleaseSummary[];
-  legacyReleases: LegacyRelease[];
-  topic: Topic;
+  releases: {
+    id: string;
+    releaseName: string;
+    slug: string;
+  }[];
+  legacyReleases: {
+    id: string;
+    description: string;
+    url: string;
+  }[];
+  topic: {
+    theme: {
+      title: string;
+    };
+  };
   contact: {
     teamName: string;
     teamEmail: string;
     contactName: string;
     contactTelNo: string;
   };
-  methodology: Methodology;
 }
 
 export interface DataQuery {

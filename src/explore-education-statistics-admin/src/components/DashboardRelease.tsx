@@ -1,16 +1,16 @@
 import React from 'react';
-// import {User} from "@admin/services/PrototypeLoginService";
 import Link from '@admin/components/Link';
 import { format } from 'date-fns';
-import { User } from '@admin/services/PrototypeLoginService';
 import Details from '@common/components/Details';
+import { User } from '@admin/services/PrototypeLoginService';
+import { LoginContext } from '@admin/components/Login';
+import { TeamContact } from '@admin/services/publicationService';
 
 interface Props {
   releaseName: string;
   timePeriodCoverage: string;
-  title?: string;
-  tag?: string;
-  lead?: string;
+  status: string;
+  lead?: TeamContact;
   isNew?: boolean;
   isLatest?: boolean;
   isLive?: boolean;
@@ -27,7 +27,7 @@ interface Props {
 const DashboardRelease = ({
   releaseName,
   timePeriodCoverage,
-  tag,
+  status,
   lead,
   isNew,
   isLatest,
@@ -47,7 +47,7 @@ const DashboardRelease = ({
       summary={`${timePeriodCoverage}, ${releaseName} ${
         isLive ? '(Live)' : ''
       } ${isLatest ? '(Live - Latest release)' : ''}`}
-      tag={tag}
+      tag={status}
     >
       <dl className="govuk-summary-list govuk-!-margin-bottom-3">
         <div className="govuk-summary-list__row">
@@ -90,20 +90,11 @@ const DashboardRelease = ({
           <dd className="govuk-summary-list__value">
             {lead && (
               <span>
-                {lead}
+                {lead.contactName}
                 <br />
-                <a href="mailto:email@example.com">email@example.com</a>
+                <a href="mailto:{lead.teamEmail}">{lead.teamEmail}</a>
                 <br />
-                07654 653762
-              </span>
-            )}
-            {!lead && (
-              <span>
-                John Smith
-                <br />
-                <a href="mailto:js@example.com">js@example.com</a>
-                <br />
-                07654 653763
+                {lead.contactTelNo}
               </span>
             )}
           </dd>
@@ -145,10 +136,25 @@ const DashboardRelease = ({
         <div className="govuk-summary-list__row">
           <dt className="govuk-summary-list__key">Last edited</dt>
           <dd className="govuk-summary-list__value  dfe-details-no-margin">
-            {' '}
-            {format(lastEdited, 'd MMMM yyyy')}
-            {' at '}
-            {format(lastEdited, 'HH:mm')} by <a href="#">{lastEditor.name}</a>
+            <LoginContext.Consumer>
+              {loginContext => {
+                const editorName =
+                  loginContext.user != null &&
+                  loginContext.user.id === lastEditor.id
+                    ? 'me'
+                    : lastEditor.name;
+
+                return (
+                  <>
+                    {' '}
+                    {format(lastEdited, 'd MMMM yyyy')}
+                    {' at '}
+                    {format(lastEdited, 'HH:mm')} by{' '}
+                    <a href="#">{editorName}</a>
+                  </>
+                );
+              }}
+            </LoginContext.Consumer>
           </dd>
           <dd className="govuk-summary-list__actions">
             {review && (
