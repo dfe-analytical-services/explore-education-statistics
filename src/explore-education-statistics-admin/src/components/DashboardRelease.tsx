@@ -2,13 +2,8 @@ import React from 'react';
 import Link from '@admin/components/Link';
 import { format } from 'date-fns';
 import Details from '@common/components/Details';
-import { User } from '@admin/services/PrototypeLoginService';
 import { LoginContext } from '@admin/components/Login';
-import {
-  ApprovalStatus,
-  Release,
-  TeamContact,
-} from '@admin/services/publicationService';
+import { ApprovalStatus, Release } from '@admin/services/publicationService';
 
 const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive && isLatest) {
@@ -89,11 +84,11 @@ const DashboardRelease = ({
           <dd className="govuk-summary-list__value">
             {release.lead && (
               <span>
-                {release.lead.contactName}
+                {release.lead.name}
                 <br />
-                <a href="mailto:{lead.teamEmail}">{release.lead.teamEmail}</a>
+                <a href="mailto:{lead.teamEmail}">{release.lead.email}</a>
                 <br />
-                {release.lead.contactTelNo}
+                {release.lead.telNo}
               </span>
             )}
           </dd>

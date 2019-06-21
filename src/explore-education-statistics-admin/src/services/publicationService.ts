@@ -1,6 +1,4 @@
 import { User } from '@admin/services/PrototypeLoginService';
-import Details from '@common/components/Details';
-import React from 'react';
 
 export interface Methodology {
   id: string;
@@ -76,7 +74,7 @@ export interface Release {
   timePeriodCoverage: TimePeriodCoverage;
   slug: string;
   status: ReleaseStatus;
-  lead: TeamContact;
+  lead: UserContact;
   dataType: ReleaseDataType;
   comments: Comment[];
 }
@@ -87,11 +85,10 @@ export interface LegacyRelease {
   url: string;
 }
 
-export interface TeamContact {
-  teamName: string;
-  teamEmail: string;
-  contactName: string;
-  contactTelNo: string;
+export interface UserContact {
+  name: string;
+  email: string;
+  telNo: string;
 }
 
 export interface Publication {
@@ -105,6 +102,6 @@ export interface Publication {
   releases: Release[];
   legacyReleases: LegacyRelease[];
   topic: Topic;
-  contact: TeamContact;
+  contact: UserContact;
   methodology: Methodology;
 }

@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import logo from 'govuk-frontend/assets/images/govuk-logotype-crown.png';
 import React from 'react';
 import { LoginContext } from '@admin/components/Login';
-import { Authentication, User } from '@admin/services/PrototypeLoginService';
+import { Authentication } from '@admin/services/PrototypeLoginService';
 
 interface Props {
   wide?: boolean;

@@ -71,10 +71,9 @@ const releaseTemplate: Release = {
   },
   dataType: dataTypeRevised,
   lead: {
-    contactName: 'John Smith',
-    contactTelNo: '07654 653763',
-    teamName: '',
-    teamEmail: 'js@example.com',
+    name: 'John Smith',
+    telNo: '07654 653763',
+    email: 'js@example.com',
   },
   comments: [
     {
@@ -109,10 +108,9 @@ const publicationTemplate: Publication = {
   legacyReleases: [],
   topic: topics[0],
   contact: {
-    teamName: '',
-    teamEmail: '',
-    contactName: '',
-    contactTelNo: '',
+    email: '',
+    name: '',
+    telNo: '',
   },
   methodology: methodologies[0],
 };
