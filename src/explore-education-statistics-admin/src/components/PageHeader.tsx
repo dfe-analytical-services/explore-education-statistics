@@ -1,6 +1,8 @@
 import classNames from 'classnames';
 import logo from 'govuk-frontend/assets/images/govuk-logotype-crown.png';
 import React from 'react';
+import { LoginContext } from '@admin/components/Login';
+import { Authentication, User } from '@admin/services/PrototypeLoginService';
 
 interface Props {
   wide?: boolean;
@@ -44,9 +46,68 @@ const PageHeader = ({ wide }: Props) => (
           >
             Explore education statistics
           </a>
+
+          <button
+            type="button"
+            className="govuk-header__menu-button js-header-toggle"
+            aria-controls="navigation"
+            aria-label="Show or hide Top Level Navigation"
+          >
+            Menu
+          </button>
+          <nav>
+            <ul
+              id="navigation"
+              className="govuk-header__navigation "
+              aria-label="Top Level Navigation"
+            >
+              <li className="govuk-header__navigation-item">
+                <a
+                  className="govuk-header__link"
+                  href="/prototypes/documentation"
+                >
+                  Administrators' guide
+                </a>
+              </li>
+              <LoginContext.Consumer>
+                {loginContext =>
+                  loginContext.user ? (
+                    <LoggedInLinks user={loginContext.user} />
+                  ) : (
+                    <NotLoggedInLinks />
+                  )
+                }
+              </LoginContext.Consumer>
+            </ul>
+          </nav>
         </div>
       </div>
     </header>
+  </>
+);
+
+const LoggedInLinks = ({ user }: Authentication) => (
+  <>
+    <li className="govuk-header__navigation-item">
+      <a className="govuk-header__link" href="#">
+        {user ? user.name : ''}
+      </a>
+    </li>
+    <li className="govuk-header__navigation-item">
+      <a className="govuk-header__link" href="#">
+        Sign out
+      </a>
+    </li>
+  </>
+);
+
+const NotLoggedInLinks = () => (
+  <>
+    <li className="govuk-header__navigation-item">
+      <a className="govuk-header__link" href="#">
+        Sign in
+      </a>
+    </li>
   </>
 );
 

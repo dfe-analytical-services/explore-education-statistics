@@ -1,6 +1,6 @@
 import AdminDashboardApprovedForPublication from '@admin/pages/prototypes/components/AdminDashboardApprovedForPublication';
 import AdminDashboardNeedsWork from '@admin/pages/prototypes/components/AdminDashboardNeedsWork';
-import AdminDashboardPublications from '@admin/pages/prototypes/components/AdminDashboardPublications';
+import PrototypeAdminDashboardPublications from '@admin/pages/prototypes/components/PrototypeAdminDashboardPublications';
 import AdminDashboardReadyForApproval from '@admin/pages/prototypes/components/AdminDashboardReadyForApproval';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
@@ -10,7 +10,7 @@ import { RouteChildrenProps } from 'react-router';
 import Link from '../../components/Link';
 import PrototypePage from './components/PrototypePage';
 
-const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
+const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
   return (
     <PrototypePage wide breadcrumbs={[{ text: 'Administrator dashboard' }]}>
       <div className="govuk-grid-row">
@@ -37,7 +37,7 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
       </div>
       <Tabs>
         <TabsSection id="publications" title="Publications">
-          <AdminDashboardPublications />
+          <PrototypeAdminDashboardPublications />
         </TabsSection>
         {/* <TabsSection
           id="task-in-progress"
@@ -281,4 +281,4 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
   );
 };
 
-export default BrowseReleasesPage;
+export default PrototypeBrowseReleasesPage;

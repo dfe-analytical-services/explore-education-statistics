@@ -1,10 +1,10 @@
-import DashboardRelease from '@admin/pages/prototypes/components/DashboardRelease';
+import PrototypeDashboardRelease from '@admin/pages/prototypes/components/PrototypeDashboardRelease';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import React from 'react';
 import Link from '@admin/components/Link';
 
-const AdminDashboardPublications = () => {
+const PrototypeAdminDashboardPublications = () => {
   return (
     <>
       <h2 className="govuk-heading-l govuk-!-margin-bottom-0">
@@ -19,7 +19,7 @@ const AdminDashboardPublications = () => {
       </Link>
       <Accordion id="pupil-absence">
         <AccordionSection
-          heading="Pupil absense statistics and data for schools in England"
+          heading="Pupil absence statistics and data for schools in England"
           caption=""
         >
           <dl className="govuk-summary-list govuk-!-margin-bottom-0">
@@ -46,7 +46,7 @@ const AdminDashboardPublications = () => {
                 <ul className="govuk-list dfe-admin">
                   {window.location.search === '?status=readyApproval' && (
                     <li>
-                      <DashboardRelease
+                      <PrototypeDashboardRelease
                         title="Academic year,"
                         years="2018 to 2019"
                         tag="Ready to review"
@@ -62,7 +62,7 @@ const AdminDashboardPublications = () => {
                   )}
                   {window.location.search === '?status=editNewRelease' && (
                     <li>
-                      <DashboardRelease
+                      <PrototypeDashboardRelease
                         title="Academic year,"
                         years="2018 to 2019"
                         tag="New release in progress"
@@ -79,7 +79,7 @@ const AdminDashboardPublications = () => {
                     </li>
                   )}
                   <li>
-                    <DashboardRelease
+                    <PrototypeDashboardRelease
                       title="Academic year,"
                       years="2017 to 2018"
                       tag={
@@ -99,7 +99,7 @@ const AdminDashboardPublications = () => {
                     />
                   </li>
                   <li>
-                    <DashboardRelease
+                    <PrototypeDashboardRelease
                       title="Academic year,"
                       years="2016 to 2017"
                       isLive
@@ -113,7 +113,7 @@ const AdminDashboardPublications = () => {
                     />
                   </li>
                   <li>
-                    <DashboardRelease
+                    <PrototypeDashboardRelease
                       title="Academic year,"
                       years="2015 to 2016"
                       isLive
@@ -135,7 +135,7 @@ const AdminDashboardPublications = () => {
           </Link>
         </AccordionSection>
         <AccordionSection
-          heading=" Pupil absense statistics and data for schools in England: autumn term"
+          heading=" Pupil absence statistics and data for schools in England: autumn term"
           caption=""
         >
           <dl className="govuk-summary-list govuk-!-margin-bottom-0">
@@ -161,7 +161,7 @@ const AdminDashboardPublications = () => {
               <dd className="govuk-summary-list__value">
                 <ul className="govuk-list">
                   <li>
-                    <DashboardRelease
+                    <PrototypeDashboardRelease
                       title="Autumn term, academic year, "
                       years="2017 to 2018"
                       isLatest
@@ -176,7 +176,7 @@ const AdminDashboardPublications = () => {
                   </li>
 
                   <li>
-                    <DashboardRelease
+                    <PrototypeDashboardRelease
                       title="Autumn term, academic year, "
                       years="2016 to 2017"
                       isLive
@@ -199,7 +199,7 @@ const AdminDashboardPublications = () => {
           </Link>
         </AccordionSection>
         <AccordionSection
-          heading="Pupil absense statistics and data for schools in England: autumn and
+          heading="Pupil absence statistics and data for schools in England: autumn and
         spring terms"
           caption=""
         >
@@ -226,7 +226,7 @@ const AdminDashboardPublications = () => {
               <dd className="govuk-summary-list__value">
                 <ul className="govuk-list">
                   <li>
-                    <DashboardRelease
+                    <PrototypeDashboardRelease
                       title="Autumn and spring terms, academic year, "
                       years="2017 to 2018"
                       isLatest
@@ -241,7 +241,7 @@ const AdminDashboardPublications = () => {
                   </li>
 
                   <li>
-                    <DashboardRelease
+                    <PrototypeDashboardRelease
                       title="Autumn and spring terms, academic year, "
                       years="2016 to 2017"
                       editing
@@ -266,7 +266,7 @@ const AdminDashboardPublications = () => {
         </AccordionSection>
         {window.location.search === '?status=newPublication' && (
           <AccordionSection
-            heading="Pupil absense statistics and data for schools in England: summer term"
+            heading="Pupil absence statistics and data for schools in England: summer term"
             caption="New publication, requires release adding"
           >
             <dl className="govuk-summary-list">
@@ -294,4 +294,4 @@ const AdminDashboardPublications = () => {
   );
 };
 
-export default AdminDashboardPublications;
+export default PrototypeAdminDashboardPublications;

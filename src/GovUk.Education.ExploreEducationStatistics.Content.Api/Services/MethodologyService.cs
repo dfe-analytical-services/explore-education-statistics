@@ -33,12 +33,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                     Id = x.Id,
                     Title = x.Title,
                     Summary = x.Summary,
-                    Publications = x.Publications.Where(p => p.Methodologies.Any())
+                    Publications = x.Publications.Where(p => p.Methodology != null)
                         .Select(p => new PublicationTree
                         {
-                            Id = p.Methodologies.FirstOrDefault().Id,
-                            Title = p.Methodologies.FirstOrDefault().Title,
-                            Summary = p.Methodologies.FirstOrDefault().Summary,
+                            Id = p.Methodology.Id,
+                            Title = p.Methodology.Title,
+                            Summary = p.Methodology.Summary,
                             Slug = p.Slug
                         }).OrderBy(publication => publication.Title).ToList()
                 }).Where(x => x.Publications.Any()).OrderBy(topic => topic.Title).ToList()

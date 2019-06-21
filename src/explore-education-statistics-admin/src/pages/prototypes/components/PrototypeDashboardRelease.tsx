@@ -23,7 +23,7 @@ interface Props {
   showComments?: boolean;
 }
 
-const DashboardRelease = ({
+const PrototypeDashboardRelease = ({
   title,
   tag,
   lead,
@@ -170,4 +170,4 @@ const DashboardRelease = ({
   );
 };
 
-export default DashboardRelease;
+export default PrototypeDashboardRelease;
