@@ -69,18 +69,32 @@ const releaseTemplate: Release = {
     published: new Date('2019-09-20 09:30'),
     nextRelease: new Date('2020-09-20 09:30'),
   },
-  meta: {
-    editing: false,
-    dataType: dataTypeRevised,
-    review: true,
-    lead: {
-      contactName: 'John Smith',
-      contactTelNo: '07654 653763',
-      teamName: '',
-      teamEmail: 'js@example.com',
-    },
-    showComments: true,
+  dataType: dataTypeRevised,
+  lead: {
+    contactName: 'John Smith',
+    contactTelNo: '07654 653763',
+    teamName: '',
+    teamEmail: 'js@example.com',
   },
+  comments: [
+    {
+      id: '1',
+      author: PrototypeLoginService.getUser('user2'),
+      datetime: new Date('2018-06-17 17:35'),
+      content: `Lorem ipsum, dolor sit amet consectetur adipisicing elit.
+                Fugit rem, optio sunt dolorum corrupti harum labore quia
+                repellat! Quae voluptatem illo soluta optio ducimus at
+                possimus quisquam doloremque veritatis provident!`,
+    },
+    {
+      id: '1',
+      author: PrototypeLoginService.getUser('user3'),
+      datetime: new Date('2018-06-17 13:35'),
+      content: `Corrupti harum labore quia repellat! Quae voluptatem illo
+                soluta optio ducimus at possimus quisquam doloremque veritatis
+                provident!`,
+    },
+  ],
 };
 
 const publicationTemplate: Publication = {

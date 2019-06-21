@@ -19,21 +19,10 @@ const DashboardReleaseList = ({ releases }: DashboardReleaseListProps) => (
             {releases.map(release => (
               <li key={release.id}>
                 <DashboardRelease
-                  releaseName={release.releaseName}
-                  timePeriodCoverage={release.timePeriodCoverage.label}
-                  approvalStatus={release.status.approvalStatus}
-                  review={release.meta.review}
-                  lastEdited={release.status.lastEdited}
-                  lastEditor={release.status.lastEditor}
-                  published={release.status.published}
-                  nextRelease={release.status.nextRelease}
-                  dataType={release.meta.dataType.title}
-                  showComments={release.meta.showComments}
-                  editing={release.meta.editing}
-                  isLatest={release.status.isLatest}
-                  isLive={release.status.isLive}
-                  isNew={release.status.isNew}
-                  lead={release.meta.lead}
+                  release={release}
+                  review={false}
+                  showComments
+                  editing={false}
                 />
               </li>
             ))}

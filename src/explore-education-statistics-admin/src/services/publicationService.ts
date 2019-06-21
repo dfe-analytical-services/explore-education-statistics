@@ -1,4 +1,6 @@
 import { User } from '@admin/services/PrototypeLoginService';
+import Details from '@common/components/Details';
+import React from 'react';
 
 export interface Methodology {
   id: string;
@@ -61,12 +63,11 @@ export interface ReleaseDataType {
   title: string;
 }
 
-export interface ReleaseMeta {
-  lead: TeamContact;
-  editing: boolean;
-  review: boolean;
-  showComments: boolean;
-  dataType: ReleaseDataType;
+export interface Comment {
+  id: string;
+  author: User;
+  datetime: Date;
+  content: string;
 }
 
 export interface Release {
@@ -75,7 +76,9 @@ export interface Release {
   timePeriodCoverage: TimePeriodCoverage;
   slug: string;
   status: ReleaseStatus;
-  meta: ReleaseMeta;
+  lead: TeamContact;
+  dataType: ReleaseDataType;
+  comments: Comment[];
 }
 
 export interface LegacyRelease {
