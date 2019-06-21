@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "50e9dfaf-7449-46b1-b1e3-107f3fe87434",
+		"_postman_id": "eb4e4878-a534-458d-a798-a77200c4b1f2",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1695,14 +1695,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/8",
+											"raw": "{{data_api_url}}/meta/subject/10",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"8"
+												"10"
 											]
 										}
 									},
@@ -1817,14 +1817,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{data_api_url}}/meta/subject/10",
+											"raw": "{{data_api_url}}/meta/subject/8",
 											"host": [
 												"{{data_api_url}}"
 											],
 											"path": [
 												"meta",
 												"subject",
-												"10"
+												"8"
 											]
 										}
 									},
