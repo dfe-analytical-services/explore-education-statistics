@@ -10,6 +10,7 @@ import { LoginContext } from '@admin/components/Login';
 import { Authentication } from '@admin/services/PrototypeLoginService';
 import AdminDashboardPublications from '@admin/components/AdminDashboardPublications';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
+import Accordion from '@common/components/Accordion';
 import Link from '../components/Link';
 import Page from '../components/Page';
 
@@ -40,9 +41,29 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
       </div>
       <Tabs>
         <TabsSection id="publications" title="Publications">
-          <AdminDashboardPublications
-            publication={DummyPublicationsData.publications[0]}
-          />
+          <h2 className="govuk-heading-l govuk-!-margin-bottom-0">
+            {DummyPublicationsData.publications[0].topic.theme.title},{' '}
+            {DummyPublicationsData.publications[0].topic.title}
+          </h2>
+          <p className="govuk-body">
+            Edit an existing release or create a new release for current
+            publications.
+          </p>
+          <Link
+            to="/prototypes/publication-create-new"
+            className="govuk-button"
+          >
+            Create a new publication
+          </Link>
+          <Accordion id="pupil-absence">
+            {DummyPublicationsData.publications.map(publication => {
+              return (
+                <>
+                  <AdminDashboardPublications publication={publication} />
+                </>
+              );
+            })}
+          </Accordion>
         </TabsSection>
         <TabsSection
           id="task-ready-approval1"
