@@ -6,22 +6,32 @@ import { User } from '@admin/services/PrototypeLoginService';
 import { LoginContext } from '@admin/components/Login';
 import { TeamContact } from '@admin/services/publicationService';
 
+const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
+  if (isLive && isLatest) {
+    return '(Live - Latest release)';
+  }
+  if (isLive) {
+    return '(Live)';
+  }
+  return null;
+};
+
 interface Props {
   releaseName: string;
   timePeriodCoverage: string;
   status: string;
-  lead?: TeamContact;
-  isNew?: boolean;
-  isLatest?: boolean;
-  isLive?: boolean;
-  editing?: boolean;
-  review?: boolean;
+  lead: TeamContact;
+  isNew: boolean;
+  isLatest: boolean;
+  isLive: boolean;
+  editing: boolean;
+  review: boolean;
   lastEdited: Date;
   lastEditor: User;
   published: Date;
-  nextRelease?: Date;
-  dataType?: string;
-  showComments?: boolean;
+  nextRelease: Date;
+  dataType: string;
+  showComments: boolean;
 }
 
 const DashboardRelease = ({
@@ -41,18 +51,13 @@ const DashboardRelease = ({
   dataType,
   showComments,
 }: Props) => {
-  let liveLatestLabel = '';
-
-  if (isLive && isLatest) {
-    liveLatestLabel = '(Live - Latest release)';
-  } else if (isLive) {
-    liveLatestLabel = '(Live)';
-  }
-
   return (
     <Details
       className="govuk-!-margin-bottom-0"
-      summary={`${timePeriodCoverage}, ${releaseName} ${liveLatestLabel}`}
+      summary={`${timePeriodCoverage}, ${releaseName} ${getLiveLatestLabel(
+        isLive,
+        isLatest,
+      )}`}
       tag={status}
     >
       <dl className="govuk-summary-list govuk-!-margin-bottom-3">

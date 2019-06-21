@@ -42,9 +42,9 @@ export interface TimePeriodCoverage {
 
 export interface ReleasePublicationStatus {
   title: string;
-  isNew?: boolean;
-  isLive?: boolean;
-  isLatest?: boolean;
+  isNew: boolean;
+  isLive: boolean;
+  isLatest: boolean;
   lastEdited: Date;
   lastEditor: User;
   published: Date;
