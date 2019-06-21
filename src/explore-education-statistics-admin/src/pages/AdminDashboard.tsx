@@ -21,9 +21,7 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         <div className="govuk-grid-column-two-thirds">
           <LoginContext.Consumer>
             {loginContext =>
-              loginContext.user ? (
-                <UserGreeting user={loginContext.user} />
-              ) : null
+              loginContext.user && <UserGreeting user={loginContext.user} />
             }
           </LoginContext.Consumer>
         </div>
