@@ -16,29 +16,27 @@ const DashboardReleaseList = ({ releases }: DashboardReleaseListProps) => (
         </dt>
         <dd className="govuk-summary-list__value">
           <ul className="govuk-list dfe-admin">
-            {releases.map(release => {
-              return (
-                <li key={release.id}>
-                  <DashboardRelease
-                    releaseName={release.releaseName}
-                    timePeriodCoverage={release.timePeriodCoverage.label}
-                    approvalStatus={release.status.approvalStatus}
-                    review={release.meta.review}
-                    lastEdited={release.status.lastEdited}
-                    lastEditor={release.status.lastEditor}
-                    published={release.status.published}
-                    nextRelease={release.status.nextRelease}
-                    dataType={release.meta.dataType.title}
-                    showComments={release.meta.showComments}
-                    editing={release.meta.editing}
-                    isLatest={release.status.isLatest}
-                    isLive={release.status.isLive}
-                    isNew={release.status.isNew}
-                    lead={release.meta.lead}
-                  />
-                </li>
-              );
-            })}
+            {releases.map(release => (
+              <li key={release.id}>
+                <DashboardRelease
+                  releaseName={release.releaseName}
+                  timePeriodCoverage={release.timePeriodCoverage.label}
+                  approvalStatus={release.status.approvalStatus}
+                  review={release.meta.review}
+                  lastEdited={release.status.lastEdited}
+                  lastEditor={release.status.lastEditor}
+                  published={release.status.published}
+                  nextRelease={release.status.nextRelease}
+                  dataType={release.meta.dataType.title}
+                  showComments={release.meta.showComments}
+                  editing={release.meta.editing}
+                  isLatest={release.status.isLatest}
+                  isLive={release.status.isLive}
+                  isNew={release.status.isNew}
+                  lead={release.meta.lead}
+                />
+              </li>
+            ))}
           </ul>
         </dd>
       </div>

@@ -54,14 +54,12 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
             Create a new publication
           </Link>
           <Accordion id="pupil-absence">
-            {DummyPublicationsData.publications.map(publication => {
-              return (
-                <AdminDashboardPublications
-                  key={publication.id}
-                  publication={publication}
-                />
-              );
-            })}
+            {DummyPublicationsData.publications.map(publication => (
+              <AdminDashboardPublications
+                key={publication.id}
+                publication={publication}
+              />
+            ))}
           </Accordion>
         </TabsSection>
         <TabsSection
