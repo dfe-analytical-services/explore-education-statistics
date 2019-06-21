@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using MimeTypes;
@@ -16,10 +16,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class FileStorageService : IFileStorageService
     {
         private readonly string _storageConnectionString;
-        private readonly ILogger _logger;
 
-        private const string containerName = "releases";
+        private const string ContainerName = "releases";
 
+        [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private enum FileSizeUnit : byte
         {
             B,
@@ -29,10 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Tb
         }
 
-        public FileStorageService(ILogger<FileStorageService> logger,
-            IConfiguration config)
+        public FileStorageService(IConfiguration config)
         {
-            _logger = logger;
             _storageConnectionString = config.GetConnectionString("AzureStorage");
         }
 
@@ -42,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
 
             var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(containerName);
+            var blobContainer = blobClient.GetContainerReference(ContainerName);
             await blobContainer.CreateIfNotExistsAsync();
 
             var permissions = new BlobContainerPermissions
@@ -62,8 +60,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             });
         }
 
-        private async Task UploadFileAsync(CloudBlobContainer blobContainer, string publication, string release,
-            IFormFile file, List<KeyValuePair<string, string>> metaValues)
+        private static async Task UploadFileAsync(CloudBlobContainer blobContainer, string publication, string release,
+            IFormFile file, IEnumerable<KeyValuePair<string, string>> metaValues)
         {
             var blob = blobContainer.GetBlockBlobReference($"{publication}/{release}/{file.FileName}");
             blob.Properties.ContentType = file.ContentType;
@@ -91,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
 
             var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(containerName);
+            var blobContainer = blobClient.GetContainerReference(ContainerName);
             blobContainer.CreateIfNotExists();
 
             return blobContainer.ListBlobs($"{publication}/{release}", true, BlobListingDetails.Metadata)
