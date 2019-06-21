@@ -1560,7 +1560,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             dataSummary = new List<string>
                             {
-                                "Up from 0.08 in 2015/16",
+                                "Up from 0.08% in 2015/16",
                                 "Up from 4.29% in 2015/16",
                                 "Up from 6,685 in 2015/16"
                             },
@@ -2478,7 +2478,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("9c0f0139-7f88-4750-afe0-1c85cdf1d047"),
                     ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                    On = new DateTime(2017, 4, 19),
+                    On = new DateTime(2018, 4, 19),
                     Reason =
                         "Underlying data file updated to include absence data by pupil residency and school location, and updated metadata document."
                 },
@@ -2486,7 +2486,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("18e0d40e-bdf7-4c84-99dd-732e72e9c9a5"),
                     ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                    On = new DateTime(2017, 3, 22),
+                    On = new DateTime(2018, 3, 22),
                     Reason = "First published."
                 },
                 new Update
