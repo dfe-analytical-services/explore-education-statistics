@@ -66,8 +66,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             });
 
             services.AddTransient<IFileStorageService, FileStorageService>();
-            services.AddTransient<INotificationService, NotificationService>();
             services.AddTransient<IImportService, ImportService>();
+            services.AddTransient<INotificationsService, NotificationsService>();
+            services.AddTransient<IPublishingService, PublishingService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

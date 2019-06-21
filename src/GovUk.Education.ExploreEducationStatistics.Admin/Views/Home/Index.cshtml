@@ -23,9 +23,11 @@
         <div class="govuk-grid-column-one-third">
             <h3 class="govuk-heading-s">Release actions</h3>
             <ul class="govuk-list">
-                
                 <li >
-                    <a class="govuk-link" asp-area="" asp-controller="Release" asp-action="Notify">Send email</a>
+                    <a class="govuk-link" asp-area="" asp-controller="Notifications" asp-action="NotifySubscribers">Notify subscribers</a>
+                </li>
+                <li >
+                    <a class="govuk-link" asp-area="" asp-controller="Publishing" asp-action="PublishReleaseData">Publish release data</a>
                 </li>
             </ul>
         </div>

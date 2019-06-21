@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _logger = logger;
         }
 
-        public void SendImportNotification(string dataFileName, Guid releaseId)
+        public void Import(string dataFileName, Guid releaseId)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();

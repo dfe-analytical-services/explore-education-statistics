@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 
             await _fileStorageService.UploadFilesAsync(release.Publication.Slug, release.Slug, file, metaFile, name);
 
-            _importService.SendImportNotification(file.FileName, release.Id);
+            _importService.Import(file.FileName, release.Id);
             
             return RedirectToAction("List", "File");
         }
