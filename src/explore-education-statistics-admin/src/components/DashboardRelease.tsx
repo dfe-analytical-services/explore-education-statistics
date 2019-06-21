@@ -41,12 +41,18 @@ const DashboardRelease = ({
   dataType,
   showComments,
 }: Props) => {
+  let liveLatestLabel = '';
+
+  if (isLive && isLatest) {
+    liveLatestLabel = '(Live - Latest release)';
+  } else if (isLive) {
+    liveLatestLabel = '(Live)';
+  }
+
   return (
     <Details
       className="govuk-!-margin-bottom-0"
-      summary={`${timePeriodCoverage}, ${releaseName} ${
-        isLive ? '(Live)' : ''
-      } ${isLatest ? '(Live - Latest release)' : ''}`}
+      summary={`${timePeriodCoverage}, ${releaseName} ${liveLatestLabel}`}
       tag={status}
     >
       <dl className="govuk-summary-list govuk-!-margin-bottom-3">
