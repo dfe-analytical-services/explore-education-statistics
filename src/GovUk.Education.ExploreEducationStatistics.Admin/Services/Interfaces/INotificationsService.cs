@@ -2,8 +2,8 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
-    public interface IImportService
+    public interface INotificationsService
     {
-        void Import(string dataFileName, Guid releaseId);
+        bool NotifySubscribers(Guid publicationId);
     }
 }

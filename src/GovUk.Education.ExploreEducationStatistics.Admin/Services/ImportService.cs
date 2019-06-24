@@ -18,8 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly string _storageConnectionString;
-
-
+        
         private readonly ILogger _logger;
 
         public ImportService(ApplicationDbContext applicationDbContext,
@@ -33,20 +32,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _logger = logger;
         }
 
-        public void SendImportNotification(string dataFileName, Guid releaseId)
+        public void Import(string dataFileName, Guid releaseId)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
             var queue = client.GetQueueReference("imports-pending");
             queue.CreateIfNotExists();
 
-            var message = BuildImportMessage(dataFileName, releaseId);
+            var message = BuildMessage(dataFileName, releaseId);
             queue.AddMessage(message);
 
-            _logger.LogTrace($"Sent import notification for data file: {dataFileName}, releaseId: {releaseId}");
+            _logger.LogTrace($"Sent import message for data file: {dataFileName}, releaseId: {releaseId}");
         }
 
-        private CloudQueueMessage BuildImportMessage(string dataFileName, Guid releaseId)
+        private CloudQueueMessage BuildMessage(string dataFileName, Guid releaseId)
         {
             var release = _context.Releases
                 .Where(r => r.Id.Equals(releaseId))
@@ -56,13 +55,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .FirstOrDefault();
 
             var importMessageRelease = _mapper.Map<Release>(release);
-            var importMessage = new ImportMessage
+            var message = new ImportMessage
             {
                 DataFileName = dataFileName,
                 Release = importMessageRelease
             };
 
-            return new CloudQueueMessage(JsonConvert.SerializeObject(importMessage));
+            return new CloudQueueMessage(JsonConvert.SerializeObject(message));
         }
     }
 }

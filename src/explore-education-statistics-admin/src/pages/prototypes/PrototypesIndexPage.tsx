@@ -19,10 +19,7 @@ function PrototypesIndexPage() {
       <h3>Tools</h3>
       <ul>
         <li>
-          <a href="/tools">Administrive tools</a>
-        </li>
-        <li>
-          <a href="/tools/release/notify">Send a release notification</a>
+          <a href="/tools">Administrative tools</a>
         </li>
       </ul>
     </PrototypePage>
