@@ -1,15 +1,9 @@
-import {
-  Component,
-  ComponentElement,
-  ComponentState,
-  ComponentType,
-  ReactElement,
-} from 'react';
+import { ComponentType, ReactComponentElement, ReactElement } from 'react';
 
-export default function isComponentType<P>(
+export default function isComponentType<P = {}>(
   value: unknown,
   componentType: ComponentType<P>,
-): value is ComponentElement<P, Component<P, ComponentState>> {
+): value is ReactComponentElement<ComponentType<P>, P> {
   if (!value) {
     return false;
   }
