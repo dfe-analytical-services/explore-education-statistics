@@ -2038,6 +2038,111 @@
 										}
 									},
 									"response": []
+								},
+								{
+									"name": "Subject Meta - Filter SubjectId 17, National",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters.SchoolPhase\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters.YearOfAdmission\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.Admissions\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.Applications\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.PreferencesBreakdowns\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.not.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.not.have.jsonBody(\"locations.LocalAuthority\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
+													"});",
+													"",
+													"pm.test(\"Number of school phase default options should be correct\", function () { ",
+													"    pm.expect(pm.response.json().filters.SchoolPhase.options.Default.options.length).to.equal(2);",
+													"});",
+													"",
+													"pm.test(\"Number of YearOfAdmission options should be correct\", function () { ",
+													"    pm.expect(pm.response.json().filters.YearOfAdmission.options.Default.options.length).to.equal(1);",
+													"});",
+													"",
+													"pm.test(\"Time periods options should be correct\", function() {",
+													"    pm.expect(pm.response.json().timePeriod.options.length).to.equal(5);",
+													"});",
+													"",
+													"pm.test(\"Number of location options should be correct\", function() {",
+													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
+													"});",
+													"",
+													"pm.test(\"Expect correct number of indicator categories\", function () {",
+													"    pm.expect(Object.keys(pm.response.json().indicators).length).to.equal(3);",
+													"    pm.expect(pm.response.json().indicators).to.not.have.property(\"AbsenceFields\");",
+													"    pm.expect(pm.response.json().indicators).to.not.have.property(\"AbsenceByReason\");",
+													"    pm.expect(pm.response.json().indicators).to.not.have.property(\"AbsenceForPersistentAbsentees\");",
+													"});",
+													"",
+													"pm.test(\"Expect number of Admissions indicators to be correct\", function () {",
+													"    pm.expect(pm.response.json().indicators.Admissions.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().indicators.Admissions.options[0].label).to.equal(\"Number of admissions\");    ",
+													"});",
+													"",
+													"pm.test(\"Expect number of Applications indicators to be correct\", function () {",
+													"    pm.expect(pm.response.json().indicators.Applications.options.length).to.equal(3);",
+													"});",
+													"",
+													"pm.test(\"Expect number of PreferencesBreakdowns indicators to be correct\", function () {",
+													"    pm.expect(pm.response.json().indicators.PreferencesBreakdowns.options.length).to.equal(11);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\tSubjectId: 17,\n\tGeographicLevel: \"National\"\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject"
+											]
+										}
+									},
+									"response": []
 								}
 							],
 							"_postman_isSubFolder": true
@@ -2198,8 +2303,25 @@
 													"    pm.expect(respJson.geographicLevel).to.equal(\"National\");",
 													"})",
 													"",
+													"pm.test(\"subjectId should be \\\"1\\\"\", function () {",
+													"    pm.expect(respJson.subjectId).to.equal(1);",
+													"});",
+													"",
+													"pm.test(\"releaseDate field is present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"});",
+													"",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
 													"    pm.expect(respJson.result.length).to.equal(16); ",
+													"});",
+													"",
+													"pm.test(\"First result should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timeIdentifier\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].year\"));",
 													"});"
 												],
 												"type": "text/javascript"
@@ -2250,9 +2372,26 @@
 													"    pm.expect(respJson.geographicLevel).to.equal(\"National\");",
 													"})",
 													"",
+													"pm.test(\"subjectId should be \\\"1\\\"\", function () {",
+													"    pm.expect(respJson.subjectId).to.equal(1);",
+													"});",
+													"",
+													"pm.test(\"releaseDate field is present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"});",
+													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
 													"    pm.expect(respJson.result.length).to.equal(4); ",
-													"});"
+													"});",
+													"",
+													"pm.test(\"First result should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timeIdentifier\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].year\"));",
+													"});",
+													""
 												],
 												"type": "text/javascript"
 											}
@@ -2296,7 +2435,15 @@
 													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(16); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(16); });",
+													"",
+													"pm.test(\"First result should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timeIdentifier\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].year\"));",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -2338,7 +2485,15 @@
 												"exec": [
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(2412); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(2412); });",
+													"",
+													"pm.test(\"First result should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timeIdentifier\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].year\"));",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -2382,7 +2537,15 @@
 													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(16); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(16); });",
+													"",
+													"pm.test(\"First result should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timeIdentifier\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].year\"));",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -2432,6 +2595,14 @@
 													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
 													"    pm.expect(respJson.result.length).to.equal(3688); ",
+													"});",
+													"",
+													"pm.test(\"First result should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timeIdentifier\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].year\"));",
 													"});"
 												],
 												"type": "text/javascript"
@@ -2476,7 +2647,15 @@
 													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(11); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(11); });",
+													"",
+													"pm.test(\"First result should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timeIdentifier\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].year\"));",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -2580,7 +2759,15 @@
 													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(33); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(33); });",
+													"",
+													"pm.test(\"First result should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timeIdentifier\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].year\"));",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -2637,7 +2824,15 @@
 													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(451); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(451); });",
+													"",
+													"pm.test(\"First result should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timeIdentifier\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].year\"));",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -3807,16 +4002,29 @@
 													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
+													"pm.test(\"Should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
 													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
 													"});",
 													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(6); ",
+													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(6); ",
 													"});",
 													"",
 													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(1); ",
+													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1); ",
 													"});",
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
@@ -3825,6 +4033,15 @@
 													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
 													"    pm.expect(respJson.result.length).to.equal(16); ",
+													"});",
+													"",
+													"pm.test(\"Every result should contain location country England only\", function () {",
+													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
+													"        pm.expect(respJson.result[i].location.country.country_name).to.equal(\"England\");",
+													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthority`));",
+													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthorityDistrict`));",
+													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.region`));",
+													"    }",
 													"});"
 												],
 												"type": "text/javascript"
@@ -3869,17 +4086,31 @@
 													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
-													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(4); ",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(1); ",
+													"pm.test(\"Should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
 													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
 													"});",
+													"",
+													"pm.test(\"Number of metaData filters should be correct\", function () {",
+													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(4); ",
+													"});",
+													"",
+													"pm.test(\"Number of metaData locations should be correct\", function () {",
+													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1); ",
+													"});",
+													"",
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    pm.expect(respJson.geographicLevel).to.equal(\"National\");",
@@ -3887,6 +4118,15 @@
 													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
 													"    pm.expect(respJson.result.length).to.equal(4); ",
+													"});",
+													"",
+													"pm.test(\"Every result should contain location country England only\", function () {",
+													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
+													"        pm.expect(respJson.result[i].location.country.country_name).to.equal(\"England\");",
+													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthority`));",
+													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthorityDistrict`));",
+													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.region`));",
+													"    }",
 													"});"
 												],
 												"type": "text/javascript"
@@ -3927,12 +4167,29 @@
 											"script": {
 												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
 												"exec": [
+													"respJson = pm.response.json()",
+													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"pm.test(\"Should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
+													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\");",
+													"});",
 													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(6); ",
+													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(6); ",
 													"});",
 													"",
 													"/*",
@@ -3946,10 +4203,20 @@
 													"*/",
 													"",
 													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(163); ",
+													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(163); ",
 													"});",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(2412); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(2412); });",
+													"",
+													"// NOTE(mark): Takes a long time to run this test",
+													"// pm.test(\"Every result should contain location country, localAuthority, and region\", function () {",
+													"//     for(var i = 0; i < pm.response.json().result.length; i++) {",
+													"//         pm.expect(respJson.result[i].location.country.country_name).to.equal(\"England\");",
+													"//         pm.expect(pm.response.to.have.jsonBody(`result[${i}].location.localAuthority`));",
+													"//         pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthorityDistrict`));",
+													"//         pm.expect(pm.response.to.have.jsonBody(`result[${i}].location.region`));",
+													"//     }",
+													"// });"
 												],
 												"type": "text/javascript"
 											}
@@ -3991,6 +4258,23 @@
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
+													"pm.test(\"Should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
+													"    pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
+													"});",
+													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
 													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(3); ",
 													"});",
@@ -3998,8 +4282,6 @@
 													"pm.test(\"Number of metaData locations should be correct\", function () {",
 													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(3); ",
 													"});",
-													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(4); });"
 												],
@@ -4041,12 +4323,29 @@
 											"script": {
 												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
 												"exec": [
-													"respJson = pm.response.json();",
+													"var respJson = pm.response.json();",
 													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
+													"pm.test(\"Should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () {",
+													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\");",
+													"});",
+													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(7); ",
+													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(7);",
 													"});",
 													"",
 													"/*",
@@ -4059,14 +4358,10 @@
 													"1 + 10 + 326 = 337",
 													"*/",
 													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(337); ",
+													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(337);",
 													"});",
 													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
-													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
+													"pm.test(\"Number of results should be correct\", function () {",
 													"    pm.expect(respJson.result.length).to.equal(3688);",
 													"});"
 												],
@@ -4108,13 +4403,26 @@
 											"script": {
 												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
 												"exec": [
-													"respJson = pm.response.json();",
+													"var respJson = pm.response.json();",
 													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
-													"// pm.test(\"Publication id matches the publication id of the subject\", function () { ",
-													"//     pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
-													"// });",
+													"pm.test(\"Should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
+													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
+													"});",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
 													"    pm.expect(respJson.result.length).to.equal(8); ",
@@ -4126,7 +4434,9 @@
 													"",
 													"pm.test(\"All results should have LA District name Hartlepool\", function () {",
 													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.sch_lad_name).to.equal(\"Hartlepool\"); ",
+													"        pm.expect(respJson.result[i].location.country.country_name).to.equal(\"England\");",
+													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.sch_lad_name).to.equal(\"Hartlepool\");",
+													"        pm.expect(respJson.result[i].location.region.region_name).to.equal(\"North East\");",
 													"    }",
 													"});"
 												],
@@ -4170,68 +4480,18 @@
 												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
-													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(3); ",
+													"pm.test(\"Should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
-													"",
-													"pm.test(\"Number of metaData indicators should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.indicators).length).to.equal(3); ",
-													"});",
-													"",
-													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(3); ",
-													"});",
-													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(2); });",
-													"",
-													"",
-													"pm.test(\"All results should have LA District name Adur\", function () {",
-													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
-													"        pm.expect(pm.response.json().result[i].location.localAuthorityDistrict.sch_lad_name).to.equal(\"Adur\"); ",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"localAuthorityDistricts\": [\n    \t\"E07000223\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Absence by characteristic - LA district - Adur Copy",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
 													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(3); ",
@@ -4245,14 +4505,19 @@
 													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(3); ",
 													"});",
 													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
+													"    pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\");",
+													"});",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(2); });",
+													"pm.test(\"Number of results should be correct\", function () { ",
+													"    pm.expect(pm.response.json().result.length).to.equal(2);",
+													"});",
 													"",
-													"",
-													"pm.test(\"All results should have LA District name Adur\", function () {",
+													"pm.test(\"All results should have correction location attributes\", function () {",
 													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
-													"        pm.expect(pm.response.json().result[i].location.localAuthorityDistrict.sch_lad_name).to.equal(\"Adur\"); ",
+													"        pm.expect(pm.response.json().result[i].location.country.country_name).to.equal(\"England\");",
+													"        pm.expect(pm.response.json().result[i].location.localAuthorityDistrict.sch_lad_name).to.equal(\"Adur\");",
+													"        pm.expect(pm.response.json().result[i].location.region.region_name).to.equal(\"South East\");",
 													"    }",
 													"});"
 												],
@@ -4343,6 +4608,187 @@
 						}
 					],
 					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Early years foundation stage results",
+					"item": [
+						{
+							"name": "Early learning goal underlying data 2013-2018",
+							"item": [
+								{
+									"name": "Early learning goal 2013-18 - LA - Lambeth, Sefton, Luton - Male, Female",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"exec": [
+													"respJson = pm.response.json()",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Should have correct filters metaData\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
+													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2); ",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters.884\"))",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters.885\"))",
+													"});",
+													"",
+													"pm.test(\"Should have correct indicators metaData\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
+													"    pm.expect(Object.keys(respJson.metaData.indicators).length).to.equal(2);",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators.218\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators.219\"));",
+													"});",
+													"",
+													"pm.test(\"Should have correct locations metaData\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(7);",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E92000001\")); // Country - England",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E09000022\")); // LA - Lambeth",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E08000014\")); //      Sefton",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000032\")); //      Luton",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E13000001\")); // Region - Inner London",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E12000002\")); //          North West",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E12000006\")); //          East of England",
+													"});",
+													"",
+													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
+													"    pm.expect(respJson.publicationId).to.equal(\"fcda2962-82a6-4052-afa2-ea398c53c85f\"); ",
+													"});",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    pm.expect(respJson.geographicLevel).to.equal(\"Local_Authority\");",
+													"})",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { ",
+													"    pm.expect(respJson.result.length).to.equal(24); ",
+													"});",
+													"",
+													"pm.test(\"All results have filter 884 or 885\", function () {",
+													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
+													"        if(respJson.result[i].filters[0] !== \"884\" && respJson.result[i].filters[0] !== \"885\") {",
+													"            pm.expect(respJson.result[i].filters[0]).to.equal(-99999);",
+													"        }",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 10,\n    \"geographicLevel\": \"Local_Authority\",\n        \"localAuthorities\": [\n    \t\"E09000022\",\n    \t\"E08000014\",\n    \t\"E06000032\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2017,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        {{INDI_TotalPointScoreBasedOnAssessmentRating}},\n        {{INDI_AveragePointScore}}\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "fda225ab-c571-4c3a-908a-d9d99051e238",
+										"type": "text/javascript",
+										"exec": [
+											"pm.globals.set(\"FILT_All\", \"883\");",
+											"pm.globals.set(\"FILT_GenderFemale\", \"884\");",
+											"pm.globals.set(\"FILT_GenderMale\", \"885\");",
+											"",
+											"pm.globals.set(\"INDI_TotalPointScoreBasedOnAssessmentRating\", \"218\");",
+											"pm.globals.set(\"INDI_AveragePointScore\", \"219\");"
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "a50021c8-3c9a-46f9-bce7-d5f222d0253e",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		},
+		{
+			"name": "Download",
+			"item": [
+				{
+					"name": "Download Absence by term",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a8450e2f-c9ab-49e3-ade8-a3a285209058",
+								"exec": [
+									"(pm.environment.get(\"data_api_url\") === \"http://localhost:5000/api\" ? pm.test.skip : pm.test)(\"Status code is 200\", function () { ",
+									"    pm.response.to.have.status(200); ",
+									"    ",
+									"});",
+									"",
+									"(pm.environment.get(\"data_api_url\") === \"http://localhost:5000/api\" ? pm.test.skip : pm.test)(\"First line of CSV should be correct\", function () { ",
+									"    pm.expect(pm.response.text()).to.contain(\"time_identifier,time_period,geographic_level,country_code,country_name,region_code,region_name,old_la_code,new_la_code,la_name,school_type,sess_possible,sess_overall,sess_authorised,sess_unauthorised,sess_overall_percent,sess_authorised_percent,sess_unauthorised_percent,sess_auth_illness,sess_auth_appointments,sess_auth_religious,sess_auth_study,sess_auth_traveller,sess_auth_holiday,sess_auth_ext_holiday,sess_auth_excluded,sess_auth_other,sess_auth_totalreasons,sess_unauth_holiday,sess_unauth_late,sess_unauth_other,sess_unauth_noyet,sess_unauth_totalreasons,sess_overall_totalreasons\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{data_api_url}}/download/pupil-absence-in-schools-in-england/2016-17/absence_by_term.csv",
+							"host": [
+								"{{data_api_url}}"
+							],
+							"path": [
+								"download",
+								"pupil-absence-in-schools-in-england",
+								"2016-17",
+								"absence_by_term.csv"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -4400,50 +4846,6 @@
 							"path": [
 								"debug",
 								"report"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Download",
-			"item": [
-				{
-					"name": "Download Absence by term",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "a8450e2f-c9ab-49e3-ade8-a3a285209058",
-								"exec": [
-									"(pm.environment.get(\"data_api_url\") === \"http://localhost:5000/api\" ? pm.test.skip : pm.test)(\"Status code is 200\", function () { ",
-									"    pm.response.to.have.status(200); ",
-									"    ",
-									"});",
-									"",
-									"(pm.environment.get(\"data_api_url\") === \"http://localhost:5000/api\" ? pm.test.skip : pm.test)(\"First line of CSV should be correct\", function () { ",
-									"    pm.expect(pm.response.text()).to.contain(\"time_identifier,time_period,geographic_level,country_code,country_name,region_code,region_name,old_la_code,new_la_code,la_name,school_type,sess_possible,sess_overall,sess_authorised,sess_unauthorised,sess_overall_percent,sess_authorised_percent,sess_unauthorised_percent,sess_auth_illness,sess_auth_appointments,sess_auth_religious,sess_auth_study,sess_auth_traveller,sess_auth_holiday,sess_auth_ext_holiday,sess_auth_excluded,sess_auth_other,sess_auth_totalreasons,sess_unauth_holiday,sess_unauth_late,sess_unauth_other,sess_unauth_noyet,sess_unauth_totalreasons,sess_overall_totalreasons\");",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{data_api_url}}/download/pupil-absence-in-schools-in-england/2016-17/absence_by_term.csv",
-							"host": [
-								"{{data_api_url}}"
-							],
-							"path": [
-								"download",
-								"pupil-absence-in-schools-in-england",
-								"2016-17",
-								"absence_by_term.csv"
 							]
 						}
 					},
