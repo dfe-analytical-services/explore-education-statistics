@@ -1,10 +1,10 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
+using Microsoft.Azure.Storage.DataMovement;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using Microsoft.WindowsAzure.Storage.DataMovement;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _publicStorageConnectionString = config.GetConnectionString("PublicStorage");
         }
 
-        public async void CopyReleaseToPublicContainer(string publication, string release)
+        public async Task CopyReleaseToPublicContainer(string publication, string release)
         {
             var privateStorageAccount = CloudStorageAccount.Parse(_privateStorageConnectionString);
             var publicStorageAccount = CloudStorageAccount.Parse(_publicStorageConnectionString);
@@ -37,13 +37,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var privateContainer = privateBlobClient.GetContainerReference(PrivateContainerName);
             var publicContainer = publicBlobClient.GetContainerReference(PublicContainerName);
 
-            // TODO
-            //var searchPattern = "^.+$(?<!\\.meta\\.csv)";
-            const string searchPattern = "*.csv";
+            // TODO DFE-871 Exclude meta files using the search pattern
+            //const string searchPattern = "(?!.*meta.csv).*$";
+            const string searchPattern = null;
 
-            var directoryAddress = $"{publication}/{release}";
-            await CopyDirectoryAsync(directoryAddress, directoryAddress, searchPattern, privateContainer,
-                publicContainer);
+            var sourceDirectoryAddress = $"{publication}/{release}";
+            var destinationDirectoryAddress = sourceDirectoryAddress;
+            await CopyDirectoryAsync(sourceDirectoryAddress, destinationDirectoryAddress, searchPattern,
+                privateContainer, publicContainer);
         }
 
         private async Task CopyDirectoryAsync(string sourceDirectoryAddress, string destinationDirectoryAddress,
@@ -64,23 +65,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             context.FileFailed += FileFailedCallback;
             context.FileSkipped += FileSkippedCallback;
 
-            await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory, true, options, context);
+            await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory, false, options, context);
         }
 
         private void FileTransferredCallback(object sender, TransferEventArgs e)
         {
-            _logger.LogWarning("Transfer succeeds. {0} -> {1}.", e.Source, e.Destination);
+            _logger.LogInformation("Transfer succeeds. {0} -> {1}.", e.Source, e.Destination);
         }
 
         private void FileFailedCallback(object sender, TransferEventArgs e)
         {
-            _logger.LogWarning("Transfer fails. {0} -> {1}. Error message:{2}", e.Source, e.Destination,
+            _logger.LogInformation("Transfer fails. {0} -> {1}. Error message:{2}", e.Source, e.Destination,
                 e.Exception.Message);
         }
 
         private void FileSkippedCallback(object sender, TransferEventArgs e)
         {
-            _logger.LogWarning("Transfer skips. {0} -> {1}.", e.Source, e.Destination);
+            _logger.LogInformation("Transfer skips. {0} -> {1}.", e.Source, e.Destination);
         }
     }
 }

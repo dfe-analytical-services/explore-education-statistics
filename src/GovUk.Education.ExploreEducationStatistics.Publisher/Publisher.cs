@@ -17,13 +17,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
         [FunctionName("Publisher")]
         // ReSharper disable once UnusedMember.Global
-        public void Run(
+        public async void Run(
             [QueueTrigger("publish-release-data", Connection = "")]
             PublishReleaseDataMessage message,
             ILogger logger)
         {
             logger.LogInformation($"{GetType().Name} function triggered: {message}");
-            _publishingService.PublishReleaseData(message);
+            await _publishingService.PublishReleaseData(message);
             logger.LogInformation($"{GetType().Name} function completed");
         }
     }
