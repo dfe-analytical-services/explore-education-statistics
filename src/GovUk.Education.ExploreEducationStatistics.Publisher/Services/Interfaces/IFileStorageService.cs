@@ -4,6 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IFileStorageService
     {
-        Task CopyFilesAsync(string publication, string release, string sourceContainerName, string destContainerName);
+        Task CopyFilesAsync(string publication, string release, string sourceContainerName,
+            string destinationContainerName);
     }
 }
