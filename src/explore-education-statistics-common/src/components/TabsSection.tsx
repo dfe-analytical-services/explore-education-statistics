@@ -16,7 +16,7 @@ export const classes = {
 
 export interface TabsSectionProps {
   children: ReactNode;
-  id: string;
+  id?: string;
   /**
    * Set to true if children should not be
    * rendered until tab has been selected.

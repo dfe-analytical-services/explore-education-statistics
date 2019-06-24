@@ -24,7 +24,7 @@ const PrototypeDataSample = ({
 }: Props) => {
   return (
     <>
-      <Tabs>
+      <Tabs id="data-sample-exclusions">
         {sectionId === 'headlines' && (
           <TabsSection id={`${sectionId}SummaryData`} title="Summary">
             <PrototypeDataTilesHighlights />

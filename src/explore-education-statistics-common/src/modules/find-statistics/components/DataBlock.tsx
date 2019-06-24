@@ -4,6 +4,8 @@ import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/find-statistics/components/ChartRenderer';
+
+import DataSource from '@common/modules/find-statistics/components/DataSource';
 import SummaryRenderer, {
   SummaryRendererProps,
 } from '@common/modules/find-statistics/components/SummaryRenderer';
@@ -22,8 +24,6 @@ import {
   Table,
 } from '@common/services/publicationService';
 import React, { Component, ReactNode } from 'react';
-
-import DataSource from '@common/modules/find-statistics/components/DataSource';
 import DownloadDetails from './DownloadDetails';
 
 export interface DataBlockProps {
@@ -140,15 +140,15 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
         {isLoading ? (
           <LoadingSpinner text="Loading content..." />
         ) : (
-          <Tabs>
+          <Tabs id={id}>
             {summary && (
-              <TabsSection id={`datablock_${id}_summary`} title="Summary">
+              <TabsSection id={`${id}-summary`} title="Summary">
                 <SummaryRenderer {...summary} />
               </TabsSection>
             )}
 
             {tables && showTables && (
-              <TabsSection id={`datablock_${id}_tables`} title="Data tables">
+              <TabsSection id={`${id}-tables`} title="Data tables">
                 {tables.map((table, idx) => {
                   const key = `${id}0_table_${idx}`;
 
@@ -166,11 +166,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
             )}
 
             {charts && (
-              <TabsSection
-                id={`datablock_${id}_charts`}
-                title="Charts"
-                lazy={false}
-              >
+              <TabsSection id={`${id}-charts`} title="Charts" lazy={false}>
                 {charts.map((chart, idx) => {
                   const key = `${id}_chart_${idx}`;
 
