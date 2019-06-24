@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         )
         {
             _context = applicationDbContext;
-            _storageConnectionString = config.GetConnectionString("AzureStorage");
+            _storageConnectionString = config.GetConnectionString("PublicStorage");
             _logger = logger;
         }
 

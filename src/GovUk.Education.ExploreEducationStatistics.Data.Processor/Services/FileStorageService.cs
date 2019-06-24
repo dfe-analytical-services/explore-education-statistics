@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public FileStorageService(IConfiguration config)
         {
-            _storageConnectionString = config.GetConnectionString("AzureStorage");
+            _storageConnectionString = config.GetConnectionString("CoreStorage");
         }
 
         public async Task<SubjectData> GetSubjectData(ImportMessage importMessage)

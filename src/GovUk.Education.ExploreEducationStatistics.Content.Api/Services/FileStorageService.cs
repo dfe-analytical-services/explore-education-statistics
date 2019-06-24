@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public FileStorageService(IConfiguration config)
         {
-            _storageConnectionString = config.GetConnectionString("AzureStorage");
+            _storageConnectionString = config.GetConnectionString("PublicStorage");
         }
 
         public IEnumerable<FileInfo> ListFiles(string publication, string release)

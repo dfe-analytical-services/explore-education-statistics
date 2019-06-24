@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public FileStorageService(IConfiguration config)
         {
-            _storageConnectionString = config.GetConnectionString("AzureStorage");
+            _storageConnectionString = config.GetConnectionString("PublicStorage");
         }
 
         public bool FileExistsAndIsReleased(string publication, string release, string filename)
