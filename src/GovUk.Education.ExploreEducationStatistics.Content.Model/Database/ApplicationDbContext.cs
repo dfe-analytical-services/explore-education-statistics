@@ -1112,7 +1112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                        " * 10% of pupils persistently absent during 2016/17"
                             }
                         },
-                        
+
                         Tables = new List<Table>
                         {
                             new Table
@@ -1447,8 +1447,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         {
                             Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = "",
                             Content = new List<IContentBlock>
-                            {                                
-                                new DataBlock {                                         
+                            {
+                                new DataBlock {
                                     DataBlockRequest = new DataBlockRequest {
                                         subjectId = 1,
                                         geographicLevel = "Local_Authority_District",
@@ -1456,13 +1456,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         endYear = "2017",
                                         indicators = new List<string> { "23" , "26" , "28" },
                                         filters = new List<string> { "1", "2"}
-                                    },         
+                                    },
                                     Charts = new List<IContentBlockChart> {
                                         new MapChart {
                                             Indicators = new List<string> { "23" , "26", "28" }
                                         }
                                     }
-                                        
+
                                 },
                                 new MarkDownBlock
                                 {
@@ -1580,7 +1580,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 indicators = new List<string> { "156", "158", "155"  }
                             }
                         },
-   
+
                         Charts = new List<IContentBlockChart> {
                             new LineChart
                             {
@@ -1642,7 +1642,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         filters = new List<string> { "727" },
                                         indicators = new List<string> { "156", "154", "155" }
                                     },
-                                    
+
                                     Tables = new List<Table>
                                     {
                                         new Table
@@ -1650,7 +1650,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             indicators = new List<string> { "154", "155", "156"  }
                                         }
                                     },
-   
+
                                     Charts = new List<IContentBlockChart> {
                                         new LineChart
                                         {
@@ -1668,7 +1668,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             },
                                         }
                                     }
-                                    
+
                                 },
                                 new MarkDownBlock
                                 {
@@ -1704,7 +1704,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         filters = new List<string> { "727" },
                                         indicators = new List<string> { "158","154","157" }
                                     },
-                                    
+
                                     Tables = new List<Table>
                                     {
                                         new Table
@@ -1712,7 +1712,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             indicators = new List<string> { "154", "157", "158"  }
                                         }
                                     },
-   
+
                                     Charts = new List<IContentBlockChart> {
                                         new LineChart
                                         {
@@ -2197,76 +2197,76 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 // Secondary and primary schools applications offers
                 new Release
                 {
-                  Id = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                  Title = "Secondary and primary school applications and offers",
-                  ReleaseName = "2018",
-                  PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
-                  Published = new DateTime(2018, 6, 14),
-                  Slug = "2018",
-                  Summary =
+                    Id = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
+                    Title = "Secondary and primary school applications and offers",
+                    ReleaseName = "2018",
+                    PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
+                    Published = new DateTime(2018, 6, 14),
+                    Slug = "2018",
+                    Summary =
                     "Read national statistical summaries, view charts and tables and download data files.\n\n" +
                     "Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](../methodology/secondary-and-primary-schools-applications-and-offers)",
-                  KeyStatistics = new DataBlock
-                  {
-                    DataBlockRequest = new DataBlockRequest
+                    KeyStatistics = new DataBlock
                     {
-                      subjectId = 17,
-                      geographicLevel = "National",
-                      startYear = "2014",
-                      endYear = "2018",
-                      filters = new List<string> { "845" },
-                      indicators = new List<string> { "189", "193", "194", "195", "196", "197", "198", "199" }
-                    },
-                    Summary = new Summary
-                    {
-                      dataKeys = new List<string>
+                        DataBlockRequest = new DataBlockRequest
+                        {
+                            subjectId = 17,
+                            geographicLevel = "National",
+                            startYear = "2014",
+                            endYear = "2018",
+                            filters = new List<string> { "845" },
+                            indicators = new List<string> { "189", "193", "194", "195", "196", "197", "198", "199" }
+                        },
+                        Summary = new Summary
+                        {
+                            dataKeys = new List<string>
                       {
                         "189", "193", "194"
                       },
-                      dataSummary = new List<string>
+                            dataSummary = new List<string>
                       {
                         "Down from 620,330 in 2017",
                         "Down from 558,411 in 2017",
                         "Down from 34,792 in 2017"
                       },
-                      description = new MarkDownBlock
-                      {
-                        Body =
+                            description = new MarkDownBlock
+                            {
+                                Body =
                           "* majority of applicants received a preferred offer\n" +
                           "* percentage of applicants receiving secondary first choice offers decreases as applications increase\n" +
                           "* slight proportional increase in applicants receiving primary first choice offer as applications decrease\n"
-                      },
-                      
-                    },
-                    Tables = new List<Table>
+                            },
+
+                        },
+                        Tables = new List<Table>
                     {
                         new Table
                         {
                             indicators = new List<string> { "189", "193", "194", "195", "198", "199"   }
                         }
                     }
-   
-                    /*
-                    Charts = new List<IContentBlockChart> {
-                        new LineChart
-                        {
-                            XAxis = new Axis
+
+                        /*
+                        Charts = new List<IContentBlockChart> {
+                            new LineChart
                             {
-                                title = "School Year"
-                            },
-                            YAxis = new Axis
-                            {
-                                title = ""
-                            },
-                            Indicators = new List<string>
-                            {
-                                "189", "196", "197"
-                            },
+                                XAxis = new Axis
+                                {
+                                    title = "School Year"
+                                },
+                                YAxis = new Axis
+                                {
+                                    title = ""
+                                },
+                                Indicators = new List<string>
+                                {
+                                    "189", "196", "197"
+                                },
+                            }
                         }
-                    }
-                    */
-                  },
-                  Content = new List<ContentSection>
+                        */
+                    },
+                    Content = new List<ContentSection>
                   {
                     new ContentSection
                     {
@@ -2328,7 +2328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                       Caption = "",
                       Content = new List<IContentBlock>
                       {
-                      
+
                         new MarkDownBlock
                         {
                           Body =
@@ -2819,7 +2819,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Order = 6,
                             Content = new List<IContentBlock>()
                         }
-                    },
+                    }
+                },
+                new Methodology
+                {
+                    Id = new Guid("8ab41234-cc9d-4b3d-a42c-c9fce7762719"),
+                    Title = "School application statistics: methodology",
+                    Published = new DateTime(2018, 6, 14),
+                    Summary = "",
+                    PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
+                    Content = new List<ContentSection>(),
+                    Annexes = new List<ContentSection>()
+                },
+                new Methodology
+                {
+                    Id = new Guid("c8c911e3-39c1-452b-801f-25bb79d1deb7"),
+                    Title = "Pupil exclusion statistics: methodology",
+                    Published = new DateTime(2018, 8, 25),
+                    Summary = "",
+                    PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+                    Content = new List<ContentSection>(),
+                    Annexes = new List<ContentSection>()
                 }
             );
         }
