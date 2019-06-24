@@ -124,9 +124,9 @@
     "notificationsstorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsstorageAccountName'))]",
     "publicStorageAccountName": "[concat(parameters('subscription'), 'sa', variables('storageEnv'), 'public')]",
     "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]",
-    "publisherAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-publisher')]",
-    "publisherPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-publisher')]",
-    "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]"
+    "releaseAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-release')]",
+    "releasePlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-release')]",
+    "releaseAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-release')]"
   },
   "resources": [
     {
@@ -881,25 +881,25 @@
     },
     {
       "apiVersion": "2015-05-01",
-      "name": "[variables('publisherAppInsights')]",
+      "name": "[variables('releaseAppInsights')]",
       "type": "Microsoft.Insights/components",
       "kind": "web",
       "location": "[resourceGroup().location]",
       "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('publisherAppName'))]": "Resource"
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('releaseAppName'))]": "Resource"
       },
       "properties": {
         "Application_Type": "web",
-        "ApplicationId": "[variables('publisherAppName')]"
+        "ApplicationId": "[variables('releaseAppName')]"
       }
     },
     {
       "type": "Microsoft.Web/serverfarms",
       "apiVersion": "2015-04-01",
-      "name": "[variables('publisherPlanName')]",
+      "name": "[variables('releasePlanName')]",
       "location": "[resourceGroup().location]",
       "properties": {
-        "name": "[variables('publisherPlanName')]",
+        "name": "[variables('releasePlanName')]",
         "computeMode": "Dynamic",
         "sku": "Dynamic"
       }
@@ -907,17 +907,17 @@
     {
       "apiVersion": "2016-08-01",
       "type": "Microsoft.Web/sites",
-      "name": "[variables('publisherAppName')]",
+      "name": "[variables('releaseAppName')]",
       "location": "[resourceGroup().location]",
       "kind": "functionapp",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('publisherPlanName'))]",
-        "[resourceId('Microsoft.Insights/components', variables('publisherAppInsights'))]",
+        "[resourceId('Microsoft.Web/serverfarms', variables('releasePlanName'))]",
+        "[resourceId('Microsoft.Insights/components', variables('releaseAppInsights'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
       ],
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('publisherPlanName'))]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('releasePlanName'))]",
         "httpsOnly": true,
         "siteConfig": {
           "http20Enabled": true,
@@ -942,7 +942,7 @@
             },
             {
               "name": "WEBSITE_CONTENTSHARE",
-              "value": "[toLower(variables('publisherAppName'))]"
+              "value": "[toLower(variables('releaseAppName'))]"
             },
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
@@ -958,7 +958,7 @@
             },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', variables('publisherAppInsights')), '2015-05-01').InstrumentationKey]"
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('releaseAppInsights')), '2015-05-01').InstrumentationKey]"
             }
           ],
           "connectionStrings": [
