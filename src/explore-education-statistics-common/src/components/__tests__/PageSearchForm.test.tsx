@@ -567,7 +567,7 @@ describe('PageSearchForm', () => {
     jest.runOnlyPendingTimers();
 
     const accordionSection = container.querySelector(
-      '#test-accordion-heading-1',
+      '#test-accordion-1-heading',
     );
 
     expect(accordionSection).toHaveAttribute('aria-expanded', 'false');
@@ -692,7 +692,7 @@ describe('PageSearchForm', () => {
     jest.runOnlyPendingTimers();
 
     const accordionSection = container.querySelector(
-      '#test-accordion-heading-1',
+      '#test-accordion-1-heading',
     );
     const tabs = container.querySelectorAll('[role="tab"]');
     const summary = container.querySelector('summary');

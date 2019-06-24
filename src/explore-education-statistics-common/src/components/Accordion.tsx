@@ -1,12 +1,15 @@
+import useMounted from '@common/hooks/useMounted';
 import isComponentType from '@common/lib/type-guards/components/isComponentType';
 import classNames from 'classnames';
 import React, {
   cloneElement,
-  Component,
-  createRef,
-  MouseEvent,
+  ReactComponentElement,
   ReactNode,
+  useEffect,
+  useRef,
+  useState,
 } from 'react';
+import { useImmer } from 'use-immer';
 import styles from './Accordion.module.scss';
 import AccordionSection, {
   accordionSectionClasses,
@@ -19,136 +22,121 @@ export interface AccordionProps {
   onToggleAll?: (open: boolean) => void;
 }
 
-interface State {
-  openSectionId: string;
-}
+const Accordion = ({ children, id, onToggleAll }: AccordionProps) => {
+  const ref = useRef<HTMLDivElement>(null);
 
-class Accordion extends Component<AccordionProps, State> {
-  public state = {
-    openSectionId: '',
-  };
+  const [hashId, setHashId] = useState('');
+  const [openSections, updateOpenSections] = useImmer<boolean[]>([]);
 
-  private ref = createRef<HTMLDivElement>();
+  const { isMounted } = useMounted(() => {
+    const goToHash = () => {
+      if (ref.current && window.location.hash) {
+        let locationHashEl: HTMLElement | null = null;
 
-  public componentDidMount(): void {
-    import('govuk-frontend/components/accordion/accordion').then(
-      ({ default: GovUkAccordion }) => {
-        if (this.ref.current) {
-          new GovUkAccordion(this.ref.current).init();
+        try {
+          locationHashEl = ref.current.querySelector(window.location.hash);
+        } catch (_) {
+          return;
         }
-      },
-    );
 
-    this.goToHash();
-    window.addEventListener('hashchange', this.goToHash);
-  }
-
-  public componentWillUnmount(): void {
-    window.removeEventListener('hashchange', this.goToHash);
-    this.clearSectionStateFromSessionStorage();
-  }
-
-  private clearSectionStateFromSessionStorage = () => {
-    // removes each sections' state from sessionStorage
-    const { children, id } = this.props;
-    let sectionCounter = 0;
-    React.Children.map(children, () => {
-      sectionCounter += 1;
-
-      const contentId = `${id}-content-${sectionCounter}`;
-      return window.sessionStorage.removeItem(contentId);
-    });
-  };
-
-  private goToHash = () => {
-    if (this.ref.current && window.location.hash) {
-      let locationHashEl: HTMLElement | null = null;
-
-      try {
-        locationHashEl = this.ref.current.querySelector(window.location.hash);
-      } catch (_) {
-        return;
-      }
-
-      if (locationHashEl) {
-        const sectionEl = locationHashEl.closest(
-          `.${accordionSectionClasses.section}`,
-        );
-
-        if (sectionEl) {
-          const contentEl = sectionEl.querySelector(
-            `.${accordionSectionClasses.sectionContent}`,
+        if (locationHashEl) {
+          const sectionEl = locationHashEl.closest(
+            `.${accordionSectionClasses.section}`,
           );
 
-          if (contentEl) {
-            if (window.sessionStorage.getItem(contentEl.id) === 'false') {
-              window.sessionStorage.removeItem(contentEl.id);
-            }
-
-            this.setState(
-              {
-                openSectionId: contentEl.id,
-              },
-              () => {
-                (locationHashEl as HTMLElement).scrollIntoView({
-                  block: 'start',
-                });
-              },
+          if (sectionEl) {
+            const contentEl = sectionEl.querySelector(
+              `.${accordionSectionClasses.sectionContent}`,
             );
+
+            if (contentEl) {
+              setHashId(contentEl.id);
+
+              (locationHashEl as HTMLElement).scrollIntoView({
+                block: 'start',
+              });
+            }
           }
         }
       }
-    }
-  };
+    };
 
-  public onClick = (e: MouseEvent) => {
-    const target = e.target as Element;
-    if (target.classList.contains('govuk-accordion__open-all')) {
-      const open = target.getAttribute('aria-expanded') === 'true';
+    goToHash();
+    window.addEventListener('hashchange', goToHash);
+  });
 
-      const { onToggleAll } = this.props;
-      if (onToggleAll) {
-        onToggleAll(open);
-      }
-    }
-  };
+  const sections = React.Children.toArray(children).filter(child =>
+    isComponentType(child, AccordionSection),
+  ) as ReactComponentElement<typeof AccordionSection>[];
 
-  public render() {
-    const { children, id } = this.props;
-    const { openSectionId } = this.state;
-
-    let sectionCounter = 0;
-
-    return (
-      <div
-        className={classNames('govuk-accordion', styles.accordionPrint)}
-        ref={this.ref}
-        id={id}
-        onClick={this.onClick}
-        role="none"
-      >
-        {React.Children.map(children, child => {
-          if (isComponentType(child, AccordionSection)) {
-            sectionCounter += 1;
-
-            const contentId = `${id}-content-${sectionCounter}`;
-            const headingId = `${id}-heading-${sectionCounter}`;
-
-            const isSectionOpen =
-              openSectionId === headingId || openSectionId === contentId;
-
-            return cloneElement<AccordionSectionProps>(child, {
-              contentId,
-              headingId,
-              open: child.props.open || isSectionOpen,
-            });
-          }
-
-          return child;
-        })}
-      </div>
+  useEffect(() => {
+    updateOpenSections(() =>
+      sections.map(section => section.props.open || false),
     );
-  }
-}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [children, updateOpenSections]);
+
+  const isAllOpen = openSections.every(isOpen => isOpen);
+
+  return (
+    <div
+      className={classNames('govuk-accordion', styles.accordionPrint)}
+      id={id}
+      ref={ref}
+      role="none"
+    >
+      {isMounted && (
+        <div className="govuk-accordion__controls">
+          <button
+            aria-expanded={isAllOpen}
+            type="button"
+            className="govuk-accordion__open-all"
+            onClick={() => {
+              updateOpenSections(draft => {
+                return draft.map(() => !isAllOpen);
+              });
+
+              if (onToggleAll) {
+                onToggleAll(!isAllOpen);
+              }
+            }}
+          >
+            {isAllOpen ? 'Close all ' : 'Open all '}
+            <span className="govuk-visually-hidden">sections</span>
+          </button>
+        </div>
+      )}
+
+      {sections.map((section, index) => {
+        const contentId =
+          section.props.contentId || `${id}-${index + 1}-content`;
+        const headingId =
+          section.props.headingId || `${id}-${index + 1}-heading`;
+
+        const isSectionOpen =
+          isAllOpen ||
+          openSections[index] ||
+          hashId === contentId ||
+          hashId === headingId;
+
+        return cloneElement<AccordionSectionProps>(section, {
+          key: headingId,
+          contentId,
+          headingId,
+          open: isSectionOpen,
+          onToggle(isOpen) {
+            updateOpenSections(draft => {
+              draft[index] = isOpen;
+            });
+
+            if (section.props.onToggle) {
+              section.props.onToggle(isOpen);
+            }
+          },
+        });
+      })}
+    </div>
+  );
+};
 
 export default Accordion;
