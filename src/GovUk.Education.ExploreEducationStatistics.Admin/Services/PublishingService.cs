@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
@@ -31,7 +32,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public void PublishReleaseData(Guid releaseId)
         {
-            var release = _context.Releases.FirstOrDefault(r => r.Id.Equals(releaseId));
+            var release = _context.Releases
+                .Where(r => r.Id.Equals(releaseId))
+                .Include(r => r.Publication)
+                .FirstOrDefault();
+            
             if (release == null)
             {
                 throw new ArgumentException("Release does not exist", nameof(releaseId));
