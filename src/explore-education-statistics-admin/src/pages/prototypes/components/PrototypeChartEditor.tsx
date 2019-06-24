@@ -22,6 +22,13 @@ import { SelectOption } from '@common/components/form/FormSelect';
 import styles from './PrototypeChartEditor.module.scss';
 import ConstData, { ChartType } from '../PrototypeData';
 
+/**
+ * TODO:
+ *
+ * Change the charts to use a "Data source" instead of explicitly defining the x/y axis
+ * so that they can pull data from indicators / filters instead of specifying x/y
+ *
+ */
 const PrototypeChartEditor = (props: {}) => {
   const [Data, updateData] = React.useState<DataBlockResponse | undefined>(
     undefined,

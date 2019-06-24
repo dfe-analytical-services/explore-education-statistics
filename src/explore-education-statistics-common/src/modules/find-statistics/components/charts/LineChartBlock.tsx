@@ -1,4 +1,6 @@
-import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import ChartFunctions, {
+  ChartProps,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import React, { Component } from 'react';
 import {
@@ -50,16 +52,7 @@ export default class LineChartBlock extends Component<ChartProps> {
   public render() {
     const { data, indicators, height, xAxis, yAxis, labels, meta } = this.props;
 
-    console.log(xAxis.key);
-
-    const filteredData = data.result.filter(result => {
-      if (xAxis.key && xAxis.key.length > 0) {
-        return xAxis.key.some(
-          key => difference(result.filters, key).length === 0,
-        );
-      }
-      return true;
-    });
+    const filteredData = ChartFunctions.filterData(data, xAxis);
 
     const timePeriods = meta.timePeriods || {};
 

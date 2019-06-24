@@ -17,6 +17,7 @@ import {
   DataBlockData,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
+import difference from 'lodash/difference';
 
 export interface ChartProps {
   data: DataBlockData;
@@ -125,6 +126,16 @@ const ChartFunctions = {
     };
 
     return referenceLines.map(generateReferenceLine);
+  },
+
+  filterData(data: DataBlockData, sourceAxis: Axis) {
+    return data.result.filter(result => {
+      return (
+        sourceAxis.key &&
+        sourceAxis.key.length > 0 &&
+        sourceAxis.key.some(key => difference(result.filters, key).length === 0)
+      );
+    });
   },
 };
 
