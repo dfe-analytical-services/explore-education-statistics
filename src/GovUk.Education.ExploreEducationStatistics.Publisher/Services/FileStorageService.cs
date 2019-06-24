@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             ILogger<FileStorageService> logger)
         {
             _logger = logger;
-            _privateStorageConnectionString = config.GetConnectionString("PrivateStorage");
+            _privateStorageConnectionString = config.GetConnectionString("CoreStorage");
             _publicStorageConnectionString = config.GetConnectionString("PublicStorage");
         }
 

@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public FileStorageService(IConfiguration config)
         {
-            _storageConnectionString = config.GetConnectionString("AzureStorage");
+            _storageConnectionString = config.GetConnectionString("CoreStorage");
         }
 
         public async Task UploadFilesAsync(string publication, string release, IFormFile dataFile, IFormFile metaFile,

@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IConfiguration config)
         {
             _context = context;
-            _storageConnectionString = config.GetConnectionString("NotificationService");
+            _storageConnectionString = config.GetConnectionString("NotificationStorage");
             _logger = logger;
         }
 
