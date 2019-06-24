@@ -21,9 +21,7 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         <div className="govuk-grid-column-two-thirds">
           <LoginContext.Consumer>
             {loginContext =>
-              loginContext.user ? (
-                <UserGreeting user={loginContext.user} />
-              ) : null
+              loginContext.user && <UserGreeting user={loginContext.user} />
             }
           </LoginContext.Consumer>
         </div>
@@ -56,13 +54,12 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
             Create a new publication
           </Link>
           <Accordion id="pupil-absence">
-            {DummyPublicationsData.publications.map(publication => {
-              return (
-                <>
-                  <AdminDashboardPublications publication={publication} />
-                </>
-              );
-            })}
+            {DummyPublicationsData.publications.map(publication => (
+              <AdminDashboardPublications
+                key={publication.id}
+                publication={publication}
+              />
+            ))}
           </Accordion>
         </TabsSection>
         <TabsSection

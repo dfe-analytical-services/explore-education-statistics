@@ -2,12 +2,8 @@ import React from 'react';
 import Link from '@admin/components/Link';
 import { format } from 'date-fns';
 import Details from '@common/components/Details';
-import { User } from '@admin/services/PrototypeLoginService';
 import { LoginContext } from '@admin/components/Login';
-import {
-  ApprovalStatus,
-  TeamContact,
-} from '@admin/services/publicationService';
+import { ApprovalStatus, Release } from '@admin/services/publicationService';
 
 const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive && isLatest) {
@@ -27,129 +23,102 @@ const getTag = (approvalStatus: ApprovalStatus) => {
 };
 
 interface Props {
-  releaseName: string;
-  timePeriodCoverage: string;
-  approvalStatus: ApprovalStatus;
-  lead: TeamContact;
-  isNew: boolean;
-  isLatest: boolean;
-  isLive: boolean;
+  release: Release;
   editing: boolean;
   review: boolean;
-  lastEdited: Date;
-  lastEditor: User;
-  published: Date;
-  nextRelease: Date;
-  dataType: string;
   showComments: boolean;
 }
 
 const DashboardRelease = ({
-  releaseName,
-  timePeriodCoverage,
-  approvalStatus,
-  lead,
-  isNew,
-  isLatest,
-  isLive,
+  release,
   editing,
   review,
-  lastEdited,
-  lastEditor,
-  published,
-  nextRelease,
-  dataType,
   showComments,
 }: Props) => {
   return (
     <Details
       className="govuk-!-margin-bottom-0"
-      summary={`${timePeriodCoverage}, ${releaseName} ${getLiveLatestLabel(
-        isLive,
-        isLatest,
-      )}`}
-      tag={getTag(approvalStatus)}
+      summary={`${release.timePeriodCoverage.label}, ${
+        release.releaseName
+      } ${getLiveLatestLabel(release.status.isLive, release.status.isLatest)}`}
+      tag={getTag(release.status.approvalStatus)}
     >
       <dl className="govuk-summary-list govuk-!-margin-bottom-3">
         <div className="govuk-summary-list__row">
-          {isNew && (
-            <React.Fragment>
+          {release.status.isNew && (
+            <>
               <dt className="govuk-summary-list__key">
                 Scheduled publish date
               </dt>
               <dd className="govuk-summary-list__value">
-                {format(published, 'd MMMM yyyy')}
+                {format(release.status.published, 'd MMMM yyyy')}
               </dd>
               <dd className="govuk-summary-list__actions">
                 <Link to="/prototypes/publication-create-new-absence-status">
                   Set status
                 </Link>
               </dd>
-            </React.Fragment>
+            </>
           )}
-          {!isNew && (
-            <React.Fragment>
+          {!release.status.isNew && (
+            <>
               <dt className="govuk-summary-list__key">Publish date</dt>
               <dd className="govuk-summary-list__value">
-                {format(published, 'd MMMM yyyy')}
+                {format(release.status.published, 'd MMMM yyyy')}
               </dd>
               <dd className="govuk-summary-list__actions" />
-            </React.Fragment>
+            </>
           )}
         </div>
-        {nextRelease && (
-          <React.Fragment>
+        {release.status.nextRelease && (
+          <>
             <dt className="govuk-summary-list__key">Next release</dt>
             <dd className="govuk-summary-list__value">
-              {format(nextRelease, 'd MMMM yyyy')}
+              {format(release.status.nextRelease, 'd MMMM yyyy')}
             </dd>
             <dd className="govuk-summary-list__actions" />
-          </React.Fragment>
+          </>
         )}
         <div className="govuk-summary-list__row">
           <dt className="govuk-summary-list__key">Lead statistician</dt>
           <dd className="govuk-summary-list__value">
-            {lead && (
+            {release.lead && (
               <span>
-                {lead.contactName}
+                {release.lead.name}
                 <br />
-                <a href="mailto:{lead.teamEmail}">{lead.teamEmail}</a>
+                <a href="mailto:{lead.teamEmail}">{release.lead.email}</a>
                 <br />
-                {lead.contactTelNo}
+                {release.lead.telNo}
               </span>
             )}
           </dd>
           <dd className="govuk-summary-list__actions" />
         </div>
-        {dataType && (
+        {release.dataType && (
           <div className="govuk-summary-list__row">
             <dt className="govuk-summary-list__key">Data type</dt>
-            <dd className="govuk-summary-list__value">{dataType}</dd>
+            <dd className="govuk-summary-list__value">
+              {release.dataType.title}
+            </dd>
             <dd className="govuk-summary-list__actions" />
           </div>
         )}
-        {showComments && (
+        {showComments && release.comments && (
           <div className="govuk-summary-list__row">
             <dt className="govuk-summary-list__key">Comments</dt>
             <dd className="govuk-summary-list__value">
-              <Details
-                summary="Ann Evans, 17 June 2018, 17:35"
-                className="govuk-!-margin-bottom-0"
-              >
-                <p>
-                  Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                  Fugit rem, optio sunt dolorum corrupti harum labore quia
-                  repellat! Quae voluptatem illo soluta optio ducimus at
-                  possimus quisquam doloremque veritatis provident!
-                </p>
-              </Details>
-              <Details summary="Stephen Doherty, 17 June 2018, 13:15">
-                <p>
-                  Corrupti harum labore quia repellat! Quae voluptatem illo
-                  soluta optio ducimus at possimus quisquam doloremque veritatis
-                  provident!
-                </p>
-              </Details>
+              {release.comments.map(comment => (
+                <Details
+                  key={comment.id}
+                  summary={`${comment.author.name}, ${format(
+                    comment.datetime,
+                    'd MMMM yyyy, HH:mm',
+                  )}`}
+                  className="govuk-!-margin-bottom-0"
+                >
+                  <p>{comment.content}</p>
+                </Details>
+              ))}
             </dd>
             <dd className="govuk-summary-list__actions" />
           </div>
@@ -161,16 +130,16 @@ const DashboardRelease = ({
               {loginContext => {
                 const editorName =
                   loginContext.user != null &&
-                  loginContext.user.id === lastEditor.id
+                  loginContext.user.id === release.status.lastEditor.id
                     ? 'me'
-                    : lastEditor.name;
+                    : release.status.lastEditor.name;
 
                 return (
                   <>
                     {' '}
-                    {format(lastEdited, 'd MMMM yyyy')}
+                    {format(release.status.lastEdited, 'd MMMM yyyy')}
                     {' at '}
-                    {format(lastEdited, 'HH:mm')} by{' '}
+                    {format(release.status.lastEdited, 'HH:mm')} by{' '}
                     <a href="#">{editorName}</a>
                   </>
                 );

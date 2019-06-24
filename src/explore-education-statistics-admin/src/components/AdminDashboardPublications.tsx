@@ -1,4 +1,3 @@
-import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import React from 'react';
 import Link from '@admin/components/Link';

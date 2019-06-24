@@ -61,12 +61,11 @@ export interface ReleaseDataType {
   title: string;
 }
 
-export interface ReleaseMeta {
-  lead: TeamContact;
-  editing: boolean;
-  review: boolean;
-  showComments: boolean;
-  dataType: ReleaseDataType;
+export interface Comment {
+  id: string;
+  author: User;
+  datetime: Date;
+  content: string;
 }
 
 export interface Release {
@@ -75,7 +74,9 @@ export interface Release {
   timePeriodCoverage: TimePeriodCoverage;
   slug: string;
   status: ReleaseStatus;
-  meta: ReleaseMeta;
+  lead: UserContact;
+  dataType: ReleaseDataType;
+  comments: Comment[];
 }
 
 export interface LegacyRelease {
@@ -84,11 +85,10 @@ export interface LegacyRelease {
   url: string;
 }
 
-export interface TeamContact {
-  teamName: string;
-  teamEmail: string;
-  contactName: string;
-  contactTelNo: string;
+export interface UserContact {
+  name: string;
+  email: string;
+  telNo: string;
 }
 
 export interface Publication {
@@ -102,6 +102,6 @@ export interface Publication {
   releases: Release[];
   legacyReleases: LegacyRelease[];
   topic: Topic;
-  contact: TeamContact;
+  contact: UserContact;
   methodology: Methodology;
 }
