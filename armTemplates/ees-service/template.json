@@ -842,7 +842,7 @@
           ],
           "connectionStrings": [
             {
-              "name": "TableStorageConnString",
+              "name": "AzureStorage",
               "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
             },
             {

@@ -131,8 +131,6 @@ function GlossaryIndexPage() {
           </p>
         </AccordionSection>
         <AccordionSection heading="F">
-          <h3 id="first-preference-offer">First preference offer</h3>
-          <p>INSERT DEFINITION - TBC</p>
           <h3 id="fixed-period-exclusion">Fixed-period exclusion</h3>
           <p>
             When a pupil is not allowed to attend (or is excluded from) a school
@@ -151,15 +149,12 @@ function GlossaryIndexPage() {
             exclusion legislation so pupils with repeat exclusions can inflate
             fixed-period exclusion rates.
           </p>
-          <h3 id="free-school-meals">Free school meals (FSM)</h3>
-          <p>INSERT DEFINITION - TBC.</p>
         </AccordionSection>
         <AccordionSection heading="G">
           <h3 id="ggg-ggg">TBC</h3>
         </AccordionSection>
         <AccordionSection heading="H">
-          <h3 id="higher-education-he">Higher education (HE)</h3>
-          <p>INSERT DEFINITION - TBC.</p>
+          <h3 id="hhh-hhh">TBC</h3>
         </AccordionSection>
         <AccordionSection heading="I">
           <h3 id="independent-review-panel">Independent review panel</h3>
@@ -185,8 +180,6 @@ function GlossaryIndexPage() {
           <h3 id="key-stage">TBC</h3>
         </AccordionSection>
         <AccordionSection heading="L">
-          <h3 id="local-authority">Local authority (LA)</h3>
-          <p>INSERT DEFINITION - TBC.</p>
           <h3 id="lunchtime-exclusion">Lunchtime exclusion</h3>
           <p>
             When a pupil is not allowed to attend (or is excluded from) a school
@@ -202,7 +195,22 @@ function GlossaryIndexPage() {
         </AccordionSection>
         <AccordionSection heading="N">
           <h3 id="national-offer-day">National Offer Day</h3>
-          <p>INSERT DEFINITION - TBC.</p>
+          <p>
+            The day when councils send parents confirmations of their child's
+            place at school.
+          </p>
+          <p>
+            Primary school places are confirmed on 16 April each year - known as
+            National Primary Offer Day.
+          </p>
+          <p>
+            Secondary school places are confirmed on 1 March each year - known
+            as National Secondary Offer Day.
+          </p>
+          <p>
+            If either date falls on a weekend, confirmations are sent the next
+            working day.
+          </p>
           <h3 id="national-scholarship-fund">National Statistician</h3>
           <p>
             Chief Executive of the UK Statistics Authority (UKSA) and the Head
@@ -279,8 +287,29 @@ function GlossaryIndexPage() {
             moved schools during the academic year or are registered in more
             than 1 school.
           </p>
-          <h3 id="pupil-referral-unit">Pupil referral unit</h3>
-          <p>INSERT DEFINITION - TBC</p>
+          <h3 id="pupil-referral-unit">Pupil referral unit (PRUs)</h3>
+          <p>
+            An alternative education provision specifically organised to provide
+            education for children who are not able to attend school and may not
+            otherwise receive a suitable education.
+          </p>
+          <p>
+            This could be because they have a short- or long-term illness, have
+            been excluded from school or are a new starter waiting for a
+            mainstream school place.
+          </p>
+          <p>
+            Under section 19 of the Education Act 1996, each local education
+            authority (LEA) has a duty to provide suitable education for
+            children of compulsory school age who cannot attend school.
+          </p>
+          <p>
+            Placing pupils in PRUs is one of the ways in which LEAs can make
+            sure they can comply with this duty.
+          </p>
+          <p>
+            PRUs are a mixture of public units and privately managed companies.
+          </p>
           <h3 id="pupils-with-1-or-more-fixed-period-exclusion">
             Pupils with one or more fixed-period exclusion
           </h3>
@@ -350,8 +379,7 @@ function GlossaryIndexPage() {
           <h3 id="vvv-vvv">TBC</h3>
         </AccordionSection>
         <AccordionSection heading="W">
-          <h3 id="what-is-an-api">What is an API?</h3>
-          <p>INSERT DEFINITION - TBC.</p>
+          <h3 id="www-wwww">TBC</h3>
         </AccordionSection>
         <AccordionSection heading="X">
           <h3 id="xxx-xxx">TBC</h3>
