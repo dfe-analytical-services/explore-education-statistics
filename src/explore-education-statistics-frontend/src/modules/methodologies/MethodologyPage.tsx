@@ -1,18 +1,20 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import DataBlock from '@common/modules/find-statistics/components/DataBlock';
-import publicationService, {
-  Release,
-} from '@common/services/publicationService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
+import ContentBlock from '@frontend/modules/find-statistics/components/ContentBlock';
+import FormattedDate from '@common/components/FormattedDate';
+import PrintThisPage from '@common/components/PrintThisPage';
+import methodologyService, {
+  Methodology,
+} from '@common/services/methodologyService';
+import PageSearchForm from '@common/components/PageSearchForm';
 
 interface Props {
   publication: string;
-  release: string;
-  data: Release;
+  data: Methodology;
 }
 
 class MethodologyPage extends Component<Props> {
@@ -20,58 +22,114 @@ class MethodologyPage extends Component<Props> {
     query,
   }: NextContext<{
     publication: string;
-    release: string;
   }>) {
-    const { publication, release } = query;
+    const { publication } = query;
 
-    const request = release
-      ? publicationService.getPublicationRelease(release)
-      : publicationService.getLatestPublicationRelease(publication);
+    const request = methodologyService.getMethodology(publication);
 
     const data = await request;
 
     return {
       data,
       publication,
-      release,
     };
   }
 
   public render() {
-    const { data, release } = this.props;
-
-    const releaseCount =
-      data.publication.releases.slice(1).length +
-      data.publication.legacyReleases.length;
+    const { data } = this.props;
 
     return (
       <Page
         breadcrumbs={[
-          { name: 'Find statistics and data', link: '/statistics' },
+          { name: 'Methodologies', link: '/methodologies' },
           { name: data.title },
         ]}
       >
-        <h2>Headline facts and figures - {data.releaseName}</h2>
+        <h1 className="govuk-heading-xl">{data.title}</h1>
+        <div className="govuk-grid-row">
+          <div className="govuk-grid-column-two-thirds">
+            <dl className="dfe-meta-content govuk-!-margin-0">
+              <dt className="govuk-caption-m">Published: </dt>
+              <dd>
+                <strong>
+                  <FormattedDate>{data.published}</FormattedDate>{' '}
+                </strong>
+              </dd>
+            </dl>
+          </div>
+          <div className="govuk-grid-column-one-third">
+            <PageSearchForm />
+          </div>
+        </div>
 
-        {data.keyStatistics && (
-          <DataBlock {...data.keyStatistics} id="keystats" />
+        <hr />
+        <div className="govuk-grid-row">
+          <div className="govuk-grid-column-two-thirds">
+            <p className="govuk-body-l">
+              Find out about the methodology behind pupil absence statistics and
+              data and how and why they're collected and published.
+            </p>
+          </div>
+
+          <div className="govuk-grid-column-one-third">
+            <aside className="app-related-items">
+              <h2 className="govuk-heading-m" id="subsection-title">
+                Related content
+              </h2>
+              <ul className="govuk-list">
+                <li>
+                  <Link to={`/statistics/${data.publication.slug}`}>
+                    {data.publication.title}
+                  </Link>{' '}
+                </li>
+              </ul>
+            </aside>
+          </div>
+        </div>
+
+        {data.content.length > 0 && (
+          <Accordion id="contents-sections">
+            {data.content.map(({ heading, caption, order, content }) => {
+              return (
+                <AccordionSection
+                  heading={heading}
+                  caption={caption}
+                  key={order}
+                >
+                  <ContentBlock
+                    content={content}
+                    id={`content_${order}`}
+                    publication={data.publication}
+                  />
+                </AccordionSection>
+              );
+            })}
+          </Accordion>
         )}
 
-        <Accordion id="extra-information-sections">
-          <AccordionSection
-            heading={`${data.title}: methodology`}
-            caption="Find out how and why we collect, process and publish these statistics"
-            headingTag="h3"
-          >
-            <p>
-              Read our{' '}
-              <Link to={`/methodology/${data.publication.slug}`}>
-                {`${data.publication.title}: methodology`}
-              </Link>{' '}
-              guidance.
-            </p>
-          </AccordionSection>
-        </Accordion>
+        <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
+
+        {data.content.length > 0 && (
+          <Accordion id="contents-sections">
+            {data.annexes.map(({ heading, caption, order, content }) => {
+              return (
+                <AccordionSection
+                  heading={heading}
+                  caption={caption}
+                  key={order}
+                >
+                  <ContentBlock
+                    content={content}
+                    id={`content_${order}`}
+                    publication={data.publication}
+                  />
+                </AccordionSection>
+              );
+            })}
+          </Accordion>
+        )}
+
+        <PrintThisPage />
       </Page>
     );
   }

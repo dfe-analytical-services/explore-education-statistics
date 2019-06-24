@@ -1,6 +1,6 @@
 import Link from '@frontend/components/Link';
 import React from 'react';
-import { Publication } from '@common/services/methodologyService';
+import { Publication } from '@common/services/publicationService';
 
 interface Props {
   publications: Publication[];

@@ -1,11 +1,5 @@
+import { ContentBlock, Publication } from '@common/services/publicationService';
 import { contentApi } from './api';
-
-export interface Publication {
-  id: string;
-  title: string;
-  slug: string;
-  summary: string;
-}
 
 export interface Topic {
   id: string;
@@ -23,8 +17,32 @@ export interface Theme {
   topics: Topic[];
 }
 
+export interface Methodology {
+  id: string;
+  title: string;
+  published: string;
+  summary: string;
+  publicationId: string;
+  publication: Publication;
+  content: {
+    order: number;
+    heading: string;
+    caption: string;
+    content: ContentBlock[];
+  }[];
+  annexes: {
+    order: number;
+    heading: string;
+    caption: string;
+    content: ContentBlock[];
+  }[];
+}
+
 export default {
   getMethodologies(): Promise<Theme[]> {
     return contentApi.get(`Methodology/tree`);
+  },
+  getMethodology(publicationSlug: string): Promise<Methodology> {
+    return contentApi.get(`Methodology/${publicationSlug}`);
   },
 };
