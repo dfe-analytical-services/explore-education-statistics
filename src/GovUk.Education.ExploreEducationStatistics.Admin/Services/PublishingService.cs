@@ -1,8 +1,9 @@
 using System;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
@@ -19,9 +20,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ILogger _logger;
 
         public PublishingService(ApplicationDbContext applicationDbContext,
-                        IConfiguration config,
+            IConfiguration config,
             ILogger<ImportService> logger
-)
+        )
         {
             _context = applicationDbContext;
             _storageConnectionString = config.GetConnectionString("AzureStorage");
@@ -41,19 +42,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var queue = client.GetQueueReference("publish-release-data");
             queue.CreateIfNotExists();
 
-            var message = BuildMessage(releaseId);
+            var message = BuildMessage(release);
             queue.AddMessage(message);
 
             _logger.LogTrace($"Sent publish release data message for release: {releaseId}");
         }
-        
-        private static CloudQueueMessage BuildMessage(Guid releaseId)
+
+        private static CloudQueueMessage BuildMessage(Release release)
         {
             var message = new PublishReleaseDataMessage
             {
-                ReleaseId = releaseId
+                PublicationSlug = release.Publication.Slug,
+                ReleaseSlug = release.Slug
             };
-            
+
             return new CloudQueueMessage(JsonConvert.SerializeObject(message));
         }
     }
