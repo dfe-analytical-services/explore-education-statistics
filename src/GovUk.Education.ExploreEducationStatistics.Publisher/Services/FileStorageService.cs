@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.DataMovement;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -11,32 +12,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         private readonly ILogger _logger;
 
-        private readonly string _storageConnectionString;
+        private readonly string _privateStorageConnectionString;
+        private readonly string _publicStorageConnectionString;
+
+        private const string PrivateContainerName = "releases";
+        private const string PublicContainerName = "downloads";
 
         public FileStorageService(IConfiguration config,
             ILogger<FileStorageService> logger)
         {
             _logger = logger;
-            _storageConnectionString = config.GetConnectionString("AzureStorage");
+            _privateStorageConnectionString = config.GetConnectionString("PrivateStorage");
+            _publicStorageConnectionString = config.GetConnectionString("PublicStorage");
         }
 
-        public async Task CopyFilesAsync(string publication,
-            string release,
-            string sourceContainerName,
-            string destinationContainerName)
+        public async void CopyReleaseToPublicContainer(string publication, string release)
         {
-            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
+            var privateStorageAccount = CloudStorageAccount.Parse(_privateStorageConnectionString);
+            var publicStorageAccount = CloudStorageAccount.Parse(_publicStorageConnectionString);
 
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var sourceContainer = blobClient.GetContainerReference(sourceContainerName);
-            var destinationContainer = blobClient.GetContainerReference(destinationContainerName);
+            var privateBlobClient = privateStorageAccount.CreateCloudBlobClient();
+            var publicBlobClient = publicStorageAccount.CreateCloudBlobClient();
 
-            var sourceDirectory = sourceContainer.GetDirectoryReference($"{publication}/{release}");
-            var destinationDirectory = destinationContainer.GetDirectoryReference($"{publication}/{release}");
+            var privateContainer = privateBlobClient.GetContainerReference(PrivateContainerName);
+            var publicContainer = publicBlobClient.GetContainerReference(PublicContainerName);
+
+            // TODO
+            //var searchPattern = "^.+$(?<!\\.meta\\.csv)";
+            const string searchPattern = "*.csv";
+
+            var directoryAddress = $"{publication}/{release}";
+            await CopyDirectoryAsync(directoryAddress, directoryAddress, searchPattern, privateContainer,
+                publicContainer);
+        }
+
+        private async Task CopyDirectoryAsync(string sourceDirectoryAddress, string destinationDirectoryAddress,
+            string searchPattern,
+            CloudBlobContainer sourceContainer, CloudBlobContainer destinationContainer)
+        {
+            var sourceDirectory = sourceContainer.GetDirectoryReference(sourceDirectoryAddress);
+            var destinationDirectory = destinationContainer.GetDirectoryReference(destinationDirectoryAddress);
 
             var options = new CopyDirectoryOptions
             {
-                SearchPattern = "*.csv",
+                SearchPattern = searchPattern,
                 Recursive = true
             };
 
@@ -45,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             context.FileFailed += FileFailedCallback;
             context.FileSkipped += FileSkippedCallback;
 
-            await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory, false, options, context);
+            await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory, true, options, context);
         }
 
         private void FileTransferredCallback(object sender, TransferEventArgs e)
