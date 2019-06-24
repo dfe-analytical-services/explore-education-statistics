@@ -1,0 +1,10 @@
+{
+  "version": "2.0",
+  "logging": {
+    "logLevel": {
+      "default": "None",
+      "Function.Publisher": "Information",
+      "GovUk.Education.ExploreEducationStatistics.Publisher": "Information"
+    }
+  }
+}

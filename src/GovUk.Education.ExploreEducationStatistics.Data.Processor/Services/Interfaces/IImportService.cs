@@ -4,6 +4,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 {
     public interface IImportService
     {
-        void Import(ImportMessage importMessage);
+        void Import(ImportMessage message);
     }
 }

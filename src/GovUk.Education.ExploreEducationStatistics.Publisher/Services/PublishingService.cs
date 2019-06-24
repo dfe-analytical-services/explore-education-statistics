@@ -1,0 +1,23 @@
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
+{
+    public class PublishingService : IPublishingService
+    {
+        private readonly IFileStorageService _fileStorageService;
+
+        public PublishingService(IFileStorageService fileStorageService)
+        {
+            _fileStorageService = fileStorageService;
+        }
+
+        public void PublishReleaseData(PublishReleaseDataMessage message)
+        {
+            _fileStorageService.CopyReleaseToPublicContainer(message.PublicationSlug, message.ReleaseSlug);
+
+            // TODO DFE-874 Run the importer or copy the data from the statistics database
+            // TODO DFE-874 to the publicly available statistics database
+        }
+    }
+}

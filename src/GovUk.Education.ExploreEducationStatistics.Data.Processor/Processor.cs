@@ -19,11 +19,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         // ReSharper disable once UnusedMember.Global
         public void Run(
             [QueueTrigger("imports-pending", Connection = "")]
-            ImportMessage importMessage,
+            ImportMessage message,
             ILogger logger)
         {
-            logger.LogInformation($"{GetType().Name} function triggered: {importMessage}");
-            _importService.Import(importMessage);
+            logger.LogInformation($"{GetType().Name} function triggered: {message}");
+            _importService.Import(message);
             logger.LogInformation($"{GetType().Name} function completed");
         }
     }

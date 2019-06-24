@@ -26,15 +26,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _importerService = importerService;
         }
 
-        public void Import(ImportMessage importMessage)
+        public void Import(ImportMessage message)
         {
-            var subjectData = _fileStorageService.GetSubjectData(importMessage).Result;
+            var subjectData = _fileStorageService.GetSubjectData(message).Result;
 
             // TODO DFE-866 Create or update the Theme/Topic/Publication/Release.
             // TODO DFE-866 Currently we assume that it already exists. No update happens.
 
             var release = _context.Release
-                .Where(r => r.Id.Equals(importMessage.Release.Id))
+                .Where(r => r.Id.Equals(message.Release.Id))
                 .Include(r => r.Publication)
                 .FirstOrDefault();
 
