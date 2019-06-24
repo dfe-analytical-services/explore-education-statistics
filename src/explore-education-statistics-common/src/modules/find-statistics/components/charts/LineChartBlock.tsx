@@ -14,6 +14,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { difference } from 'lodash';
 import { colours, symbols } from './Charts';
 
 const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
@@ -49,14 +50,18 @@ export default class LineChartBlock extends Component<ChartProps> {
   public render() {
     const { data, indicators, height, xAxis, yAxis, labels, meta } = this.props;
 
+    console.log(xAxis.key);
+
     const filteredData = data.result.filter(result => {
-      if (xAxis.key) {
-        return Array.from(result.filters).every(
-          filter => xAxis.key && xAxis.key.includes(filter),
+      if (xAxis.key && xAxis.key.length > 0) {
+        return xAxis.key.some(
+          key => difference(result.filters, key).length === 0,
         );
       }
       return true;
     });
+
+    const timePeriods = meta.timePeriods || {};
 
     const chartData = filteredData.map(result => {
       return indicators.reduce(
@@ -68,7 +73,7 @@ export default class LineChartBlock extends Component<ChartProps> {
         },
         {
           name: `${
-            meta.timePeriods[`${result.year}_${result.timeIdentifier}`].label
+            timePeriods[`${result.year}_${result.timeIdentifier}`].label
           }`,
         },
       );

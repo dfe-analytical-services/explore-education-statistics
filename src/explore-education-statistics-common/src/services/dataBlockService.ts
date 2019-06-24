@@ -49,7 +49,7 @@ export interface DataBlockLocation {
 }
 
 export interface Result {
-  filters: Set<string>;
+  filters: string[];
   location: DataBlockLocation;
   measures: {
     [key: string]: string;

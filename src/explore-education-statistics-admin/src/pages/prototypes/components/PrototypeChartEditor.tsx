@@ -150,30 +150,30 @@ const PrototypeChartEditor = (props: {}) => {
       const mappingFunctions: Dictionary<(value: string[]) => void> = {
         xaxis: (value: string[]) => {
           // @ts-ignore
-          return xAxis.key.add(value);
+          return xAxis.key.push(value);
         },
         yaxis: (value: string[]) => {
           // @ts-ignore
-          return yAxis.key.add(value);
+          return yAxis.key.push(value);
         },
         geojson: (value: string[]) => {},
       };
 
       const { dataMapping } = selectedChartType;
 
-      selectedAxes.forEach((axis: string[], index) => {
+      selectedAxes.forEach((axes: string[], index) => {
         const mapping =
           index < dataMapping.length
             ? dataMapping[index]
             : dataMapping[dataMapping.length - 1];
 
         if (mappingFunctions[mapping.mapTo]) {
-          //          const
-          //        if (axis) axis.forEach( entry => mappingFunctions[mapping.mapTo](new Set(entry.split(",") ) ));
+          axes.forEach(axis => {
+            const indicators = axis.split(',');
+            mappingFunctions[mapping.mapTo](indicators);
+          });
         }
       });
-
-      console.log(xAxis, yAxis);
 
       return (
         <ChartRenderer
