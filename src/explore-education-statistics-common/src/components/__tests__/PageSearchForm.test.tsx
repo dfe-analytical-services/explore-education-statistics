@@ -618,11 +618,11 @@ describe('PageSearchForm', () => {
 
     const { container, getByLabelText } = render(
       <div>
-        <Tabs>
-          <TabsSection title="Tab 1" id="section-1">
+        <Tabs id="test-tabs">
+          <TabsSection title="Tab 1">
             <p>Something</p>
           </TabsSection>
-          <TabsSection title="Tab 2" id="section-2">
+          <TabsSection title="Tab 2">
             <p id="target">Test</p>
           </TabsSection>
         </Tabs>
@@ -664,11 +664,11 @@ describe('PageSearchForm', () => {
       <div>
         <Accordion id="test-accordion">
           <AccordionSection heading="Section 1">
-            <Tabs>
-              <TabsSection title="Tab 1" id="section-1">
+            <Tabs id="test-tabs">
+              <TabsSection title="Tab 1">
                 <p>Something</p>
               </TabsSection>
-              <TabsSection title="Tab 2" id="section-2">
+              <TabsSection title="Tab 2">
                 <Details summary="Details 1">
                   <p id="target">Test</p>
                 </Details>
