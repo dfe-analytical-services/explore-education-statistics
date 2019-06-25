@@ -2,8 +2,7 @@ import HorizontalBarBlock from '@common/modules/find-statistics/components/chart
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
 import {
-  Axis,
-  ChartDataGroup,
+  Axis, ChartDataSet,
   ChartType,
   ReferenceLine,
 } from '@common/services/publicationService';
@@ -32,7 +31,7 @@ export interface ChartRendererProps {
   width?: number;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
-  dataGroupings?: ChartDataGroup[];
+  dataSets?: ChartDataSet[];
 }
 
 function ChartRenderer(props: ChartRendererProps) {
@@ -45,13 +44,13 @@ function ChartRenderer(props: ChartRendererProps) {
     referenceLines,
     stacked,
     type,
-    xAxis = { title: '' },
-    yAxis = { title: '' },
-    dataGroupings,
+    xAxis = {title: ''},
+    yAxis = {title: ''},
+    dataSets,
   } = props;
 
   const labels = Object.entries(meta.indicators).reduce(
-    (results, [key, indicator]) => ({ ...results, [key]: indicator.label }),
+    (results, [key, indicator]) => ({...results, [key]: indicator.label}),
     {},
   );
 
@@ -81,6 +80,7 @@ function ChartRenderer(props: ChartRendererProps) {
           height={height}
           width={width}
           referenceLines={referenceLines}
+          dataSets={dataSets}
         />
       );
     case 'verticalbar':
@@ -123,7 +123,7 @@ function ChartRenderer(props: ChartRendererProps) {
           yAxis={yAxis}
           height={height}
           width={width}
-          dataGroupings={dataGroupings}
+
         />
       );
     default:

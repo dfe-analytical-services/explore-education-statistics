@@ -1,8 +1,9 @@
 import ChartFunctions, {
+  ChartDefinition,
   ChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
   AxisDomain,
   CartesianGrid,
@@ -16,31 +17,32 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { difference } from 'lodash';
-import { colours, symbols } from './Charts';
+import {colours, symbols} from './Charts';
+import {Result} from "@common/services/dataBlockService";
+import {Dictionary} from "@common/types";
 
-const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
+const CustomToolTip = ({active, payload, label}: TooltipProps) => {
   if (active) {
     return (
       <div className="graph-tooltip">
         <p>{label}</p>
         {payload &&
-          payload
-            .sort((a, b) => {
-              if (typeof b.value === 'number' && typeof a.value === 'number') {
-                return b.value - a.value;
-              }
+        payload
+          .sort((a, b) => {
+            if (typeof b.value === 'number' && typeof a.value === 'number') {
+              return b.value - a.value;
+            }
 
-              return 0;
-            })
-            .map((_, index) => {
-              return (
-                // eslint-disable-next-line react/no-array-index-key
-                <p key={index}>
-                  {`${payload[index].name} : ${payload[index].value}`}
-                </p>
-              );
-            })}
+            return 0;
+          })
+          .map((_, index) => {
+            return (
+              // eslint-disable-next-line react/no-array-index-key
+              <p key={index}>
+                {`${payload[index].name} : ${payload[index].value}`}
+              </p>
+            );
+          })}
       </div>
     );
   }
@@ -49,28 +51,62 @@ const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
 };
 
 export default class LineChartBlock extends Component<ChartProps> {
-  public render() {
-    const { data, indicators, height, xAxis, yAxis, labels, meta } = this.props;
 
-    const filteredData = ChartFunctions.filterData(data, xAxis);
+  public static definition: ChartDefinition = {
+    type: 'line',
+    name: 'Line',
+
+    data: [{
+      type: 'line',
+      title: 'Line',
+      entryCount: "multiple",
+      targetAxis: 'xaxis'
+    }],
+
+    axes: [{
+      id: 'xaxis',
+      title: 'X Axis',
+      type: 'major'
+    }]
+  };
+
+  public render() {
+    const {data, indicators, height, xAxis, yAxis, labels, meta, dataSets} = this.props;
+
 
     const timePeriods = meta.timePeriods || {};
 
-    const chartData = filteredData.map(result => {
-      return indicators.reduce(
-        (v, indicatorName) => {
-          return {
-            ...v,
-            [indicatorName]: result.measures[indicatorName],
-          };
-        },
-        {
-          name: `${
-            timePeriods[`${result.year}_${result.timeIdentifier}`].label
-          }`,
-        },
-      );
-    });
+    let chartData : {name:string}[];
+
+    if (dataSets) {
+      const filteredData = data.result.filter( (r) => {
+        return (difference(r.measures, dataSets
+      });
+
+      chartData = filteredData.map( result => {
+        return dataSets.reduce(
+          (v, dataSet) => {
+            return
+      });
+
+    } else {
+        const filteredData = ChartFunctions.filterData(data, xAxis);
+      chartData = filteredData.map(result => {
+        return indicators.reduce(
+          (v, indicatorName) => {
+            return {
+              ...v,
+              [indicatorName]: result.measures[indicatorName],
+            };
+          },
+          {
+            name: `${
+              timePeriods[`${result.year}_${result.timeIdentifier}`].label
+              }`,
+          },
+        );
+      });
+    }
 
     let yAxisDomain: [AxisDomain, AxisDomain] = [0, 0];
 
@@ -82,7 +118,7 @@ export default class LineChartBlock extends Component<ChartProps> {
       <ResponsiveContainer width={900} height={height || 300}>
         <LineChart
           data={chartData}
-          margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
+          margin={{top: 5, right: 30, left: 20, bottom: 25}}
         >
           <Tooltip content={CustomToolTip} />
           {indicators.length > 1 ? (
@@ -98,7 +134,7 @@ export default class LineChartBlock extends Component<ChartProps> {
               position: 'bottom',
               value: xAxis.title,
             }}
-            padding={{ left: 20, right: 20 }}
+            padding={{left: 20, right: 20}}
             tickMargin={10}
           />
           <YAxis
@@ -126,7 +162,7 @@ export default class LineChartBlock extends Component<ChartProps> {
                 strokeWidth="5"
                 unit="%"
                 legendType={symbols[index]}
-                activeDot={{ r: 3 }}
+                activeDot={{r: 3}}
                 dot={props => <Symbols {...props} type={symbols[index]} />}
                 isAnimationActive={false}
               />

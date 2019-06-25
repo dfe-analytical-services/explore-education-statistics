@@ -1,7 +1,8 @@
 import ChartFunctions, {
+  ChartDefinition,
   ChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import React from 'react';
+import React, {Component} from 'react';
 import {
   Bar,
   BarChart,
@@ -17,59 +18,85 @@ interface StackedBarHorizontalProps extends ChartProps {
   stacked?: boolean;
 }
 
-export default function HorizontalBarBlock(props: StackedBarHorizontalProps) {
-  const {
-    data,
-    meta,
-    height,
-    width,
-    xAxis,
-    referenceLines,
-    yAxis,
-    stacked,
-    indicators,
-  } = props;
+export default class HorizontalBarBlock extends Component<StackedBarHorizontalProps> {
 
-  const chartData = data.result.map(({ measures, year, timeIdentifier }) => ({
-    name: `${meta.timePeriods[`${year}_${timeIdentifier}`].label}`,
-    ...measures,
-  }));
+  public static  definition : ChartDefinition  = {
+    type: 'horizontalbar',
+    name: 'Horizontal Bar',
 
-  return (
-    <ResponsiveContainer width={width || '100%'} height={height || 600}>
-      <BarChart
-        data={chartData}
-        layout="vertical"
-        margin={ChartFunctions.calculateMargins(yAxis, xAxis, referenceLines)}
-      >
-        {ChartFunctions.calculateYAxis(yAxis, {
-          type: 'category',
-          dataKey: yAxis.key || 'name',
-        })}
+    data: [{
+      type: 'bar',
+      title: 'Bar',
+      entryCount: 1,
+      targetAxis: 'yaxis'
+    }],
 
-        <CartesianGrid />
+    axes: [{
+      id: 'yaxis',
+      title: 'Y Axis',
+      type: 'major'
+    }]
+  };
 
-        {ChartFunctions.calculateXAxis(xAxis, { type: 'number' })}
+  public render() {
 
-        <Tooltip cursor={false} />
-        <Legend />
 
-        {indicators.map((dataKey, index) => {
-          return (
-            <Bar
-              key={dataKey}
-              dataKey={dataKey}
-              name={(meta && meta.indicators[dataKey].label) || 'a'}
-              fill={colours[index]}
-              stackId={stacked ? 'a' : undefined}
-              isAnimationActive={false}
-            />
-          );
-        })}
+    const {
+      data,
+      meta,
+      height,
+      width,
+      xAxis,
+      referenceLines,
+      yAxis,
+      stacked,
+      indicators,
+    } = this.props;
 
-        {referenceLines &&
+    const chartData = data.result.map(({measures, year, timeIdentifier}) => ({
+      name: `${meta.timePeriods[`${year}_${timeIdentifier}`].label}`,
+      ...measures,
+    }));
+
+    return (
+      <ResponsiveContainer width={width || '100%'} height={height || 600}>
+        <BarChart
+          data={chartData}
+          layout="vertical"
+          margin={ChartFunctions.calculateMargins(yAxis, xAxis, referenceLines)}
+        >
+          {ChartFunctions.calculateYAxis(yAxis, {
+            type: 'category',
+            dataKey: (xAxis.key || ['name'])[0],
+          })}
+
+          <CartesianGrid />
+
+          {ChartFunctions.calculateXAxis(xAxis, {type: 'number'})}
+
+          <Tooltip cursor={false} />
+          <Legend />
+
+          {indicators.map((dataKey, index) => {
+            return (
+              <Bar
+                key={dataKey}
+                dataKey={dataKey}
+                name={(meta && meta.indicators[dataKey].label) || 'a'}
+                fill={colours[index]}
+                stackId={stacked ? 'a' : undefined}
+                isAnimationActive={false}
+              />
+            );
+          })}
+
+          {referenceLines &&
           ChartFunctions.generateReferenceLines(referenceLines)}
-      </BarChart>
-    </ResponsiveContainer>
-  );
+        </BarChart>
+      </ResponsiveContainer>
+    );
+  }
 }
+
+
+

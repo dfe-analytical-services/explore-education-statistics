@@ -7,7 +7,7 @@ import {
 import 'leaflet/dist/leaflet.css';
 import React, { Component, createRef } from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
-import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import {ChartDefinition, ChartProps} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import {
   DataBlockData,
   DataBlockGeoJsonProperties,
@@ -86,6 +86,9 @@ function getLowestLocationCode(location: DataBlockLocation) {
 }
 
 class MapBlock extends Component<MapProps, MapState> {
+
+
+
   private readonly mapRef = createRef<Map>();
 
   private readonly geoJsonRef = createRef<GeoJSON>();
@@ -161,6 +164,24 @@ class MapBlock extends Component<MapProps, MapState> {
       this.intersectionObserver.disconnect();
     }
   }
+
+  public static  definition : ChartDefinition  = {
+    type: 'map',
+    name: 'Geographic',
+
+    data: [{
+      type: 'geojson',
+      title: 'Geographic',
+      entryCount: "multiple",
+      targetAxis: 'geojson'
+    }],
+
+    axes: [{
+      id: 'geojson',
+      title: 'geojson',
+      type: 'major'
+    }]
+  };
 
   private static getLocationsForIndicator(
     data: DataBlockData,

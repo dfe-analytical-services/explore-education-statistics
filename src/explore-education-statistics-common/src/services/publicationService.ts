@@ -54,7 +54,8 @@ export interface Axis {
 
 export type ChartType = 'line' | 'verticalbar' | 'horizontalbar' | 'map';
 
-export interface ChartDataGroup {
+export interface ChartDataSet {
+  indicator: string;
   filters?: string[];
   location?: string[];
   timePeriod?: boolean;
@@ -62,8 +63,8 @@ export interface ChartDataGroup {
 
 export interface Chart {
   type: ChartType;
+  dataSets?: ChartDataSet[];
   indicators: string[];
-  dataGroupings?: ChartDataGroup[];
   xAxis?: Axis;
   yAxis?: Axis;
   stacked?: boolean;

@@ -1,7 +1,8 @@
 import ChartFunctions, {
+  ChartDefinition,
   ChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import React from 'react';
+import React, {Component} from 'react';
 import {
   Bar,
   BarChart,
@@ -13,51 +14,74 @@ import {
 
 import { colours } from './Charts';
 
-export default function VerticalBarBlock({
-  data,
-  indicators,
-  height,
-  xAxis,
-  yAxis,
-  width,
-  meta,
-}: ChartProps) {
-  const chartData = data.result.map(({ measures, year, timeIdentifier }) => ({
-    name: `${meta.timePeriods[`${year}_${timeIdentifier}`].label}`,
-    ...measures,
-  }));
+export default class VerticalBarBlock extends Component<ChartProps> {
 
-  return (
-    <ResponsiveContainer width={width || 900} height={height || 300}>
-      <BarChart
-        data={chartData}
-        margin={ChartFunctions.calculateMargins(xAxis, yAxis, undefined)}
-      >
-        {ChartFunctions.calculateXAxis(xAxis, {
-          interval: 0,
-          tick: { fontSize: 12 },
-          dataKey: xAxis.key || 'name',
-        })}
+  public static  definition : ChartDefinition  = {
+    type: 'verticalbar',
+    name: 'Vertical Bar',
 
-        <CartesianGrid />
+    data: [{
+      type: 'bar',
+      title: 'Bar',
+      entryCount: 1,
+      targetAxis: 'xaxis'
+    }],
 
-        {ChartFunctions.calculateYAxis(yAxis, { type: 'number' })}
+    axes: [{
+      id: 'xaxis',
+      title: 'X Axis',
+      type: 'major'
+    }]
+  };
 
-        <Tooltip />
-        <Legend />
 
-        {indicators.map((dataKey, index) => {
-          return (
-            <Bar
-              key={dataKey}
-              dataKey={dataKey}
-              fill={colours[index]}
-              name={(meta && meta.indicators[dataKey].label) || 'a'}
-              isAnimationActive={false}
-            />
-          );
-        })}
-      </BarChart>
-    </ResponsiveContainer>
-  );
+  public render() {
+    const {
+      data,
+      indicators,
+      height,
+      xAxis,
+      yAxis,
+      width,
+      meta,
+    } = this.props;
+    const chartData = data.result.map(({measures, year, timeIdentifier}) => ({
+      name: `${meta.timePeriods[`${year}_${timeIdentifier}`].label}`,
+      ...measures,
+    }));
+
+    return (
+      <ResponsiveContainer width={width || 900} height={height || 300}>
+        <BarChart
+          data={chartData}
+          margin={ChartFunctions.calculateMargins(xAxis, yAxis, undefined)}
+        >
+          {ChartFunctions.calculateXAxis(xAxis, {
+            interval: 0,
+            tick: {fontSize: 12},
+            dataKey: (xAxis.key || ['name'])[0],
+          })}
+
+          <CartesianGrid />
+
+          {ChartFunctions.calculateYAxis(yAxis, {type: 'number'})}
+
+          <Tooltip />
+          <Legend />
+
+          {indicators.map((dataKey, index) => {
+            return (
+              <Bar
+                key={dataKey}
+                dataKey={dataKey}
+                fill={colours[index]}
+                name={(meta && meta.indicators[dataKey].label) || 'a'}
+                isAnimationActive={false}
+              />
+            );
+          })}
+        </BarChart>
+      </ResponsiveContainer>
+    );
+  }
 }

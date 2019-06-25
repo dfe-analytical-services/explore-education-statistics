@@ -1,57 +1,21 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Dictionary } from '@common/types';
-import DataBlockService, {
-  DataBlockResponse,
-  GeographicLevel,
-  DataBlockLocation,
-  Result,
-  Country,
-  LabelValueUnitMetadata,
-} from '@common/services/dataBlockService';
-
 import { ChartType as PublicationChartType } from '@common/services/publicationService';
+import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
+import {ChartDefinition} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
+import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
+import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
 
-export interface ChartType {
-  type: PublicationChartType;
-  title: string;
 
-  dataOptions: string[];
-  dataMapping: {
-    mapTo: string;
-  }[];
-  hasLegend: boolean;
-}
-
-const chartTypes: ChartType[] = [
-  {
-    type: 'line',
-    title: 'Line Chart',
-    dataOptions: ['X Axis'],
-    dataMapping: [{ mapTo: 'xaxis' }],
-    hasLegend: true,
-  },
-  {
-    type: 'horizontalbar',
-    title: 'Horizontal bar',
-    dataOptions: ['Y Axis', 'Group fields'],
-    dataMapping: [{ mapTo: 'yaxis' }],
-    hasLegend: true,
-  },
-  {
-    type: 'verticalbar',
-    title: 'Vertical bar',
-    dataOptions: ['X Axis', 'Group fields'],
-    dataMapping: [{ mapTo: 'xaxis' }],
-    hasLegend: true,
-  },
-  {
-    type: 'map',
-    title: 'Map',
-    dataOptions: [],
-    dataMapping: [{ mapTo: 'geojson' }],
-    hasLegend: false,
-  },
+const chartTypes: ChartDefinition[] = [
+  LineChartBlock.definition,
+  HorizontalBarBlock.definition,
+  VerticalBarBlock.definition,
+  MapBlock.definition
 ];
+
+
 
 export interface PrototypeTable {
   label: string;

@@ -5,7 +5,7 @@
 .chart {
   align-items: center;
   display: flex;
-  flex-basis: 128px;
+  flex-basis: 25%;
   flex-direction: column;
   margin: 4px;
   padding: 8px;
@@ -17,6 +17,7 @@
 
   &.selected {
     background-color: #005ea5;
+    color: #fff;
   }
 }
 
@@ -24,9 +25,8 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
-  border: 2px solid #777;
   height: 128px;
-  width: 128px;
+  width: 192px;
 }
 
 .chart .title {
@@ -34,19 +34,19 @@
 }
 
 .line {
-  background: url('./charts/line-chart.png');
+  background: url('/static/images/chart-types/line-chart.png');
 }
 
-.horizontal {
-  background: url('./charts/horizontal-bar.png');
+.horizontalbar {
+  background: url('/static/images/chart-types/horizontal-bar.png');
 }
 
-.vertical {
-  background: url('./charts/vertical-bar.png');
+.verticalbar {
+  background: url('/static/images/chart-types/vertical-bar.png');
 }
 
 .map {
-  background: url('./charts/map.png');
+  background: url('/static/images/chart-types/map.png');
 }
 
 .formselect {
