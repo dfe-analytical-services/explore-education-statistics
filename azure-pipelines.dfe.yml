@@ -145,6 +145,13 @@ jobs:
         continueOnError: true
         enabled: false
       - task: 'Npm@1'
+        displayName: 'npm run tsc'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run tsc'
+      - task: 'Npm@1'
         displayName: 'npm run lint'
         inputs:
           command: 'custom'
@@ -272,7 +279,7 @@ jobs:
         displayName: 'Publish Pipeline Artifact'
         inputs:
           artifactName: 'frontend-dev02'
-          targetPath: '$(Build.ArtifactStagingDirectory)'          
+          targetPath: '$(Build.ArtifactStagingDirectory)'
   - job: 'FrontendArtifactDev03'
     dependsOn: 'Frontend'
     pool:
