@@ -2,7 +2,7 @@ import ChartFunctions, {
   ChartDefinition,
   ChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   Bar,
   BarChart,
@@ -18,29 +18,32 @@ interface StackedBarHorizontalProps extends ChartProps {
   stacked?: boolean;
 }
 
-export default class HorizontalBarBlock extends Component<StackedBarHorizontalProps> {
-
-  public static  definition : ChartDefinition  = {
+export default class HorizontalBarBlock extends Component<
+  StackedBarHorizontalProps
+> {
+  public static definition: ChartDefinition = {
     type: 'horizontalbar',
     name: 'Horizontal Bar',
 
-    data: [{
-      type: 'bar',
-      title: 'Bar',
-      entryCount: 1,
-      targetAxis: 'yaxis'
-    }],
+    data: [
+      {
+        type: 'bar',
+        title: 'Bar',
+        entryCount: 1,
+        targetAxis: 'yaxis',
+      },
+    ],
 
-    axes: [{
-      id: 'yaxis',
-      title: 'Y Axis',
-      type: 'major'
-    }]
+    axes: [
+      {
+        id: 'yaxis',
+        title: 'Y Axis',
+        type: 'major',
+      },
+    ],
   };
 
   public render() {
-
-
     const {
       data,
       meta,
@@ -53,7 +56,7 @@ export default class HorizontalBarBlock extends Component<StackedBarHorizontalPr
       indicators,
     } = this.props;
 
-    const chartData = data.result.map(({measures, year, timeIdentifier}) => ({
+    const chartData = data.result.map(({ measures, year, timeIdentifier }) => ({
       name: `${meta.timePeriods[`${year}_${timeIdentifier}`].label}`,
       ...measures,
     }));
@@ -72,7 +75,7 @@ export default class HorizontalBarBlock extends Component<StackedBarHorizontalPr
 
           <CartesianGrid />
 
-          {ChartFunctions.calculateXAxis(xAxis, {type: 'number'})}
+          {ChartFunctions.calculateXAxis(xAxis, { type: 'number' })}
 
           <Tooltip cursor={false} />
           <Legend />
@@ -91,12 +94,9 @@ export default class HorizontalBarBlock extends Component<StackedBarHorizontalPr
           })}
 
           {referenceLines &&
-          ChartFunctions.generateReferenceLines(referenceLines)}
+            ChartFunctions.generateReferenceLines(referenceLines)}
         </BarChart>
       </ResponsiveContainer>
     );
   }
 }
-
-
-

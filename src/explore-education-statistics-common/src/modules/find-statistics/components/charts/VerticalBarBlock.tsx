@@ -2,7 +2,7 @@ import ChartFunctions, {
   ChartDefinition,
   ChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   Bar,
   BarChart,
@@ -15,37 +15,31 @@ import {
 import { colours } from './Charts';
 
 export default class VerticalBarBlock extends Component<ChartProps> {
-
-  public static  definition : ChartDefinition  = {
+  public static definition: ChartDefinition = {
     type: 'verticalbar',
     name: 'Vertical Bar',
 
-    data: [{
-      type: 'bar',
-      title: 'Bar',
-      entryCount: 1,
-      targetAxis: 'xaxis'
-    }],
+    data: [
+      {
+        type: 'bar',
+        title: 'Bar',
+        entryCount: 1,
+        targetAxis: 'xaxis',
+      },
+    ],
 
-    axes: [{
-      id: 'xaxis',
-      title: 'X Axis',
-      type: 'major'
-    }]
+    axes: [
+      {
+        id: 'xaxis',
+        title: 'X Axis',
+        type: 'major',
+      },
+    ],
   };
 
-
   public render() {
-    const {
-      data,
-      indicators,
-      height,
-      xAxis,
-      yAxis,
-      width,
-      meta,
-    } = this.props;
-    const chartData = data.result.map(({measures, year, timeIdentifier}) => ({
+    const { data, indicators, height, xAxis, yAxis, width, meta } = this.props;
+    const chartData = data.result.map(({ measures, year, timeIdentifier }) => ({
       name: `${meta.timePeriods[`${year}_${timeIdentifier}`].label}`,
       ...measures,
     }));
@@ -58,13 +52,13 @@ export default class VerticalBarBlock extends Component<ChartProps> {
         >
           {ChartFunctions.calculateXAxis(xAxis, {
             interval: 0,
-            tick: {fontSize: 12},
+            tick: { fontSize: 12 },
             dataKey: (xAxis.key || ['name'])[0],
           })}
 
           <CartesianGrid />
 
-          {ChartFunctions.calculateYAxis(yAxis, {type: 'number'})}
+          {ChartFunctions.calculateYAxis(yAxis, { type: 'number' })}
 
           <Tooltip />
           <Legend />

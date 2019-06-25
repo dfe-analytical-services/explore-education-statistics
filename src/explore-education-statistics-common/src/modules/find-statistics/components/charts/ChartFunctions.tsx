@@ -1,6 +1,8 @@
 import {
   Axis,
-  ChartDataGroup, ChartDataSet, ChartType,
+  ChartDataGroup,
+  ChartDataSet,
+  ChartType,
   ReferenceLine,
 } from '@common/services/publicationService';
 import React, { ReactNode } from 'react';
@@ -34,21 +36,21 @@ export interface ChartProps {
 }
 
 export interface ChartDefinition {
-  type: ChartType,
-  name: string,
+  type: ChartType;
+  name: string;
 
   data: {
-    type: string,
-    title: string,
-    entryCount: number | "multiple",
-    targetAxis: string
-  }[],
+    type: string;
+    title: string;
+    entryCount: number | 'multiple';
+    targetAxis: string;
+  }[];
 
   axes: {
-    id: string,
-    title: string
-    type: "major" | "value" | "group"
-  }[]
+    id: string;
+    title: string;
+    type: 'major' | 'value' | 'group';
+  }[];
 }
 
 const ChartFunctions = {

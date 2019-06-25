@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {Fragment} from 'react';
+import React, { Fragment } from 'react';
 
 import classnames from 'classnames';
 
@@ -10,12 +10,12 @@ import DataBlockService, {
   GeographicLevel,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import {ChartDefinition} from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import ChartDataSelector from "@admin/pages/prototypes/components/graph-builder/ChartDataSelector";
+import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import ChartDataSelector from '@admin/pages/prototypes/components/graph-builder/ChartDataSelector';
 import styles from './graph-builder/graph-builder.module.scss';
 import ConstData from '../PrototypeData';
 import ChartTypeSelector from './graph-builder/ChartTypeSelector';
-import {ChartDataSet} from '@common/services/publicationService';
+import { ChartDataSet } from '@common/services/publicationService';
 
 /**
  * TODO:
@@ -29,9 +29,10 @@ const PrototypeChartEditor = (props: {}) => {
     undefined,
   );
 
-  const {chartTypes} = ConstData;
-  const [selectedChartType, selectChartType] = React.useState<ChartDefinition | undefined>();
-
+  const { chartTypes } = ConstData;
+  const [selectedChartType, selectChartType] = React.useState<
+    ChartDefinition | undefined
+  >();
 
   const [selectedIndicators, selectIndicators] = React.useState(
     new Array<string>(),
@@ -56,7 +57,9 @@ const PrototypeChartEditor = (props: {}) => {
     return false;
   };
 
-  const [filterIdCombinations, setFilterIdCombinations] = React.useState<string[][]>([]);
+  const [filterIdCombinations, setFilterIdCombinations] = React.useState<
+    string[][]
+  >([]);
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -78,11 +81,10 @@ const PrototypeChartEditor = (props: {}) => {
 
           return {
             ...filterSet,
-            [filterIds.join('_')]: filterIds
+            [filterIds.join('_')]: filterIds,
           };
         }, {}),
       );
-
 
       setFilterIdCombinations(uniqueFilterIds);
     };
@@ -91,14 +93,10 @@ const PrototypeChartEditor = (props: {}) => {
   }, []);
 
   React.useEffect(() => {
-
     if (selectedChartType) {
       //
     }
-    ;
-
-  }, [selectedChartType])
-
+  }, [selectedChartType]);
 
   const isValidChartOptions = () => {
     if (selectedChartType) {
@@ -124,13 +122,19 @@ const PrototypeChartEditor = (props: {}) => {
 
   const [indicators, setIndicators] = React.useState<string[]>([]);
 
-  const onDataAddedToChart = ({filters, indicator}: { filters: string[], indicator: string }) => {
-
-    setDataSets([...dataSets,
+  const onDataAddedToChart = ({
+    filters,
+    indicator,
+  }: {
+    filters: string[];
+    indicator: string;
+  }) => {
+    setDataSets([
+      ...dataSets,
       {
         indicator,
-        filters
-      }
+        filters,
+      },
     ]);
     setIndicators([...indicators, indicator]);
   };
@@ -145,35 +149,32 @@ const PrototypeChartEditor = (props: {}) => {
           onSelectChart={selectChartType}
           selectedChartType={selectedChartType}
         />
-
       </Details>
 
-      {selectedChartType &&
-      <Fragment>
-        <Details summary="Chart preview" open>
-          <ChartRenderer
-            type={selectedChartType.type}
-            indicators={indicators}
-            dataSets={dataSets}
-            data={Data}
-            meta={Data.metaData}
-            xAxis={{title: ''}}
-            yAxis={{title: ''}}
-          />
-        </Details>
-        <Details summary="Add data to chart" open>
-          <ChartDataSelector
-            onDataAdded={onDataAddedToChart}
-            metaData={Data.metaData}
-            indicatorIds={indicatorIds}
-            filterIds={filterIdCombinations}
-            chartType={selectedChartType}
-          />
-        </Details>
-      </Fragment>
-      }
-
-
+      {selectedChartType && (
+        <Fragment>
+          <Details summary="Chart preview" open>
+            <ChartRenderer
+              type={selectedChartType.type}
+              indicators={indicators}
+              dataSets={dataSets}
+              data={Data}
+              meta={Data.metaData}
+              xAxis={{ title: '' }}
+              yAxis={{ title: '' }}
+            />
+          </Details>
+          <Details summary="Add data to chart" open>
+            <ChartDataSelector
+              onDataAdded={onDataAddedToChart}
+              metaData={Data.metaData}
+              indicatorIds={indicatorIds}
+              filterIds={filterIdCombinations}
+              chartType={selectedChartType}
+            />
+          </Details>
+        </Fragment>
+      )}
     </div>
   );
 };
