@@ -107,13 +107,19 @@ const TimePeriodDataTable = ({
           }
 
           const rawValue = matchingResult.measures[row.value];
-          const parsedValue = Number(rawValue);
+          const numberValue = Number(rawValue);
 
-          if (Number.isNaN(parsedValue)) {
+          if (Number.isNaN(numberValue)) {
             return rawValue;
           }
 
-          return `${parsedValue.toLocaleString('en-GB')}${row.unit}`;
+          const [_, decimals] = rawValue.split('.');
+          const decimalPlaces = decimals ? decimals.length : 0;
+
+          return `${numberValue.toLocaleString('en-GB', {
+            maximumFractionDigits: decimalPlaces,
+            minimumFractionDigits: decimalPlaces,
+          })}${row.unit}`;
         }),
       );
 
