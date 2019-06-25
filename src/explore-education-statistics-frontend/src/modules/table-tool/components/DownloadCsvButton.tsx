@@ -70,7 +70,7 @@ const DownloadCsvButton = ({
           return rawValue;
         }
 
-        const [_, decimals] = rawValue.split('.');
+        const decimals = rawValue.split('.')[1];
         const decimalPlaces = decimals ? decimals.length : 0;
 
         return numberValue.toLocaleString('en-GB', {
