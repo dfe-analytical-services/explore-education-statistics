@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Storage;
@@ -14,6 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private readonly string _privateStorageConnectionString;
         private readonly string _publicStorageConnectionString;
+        private readonly Regex _searchPatternRegex = new Regex(@"^[\w-_/]+\.(?!meta\.csv)");
 
         private const string PrivateContainerName = "releases";
         private const string PublicContainerName = "downloads";
@@ -37,18 +39,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var privateContainer = privateBlobClient.GetContainerReference(PrivateContainerName);
             var publicContainer = publicBlobClient.GetContainerReference(PublicContainerName);
 
-            // TODO DFE-871 Exclude meta files using the search pattern
-            //const string searchPattern = "(?!.*meta.csv).*$";
-            const string searchPattern = null;
-
             var sourceDirectoryAddress = $"{publication}/{release}";
             var destinationDirectoryAddress = sourceDirectoryAddress;
-            await CopyDirectoryAsync(sourceDirectoryAddress, destinationDirectoryAddress, searchPattern,
-                privateContainer, publicContainer);
+            await CopyDirectoryAsync(sourceDirectoryAddress, destinationDirectoryAddress, privateContainer,
+                publicContainer);
         }
 
         private async Task CopyDirectoryAsync(string sourceDirectoryAddress, string destinationDirectoryAddress,
-            string searchPattern,
             CloudBlobContainer sourceContainer, CloudBlobContainer destinationContainer)
         {
             var sourceDirectory = sourceContainer.GetDirectoryReference(sourceDirectoryAddress);
@@ -56,7 +53,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             var options = new CopyDirectoryOptions
             {
-                SearchPattern = searchPattern,
                 Recursive = true
             };
 
@@ -64,6 +60,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             context.FileTransferred += FileTransferredCallback;
             context.FileFailed += FileFailedCallback;
             context.FileSkipped += FileSkippedCallback;
+            context.ShouldTransferCallbackAsync += async (source, destination) =>
+            {
+                var path = (source as CloudBlockBlob)?.Name;
+                return path != null && _searchPatternRegex.IsMatch(path);
+            };
 
             await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory, false, options, context);
         }
