@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task PublishReleaseData(PublishReleaseDataMessage message)
         {
-            await _fileStorageService.CopyReleaseToPublicContainer(message.PublicationSlug, message.ReleaseSlug);
+            await _fileStorageService.CopyReleaseToPublicContainer(message);
 
             // TODO DFE-874 Run the importer or copy the data from the statistics database
             // TODO DFE-874 to the publicly available statistics database

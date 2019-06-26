@@ -71,7 +71,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         private static string GetExtension(CloudBlob blob)
         {
-            return MimeTypeMap.GetExtension(blob.Properties.ContentType).TrimStart('.');
+            var contentType = blob.Properties.ContentType;
+            contentType = contentType.Replace("; charset=utf-8", "");
+            return MimeTypeMap.GetExtension(contentType).TrimStart('.');
         }
 
         private static string GetName(CloudBlob blob)
