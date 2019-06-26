@@ -13,6 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string Summary { get; set; }
         
         public DateTime? Published { get; set; }
+
+        public DateTime? LastUpdated { get; set; }
  
         public List<ContentSection> Content { get; set; }
         
