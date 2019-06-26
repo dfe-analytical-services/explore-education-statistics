@@ -4,7 +4,6 @@ exports[`DataBlock renders map instead of chart 1`] = `
 <section
   aria-labelledby="test-datablock-charts-tab"
   class="govuk-tabs__panel dfe-content-overflow panel"
-  data-testid="Charts"
   id="test-datablock-charts"
   role="tabpanel"
   tabindex="-1"
@@ -305,7 +304,6 @@ exports[`DataBlock renders summary 1`] = `
 <section
   aria-labelledby="test-datablock-summary-tab"
   class="govuk-tabs__panel dfe-content-overflow panel"
-  data-testid="Summary"
   id="test-datablock-summary"
   role="tabpanel"
   tabindex="-1"
@@ -324,15 +322,15 @@ exports[`DataBlock renders summary 1`] = `
       >
         <h3
           class="govuk-heading-s"
+          data-testid="key-stat-tile-title"
         >
           Unauthorised absence rate
         </h3>
         <p
           class="govuk-heading-xl"
-          data-testid="tile Unauthorised absence rate"
+          data-testid="key-stat-tile-value"
         >
-          3
-          %
+          3%
         </p>
         <p
           class="govuk-body-s"
@@ -377,15 +375,15 @@ exports[`DataBlock renders summary 1`] = `
       >
         <h3
           class="govuk-heading-s"
+          data-testid="key-stat-tile-title"
         >
           Overall absence rate
         </h3>
         <p
           class="govuk-heading-xl"
-          data-testid="tile Overall absence rate"
+          data-testid="key-stat-tile-value"
         >
-          10
-          %
+          10%
         </p>
         <p
           class="govuk-body-s"
@@ -430,15 +428,15 @@ exports[`DataBlock renders summary 1`] = `
       >
         <h3
           class="govuk-heading-s"
+          data-testid="key-stat-tile-title"
         >
           Authorised absence rate
         </h3>
         <p
           class="govuk-heading-xl"
-          data-testid="tile Authorised absence rate"
+          data-testid="key-stat-tile-value"
         >
-          5
-          %
+          5%
         </p>
         <p
           class="govuk-body-s"

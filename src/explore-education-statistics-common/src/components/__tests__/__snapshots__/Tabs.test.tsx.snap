@@ -36,7 +36,6 @@ exports[`Tabs renders multiple tabs correctly 1`] = `
   </ul>
   <section class="govuk-tabs__panel dfe-content-overflow panel"
            id="test-tabs-1"
-           data-testid="Tab 1"
            aria-labelledby="test-tabs-1-tab"
            role="tabpanel"
            tabindex="-1"
@@ -50,7 +49,6 @@ exports[`Tabs renders multiple tabs correctly 1`] = `
   </section>
   <section class="govuk-tabs__panel dfe-content-overflow panel govuk-tabs__panel--hidden"
            id="test-tabs-2"
-           data-testid="Tab 2"
            aria-labelledby="test-tabs-2-tab"
            role="tabpanel"
            tabindex="-1"
@@ -88,7 +86,6 @@ exports[`Tabs renders single tab correctly 1`] = `
   </ul>
   <section class="govuk-tabs__panel dfe-content-overflow panel"
            id="test-tabs-1"
-           data-testid="Tab 1"
            aria-labelledby="test-tabs-1-tab"
            role="tabpanel"
            tabindex="-1"
