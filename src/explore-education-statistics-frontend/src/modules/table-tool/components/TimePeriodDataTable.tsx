@@ -9,7 +9,6 @@ import { Dictionary } from '@common/types/util';
 import sortBy from 'lodash/sortBy';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import FixedHeaderGroupedDataTable, {
-  HeaderGroup,
   RowGroup,
 } from './FixedHeaderGroupedDataTable';
 import TableHeadersForm from './TableHeadersForm';
@@ -78,14 +77,10 @@ const TimePeriodDataTable = ({
     locationLabels,
   )} ${timePeriodString}`;
 
-  const headerRow: HeaderGroup[] = tableHeaders.columnGroups.map(
-    columnGroup => {
-      return {
-        columns: tableHeaders.columns.map(column => column.label),
-        label: columnGroup.label,
-      };
-    },
-  );
+  const headerRow: string[][] = [
+    tableHeaders.columnGroups.map(colGroup => colGroup.label),
+    tableHeaders.columns.map(column => column.label),
+  ];
 
   const groupedData: RowGroup[] = tableHeaders.rowGroups.map(rowGroup => {
     const rows = tableHeaders.rows.map(row => {

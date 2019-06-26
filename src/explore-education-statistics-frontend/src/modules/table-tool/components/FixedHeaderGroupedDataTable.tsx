@@ -1,15 +1,11 @@
 import classNames from 'classnames';
 import throttle from 'lodash/throttle';
+import times from 'lodash/times';
 import React, { forwardRef, Ref, useEffect, useRef } from 'react';
 import DataTableKeys from './DataTableKeys';
 import styles from './FixedHeaderGroupedDataTable.module.scss';
 
 const dataTableCaption = 'dataTableCaption';
-
-export interface HeaderGroup {
-  label: string;
-  columns: string[];
-}
 
 export interface RowGroup {
   label: string;
@@ -21,7 +17,7 @@ export interface RowGroup {
 
 interface Props {
   caption: string;
-  headers: HeaderGroup[];
+  headers: string[][];
   innerRef?: Ref<HTMLElement>;
   rowGroups: RowGroup[];
 }
@@ -45,6 +41,17 @@ const GroupedDataTable = forwardRef<HTMLTableElement, InnerTableProps>(
     },
     ref,
   ) => {
+    const maxColSpan = headers.reduce(
+      (total, header) => total * header.length,
+      1,
+    );
+
+    const getColSpan = (headerRowIndex: number) => {
+      return headers
+        .slice(headerRowIndex + 1)
+        .reduce((total, row) => total * row.length, 1);
+    };
+
     return (
       <table
         aria-hidden={ariaHidden}
@@ -53,62 +60,52 @@ const GroupedDataTable = forwardRef<HTMLTableElement, InnerTableProps>(
         ref={ref}
       >
         <thead>
-          <tr>
-            <th
-              colSpan={2}
-              className={classNames(
-                styles.borderRight,
-                styles.intersectionCell,
-              )}
-            />
-            {!isStickyColumn &&
-              headers.map((group, groupIndex) => {
-                const key = `${group.label}-${groupIndex}`;
+          {headers.map((columns, rowIndex) => {
+            const colSpan = getColSpan(rowIndex) || 1;
+            const isColGroup = rowIndex !== headers.length - 1;
 
-                return (
+            return (
+              // eslint-disable-next-line react/no-array-index-key
+              <tr key={rowIndex}>
+                {rowIndex === 0 && (
                   <th
+                    colSpan={2}
+                    rowSpan={headers.length}
                     className={classNames(
-                      'govuk-table__header--center',
-                      styles.borderLeft,
+                      styles.borderBottom,
+                      styles.borderRight,
                     )}
-                    colSpan={group.columns.length || 1}
-                    scope="colgroup"
-                    key={key}
-                  >
-                    {group.label}
-                  </th>
-                );
-              })}
-          </tr>
-          <tr>
-            <th
-              colSpan={2}
-              className={classNames(styles.borderBottom, styles.borderRight)}
-            />
-            {!isStickyColumn &&
-              headers.flatMap(group =>
-                group.columns.map((column, columnIndex) => {
-                  const key = `${group.label}_${column}_${columnIndex}`;
+                  />
+                )}
 
-                  return (
-                    <th
-                      className={classNames(
-                        'govuk-table__header--numeric',
-                        styles.borderBottom,
-                        {
-                          [styles.borderLeft]: columnIndex === 0,
-                        },
-                      )}
-                      scope="col"
-                      key={key}
-                    >
-                      {column}
-                    </th>
-                  );
-                }),
-              )}
-          </tr>
+                {!isStickyColumn &&
+                  times(maxColSpan / (colSpan * columns.length), () =>
+                    columns.map((column, columnIndex) => {
+                      const key = `${column}_${columnIndex}`;
+
+                      return (
+                        <th
+                          className={classNames({
+                            'govuk-table__header--numeric': !isColGroup,
+                            'govuk-table__header--center': isColGroup,
+                            [styles.borderBottom]: !isColGroup,
+                            [styles.borderLeft]:
+                              columnIndex === 0 || isColGroup,
+                          })}
+                          colSpan={colSpan}
+                          scope={colSpan > 1 ? 'colgroup' : 'col'}
+                          key={key}
+                        >
+                          {column}
+                        </th>
+                      );
+                    }),
+                  )}
+              </tr>
+            );
+          })}
         </thead>
+
         {rowGroups.map((group, groupIndex) => {
           const groupKey = `${group.label}-${groupIndex}`;
 
@@ -210,7 +207,7 @@ const FixedHeaderGroupedDataTable = forwardRef<HTMLElement, Props>(
 
         if (columnTableRef.current) {
           cloneCellHeightWidth(
-            'thead tr th:first-child',
+            'thead tr:first-child th:first-child',
             columnTableRef.current,
           );
           cloneCellHeightWidth('tbody th', columnTableRef.current);
@@ -218,7 +215,7 @@ const FixedHeaderGroupedDataTable = forwardRef<HTMLElement, Props>(
 
         if (intersectionTableRef.current) {
           cloneCellHeightWidth(
-            'thead tr th:first-child',
+            'thead tr:first-child th:first-child',
             intersectionTableRef.current,
           );
         }
@@ -230,7 +227,7 @@ const FixedHeaderGroupedDataTable = forwardRef<HTMLElement, Props>(
         setStickyElementSizes();
 
         window.addEventListener('resize', setStickyElementSizes);
-      }, 100);
+      }, 200);
 
       return () => {
         window.removeEventListener('resize', setStickyElementSizes);
