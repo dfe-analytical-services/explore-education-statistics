@@ -103,7 +103,7 @@ def user_checks_key_stat_tile_contents(tile_title, tile_value, tile_context):
     raise AssertionError(f'Cannot find key stat tile "{tile_title}" with context "{tile_context}"')
 
 def user_checks_key_stat_bullet_exists(bullet_text):
-  elem = sl.driver.find_element_by_xpath('.//*[@id="datablock_keystats_summary"]')
+  elem = sl.driver.find_element_by_xpath('.//*[@id="keystats-summary"]')
   try:
     elem.find_element_by_xpath(f'.//li[text()="{bullet_text}"]')
   except NoSuchElementException:
