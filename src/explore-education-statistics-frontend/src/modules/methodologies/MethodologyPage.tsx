@@ -55,6 +55,14 @@ class MethodologyPage extends Component<Props> {
                   <FormattedDate>{data.published}</FormattedDate>{' '}
                 </strong>
               </dd>
+              {data.lastUpdated.length > 0 && (
+                <>
+                  <dt className="govuk-caption-m">Last updated: </dt>
+                  <dd>
+                    <FormattedDate>{data.lastUpdated}</FormattedDate>{' '}
+                  </dd>
+                </>
+              )}
             </dl>
           </div>
           <div className="govuk-grid-column-one-third">
