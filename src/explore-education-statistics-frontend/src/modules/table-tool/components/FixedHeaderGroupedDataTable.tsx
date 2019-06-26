@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import throttle from 'lodash/throttle';
-import React, { Component, createRef, forwardRef, Ref } from 'react';
+import React, { forwardRef, Ref, useEffect, useRef } from 'react';
 import DataTableKeys from './DataTableKeys';
 import styles from './FixedHeaderGroupedDataTable.module.scss';
 
@@ -173,84 +173,72 @@ const GroupedDataTable = forwardRef<HTMLTableElement, InnerTableProps>(
 
 GroupedDataTable.displayName = 'GroupedDataTable';
 
-// eslint-disable-next-line react/no-multi-comp
-class FixedHeaderGroupedDataTable extends Component<Props> {
-  private mainTableRef = createRef<HTMLTableElement>();
+const FixedHeaderGroupedDataTable = forwardRef<HTMLElement, Props>(
+  (props, ref) => {
+    const { caption } = props;
 
-  private headerTableRef = createRef<HTMLTableElement>();
+    const mainTableRef = useRef<HTMLTableElement>(null);
+    const headerTableRef = useRef<HTMLTableElement>(null);
+    const columnTableRef = useRef<HTMLTableElement>(null);
+    const intersectionTableRef = useRef<HTMLTableElement>(null);
 
-  private columnTableRef = createRef<HTMLTableElement>();
+    const setStickyElementSizes = throttle(() => {
+      if (mainTableRef.current) {
+        const mainTableEl = mainTableRef.current;
 
-  private intersectionTableRef = createRef<HTMLTableElement>();
+        const cloneCellHeightWidth = (
+          selector: string,
+          tableEl: HTMLTableElement,
+        ) => {
+          const tableCells = tableEl.querySelectorAll<HTMLTableCellElement>(
+            selector,
+          );
 
-  public componentDidMount() {
-    setTimeout(() => {
-      this.setStickyElementSizes();
+          mainTableEl
+            .querySelectorAll<HTMLTableCellElement>(selector)
+            .forEach((el, index) => {
+              tableCells[index].style.height = `${el.offsetHeight}px`;
+              tableCells[index].style.width = `${el.offsetWidth}px`;
+            });
+        };
 
-      window.addEventListener('resize', this.setStickyElementSizes);
-    });
-  }
+        if (headerTableRef.current) {
+          headerTableRef.current.style.width = `${mainTableEl.offsetWidth}px`;
 
-  public componentDidUpdate(): void {
-    setTimeout(() => {
-      this.setStickyElementSizes();
-    });
-  }
+          cloneCellHeightWidth('thead th', headerTableRef.current);
+        }
 
-  public componentWillUnmount(): void {
-    window.removeEventListener('resize', this.setStickyElementSizes);
-  }
+        if (columnTableRef.current) {
+          cloneCellHeightWidth(
+            'thead tr th:first-child',
+            columnTableRef.current,
+          );
+          cloneCellHeightWidth('tbody th', columnTableRef.current);
+        }
 
-  private setStickyElementSizes = throttle(() => {
-    if (this.mainTableRef.current) {
-      const mainTableEl = this.mainTableRef.current;
+        if (intersectionTableRef.current) {
+          cloneCellHeightWidth(
+            'thead tr th:first-child',
+            intersectionTableRef.current,
+          );
+        }
+      }
+    }, 200);
 
-      const cloneCellHeightWidth = (
-        selector: string,
-        tableEl: HTMLTableElement,
-      ) => {
-        const tableCells = tableEl.querySelectorAll<HTMLTableCellElement>(
-          selector,
-        );
+    useEffect(() => {
+      setTimeout(() => {
+        setStickyElementSizes();
 
-        mainTableEl
-          .querySelectorAll<HTMLTableCellElement>(selector)
-          .forEach((el, index) => {
-            tableCells[index].style.height = `${el.offsetHeight}px`;
-            tableCells[index].style.width = `${el.offsetWidth}px`;
-          });
+        window.addEventListener('resize', setStickyElementSizes);
+      }, 100);
+
+      return () => {
+        window.removeEventListener('resize', setStickyElementSizes);
       };
-
-      if (this.headerTableRef.current) {
-        this.headerTableRef.current.style.width = `${
-          mainTableEl.offsetWidth
-        }px`;
-
-        cloneCellHeightWidth('thead th', this.headerTableRef.current);
-      }
-
-      if (this.columnTableRef.current) {
-        cloneCellHeightWidth(
-          'thead tr th:first-child',
-          this.columnTableRef.current,
-        );
-        cloneCellHeightWidth('tbody th', this.columnTableRef.current);
-      }
-
-      if (this.intersectionTableRef.current) {
-        cloneCellHeightWidth(
-          'thead tr th:first-child',
-          this.intersectionTableRef.current,
-        );
-      }
-    }
-  }, 200);
-
-  public render() {
-    const { caption, innerRef } = this.props;
+    });
 
     return (
-      <figure className={styles.figure} ref={innerRef}>
+      <figure className={styles.figure} ref={ref}>
         <figcaption>
           <strong id={dataTableCaption}>{caption}</strong>
 
@@ -264,55 +252,50 @@ class FixedHeaderGroupedDataTable extends Component<Props> {
           onScroll={event => {
             const { scrollLeft, scrollTop } = event.currentTarget;
 
-            if (this.headerTableRef.current) {
-              this.headerTableRef.current.style.top = `${scrollTop}px`;
+            if (headerTableRef.current) {
+              headerTableRef.current.style.top = `${scrollTop}px`;
             }
 
-            if (this.columnTableRef.current) {
-              this.columnTableRef.current.style.left = `${scrollLeft}px`;
+            if (columnTableRef.current) {
+              columnTableRef.current.style.left = `${scrollLeft}px`;
             }
 
-            if (this.intersectionTableRef.current) {
-              this.intersectionTableRef.current.style.top = `${scrollTop}px`;
-              this.intersectionTableRef.current.style.left = `${scrollLeft}px`;
+            if (intersectionTableRef.current) {
+              intersectionTableRef.current.style.top = `${scrollTop}px`;
+              intersectionTableRef.current.style.left = `${scrollLeft}px`;
             }
           }}
         >
           <GroupedDataTable
-            {...this.props}
+            {...props}
             className={styles.intersectionTable}
-            ref={this.intersectionTableRef}
+            ref={intersectionTableRef}
             ariaHidden
             isStickyColumn
             isStickyHeader
           />
           <GroupedDataTable
-            {...this.props}
+            {...props}
             className={styles.columnTable}
-            ref={this.columnTableRef}
+            ref={columnTableRef}
             ariaHidden
             isStickyColumn
           />
           <GroupedDataTable
-            {...this.props}
+            {...props}
             className={styles.headerTable}
-            ref={this.headerTableRef}
+            ref={headerTableRef}
             ariaHidden
             isStickyHeader
           />
 
-          <GroupedDataTable ref={this.mainTableRef} {...this.props} />
+          <GroupedDataTable ref={mainTableRef} {...props} />
         </div>
       </figure>
     );
-  }
-}
+  },
+);
 
-// eslint-disable-next-line react/no-multi-comp
-const TableWithRef = forwardRef<HTMLElement, Props>((props, ref) => (
-  <FixedHeaderGroupedDataTable {...props} innerRef={ref} />
-));
+FixedHeaderGroupedDataTable.displayName = 'FixedHeaderGroupedDataTable';
 
-TableWithRef.displayName = 'FixedHeaderGroupedDataTable';
-
-export default TableWithRef;
+export default FixedHeaderGroupedDataTable;
