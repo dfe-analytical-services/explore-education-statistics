@@ -7,39 +7,74 @@ const hiddenSectionClass = 'govuk-tabs__panel--hidden';
 
 describe('Tabs', () => {
   test('renders single tab correctly', () => {
-    const { container } = render(
-      <Tabs>
-        <TabsSection id="section-1" title="Tab 1">
+    const { container, getAllByText } = render(
+      <Tabs id="test-tabs">
+        <TabsSection title="Tab 1">
           <p>Test section 1 content</p>
         </TabsSection>
       </Tabs>,
     );
+
+    expect(getAllByText('Tab 1')[0]).toHaveAttribute('aria-selected', 'true');
 
     expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('renders multiple tabs correctly', () => {
-    const { container } = render(
-      <Tabs>
-        <TabsSection id="section-1" title="Tab 1">
+    const { container, getAllByText } = render(
+      <Tabs id="test-tabs">
+        <TabsSection title="Tab 1">
           <p>Test section 1 content</p>
         </TabsSection>
-        <TabsSection id="section-2" title="Tab 2">
+        <TabsSection title="Tab 2">
           <p>Test section 2 content</p>
         </TabsSection>
       </Tabs>,
     );
 
+    expect(getAllByText('Tab 1')[0]).toHaveAttribute('aria-selected', 'true');
+    expect(getAllByText('Tab 2')[0]).toHaveAttribute('aria-selected', 'false');
+
     expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('can use custom section IDs', () => {
+    const { container } = render(
+      <Tabs id="test-tabs">
+        <TabsSection title="Tab 1" id="custom-section">
+          <p>Test section 1 content</p>
+        </TabsSection>
+        <TabsSection title="Tab 2">
+          <p>Test section 2 content</p>
+        </TabsSection>
+      </Tabs>,
+    );
+
+    expect(container.querySelector('#test-tabs-1-tab')).toBeNull();
+    expect(container.querySelector('#test-tabs-1')).toBeNull();
+
+    expect(container.querySelector('#custom-section-tab')).toHaveTextContent(
+      'Tab 1',
+    );
+    expect(container.querySelector('#custom-section')).toHaveTextContent(
+      'Test section 1 content',
+    );
+
+    expect(container.querySelector('#test-tabs-2-tab')).toHaveTextContent(
+      'Tab 2',
+    );
+    expect(container.querySelector('#test-tabs-2')).toHaveTextContent(
+      'Test section 2 content',
+    );
   });
 
   test('setting `headingTag` changes section heading size', () => {
     const { container } = render(
-      <Tabs>
-        <TabsSection id="section-1" title="Tab 1">
+      <Tabs id="test-tabs">
+        <TabsSection title="Tab 1">
           <p>Test section 1 content</p>
         </TabsSection>
-        <TabsSection id="section-2" title="Tab 2" headingTag="h2">
+        <TabsSection title="Tab 2" headingTag="h2">
           <p>Test section 2 content</p>
         </TabsSection>
       </Tabs>,
@@ -54,11 +89,11 @@ describe('Tabs', () => {
 
   test('does not immediately render lazy tab section', () => {
     const { queryByText } = render(
-      <Tabs>
-        <TabsSection id="section-1" title="Tab 1">
+      <Tabs id="test-tabs">
+        <TabsSection title="Tab 1">
           <p>Test section 1 content</p>
         </TabsSection>
-        <TabsSection id="section-2" title="Tab 2" lazy>
+        <TabsSection title="Tab 2" lazy>
           <p>Test section 2 content</p>
         </TabsSection>
       </Tabs>,
@@ -70,34 +105,34 @@ describe('Tabs', () => {
 
   test('tab links match section ids', () => {
     const { getAllByText } = render(
-      <Tabs>
-        <TabsSection id="section-1" title="Tab 1">
+      <Tabs id="test-tabs">
+        <TabsSection title="Tab 1">
           <p>Test section 1 content</p>
         </TabsSection>
-        <TabsSection id="section-2" title="Tab 2">
+        <TabsSection title="Tab 2">
           <p>Test section 2 content</p>
         </TabsSection>
       </Tabs>,
     );
 
-    expect(getAllByText('Tab 1')[0]).toHaveAttribute('href', '#section-1');
-    expect(getAllByText('Tab 2')[0]).toHaveAttribute('href', '#section-2');
+    expect(getAllByText('Tab 1')[0]).toHaveAttribute('href', '#test-tabs-1');
+    expect(getAllByText('Tab 2')[0]).toHaveAttribute('href', '#test-tabs-2');
   });
 
   test('clicking tab reveals correct section', () => {
     const { getAllByText, container } = render(
-      <Tabs>
-        <TabsSection id="section-1" title="Tab 1">
+      <Tabs id="test-tabs">
+        <TabsSection title="Tab 1">
           <p>Test section 1 content</p>
         </TabsSection>
-        <TabsSection id="section-2" title="Tab 2">
+        <TabsSection title="Tab 2">
           <p>Test section 2 content</p>
         </TabsSection>
       </Tabs>,
     );
 
-    const tabSection1 = container.querySelector('#section-1') as HTMLElement;
-    const tabSection2 = container.querySelector('#section-2') as HTMLElement;
+    const tabSection1 = container.querySelector('#test-tabs-1') as HTMLElement;
+    const tabSection2 = container.querySelector('#test-tabs-2') as HTMLElement;
 
     expect(tabSection1).not.toHaveClass(hiddenSectionClass);
     expect(tabSection2).toHaveClass(hiddenSectionClass);
@@ -110,11 +145,11 @@ describe('Tabs', () => {
 
   test('clicking tab changes location hash', () => {
     const { getAllByText } = render(
-      <Tabs>
-        <TabsSection id="section-1" title="Tab 1">
+      <Tabs id="test-tabs">
+        <TabsSection title="Tab 1">
           <p>Test section 1 content</p>
         </TabsSection>
-        <TabsSection id="section-2" title="Tab 2">
+        <TabsSection title="Tab 2">
           <p>Test section 2 content</p>
         </TabsSection>
       </Tabs>,
@@ -124,16 +159,16 @@ describe('Tabs', () => {
 
     fireEvent.click(getAllByText('Tab 2')[0]);
 
-    expect(window.location.hash).toBe('#section-2');
+    expect(window.location.hash).toBe('#test-tabs-2');
   });
 
   test('clicking tab renders lazy section', () => {
     const { getAllByText, queryByText } = render(
-      <Tabs>
-        <TabsSection id="section-1" title="Tab 1">
+      <Tabs id="test-tabs">
+        <TabsSection title="Tab 1">
           <p>Test section 1 content</p>
         </TabsSection>
-        <TabsSection id="section-2" title="Tab 2" lazy>
+        <TabsSection title="Tab 2" lazy>
           <p>Test section 2 content</p>
         </TabsSection>
       </Tabs>,
@@ -156,14 +191,14 @@ describe('Tabs', () => {
 
     beforeEach(() => {
       const { getAllByText, container } = render(
-        <Tabs>
-          <TabsSection id="section-1" title="Tab 1">
+        <Tabs id="test-tabs">
+          <TabsSection title="Tab 1">
             <p>Test section 1 content</p>
           </TabsSection>
-          <TabsSection id="section-2" title="Tab 2">
+          <TabsSection title="Tab 2">
             <p>Test section 2 content</p>
           </TabsSection>
-          <TabsSection id="section-3" title="Tab 3">
+          <TabsSection title="Tab 3">
             <p>Test section 2 content</p>
           </TabsSection>
         </Tabs>,
@@ -173,9 +208,9 @@ describe('Tabs', () => {
       tab2 = getAllByText('Tab 2')[0] as HTMLAnchorElement;
       tab3 = getAllByText('Tab 3')[0] as HTMLAnchorElement;
 
-      tabSection1 = container.querySelector('#section-1') as HTMLElement;
-      tabSection2 = container.querySelector('#section-2') as HTMLElement;
-      tabSection3 = container.querySelector('#section-3') as HTMLElement;
+      tabSection1 = container.querySelector('#test-tabs-1') as HTMLElement;
+      tabSection2 = container.querySelector('#test-tabs-2') as HTMLElement;
+      tabSection3 = container.querySelector('#test-tabs-3') as HTMLElement;
     });
 
     test('pressing left arrow key moves to previous tab', () => {
@@ -187,7 +222,7 @@ describe('Tabs', () => {
       expect(tabSection1).toHaveClass(hiddenSectionClass);
       expect(tabSection2).not.toHaveClass(hiddenSectionClass);
 
-      expect(window.location.hash).toBe('#section-2');
+      expect(window.location.hash).toBe('#test-tabs-2');
 
       fireEvent.keyDown(tab2, { key: 'ArrowLeft' });
 
@@ -198,7 +233,7 @@ describe('Tabs', () => {
       expect(tabSection1).not.toHaveClass(hiddenSectionClass);
       expect(tabSection2).toHaveClass(hiddenSectionClass);
 
-      expect(window.location.hash).toBe('#section-1');
+      expect(window.location.hash).toBe('#test-tabs-1');
     });
 
     test('pressing left arrow key cycles to end of tabs', () => {
@@ -210,7 +245,7 @@ describe('Tabs', () => {
       expect(tabSection1).not.toHaveClass(hiddenSectionClass);
       expect(tabSection3).toHaveClass(hiddenSectionClass);
 
-      expect(window.location.hash).toBe('#section-1');
+      expect(window.location.hash).toBe('#test-tabs-1');
 
       fireEvent.keyDown(tab1, { key: 'ArrowLeft' });
 
@@ -221,7 +256,7 @@ describe('Tabs', () => {
       expect(tabSection1).toHaveClass(hiddenSectionClass);
       expect(tabSection3).not.toHaveClass(hiddenSectionClass);
 
-      expect(window.location.hash).toBe('#section-3');
+      expect(window.location.hash).toBe('#test-tabs-3');
     });
 
     test('pressing right arrow key moves to next tab', () => {
@@ -233,7 +268,7 @@ describe('Tabs', () => {
       expect(tabSection2).not.toHaveClass(hiddenSectionClass);
       expect(tabSection3).toHaveClass(hiddenSectionClass);
 
-      expect(window.location.hash).toBe('#section-2');
+      expect(window.location.hash).toBe('#test-tabs-2');
 
       fireEvent.keyDown(tab2, { key: 'ArrowRight' });
 
@@ -244,7 +279,7 @@ describe('Tabs', () => {
       expect(tabSection2).toHaveClass(hiddenSectionClass);
       expect(tabSection3).not.toHaveClass(hiddenSectionClass);
 
-      expect(window.location.hash).toBe('#section-3');
+      expect(window.location.hash).toBe('#test-tabs-3');
     });
 
     test('pressing right arrow key cycles to beginning of tabs', () => {
@@ -256,7 +291,7 @@ describe('Tabs', () => {
       expect(tabSection1).toHaveClass(hiddenSectionClass);
       expect(tabSection3).not.toHaveClass(hiddenSectionClass);
 
-      expect(window.location.hash).toBe('#section-3');
+      expect(window.location.hash).toBe('#test-tabs-3');
 
       fireEvent.keyDown(tab3, { key: 'ArrowRight' });
 
@@ -267,7 +302,7 @@ describe('Tabs', () => {
       expect(tabSection1).not.toHaveClass(hiddenSectionClass);
       expect(tabSection3).toHaveClass(hiddenSectionClass);
 
-      expect(window.location.hash).toBe('#section-1');
+      expect(window.location.hash).toBe('#test-tabs-1');
     });
 
     test('pressing down arrow key focuses the tab section', async () => {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { EffectCallback, useEffect, useState } from 'react';
 
 /**
  * Simple hook that returns true once a component
@@ -8,11 +8,16 @@ import { useEffect, useState } from 'react';
  * enhancing components in SSR where not all attributes
  * should be set until the client-side JS loads.
  */
-function useMounted() {
+function useMounted(effect?: EffectCallback) {
   const [isMounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+
+    if (effect) {
+      effect();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
