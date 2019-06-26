@@ -10,12 +10,13 @@ export default function mapValuesWithKeys<
   TResult
 >(
   object: T,
-  mappingFunction: (entry: [string, T[keyof T]]) => TResult,
+  mappingFunction: (key: string, value: T[keyof T]) => TResult,
 ): Dictionary<TResult> {
+  const mappedObject: Dictionary<TResult> = {};
+
   return Object.entries(object).reduce((acc, entry) => {
-    return {
-      ...acc,
-      [entry[0]]: mappingFunction(entry),
-    };
-  }, {});
+    // eslint-disable-next-line no-param-reassign
+    acc[entry[0]] = mappingFunction(entry[0], entry[1]);
+    return acc;
+  }, mappedObject);
 }

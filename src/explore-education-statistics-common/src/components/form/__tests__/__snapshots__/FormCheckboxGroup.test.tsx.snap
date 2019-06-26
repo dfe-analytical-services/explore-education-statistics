@@ -66,7 +66,7 @@ exports[`FormCheckboxGroup renders \`Select all 3 options\` button when \`select
     </legend>
     <div class="govuk-checkboxes">
       <button id="test-checkboxes-all"
-              class="button selectAll"
+              class="button noUnderline selectAll"
               type="button"
       >
         Select all 3 options

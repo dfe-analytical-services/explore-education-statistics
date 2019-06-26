@@ -11,7 +11,7 @@ describe('mapValuesWithKeys', () => {
       lastName: 'Doe',
     };
 
-    const newObj = mapValuesWithKeys(origObj, ([key]) => key.toUpperCase());
+    const newObj = mapValuesWithKeys(origObj, key => key.toUpperCase());
 
     expect(newObj).toEqual({
       firstName: 'FIRSTNAME',
@@ -25,7 +25,7 @@ describe('mapValuesWithKeys', () => {
       lastName: 'Doe',
     };
 
-    const newObj = mapValuesWithKeys(origObj, ([_, value]) =>
+    const newObj = mapValuesWithKeys(origObj, (_, value) =>
       value.toUpperCase(),
     );
 
@@ -43,7 +43,7 @@ describe('mapValuesWithKeys', () => {
 
     const newObj = mapValuesWithKeys(
       origObj,
-      ([key, value]) => `${key}(${value})`,
+      (key, value) => `${key}(${value})`,
     );
 
     expect(newObj).toEqual({

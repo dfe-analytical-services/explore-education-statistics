@@ -61,7 +61,21 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
       enableReinitialize
       ref={formikRef}
       onSubmit={async values => {
-        await onSubmit(values);
+        const locations = Object.entries(values.locations).reduce(
+          (acc, [level, levelOptions]) => {
+            if (levelOptions.length === 0) {
+              return acc;
+            }
+
+            return {
+              ...acc,
+              [level]: levelOptions,
+            };
+          },
+          {},
+        );
+
+        await onSubmit({ locations });
         goToNextStep();
       }}
       initialValues={{

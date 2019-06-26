@@ -10,12 +10,14 @@ import tableBuilderService, {
 } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
+import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageTitle from '@frontend/components/PageTitle';
 import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
 import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
+import DownloadCsvButton from './components/DownloadCsvButton';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
 import LocationFiltersForm, {
   LocationFiltersFormSubmitHandler,
@@ -147,7 +149,7 @@ class TableToolPage extends Component<Props, State> {
     this.setState({
       locations: mapValuesWithKeys(
         values.locations,
-        ([locationLevel, locations]) =>
+        (locationLevel, locations) =>
           locations.map(
             location =>
               subjectMeta.locations[locationLevel].options.find(
@@ -182,7 +184,7 @@ class TableToolPage extends Component<Props, State> {
     );
 
     this.setState({
-      filters: mapValuesWithKeys(filters, ([filterGroup, selectedFilters]) =>
+      filters: mapValuesWithKeys(filters, (filterGroup, selectedFilters) =>
         selectedFilters.map(filter => filtersByValue[filterGroup][filter]),
       ),
       indicators: indicators.map(indicator => indicatorsByValue[indicator]),
@@ -294,7 +296,7 @@ class TableToolPage extends Component<Props, State> {
 
                       {tableData.length > 0 && (
                         <>
-                          <div className="govuk-!-margin-bottom-2">
+                          <div className="govuk-!-margin-bottom-4">
                             <TimePeriodDataTable
                               filters={filters}
                               indicators={indicators}
@@ -308,25 +310,45 @@ class TableToolPage extends Component<Props, State> {
                             />
                           </div>
 
-                          <ul className="govuk-list">
-                            {publication && (
-                              <li>
-                                <a href={publication.slug}>Go to publication</a>
-                              </li>
-                            )}
-                            <li>
-                              <a href="#download">Download data (.csv)</a>
-                            </li>
-                            <li>
-                              <a href="#api">Access developer API</a>
-                            </li>
-                            <li>
-                              <a href="#methodology">Methodology</a>
-                            </li>
-                            <li>
-                              <a href="#contact">Contact</a>
-                            </li>
-                          </ul>
+                          {publication && (
+                            <>
+                              <h3>Additional options</h3>
+
+                              <ul className="govuk-list">
+                                <li>
+                                  <Link
+                                    as={`/statistics/${publication.slug}`}
+                                    to={`/statistics/publication?publication=${
+                                      publication.slug
+                                    }`}
+                                  >
+                                    Go to publication
+                                  </Link>
+                                </li>
+                                <li>
+                                  <DownloadCsvButton
+                                    publicationSlug={publication.slug}
+                                    meta={subjectMeta}
+                                    filters={filters}
+                                    indicators={indicators}
+                                    locations={locations}
+                                    timePeriods={timePeriods}
+                                    results={tableData}
+                                  />
+                                </li>
+
+                                <li>
+                                  <a href="#api">Access developer API</a>
+                                </li>
+                                <li>
+                                  <a href="#methodology">Methodology</a>
+                                </li>
+                                <li>
+                                  <a href="#contact">Contact</a>
+                                </li>
+                              </ul>
+                            </>
+                          )}
                         </>
                       )}
                     </>
