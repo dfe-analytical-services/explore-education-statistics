@@ -60,6 +60,11 @@ class DownloadIndexPage extends Component<Props> {
                 <li>
                   <Link to="/glossary">Education statistics: glossary</Link>
                 </li>
+                <li>
+                  <Link to="/methodologies">
+                    Education statistics: methodology
+                  </Link>
+                </li>
               </ul>
             </RelatedInformation>
           </div>
