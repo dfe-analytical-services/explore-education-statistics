@@ -341,7 +341,14 @@ class TableToolPage extends Component<Props, State> {
                                   <a href="#api">Access developer API</a>
                                 </li>
                                 <li>
-                                  <a href="#methodology">Methodology</a>
+                                  <Link
+                                    as={`/methodologies/${publication.slug}`}
+                                    to={`/methodologies/methodology?methodology=${
+                                      publication.slug
+                                    }`}
+                                  >
+                                    Go to methodology
+                                  </Link>
                                 </li>
                                 <li>
                                   <a href="#contact">Contact</a>
