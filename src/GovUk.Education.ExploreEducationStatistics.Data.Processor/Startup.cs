@@ -1,4 +1,5 @@
 ﻿using System;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
@@ -16,6 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         public override void Configure(IFunctionsHostBuilder builder)
         {
             builder.Services
+                .AddAutoMapper()
                 .AddMemoryCache()
                 .AddDbContext<ApplicationDbContext>(options =>
                     options.UseSqlServer(GetSqlAzureConnectionString("StatisticsDb")))

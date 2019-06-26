@@ -1,4 +1,5 @@
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 {
@@ -9,6 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
     {
         public MappingProfiles()
         {
+            CreateMap<Release, Data.Processor.Model.Release>().ForMember(dest => dest.Title,
+                opts => opts.MapFrom(release => release.ReleaseName));
         }
     }
 }

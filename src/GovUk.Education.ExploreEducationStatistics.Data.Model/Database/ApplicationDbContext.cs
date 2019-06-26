@@ -22,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<Location> Location { get; set; }
         public DbSet<Observation> Observation { get; set; }
         public DbSet<ObservationFilterItem> ObservationFilterItem { get; set; }
+        public DbSet<Publication> Publication { get; set; }
         public DbSet<Release> Release { get; set; }
         public DbSet<School> School { get; set; }
         public DbSet<Subject> Subject { get; set; }
