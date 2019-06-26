@@ -24,7 +24,9 @@ function GlossaryIndexPage() {
           <RelatedInformation>
             <ul className="govuk-list">
               <li>
-                <Link to="/methodology">Education statistics: methodology</Link>
+                <Link to="/methodologies">
+                  Education statistics: methodology
+                </Link>
               </li>
             </ul>
           </RelatedInformation>
