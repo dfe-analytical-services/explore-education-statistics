@@ -21,6 +21,7 @@ export interface Methodology {
   id: string;
   title: string;
   published: string;
+  lastUpdated: string;
   summary: string;
   publicationId: string;
   publication: Publication;
