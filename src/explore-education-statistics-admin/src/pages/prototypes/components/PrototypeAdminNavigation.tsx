@@ -6,7 +6,7 @@ interface Props {
   task?: string;
 }
 
-const PrototypeAdminNavigation = ({ sectionId, task }: Props) => {
+const PrototypeAdminNavigation = ({ sectionId }: Props) => {
   return (
     <>
       <h1 className="govuk-heading-l">

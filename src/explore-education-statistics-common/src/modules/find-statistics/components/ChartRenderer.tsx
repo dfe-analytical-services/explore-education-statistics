@@ -96,6 +96,7 @@ function ChartRenderer(props: ChartRendererProps) {
           height={height}
           width={width}
           referenceLines={referenceLines}
+          dataSets={dataSets}
         />
       );
     case 'horizontalbar':
@@ -111,6 +112,7 @@ function ChartRenderer(props: ChartRendererProps) {
           width={width}
           stacked={stacked}
           referenceLines={referenceLines}
+          dataSets={dataSets}
         />
       );
     case 'map':

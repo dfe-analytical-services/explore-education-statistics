@@ -1,6 +1,5 @@
 import {
   Axis,
-  ChartDataGroup,
   ChartDataSet,
   ChartType,
   ReferenceLine,
@@ -18,8 +17,10 @@ import {
 import {
   DataBlockData,
   DataBlockMetadata,
+  Result,
 } from '@common/services/dataBlockService';
 import difference from 'lodash/difference';
+import { Dictionary } from '@common/types';
 
 export interface ChartProps {
   data: DataBlockData;
@@ -33,6 +34,18 @@ export interface ChartProps {
   height?: number;
   width?: number;
   referenceLines?: ReferenceLine[];
+}
+
+export interface ChartData {
+  name: string;
+  data?: ChartData[];
+  value?: string;
+}
+
+export interface DataSetResult {
+  dataSet: ChartDataSet;
+
+  results: Result[];
 }
 
 export interface ChartDefinition {
@@ -148,7 +161,7 @@ const ChartFunctions = {
     return referenceLines.map(generateReferenceLine);
   },
 
-  filterData(data: DataBlockData, sourceAxis: Axis) {
+  filterDataByAxis(data: DataBlockData, sourceAxis: Axis) {
     return data.result.filter(result => {
       return (
         sourceAxis.key &&
@@ -157,6 +170,124 @@ const ChartFunctions = {
       );
     });
   },
+
+  filterResultsByDataSet(dataSets: ChartDataSet[], results: Result[]) {
+    return dataSets.map(dataSet => {
+      return {
+        dataSet,
+        results: results.filter(
+          r =>
+            Object.keys(r.measures).includes(dataSet.indicator) &&
+            (dataSet.filters &&
+              difference(r.filters, dataSet.filters).length === 0),
+        ),
+      };
+    });
+  },
+
+  groupByYear(
+    dataSet: ChartDataSet,
+    results: Result[],
+    meta: DataBlockMetadata,
+  ) {
+    return results.reduce<ChartData[]>((cd, result) => {
+      let name = `${result.year}_${result.timeIdentifier}`;
+
+      name =
+        (meta.timePeriods &&
+          meta.timePeriods[name] &&
+          meta.timePeriods[name].label) ||
+        name;
+
+      return [
+        ...cd,
+        {
+          name,
+          value: result.measures[dataSet.indicator],
+        },
+      ];
+    }, []);
+  },
+
+  generateDataGroupedByIndicators(
+    dataSetResults: DataSetResult[],
+    meta: DataBlockMetadata,
+  ) {
+    return dataSetResults.reduce<ChartData[]>((cd, { dataSet, results }) => {
+      return [
+        ...cd,
+
+        {
+          name: dataSet.indicator,
+          data: ChartFunctions.groupByYear(dataSet, results, meta),
+        },
+      ];
+    }, []);
+  },
+
+  flattenChartDataItem(chartData: ChartData) {
+    return (chartData.data || []).reduce(
+      (cd, next) => ({
+        ...cd,
+        [next.name]: [next.value],
+      }),
+      {
+        name: chartData.name,
+      },
+    );
+  },
+
+  flattenChartData(chartData: ChartData[]) {
+    return chartData.map(cd => ChartFunctions.flattenChartDataItem(cd));
+  },
+
+  generateDataGroupedByGroups(
+    dataSetResults: DataSetResult[],
+    meta: DataBlockMetadata,
+  ): ChartData[] {
+    const chartMap = dataSetResults.reduce<Dictionary<ChartData[]>>(
+      (chartDataMap, { dataSet, results }) => {
+        const currentIndicator = dataSet.indicator;
+        const newChartDataMap = { ...chartDataMap };
+
+        results.forEach(result => {
+          const dataKey = `${result.year}_${result.timeIdentifier}`;
+
+          newChartDataMap[dataKey] = [
+            ...(newChartDataMap[dataKey] || []),
+            {
+              name: currentIndicator,
+              value: result.measures[currentIndicator],
+            },
+          ];
+        }, {});
+
+        return newChartDataMap;
+      },
+      {},
+    );
+
+    return Object.entries(chartMap).map(([key, value]) => {
+      return {
+        name:
+          (meta.timePeriods &&
+            meta.timePeriods[key] &&
+            meta.timePeriods[key].label) ||
+          key,
+        data: value,
+
+        ...value.reduce((values, v) => {
+          return {
+            ...values,
+            [v.name]: v.value,
+          };
+        }, {}),
+      };
+    });
+  },
+
+  flattenGroupedData() //Chart
+  {},
 };
 
 export default ChartFunctions;

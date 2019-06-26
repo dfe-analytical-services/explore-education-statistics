@@ -1,4 +1,5 @@
 import ChartFunctions, {
+  ChartData,
   ChartDefinition,
   ChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
@@ -54,12 +55,33 @@ export default class HorizontalBarBlock extends Component<
       yAxis,
       stacked,
       indicators,
+      dataSets,
     } = this.props;
+
+    if (dataSets === undefined) return <div />;
+
+    const chartData: ChartData[] = ChartFunctions.generateDataGroupedByGroups(
+      ChartFunctions.filterResultsByDataSet(dataSets, data.result),
+      meta,
+    );
+
+    const chartKeys: Set<string> = chartData.reduce(
+      (keys: Set<string>, next) => {
+        return new Set([
+          ...Array.from(keys),
+          ...(next.data || []).map(({ name }) => name),
+        ]);
+      },
+      new Set<string>(),
+    );
+
+    /*
 
     const chartData = data.result.map(({ measures, year, timeIdentifier }) => ({
       name: `${meta.timePeriods[`${year}_${timeIdentifier}`].label}`,
       ...measures,
     }));
+     */
 
     return (
       <ResponsiveContainer width={width || '100%'} height={height || 600}>
@@ -80,18 +102,16 @@ export default class HorizontalBarBlock extends Component<
           <Tooltip cursor={false} />
           <Legend />
 
-          {indicators.map((dataKey, index) => {
-            return (
-              <Bar
-                key={dataKey}
-                dataKey={dataKey}
-                name={(meta && meta.indicators[dataKey].label) || 'a'}
-                fill={colours[index]}
-                stackId={stacked ? 'a' : undefined}
-                isAnimationActive={false}
-              />
-            );
-          })}
+          {Array.from(chartKeys).map((dataKey, index) => (
+            <Bar
+              key={dataKey}
+              dataKey={dataKey}
+              fill={colours[index]}
+              name={meta.indicators[dataKey].label || 'a'}
+              unit={meta.indicators[dataKey].unit || 'a'}
+              stackId={stacked ? 'a' : undefined}
+            />
+          ))}
 
           {referenceLines &&
             ChartFunctions.generateReferenceLines(referenceLines)}

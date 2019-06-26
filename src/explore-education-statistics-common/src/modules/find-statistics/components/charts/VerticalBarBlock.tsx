@@ -1,6 +1,8 @@
 import ChartFunctions, {
+  ChartData,
   ChartDefinition,
   ChartProps,
+  DataSetResult,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React, { Component } from 'react';
 import {
@@ -38,11 +40,24 @@ export default class VerticalBarBlock extends Component<ChartProps> {
   };
 
   public render() {
-    const { data, indicators, height, xAxis, yAxis, width, meta } = this.props;
-    const chartData = data.result.map(({ measures, year, timeIdentifier }) => ({
-      name: `${meta.timePeriods[`${year}_${timeIdentifier}`].label}`,
-      ...measures,
-    }));
+    const { data, height, xAxis, yAxis, width, meta, dataSets } = this.props;
+
+    if (dataSets === undefined) return <div />;
+
+    const chartData: ChartData[] = ChartFunctions.generateDataGroupedByGroups(
+      ChartFunctions.filterResultsByDataSet(dataSets, data.result),
+      meta,
+    );
+
+    const chartKeys: Set<string> = chartData.reduce(
+      (keys: Set<string>, next) => {
+        return new Set([
+          ...Array.from(keys),
+          ...(next.data || []).map(({ name }) => name),
+        ]);
+      },
+      new Set<string>(),
+    );
 
     return (
       <ResponsiveContainer width={width || 900} height={height || 300}>
@@ -53,7 +68,7 @@ export default class VerticalBarBlock extends Component<ChartProps> {
           {ChartFunctions.calculateXAxis(xAxis, {
             interval: 0,
             tick: { fontSize: 12 },
-            dataKey: (xAxis.key || ['name'])[0],
+            dataKey: 'name',
           })}
 
           <CartesianGrid />
@@ -63,17 +78,15 @@ export default class VerticalBarBlock extends Component<ChartProps> {
           <Tooltip />
           <Legend />
 
-          {indicators.map((dataKey, index) => {
-            return (
-              <Bar
-                key={dataKey}
-                dataKey={dataKey}
-                fill={colours[index]}
-                name={(meta && meta.indicators[dataKey].label) || 'a'}
-                isAnimationActive={false}
-              />
-            );
-          })}
+          {Array.from(chartKeys).map((dataKey, index) => (
+            <Bar
+              key={dataKey}
+              dataKey={dataKey}
+              fill={colours[index]}
+              name={meta.indicators[dataKey].label || 'a'}
+              unit={meta.indicators[dataKey].unit || 'a'}
+            />
+          ))}
         </BarChart>
       </ResponsiveContainer>
     );

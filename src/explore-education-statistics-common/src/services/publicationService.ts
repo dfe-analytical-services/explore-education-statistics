@@ -58,7 +58,7 @@ export interface ChartDataSet {
   indicator: string;
   filters?: string[];
   location?: string[];
-  timePeriod?: boolean;
+  timePeriod?: string;
 }
 
 export interface Chart {

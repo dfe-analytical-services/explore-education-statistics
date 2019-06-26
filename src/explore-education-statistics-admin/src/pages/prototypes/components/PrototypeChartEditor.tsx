@@ -11,11 +11,13 @@ import DataBlockService, {
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import ChartDataSelector from '@admin/pages/prototypes/components/graph-builder/ChartDataSelector';
+import ChartDataSelector, {
+  DataAddedEvent,
+} from '@admin/pages/prototypes/components/graph-builder/ChartDataSelector';
+import { ChartDataSet } from '@common/services/publicationService';
 import styles from './graph-builder/graph-builder.module.scss';
 import ConstData from '../PrototypeData';
 import ChartTypeSelector from './graph-builder/ChartTypeSelector';
-import { ChartDataSet } from '@common/services/publicationService';
 
 /**
  * TODO:
@@ -122,21 +124,10 @@ const PrototypeChartEditor = (props: {}) => {
 
   const [indicators, setIndicators] = React.useState<string[]>([]);
 
-  const onDataAddedToChart = ({
-    filters,
-    indicator,
-  }: {
-    filters: string[];
-    indicator: string;
-  }) => {
-    setDataSets([
-      ...dataSets,
-      {
-        indicator,
-        filters,
-      },
-    ]);
-    setIndicators([...indicators, indicator]);
+  const onDataAddedToChart = (data: DataAddedEvent[]) => {
+    const newDataSets = data;
+
+    setDataSets(newDataSets);
   };
 
   if (Data === undefined) return <div />;
@@ -166,7 +157,7 @@ const PrototypeChartEditor = (props: {}) => {
           </Details>
           <Details summary="Add data to chart" open>
             <ChartDataSelector
-              onDataAdded={onDataAddedToChart}
+              onDataUpdated={data => onDataAddedToChart(data)}
               metaData={Data.metaData}
               indicatorIds={indicatorIds}
               filterIds={filterIdCombinations}

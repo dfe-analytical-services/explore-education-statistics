@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormSelect, FormGroup, FormFieldset } from '@common/components/form';
+import { FormSelect, FormFieldset } from '@common/components/form';
 import PrototypeAdminExampleTables from './components/PrototypeAdminExampleTables';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
