@@ -2721,6 +2721,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("caa8e56f-41d2-4129-a5c3-53b051134bd7"),
                     Title = "Pupil absence statistics: methodology",
                     Published = new DateTime(2018, 3, 22),
+                    LastUpdated = new DateTime(2019, 6, 26),
                     Summary = "Find out about the methodology behind pupil absence statistics and data and how and why they're collected and published.",
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Content = new List<ContentSection>
