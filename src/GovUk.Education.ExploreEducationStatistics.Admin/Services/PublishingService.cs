@@ -58,6 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var message = new PublishReleaseDataMessage
             {
                 PublicationSlug = release.Publication.Slug,
+                ReleasePublished = release.Published ?? DateTime.UtcNow,
                 ReleaseSlug = release.Slug
             };
 

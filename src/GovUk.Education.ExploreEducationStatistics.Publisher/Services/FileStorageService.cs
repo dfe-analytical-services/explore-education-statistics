@@ -1,5 +1,8 @@
+using System;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
@@ -28,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _publicStorageConnectionString = config.GetConnectionString("PublicStorage");
         }
 
-        public async Task CopyReleaseToPublicContainer(string publication, string release)
+        public async Task CopyReleaseToPublicContainer(PublishReleaseDataMessage message)
         {
             var privateStorageAccount = CloudStorageAccount.Parse(_privateStorageConnectionString);
             var publicStorageAccount = CloudStorageAccount.Parse(_publicStorageConnectionString);
@@ -39,14 +42,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var privateContainer = privateBlobClient.GetContainerReference(PrivateContainerName);
             var publicContainer = publicBlobClient.GetContainerReference(PublicContainerName);
 
-            var sourceDirectoryAddress = $"{publication}/{release}";
+            var sourceDirectoryAddress = $"{message.PublicationSlug}/{message.ReleaseSlug}";
             var destinationDirectoryAddress = sourceDirectoryAddress;
             await CopyDirectoryAsync(sourceDirectoryAddress, destinationDirectoryAddress, privateContainer,
-                publicContainer);
+                publicContainer, message.ReleasePublished);
         }
 
         private async Task CopyDirectoryAsync(string sourceDirectoryAddress, string destinationDirectoryAddress,
-            CloudBlobContainer sourceContainer, CloudBlobContainer destinationContainer)
+            CloudBlobContainer sourceContainer, CloudBlobContainer destinationContainer, DateTime releasePublished)
         {
             var sourceDirectory = sourceContainer.GetDirectoryReference(sourceDirectoryAddress);
             var destinationDirectory = destinationContainer.GetDirectoryReference(destinationDirectoryAddress);
@@ -64,6 +67,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 var path = (source as CloudBlockBlob)?.Name;
                 return path != null && _searchPatternRegex.IsMatch(path);
+            };
+
+            context.SetAttributesCallbackAsync += async destination =>
+            {
+                var releasePublishedString = releasePublished.ToString("o", CultureInfo.InvariantCulture);
+                (destination as CloudBlockBlob)?.Metadata.Add("releasedatetime", releasePublishedString);
             };
 
             await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory, false, options, context);
