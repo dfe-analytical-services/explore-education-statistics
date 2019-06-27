@@ -4,7 +4,7 @@ import { Route } from 'react-router';
 import './App.scss';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 import { BrowserRouter } from 'react-router-dom';
-import AdminDashboardPage from './pages/prototypes/PrototypeAdminDashboard';
+import AdminDashboardPage from './pages/AdminDashboard';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
 
@@ -26,15 +26,22 @@ import PublicationCreateNewAbsenceSchedule from './pages/prototypes/PrototypePub
 import PublicationCreateNewAbsenceScheduleEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceScheduleEdit';
 import PublicationCreateNewAbsenceStatus from './pages/prototypes/PrototypePublicationPageNewAbsenceStatus';
 import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
+import IndexPage from './pages/IndexPage';
 
 import { LoginContext } from './components/Login';
 
 function App() {
   return (
     <BrowserRouter>
-      <Route exact path="/" component={PrototypesIndexPage} />
+      <Route exact path="/" component={IndexPage} />
 
-      <LoginContext.Provider value={PrototypeLoginService.getUser('user1')}>
+      <LoginContext.Provider
+        value={PrototypeLoginService.getAuthentication('user1')}
+      >
+        {/* Non-Prototype Routes*/}
+        <Route exact path="/admin-dashboard" component={AdminDashboardPage} />
+
+        {/* Prototype Routes*/}
         <Route exact path="/prototypes/" component={PrototypesIndexPage} />
 
         <Route
@@ -42,6 +49,7 @@ function App() {
           path="/prototypes/admin-dashboard"
           component={AdminDashboardPage}
         />
+
         <Route
           exact
           path="/prototypes/publication-edit"

@@ -1,4 +1,4 @@
-import DashboardRelease from '@admin/pages/prototypes/components/DashboardRelease';
+import PrototypeDashboardRelease from '@admin/pages/prototypes/components/PrototypeDashboardRelease';
 import React from 'react';
 
 const AdminDashboardReadyForApproval = () => {
@@ -23,7 +23,7 @@ const AdminDashboardReadyForApproval = () => {
           <h3 className="govuk-heading-m">
             Pupil absence statistics and data for schools in England
           </h3>
-          <DashboardRelease
+          <PrototypeDashboardRelease
             title="Academic year,"
             years="2018 to 2019"
             tag="Ready to review"
