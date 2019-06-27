@@ -120,12 +120,12 @@ Object {
   },
   "publicationId": "test",
   "releaseDate": Object {},
-  "releaseId": 1,
+  "releaseId": "1",
   "result": Array [
     Object {
       "filters": Array [
-        1,
-        2,
+        "1",
+        "2",
       ],
       "location": Object {
         "country": Object {
@@ -156,8 +156,8 @@ Object {
     },
     Object {
       "filters": Array [
-        1,
-        2,
+        "1",
+        "2",
       ],
       "location": Object {
         "country": Object {

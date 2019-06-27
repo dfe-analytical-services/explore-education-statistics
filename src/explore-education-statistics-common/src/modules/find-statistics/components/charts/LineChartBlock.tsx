@@ -2,7 +2,6 @@ import ChartFunctions, {
   ChartData,
   ChartDefinition,
   ChartProps,
-  DataSetResult,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import React, { Component } from 'react';
@@ -19,9 +18,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import difference from 'lodash/difference';
-import { Result } from '@common/services/dataBlockService';
-import { ChartDataSet } from '@common/services/publicationService';
 import { colours, symbols } from './Charts';
 
 const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
@@ -79,7 +75,7 @@ export default class LineChartBlock extends Component<ChartProps> {
   public render() {
     const { data, height, xAxis, yAxis, labels, meta, dataSets } = this.props;
 
-    const timePeriods = meta.timePeriods || {};
+    // const timePeriods = meta.timePeriods || {};
 
     const chartData: ChartData[] = ChartFunctions.generateDataGroupedByIndicators(
       // @ts-ignore

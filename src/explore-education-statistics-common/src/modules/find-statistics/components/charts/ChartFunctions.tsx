@@ -284,9 +284,6 @@ const ChartFunctions = {
       };
     });
   },
-
-  flattenGroupedData() //Chart
-  {},
 };
 
 export default ChartFunctions;

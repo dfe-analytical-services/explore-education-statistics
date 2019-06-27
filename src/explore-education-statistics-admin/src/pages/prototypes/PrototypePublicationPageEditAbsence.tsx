@@ -1,4 +1,3 @@
-import { Release } from '@common/services/publicationService';
 import React, { Component } from 'react';
 import PrototypePublicationService from '@admin/pages/prototypes/components/PrototypePublicationService';
 import EditablePublicationPage from '@admin/pages/prototypes/components/EditablePublicationPage';
@@ -20,7 +19,7 @@ class PublicationPage extends Component<{}, State> {
   public async componentDidMount() {
     // const publication = 'pupil-absence-in-schools-in-england';
 
-    //const request = PrototypePublicationService.getLatestPublicationRelease(
+    // const request = PrototypePublicationService.getLatestPublicationRelease(
     // publication,
     // );
 

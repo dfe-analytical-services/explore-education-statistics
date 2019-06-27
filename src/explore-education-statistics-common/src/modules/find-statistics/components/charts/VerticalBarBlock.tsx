@@ -2,7 +2,6 @@ import ChartFunctions, {
   ChartData,
   ChartDefinition,
   ChartProps,
-  DataSetResult,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React, { Component } from 'react';
 import {
