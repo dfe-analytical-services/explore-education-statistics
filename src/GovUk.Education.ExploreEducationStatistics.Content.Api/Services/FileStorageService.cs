@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
@@ -7,13 +8,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using MimeTypes;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {
     public class FileStorageService : IFileStorageService
     {
+        [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private enum FileSizeUnit : byte
         {
             B,
@@ -24,15 +25,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
         }
 
         private readonly string _storageConnectionString;
-        private readonly ILogger _logger;
 
-        private const string containerName = "downloads";
+        private const string ContainerName = "downloads";
 
-        public FileStorageService(IConfiguration config,
-            ILogger<FileStorageService> logger)
+        public FileStorageService(IConfiguration config)
         {
-            _logger = logger;
-            _storageConnectionString = config.GetConnectionString("AzureStorage");
+            _storageConnectionString = config.GetConnectionString("PublicStorage");
         }
 
         public IEnumerable<FileInfo> ListFiles(string publication, string release)
@@ -40,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
 
             var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(containerName);
+            var blobContainer = blobClient.GetContainerReference(ContainerName);
             blobContainer.CreateIfNotExists();
 
             return blobContainer.ListBlobs($"{publication}/{release}", true, BlobListingDetails.Metadata)
@@ -73,7 +71,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         private static string GetExtension(CloudBlob blob)
         {
-            return MimeTypeMap.GetExtension(blob.Properties.ContentType).TrimStart('.');
+            var contentType = blob.Properties.ContentType;
+            contentType = contentType.Replace("; charset=utf-8", "");
+            return MimeTypeMap.GetExtension(contentType).TrimStart('.');
         }
 
         private static string GetName(CloudBlob blob)

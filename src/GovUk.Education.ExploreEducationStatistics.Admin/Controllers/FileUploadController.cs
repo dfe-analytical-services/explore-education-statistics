@@ -16,12 +16,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IFileStorageService _fileStorageService;
+        private readonly IImportService _importService;
 
         public FileUploadController(ApplicationDbContext context,
-            IFileStorageService fileStorageService)
+            IFileStorageService fileStorageService,
+            IImportService importService)
         {
             _context = context;
             _fileStorageService = fileStorageService;
+            _importService = importService;
         }
 
         public IActionResult Upload()
@@ -41,6 +44,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 
             await _fileStorageService.UploadFilesAsync(release.Publication.Slug, release.Slug, file, metaFile, name);
 
+            _importService.Import(file.FileName, release.Id);
+            
             return RedirectToAction("List", "File");
         }
     }

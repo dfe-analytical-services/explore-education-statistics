@@ -37,7 +37,7 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
           </RelatedInformation>
         </div>
       </div>
-      <Tabs>
+      <Tabs id="publicationTabs">
         <TabsSection id="publications" title="Publications">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-0">
             {DummyPublicationsData.publications[0].topic.theme.title},{' '}

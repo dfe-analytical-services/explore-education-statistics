@@ -10,6 +10,8 @@
 
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="8.1.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.1.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.6.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="MediaTypeMap" Version="2.1.0" />
@@ -91,11 +93,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Processor.Model\GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Publisher.Model\GovUk.Education.ExploreEducationStatistics.Publisher.Model.csproj" />
   </ItemGroup>
 
 
   <ItemGroup>
-    <Folder Include="ViewModels" />
     <Folder Include="Views\Import" />
   </ItemGroup>
 

@@ -207,7 +207,7 @@ class PublicationReleasePage extends Component<Props> {
               <nav role="navigation" aria-labelledby="related-content">
                 <ul className="govuk-list">
                   <li>
-                    <Link to={`/methodology/${data.publication.slug}`}>
+                    <Link to={`/methodologies/${data.publication.slug}`}>
                       {`${data.publication.title}: methodology`}
                     </Link>
                   </li>
@@ -256,7 +256,7 @@ class PublicationReleasePage extends Component<Props> {
           >
             <p>
               Read our{' '}
-              <Link to={`/methodology/${data.publication.slug}`}>
+              <Link to={`/methodologies/${data.publication.slug}`}>
                 {`${data.publication.title}: methodology`}
               </Link>{' '}
               guidance.

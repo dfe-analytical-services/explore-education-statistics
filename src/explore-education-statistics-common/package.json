@@ -36,6 +36,7 @@
     "geojson": "^0.5.0",
     "govuk-frontend": "^2.12.0",
     "identity-obj-proxy": "^3.0.0",
+    "immer": "^3.1.3",
     "jest": "^24.8.0",
     "jest-dom": "^3.4.0",
     "jest-junit": "^6.4.0",
@@ -59,6 +60,7 @@
     "recharts": "^1.6.2",
     "stylelint": "^10.0.1",
     "typescript": "^3.5.1",
+    "use-immer": "^0.3.2",
     "yup": "^0.27.0"
   },
   "scripts": {
@@ -89,8 +91,8 @@
       "<rootDir>/test/setupTests.js"
     ],
     "testMatch": [
-      "<rootDir>/src/**/*.(spec|test).(tsx)",
-      "<rootDir>/test/**/*.(spec|test).(tsx)"
+      "<rootDir>/src/**/(*.)(spec|test).{js,jsx,ts,tsx}",
+      "<rootDir>/test/**/(*.)(spec|test).{js,jsx,ts,tsx}"
     ],
     "testPathIgnorePatterns": [
       "node_modules",

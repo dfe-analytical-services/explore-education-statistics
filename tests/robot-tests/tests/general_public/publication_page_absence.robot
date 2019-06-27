@@ -53,16 +53,16 @@ Validate "About these statistics" -- "For school year"
 
 Validate "About these statistics" -- "Last updated"
     [Tags]     HappyPath
-    user checks element contains  css:[data-testid="last-updated"] time     19 April 2017
+    user checks element contains  css:[data-testid="last-updated"] time     19 April 2018
 
 #    user clicks details   css:[data-testid="See all 2 updates"]
     user clicks element containing text   See all 2 updates
 #    element attribute value should be  css:[data-testid="See all 2 updates"] summary   aria-expanded   true
 
-    user checks element contains  css:[data-testid="last-updated-element"]:nth-child(1) time   19 April 2017
+    user checks element contains  css:[data-testid="last-updated-element"]:nth-child(1) time   19 April 2018
     user checks element contains  css:[data-testid="last-updated-element"]:nth-child(1) p   Underlying data file updated to include absence data
 
-    user checks element contains  css:[data-testid="last-updated-element"]:nth-child(2) time   22 March 2017
+    user checks element contains  css:[data-testid="last-updated-element"]:nth-child(2) time   22 March 2018
     user checks element contains  css:[data-testid="last-updated-element"]:nth-child(2) p   First published.
 
 #    user clicks details   css:[data-testid="See all 2 updates"]

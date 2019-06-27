@@ -65,7 +65,7 @@ class FindStatisticsPage extends Component<Props> {
             <RelatedInformation>
               <ul className="govuk-list">
                 <li>
-                  <Link to="/methodology">
+                  <Link to="/methodologies">
                     Education statistics: methodology
                   </Link>
                 </li>

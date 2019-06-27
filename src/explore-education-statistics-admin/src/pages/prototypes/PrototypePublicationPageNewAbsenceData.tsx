@@ -22,7 +22,7 @@ const PublicationDataPage = () => {
       ]}
     >
       <PrototypeAdminNavigation sectionId="addData" />
-      <Tabs>
+      <Tabs id="dataUploadTab">
         <TabsSection id="data-upload" title="Data uploads">
           <div className="govuk-table">
             <caption className="govuk-table__caption govuk-heading-m">

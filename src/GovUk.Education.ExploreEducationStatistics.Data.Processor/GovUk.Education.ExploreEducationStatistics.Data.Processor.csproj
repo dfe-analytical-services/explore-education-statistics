@@ -3,25 +3,17 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AzureFunctionsVersion>v2</AzureFunctionsVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
-  </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="8.1.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.1.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="3.0.4" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.26" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="3.0.0" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.28" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Importer\GovUk.Education.ExploreEducationStatistics.Data.Importer.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model\GovUk.Education.ExploreEducationStatistics.Data.Model.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Processor.Model\GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

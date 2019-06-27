@@ -57,7 +57,7 @@ function HomePage() {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-half">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="/methodology">Education statistics: methodology</Link>
+            <Link to="/methodologies">Education statistics: methodology</Link>
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">
             Browse to find out more about the methodology behind education

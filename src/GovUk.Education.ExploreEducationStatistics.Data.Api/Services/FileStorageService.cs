@@ -7,22 +7,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class FileStorageService : IFileStorageService
     {
         private readonly string _storageConnectionString;
-        private readonly ILogger _logger;
 
-        private const string containerName = "downloads";
+        private const string ContainerName = "downloads";
 
-        public FileStorageService(IConfiguration config,
-            ILogger<FileStorageService> logger)
+        public FileStorageService(IConfiguration config)
         {
-            _logger = logger;
-            _storageConnectionString = config.GetConnectionString("AzureStorage");
+            _storageConnectionString = config.GetConnectionString("PublicStorage");
         }
 
         public bool FileExistsAndIsReleased(string publication, string release, string filename)
@@ -30,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
 
             var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(containerName);
+            var blobContainer = blobClient.GetContainerReference(ContainerName);
             var blob = blobContainer.GetBlockBlobReference($"{publication}/{release}/{filename}");
 
             return blob.Exists() && IsFileReleased(blob);
@@ -41,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
 
             var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(containerName);
+            var blobContainer = blobClient.GetContainerReference(ContainerName);
             var blob = blobContainer.GetBlockBlobReference($"{publication}/{release}/{filename}");
 
             if (!blob.Exists())

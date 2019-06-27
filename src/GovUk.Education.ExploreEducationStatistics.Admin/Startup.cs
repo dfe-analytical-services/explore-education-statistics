@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+﻿using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
@@ -41,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
+            services.AddAutoMapper();
             services.AddMvc(options =>
                 {
                     var policy = new AuthorizationPolicyBuilder()
@@ -64,8 +66,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             });
 
             services.AddTransient<IFileStorageService, FileStorageService>();
-            services.AddTransient<INotificationService, NotificationService>();
             services.AddTransient<IImportService, ImportService>();
+            services.AddTransient<INotificationsService, NotificationsService>();
+            services.AddTransient<IPublishingService, PublishingService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -123,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 if (env.IsDevelopment())
                 {
                     spa.Options.SourcePath = "../explore-education-statistics-admin";
-                    spa.UseReactDevelopmentServer(npmScript: "start");
+                    spa.UseReactDevelopmentServer("start");
                 }
             });
         }

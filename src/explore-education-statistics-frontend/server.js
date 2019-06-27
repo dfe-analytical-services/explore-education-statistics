@@ -58,8 +58,13 @@ async function startServer(port = process.env.PORT || 3000) {
           'https://www.google-analytics.com/',
           'https://insights.hotjar.com',
           'https://static.hotjar.com',
+          'https://script.hotjar.com',
         ],
-        fontSrc: ["'self'", 'https://static.hotjar.com'],
+        fontSrc: [
+          "'self'",
+          'https://static.hotjar.com',
+          'https://script.hotjar.com',
+        ],
         connectSrc:
           process.env.NODE_ENV !== 'production' ? ['*'] : cspConnectSrc,
         frameSrc: ["'self'", 'https://vars.hotjar.com '],
@@ -103,6 +108,13 @@ async function startServer(port = process.env.PORT || 3000) {
 
   server.get('/statistics/:publication/:release?', (req, res) => {
     return app.render(req, res, '/statistics/publication', {
+      publication: req.params.publication,
+      release: req.params.release,
+    });
+  });
+
+  server.get('/methodologies/:publication/:release?', (req, res) => {
+    return app.render(req, res, '/methodologies/methodology', {
       publication: req.params.publication,
       release: req.params.release,
     });

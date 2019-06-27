@@ -293,7 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private static Mat GetMat(IReadOnlyList<string> line,
             List<string> headers)
         {
-            var columns = new[] {"mat_id", "mat_name"};
+            var columns = new[] {"trust_id", "trust_name"};
             return CsvUtil.BuildType(line, headers, columns, values =>
                 new Mat(values[0], values[1]));
         }

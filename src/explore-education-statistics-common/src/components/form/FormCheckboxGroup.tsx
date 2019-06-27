@@ -138,6 +138,7 @@ export class BaseFormCheckboxGroup extends PureComponent<
             id={`${id}-all`}
             onClick={this.handleAllChange}
             className={styles.selectAll}
+            underline={false}
           >
             {isAllChecked ? 'Unselect' : 'Select'} all {options.length} options
           </ButtonText>

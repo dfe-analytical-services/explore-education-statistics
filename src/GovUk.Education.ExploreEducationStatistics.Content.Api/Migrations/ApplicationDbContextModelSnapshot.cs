@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -230,6 +230,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 
                     b.Property<string>("Content");
 
+                    b.Property<DateTime?>("LastUpdated");
+
                     b.Property<Guid>("PublicationId");
 
                     b.Property<DateTime?>("Published");
@@ -251,10 +253,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                             Id = new Guid("caa8e56f-41d2-4129-a5c3-53b051134bd7"),
                             Annexes = "[{\"Order\":1,\"Heading\":\"Annex A - Glossary\",\"Caption\":\"\",\"Content\":[]},{\"Order\":2,\"Heading\":\"Annex B - Calculations\",\"Caption\":\"\",\"Content\":[]},{\"Order\":3,\"Heading\":\"Annex C - School attendance codes\",\"Caption\":\"\",\"Content\":[]},{\"Order\":4,\"Heading\":\"Annex D - Links to pupil absence national statistics and data\",\"Caption\":\"\",\"Content\":[]},{\"Order\":5,\"Heading\":\"Annex E - Standard breakdowns\",\"Caption\":\"\",\"Content\":[]},{\"Order\":6,\"Heading\":\"Annex F - Timeline\",\"Caption\":\"\",\"Content\":[]}]",
                             Content = "[{\"Order\":1,\"Heading\":\"1. Overview of absence statistics\",\"Caption\":\"\",\"Content\":[]},{\"Order\":2,\"Heading\":\"2. National Statistics badging\",\"Caption\":\"\",\"Content\":[]},{\"Order\":3,\"Heading\":\"3. Methodology\",\"Caption\":\"\",\"Content\":[]},{\"Order\":4,\"Heading\":\"4. Data collection\",\"Caption\":\"\",\"Content\":[]},{\"Order\":5,\"Heading\":\"5. Data processing\",\"Caption\":\"\",\"Content\":[]},{\"Order\":6,\"Heading\":\"6. Data quality\",\"Caption\":\"\",\"Content\":[]},{\"Order\":7,\"Heading\":\"7. Contacts\",\"Caption\":\"\",\"Content\":[]}]",
+                            LastUpdated = new DateTime(2019, 6, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             Published = new DateTime(2018, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Summary = "Find out about the methodology behind pupil absence statistics and data and how and why they're collected and published.",
                             Title = "Pupil absence statistics: methodology"
+                        },
+                        new
+                        {
+                            Id = new Guid("8ab41234-cc9d-4b3d-a42c-c9fce7762719"),
+                            Annexes = "[]",
+                            Content = "[]",
+                            PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
+                            Published = new DateTime(2018, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Summary = "",
+                            Title = "School application statistics: methodology"
+                        },
+                        new
+                        {
+                            Id = new Guid("c8c911e3-39c1-452b-801f-25bb79d1deb7"),
+                            Annexes = "[]",
+                            Content = "[]",
+                            PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
+                            Published = new DateTime(2018, 8, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Summary = "",
+                            Title = "Pupil exclusion statistics: methodology"
                         });
                 });
 

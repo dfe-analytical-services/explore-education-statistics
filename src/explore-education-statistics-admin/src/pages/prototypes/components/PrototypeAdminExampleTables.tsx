@@ -23,7 +23,7 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
 
   return (
     <div className="govuk-width-container">
-      <Tabs>
+      <Tabs id="tablePreviewTab">
         <TabsSection id="table-preview" title="Table preview">
           <PrototypeTableContent table={table} task={task} />
         </TabsSection>

@@ -136,7 +136,7 @@ describe('DataBlock', () => {
 
     expect(getDataBlockForSubject).toBeCalledWith(dataBlockRequest);
 
-    expect(container.querySelector('table')).toMatchSnapshot();
+    expect(container.querySelector('#test-datablock-table')).toMatchSnapshot();
   });
 
   test('renders summary', async () => {
@@ -148,7 +148,7 @@ describe('DataBlock', () => {
 
     const { container } = render(
       <DataBlock
-        id="test"
+        id="test-datablock"
         type="databock"
         dataBlockRequest={dataBlockRequest}
         showTables={false}
@@ -168,11 +168,11 @@ describe('DataBlock', () => {
     expect(getDataBlockForSubject).toBeCalledWith(dataBlockRequest);
 
     expect(
-      container.querySelector('#datablock_test_summary'),
+      container.querySelector('#test-datablock-summary'),
     ).toMatchSnapshot();
   });
 
-  test('datablock renders map', async () => {
+  test('renders map instead of chart', async () => {
     const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
       (_: DataBlockRequest) => {
         return Promise.resolve(testData.response);
@@ -181,7 +181,7 @@ describe('DataBlock', () => {
 
     const { container } = render(
       <DataBlock
-        id="test"
+        id="test-datablock"
         type="datablock"
         dataBlockRequest={dataBlockRequest}
         showTables={false}
@@ -206,6 +206,6 @@ describe('DataBlock', () => {
 
     expect(getDataBlockForSubject).toBeCalledWith(dataBlockRequest);
 
-    expect(container.innerHTML).toMatchSnapshot();
+    expect(container.querySelector('#test-datablock-charts')).toMatchSnapshot();
   });
 });

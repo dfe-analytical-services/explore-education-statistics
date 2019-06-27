@@ -164,7 +164,7 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
       class="govuk-checkboxes govuk-checkboxes--small"
     >
       <button
-        class="button selectAll"
+        class="button noUnderline selectAll"
         id="test-all"
         type="button"
       >
