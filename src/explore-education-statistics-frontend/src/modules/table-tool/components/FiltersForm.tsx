@@ -52,6 +52,16 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     <WizardStepHeading {...props}>Choose your filters</WizardStepHeading>
   );
 
+  function getSectionError(errorLabel: string, spliceOut: string) {
+    // eg. turns: Indicator - select at least one option
+    //      into: Select at least one option
+    const separator = ' - ';
+    const newErrorLabel = errorLabel.replace(spliceOut + separator, '');
+    return errorLabel
+      ? newErrorLabel.charAt(0).toUpperCase() + newErrorLabel.slice(1)
+      : undefined;
+  }
+
   return (
     <Formik<FormValues>
       enableReinitialize
@@ -61,19 +71,16 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
         indicators: [],
       }}
       validationSchema={Yup.object<FormValues>({
+        indicators: Yup.array()
+          .of(Yup.string())
+          .required('Indicators - select at least one option'),
         filters: Yup.object(
           mapValues(specification.filters, filter =>
             Yup.array()
               .of(Yup.string())
-              .min(
-                1,
-                `Select at least one option under ${filter.legend.toLowerCase()}`,
-              ),
+              .min(1, `${filter.legend} - select at least one option`),
           ),
         ),
-        indicators: Yup.array()
-          .of(Yup.string())
-          .required('Select at least one indicator'),
       })}
       onSubmit={async values => {
         await onSubmit(values);
@@ -96,7 +103,10 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       legend="Indicators"
                       legendSize="s"
                       hint="Select at least one indicator"
-                      error={getError('indicators')}
+                      error={getSectionError(
+                        getError('indicators'),
+                        'Indicators',
+                      )}
                       selectAll
                       options={Object.entries(specification.indicators).map(
                         ([_, group]) => {
@@ -126,7 +136,10 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                               id={`${formId}-${camelCase(filterName)}`}
                               legend={filterGroup.legend}
                               hint={filterGroup.hint}
-                              error={getError(filterName)}
+                              error={getSectionError(
+                                getError(filterName),
+                                filterGroup.legend,
+                              )}
                               selectAll
                               options={Object.entries(filterGroup.options).map(
                                 ([_, group]) => {
