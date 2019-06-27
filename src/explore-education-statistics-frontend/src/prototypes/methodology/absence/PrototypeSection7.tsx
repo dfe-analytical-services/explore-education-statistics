@@ -38,7 +38,7 @@ const PrototypeMethodologySection = () => {
       </p>
       <p>
         Telephone <br />
-        037 0000 2288
+        0370 000 2288
       </p>
     </>
   );

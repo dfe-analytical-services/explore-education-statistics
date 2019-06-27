@@ -29,7 +29,9 @@ const PrototypeMethodologySection = () => {
         In published releases, to allow users to compare over time, time series
         information is recalculated following any methodology change.
       </p>
-      <h4>Overview of persistent absence measures used since 2005/06</h4>
+      <h4 id="section3-2-1">
+        3.2.1 Overview of persistent absence measures used since 2005/06
+      </h4>
       <table className="govuk-table">
         <caption className="govuk-table-caption">
           Table 2: Persistent absence measures since 2005/06
@@ -64,16 +66,23 @@ const PrototypeMethodologySection = () => {
           </tr>
         </tbody>
       </table>
-      <h4>2015/16 onwards (10 per cent, based on an exact methodology)</h4>
+      <h4 id="section3-2-2">
+        3.2.2 2015/16 onwards (10% based on an exact methodology)
+      </h4>
       <p>
         Since the start of the 2015/16 academic year schools, a pupil has been
-        classified as a persistent absentee if they miss 10 per cent or more of
-        their own possible sessions, rather than if they reach a standard
-        threshold of absence sessions. Meaning, that if an enrolment’s overall
-        absence rate 10 per cent or higher2 they will be classified as
-        persistently absent. See{' '}
-        <a href="#section3-1">overall absence methodology</a> section for
-        further information.
+        classified as a persistent absentee if they miss 10% or more of their
+        own possible sessions, rather than if they reach a standard threshold of
+        absence sessions.
+      </p>
+      <p>
+        Meaning, that if an enrolment’s overall absence rate 10% or higher2
+        they'll be classified as persistently absent.
+      </p>
+      <p>
+        {' '}
+        For further information:{' '}
+        <a href="#section3-1">3.1 Overall absence methodology</a>
       </p>
       <p>
         To calculate school, local authority and national level persistent
@@ -86,9 +95,11 @@ const PrototypeMethodologySection = () => {
       </p>
       <p>
         Note that, although the measure was only in place from September 2015,
-        figures based on the 10 per cent exact methodology were published
-        alongside the 2014/15 Pupil absence in schools in England releases for
-        information purposes only.
+        figures based on the 10% exact methodology were published alongside the{' '}
+        <a href="https://www.gov.uk/government/collections/statistics-pupil-absence">
+          2014/15 Pupil absence in schools in England releases
+        </a>{' '}
+        for information purposes only.
       </p>
       <p>
         Table 3 provides a comparison of figures at the 10% and 15% level using
@@ -124,14 +135,14 @@ const PrototypeMethodologySection = () => {
             <th colSpan={5}>Total</th>
           </tr>
           <tr>
-            <td>10 per cent</td>
+            <td>10%</td>
             <td className="govuk-table__cell--numeric">327,070</td>
             <td className="govuk-table__cell--numeric">9.4</td>
             <td className="govuk-table__cell--numeric">728,080</td>
             <td className="govuk-table__cell--numeric">11.0</td>
           </tr>
           <tr>
-            <td>15 per cent</td>
+            <td>15%</td>
             <td className="govuk-table__cell--numeric">245,840</td>
             <td className="govuk-table__cell--numeric">3.7</td>
             <td className="govuk-table__cell--numeric">308,100</td>
@@ -142,14 +153,14 @@ const PrototypeMethodologySection = () => {
             <th colSpan={5}>Primary</th>
           </tr>
           <tr>
-            <td>10 per cent</td>
+            <td>10%</td>
             <td className="govuk-table__cell--numeric">257,945</td>
             <td className="govuk-table__cell--numeric">6.9</td>
             <td className="govuk-table__cell--numeric">314,440</td>
             <td className="govuk-table__cell--numeric">8.4</td>
           </tr>
           <tr>
-            <td>15 per cent</td>
+            <td>15%</td>
             <td className="govuk-table__cell--numeric">79,955</td>
             <td className="govuk-table__cell--numeric">2.1</td>
             <td className="govuk-table__cell--numeric">113,160</td>
@@ -160,14 +171,14 @@ const PrototypeMethodologySection = () => {
             <th colSpan={5}>Secondary</th>
           </tr>
           <tr>
-            <td>10 per cent</td>
+            <td>10%</td>
             <td className="govuk-table__cell--numeric">347,425</td>
             <td className="govuk-table__cell--numeric">12.3</td>
             <td className="govuk-table__cell--numeric">390,185</td>
             <td className="govuk-table__cell--numeric">13.8</td>
           </tr>
           <tr>
-            <td>15 per cent</td>
+            <td>15%</td>
             <td className="govuk-table__cell--numeric">152,775</td>
             <td className="govuk-table__cell--numeric">5.4</td>
             <td className="govuk-table__cell--numeric">180,610</td>
@@ -178,14 +189,14 @@ const PrototypeMethodologySection = () => {
             <th colSpan={5}>Special</th>
           </tr>
           <tr>
-            <td>10 per cent</td>
+            <td>10%</td>
             <td className="govuk-table__cell--numeric">21,700</td>
             <td className="govuk-table__cell--numeric">25.4</td>
             <td className="govuk-table__cell--numeric">23,460</td>
             <td className="govuk-table__cell--numeric">27.5</td>
           </tr>
           <tr>
-            <td>15 per cent</td>
+            <td>15%</td>
             <td className="govuk-table__cell--numeric">13,110</td>
             <td className="govuk-table__cell--numeric">15.4</td>
             <td className="govuk-table__cell--numeric">14,330</td>
@@ -197,26 +208,32 @@ const PrototypeMethodologySection = () => {
       <p>
         Further details on the rationale for the methodology change can be found
         in the original consultation document on proposed changes to absence
-        statistics which was published in October 2014 in Section 9 of the Pupil
-        absence in schools in England: autumn 2013 and spring 2014 Statistical
-        First Release. A consultation response summarising feedback received
-        from users on the proposed change to the methodology and next steps,
-        published in October 2015, can also be found on the same webpage.
+        statistics which was published in October 2014 in Section 9 of{' '}
+        <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-autumn-2013-and-spring-2014">
+          Pupil absence in schools in England: autumn 2013 and spring 2014
+        </a>
+        .
+      </p>
+      <p>
+        A consultation response summarising feedback received from users on the
+        proposed change to the methodology and next steps ( published in October
+        2015) can also be found on the same webpage.
       </p>
 
-      <h4>2010/11 to 2014/15 methodology (15 per cent PA threshold)</h4>
+      <h4 id="section3-2-3">
+        3.2.3 2010/11 to 2014/15 methodology (15% PA threshold)
+      </h4>
 
       <p>
         Pupils were identified as persistent absentees by comparing the number
         of overall absence sessions they had against a standard threshold of
-        around 15 per cent of possible sessions, equating to 56 or more sessions
-        across the full academic year for pupils aged 5 to 14 and 46 or more
-        sessions across the full academic year for pupils aged 15 (whose absence
+        around 15% of possible sessions, equating to 56 or more sessions across
+        the full academic year for pupils aged 5 to 14 and 46 or more sessions
+        across the full academic year for pupils aged 15 (whose absence
         information is based on the first five half terms only, as any sixth
-        half term absence is removed prior to analysis as set out in the section
-        on the{' '}
-        <a href="#section2-4">
-          school year (five half terms vs six half terms)
+        half term absence is removed prior to analysis as set out in{' '}
+        <a href="#section1-6">
+          1.6 The school year (five half terms vs six half terms)
         </a>
         .
       </p>
@@ -239,18 +256,24 @@ const PrototypeMethodologySection = () => {
       </p>
       <p>
         Standard termly persistent absentee thresholds were calculated by taking
-        15 per cent of the mode (most common number of) possible sessions for
-        all enrolments. This meant that, in some cases, the standard threshold
-        may be more or less than 15 per cent of an individual pupil’s sessions.
+        15% of the mode (most common number of) possible sessions for all
+        enrolments.
+      </p>
+      <p>
+        This meant that, in some cases, the standard threshold may be more or
+        less than 15% of an individual pupil’s sessions.
+      </p>
+      <p>
         The termly persistent absence thresholds were reviewed each term to
         account for any changes to the mode possible sessions, but the
-        thresholds did not tend to change from year to year. See table 4 for
-        standard thresholds.
+        thresholds did not tend to change from year to year. See following Table
+        4: Standard cumulative persistent absence thresholds for missing 15% of
+        possible sessions.
       </p>
       <table className="govuk-table">
         <caption className="govuk-table-cap">
           Table 4: Standard cumulative persistent absence thresholds for missing
-          15 per cent of possible sessions
+          15% of possible sessions
         </caption>
         <thead>
           <tr>
@@ -265,7 +288,7 @@ const PrototypeMethodologySection = () => {
           </tr>
           <tr>
             <td>
-              Spring term (as of 2012/13, no longer published individually)
+              Spring term (as of 2012/13 no longer published individually)
             </td>
             <td>16 sessions</td>
           </tr>
@@ -283,27 +306,35 @@ const PrototypeMethodologySection = () => {
           </tr>
         </tbody>
       </table>
-      <h4>2005/06 to 2009/10 methodology (20 per cent PA threshold)</h4>
+      <h4 id="section3-2-4">
+        3.2.4 2005/06 to 2009/10 methodology (20% PA threshold)
+      </h4>
       <p>
         The persistent absence measure was first introduced in 2005/06, where a
-        pupil was identified as a persistent absentee if they missed around 20
-        per cent or more of possible sessions.{' '}
+        pupil was identified as a persistent absentee if they missed around 20%
+        or more of possible sessions.{' '}
       </p>
 
       <p>
         Persistent absence figures were published in a similar way to that of
-        the 15 per cent threshold figures that were in place between 2010/11 and
-        2013/14. With both the autumn term and autumn and spring term releases
-        showing how many enrolments 17 have already become persistent absentees,
-        as well as those who may become, persistent absentees based on the
-        standard threshold. See table 5 for standard thresholds to which missing
-        20 per cent of sessions equated to.{' '}
+        the 15% threshold figures that were in place between 2010/11 and
+        2013/14.
+      </p>
+      <p>
+        With both the autumn term and autumn and spring term releases showing
+        how many enrolments 17 have already become persistent absentees, as well
+        as those who may become, persistent absentees based on the standard
+        threshold.
+      </p>
+      <p>
+        See table 5 for standard thresholds to which missing 20% of sessions
+        equated to.{' '}
       </p>
       <p>This threshold was reduced to 15 per cent as of September 2010.</p>
       <table className="govuk-table">
         <caption className="govuk-table-caption">
-          Table 5: Standard absence thresholds for missing 20 per cent of
-          possible sessions, between 2005/06 and 2009/10
+          Table 5: Standard absence thresholds for missing 20% of possible
+          sessions, between 2005/06 and 2009/10
         </caption>
         <thead>
           <tr>

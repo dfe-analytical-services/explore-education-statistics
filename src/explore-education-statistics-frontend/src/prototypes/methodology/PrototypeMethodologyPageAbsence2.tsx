@@ -6,7 +6,6 @@ import PrototypeAnnexA from '@frontend/prototypes/methodology/absence2/Prototype
 import PrototypeAnnexB from '@frontend/prototypes/methodology/absence2/PrototypeAnnexB';
 import PrototypeAnnexC from '@frontend/prototypes/methodology/absence2/PrototypeAnnexC';
 import PrototypeAnnexD from '@frontend/prototypes/methodology/absence2/PrototypeAnnexD';
-import PrototypeAnnexE from '@frontend/prototypes/methodology/absence2/PrototypeAnnexE';
 import PrototypeSection1 from '@frontend/prototypes/methodology/absence2/PrototypeSection1';
 import PrototypeSection2 from '@frontend/prototypes/methodology/absence2/PrototypeSection2';
 import PrototypeSection3 from '@frontend/prototypes/methodology/absence2/PrototypeSection3';
@@ -33,13 +32,15 @@ const PublicationPage = () => {
         },
       ]}
     >
-      <h1 className="govuk-heading-xl">Exclusions statistics: methodology</h1>
+      <h1 className="govuk-heading-xl">
+        Permanent and fixed-period exclusions in England: methodology
+      </h1>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <dl className="dfe-meta-content govuk-!-margin-0">
             <dt className="govuk-caption-m">Published: </dt>
             <dd>
-              <strong>22 March 2018</strong>
+              <strong>September 2017</strong>
             </dd>
           </dl>
         </div>
@@ -52,8 +53,8 @@ const PublicationPage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">
-            Find out about the methodology behind pupil absence statistics and
-            data and how and why they're collected and published.
+            Find out about the methodology behind exclusions statistics and data
+            and how and why they're collected and published.
           </p>
         </div>
 
@@ -64,8 +65,9 @@ const PublicationPage = () => {
             </h2>
             <ul className="govuk-list">
               <li>
-                <a href="/prototypes/publication">
-                  Pupil absence statistics and data for schools in England
+                <a href="/prototypes/publication-exclusions">
+                  Permanent and fixed-period exclusions statistics for schools
+                  in England
                 </a>
               </li>
             </ul>
@@ -74,34 +76,32 @@ const PublicationPage = () => {
       </div>
 
       <Accordion id="contents-sections">
-        <AccordionSection heading="1. Overview of absence statistics">
+        <AccordionSection heading="1. Overview of exculsion statistics">
           <MethodologySection>
             <MethodologyHeader>
               <h3 className="govuk-heading-s">In this section</h3>
               <ul className="govuk-body-s">
                 <li>
-                  <a href="#section1-1">
-                    1.1 Pupil attendance requirements for schools
-                  </a>
+                  <a href="#section1-1">1.1 Requirements for schools</a>
                 </li>
                 <li>
                   <a href="#section1-2">
-                    1.2 Uses and users of absence statistics and data
+                    1.2 Uses and users of exclusion statistics and data
                   </a>
                 </li>
                 <li>
-                  <a href="#section1-3">1.3 Current termly publications</a>
+                  <a href="#section1-3">1.3 Current publications</a>
                 </li>
                 <li>
-                  <a href="#section1-4">1.4 Key absence measures</a>
+                  <a href="#section1-4">1.4 Key exclusion measures</a>
                 </li>
                 <li>
-                  <a href="#section1-5">1.5 Cohort used in absence measures</a>
-                </li>
-                <li>
-                  <a href="#section1-6">
-                    1.6 The school year (five half terms vs six half terms)
+                  <a href="#section1-5">
+                    1.5 Cohort used in exlcusion measures
                   </a>
+                </li>
+                <li>
+                  <a href="#section1-6">1.6 Lunch time exclusions</a>
                 </li>
                 <li>
                   <a href="#section1-7">
@@ -110,18 +110,23 @@ const PublicationPage = () => {
                 </li>
                 <li>
                   <a href="#section1-8">
-                    1.8 Underlying data provided alongside publications
+                    1.8 Appeals and reviews relating to permanent exclusions
                   </a>
                 </li>
                 <li>
-                  <a href="#section1-9">1.9 Suppression of absence data</a>
+                  <a href="#section1-9">
+                    1.9 Underlying data provided alongside publications
+                  </a>
                 </li>
                 <li>
-                  <a href="#section1-10">1.10 Other related publications</a>
+                  <a href="#section1-10">1.10 Suppression of exclusions data</a>
                 </li>
                 <li>
-                  <a href="#section1-11">
-                    1.11 Devolved administration statistics on absence
+                  <a href="#section1-11">1.11 Other related publications</a>
+                </li>
+                <li>
+                  <a href="#section1-12">
+                    1.12 Devolved administration statistics on absence
                   </a>
                 </li>
               </ul>
@@ -155,10 +160,17 @@ const PublicationPage = () => {
               <h3 className="govuk-heading-s">In this section</h3>
               <ul className="govuk-body-s">
                 <li>
-                  <a href="#section3-1">3.1 Overall absence methodology</a>
+                  <a href="#section3-1">3.1 Calculation of exclusion rates</a>
                 </li>
                 <li>
-                  <a href="#section3-2">3.2 Persistent absence methodology</a>
+                  <a href="#section3-2">
+                    3.2 Permanent exclusion checking exercise 1997/98 to 2009/10
+                  </a>
+                </li>
+                <li>
+                  <a href="#section3-3">
+                    3.3 Appeals and reviews relating to permanent exclusions
+                  </a>
                 </li>
               </ul>
             </MethodologyHeader>
@@ -174,20 +186,20 @@ const PublicationPage = () => {
               <h3 className="govuk-heading-s">In this section</h3>
               <ul className="govuk-body-s">
                 <li>
-                  <a href="#section4-1">
-                    4.1 The current process 2005/06 to present
-                  </a>
+                  <a href="#section4-1">4.1 The collection process</a>
                 </li>
                 <li>
                   <a href="#section4-2">
-                    4.2 Background of absence data collection
+                    4.2 Background to exclusions data collection
                   </a>
                 </li>
                 <li>
                   <a href="#section4-3">4.3 Data coverage</a>
                 </li>
                 <li>
-                  <a href="#section4-4">4.4 What absence data is collected</a>
+                  <a href="#section4-4">
+                    4.4 What exclusions data is collected
+                  </a>
                 </li>
                 <li>
                   <a href="#section4-5">
@@ -196,7 +208,7 @@ const PublicationPage = () => {
                 </li>
                 <li>
                   <a href="#section4-6">
-                    4.6 What absence data is not collected
+                    4.6 What exclusion data is not collected
                   </a>
                 </li>
               </ul>
@@ -220,9 +232,6 @@ const PublicationPage = () => {
                 </li>
                 <li>
                   <a href="#section5-3">5.3 Variables added</a>
-                </li>
-                <li>
-                  <a href="#section5-4">5.4 Consistency checks</a>
                 </li>
               </ul>
             </MethodologyHeader>
@@ -255,23 +264,17 @@ const PublicationPage = () => {
 
       <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
       <Accordion id="annex-sections">
-        <AccordionSection heading="Annex A - Glossary">
+        <AccordionSection heading="Annex A - Calculations">
           <PrototypeAnnexA />
         </AccordionSection>
-        <AccordionSection heading="Annex B - Calculations">
+        <AccordionSection heading="Annex B - Exclusion by reason codes">
           <PrototypeAnnexB />
         </AccordionSection>
-        <AccordionSection heading="Annex C - School attendance codes">
+        <AccordionSection heading="Annex C - Links to pupil exclusions statistics and data">
           <PrototypeAnnexC />
         </AccordionSection>
-        <AccordionSection heading="Annex D - Links to pupil absence national statistics and data">
+        <AccordionSection heading="Annex D - Standard breakdowns">
           <PrototypeAnnexD />
-        </AccordionSection>
-        <AccordionSection heading="Annex E - Standard breakdowns">
-          <PrototypeAnnexE />
-        </AccordionSection>
-        <AccordionSection heading="Annex F - Timeline">
-          <p>timeline</p>
         </AccordionSection>
       </Accordion>
 

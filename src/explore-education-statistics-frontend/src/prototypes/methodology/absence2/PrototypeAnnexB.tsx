@@ -3,61 +3,68 @@ import React from 'react';
 const PrototypeMethodologySection = () => {
   return (
     <>
-      <p>
-        The following calculations are used to produce absence National
-        Statistics:
-      </p>
-      <dl className="govuk-list">
-        <dt>Percentage of sessions missed due to overall absence</dt>
-        <dd>
-          (Total overall absence sessions / Total sessions possible) X 100
-        </dd>
-        <dt>Percentage of sessions missed due to authorised absence</dt>
-        <dd>
-          (Total authorised absence sessions / Total sessions possible) X 100
-        </dd>
-        <dt>Percentage of sessions missed due to unauthorised absence</dt>
-        <dd>
-          (Total unauthorised absence sessions / Total sessions possible) X 100
-        </dd>
-        <dt>
-          Percentage of pupils with one or more session of absence by reason
-        </dt>
-        <dd>
-          (Number of enrolments with one or more session of absence for a reason
-          / Number of enrolments) X 100
-        </dd>
-        <dt>
-          Percentage of overall absence for which persistent absentees are
-          responsible
-        </dt>
-        <dd>
-          (Overall absence sessions for persistent absentees / Total overall
-          absence sessions) X 100
-        </dd>
-        <dt>
-          Percentage of authorised absence for which persistent absentees are
-          responsibe
-        </dt>
-        <dd>
-          (Authorised absence session for persistent absentees / Total overall
-          absence sessions) X 100
-        </dd>
-        <dt>
-          Percentage of unauthorised absence for which persistent absentees are
-          responsible
-        </dt>
-        <dd>
-          (unauthorised absence sessions for persistent absentees / Total
-          overall absence sessions) X 100
-        </dd>
-        <dt>Distribution of reasons for absence</dt>
-        <dd>
-          (Absence for this reason / Total overall absence with reasons) X 100
-        </dd>
-        <dt>Absence rates by reason</dt>
-        <dd>(Absence for the reason / Total session possible) X 100</dd>
-      </dl>
+      <table className="govuk-table">
+        <caption className="govuk-table-caption">
+          The following codes are used by schools when taking registers, further
+          details are available in the Department’s School Attendance advice:
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Code</th>
+            <th scope="col">Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>PP</td>
+            <td>Physical assault against a pupil</td>
+          </tr>
+          <tr>
+            <td>PA</td>
+            <td>Physical assault against an adult</td>
+          </tr>
+          <tr>
+            <td>VP</td>
+            <td>Verbal abuse / threatening behaviour against a pupil</td>
+          </tr>
+          <tr>
+            <td>VA</td>
+            <td>Verbal abuse / threatening behaviour against a adult</td>
+          </tr>
+          <tr>
+            <td>BU</td>
+            <td>Bullying</td>
+          </tr>
+          <tr>
+            <td>RA</td>
+            <td>Racist abuse</td>
+          </tr>
+          <tr>
+            <td>SM</td>
+            <td>Sexual misconduct</td>
+          </tr>
+          <tr>
+            <td>DA</td>
+            <td>Drug and alcohol related</td>
+          </tr>
+          <tr>
+            <td>DM</td>
+            <td>Damage</td>
+          </tr>
+          <tr>
+            <td>TH</td>
+            <td>Theft</td>
+          </tr>
+          <tr>
+            <td>DB</td>
+            <td>Persistent disruptive behaviour</td>
+          </tr>
+          <tr>
+            <td>OT</td>
+            <td>Other</td>
+          </tr>
+        </tbody>
+      </table>
     </>
   );
 };
