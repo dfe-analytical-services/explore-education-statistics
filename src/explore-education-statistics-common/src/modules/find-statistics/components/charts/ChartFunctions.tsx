@@ -37,6 +37,7 @@ export interface ChartProps {
 
 export interface ChartData {
   name: string;
+  indicator: string | undefined;
   data?: ChartData[];
   value?: string;
 }
@@ -170,15 +171,39 @@ const ChartFunctions = {
     });
   },
 
+  filterResultsBySingleDataSet(dataSet: ChartDataSet, results: Result[]) {
+    return results.filter(
+      r =>
+        Object.keys(r.measures).includes(dataSet.indicator) &&
+        (dataSet.filters &&
+          difference(r.filters, dataSet.filters).length === 0),
+    );
+  },
+
+  filterNonRelaventDataFromDataSet(dataSet: ChartDataSet, results: Result[]) {
+    return results.map(result => {
+      return {
+        ...result,
+        measures: Object.entries(result.measures)
+          .filter(([measureId, _]) => dataSet.indicator === measureId)
+          .reduce<Dictionary<string>>(
+            (newMeasures, [measureId, measureValue]) => ({
+              ...newMeasures,
+              [measureId]: measureValue,
+            }),
+            {},
+          ),
+      };
+    });
+  },
+
   filterResultsByDataSet(dataSets: ChartDataSet[], results: Result[]) {
     return dataSets.map(dataSet => {
       return {
         dataSet,
-        results: results.filter(
-          r =>
-            Object.keys(r.measures).includes(dataSet.indicator) &&
-            (dataSet.filters &&
-              difference(r.filters, dataSet.filters).length === 0),
+        results: ChartFunctions.filterNonRelaventDataFromDataSet(
+          dataSet,
+          ChartFunctions.filterResultsBySingleDataSet(dataSet, results),
         ),
       };
     });
@@ -202,6 +227,7 @@ const ChartFunctions = {
         ...cd,
         {
           name,
+          indicator: name,
           value: result.measures[dataSet.indicator],
         },
       ];
@@ -217,7 +243,9 @@ const ChartFunctions = {
         ...cd,
 
         {
-          name: dataSet.indicator,
+          name: `${dataSet.indicator}_${dataSet.filters &&
+            dataSet.filters.join('_')}`,
+          indicator: dataSet.indicator,
           data: ChartFunctions.groupByYear(dataSet, results, meta),
         },
       ];
@@ -256,6 +284,7 @@ const ChartFunctions = {
             ...(newChartDataMap[dataKey] || []),
             {
               name: currentIndicator,
+              indicator: currentIndicator,
               value: result.measures[currentIndicator],
             },
           ];
@@ -273,6 +302,7 @@ const ChartFunctions = {
             meta.timePeriods[key] &&
             meta.timePeriods[key].label) ||
           key,
+        indicator: undefined,
         data: value,
 
         ...value.reduce((values, v) => {

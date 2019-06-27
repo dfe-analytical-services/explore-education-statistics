@@ -126,7 +126,7 @@ export default class LineChartBlock extends Component<ChartProps> {
             <Line
               dataKey="value"
               data={cd.data}
-              name={labels[cd.name]}
+              name={cd.indicator && meta.indicators[cd.indicator].label}
               key={cd.name}
               legendType={symbols[index]}
               dot={props => <Symbols {...props} type={symbols[index]} />}
@@ -134,7 +134,7 @@ export default class LineChartBlock extends Component<ChartProps> {
               stroke={colours[index]}
               fill={colours[index]}
               strokeWidth="5"
-              unit={meta.indicators[cd.name].unit}
+              unit={cd.indicator && meta.indicators[cd.indicator].unit}
             />
           ))}
         </LineChart>

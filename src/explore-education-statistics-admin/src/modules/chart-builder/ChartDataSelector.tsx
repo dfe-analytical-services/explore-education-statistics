@@ -108,13 +108,15 @@ const ChartDataSelector = ({
           </thead>
           <tbody>
             {selectedList.map((selected, index) => (
-              <tr key={selected.indicator}>
+              <tr key={`${selected.indicator}_${selected.filters.join(',')}`}>
                 <td className="govuk-table__cell">
                   {selected.filters.map(_ => (
-                    <span key={_}>{_}</span>
+                    <span key={_}>{metaData.filters[_].label}</span>
                   ))}
                 </td>
-                <td className="govuk-table__cell">{selected.indicator}</td>
+                <td className="govuk-table__cell">
+                  {metaData.indicators[selected.indicator].label}
+                </td>
                 <td className="govuk-table__cell">
                   <Button
                     type="button"
