@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 (destination as CloudBlockBlob)?.Metadata.Add("releasedatetime", releasePublishedString);
             };
 
-            await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory, false, options, context);
+            await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory, true, options, context);
         }
 
         private void FileTransferredCallback(object sender, TransferEventArgs e)
