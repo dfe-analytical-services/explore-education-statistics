@@ -54,7 +54,6 @@ export default class HorizontalBarBlock extends Component<
       referenceLines,
       yAxis,
       stacked,
-      indicators,
       dataSets,
     } = this.props;
 
@@ -74,14 +73,6 @@ export default class HorizontalBarBlock extends Component<
       },
       new Set<string>(),
     );
-
-    /*
-
-    const chartData = data.result.map(({ measures, year, timeIdentifier }) => ({
-      name: `${meta.timePeriods[`${year}_${timeIdentifier}`].label}`,
-      ...measures,
-    }));
-     */
 
     return (
       <ResponsiveContainer width={width || '100%'} height={height || 600}>

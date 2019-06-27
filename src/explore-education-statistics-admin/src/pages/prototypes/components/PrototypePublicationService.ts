@@ -453,7 +453,11 @@ export default class PrototypePublicationService {
 
         charts: [
           {
-            indicators: [],
+            dataSets: [
+              { indicator: '23', filters: ['1', '2'] },
+              { indicator: '26', filters: ['1', '2'] },
+              { indicator: '28', filters: ['1', '2'] },
+            ],
             xAxis: { title: 'School Year' },
             yAxis: { title: 'Absence Rate' },
             type: 'line',

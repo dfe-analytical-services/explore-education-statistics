@@ -25,12 +25,12 @@ export const newApiHorizontalData: ChartProps = {
   data: {
     publicationId: 'test',
     releaseDate: new Date(),
-    releaseId: 1,
+    releaseId: '1',
     subjectId: 1,
     geographicLevel: GeographicLevel.National,
     result: [
       {
-        filters: [1],
+        filters: ['1'],
         location: {
           country: {
             country_code: 'E92000001',
@@ -59,7 +59,7 @@ export const newApiHorizontalData: ChartProps = {
         year: 2014,
       },
       {
-        filters: [1],
+        filters: ['1'],
         location: {
           country: {
             country_code: 'E92000001',
@@ -130,7 +130,12 @@ export const newApiHorizontalData: ChartProps = {
     '23': 'Unauthorised absence rate',
   },
 
-  indicators: ['23', '26', '28'],
+  dataSets: [
+    { indicator: '23', filters: ['1'] },
+    { indicator: '26', filters: ['1'] },
+    { indicator: '28', filters: ['1'] },
+  ],
+
   xAxis: { title: 'test x axis' },
   yAxis: { title: 'test y axis' },
 };
@@ -156,8 +161,13 @@ export const newChartsApiDataBlock: DataBlockProps = {
       type: 'map',
       xAxis: { title: '' },
       yAxis: { title: '' },
-      indicators: ['23', '26', '28', '27'],
-      dataGroupings: [{ timePeriod: true }],
+
+      dataSets: [
+        { indicator: '23', filters: ['1', '2'] },
+        { indicator: '26', filters: ['1', '2'] },
+        { indicator: '28', filters: ['1', '2'] },
+        { indicator: '27', filters: ['1', '2'] },
+      ],
     },
   ],
 };
