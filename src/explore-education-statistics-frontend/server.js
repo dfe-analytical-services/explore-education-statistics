@@ -1,15 +1,20 @@
 require('core-js/fn/array/flat-map');
 
 const appInsights = require('applicationinsights');
-appInsights.setup("<key-here>")
-  .setAutoDependencyCorrelation(true)
-  .setAutoCollectRequests(true)
-  .setAutoCollectPerformance(true)
-  .setAutoCollectExceptions(true)
-  .setAutoCollectDependencies(true)
-  .setAutoCollectConsole(true)
-  .setUseDiskRetryCaching(true)
-  .start();
+
+// AI Key should be loaded via enviroment variable APPINSIGHTS_INSTRUMENTATIONKEY
+if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
+  appInsights
+    .setup()
+    .setAutoDependencyCorrelation(true)
+    .setAutoCollectRequests(true)
+    .setAutoCollectPerformance(true)
+    .setAutoCollectExceptions(true)
+    .setAutoCollectDependencies(true)
+    .setAutoCollectConsole(true)
+    .setUseDiskRetryCaching(true)
+    .start();
+}
 
 const basicAuth = require('express-basic-auth');
 const express = require('express');
