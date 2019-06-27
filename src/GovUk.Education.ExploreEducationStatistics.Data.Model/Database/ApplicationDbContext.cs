@@ -275,12 +275,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureLocalAuthority(modelBuilder);
             ConfigureLocalAuthorityDistrict(modelBuilder);
             ConfigureLocalEnterprisePartnership(modelBuilder);
-            ConfigureMat(modelBuilder);
+            ConfigureMultiAcademyTrust(modelBuilder);
             ConfigureMayoralCombinedAuthority(modelBuilder);
             ConfigureOpportunityArea(modelBuilder);
             ConfigureParliamentaryConstituency(modelBuilder);
             ConfigureRegion(modelBuilder);
             ConfigureRscRegion(modelBuilder);
+            ConfigureSponsor(modelBuilder);
             ConfigureWard(modelBuilder);
         }
 
@@ -389,10 +390,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     builder => builder.HasIndex(localEnterprisePartnership => localEnterprisePartnership.Code));
         }
 
-        private static void ConfigureMat(ModelBuilder modelBuilder)
+        private static void ConfigureMultiAcademyTrust(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.Mat,
+                .OwnsOne(level => level.MultiAcademyTrust,
                     builder => builder.HasIndex(mat => mat.Code));
         }
 
@@ -431,6 +432,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     builder => builder.HasIndex(rscRegion => rscRegion.Code));
         }
 
+        private static void ConfigureSponsor(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Location>()
+                .OwnsOne(level => level.Sponsor,
+                    builder => builder.HasIndex(sponsor => sponsor.Code));
+        }
+        
         private static void ConfigureWard(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
