@@ -463,31 +463,13 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
             class="recharts-layer recharts-bar-rectangles"
           >
             <g
-              class="recharts-layer recharts-bar-rectangle"
+              class="recharts-layer"
             >
-              <path
-                class="recharts-rectangle"
-                d="M 175,39.25 h 104.25 v 194 h -104.25 Z"
-                fill="#4763a5"
-                height="194"
-                radius="0"
-                width="104.25"
-                x="175"
-                y="39.25"
+              <g
+                class="recharts-layer recharts-bar-rectangle"
               />
-            </g>
-            <g
-              class="recharts-layer recharts-bar-rectangle"
-            >
-              <path
-                class="recharts-rectangle"
-                d="M 175,281.75 h 104.25 v 194 h -104.25 Z"
-                fill="#4763a5"
-                height="194"
-                radius="0"
-                width="104.25"
-                x="175"
-                y="281.75"
+              <g
+                class="recharts-layer recharts-bar-rectangle"
               />
             </g>
           </g>
@@ -499,31 +481,13 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
             class="recharts-layer recharts-bar-rectangles"
           >
             <g
-              class="recharts-layer recharts-bar-rectangle"
+              class="recharts-layer"
             >
-              <path
-                class="recharts-rectangle"
-                d="M 279.25,39.25 h 347.5 v 194 h -347.5 Z"
-                fill="#f5a450"
-                height="194"
-                radius="0"
-                width="347.5"
-                x="279.25"
-                y="39.25"
+              <g
+                class="recharts-layer recharts-bar-rectangle"
               />
-            </g>
-            <g
-              class="recharts-layer recharts-bar-rectangle"
-            >
-              <path
-                class="recharts-rectangle"
-                d="M 279.25,281.75 h 347.5 v 194 h -347.5 Z"
-                fill="#f5a450"
-                height="194"
-                radius="0"
-                width="347.5"
-                x="279.25"
-                y="281.75"
+              <g
+                class="recharts-layer recharts-bar-rectangle"
               />
             </g>
           </g>
@@ -535,31 +499,13 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
             class="recharts-layer recharts-bar-rectangles"
           >
             <g
-              class="recharts-layer recharts-bar-rectangle"
+              class="recharts-layer"
             >
-              <path
-                class="recharts-rectangle"
-                d="M 626.75,39.25 h 173.75 v 194 h -173.75 Z"
-                fill="#005ea5"
-                height="194"
-                radius="0"
-                width="173.75"
-                x="626.75"
-                y="39.25"
+              <g
+                class="recharts-layer recharts-bar-rectangle"
               />
-            </g>
-            <g
-              class="recharts-layer recharts-bar-rectangle"
-            >
-              <path
-                class="recharts-rectangle"
-                d="M 626.75,281.75 h 173.75 v 194 h -173.75 Z"
-                fill="#005ea5"
-                height="194"
-                radius="0"
-                width="173.75"
-                x="626.75"
-                y="281.75"
+              <g
+                class="recharts-layer recharts-bar-rectangle"
               />
             </g>
           </g>

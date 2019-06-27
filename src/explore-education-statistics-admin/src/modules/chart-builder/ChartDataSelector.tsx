@@ -60,7 +60,7 @@ const ChartDataSelector = ({
 
   const removeSelected = (selected: DataAddedEvent, index: number) => {
     selectedList.splice(index, 1);
-    setSelectedList(selectedList);
+    setSelectedList([...selectedList]);
 
     if (onDataUpdated) onDataUpdated(selectedList);
   };
@@ -96,24 +96,38 @@ const ChartDataSelector = ({
         </div>
       </FormGroup>
 
-      <div>
-        {selectedList.map((selected, index) => (
-          <div key={selected.indicator}>
-            <div>{selected.indicator}</div>
-            <div>
-              {selected.filters.map(_ => (
-                <div key={_}>{_}</div>
-              ))}
-            </div>
-            <Button
-              type="button"
-              onClick={() => removeSelected(selected, index)}
-            >
-              remove
-            </Button>
-          </div>
-        ))}
-      </div>
+      {selectedList.length > 0 && (
+        <table className="govuk-table">
+          <caption>Selected data</caption>
+          <thead>
+            <tr>
+              <th className="govuk-table__header">Filters</th>
+              <th className="govuk-table__header">Indicator</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {selectedList.map((selected, index) => (
+              <tr key={selected.indicator}>
+                <td className="govuk-table__cell">
+                  {selected.filters.map(_ => (
+                    <span key={_}>{_}</span>
+                  ))}
+                </td>
+                <td className="govuk-table__cell">{selected.indicator}</td>
+                <td className="govuk-table__cell">
+                  <Button
+                    type="button"
+                    onClick={() => removeSelected(selected, index)}
+                  >
+                    remove
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       {selectedIndicator && selectedFilters && (
         <div className="govuk-grid-row">

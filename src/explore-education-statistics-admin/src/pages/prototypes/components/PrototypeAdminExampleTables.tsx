@@ -7,7 +7,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import useToggle from '@common/hooks/useToggle';
 import PrototypeTableContent from '@admin/pages/prototypes/components/PrototypeTableContent';
-import PrototypeChartEditor from '@admin/pages/prototypes/components/PrototypeChartEditor';
+import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
 import Link from '../../../components/Link';
 import { PrototypeTable } from '../PrototypeData';
 
@@ -28,7 +28,7 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
           <PrototypeTableContent table={table} task={task} />
         </TabsSection>
         <TabsSection id="add-chart" title="Add a chart">
-          <PrototypeChartEditor />
+          <ChartBuilder />
         </TabsSection>
       </Tabs>
       {task === 'view' && (

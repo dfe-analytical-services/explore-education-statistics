@@ -63,8 +63,7 @@ export interface ChartDataSet {
 
 export interface Chart {
   type: ChartType;
-  dataSets?: ChartDataSet[];
-  indicators: string[];
+  dataSets: ChartDataSet[];
   xAxis?: Axis;
   yAxis?: Axis;
   stacked?: boolean;

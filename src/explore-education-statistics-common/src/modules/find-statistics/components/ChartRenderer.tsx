@@ -23,7 +23,6 @@ const DynamicMapBlock = dynamic(
 
 export interface ChartRendererProps {
   type: ChartType;
-  indicators: string[];
   data: DataBlockData;
   meta: DataBlockMetadata;
   xAxis: Axis;
@@ -32,7 +31,7 @@ export interface ChartRendererProps {
   width?: number;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
-  dataSets?: ChartDataSet[];
+  dataSets: ChartDataSet[];
 }
 
 function ChartRenderer(props: ChartRendererProps) {
@@ -41,7 +40,6 @@ function ChartRenderer(props: ChartRendererProps) {
     height,
     width,
     meta,
-    indicators,
     referenceLines,
     stacked,
     type,
@@ -72,7 +70,6 @@ function ChartRenderer(props: ChartRendererProps) {
     case 'line':
       return (
         <LineChartBlock
-          indicators={indicators}
           data={data}
           meta={meta}
           labels={labels}
@@ -87,7 +84,6 @@ function ChartRenderer(props: ChartRendererProps) {
     case 'verticalbar':
       return (
         <VerticalBarBlock
-          indicators={indicators}
           data={data}
           meta={meta}
           labels={labels}
@@ -102,7 +98,6 @@ function ChartRenderer(props: ChartRendererProps) {
     case 'horizontalbar':
       return (
         <HorizontalBarBlock
-          indicators={indicators}
           data={data}
           meta={meta}
           labels={labels}
@@ -118,7 +113,6 @@ function ChartRenderer(props: ChartRendererProps) {
     case 'map':
       return (
         <DynamicMapBlock
-          indicators={indicators}
           data={data}
           meta={meta}
           labels={labels}
@@ -126,6 +120,7 @@ function ChartRenderer(props: ChartRendererProps) {
           yAxis={yAxis}
           height={height}
           width={width}
+          dataSets={dataSets}
         />
       );
     default:

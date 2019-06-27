@@ -84,7 +84,8 @@ function getLowestLocationCode(location: DataBlockLocation) {
       location.localAuthorityDistrict.sch_lad_code) ||
     (location.localAuthority && location.localAuthority.new_la_code) ||
     (location.region && location.region.region_code) ||
-    (location.country && location.country.country_code)
+    (location.country && location.country.country_code) ||
+    ''
   );
 }
 
@@ -205,7 +206,7 @@ class MapBlock extends Component<MapProps, MapState> {
       ...allLocationIds
         .reduce(
           (locations: { label: string; value: string }[], next: string) => {
-            const { label, value } = meta.locations[next];
+            const { label, value } = (meta.locations || {})[next];
 
             return [...locations, { label, value }];
           },
@@ -310,7 +311,9 @@ class MapBlock extends Component<MapProps, MapState> {
 
     return resultsFilteredByYear
       .map(result => ({
-        location: meta.locations[getLowestLocationCode(result.location)],
+        location: (meta.locations || {})[
+          getLowestLocationCode(result.location)
+        ],
         selectedMeasure: +result.measures[displayedFilter],
         measures: result.measures,
       }))
@@ -508,7 +511,7 @@ class MapBlock extends Component<MapProps, MapState> {
 
         if (feature.id) {
           content.unshift(
-            `<strong>${meta.locations[feature.id].label}</strong>`,
+            `<strong>${(meta.locations || {})[feature.id].label}</strong>`,
           );
         }
 
@@ -532,7 +535,7 @@ class MapBlock extends Component<MapProps, MapState> {
       width,
       height,
       meta,
-      indicators,
+      dataSets = [],
     } = this.props;
 
     const { selected, options, geometry, legend, ukGeometry } = this.state;
@@ -593,8 +596,8 @@ class MapBlock extends Component<MapProps, MapState> {
                 label="Select data to view"
                 value={selected.indicator}
                 onChange={e => this.onSelectIndicator(e.currentTarget.value)}
-                options={indicators.map(
-                  indicator => meta.indicators[indicator],
+                options={dataSets.map(
+                  indicator => meta.indicators[+indicator.indicator],
                 )}
                 order={[]}
               />

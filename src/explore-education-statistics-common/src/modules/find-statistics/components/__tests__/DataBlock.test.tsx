@@ -42,7 +42,11 @@ describe('DataBlock', () => {
           {
             type: 'horizontalbar',
             stacked: true,
-            indicators: ['23', '26', '28'],
+            dataSets: [
+              { indicator: '23', filters: ['1', '2'] },
+              { indicator: '26', filters: ['1', '2'] },
+              { indicator: '28', filters: ['1', '2'] },
+            ],
             xAxis: { title: 'test x axis' },
             yAxis: { title: 'test y axis' },
             width: 800,
@@ -83,7 +87,11 @@ describe('DataBlock', () => {
         charts={[
           {
             type: 'verticalbar',
-            indicators: ['23', '26', '28'],
+            dataSets: [
+              { indicator: '23', filters: ['1', '2'] },
+              { indicator: '26', filters: ['1', '2'] },
+              { indicator: '28', filters: ['1', '2'] },
+            ],
             xAxis: { title: 'test x axis' },
             yAxis: { title: 'test y axis' },
             width: 800,
@@ -180,7 +188,11 @@ describe('DataBlock', () => {
         charts={[
           {
             type: 'map',
-            indicators: ['23', '26', '28'],
+            dataSets: [
+              { indicator: '23', filters: ['1', '2'] },
+              { indicator: '26', filters: ['1', '2'] },
+              { indicator: '28', filters: ['1', '2'] },
+            ],
             xAxis: { title: 'test x axis' },
             yAxis: { title: 'test y axis' },
             width: 800,

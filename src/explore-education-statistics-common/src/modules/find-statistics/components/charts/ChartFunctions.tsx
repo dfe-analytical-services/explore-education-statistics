@@ -25,8 +25,7 @@ import { Dictionary } from '@common/types';
 export interface ChartProps {
   data: DataBlockData;
   meta: DataBlockMetadata;
-  indicators: string[]; // the data values
-  dataSets?: ChartDataSet[];
+  dataSets: ChartDataSet[];
 
   labels: { [key: string]: string };
   xAxis: Axis;

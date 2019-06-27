@@ -13,12 +13,12 @@ import Features from './testLocationData';
 const data: DataBlockData = {
   publicationId: 'test',
   releaseDate: new Date(),
-  releaseId: 1,
+  releaseId: '1',
   subjectId: 1,
   geographicLevel: GeographicLevel.National,
   result: [
     {
-      filters: [1, 2],
+      filters: ['1', '2'],
       location: {
         country: {
           country_code: 'E92000001',
@@ -47,7 +47,7 @@ const data: DataBlockData = {
       year: 2014,
     },
     {
-      filters: [1, 2],
+      filters: ['1', '2'],
       location: {
         country: {
           country_code: 'E92000001',
@@ -81,12 +81,12 @@ const data: DataBlockData = {
 const multipleData: DataBlockData = {
   publicationId: 'test',
   releaseDate: new Date(),
-  releaseId: 1,
+  releaseId: '1',
   subjectId: 1,
   geographicLevel: GeographicLevel.National,
   result: [
     {
-      filters: [1, 2],
+      filters: ['1', '2'],
       location: {
         country: {
           country_code: 'E92000001',
@@ -115,7 +115,7 @@ const multipleData: DataBlockData = {
       year: 2015,
     },
     {
-      filters: [1, 2],
+      filters: ['1', '2'],
       location: {
         country: {
           country_code: 'S92000001',
@@ -2807,7 +2807,11 @@ const AbstractChartProps: ChartProps = {
   data,
   meta: metaData,
   labels,
-  indicators: ['23', '26', '28'],
+  dataSets: [
+    { indicator: '23', filters: ['1', '2'] },
+    { indicator: '26', filters: ['1', '2'] },
+    { indicator: '28', filters: ['1', '2'] },
+  ],
   xAxis: { title: 'test x axis' },
   yAxis: { title: 'test y axis' },
 };
@@ -2816,7 +2820,11 @@ const AbstractMultipleChartProps: ChartProps = {
   data: multipleData,
   meta: metaData,
   labels,
-  indicators: ['23', '26', '28'],
+  dataSets: [
+    { indicator: '23', filters: ['1', '2'] },
+    { indicator: '26', filters: ['1', '2'] },
+    { indicator: '28', filters: ['1', '2'] },
+  ],
   xAxis: { title: 'test x axis' },
   yAxis: { title: 'test y axis' },
 };
