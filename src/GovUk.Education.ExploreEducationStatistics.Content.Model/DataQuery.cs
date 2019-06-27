@@ -34,10 +34,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model {
         string Type { get; }
     }
 
+    public class ChartDataSet
+    {
+        public string Indicator;
+        public List<string> filters;
+        public List<string> location;
+        public string timePeriod;
+    }
+
     public class LineChart : IContentBlockChart
     {
         public string Type => "line";
-        public List<string> Indicators;
+        public List<ChartDataSet> DataSets { get; set; }
         public Axis XAxis;
         public Axis YAxis;
     }
@@ -45,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model {
     public class HorizontalBarChart : IContentBlockChart 
     {
         public string Type => "horizontalbar";
-        public List<string> Indicators;
+        public List<ChartDataSet> DataSets { get; set; }
         public Axis XAxis;
         public Axis YAxis;
 
@@ -54,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model {
     public class VerticalBarChart : IContentBlockChart 
     {
         public string Type => "verticalbar";
-        public List<string> Indicators;
+        public List<ChartDataSet> DataSets { get; set; }
         public Axis XAxis;
         public Axis YAxis;
 
@@ -63,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model {
     public class MapChart : IContentBlockChart 
     {
         public string Type => "map";
-        public List<string> Indicators;
+        public List<ChartDataSet> DataSets { get; set; }
         public Axis XAxis => new Axis { title = "map"};
         public Axis YAxis => new Axis { title = "map"};
 

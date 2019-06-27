@@ -1132,9 +1132,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 {
                                     title = "Absence Rate"
                                 },
-                                Indicators = new List<string>
+                                DataSets = new List<ChartDataSet>
                                 {
-                                    "23", "26", "28"
+                                    new ChartDataSet { Indicator="23", filters  = new List<string> {"1","2"} },
+                                    new ChartDataSet { Indicator="26", filters  = new List<string> {"1","2"} },
+                                    new ChartDataSet { Indicator="28", filters  = new List<string> {"1","2"} },
                                 },
                             }
                         }
@@ -1206,9 +1208,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             {
                                                 title = "Absence Rate"
                                             },
-                                            Indicators = new List<string>
+                                            DataSets = new List<ChartDataSet>
                                             {
-                                                "23", "26", "28"
+                                                new ChartDataSet { Indicator="23", filters  = new List<string> {"1","2"} },
+                                                new ChartDataSet { Indicator="26", filters  = new List<string> {"1","2"} },
+                                                new ChartDataSet { Indicator="28", filters  = new List<string> {"1","2"} },
                                             },
                                         }
                                     }
@@ -1459,7 +1463,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Charts = new List<IContentBlockChart> {
                                         new MapChart {
-                                            Indicators = new List<string> { "23" , "26", "28" }
+                                            DataSets = new List<ChartDataSet>
+                                            {
+                                                new ChartDataSet { Indicator="23", filters  = new List<string> {"1","2"} },
+                                                new ChartDataSet { Indicator="26", filters  = new List<string> {"1","2"} },
+                                                new ChartDataSet { Indicator="28", filters  = new List<string> {"1","2"} },
+                                            },
                                         }
                                     }
 
@@ -1592,10 +1601,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 {
                                     title = ""
                                 },
-                                Indicators = new List<string>
+                                DataSets = new List<ChartDataSet>
                                 {
-                                    "158", "160"
+                                    new ChartDataSet { Indicator="158", filters  = new List<string> {"727"} },
+                                    new ChartDataSet { Indicator="160", filters  = new List<string> {"727"} }
                                 },
+
                             }
                         }
                     },
@@ -1662,10 +1673,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             {
                                                 title = ""
                                             },
-                                            Indicators = new List<string>
+                                            DataSets = new List<ChartDataSet>
                                             {
-                                                "156"
-                                            },
+                                                new ChartDataSet { Indicator="156", filters  = new List<string> {"727"} }
+                                            }
                                         }
                                     }
 
@@ -1724,9 +1735,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             {
                                                 title = ""
                                             },
-                                            Indicators = new List<string>
+                                            DataSets = new List<ChartDataSet>
                                             {
-                                                "158"
+                                                new ChartDataSet { Indicator="158", filters  = new List<string> {"727"} }
                                             },
                                         }
                                     }
