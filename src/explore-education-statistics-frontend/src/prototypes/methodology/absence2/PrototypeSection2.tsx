@@ -4,25 +4,25 @@ const PrototypeMethodologySection = () => {
   return (
     <>
       <p>
-        DfE’s annual absence releases have been badged as National Statistics
+        DfE’s annual exclusions releases have been badged as National Statistics
         since the 1999/00 academic year publication.
-      </p>
-      <p>
-        The termly and 2 term combined releases were badged as National
-        Statistics slightly later.
-      </p>
-      <p>
-        The combined autumn and spring term release was badged as national
-        statistics from the autumn 2006 and spring 2007 publication and the
-        single term releases were badged as National Statistics as of the autumn
-        term 2009 publication.
       </p>
       <h3 id="section2-1">2.1 National Statistics designation</h3>
       <p>
-        The United Kingdom Statistics Authority (UKSA) designated these
-        statistics as National Statistics in Month Year in accordance with the
-        Statistics and Registration Service Act 2007 and signifying compliance
-        with the Code of Practice for Statistics.
+        The{' '}
+        <a href="https://www.statisticsauthority.gov.uk/">
+          United Kingdom Statistics Authority (UKSA)
+        </a>{' '}
+        designated these statistics as National Statistics in accordance with
+        the
+        <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
+          Statistics and Registration Service Act 2007
+        </a>{' '}
+        and signifying compliance with the{' '}
+        <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
+          Code of Practice for Statistics
+        </a>
+        .
       </p>
       <p>Designation can be broadly interpreted to mean that the statistics:</p>
       <ul>

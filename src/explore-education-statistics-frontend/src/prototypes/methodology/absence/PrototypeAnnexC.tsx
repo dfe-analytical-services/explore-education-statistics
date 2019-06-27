@@ -3,197 +3,57 @@ import React from 'react';
 const PrototypeMethodologySection = () => {
   return (
     <>
-      <table className="govuk-table">
-        <caption className="govuk-table-caption">
-          The following codes are used by schools when taking registers, further
-          details are available in the Department’s School Attendance advice:
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col">Code</th>
-            <th scope="col">Reason</th>
-            <th scope="col">Colected in school census?</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td> / </td>
-            <td>Present (AM)</td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td> \ </td>
-            <td>Present (PM)</td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>L</td>
-            <td>Late (before registers closed) marked as present</td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>I</td>
-            <td>
-              Authorised absence due to Illness (NOT medical or dental etc.
-              appointments)
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>M</td>
-            <td>Authorised absence due to medical / dental appointments</td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>R</td>
-            <td>Authorised absence due to religious observance </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>S</td>
-            <td>Authorised absence due to study leave </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>T</td>
-            <td>
-              Authorised absence due to Gypsy, Roma and Traveller absence{' '}
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>H</td>
-            <td>Authorised absence due to authorised family holiday </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>E</td>
-            <td>
-              Authorised absence as pupil is excluded, but still on the
-              admission register, with no alternative provision made{' '}
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>C</td>
-            <td>
-              Authorised absence for reasons not covered by any other authorised
-              absence code, this code should only be used in exceptional
-              circumstances{' '}
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>B</td>
-            <td>
-              Approved educational activity as pupil being educated off site
-              (not dual registration)
-            </td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>D</td>
-            <td>
-              Dual registered (at another establishment) - not counted in
-              possible attendance
-            </td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>J</td>
-            <td>
-              Approved educational activity as pupil is attending interview with
-              prospective employer or another educational establishment
-            </td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>P</td>
-            <td>
-              Approved education activity as pupil is participating in an
-              approved supervised sporting activity
-            </td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>V</td>
-            <td>
-              Approved educational activity as pupil is at an organised
-              educational visit or trip
-            </td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>W</td>
-            <td>
-              Approved educational activity as pupil is attending work
-              experience
-            </td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>G</td>
-            <td>
-              Unauthorised absence as pupil is on a family holiday, not agreed,
-              or is taking days in excess of an agreed family holiday
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>U</td>
-            <td>
-              Unauthorised absence as pupil arrived after registration closed
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>O</td>
-            <td>
-              Unauthorised absence as the school is not satisfied with the
-              reason given for the absence, has not authorised the absence and
-              it is not covered by any other code / description
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>N</td>
-            <td>
-              Unauthorised absence as pupil missed session/s for a reason that
-              has not yet been provided
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>X</td>
-            <td>
-              Non-compulsory school age absence - not counted in possible
-              attendances
-            </td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>Y</td>
-            <td>
-              Non-compulsory school age absence - not counted in possible
-              attendances
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>Z</td>
-            <td>Pupil not yet on roll - not counted in possible attendances</td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>#</td>
-            <td>
-              Planned whole or partial school closure - not counted in possible
-              attendances
-            </td>
-            <td>No</td>
-          </tr>
-        </tbody>
-      </table>
+      <p>
+        Published pupil absence National Statistics are available at the
+        following links.{' '}
+      </p>
+      <dl>
+        <dt>*</dt>
+        <dd>Identifies those published as National Statistics</dd>
+        <dt>~</dt>
+        <dd>
+          For the 2006/07 academic year the separate autumn and spring term
+          reports were published as parts of one release
+        </dd>
+        <dt>^</dt>
+        <dd>Provisional publication</dd>
+      </dl>
+      <h3>Full academic year</h3>
+      <ul className="govuk-list">
+        <li>
+          <a href="/prototypes/publication">
+            Pupil absence in schools in England: 2016 to 2017
+          </a>{' '}
+          *
+        </li>
+      </ul>
+      <h3>Autumn term</h3>
+      <ul className="govuk-list">
+        <li>
+          <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-autumn-term-2016">
+            Pupil absence in schools in England: autumn term 2016
+          </a>{' '}
+          *
+        </li>
+      </ul>
+      <h3>Spring term</h3>
+      <ul className="govuk-list">
+        <li>
+          <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-spring-term-2012">
+            Pupil absence in schools in England: spring term 2012
+          </a>{' '}
+          *
+        </li>
+      </ul>
+      <h3>Autumn and spring terms</h3>
+      <ul className="govuk-list">
+        <li>
+          <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-autumn-2015-and-spring-2016">
+            Pupil absence in schools in England: autumn 2015 and spring 2016
+          </a>{' '}
+          *
+        </li>
+      </ul>
     </>
   );
 };

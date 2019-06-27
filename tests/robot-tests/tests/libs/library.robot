@@ -192,6 +192,9 @@ user presses keys
   [Arguments]   ${keys}
   press keys  ${None}    ${keys}
 
-user clicks details
-  [Arguments]   ${locator}
-  user clicks element  ${locator} span
+#user clicks accordion
+#  [Arguments]   ${text}
+#  # Expand accordion
+##  user clicks element containing text  ${text}
+#  user clicks element   css:[data-testid*="AccordionSection ${text}"]
+#  # Check that it has expanded

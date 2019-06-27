@@ -53,7 +53,6 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
         ref={ref}
         role={onMedia('tabpanel')}
         tabIndex={onMedia(-1)}
-        data-testid={title}
       >
         {createElement(headingTag, { children: title })}
         {children}

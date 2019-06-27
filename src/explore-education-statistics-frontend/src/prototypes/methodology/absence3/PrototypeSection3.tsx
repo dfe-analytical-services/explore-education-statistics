@@ -3,333 +3,190 @@ import React from 'react';
 const PrototypeMethodologySection = () => {
   return (
     <>
-      <h3 id="section3-1">3.1 Overall absence methodology</h3>
+      <h3 id="section3-1">3.1 Collection and cleaning of the data</h3>
       <p>
-        An enrolment’s overall absence rate is the total number of overall
-        absence sessions as a percentage of the total number of possible
-        sessions available to that enrolment, where overall absence is the sum
-        of authorised and unauthorised absence and one session is equal to half
-        a day
+        Secondary and primary data were gathered from local authorities (LAs) at
+        pupil level, with a record for each applicant for a school place.
       </p>
       <p>
-        To calculate school, local authority and national level overall absence
-        rates, the total absences and possible sessions for all enrolments
-        within the relevant areas are included.
-      </p>
-      <p className="govuk-body-s">
-        Overall absence rate = (Total overall absence sessions) / Total sessions
-        possible) X 100
-      </p>
-      <h3 id="section3-2">3.2 Persistent absence methodology</h3>
-      <p>
-        The persistent absence measure was introduced in 2005/06. The sections
-        below outline how the measure has changed since it was implemented.
+        This data has been aggregated by DfE into the local authority level
+        figures provided in this release.
       </p>
       <p>
-        In published releases, to allow users to compare over time, time series
-        information is recalculated following any methodology change.
-      </p>
-      <h4>Overview of persistent absence measures used since 2005/06</h4>
-      <table className="govuk-table">
-        <caption className="govuk-table-caption">
-          Table 2: Persistent absence measures since 2005/06
-        </caption>
-        <thead>
-          <tr>
-            <th>Description of persistent absence measure</th>
-            <th>Academic years</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              10% or more of sessions missed (based on each pupil’s possible
-              sessions)
-            </td>
-            <td>2015/16 onwards</td>
-          </tr>
-          <tr>
-            <td>
-              Around 15% or more of sessions missed (based on a standard
-              threshold)
-            </td>
-            <td>2010/11 to 2014/15</td>
-          </tr>
-          <tr>
-            <td>
-              Around 20% or more of sessions missed (based on a standard
-              threshold)
-            </td>
-            <td>2005/06 to 2009/10</td>
-          </tr>
-        </tbody>
-      </table>
-      <h4>2015/16 onwards (10 per cent, based on an exact methodology)</h4>
-      <p>
-        Since the start of the 2015/16 academic year schools, a pupil has been
-        classified as a persistent absentee if they miss 10 per cent or more of
-        their own possible sessions, rather than if they reach a standard
-        threshold of absence sessions. Meaning, that if an enrolment’s overall
-        absence rate 10 per cent or higher2 they will be classified as
-        persistently absent. See{' '}
-        <a href="#section3-1">overall absence methodology</a> section for
-        further information.
+        The data collected is the position as at the respective national offer
+        day. It includes all offers made on that day, regardless of whether they
+        were subsequently accepted or refused.
       </p>
       <p>
-        To calculate school, local authority and national level persistent
-        absence rates, all persistently absent enrolments within the relevant
-        areas are included.
-      </p>
-      <p className="govuk-body-s">
-        Persistent absence rate = (Number of enrolments classed as persistent
-        absentees / Number of enrolments) X 100
+        Cleaning of the data prior to aggregation may cause slight differences
+        between the figures contained in this publication and any released by
+        the LAs themselves closer to the respective national offer days.
       </p>
       <p>
-        Note that, although the measure was only in place from September 2015,
-        figures based on the 10 per cent exact methodology were published
-        alongside the 2014/15 Pupil absence in schools in England releases for
-        information purposes only.
+        In some cases an application was recorded by both the home authority (to
+        whom the application was made) and also by the LA within which the
+        school where a place was offered is based.
       </p>
       <p>
-        Table 3 provides a comparison of figures at the 10% and 15% level using
-        the previous threshold methodology and the current exact methodology,
-        based on figures for the full 2014/15 academic year, when the change
-        became effective.
+        To be correct, only the home authority to whom the applicant sent their
+        form should record the application and offer. Therefore the duplicate
+        record submitted by the LA in which the school is based has been
+        removed.
       </p>
-      <table className="govuk-table">
-        <caption className="govuk-table-caption">
-          Table 3: Comparison of the number and percentage of persistent
-          absentees for the 2014/15 academic year based on the threshold
-          (previous) and exact (current) methodology
-        </caption>
-        <thead>
-          <tr>
-            <td rowSpan={2} />
-            <th colSpan={2} scope="col" className="govuk-table__cell--numeric">
-              Threshold methodology
-            </th>
-            <th colSpan={2} scope="col" className="govuk-table__cell--numeric">
-              Exact methodology
-            </th>
-          </tr>
-          <tr>
-            <th className="govuk-table__cell--numeric">Number</th>
-            <th className="govuk-table__cell--numeric">Percentage</th>
-            <th className="govuk-table__cell--numeric">Number</th>
-            <th className="govuk-table__cell--numeric">Percentage</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th colSpan={5}>Total</th>
-          </tr>
-          <tr>
-            <td>10 per cent</td>
-            <td className="govuk-table__cell--numeric">327,070</td>
-            <td className="govuk-table__cell--numeric">9.4</td>
-            <td className="govuk-table__cell--numeric">728,080</td>
-            <td className="govuk-table__cell--numeric">11.0</td>
-          </tr>
-          <tr>
-            <td>15 per cent</td>
-            <td className="govuk-table__cell--numeric">245,840</td>
-            <td className="govuk-table__cell--numeric">3.7</td>
-            <td className="govuk-table__cell--numeric">308,100</td>
-            <td className="govuk-table__cell--numeric">4.6</td>
-          </tr>
-
-          <tr>
-            <th colSpan={5}>Primary</th>
-          </tr>
-          <tr>
-            <td>10 per cent</td>
-            <td className="govuk-table__cell--numeric">257,945</td>
-            <td className="govuk-table__cell--numeric">6.9</td>
-            <td className="govuk-table__cell--numeric">314,440</td>
-            <td className="govuk-table__cell--numeric">8.4</td>
-          </tr>
-          <tr>
-            <td>15 per cent</td>
-            <td className="govuk-table__cell--numeric">79,955</td>
-            <td className="govuk-table__cell--numeric">2.1</td>
-            <td className="govuk-table__cell--numeric">113,160</td>
-            <td className="govuk-table__cell--numeric">3.0</td>
-          </tr>
-
-          <tr>
-            <th colSpan={5}>Secondary</th>
-          </tr>
-          <tr>
-            <td>10 per cent</td>
-            <td className="govuk-table__cell--numeric">347,425</td>
-            <td className="govuk-table__cell--numeric">12.3</td>
-            <td className="govuk-table__cell--numeric">390,185</td>
-            <td className="govuk-table__cell--numeric">13.8</td>
-          </tr>
-          <tr>
-            <td>15 per cent</td>
-            <td className="govuk-table__cell--numeric">152,775</td>
-            <td className="govuk-table__cell--numeric">5.4</td>
-            <td className="govuk-table__cell--numeric">180,610</td>
-            <td className="govuk-table__cell--numeric">6.4</td>
-          </tr>
-
-          <tr>
-            <th colSpan={5}>Special</th>
-          </tr>
-          <tr>
-            <td>10 per cent</td>
-            <td className="govuk-table__cell--numeric">21,700</td>
-            <td className="govuk-table__cell--numeric">25.4</td>
-            <td className="govuk-table__cell--numeric">23,460</td>
-            <td className="govuk-table__cell--numeric">27.5</td>
-          </tr>
-          <tr>
-            <td>15 per cent</td>
-            <td className="govuk-table__cell--numeric">13,110</td>
-            <td className="govuk-table__cell--numeric">15.4</td>
-            <td className="govuk-table__cell--numeric">14,330</td>
-            <td className="govuk-table__cell--numeric">16.8</td>
-          </tr>
-        </tbody>
-      </table>
-
       <p>
-        Further details on the rationale for the methodology change can be found
-        in the original consultation document on proposed changes to absence
-        statistics which was published in October 2014 in Section 9 of the Pupil
-        absence in schools in England: autumn 2013 and spring 2014 Statistical
-        First Release. A consultation response summarising feedback received
-        from users on the proposed change to the methodology and next steps,
-        published in October 2015, can also be found on the same webpage.
+        Applications listing preferences or offers to schools which could not be
+        identified from the school census,{' '}
+        <a href="https://get-information-schools.service.gov.uk/">
+          Get Information About Schools
+        </a>{' '}
+        or via one of the additional 'dummy' school codes used to identify new
+        schools or split entries (see below) were removed.
       </p>
-
-      <h4>2010/11 to 2014/15 methodology (15 per cent PA threshold)</h4>
-
       <p>
-        Pupils were identified as persistent absentees by comparing the number
-        of overall absence sessions they had against a standard threshold of
-        around 15 per cent of possible sessions, equating to 56 or more sessions
-        across the full academic year for pupils aged 5 to 14 and 46 or more
-        sessions across the full academic year for pupils aged 15 (whose absence
-        information is based on the first five half terms only, as any sixth
-        half term absence is removed prior to analysis as set out in the section
-        on the{' '}
-        <a href="#section2-4">
-          school year (five half terms vs six half terms)
+        Other very small adjustments have been made as required to the source
+        data to ensure that we provide as full and accurate a picture of the
+        application and offer process as possible (for example, removing the
+        second example if two offers have been recorded for one applicant,
+        causing double-counting).
+      </p>
+      <h3 id="section3-2">3.2 Interpretation of the figures</h3>
+      <p>
+        The figures are based on the offers sent out by LAs on the respective
+        national offer days.
+      </p>
+      <p>
+        The final numbers of pupils starting in specific schools is likely to be
+        different due to late applicants, refusal of offers, subsequent offers
+        made via a second offer round or via the schools' waiting lists, or
+        successful appeals. Revised figures incorporating any subsequent changes
+        are not collected or published.
+      </p>
+      <p>
+        The inclusion of a school by an applicant as one of their preferences
+        does not mean that they meet the admissions criteria for that school.
+      </p>
+      <p>
+        Examples of where the applicant has little or no chance of being
+        admitted on national offer day include naming a selective school having
+        not passed the grammar entrance test, living a long way out of catchment
+        for a popular community school and requesting a place for a boy at a
+        girls' school.
+      </p>
+      <p>
+        Some schools offer places via a lottery, where everyone who applies has
+        an equal (subject to fair banding) chance of being considered, which may
+        encourage applications.
+      </p>
+      <p>
+        If an authority is not able to make an offer of a preferred school, in
+        most cases they offer a place at an alternative school.
+      </p>
+      <p>
+        However, some authorities chose instead to send the applicant a list of
+        schools with available places and invite them to state which of these
+        schools they would prefer their child to attend. These incidences are
+        recorded as the applicant receiving no offer.
+      </p>
+      <p>
+        A total of five LAs made no alternative offers on secondary national
+        offer day, to applicants to whom they were not able to make an offer of
+        one of their preferred schools, and six made no alternative offers on
+        primary national offer day.
+      </p>
+      <p>
+        The tables include the percentage of offers which are of schools a)
+        within or b) outside the LA to which the application was made. These are
+        calculated as a proportion of all offers, including those made to
+        non-applicants (see table notes).
+      </p>
+      <p>
+        The LAs were asked not to provide data on school places offered to
+        children with an Education, Health and Care Plan (EHC) or statement of
+        special educational needs (SEN), since the parents of these children
+        were not required to apply for a school place.
+      </p>
+      <p>
+        However, there are a number of applications where special schools were
+        amongst the preferences stated and, in some cases, a special school has
+        been offered.
+      </p>
+      <p>
+        It's assumed these are offers to SEN children who do not have a
+        statement or EHCP. These preferences and offers have been included in
+        the final figures.
+      </p>
+      <p>
+        At secondary level the application is for the main entry point into
+        secondary school in that local authority. This is usually year 7 but a
+        small number of authorities have a main entry point in year 9 and this
+        is what they report on.
+      </p>
+      <p>
+        For LAs with more than one entry point, the intake with the largest
+        number of places available is the one reported.
+      </p>
+      <p>
+        Places at schools such as UTCs and studio schools, whose intake is in
+        year 10 (at age 14 years) are not allocated via the co-ordinated
+        admissions process and therefore are not included in these figures.
+      </p>
+      <p>
+        Some schools have two entry routes. At primary school this is generally
+        a school with a single school code but with two sites, each of which can
+        be applied for separately.
+      </p>
+      <p>
+        At secondary level the two routes are usually either a school with day
+        and boarding places, or a school with a number of places reserved for
+        those passing aptitude tests (for example, in music or languages).
+      </p>
+      <p>
+        In these cases, parents can apply for both routes (e.g. for both sites
+        of a split-site primary school), so a 'dummy' school code is used to
+        identify the second option for each affected school.
+      </p>
+      <p>
+        All mainstream state-funded schools, including academies, are included
+        in the figures.
+      </p>
+      <p>
+        However, new opener free schools can have a rapid set-up process and may
+        not be ready in time to make their offers within the local authority
+        co-ordinated exercise.
+      </p>
+      <p>
+        Therefore, for their first year of operation only, free schools may make
+        offers directly and those that do so will be excluded from these
+        figures. In their second year of operation, they must make offers within
+        the local authority co-ordination process.
+      </p>
+      <p>
+        The Isles of Scilly local authority has one school which takes pupils
+        between the ages of 3 and 16.
+      </p>
+      <p>
+        Parents are not required to complete an application form and there is no
+        competition for a place at the school. Therefore this authority has been
+        omitted from both tables as preference rates cannot be calculated.
+      </p>
+      <h3 id="section3-3">3.3 Further information</h3>
+      <p>
+        This release is the latest in an annual series with releases from 2011
+        onwards available on{' '}
+        <a href="https://www.gov.uk/government/collections/statistics-school-applications">
+          Statistics: school applications
         </a>
-        .
+        statistics website.
       </p>
       <p>
-        Prior to 2012/13 (when absence data was first collected for the second
-        half of the summer term), the threshold was 46 sessions across the first
-        five half terms of the year for all pupils.
+        However, information on primary level preferences is only included from
+        2014 onwards.
       </p>
       <p>
-        For the autumn term, figures showed how many enrolments had already
-        become persistent absentees, as well as those who may become persistent
-        absentees based on the standard threshold of 22 or more sessions of
-        absence.
+        This is when DfE started collecting data on primary applications and
+        offers, based on the newly introduced national primary offer day of 16
+        April (or next working day).
       </p>
-      <p>
-        For the autumn and spring terms, figures showed how many enrolments had
-        already become persistent absentees, as well as those who may become
-        persistent absentees based on the standard threshold of 38 or more
-        sessions of absence.
-      </p>
-      <p>
-        Standard termly persistent absentee thresholds were calculated by taking
-        15 per cent of the mode (most common number of) possible sessions for
-        all enrolments. This meant that, in some cases, the standard threshold
-        may be more or less than 15 per cent of an individual pupil’s sessions.
-        The termly persistent absence thresholds were reviewed each term to
-        account for any changes to the mode possible sessions, but the
-        thresholds did not tend to change from year to year. See table 4 for
-        standard thresholds.
-      </p>
-      <table className="govuk-table">
-        <caption className="govuk-table-cap">
-          Table 4: Standard cumulative persistent absence thresholds for missing
-          15 per cent of possible sessions
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col">Term</th>
-            <th scope="col">Threshold</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Autumn term</td>
-            <td>22 sessions</td>
-          </tr>
-          <tr>
-            <td>
-              Spring term (as of 2012/13, no longer published individually)
-            </td>
-            <td>16 sessions</td>
-          </tr>
-          <tr>
-            <td>Autumn and spring terms</td>
-            <td>38 sessions</td>
-          </tr>
-          <tr>
-            <td>First five half terms</td>
-            <td>46 sessions</td>
-          </tr>
-          <tr>
-            <td>Full academic year – six half terms</td>
-            <td>56 sessions</td>
-          </tr>
-        </tbody>
-      </table>
-      <h4>2005/06 to 2009/10 methodology (20 per cent PA threshold)</h4>
-      <p>
-        The persistent absence measure was first introduced in 2005/06, where a
-        pupil was identified as a persistent absentee if they missed around 20
-        per cent or more of possible sessions.{' '}
-      </p>
-
-      <p>
-        Persistent absence figures were published in a similar way to that of
-        the 15 per cent threshold figures that were in place between 2010/11 and
-        2013/14. With both the autumn term and autumn and spring term releases
-        showing how many enrolments 17 have already become persistent absentees,
-        as well as those who may become, persistent absentees based on the
-        standard threshold. See table 5 for standard thresholds to which missing
-        20 per cent of sessions equated to.{' '}
-      </p>
-      <p>This threshold was reduced to 15 per cent as of September 2010.</p>
-      <table className="govuk-table">
-        <caption className="govuk-table-caption">
-          Table 5: Standard absence thresholds for missing 20 per cent of
-          possible sessions, between 2005/06 and 2009/10
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col">Term</th>
-            <th scope="col">Threshold</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Autumn term</td>
-            <td>28 sessions</td>
-          </tr>
-          <tr>
-            <td>Spring term</td>
-            <td>52 sessions</td>
-          </tr>
-          <tr>
-            <td>Autumn and Spring term</td>
-            <td>52 sessions</td>
-          </tr>
-          <tr>
-            <td>First five half terms</td>
-            <td>64 sessions</td>
-          </tr>
-        </tbody>
-      </table>
     </>
   );
 };

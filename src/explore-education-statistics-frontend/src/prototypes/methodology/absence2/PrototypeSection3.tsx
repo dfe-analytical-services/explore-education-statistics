@@ -3,333 +3,228 @@ import React from 'react';
 const PrototypeMethodologySection = () => {
   return (
     <>
-      <h3 id="section3-1">3.1 Overall absence methodology</h3>
+      <h3 id="section3-1">3.1 Calculation of exclusion rates</h3>
       <p>
-        An enrolment’s overall absence rate is the total number of overall
-        absence sessions as a percentage of the total number of possible
-        sessions available to that enrolment, where overall absence is the sum
-        of authorised and unauthorised absence and one session is equal to half
-        a day
+        Within published exclusions statistics both the number of exclusions and
+        the rate of exclusion are presented.
       </p>
       <p>
-        To calculate school, local authority and national level overall absence
-        rates, the total absences and possible sessions for all enrolments
-        within the relevant areas are included.
+        Rates of exclusion are a more appropriate measure for comparisons over
+        time as they take into account changes in the overall number of pupils
+        across different academic years.
+      </p>
+      <p>
+        As pupils can receive more than one fixed-period exclusion, in some
+        cases the rate of exclusion may be above 100%.
+      </p>
+      <p>
+        The following sections outline the methodology used to calculate
+        exclusion rates - including a change implemented as of the 2013/14
+        academic year.
+      </p>
+      <h4 id="section3-1-1">3.1.1 2013/14 releases onwards</h4>
+      <p>
+        This change is an improvement as it more accurately reflects the number
+        of pupils who could be excluded, resulting in more accurate exclusion
+        rates.
+      </p>
+      <p>
+        This change has a minor effect on exclusion rates, but to assist users
+        recalculated time series data have been made available within national
+        published time series tables and underlying data.
+      </p>
+      <p>Figures on numbers of exclusions are not affected by this change.</p>
+      <p className="govuk-body-s">
+        Permanent exclusion rate = (Number of permanent exclusions recorded
+        across whole academic year / Number of sole and dual main registered
+        pupils on roll as of January census day) X 100
       </p>
       <p className="govuk-body-s">
-        Overall absence rate = (Total overall absence sessions) / Total sessions
-        possible) X 100
+        Fixed-period exclusion rate = (Number of fixed-period exclusions
+        recorded across whole academic year / Number of sole and dual main
+        registered pupils on roll as of January census day) X 100
       </p>
-      <h3 id="section3-2">3.2 Persistent absence methodology</h3>
+      <h4 id="section3-1-1">3.1.2 2013/14 releases onwards</h4>
       <p>
-        The persistent absence measure was introduced in 2005/06. The sections
-        below outline how the measure has changed since it was implemented.
-      </p>
-      <p>
-        In published releases, to allow users to compare over time, time series
-        information is recalculated following any methodology change.
-      </p>
-      <h4>Overview of persistent absence measures used since 2005/06</h4>
-      <table className="govuk-table">
-        <caption className="govuk-table-caption">
-          Table 2: Persistent absence measures since 2005/06
-        </caption>
-        <thead>
-          <tr>
-            <th>Description of persistent absence measure</th>
-            <th>Academic years</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              10% or more of sessions missed (based on each pupil’s possible
-              sessions)
-            </td>
-            <td>2015/16 onwards</td>
-          </tr>
-          <tr>
-            <td>
-              Around 15% or more of sessions missed (based on a standard
-              threshold)
-            </td>
-            <td>2010/11 to 2014/15</td>
-          </tr>
-          <tr>
-            <td>
-              Around 20% or more of sessions missed (based on a standard
-              threshold)
-            </td>
-            <td>2005/06 to 2009/10</td>
-          </tr>
-        </tbody>
-      </table>
-      <h4>2015/16 onwards (10 per cent, based on an exact methodology)</h4>
-      <p>
-        Since the start of the 2015/16 academic year schools, a pupil has been
-        classified as a persistent absentee if they miss 10 per cent or more of
-        their own possible sessions, rather than if they reach a standard
-        threshold of absence sessions. Meaning, that if an enrolment’s overall
-        absence rate 10 per cent or higher2 they will be classified as
-        persistently absent. See{' '}
-        <a href="#section3-1">overall absence methodology</a> section for
-        further information.
+        Prior to the 2013/14 annual exclusions release, exclusion rates were
+        calculated as a percentage of the total number of solely registered
+        pupils on roll as at January census day.
       </p>
       <p>
-        To calculate school, local authority and national level persistent
-        absence rates, all persistently absent enrolments within the relevant
-        areas are included.
+        Formulae for exclusion rates prior to the 2013/14 release are as
+        follows:
       </p>
       <p className="govuk-body-s">
-        Persistent absence rate = (Number of enrolments classed as persistent
-        absentees / Number of enrolments) X 100
+        Permanent exclusion rate = (Number of permanent exclusions recorded
+        across whole academic year / Number of sole registered pupils on roll as
+        of January census day) X 100
+      </p>
+      <p className="govuk-body-s">
+        Fixed-period exclusion rate = (Number of fixed-period exclusions
+        recorded across whole academic year / Number of sole registered pupils
+        on roll as of January census day) X 100
+      </p>
+      <h3 id="section3-2">
+        3.2 Permanent exclusion checking exercise 1997/98 to 2009/10
+      </h3>
+      <p>
+        Due to some known under-reporting and some over-reporting of permanent
+        exclusions, a data checking exercise with local authorities was carried
+        out from 1997/98 to 2009/10 to confirm the number of permanent
+        exclusions.
       </p>
       <p>
-        Note that, although the measure was only in place from September 2015,
-        figures based on the 10 per cent exact methodology were published
-        alongside the 2014/15 Pupil absence in schools in England releases for
-        information purposes only.
+        Therefore, for these years, permanent exclusion figures are estimates
+        based on incomplete pupil level data.
       </p>
       <p>
-        Table 3 provides a comparison of figures at the 10% and 15% level using
-        the previous threshold methodology and the current exact methodology,
-        based on figures for the full 2014/15 academic year, when the change
-        became effective.
+        The checking exercise took place at local authority level, where the
+        number of permanent exclusions reported by schools via the schools
+        census were compared to the number of permanent exclusions confirmed by
+        each local authority.
       </p>
-      <table className="govuk-table">
-        <caption className="govuk-table-caption">
-          Table 3: Comparison of the number and percentage of persistent
-          absentees for the 2014/15 academic year based on the threshold
-          (previous) and exact (current) methodology
-        </caption>
-        <thead>
-          <tr>
-            <td rowSpan={2} />
-            <th colSpan={2} scope="col" className="govuk-table__cell--numeric">
-              Threshold methodology
-            </th>
-            <th colSpan={2} scope="col" className="govuk-table__cell--numeric">
-              Exact methodology
-            </th>
-          </tr>
-          <tr>
-            <th className="govuk-table__cell--numeric">Number</th>
-            <th className="govuk-table__cell--numeric">Percentage</th>
-            <th className="govuk-table__cell--numeric">Number</th>
-            <th className="govuk-table__cell--numeric">Percentage</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th colSpan={5}>Total</th>
-          </tr>
-          <tr>
-            <td>10 per cent</td>
-            <td className="govuk-table__cell--numeric">327,070</td>
-            <td className="govuk-table__cell--numeric">9.4</td>
-            <td className="govuk-table__cell--numeric">728,080</td>
-            <td className="govuk-table__cell--numeric">11.0</td>
-          </tr>
-          <tr>
-            <td>15 per cent</td>
-            <td className="govuk-table__cell--numeric">245,840</td>
-            <td className="govuk-table__cell--numeric">3.7</td>
-            <td className="govuk-table__cell--numeric">308,100</td>
-            <td className="govuk-table__cell--numeric">4.6</td>
-          </tr>
-
-          <tr>
-            <th colSpan={5}>Primary</th>
-          </tr>
-          <tr>
-            <td>10 per cent</td>
-            <td className="govuk-table__cell--numeric">257,945</td>
-            <td className="govuk-table__cell--numeric">6.9</td>
-            <td className="govuk-table__cell--numeric">314,440</td>
-            <td className="govuk-table__cell--numeric">8.4</td>
-          </tr>
-          <tr>
-            <td>15 per cent</td>
-            <td className="govuk-table__cell--numeric">79,955</td>
-            <td className="govuk-table__cell--numeric">2.1</td>
-            <td className="govuk-table__cell--numeric">113,160</td>
-            <td className="govuk-table__cell--numeric">3.0</td>
-          </tr>
-
-          <tr>
-            <th colSpan={5}>Secondary</th>
-          </tr>
-          <tr>
-            <td>10 per cent</td>
-            <td className="govuk-table__cell--numeric">347,425</td>
-            <td className="govuk-table__cell--numeric">12.3</td>
-            <td className="govuk-table__cell--numeric">390,185</td>
-            <td className="govuk-table__cell--numeric">13.8</td>
-          </tr>
-          <tr>
-            <td>15 per cent</td>
-            <td className="govuk-table__cell--numeric">152,775</td>
-            <td className="govuk-table__cell--numeric">5.4</td>
-            <td className="govuk-table__cell--numeric">180,610</td>
-            <td className="govuk-table__cell--numeric">6.4</td>
-          </tr>
-
-          <tr>
-            <th colSpan={5}>Special</th>
-          </tr>
-          <tr>
-            <td>10 per cent</td>
-            <td className="govuk-table__cell--numeric">21,700</td>
-            <td className="govuk-table__cell--numeric">25.4</td>
-            <td className="govuk-table__cell--numeric">23,460</td>
-            <td className="govuk-table__cell--numeric">27.5</td>
-          </tr>
-          <tr>
-            <td>15 per cent</td>
-            <td className="govuk-table__cell--numeric">13,110</td>
-            <td className="govuk-table__cell--numeric">15.4</td>
-            <td className="govuk-table__cell--numeric">14,330</td>
-            <td className="govuk-table__cell--numeric">16.8</td>
-          </tr>
-        </tbody>
-      </table>
-
       <p>
-        Further details on the rationale for the methodology change can be found
-        in the original consultation document on proposed changes to absence
-        statistics which was published in October 2014 in Section 9 of the Pupil
-        absence in schools in England: autumn 2013 and spring 2014 Statistical
-        First Release. A consultation response summarising feedback received
-        from users on the proposed change to the methodology and next steps,
-        published in October 2015, can also be found on the same webpage.
+        This resulted in a pro-rate variable for each reported exclusion, where
+        each exclusion could account for more or less depending on if schools
+        within the local authority were deemed to have over or under reported
+        their exclusions.
       </p>
-
-      <h4>2010/11 to 2014/15 methodology (15 per cent PA threshold)</h4>
-
+      <p className="govuk-body-s">
+        Permanent pro rate = Number of permanent exclusions confirmed by local
+        authority during checking exercise for each school / Number of permanent
+        exclusions reported in school census for each type of school
+      </p>
       <p>
-        Pupils were identified as persistent absentees by comparing the number
-        of overall absence sessions they had against a standard threshold of
-        around 15 per cent of possible sessions, equating to 56 or more sessions
-        across the full academic year for pupils aged 5 to 14 and 46 or more
-        sessions across the full academic year for pupils aged 15 (whose absence
-        information is based on the first five half terms only, as any sixth
-        half term absence is removed prior to analysis as set out in the section
-        on the{' '}
-        <a href="#section2-4">
-          school year (five half terms vs six half terms)
+        For example, if 5 permanent exclusions were reported for primary schools
+        by a local authority via the school census but 10 permanent exclusions
+        for primary schools were confirmed by the local authority during the
+        checking exercise, each individual reported permanent exclusion was
+        subsequently counted as 2.
+      </p>
+      <p className="govuk-body-s">
+        Published permanent exclusion figure = (Number of permanent exclusions
+        reported in school census X Permanent pro rate
+      </p>
+      <p>
+        This issue has decreased over time and the checking exercise was
+        discontinued following the 2009/10 academic year.
+      </p>
+      <p>
+        Following this - ie from the 2010/11 publication onwards - published
+        permanent exclusion figures are as reported by schools.
+      </p>
+      <h3 id="section3-3">
+        3.3 Appeals and reviews relating to permanent exclusions
+      </h3>
+      <p>
+        Parents (and pupils if aged over 18 years) are able to request a review
+        of a permanent exclusion.
+      </p>
+      <p>
+        Data on independent review panels regarding permanent exclusions is
+        collected at local authority level via an annual survey. Data was first
+        collected for the 2012/13 academic year.
+      </p>
+      <p>
+        Information on the old independent appeal panels has been collected by
+        DfE via an annual survey since 1994/95.
+      </p>
+      <p>
+        However, figures for 1994/95 to 1996/97 are known to be incomplete.
+        Therefore, in the majority of releases, appeals data has been published
+        from 1997/98 onwards.
+      </p>
+      <p>
+        For further information on independent review panels:{' '}
+        <a href="https://www.gov.uk/government/publications/school-exclusion">
+          Statutory guidance: school exclusion
         </a>
-        .
+      </p>
+      <h4 id="section3-3-1">
+        3.3.1 Reviews of permanent exclusions: 2012/13 onwards
+      </h4>
+      <p>
+        From 1 September 2012, independent appeal panels were replaced with
+        independent review panels - a new system by which the governing body's
+        decision to uphold a permanent exclusion decision can be reviewed.
       </p>
       <p>
-        Prior to 2012/13 (when absence data was first collected for the second
-        half of the summer term), the threshold was 46 sessions across the first
-        five half terms of the year for all pupils.
+        The role of the independent review panel is to review the governing
+        body's decision not to reinstate a permanently excluded pupil.
       </p>
       <p>
-        For the autumn term, figures showed how many enrolments had already
-        become persistent absentees, as well as those who may become persistent
-        absentees based on the standard threshold of 22 or more sessions of
-        absence.
+        In reviewing the decision the panel must consider the interests and
+        circumstances of the excluded pupil, including the circumstances in
+        which the pupil was excluded, and have regard to the interests of other
+        pupils and people working at the school.
       </p>
       <p>
-        For the autumn and spring terms, figures showed how many enrolments had
-        already become persistent absentees, as well as those who may become
-        persistent absentees based on the standard threshold of 38 or more
-        sessions of absence.
+        Where a panel decides that a governing body's decision is flawed in the
+        light of the principles applicable on an application for judicial
+        review, it can direct the governing body to reconsider its decision.
       </p>
       <p>
-        Standard termly persistent absentee thresholds were calculated by taking
-        15 per cent of the mode (most common number of) possible sessions for
-        all enrolments. This meant that, in some cases, the standard threshold
-        may be more or less than 15 per cent of an individual pupil’s sessions.
-        The termly persistent absence thresholds were reviewed each term to
-        account for any changes to the mode possible sessions, but the
-        thresholds did not tend to change from year to year. See table 4 for
-        standard thresholds.
+        If the governing body does not subsequently offer to reinstate a pupil,
+        the panel will be expected to order that the school makes an additional
+        payment of £4,000.
       </p>
-      <table className="govuk-table">
-        <caption className="govuk-table-cap">
-          Table 4: Standard cumulative persistent absence thresholds for missing
-          15 per cent of possible sessions
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col">Term</th>
-            <th scope="col">Threshold</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Autumn term</td>
-            <td>22 sessions</td>
-          </tr>
-          <tr>
-            <td>
-              Spring term (as of 2012/13, no longer published individually)
-            </td>
-            <td>16 sessions</td>
-          </tr>
-          <tr>
-            <td>Autumn and spring terms</td>
-            <td>38 sessions</td>
-          </tr>
-          <tr>
-            <td>First five half terms</td>
-            <td>46 sessions</td>
-          </tr>
-          <tr>
-            <td>Full academic year – six half terms</td>
-            <td>56 sessions</td>
-          </tr>
-        </tbody>
-      </table>
-      <h4>2005/06 to 2009/10 methodology (20 per cent PA threshold)</h4>
       <p>
-        The persistent absence measure was first introduced in 2005/06, where a
-        pupil was identified as a persistent absentee if they missed around 20
-        per cent or more of possible sessions.{' '}
+        This payment will go to the local authority. In other circumstances a
+        panel can recommend, rather than direct, that a governing body
+        reconsiders its decision.
       </p>
-
       <p>
-        Persistent absence figures were published in a similar way to that of
-        the 15 per cent threshold figures that were in place between 2010/11 and
-        2013/14. With both the autumn term and autumn and spring term releases
-        showing how many enrolments 17 have already become persistent absentees,
-        as well as those who may become, persistent absentees based on the
-        standard threshold. See table 5 for standard thresholds to which missing
-        20 per cent of sessions equated to.{' '}
+        No additional payment is required if reinstatement is not offered
+        following a recommendation to reconsider.
       </p>
-      <p>This threshold was reduced to 15 per cent as of September 2010.</p>
-      <table className="govuk-table">
-        <caption className="govuk-table-caption">
-          Table 5: Standard absence thresholds for missing 20 per cent of
-          possible sessions, between 2005/06 and 2009/10
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col">Term</th>
-            <th scope="col">Threshold</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Autumn term</td>
-            <td>28 sessions</td>
-          </tr>
-          <tr>
-            <td>Spring term</td>
-            <td>52 sessions</td>
-          </tr>
-          <tr>
-            <td>Autumn and Spring term</td>
-            <td>52 sessions</td>
-          </tr>
-          <tr>
-            <td>First five half terms</td>
-            <td>64 sessions</td>
-          </tr>
-        </tbody>
-      </table>
+      <p>
+        Whether or not a school recognises that a pupil has special educational
+        needs (SEN), all parents (or pupils if aged 18 or over) have the right
+        to request the presence of a SEN expert at an independent review panel.
+      </p>
+      <p>
+        The SEN expert's role is to provide impartial advice to the panel about
+        how SEN could be relevant to the exclusion.
+      </p>
+      <p>
+        For example, whether the school acted reasonably in relation to its SEN
+        duties when excluding the pupil.
+      </p>
+      <p>
+        The data does not show whether any reinstatement offer has been accepted
+        by parents.
+      </p>
+      <h4 id="section3-3-1">
+        3.3.2 Appeals against permanent exclusions: prior to 2012/13
+      </h4>
+      <p>
+        Prior to 1 September 2012, independent appeal panels were used to appeal
+        the decision to permanently exclude a pupil. Panels could either:
+      </p>
+      <ul className="govuk-list govuk-list--bullet">
+        <li>uphold the exclusion</li>
+        <p>
+          <strong>OR</strong>
+        </p>
+        <li>
+          overturn the exclusion. In this case they could either:
+          <ul className="govuk-list govuk-list--bullet">
+            <li>
+              direct immediate reinstatement or reinstatement at some future
+              date
+            </li>
+            <p>
+              <strong>OR</strong>
+            </p>
+            <li>
+              decide that because of exceptional circumstances or other reasons
+              it was not practical to give a direction requiring reinstatement,
+              but that it would otherwise have been appropriate to give such a
+              direction
+            </li>
+          </ul>
+        </li>
+      </ul>
     </>
   );
 };

@@ -6,32 +6,47 @@ const PrototypeMethodologySection = () => {
       <h3 id="section6-1">Data quality</h3>
       <p>
         The following should be taken into account when reviewing published
-        pupil absence statistics.
+        exclusions statistics.
       </p>
       <p>
-        The absence information reported in published releases is based on data
-        returned by schools as part of the school census. This might include
-        duplicates if schools have recorded duplicated pupils.
+        The exclusions information reported in published releases is based on
+        data returned by schools as part of the school census.
       </p>
       <p>
         It does not include data which has been submitted by local authorities
-        or schools outside of the school census.{' '}
+        (LAs) or schools outside of the school census.{' '}
       </p>
       <p>
-        It is a school’s responsibility to record absence data correctly in
-        their school census return and the parent’s responsibility to truthfully
-        report the reason for a child’s absence from school.
+        It's a school's responsibility to record exclusions data correctly in
+        their school census return.
       </p>
       <p>
-        Only full year absence statistics give a definitive view of pupil
-        absence, so figures presented in the interim termly publications should
-        be treated with caution.
+        As exclusions information is collected two terms in arrears, when a
+        school closes and is replaced by a sponsored academy data is not
+        available for the last two terms that the predecessor school was open.
       </p>
       <p>
         Caution is recommended when interpreting the data for Traveller of Irish
-        Heritage and Gypsy/Roma children due to potential under-reporting for
-        these ethnic classifications
+        Heritage and Gypsy/Roma children due to small population sizes.
       </p>
+      <h4 id="section6-1-1">6.1.1 Data checking</h4>
+      <p>
+        Prior to the release of exclusion National Statistics the raw data goes
+        through a thorough quality assurance process to ensure it is fit for
+        purpose.
+      </p>
+      <p>The main areas of this checking are:</p>
+      <ul className="govuk-list govuk-list--bullet">
+        <li>matching derived data back to raw sources</li>
+        <li>
+          comparing year-on-year trends across different geographies and pupil
+          groups to look for and investigate substantial changes
+        </li>
+        <li>comparing figures and trends to other published sources</li>
+        <li>
+          cross-checking data within the release to ensure totals are consistent
+        </li>
+      </ul>
     </>
   );
 };

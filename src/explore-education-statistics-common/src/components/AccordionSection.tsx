@@ -55,10 +55,7 @@ const AccordionSection = ({
       })}
       role="presentation"
     >
-      <div
-        className="govuk-accordion__section-header"
-        data-testid={`SectionHeader ${heading}`}
-      >
+      <div className="govuk-accordion__section-header">
         {createElement(
           headingTag,
           {

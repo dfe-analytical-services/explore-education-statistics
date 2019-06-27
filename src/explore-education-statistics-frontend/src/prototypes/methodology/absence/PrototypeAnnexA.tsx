@@ -4,62 +4,59 @@ const PrototypeMethodologySection = () => {
   return (
     <>
       <p>
-        The following are key terms used in published absence statistics and
-        their definitions:
+        The following calculations are used to produce absence National
+        Statistics:
       </p>
       <dl className="govuk-list">
-        <dt>Academic year</dt>
+        <dt>Percentage of sessions missed due to overall absence</dt>
         <dd>
-          31st August to the 31st July.
-          <br />
-          The academic year is generally broken into three terms, autumn spring
-          and summer.
+          (Total overall absence sessions / Total sessions possible) X 100
         </dd>
-        <dt>Authorised absence</dt>
+        <dt>Percentage of sessions missed due to authorised absence</dt>
         <dd>
-          Absence with permission from a teacher or other authorised
-          representative of the schools. Counted in sessions, where each session
-          is equivalent to half a day.
+          (Total authorised absence sessions / Total sessions possible) X 100
         </dd>
-        <dt>Overall absence</dt>
+        <dt>Percentage of sessions missed due to unauthorised absence</dt>
         <dd>
-          The aggregated total of all authorised and unauthorised absences,
-          counted in sessions where each session is equivalent to half a day.
+          (Total unauthorised absence sessions / Total sessions possible) X 100
         </dd>
-        <dt>Persistent absence</dt>
+        <dt>
+          Percentage of pupils with one or more session of absence by reason
+        </dt>
         <dd>
-          A pupil enrolment is identified as a persistent absentee if they miss
-          10 per cent or more of their own possible sessions.
+          (Number of enrolments with one or more session of absence for a reason
+          / Number of enrolments) X 100
         </dd>
-        <dt>Possible session</dt>
+        <dt>
+          Percentage of overall absence for which persistent absentees are
+          responsible
+        </dt>
         <dd>
-          Schools are required to provide two possible sessions per day, where
-          one session is the equivalent to half a day i.e. one session in the
-          morning and one in the afternoon.
+          (Overall absence sessions for persistent absentees / Total overall
+          absence sessions) X 100
         </dd>
-        <dt>Pupil enrolment</dt>
+        <dt>
+          Percentage of authorised absence for which persistent absentees are
+          responsibe
+        </dt>
         <dd>
-          The number of pupil enrolments presented includes pupils on the school
-          roll for at least one session who are aged between 5 and 15, excluding
-          boarders. Some pupils may be counted more than once (if they moved
-          schools during the academic year or are registered in more than one
-          school).
+          (Authorised absence session for persistent absentees / Total overall
+          absence sessions) X 100
         </dd>
-        <dt>School census</dt>
+        <dt>
+          Percentage of unauthorised absence for which persistent absentees are
+          responsible
+        </dt>
         <dd>
-          Statutory termly data collection for all maintained nursery, primary,
-          secondary, middle-deemed primary, middle-deemed secondary, local
-          authority maintained special and non-maintained special schools,
-          academies including free schools, studio schools and university
-          technical colleges and city technology colleges in England.
+          (unauthorised absence sessions for persistent absentees / Total
+          overall absence sessions) X 100
         </dd>
-        <dt>Unauthorised absence</dt>
+        <dt>Distribution of reasons for absence</dt>
         <dd>
-          Absence without permission from a teacher or other authorised
-          representative of the school. This includes all unexplained or
-          unjustified absences and late arrivals. Counted in sessions, where
-          each session is equivalent to half a day.
+          (Absence for this reason / Total overall absence with reasons) X 100
         </dd>
+        <dt>Absence rates by reason</dt>
+        <dd>(Absence for the reason / Total session possible) X 100</dd>
       </dl>
     </>
   );

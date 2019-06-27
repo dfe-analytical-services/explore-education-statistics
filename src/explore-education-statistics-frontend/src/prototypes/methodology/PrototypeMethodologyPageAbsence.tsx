@@ -34,14 +34,14 @@ const PublicationPage = () => {
       ]}
     >
       <h1 className="govuk-heading-xl">
-        Pupil absence statistics: methodology
+        Pupil absence in schools in England: methodology
       </h1>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <dl className="dfe-meta-content govuk-!-margin-0">
             <dt className="govuk-caption-m">Published: </dt>
             <dd>
-              <strong>22 March 2018</strong>
+              <strong>March 2019</strong>
             </dd>
           </dl>
         </div>
@@ -257,23 +257,23 @@ const PublicationPage = () => {
 
       <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
       <Accordion id="annex-sections">
-        <AccordionSection heading="Annex A - Glossary">
+        <AccordionSection heading="Annex A - Calculations">
           <PrototypeAnnexA />
         </AccordionSection>
-        <AccordionSection heading="Annex B - Calculations">
+        <AccordionSection heading="Annex B - School attendance codes">
           <PrototypeAnnexB />
         </AccordionSection>
-        <AccordionSection heading="Annex C - School attendance codes">
+        <AccordionSection heading="Annex C - Links to pupil absence national statistics and data">
           <PrototypeAnnexC />
         </AccordionSection>
-        <AccordionSection heading="Annex D - Links to pupil absence national statistics and data">
+        <AccordionSection heading="Annex D - Standard breakdowns">
           <PrototypeAnnexD />
         </AccordionSection>
-        <AccordionSection heading="Annex E - Standard breakdowns">
+        <AccordionSection heading="Annex E - Timeline">
           <PrototypeAnnexE />
         </AccordionSection>
-        <AccordionSection heading="Annex F - Timeline">
-          <p>timeline</p>
+        <AccordionSection heading="Annex F - Absence rates over time">
+          <PrototypeAnnexE />
         </AccordionSection>
       </Accordion>
 
