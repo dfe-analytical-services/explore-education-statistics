@@ -79,7 +79,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
           .required('Start date required')
           .test(
             'lessThanOrEqual',
-            'Must be before or same as end date',
+            'Start date must be before or same as end date',
             function lessThanOrEqual(value: string) {
               if (!value) {
                 return true;
@@ -106,7 +106,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
           .required('End date required')
           .test(
             'moreThanOrEqual',
-            'Must be after or same as start date',
+            'End date must be before or same as start date',
             function moreThanOrEqual(value: string) {
               if (!value) {
                 return true;
