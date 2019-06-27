@@ -34,16 +34,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 CreateIdListType("localAuthorityDistrictList", query.LocalAuthorityDistricts);
             var localEnterprisePartnershipListParam =
                 CreateIdListType("localEnterprisePartnershipList", query.LocalEnterprisePartnerships);
-            var matListParam =
-                CreateIdListType("matList", query.Mats);
             var mayoralCombinedAuthorityListParam =
                 CreateIdListType("mayoralCombinedAuthorityList", query.MayoralCombinedAuthorities);
+            var multiAcademyTrustListParam =
+                CreateIdListType("multiAcademyTrustList", query.Mats);
             var opportunityAreaListParam =
                 CreateIdListType("opportunityAreaList", query.OpportunityAreas);
             var parliamentaryConstituencyListParam =
                 CreateIdListType("parliamentaryConstituencyList", query.ParliamentaryConstituencies);
             var regionsListParam = CreateIdListType("regionsList", query.Regions);
             var rscRegionListParam = CreateIdListType("rscRegionsList", query.RscRegions);
+            var sponsorListParam = CreateIdListType("sponsorList", query.Sponsors);
             var wardListParam =
                 CreateIdListType("wardList", query.Wards);
             var filtersListParam = CreateIdListType("filtersList", query.Filters);
@@ -58,12 +59,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                          "@localAuthorityList," +
                          "@localAuthorityDistrictList," +
                          "@localEnterprisePartnershipList," +
-                         "@matList," +
                          "@mayoralCombinedAuthorityList," +
+                         "@multiAcademyTrustList," +
                          "@opportunityAreaList," +
                          "@parliamentaryConstituencyList," +
                          "@regionsList," +
                          "@rscRegionsList," +
+                         "@sponsorList," +
                          "@wardList," +
                          "@filtersList",
                     subjectIdParam,
@@ -74,12 +76,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                     localAuthorityListParam,
                     localAuthorityDistrictListParam,
                     localEnterprisePartnershipListParam,
-                    matListParam,
                     mayoralCombinedAuthorityListParam,
+                    multiAcademyTrustListParam,
                     opportunityAreaListParam,
                     parliamentaryConstituencyListParam,
                     regionsListParam,
                     rscRegionListParam,
+                    sponsorListParam,
                     wardListParam,
                     filtersListParam);
 

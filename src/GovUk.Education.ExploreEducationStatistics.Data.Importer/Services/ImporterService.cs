@@ -216,12 +216,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 GetLocalAuthority(line, headers),
                 GetLocalAuthorityDistrict(line, headers),
                 GetLocalEnterprisePartnership(line, headers),
-                GetMat(line, headers),
                 GetMayoralCombinedAuthority(line, headers),
+                GetMultiAcademyTrust(line, headers),
                 GetOpportunityArea(line, headers),
                 GetParliamentaryConstituency(line, headers),
                 GetRegion(line, headers),
                 GetRscRegion(line, headers),
+                GetSponsor(line, headers),
                 GetWard(line, headers)
             ).Id;
         }
@@ -290,20 +291,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 new LocalEnterprisePartnership(values[0], values[1]));
         }
 
-        private static Mat GetMat(IReadOnlyList<string> line,
-            List<string> headers)
-        {
-            var columns = new[] {"trust_id", "trust_name"};
-            return CsvUtil.BuildType(line, headers, columns, values =>
-                new Mat(values[0], values[1]));
-        }
-
         private static MayoralCombinedAuthority GetMayoralCombinedAuthority(IReadOnlyList<string> line,
             List<string> headers)
         {
             var columns = new[] {"mayoral_combined_authority_code", "mayoral_combined_authority_name"};
             return CsvUtil.BuildType(line, headers, columns, values =>
                 new MayoralCombinedAuthority(values[0], values[1]));
+        }
+        
+        private static Mat GetMultiAcademyTrust(IReadOnlyList<string> line,
+            List<string> headers)
+        {
+            var columns = new[] {"trust_id", "trust_name"};
+            return CsvUtil.BuildType(line, headers, columns, values =>
+                new Mat(values[0], values[1]));
         }
 
         private static OpportunityArea GetOpportunityArea(IReadOnlyList<string> line,
@@ -340,6 +341,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private static RscRegion GetRscRegion(IReadOnlyList<string> line, List<string> headers)
         {
             return CsvUtil.BuildType(line, headers, "rsc_region_lead_name", value => new RscRegion(value));
+        }
+
+        private static Sponsor GetSponsor(IReadOnlyList<string> line, List<string> headers)
+        {
+            var columns = new[] {"sponsor_id", "sponsor_name"};
+            return CsvUtil.BuildType(line, headers, columns, values =>
+                new Sponsor(values[0], values[1]));
         }
 
         private static Ward GetWard(IReadOnlyList<string> line,

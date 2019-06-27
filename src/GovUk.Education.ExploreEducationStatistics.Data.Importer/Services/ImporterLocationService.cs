@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -25,17 +24,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             LocalAuthority localAuthority = null,
             LocalAuthorityDistrict localAuthorityDistrict = null,
             LocalEnterprisePartnership localEnterprisePartnership = null,
-            Mat mat = null,
             MayoralCombinedAuthority mayoralCombinedAuthority = null,
+            Mat multiAcademyTrust = null,
             OpportunityArea opportunityArea = null,
             ParliamentaryConstituency parliamentaryConstituency = null,
             Region region = null,
             RscRegion rscRegion = null,
+            Sponsor sponsor = null,
             Ward ward = null)
         {
             var cacheKey = GetCacheKey(country, institution, localAuthority, localAuthorityDistrict,
-                localEnterprisePartnership, mat, mayoralCombinedAuthority, opportunityArea, parliamentaryConstituency,
-                region, rscRegion, ward);
+                localEnterprisePartnership, mayoralCombinedAuthority, multiAcademyTrust, opportunityArea,
+                parliamentaryConstituency, region, rscRegion, sponsor, ward);
 
             if (_cache.TryGetValue(cacheKey, out Location location))
             {
@@ -43,8 +43,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             }
 
             location = LookupOrCreate(country, institution, localAuthority, localAuthorityDistrict,
-                localEnterprisePartnership, mat, mayoralCombinedAuthority, opportunityArea, parliamentaryConstituency,
-                region, rscRegion, ward);
+                localEnterprisePartnership, mayoralCombinedAuthority, multiAcademyTrust, opportunityArea,
+                parliamentaryConstituency, region, rscRegion, sponsor, ward);
             _cache.Set(cacheKey, location,
                 new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
 
@@ -56,76 +56,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             LocalAuthority localAuthority,
             LocalAuthorityDistrict localAuthorityDistrict,
             LocalEnterprisePartnership localEnterprisePartnership,
-            Mat mat,
             MayoralCombinedAuthority mayoralCombinedAuthority,
+            Mat multiAcademyTrust,
             OpportunityArea opportunityArea,
             ParliamentaryConstituency parliamentaryConstituency,
             Region region,
             RscRegion rscRegion,
+            Sponsor sponsor,
             Ward ward)
         {
-            const string separator = "_";
+            var observationalUnits = new IObservationalUnit[]
+            {
+                country, institution, localAuthority, localAuthorityDistrict, localEnterprisePartnership,
+                mayoralCombinedAuthority, multiAcademyTrust, parliamentaryConstituency, opportunityArea, region,
+                rscRegion, sponsor, ward
+            };
 
-            var stringBuilder = new StringBuilder(country.Code);
+            const string separator = "_";
 
             // TODO avoid possibility of a collision between different types of codes
 
-            if (institution != null)
-            {
-                stringBuilder.Append(separator).Append(institution.Code);
-            }
-
-            if (localAuthority != null)
-            {
-                stringBuilder.Append(separator).Append(localAuthority.Code);
-            }
-
-            if (localAuthorityDistrict != null)
-            {
-                stringBuilder.Append(separator).Append(localAuthorityDistrict.Code);
-            }
-
-            if (localEnterprisePartnership != null)
-            {
-                stringBuilder.Append(separator).Append(localEnterprisePartnership.Code);
-            }
-
-            if (mat != null)
-            {
-                stringBuilder.Append(separator).Append(mat.Code);
-            }
-
-            if (mayoralCombinedAuthority != null)
-            {
-                stringBuilder.Append(separator).Append(mayoralCombinedAuthority.Code);
-            }
-
-            if (parliamentaryConstituency != null)
-            {
-                stringBuilder.Append(separator).Append(parliamentaryConstituency.Code);
-            }
-
-            if (opportunityArea != null)
-            {
-                stringBuilder.Append(separator).Append(opportunityArea.Code);
-            }
-
-            if (region != null)
-            {
-                stringBuilder.Append(separator).Append(region.Code);
-            }
-
-            if (rscRegion != null)
-            {
-                stringBuilder.Append(separator).Append(rscRegion.Code);
-            }
-
-            if (ward != null)
-            {
-                stringBuilder.Append(separator).Append(ward.Code);
-            }
-
-            return stringBuilder.ToString();
+            return string.Join(separator, observationalUnits.Select(unit => unit.Code));
         }
 
         private Location LookupOrCreate(Country country,
@@ -133,12 +84,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             LocalAuthority localAuthority = null,
             LocalAuthorityDistrict localAuthorityDistrict = null,
             LocalEnterprisePartnership localEnterprisePartnership = null,
-            Mat mat = null,
             MayoralCombinedAuthority mayoralCombinedAuthority = null,
+            Mat multiAcademyTrust = null,
             OpportunityArea opportunityArea = null,
             ParliamentaryConstituency parliamentaryConstituency = null,
             Region region = null,
             RscRegion rscRegion = null,
+            Sponsor sponsor = null,
             Ward ward = null)
         {
             var location = Lookup(
@@ -147,12 +99,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 localAuthority,
                 localAuthorityDistrict,
                 localEnterprisePartnership,
-                mat,
                 mayoralCombinedAuthority,
+                multiAcademyTrust,
                 opportunityArea,
                 parliamentaryConstituency,
                 region,
                 rscRegion,
+                sponsor,
                 ward);
 
             if (location == null)
@@ -164,8 +117,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     LocalAuthority = localAuthority ?? LocalAuthority.Empty(),
                     LocalAuthorityDistrict = localAuthorityDistrict ?? LocalAuthorityDistrict.Empty(),
                     LocalEnterprisePartnership = localEnterprisePartnership ?? LocalEnterprisePartnership.Empty(),
-                    Mat = mat ?? Mat.Empty(),
                     MayoralCombinedAuthority = mayoralCombinedAuthority ?? MayoralCombinedAuthority.Empty(),
+                    MultiAcademyTrust = multiAcademyTrust ?? Mat.Empty(),
                     OpportunityArea = opportunityArea ?? OpportunityArea.Empty(),
                     ParliamentaryConstituency = parliamentaryConstituency ?? ParliamentaryConstituency.Empty(),
                     Region = region ?? Region.Empty(),
@@ -185,12 +138,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             LocalAuthority localAuthority = null,
             LocalAuthorityDistrict localAuthorityDistrict = null,
             LocalEnterprisePartnership localEnterprisePartnership = null,
-            Mat mat = null,
             MayoralCombinedAuthority mayoralCombinedAuthority = null,
+            Mat multiAcademyTrust = null,
             OpportunityArea opportunityArea = null,
             ParliamentaryConstituency parliamentaryConstituency = null,
             Region region = null,
             RscRegion rscRegion = null,
+            Sponsor sponsor = null,
             Ward ward = null)
         {
             var predicateBuilder = PredicateBuilder.True<Location>()
@@ -213,12 +167,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 (localEnterprisePartnership != null ? localEnterprisePartnership.Code : null));
 
             predicateBuilder = predicateBuilder.And(location =>
-                location.Mat.Code ==
-                (mat != null ? mat.Code : null));
-
-            predicateBuilder = predicateBuilder.And(location =>
                 location.MayoralCombinedAuthority.Code ==
                 (mayoralCombinedAuthority != null ? mayoralCombinedAuthority.Code : null));
+
+            predicateBuilder = predicateBuilder.And(location =>
+                location.MultiAcademyTrust.Code ==
+                (multiAcademyTrust != null ? multiAcademyTrust.Code : null));
 
             predicateBuilder = predicateBuilder.And(location =>
                 location.OpportunityArea.Code ==
@@ -235,6 +189,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             predicateBuilder = predicateBuilder.And(location =>
                 location.RscRegion.Code ==
                 (rscRegion != null ? rscRegion.Code : null));
+
+            predicateBuilder = predicateBuilder.And(location =>
+                location.Sponsor.Code ==
+                (sponsor != null ? sponsor.Code : null));
 
             predicateBuilder = predicateBuilder.And(location =>
                 location.Ward.Code ==
