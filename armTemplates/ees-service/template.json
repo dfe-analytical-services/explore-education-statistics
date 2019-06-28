@@ -33,7 +33,7 @@
     },
     "skuAdmin": {
       "type": "string",
-      "defaultValue": "F1 Free"
+      "defaultValue": "S1 Standard"
     },
     "sqlAdministratorLogin": {
       "type": "string",
@@ -397,7 +397,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "phpVersion": "off",
-          "AlwaysOn": false,
+          "AlwaysOn": true,
           "cors": {
             "allowedOrigins": [
               "*"
