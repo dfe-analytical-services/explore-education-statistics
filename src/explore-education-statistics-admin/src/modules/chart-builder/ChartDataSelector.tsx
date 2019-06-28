@@ -110,8 +110,8 @@ const ChartDataSelector = ({
             {selectedList.map((selected, index) => (
               <tr key={selected.indicator}>
                 <td className="govuk-table__cell">
-                  {selected.filters.map(_ => (
-                    <span key={_}>{_}</span>
+                  {selected.filters.map(filter => (
+                    <span key={filter}>{filter}</span>
                   ))}
                 </td>
                 <td className="govuk-table__cell">{selected.indicator}</td>

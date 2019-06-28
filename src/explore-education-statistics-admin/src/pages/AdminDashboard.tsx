@@ -2,12 +2,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import { Dictionary } from '@common/types';
 import { LoginContext } from '@admin/components/Login';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
 import { Publication } from '@admin/services/publicationService';
 import AdminDashboardPublicationsTab from '@admin/components/AdminDashboardPublicationsTab';
-import groupBy from 'lodash/groupBy';
 import Link from '../components/Link';
 import Page from '../components/Page';
 
@@ -30,14 +28,14 @@ const AdminDashboardPage = () => {
       loggedInUserId === null
         ? []
         : DummyPublicationsData.allPublications.filter(
-            _ => _.owner.id === loggedInUserId,
+            publication => publication.owner.id === loggedInUserId,
           );
 
     const fetchedInProgressPublications =
       loggedInUserId === null
         ? []
         : DummyPublicationsData.allPublications.filter(
-            _ => _.owner.id !== loggedInUserId,
+            publication => publication.owner.id !== loggedInUserId,
           );
 
     setMyPublications(fetchedMyPublications);
@@ -45,18 +43,6 @@ const AdminDashboardPage = () => {
   };
 
   useEffect(loadInitialData, []);
-
-  const createThemeTopicTitleLabel = (_: Publication) =>
-    `${_.topic.theme.title}, ${_.topic.title}`;
-
-  const myPublicationsByThemeAndTopic: Dictionary<Publication[]> = groupBy(
-    myPublications,
-    createThemeTopicTitleLabel,
-  );
-
-  const inProgressPublicationsByThemeAndTopic: Dictionary<
-    Publication[]
-  > = groupBy(inProgressPublications, createThemeTopicTitleLabel);
 
   return (
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
@@ -79,13 +65,13 @@ const AdminDashboardPage = () => {
       <Tabs id="publicationTabs">
         <TabsSection id="my-publications" title="Publications">
           <AdminDashboardPublicationsTab
-            publicationsByThemeAndTopic={myPublicationsByThemeAndTopic}
+            publications={myPublications}
             noResultsMessage="You have not yet created any publications"
           />
         </TabsSection>
         <TabsSection id="in-progress-publications" title="In progress">
           <AdminDashboardPublicationsTab
-            publicationsByThemeAndTopic={inProgressPublicationsByThemeAndTopic}
+            publications={inProgressPublications}
             noResultsMessage="There are currently no releases in progress"
           />
         </TabsSection>

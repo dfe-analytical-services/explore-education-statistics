@@ -3,18 +3,27 @@ import { Dictionary } from '@common/types';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import { Publication } from '@admin/services/publicationService';
+import groupBy from 'lodash/groupBy';
 import AdminDashboardPublications from './AdminDashboardPublications';
 import Link from './Link';
 
 interface AdminDashboardPublicationsTabProps {
-  publicationsByThemeAndTopic: Dictionary<Publication[]>;
+  publications: Publication[];
   noResultsMessage: string;
 }
 
 const AdminDashboardPublicationsTab = ({
-  publicationsByThemeAndTopic,
+  publications,
   noResultsMessage,
 }: AdminDashboardPublicationsTabProps) => {
+  const createThemeTopicTitleLabel = (publication: Publication) =>
+    `${publication.topic.theme.title}, ${publication.topic.title}`;
+
+  const publicationsByThemeAndTopic: Dictionary<Publication[]> = groupBy(
+    publications,
+    createThemeTopicTitleLabel,
+  );
+
   const themesAndTopics = Object.keys(publicationsByThemeAndTopic);
 
   if (themesAndTopics.length === 0) {
@@ -25,26 +34,6 @@ const AdminDashboardPublicationsTab = ({
     publicationsByThemeAndTopic[themeTopic];
 
   const themesAndTopicsSections = themesAndTopics.map(themeTopic => (
-    <AdminDashboardThemeTopic
-      themeTopic={themeTopic}
-      publications={publicationsForThemeTopic(themeTopic)}
-      key={themeTopic}
-    />
-  ));
-
-  return <section>{themesAndTopicsSections}</section>;
-};
-
-interface AdminDashboardThemeTopicProps {
-  themeTopic: string;
-  publications: Publication[];
-}
-
-const AdminDashboardThemeTopic = ({
-  themeTopic,
-  publications,
-}: AdminDashboardThemeTopicProps) => {
-  return (
     <>
       <h2 className="govuk-heading-l govuk-!-margin-bottom-0">{themeTopic}</h2>
       <p className="govuk-body">
@@ -55,7 +44,7 @@ const AdminDashboardThemeTopic = ({
         Create a new publication
       </Link>
       <Accordion id={themeTopic} key={themeTopic}>
-        {publications.map(publication => (
+        {publicationsForThemeTopic(themeTopic).map(publication => (
           <AccordionSection
             key={publication.id}
             heading={publication.title}
@@ -67,7 +56,9 @@ const AdminDashboardThemeTopic = ({
         ))}
       </Accordion>
     </>
-  );
+  ));
+
+  return <section>{themesAndTopicsSections}</section>;
 };
 
 export default AdminDashboardPublicationsTab;
