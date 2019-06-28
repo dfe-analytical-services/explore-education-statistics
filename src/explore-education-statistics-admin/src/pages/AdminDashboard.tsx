@@ -14,13 +14,16 @@ import Page from '../components/Page';
 
 const AdminDashboardPage = () => {
   const emptyPublicationsArray: Publication[] = [];
+
   const [myPublications, setMyPublications] = useState(emptyPublicationsArray);
+
   const [inProgressPublications, setInProgressPublications] = useState(
     emptyPublicationsArray,
   );
+
   const authentication = useContext(LoginContext);
 
-  useEffect(() => {
+  const loadInitialData = () => {
     const { user } = authentication;
     const loggedInUserId = user ? user.id : null;
 
@@ -40,7 +43,9 @@ const AdminDashboardPage = () => {
 
     setMyPublications(fetchedMyPublications);
     setInProgressPublications(fetchedInProgressPublications);
-  });
+  };
+
+  useEffect(loadInitialData);
 
   const createThemeTopicTitleLabel = (_: Publication) =>
     `${_.topic.theme.title}, ${_.topic.title}`;
