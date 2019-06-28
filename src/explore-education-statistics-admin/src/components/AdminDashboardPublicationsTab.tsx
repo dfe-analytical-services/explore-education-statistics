@@ -21,19 +21,18 @@ const AdminDashboardPublicationsTab = ({
     return <div className="govuk-inset-text">{noResultsMessage}</div>;
   }
 
-  const themesAndTopicsSections = themesAndTopics.map(themeTopic => {
-    const publications = publicationsByThemeAndTopic[themeTopic];
-    return (
-      <>
-        <AdminDashboardThemeTopic
-          themeTopic={themeTopic}
-          publications={publications}
-        />
-      </>
-    );
-  });
+  const publicationsForThemeTopic = (themeTopic: string) =>
+    publicationsByThemeAndTopic[themeTopic];
 
-  return <div>{themesAndTopicsSections}</div>;
+  const themesAndTopicsSections = themesAndTopics.map(themeTopic => (
+    <AdminDashboardThemeTopic
+      themeTopic={themeTopic}
+      publications={publicationsForThemeTopic(themeTopic)}
+      key={themeTopic}
+    />
+  ));
+
+  return <section>{themesAndTopicsSections}</section>;
 };
 
 interface AdminDashboardThemeTopicProps {
@@ -63,10 +62,7 @@ const AdminDashboardThemeTopic = ({
             caption=""
             headingTag="h3"
           >
-            <AdminDashboardPublications
-              key={publication.id}
-              publication={publication}
-            />
+            <AdminDashboardPublications publication={publication} />
           </AccordionSection>
         ))}
       </Accordion>

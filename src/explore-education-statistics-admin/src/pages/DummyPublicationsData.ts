@@ -17,20 +17,22 @@ const methodologies: Methodology[] = [
   },
 ];
 
-const themes: Theme[] = [
-  {
-    id: 'theme-1',
-    title: 'Pupils and schools',
-  },
-];
+const theme1: Theme = {
+  id: 'theme-1',
+  title: 'Pupils and schools',
+};
 
-const topics: Topic[] = [
-  {
-    id: 'topic-1',
-    title: 'pupil absence',
-    theme: themes[0],
-  },
-];
+const theme1Topic1: Topic = {
+  id: 'topic-1',
+  title: 'pupil absence',
+  theme: theme1,
+};
+
+const theme1Topic2: Topic = {
+  id: 'topic-2',
+  title: 'exclusions',
+  theme: theme1,
+};
 
 const timePeriodTermAutumn: TimePeriod = {
   id: 'term-autumn',
@@ -86,7 +88,7 @@ const releaseTemplate: Release = {
                 possimus quisquam doloremque veritatis provident!`,
     },
     {
-      id: '1',
+      id: '2',
       author: PrototypeLoginService.getUser('user3'),
       datetime: new Date('2018-06-17 13:35'),
       content: `Corrupti harum labore quia repellat! Quae voluptatem illo
@@ -106,7 +108,7 @@ const publicationTemplate: Publication = {
   nextUpdate: '',
   releases: [],
   legacyReleases: [],
-  topic: topics[0],
+  topic: theme1Topic1,
   contact: {
     email: '',
     name: '',
@@ -204,6 +206,7 @@ const myPublication3ReleaseTemplate = {
       termsPerYear: 6,
     },
   },
+  topic: theme1Topic2,
 };
 
 const myPublication3Releases: Release[] = [
@@ -226,10 +229,11 @@ const myPublication3 = {
   ...publicationTemplate,
   id: 'my-publication-3',
   slug:
-    'pupil-absence-statistics-and-data-for-schools-in-england-autumn-and-spring-terms',
+    'pupil-exclusions-statistics-and-data-for-schools-in-england-autumn-and-spring-terms',
   title:
-    'Pupil absence statistics and data for schools in England: autumn and spring terms',
+    'Pupil exclusions statistics and data for schools in England: autumn and spring terms',
   releases: myPublication3Releases,
+  topic: theme1Topic2,
 };
 
 //
@@ -263,6 +267,8 @@ const inProgressPublication1Releases: Release[] = [
 
 const inProgressPublication1 = {
   ...publicationTemplate,
+  title:
+    'Pupil absence statistics and data for schools in England: autumn and spring terms',
   owner: PrototypeLoginService.getUser('user2'),
   releases: inProgressPublication1Releases,
 };

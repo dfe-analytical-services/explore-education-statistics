@@ -4,7 +4,6 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { Dictionary } from '@common/types';
 import { LoginContext } from '@admin/components/Login';
-import { Authentication } from '@admin/services/PrototypeLoginService';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
 import { Publication } from '@admin/services/publicationService';
 import AdminDashboardPublicationsTab from '@admin/components/AdminDashboardPublicationsTab';
@@ -45,7 +44,7 @@ const AdminDashboardPage = () => {
     setInProgressPublications(fetchedInProgressPublications);
   };
 
-  useEffect(loadInitialData);
+  useEffect(loadInitialData, []);
 
   const createThemeTopicTitleLabel = (_: Publication) =>
     `${_.topic.theme.title}, ${_.topic.title}`;
