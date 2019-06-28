@@ -2,15 +2,16 @@ import throttle from 'lodash/throttle';
 import React, { forwardRef, Ref, useEffect, useRef } from 'react';
 import DataTableKeys from './DataTableKeys';
 import styles from './FixedHeaderGroupedDataTable.module.scss';
-import MultiHeaderTable, { RowGroup } from './MultiHeaderTable';
+import MultiHeaderTable from './MultiHeaderTable';
 
 const dataTableCaption = 'dataTableCaption';
 
 interface Props {
   caption: string;
-  headers: string[][];
   innerRef?: Ref<HTMLElement>;
-  rowGroups: RowGroup[];
+  columnHeaders: string[][];
+  rowHeaders: string[][];
+  rows: string[][];
 }
 
 const FixedHeaderGroupedDataTable = forwardRef<HTMLElement, Props>(
@@ -50,7 +51,7 @@ const FixedHeaderGroupedDataTable = forwardRef<HTMLElement, Props>(
 
         if (columnTableRef.current) {
           cloneCellHeightWidth(
-            'thead tr:first-child th:first-child',
+            'thead tr:first-child td:first-child',
             columnTableRef.current,
           );
           cloneCellHeightWidth('tbody th', columnTableRef.current);
@@ -58,7 +59,7 @@ const FixedHeaderGroupedDataTable = forwardRef<HTMLElement, Props>(
 
         if (intersectionTableRef.current) {
           cloneCellHeightWidth(
-            'thead tr:first-child th:first-child',
+            'thead tr:first-child td:first-child',
             intersectionTableRef.current,
           );
         }

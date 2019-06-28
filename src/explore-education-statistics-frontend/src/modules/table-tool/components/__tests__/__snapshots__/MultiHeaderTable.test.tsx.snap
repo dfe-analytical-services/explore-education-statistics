@@ -1,0 +1,547 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MultiHeaderTable renders 2x2 table correctly 1`] = `
+<table aria-labelledby="Test caption"
+       class="govuk-table"
+>
+  <thead>
+    <tr>
+      <td colspan="2"
+          rowspan="2"
+          class="borderBottom borderRight"
+      >
+      </td>
+      <th class="govuk-table__header--center borderLeft"
+          colspan="2"
+          scope="colgroup"
+      >
+        A
+      </th>
+      <th class="govuk-table__header--center borderLeft"
+          colspan="2"
+          scope="colgroup"
+      >
+        B
+      </th>
+    </tr>
+    <tr>
+      <th class="govuk-table__header--numeric borderBottom borderLeft"
+          colspan="1"
+          scope="col"
+      >
+        C
+      </th>
+      <th class="govuk-table__header--numeric borderBottom"
+          colspan="1"
+          scope="col"
+      >
+        D
+      </th>
+      <th class="govuk-table__header--numeric borderBottom borderLeft"
+          colspan="1"
+          scope="col"
+      >
+        C
+      </th>
+      <th class="govuk-table__header--numeric borderBottom"
+          colspan="1"
+          scope="col"
+      >
+        D
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class>
+      <th class="govuk-table__cell--center borderBottom"
+          rowspan="2"
+          role="rowgroup"
+      >
+        1
+      </th>
+      <th class="govuk-table__cell--numeric borderRight"
+          rowspan="1"
+          role="row"
+      >
+        3
+      </th>
+      <td class="govuk-table__cell--numeric borderLeft">
+        AC13
+      </td>
+      <td class="govuk-table__cell--numeric">
+        AD13
+      </td>
+      <td class="govuk-table__cell--numeric borderLeft">
+        BC13
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BD13
+      </td>
+    </tr>
+    <tr class="borderBottom">
+      <th class="govuk-table__cell--numeric borderRight borderBottom"
+          rowspan="1"
+          role="row"
+      >
+        4
+      </th>
+      <td class="govuk-table__cell--numeric borderLeft">
+        AC14
+      </td>
+      <td class="govuk-table__cell--numeric">
+        AD14
+      </td>
+      <td class="govuk-table__cell--numeric borderLeft">
+        BC14
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BD14
+      </td>
+    </tr>
+    <tr class>
+      <th class="govuk-table__cell--center borderBottom"
+          rowspan="2"
+          role="rowgroup"
+      >
+        2
+      </th>
+      <th class="govuk-table__cell--numeric borderRight"
+          rowspan="1"
+          role="row"
+      >
+        3
+      </th>
+      <td class="govuk-table__cell--numeric borderLeft">
+        AC23
+      </td>
+      <td class="govuk-table__cell--numeric">
+        AD23
+      </td>
+      <td class="govuk-table__cell--numeric borderLeft">
+        BC23
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BC23
+      </td>
+    </tr>
+    <tr class="borderBottom">
+      <th class="govuk-table__cell--numeric borderRight borderBottom"
+          rowspan="1"
+          role="row"
+      >
+        4
+      </th>
+      <td class="govuk-table__cell--numeric borderLeft">
+        AC24
+      </td>
+      <td class="govuk-table__cell--numeric">
+        AD24
+      </td>
+      <td class="govuk-table__cell--numeric borderLeft">
+        BC23
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BC24
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
+<table aria-labelledby="Test caption"
+       class="govuk-table"
+>
+  <thead>
+    <tr>
+      <td colspan="3"
+          rowspan="3"
+          class="borderBottom borderRight"
+      >
+      </td>
+      <th class="govuk-table__header--center borderLeft"
+          colspan="4"
+          scope="colgroup"
+      >
+        A
+      </th>
+      <th class="govuk-table__header--center borderLeft"
+          colspan="4"
+          scope="colgroup"
+      >
+        B
+      </th>
+    </tr>
+    <tr>
+      <th class="govuk-table__header--center borderLeft"
+          colspan="2"
+          scope="colgroup"
+      >
+        C
+      </th>
+      <th class="govuk-table__header--center borderLeft"
+          colspan="2"
+          scope="colgroup"
+      >
+        D
+      </th>
+      <th class="govuk-table__header--center borderLeft"
+          colspan="2"
+          scope="colgroup"
+      >
+        C
+      </th>
+      <th class="govuk-table__header--center borderLeft"
+          colspan="2"
+          scope="colgroup"
+      >
+        D
+      </th>
+    </tr>
+    <tr>
+      <th class="govuk-table__header--numeric borderBottom borderLeft"
+          colspan="1"
+          scope="col"
+      >
+        E
+      </th>
+      <th class="govuk-table__header--numeric borderBottom"
+          colspan="1"
+          scope="col"
+      >
+        F
+      </th>
+      <th class="govuk-table__header--numeric borderBottom borderLeft"
+          colspan="1"
+          scope="col"
+      >
+        E
+      </th>
+      <th class="govuk-table__header--numeric borderBottom"
+          colspan="1"
+          scope="col"
+      >
+        F
+      </th>
+      <th class="govuk-table__header--numeric borderBottom borderLeft"
+          colspan="1"
+          scope="col"
+      >
+        E
+      </th>
+      <th class="govuk-table__header--numeric borderBottom"
+          colspan="1"
+          scope="col"
+      >
+        F
+      </th>
+      <th class="govuk-table__header--numeric borderBottom borderLeft"
+          colspan="1"
+          scope="col"
+      >
+        E
+      </th>
+      <th class="govuk-table__header--numeric borderBottom"
+          colspan="1"
+          scope="col"
+      >
+        F
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class>
+      <th class="govuk-table__cell--center borderBottom"
+          rowspan="4"
+          role="rowgroup"
+      >
+        1
+      </th>
+      <th class="govuk-table__cell--center borderBottom"
+          rowspan="2"
+          role="rowgroup"
+      >
+        3
+      </th>
+      <th class="govuk-table__cell--numeric borderRight"
+          rowspan="1"
+          role="row"
+      >
+        5
+      </th>
+      <td class="govuk-table__cell--numeric borderLeft">
+        ACE135
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ACF135
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ADE135
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ADF135
+      </td>
+      <td class="govuk-table__cell--numeric borderLeft">
+        BCE135
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BCF135
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BDE135
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BDF135
+      </td>
+    </tr>
+    <tr class>
+      <th class="govuk-table__cell--numeric borderRight borderBottom"
+          rowspan="1"
+          role="row"
+      >
+        6
+      </th>
+      <td class="govuk-table__cell--numeric borderLeft">
+        ACE136
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ACF136
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ADE136
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ADF136
+      </td>
+      <td class="govuk-table__cell--numeric borderLeft">
+        BCE136
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BCF136
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BDE136
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BDF136
+      </td>
+    </tr>
+    <tr class>
+      <th class="govuk-table__cell--center borderBottom"
+          rowspan="2"
+          role="rowgroup"
+      >
+        4
+      </th>
+      <th class="govuk-table__cell--numeric borderRight"
+          rowspan="1"
+          role="row"
+      >
+        5
+      </th>
+      <td class="govuk-table__cell--numeric borderLeft">
+        ACE145
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ACF145
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ADE145
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ADF145
+      </td>
+      <td class="govuk-table__cell--numeric borderLeft">
+        BCE145
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BCF145
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BDE145
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BDF145
+      </td>
+    </tr>
+    <tr class="borderBottom">
+      <th class="govuk-table__cell--numeric borderRight borderBottom"
+          rowspan="1"
+          role="row"
+      >
+        6
+      </th>
+      <td class="govuk-table__cell--numeric borderLeft">
+        ACE146
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ACF146
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ADE146
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ADF146
+      </td>
+      <td class="govuk-table__cell--numeric borderLeft">
+        BCE146
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BCF146
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BDE146
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BDF146
+      </td>
+    </tr>
+    <tr class>
+      <th class="govuk-table__cell--center borderBottom"
+          rowspan="4"
+          role="rowgroup"
+      >
+        2
+      </th>
+      <th class="govuk-table__cell--center borderBottom"
+          rowspan="2"
+          role="rowgroup"
+      >
+        3
+      </th>
+      <th class="govuk-table__cell--numeric borderRight"
+          rowspan="1"
+          role="row"
+      >
+        5
+      </th>
+      <td class="govuk-table__cell--numeric borderLeft">
+        ACE235
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ACF235
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ADE235
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ADF235
+      </td>
+      <td class="govuk-table__cell--numeric borderLeft">
+        BCE235
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BCF235
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BDE235
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BDF235
+      </td>
+    </tr>
+    <tr class>
+      <th class="govuk-table__cell--numeric borderRight borderBottom"
+          rowspan="1"
+          role="row"
+      >
+        6
+      </th>
+      <td class="govuk-table__cell--numeric borderLeft">
+        ACE236
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ACF236
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ADE236
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ADF236
+      </td>
+      <td class="govuk-table__cell--numeric borderLeft">
+        BCE236
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BCF236
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BDE236
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BDF236
+      </td>
+    </tr>
+    <tr class>
+      <th class="govuk-table__cell--center borderBottom"
+          rowspan="2"
+          role="rowgroup"
+      >
+        4
+      </th>
+      <th class="govuk-table__cell--numeric borderRight"
+          rowspan="1"
+          role="row"
+      >
+        5
+      </th>
+      <td class="govuk-table__cell--numeric borderLeft">
+        ACE245
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ACF245
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ADE245
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ADF245
+      </td>
+      <td class="govuk-table__cell--numeric borderLeft">
+        BCE245
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BCF245
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BDE245
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BDF245
+      </td>
+    </tr>
+    <tr class="borderBottom">
+      <th class="govuk-table__cell--numeric borderRight borderBottom"
+          rowspan="1"
+          role="row"
+      >
+        6
+      </th>
+      <td class="govuk-table__cell--numeric borderLeft">
+        ACE246
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ACF246
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ADE246
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ADF246
+      </td>
+      <td class="govuk-table__cell--numeric borderLeft">
+        BCE246
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BCF246
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BDE246
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BDF246
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;

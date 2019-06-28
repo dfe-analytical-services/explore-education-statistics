@@ -1,3 +1,4 @@
+import cartesian from '@common/lib/utils/cartesian';
 import commaList from '@common/lib/utils/string/commaList';
 import {
   FilterOption,
@@ -8,9 +9,7 @@ import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import sortBy from 'lodash/sortBy';
 import React, { memo, useEffect, useRef, useState } from 'react';
-import FixedHeaderGroupedDataTable, {
-  RowGroup,
-} from './FixedHeaderGroupedDataTable';
+import FixedHeaderGroupedDataTable from './FixedHeaderGroupedDataTable';
 import TableHeadersForm from './TableHeadersForm';
 
 interface TableHeaders {
@@ -77,57 +76,70 @@ const TimePeriodDataTable = ({
     locationLabels,
   )} ${timePeriodString}`;
 
-  const headerRow: string[][] = [
+  const columnHeaders: string[][] = [
     tableHeaders.columnGroups.map(colGroup => colGroup.label),
     tableHeaders.columns.map(column => column.label),
   ];
 
-  const groupedData: RowGroup[] = tableHeaders.rowGroups.map(rowGroup => {
-    const rows = tableHeaders.rows.map(row => {
-      const columnGroupValues = tableHeaders.columnGroups.map(colGroup =>
-        tableHeaders.columns.map(column => {
-          const matchingResult = results.find(result => {
-            return Boolean(
-              result.measures[row.value] !== undefined &&
-                result.filters.every(filter =>
-                  [colGroup.value, rowGroup.value].includes(filter),
-                ) &&
-                result.timeIdentifier === column.code &&
-                result.year === column.year,
-            );
-          });
+  const rowHeaders: string[][] = [
+    tableHeaders.rowGroups.map(rowGroup => rowGroup.label),
+    tableHeaders.rows.map(row => row.label),
+  ];
 
-          if (!matchingResult) {
-            return 'n/a';
-          }
+  const rowHeadersCartesian = cartesian(
+    tableHeaders.rowGroups,
+    tableHeaders.rows,
+  );
 
-          const rawValue = matchingResult.measures[row.value];
-          const numberValue = Number(rawValue);
+  const columnHeadersCartesian = cartesian(
+    tableHeaders.columnGroups,
+    tableHeaders.columns,
+  );
 
-          if (Number.isNaN(numberValue)) {
-            return rawValue;
-          }
+  const rows = rowHeadersCartesian.map(rowFilterCombination => {
+    const indicatorOption = rowFilterCombination[
+      rowFilterCombination.length - 1
+    ] as IndicatorOption;
 
-          const decimals = rawValue.split('.')[1];
-          const decimalPlaces = decimals ? decimals.length : 0;
+    return columnHeadersCartesian.map(columnFilterCombination => {
+      const time = columnFilterCombination[
+        columnFilterCombination.length - 1
+      ] as TimePeriod;
 
-          return `${numberValue.toLocaleString('en-GB', {
-            maximumFractionDigits: decimalPlaces,
-            minimumFractionDigits: decimalPlaces,
-          })}${row.unit}`;
-        }),
-      );
+      const aggregateFilters = [
+        ...rowFilterCombination.slice(0, -1),
+        ...columnFilterCombination.slice(0, -1),
+      ];
 
-      return {
-        columnGroups: columnGroupValues,
-        label: row.label,
-      };
+      const matchingResult = results.find(result => {
+        return (
+          aggregateFilters.every(filter => {
+            return result.filters.includes(filter.value);
+          }) &&
+          result.timeIdentifier === time.code &&
+          result.year === time.year
+        );
+      });
+
+      if (!matchingResult) {
+        return 'n/a';
+      }
+
+      const rawValue = matchingResult.measures[indicatorOption.value];
+      const numberValue = Number(rawValue);
+
+      if (Number.isNaN(numberValue)) {
+        return rawValue;
+      }
+
+      const decimals = rawValue.split('.')[1];
+      const decimalPlaces = decimals ? decimals.length : 0;
+
+      return `${numberValue.toLocaleString('en-GB', {
+        maximumFractionDigits: decimalPlaces,
+        minimumFractionDigits: decimalPlaces,
+      })}${indicatorOption.unit}`;
     });
-
-    return {
-      rows,
-      label: rowGroup.label,
-    };
   });
 
   return (
@@ -148,8 +160,9 @@ const TimePeriodDataTable = ({
 
       <FixedHeaderGroupedDataTable
         caption={caption}
-        headers={headerRow}
-        rowGroups={groupedData}
+        columnHeaders={columnHeaders}
+        rowHeaders={rowHeaders}
+        rows={rows}
         ref={dataTableRef}
       />
     </div>
