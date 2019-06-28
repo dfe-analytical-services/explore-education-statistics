@@ -64,8 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 Options = timePeriodsMeta.Select(tuple => new TimePeriodMetaViewModel
                 {
                     Code = tuple.TimePeriod,
-                    // TODO DFE-610 generate a label from code and year
-                    Label = tuple.Year.ToString(),
+                    Label = TimePeriodLabelFormatter.Format(tuple.Year, tuple.TimePeriod),
                     Year = tuple.Year
                 })
             };
