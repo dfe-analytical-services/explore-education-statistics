@@ -148,16 +148,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         [TimeIdentifierLabelValue("Up Until 31st March", "EOM")]
         EndOfMarch,
 
-        [TimeIdentifierLabelValue("Autumn Term", "T1")]
+        [TimeIdentifierLabelValue("Autumn Term", "T1", AcademicOrFiscal)]
         AutumnTerm,
 
-        [TimeIdentifierLabelValue("Autumn and Spring Term", "T1T2")]
+        [TimeIdentifierLabelValue("Autumn and Spring Term", "T1T2", AcademicOrFiscal)]
         AutumnSpringTerm,
 
-        [TimeIdentifierLabelValue("Spring Term", "T2")]
+        [TimeIdentifierLabelValue("Spring Term", "T2", AcademicOrFiscal)]
         SpringTerm,
 
-        [TimeIdentifierLabelValue("Summer Term", "T3")]
+        [TimeIdentifierLabelValue("Summer Term", "T3", AcademicOrFiscal)]
         SummerTerm,
 
         [TimeIdentifierLabelValue("January", "M1")]
