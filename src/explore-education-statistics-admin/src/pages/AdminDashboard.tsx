@@ -1,85 +1,112 @@
-import AdminDashboardApprovedForPublication from '@admin/pages/prototypes/components/AdminDashboardApprovedForPublication';
-import AdminDashboardNeedsWork from '@admin/pages/prototypes/components/AdminDashboardNeedsWork';
-import AdminDashboardReadyForApproval from '@admin/pages/prototypes/components/AdminDashboardReadyForApproval';
+import React, { Component } from 'react';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import React from 'react';
-import { RouteChildrenProps } from 'react-router';
+import { Dictionary } from '@common/types';
 import { LoginContext } from '@admin/components/Login';
 import { Authentication } from '@admin/services/PrototypeLoginService';
-import AdminDashboardPublications from '@admin/components/AdminDashboardPublications';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
-import Accordion from '@common/components/Accordion';
+import { Publication } from '@admin/services/publicationService';
+import AdminDashboardPublicationsTab from '@admin/components/AdminDashboardPublicationsTab';
+import groupBy from 'lodash/groupBy';
 import Link from '../components/Link';
 import Page from '../components/Page';
 
-const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
-  return (
-    <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-two-thirds">
-          <LoginContext.Consumer>
-            {loginContext =>
-              loginContext.user && <UserGreeting user={loginContext.user} />
-            }
-          </LoginContext.Consumer>
+interface State {
+  myPublications: Publication[];
+  inProgressPublications: Publication[];
+}
+
+class BrowseReleasesPage extends Component<{}, State> {
+  public state: State = {
+    myPublications: [],
+    inProgressPublications: [],
+  };
+
+  public componentDidMount(): void {
+    const authentication: Authentication = this.context;
+    const { user } = authentication;
+    const loggedInUserId = user ? user.id : null;
+
+    const myPublications =
+      loggedInUserId === null
+        ? []
+        : DummyPublicationsData.allPublications.filter(
+            _ => _.owner.id === loggedInUserId,
+          );
+
+    const inProgressPublications =
+      loggedInUserId === null
+        ? []
+        : DummyPublicationsData.allPublications.filter(
+            _ => _.owner.id !== loggedInUserId,
+          );
+
+    this.setState({
+      myPublications,
+      inProgressPublications,
+    });
+  }
+
+  public render() {
+    const { myPublications, inProgressPublications } = this.state;
+
+    const myPublicationsByThemeAndTopic: Dictionary<Publication[]> = groupBy(
+      myPublications,
+      _ => `${_.topic.theme.title}, ${_.topic.title}`,
+    );
+
+    const inProgressPublicationsByThemeAndTopic: Dictionary<
+      Publication[]
+    > = groupBy(
+      inProgressPublications,
+      _ => `${_.topic.theme.title}, ${_.topic.title}`,
+    );
+
+    return (
+      <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
+        <div className="govuk-grid-row">
+          <div className="govuk-grid-column-two-thirds">
+            <LoginContext.Consumer>
+              {loginContext =>
+                loginContext.user && <UserGreeting user={loginContext.user} />
+              }
+            </LoginContext.Consumer>
+          </div>
+          <div className="govuk-grid-column-one-third">
+            <RelatedInformation heading="Help and guidance">
+              <ul className="govuk-list">
+                <li>
+                  <Link to="/prototypes/methodology-home">
+                    Administrators' guide{' '}
+                  </Link>
+                </li>
+              </ul>
+            </RelatedInformation>
+          </div>
         </div>
-        <div className="govuk-grid-column-one-third">
-          <RelatedInformation heading="Help and guidance">
-            <ul className="govuk-list">
-              <li>
-                <Link to="/prototypes/methodology-home">
-                  Administrators' guide{' '}
-                </Link>
-              </li>
-            </ul>
-          </RelatedInformation>
-        </div>
-      </div>
-      <Tabs id="publicationTabs">
-        <TabsSection id="publications" title="Publications">
-          <h2 className="govuk-heading-l govuk-!-margin-bottom-0">
-            {DummyPublicationsData.publications[0].topic.theme.title},{' '}
-            {DummyPublicationsData.publications[0].topic.title}
-          </h2>
-          <p className="govuk-body">
-            Edit an existing release or create a new release for current
-            publications.
-          </p>
-          <Link
-            to="/prototypes/publication-create-new"
-            className="govuk-button"
-          >
-            Create a new publication
-          </Link>
-          <Accordion id="pupil-absence">
-            {DummyPublicationsData.publications.map(publication => (
-              <AdminDashboardPublications
-                key={publication.id}
-                publication={publication}
-              />
-            ))}
-          </Accordion>
-        </TabsSection>
-        <TabsSection
-          id="task-ready-approval1"
-          title={`Ready to review ${
-            location.search === '?status=readyApproval' ? '(1)' : ''
-          }`}
-        >
-          <AdminDashboardReadyForApproval />
-        </TabsSection>
-        <TabsSection id="task-ready-approval2" title="Needs work">
-          <AdminDashboardNeedsWork />
-        </TabsSection>
-        <TabsSection id="task-ready-approval3" title="Approved for publication">
-          <AdminDashboardApprovedForPublication />
-        </TabsSection>
-      </Tabs>
-    </Page>
-  );
-};
+        <Tabs id="publicationTabs">
+          <TabsSection id="my-publications" title="Publications">
+            <AdminDashboardPublicationsTab
+              publicationsByThemeAndTopic={myPublicationsByThemeAndTopic}
+              noResultsMessage="You have not yet created any publications"
+            />
+          </TabsSection>
+          <TabsSection id="in-progress-publications" title="In progress">
+            <AdminDashboardPublicationsTab
+              publicationsByThemeAndTopic={
+                inProgressPublicationsByThemeAndTopic
+              }
+              noResultsMessage="There are currenly no releases in progress"
+            />
+          </TabsSection>
+        </Tabs>
+      </Page>
+    );
+  }
+}
+
+BrowseReleasesPage.contextType = LoginContext;
 
 const UserGreeting = ({ user }: Authentication) => (
   <>
