@@ -61,6 +61,9 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
         indicators: [],
       }}
       validationSchema={Yup.object<FormValues>({
+        indicators: Yup.array()
+          .of(Yup.string())
+          .required('Select at least one indicator'),
         filters: Yup.object(
           mapValues(specification.filters, filter =>
             Yup.array()
@@ -71,9 +74,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
               ),
           ),
         ),
-        indicators: Yup.array()
-          .of(Yup.string())
-          .required('Select at least one indicator'),
       })}
       onSubmit={async values => {
         await onSubmit(values);

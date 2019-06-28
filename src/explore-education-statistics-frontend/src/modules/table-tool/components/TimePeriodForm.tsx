@@ -75,38 +75,11 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
         end: '',
       }}
       validationSchema={Yup.object<FormValues>({
-        end: Yup.string()
-          .required('End date is required')
-          .test(
-            'moreThanOrEqual',
-            'Must be after or same as start date',
-            function moreThanOrEqual(value: string) {
-              if (!value) {
-                return true;
-              }
-
-              const start: string = this.resolve(Yup.ref('start'));
-
-              if (!start) {
-                return true;
-              }
-
-              const endTime = TimePeriod.fromString(value);
-              const startTime = TimePeriod.fromString(start);
-
-              const comparison = endTime.compare(startTime);
-
-              return (
-                comparison === Comparison.GreaterThan ||
-                comparison === Comparison.EqualTo
-              );
-            },
-          ),
         start: Yup.string()
-          .required('Start date is required')
+          .required('Start date required')
           .test(
             'lessThanOrEqual',
-            'Must be before or same as end date',
+            'Start date must be before or same as end date',
             function lessThanOrEqual(value: string) {
               if (!value) {
                 return true;
@@ -125,6 +98,33 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
 
               return (
                 comparison === Comparison.LessThan ||
+                comparison === Comparison.EqualTo
+              );
+            },
+          ),
+        end: Yup.string()
+          .required('End date required')
+          .test(
+            'moreThanOrEqual',
+            'End date must be before or same as start date',
+            function moreThanOrEqual(value: string) {
+              if (!value) {
+                return true;
+              }
+
+              const start: string = this.resolve(Yup.ref('start'));
+
+              if (!start) {
+                return true;
+              }
+
+              const endTime = TimePeriod.fromString(value);
+              const startTime = TimePeriod.fromString(start);
+
+              const comparison = endTime.compare(startTime);
+
+              return (
+                comparison === Comparison.GreaterThan ||
                 comparison === Comparison.EqualTo
               );
             },
