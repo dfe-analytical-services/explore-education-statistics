@@ -51,17 +51,17 @@ class BrowseReleasesPage extends Component<{}, State> {
   public render() {
     const { myPublications, inProgressPublications } = this.state;
 
+    const createThemeTopicTitleLabel = (_: Publication) =>
+      `${_.topic.theme.title}, ${_.topic.title}`;
+
     const myPublicationsByThemeAndTopic: Dictionary<Publication[]> = groupBy(
       myPublications,
-      _ => `${_.topic.theme.title}, ${_.topic.title}`,
+      createThemeTopicTitleLabel,
     );
 
     const inProgressPublicationsByThemeAndTopic: Dictionary<
       Publication[]
-    > = groupBy(
-      inProgressPublications,
-      _ => `${_.topic.theme.title}, ${_.topic.title}`,
-    );
+    > = groupBy(inProgressPublications, createThemeTopicTitleLabel);
 
     return (
       <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
