@@ -12,7 +12,7 @@ import groupBy from 'lodash/groupBy';
 import Link from '../components/Link';
 import Page from '../components/Page';
 
-const BrowseReleasesPage = () => {
+const AdminDashboardPage = () => {
   const emptyPublicationsArray: Publication[] = [];
   const [myPublications, setMyPublications] = useState(emptyPublicationsArray);
   const [inProgressPublications, setInProgressPublications] = useState(
@@ -58,7 +58,7 @@ const BrowseReleasesPage = () => {
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <UserGreeting user={authentication.user} />
+          <UserGreeting />
         </div>
         <div className="govuk-grid-column-one-third">
           <RelatedInformation heading="Help and guidance">
@@ -82,7 +82,7 @@ const BrowseReleasesPage = () => {
         <TabsSection id="in-progress-publications" title="In progress">
           <AdminDashboardPublicationsTab
             publicationsByThemeAndTopic={inProgressPublicationsByThemeAndTopic}
-            noResultsMessage="There are currenly no releases in progress"
+            noResultsMessage="There are currently no releases in progress"
           />
         </TabsSection>
       </Tabs>
@@ -90,17 +90,21 @@ const BrowseReleasesPage = () => {
   );
 };
 
-const UserGreeting = ({ user }: Authentication) => (
-  <>
-    <span className="govuk-caption-xl">Welcome</span>
+const UserGreeting = () => {
+  const { user } = useContext(LoginContext);
 
-    <h1 className="govuk-heading-xl">
-      {user ? user.name : ''}{' '}
-      <span className="govuk-body-s">
-        Not you? <Link to="#">Sign out</Link>
-      </span>
-    </h1>
-  </>
-);
+  return (
+    <>
+      <span className="govuk-caption-xl">Welcome</span>
 
-export default BrowseReleasesPage;
+      <h1 className="govuk-heading-xl">
+        {user ? user.name : ''}{' '}
+        <span className="govuk-body-s">
+          Not you? <Link to="#">Sign out</Link>
+        </span>
+      </h1>
+    </>
+  );
+};
+
+export default AdminDashboardPage;
