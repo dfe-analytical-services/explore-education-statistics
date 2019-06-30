@@ -82,7 +82,11 @@ export interface Summary {
   description: { type: string; body: string };
 }
 
-export type ContentBlockType = 'MarkDownBlock' | 'InsetTextBlock' | 'DataBlock';
+export type ContentBlockType =
+  | 'MarkDownBlock'
+  | 'InsetTextBlock'
+  | 'DataBlock'
+  | 'HtmlBlock';
 
 export interface ContentBlock {
   type: ContentBlockType;
