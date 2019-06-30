@@ -4,61 +4,37 @@ const PrototypeMethodologySection = () => {
   return (
     <>
       <p>
-        The following are key terms used in published absence statistics and
-        their definitions:
+        The following calculations are used to produce absence National
+        Statistics:
       </p>
       <dl className="govuk-list">
-        <dt>Academic year</dt>
+        <dt>Permanent or fixed-period exclusion rate</dt>
         <dd>
-          31st August to the 31st July.
-          <br />
-          The academic year is generally broken into three terms, autumn spring
-          and summer.
+          (Number of permanent exclusions recorded across the whole academic
+          year / Number of sole and dual main registered pupils on roll as at
+          January census dat) X 100
         </dd>
-        <dt>Authorised absence</dt>
+        <dt>Pupils with one or more fixed-period exclusion rate</dt>
         <dd>
-          Absence with permission from a teacher or other authorised
-          representative of the schools. Counted in sessions, where each session
-          is equivalent to half a day.
+          (Number of pupils with one of more fixed-period exclusions in full
+          academic year / Number of sole and dual main registered pupils on roll
+          as at January census day) X 100
         </dd>
-        <dt>Overall absence</dt>
+        <dt>Proportion of all exclusions</dt>
         <dd>
-          The aggregated total of all authorised and unauthorised absences,
-          counted in sessions where each session is equivalent to half a day.
+          (Number of exclusions / Overall total number of exclusions) X 100
         </dd>
-        <dt>Persistent absence</dt>
+        <dt>Average exclusions per day</dt>
+        <dd>Number of exclusions / 190</dd>
+        <dt>Average fixed-period exclusions per pupil</dt>
         <dd>
-          A pupil enrolment is identified as a persistent absentee if they miss
-          10 per cent or more of their own possible sessions.
+          Number of fixed-period exclusions / Number of pupils with one or more
+          fixed-period exclusions
         </dd>
-        <dt>Possible session</dt>
+        <dt>Average length of fixed-period exclusions</dt>
         <dd>
-          Schools are required to provide two possible sessions per day, where
-          one session is the equivalent to half a day i.e. one session in the
-          morning and one in the afternoon.
-        </dd>
-        <dt>Pupil enrolment</dt>
-        <dd>
-          The number of pupil enrolments presented includes pupils on the school
-          roll for at least one session who are aged between 5 and 15, excluding
-          boarders. Some pupils may be counted more than once (if they moved
-          schools during the academic year or are registered in more than one
-          school).
-        </dd>
-        <dt>School census</dt>
-        <dd>
-          Statutory termly data collection for all maintained nursery, primary,
-          secondary, middle-deemed primary, middle-deemed secondary, local
-          authority maintained special and non-maintained special schools,
-          academies including free schools, studio schools and university
-          technical colleges and city technology colleges in England.
-        </dd>
-        <dt>Unauthorised absence</dt>
-        <dd>
-          Absence without permission from a teacher or other authorised
-          representative of the school. This includes all unexplained or
-          unjustified absences and late arrivals. Counted in sessions, where
-          each session is equivalent to half a day.
+          Total number of fixed-period exclusion sessions / Total number of
+          fixed-period exclusions
         </dd>
       </dl>
     </>

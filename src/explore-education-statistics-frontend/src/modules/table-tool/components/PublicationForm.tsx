@@ -61,7 +61,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
         goToNextStep();
       }}
       validationSchema={Yup.object<FormValues>({
-        publicationId: Yup.string().required('Choose a publication'),
+        publicationId: Yup.string().required('Choose publication'),
       })}
       render={(form: FormikProps<FormValues>) => {
         const { values } = form;

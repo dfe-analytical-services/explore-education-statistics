@@ -29,7 +29,6 @@ exports[`Accordion renders with hidden content by default 1`] = `
     >
       <div
         class="govuk-accordion__section-header"
-        data-testid="SectionHeader Test heading"
       >
         <h2
           class="govuk-accordion__section-heading"
@@ -99,7 +98,6 @@ exports[`Accordion renders with visible content when \`open\` is true 1`] = `
     >
       <div
         class="govuk-accordion__section-header"
-        data-testid="SectionHeader Test heading"
       >
         <h2
           class="govuk-accordion__section-heading"

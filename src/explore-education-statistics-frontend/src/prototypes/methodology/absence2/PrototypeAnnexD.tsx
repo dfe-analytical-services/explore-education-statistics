@@ -4,52 +4,109 @@ const PrototypeMethodologySection = () => {
   return (
     <>
       <p>
-        Published pupil absence National Statistics are available at the
-        following links.{' '}
+        The following breakdowns are currently available in published exclusions
+        statistics.
       </p>
-      <dl>
-        <dt>*</dt>
-        <dd>Identifies those published as National Statistics</dd>
-        <dt>~</dt>
-        <dd>
-          For the 2006/07 academic year the separate autumn and spring term
-          reports were published as parts of one release
-        </dd>
-        <dt>^</dt>
-        <dd>Provisional publication</dd>
-      </dl>
-      <h3>Full academic year</h3>
-      <ul className="govuk-list">
-        <li>
-          <a href="/prototypes/publication">
-            Pupil absence in schools in England: 2016 to 2017 *
-          </a>{' '}
-        </li>
-      </ul>
-      <h3>Autumn term</h3>
-      <ul className="govuk-list">
-        <li>
-          <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-autumn-term-2016">
-            Pupil absence in schools in England: autumn term 2016 *
-          </a>{' '}
-        </li>
-      </ul>
-      <h3>Spring term</h3>
-      <ul className="govuk-list">
-        <li>
-          <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-spring-term-2012">
-            Pupil absence in schools in England: spring term 2012 *
-          </a>{' '}
-        </li>
-      </ul>
-      <h3>Autumn and spring terms</h3>
-      <ul className="govuk-list">
-        <li>
-          <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-autumn-2015-and-spring-2016">
-            Pupil absence in schools in England: autumn 2015 and spring 2016 *
-          </a>{' '}
-        </li>
-      </ul>
+      <table className="govuk-table">
+        <tbody>
+          <tr>
+            <th colSpan={3}>National level</th>
+          </tr>
+          <tr>
+            <td>Exclusion numbers and rates</td>
+            <td />
+            <td>
+              For permanent and fixed-period exclusions broken down by school
+              type. Time series
+            </td>
+          </tr>
+          <tr>
+            <td>Exclusions information by characteristic</td>
+            <td />
+            <td>
+              Permanent and fixed-period exclusion information by age, gender,
+              free school meal eligibility, national curriculum year group, SEN
+              provision, ethnic group and level of deprivation
+            </td>
+          </tr>
+          <tr>
+            <td>Duration of fixed-period exclusions</td>
+            <td />
+            <td>
+              The duration of fixed-period exclusions, including average length
+              of exclusion, broken down by school type
+            </td>
+          </tr>
+          <tr>
+            <td>Number of fixed-period exclusions</td>
+            <td />
+            <td>
+              The number of fixed-period exclusions, including the number
+              subsequently being permanently excluded, broken down by school
+              type
+            </td>
+          </tr>
+          <tr>
+            <td>Exclusions by reason</td>
+            <td />
+            <td>
+              The number and proportion of permanent and fixed-period exclusions
+              broken down by school type
+            </td>
+          </tr>
+          <tr>
+            <td>Exclusion review panels</td>
+            <td />
+            <td>
+              Information on the number of exclusion review panels in maintained
+              primary, secondary, special schools and academies
+            </td>
+          </tr>
+          <tr>
+            <td>Academy exclusions</td>
+            <td />
+            <td>
+              Permanent, fixed-period and one or more fixed-period exclusion
+              information for academies
+            </td>
+          </tr>
+          <tr>
+            <th colSpan={3}>Local authority level</th>
+          </tr>
+          <tr>
+            <td>Exclusion numbers and rates</td>
+            <td />
+            <td>
+              For permanent and fixed-period exclusions as well as those with
+              one or more fixed-period exclusion broken down by school type
+            </td>
+          </tr>
+          <tr>
+            <td>Exclusions by reason</td>
+            <td />
+            <td>For fixed-period and permanent exclusions</td>
+          </tr>
+          <tr>
+            <td>Exclusions by ethnicity</td>
+            <td />
+            <td>
+              For fixed-period and permanent exclusions. A school type split is
+              provided for fixed-period exclusions
+            </td>
+          </tr>
+          <tr>
+            <th colSpan={3}>School level</th>
+          </tr>
+          <tr>
+            <td>Exclusion numbers and rates</td>
+            <td />
+            <td>
+              For permanent and fixed-period exclusions as well as those with
+              one or more fixed-period exclusion broken down by school type
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </>
   );
 };

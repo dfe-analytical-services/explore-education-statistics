@@ -28,11 +28,7 @@ const FormattedDate = ({
     return null;
   }
 
-  return (
-    <time className={className} data-testid="published-date">
-      {formatter(parsedDate, format)}
-    </time>
-  );
+  return <time className={className}>{formatter(parsedDate, format)}</time>;
 };
 
 export default FormattedDate;

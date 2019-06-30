@@ -134,7 +134,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
     const { charts, summary, tables, isLoading } = this.state;
 
     return (
-      <div data-testid={`DataBlock ${heading}`}>
+      <>
         {heading && <h3>{heading}</h3>}
 
         {isLoading ? (
@@ -184,7 +184,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
             )}
           </Tabs>
         )}
-      </div>
+      </>
     );
   }
 }
