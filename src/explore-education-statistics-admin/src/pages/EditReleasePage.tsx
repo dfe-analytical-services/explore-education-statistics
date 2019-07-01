@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Page from '@admin/components/Page';
-import SecondLevelNavigationHeadings, {
-  NavigationHeader,
-} from '@admin/components/SecondLevelNavigationHeadings';
 import { Release } from '@admin/services/publicationService';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
 import EditReleaseSetupSummary from '@admin/components/EditReleaseSetupSummary';
+import SectionedPage, {
+  NavigationHeader,
+} from '@admin/components/SectionedPage';
 import { RouteComponentProps } from 'react-router';
-import Link from '@admin/components/Link';
-import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
-import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 
 export enum ReleaseSection {
   ReleaseSetup,
@@ -62,8 +59,17 @@ const navigationHeadings: (
   ];
 };
 
+const breadcrumbs = [
+  {
+    link: '/admin-dashboard',
+    name: 'Administrator dashboard',
+  },
+  { name: 'Edit release', link: '#' },
+];
+
 const EditReleasePage = ({ releaseId, location }: Props) => {
   const [release, setRelease] = useState<Release>();
+
   const [publicationTitle, setPublicationTitle] = useState<string>();
 
   useEffect(() => {
@@ -82,45 +88,23 @@ const EditReleasePage = ({ releaseId, location }: Props) => {
       location.pathname.endsWith(section.linkTo),
     ) || availableSections[0];
 
-  const nextSection =
-    availableSections.indexOf(selectedSection) < availableSections.length - 1
-      ? availableSections[availableSections.indexOf(selectedSection) + 1]
-      : null;
-
-  const previousSection =
-    availableSections.indexOf(selectedSection) > 0
-      ? availableSections[availableSections.indexOf(selectedSection) - 1]
-      : null;
-
   return (
-    <Page
-      wide
-      breadcrumbs={[
-        {
-          link: '/admin-dashboard',
-          name: 'Administrator dashboard',
-        },
-        { name: 'Edit release', link: '#' },
-      ]}
-    >
+    <Page wide breadcrumbs={breadcrumbs}>
       {release && publicationTitle && (
         <>
-          <SecondLevelNavigationHeadings
+          <SectionedPage
             navigationHeadingText={publicationTitle}
             navigationHeadingSubtitle="Edit release"
-            selectedSection={selectedSection.section}
             availableSections={availableSections}
-          />
-          {ReleaseSection.ReleaseSetup === selectedSection.section && (
-            <EditReleaseSetupSummary
-              publicationTitle={publicationTitle}
-              release={release}
-            />
-          )}
-          <PreviousNextLinks
-            previousSection={previousSection || undefined}
-            nextSection={nextSection || undefined}
-          />
+            selectedSection={selectedSection}
+          >
+            {ReleaseSection.ReleaseSetup === selectedSection.section && (
+              <EditReleaseSetupSummary
+                publicationTitle={publicationTitle}
+                release={release}
+              />
+            )}
+          </SectionedPage>
         </>
       )}
     </Page>
