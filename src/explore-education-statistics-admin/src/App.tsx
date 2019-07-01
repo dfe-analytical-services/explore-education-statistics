@@ -4,6 +4,7 @@ import { Route } from 'react-router';
 import './App.scss';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 import { BrowserRouter } from 'react-router-dom';
+import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 import AdminDashboardPage from './pages/AdminDashboard';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
@@ -47,7 +48,7 @@ function App() {
         <Route
           exact
           path="/prototypes/admin-dashboard"
-          component={AdminDashboardPage}
+          component={PrototypeAdminDashboard}
         />
 
         <Route

@@ -2,79 +2,74 @@ import React from 'react';
 
 import Details from '@common/components/Details';
 import ChartRenderer from '@common/modules/find-statistics/components/ChartRenderer';
-import DataBlockService, {
-  GeographicLevel,
-  DataBlockResponse,
-} from '@common/services/dataBlockService';
+import { DataBlockResponse } from '@common/services/dataBlockService';
 import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import ChartDataSelector, {
-  DataAddedEvent,
+  DataUpdatedEvent,
 } from '@admin/modules/chart-builder/ChartDataSelector';
-import { ChartDataSet } from '@common/services/publicationService';
+import {
+  ChartDataSet,
+  ChartConfigurationOptions,
+  DataLabelConfigurationItem,
+} from '@common/services/publicationService';
+import { Dictionary } from '@common/types';
 import styles from './graph-builder.module.scss';
 import ConstData from '../../pages/prototypes/PrototypeData';
 import ChartTypeSelector from './ChartTypeSelector';
+import ChartDataConfiguration from './ChartDataConfiguration';
+import ChartAxisConfiguration from './ChartAxisConfiguration';
 
-const ChartBuilder = () => {
-  const [Data, updateData] = React.useState<DataBlockResponse | undefined>(
-    undefined,
-  );
+interface Props {
+  data: DataBlockResponse;
+}
 
-  const { chartTypes } = ConstData;
+const ChartBuilder = ({ data }: Props) => {
   const [selectedChartType, selectChartType] = React.useState<
     ChartDefinition | undefined
   >();
 
-  const [indicatorIds, setIndicatorIds] = React.useState<string[]>([]);
+  const { chartTypes } = ConstData;
 
-  const [filterIdCombinations, setFilterIdCombinations] = React.useState<
-    string[][]
-  >([]);
+  const indicatorIds = Object.keys(data.metaData.indicators);
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      const newData = await DataBlockService.getDataBlockForSubject({
-        subjectId: 1,
-        startYear: '2012',
-        endYear: '2016',
-        filters: ['1', '71', '72', '73'],
-        geographicLevel: GeographicLevel.National,
-        indicators: ['23', '26', '28'],
-      });
-      updateData(newData);
+  const filterIdCombinations: string[][] = Object.values(
+    data.result.reduce((filterSet, result) => {
+      const filterIds = Array.from(result.filters);
 
-      setIndicatorIds(Object.keys(newData.metaData.indicators));
-
-      const uniqueFilterIds: string[][] = Object.values(
-        newData.result.reduce((filterSet, result) => {
-          const filterIds = Array.from(result.filters);
-
-          return {
-            ...filterSet,
-            [filterIds.join('_')]: filterIds,
-          };
-        }, {}),
-      );
-
-      setFilterIdCombinations(uniqueFilterIds);
-    };
-
-    fetchData();
-  }, []);
-
-  React.useEffect(() => {
-    if (selectedChartType) {
-      //
-    }
-  }, [selectedChartType]);
+      return {
+        ...filterSet,
+        [filterIds.join('_')]: filterIds,
+      };
+    }, {}),
+  );
 
   const [dataSets, setDataSets] = React.useState<ChartDataSet[]>([]);
 
-  const onDataAddedToChart = (data: DataAddedEvent[]) => {
-    setDataSets(data);
+  const onDataUpdated = (addedData: DataUpdatedEvent[]) => {
+    setDataSets(addedData);
   };
 
-  if (Data === undefined) return <div />;
+  const [chartConfiguration, setChartConfiguration] = React.useState<
+    ChartConfigurationOptions
+  >({ dataLabels: {} });
+
+  const onDataLabelsChange = (
+    dataLabels: Dictionary<DataLabelConfigurationItem>,
+  ) => {
+    setChartConfiguration({ ...chartConfiguration, dataLabels });
+  };
+
+  React.useEffect(() => {
+    selectChartType(chartTypes[0]);
+    setDataSets([
+      {
+        indicator: '23',
+        filters: ['1', '71'],
+      },
+    ]);
+  }, []);
+
+  if (data === undefined) return <div />;
 
   return (
     <div className={styles.editor}>
@@ -89,8 +84,8 @@ const ChartBuilder = () => {
       {selectedChartType && (
         <Details summary="Add data to chart" open>
           <ChartDataSelector
-            onDataUpdated={data => onDataAddedToChart(data)}
-            metaData={Data.metaData}
+            onDataUpdated={onDataUpdated}
+            metaData={data.metaData}
             indicatorIds={indicatorIds}
             filterIds={filterIdCombinations}
             chartType={selectedChartType}
@@ -99,16 +94,37 @@ const ChartBuilder = () => {
       )}
 
       {selectedChartType && dataSets.length > 0 && (
-        <Details summary="Chart preview" open>
-          <ChartRenderer
-            type={selectedChartType.type}
-            dataSets={dataSets}
-            data={Data}
-            meta={Data.metaData}
-            xAxis={{ title: '' }}
-            yAxis={{ title: '' }}
-          />
-        </Details>
+        <React.Fragment>
+          <Details summary="Chart preview" open>
+            <ChartRenderer
+              type={selectedChartType.type}
+              dataSets={dataSets}
+              data={data}
+              meta={data.metaData}
+              xAxis={{ title: '' }}
+              yAxis={{ title: '' }}
+              configuration={chartConfiguration}
+            />
+          </Details>
+
+          <Details summary="Data label options">
+            <ChartDataConfiguration
+              dataSets={dataSets}
+              data={data}
+              meta={data.metaData}
+              onDataLabelsChange={onDataLabelsChange}
+            />
+          </Details>
+
+          <Details summary="Axes options" open>
+            <p>
+              Add / Remove and update the axes and how they display data ranges
+            </p>
+            {selectedChartType.axes.map(axis => (
+              <ChartAxisConfiguration key={axis.id} {...axis} />
+            ))}
+          </Details>
+        </React.Fragment>
       )}
     </div>
   );

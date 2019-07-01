@@ -69,11 +69,25 @@ export default class LineChartBlock extends Component<ChartProps> {
         title: 'X Axis',
         type: 'major',
       },
+      {
+        id: 'yaxis',
+        title: 'Y Axis',
+        type: 'value',
+      },
     ],
   };
 
   public render() {
-    const { data, height, xAxis, yAxis, labels, meta, dataSets } = this.props;
+    const {
+      data,
+      height,
+      xAxis,
+      yAxis,
+      labels,
+      meta,
+      dataSets,
+      configuration,
+    } = this.props;
 
     // const timePeriods = meta.timePeriods || {};
 
@@ -126,7 +140,12 @@ export default class LineChartBlock extends Component<ChartProps> {
             <Line
               dataKey="value"
               data={cd.data}
-              name={labels[cd.name]}
+              name={
+                cd.name &&
+                configuration &&
+                configuration.dataLabels[cd.name] &&
+                configuration.dataLabels[cd.name].label
+              }
               key={cd.name}
               legendType={symbols[index]}
               dot={props => <Symbols {...props} type={symbols[index]} />}
@@ -134,7 +153,13 @@ export default class LineChartBlock extends Component<ChartProps> {
               stroke={colours[index]}
               fill={colours[index]}
               strokeWidth="5"
-              unit={meta.indicators[cd.name].unit}
+              unit={
+                cd.name &&
+                configuration &&
+                configuration.dataLabels[cd.name] &&
+                configuration.dataLabels[cd.name].unit
+              }
+              isAnimationActive={false}
             />
           ))}
         </LineChart>

@@ -8,6 +8,10 @@ import TabsSection from '@common/components/TabsSection';
 import useToggle from '@common/hooks/useToggle';
 import PrototypeTableContent from '@admin/pages/prototypes/components/PrototypeTableContent';
 import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
+import DataBlockService, {
+  DataBlockResponse,
+  GeographicLevel,
+} from '@common/services/dataBlockService';
 import Link from '../../../components/Link';
 import { PrototypeTable } from '../PrototypeData';
 
@@ -21,6 +25,25 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
   const [showEditModal, toggleEditModal] = useToggle(false);
   const [showDeleteModal, toggleDeleteModal] = useToggle(false);
 
+  const [Data, updateData] = React.useState<DataBlockResponse>();
+
+  React.useEffect(() => {
+    // Temporary for now
+    const fetchData = async () => {
+      const newData = await DataBlockService.getDataBlockForSubject({
+        subjectId: 1,
+        startYear: '2012',
+        endYear: '2016',
+        filters: ['1', '71', '72', '73'],
+        geographicLevel: GeographicLevel.National,
+        indicators: ['23', '26', '28'],
+      });
+      updateData(newData);
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className="govuk-width-container">
       <Tabs id="tablePreviewTab">
@@ -28,7 +51,7 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
           <PrototypeTableContent table={table} task={task} />
         </TabsSection>
         <TabsSection id="add-chart" title="Add a chart">
-          <ChartBuilder />
+          {Data && <ChartBuilder data={Data} />}
         </TabsSection>
       </Tabs>
       {task === 'view' && (
