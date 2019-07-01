@@ -2,10 +2,7 @@ import React from 'react';
 
 import Details from '@common/components/Details';
 import ChartRenderer from '@common/modules/find-statistics/components/ChartRenderer';
-import DataBlockService, {
-  GeographicLevel,
-  DataBlockResponse,
-} from '@common/services/dataBlockService';
+import { DataBlockResponse } from '@common/services/dataBlockService';
 import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import ChartDataSelector, {
   DataAddedEvent,
@@ -14,67 +11,39 @@ import { ChartDataSet } from '@common/services/publicationService';
 import styles from './graph-builder.module.scss';
 import ConstData from '../../pages/prototypes/PrototypeData';
 import ChartTypeSelector from './ChartTypeSelector';
+import ChartConfiguration from './ChartConfiguration';
 
-const ChartBuilder = () => {
-  const [Data, updateData] = React.useState<DataBlockResponse | undefined>(
-    undefined,
-  );
+interface Props {
+  data: DataBlockResponse;
+}
 
-  const { chartTypes } = ConstData;
+const ChartBuilder = ({ data }: Props) => {
   const [selectedChartType, selectChartType] = React.useState<
     ChartDefinition | undefined
   >();
 
-  const [indicatorIds, setIndicatorIds] = React.useState<string[]>([]);
+  const { chartTypes } = ConstData;
 
-  const [filterIdCombinations, setFilterIdCombinations] = React.useState<
-    string[][]
-  >([]);
+  const indicatorIds = Object.keys(data.metaData.indicators);
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      const newData = await DataBlockService.getDataBlockForSubject({
-        subjectId: 1,
-        startYear: '2012',
-        endYear: '2016',
-        filters: ['1', '71', '72', '73'],
-        geographicLevel: GeographicLevel.National,
-        indicators: ['23', '26', '28'],
-      });
-      updateData(newData);
+  const filterIdCombinations: string[][] = Object.values(
+    data.result.reduce((filterSet, result) => {
+      const filterIds = Array.from(result.filters);
 
-      setIndicatorIds(Object.keys(newData.metaData.indicators));
-
-      const uniqueFilterIds: string[][] = Object.values(
-        newData.result.reduce((filterSet, result) => {
-          const filterIds = Array.from(result.filters);
-
-          return {
-            ...filterSet,
-            [filterIds.join('_')]: filterIds,
-          };
-        }, {}),
-      );
-
-      setFilterIdCombinations(uniqueFilterIds);
-    };
-
-    fetchData();
-  }, []);
-
-  React.useEffect(() => {
-    if (selectedChartType) {
-      //
-    }
-  }, [selectedChartType]);
+      return {
+        ...filterSet,
+        [filterIds.join('_')]: filterIds,
+      };
+    }, {}),
+  );
 
   const [dataSets, setDataSets] = React.useState<ChartDataSet[]>([]);
 
-  const onDataAddedToChart = (data: DataAddedEvent[]) => {
-    setDataSets(data);
+  const onDataAddedToChart = (addedData: DataAddedEvent[]) => {
+    setDataSets(addedData);
   };
 
-  if (Data === undefined) return <div />;
+  if (data === undefined) return <div />;
 
   return (
     <div className={styles.editor}>
@@ -89,8 +58,8 @@ const ChartBuilder = () => {
       {selectedChartType && (
         <Details summary="Add data to chart" open>
           <ChartDataSelector
-            onDataUpdated={data => onDataAddedToChart(data)}
-            metaData={Data.metaData}
+            onDataUpdated={onDataAddedToChart}
+            metaData={data.metaData}
             indicatorIds={indicatorIds}
             filterIds={filterIdCombinations}
             chartType={selectedChartType}
@@ -99,16 +68,26 @@ const ChartBuilder = () => {
       )}
 
       {selectedChartType && dataSets.length > 0 && (
-        <Details summary="Chart preview" open>
-          <ChartRenderer
-            type={selectedChartType.type}
-            dataSets={dataSets}
-            data={Data}
-            meta={Data.metaData}
-            xAxis={{ title: '' }}
-            yAxis={{ title: '' }}
-          />
-        </Details>
+        <React.Fragment>
+          <Details summary="Chart preview" open>
+            <ChartRenderer
+              type={selectedChartType.type}
+              dataSets={dataSets}
+              data={data}
+              meta={data.metaData}
+              xAxis={{ title: '' }}
+              yAxis={{ title: '' }}
+            />
+          </Details>
+
+          <Details summary="Chart configuration">
+            <ChartConfiguration
+              dataSets={dataSets}
+              data={data}
+              meta={data.metaData}
+            />
+          </Details>
+        </React.Fragment>
       )}
     </div>
   );
