@@ -104,4 +104,5 @@ export interface Publication {
   topic: Topic;
   contact: UserContact;
   methodology: Methodology;
+  owner: User;
 }

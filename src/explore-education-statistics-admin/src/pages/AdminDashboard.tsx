@@ -1,29 +1,49 @@
-import AdminDashboardApprovedForPublication from '@admin/pages/prototypes/components/AdminDashboardApprovedForPublication';
-import AdminDashboardNeedsWork from '@admin/pages/prototypes/components/AdminDashboardNeedsWork';
-import AdminDashboardReadyForApproval from '@admin/pages/prototypes/components/AdminDashboardReadyForApproval';
+import React, { useContext, useEffect, useState } from 'react';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import React from 'react';
-import { RouteChildrenProps } from 'react-router';
 import { LoginContext } from '@admin/components/Login';
-import { Authentication } from '@admin/services/PrototypeLoginService';
-import AdminDashboardPublications from '@admin/components/AdminDashboardPublications';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
-import Accordion from '@common/components/Accordion';
+import { Publication } from '@admin/services/publicationService';
+import AdminDashboardPublicationsTab from '@admin/components/AdminDashboardPublicationsTab';
 import Link from '../components/Link';
 import Page from '../components/Page';
 
-const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
+const AdminDashboardPage = () => {
+  const [myPublications, setMyPublications] = useState<Publication[]>([]);
+
+  const [inProgressPublications, setInProgressPublications] = useState<
+    Publication[]
+  >([]);
+
+  const authentication = useContext(LoginContext);
+
+  useEffect(() => {
+    const { user } = authentication;
+    const loggedInUserId = user ? user.id : null;
+
+    if (loggedInUserId) {
+      const fetchedMyPublications = DummyPublicationsData.allPublications.filter(
+        publication => publication.owner.id === loggedInUserId,
+      );
+
+      const fetchedInProgressPublications = DummyPublicationsData.allPublications.filter(
+        publication => publication.owner.id !== loggedInUserId,
+      );
+
+      setMyPublications(fetchedMyPublications);
+      setInProgressPublications(fetchedInProgressPublications);
+    } else {
+      setMyPublications([]);
+      setInProgressPublications([]);
+    }
+  }, [authentication]);
+
   return (
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <LoginContext.Consumer>
-            {loginContext =>
-              loginContext.user && <UserGreeting user={loginContext.user} />
-            }
-          </LoginContext.Consumer>
+          <UserGreeting />
         </div>
         <div className="govuk-grid-column-one-third">
           <RelatedInformation heading="Help and guidance">
@@ -38,60 +58,38 @@ const BrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         </div>
       </div>
       <Tabs id="publicationTabs">
-        <TabsSection id="publications" title="Publications">
-          <h2 className="govuk-heading-l govuk-!-margin-bottom-0">
-            {DummyPublicationsData.publications[0].topic.theme.title},{' '}
-            {DummyPublicationsData.publications[0].topic.title}
-          </h2>
-          <p className="govuk-body">
-            Edit an existing release or create a new release for current
-            publications.
-          </p>
-          <Link
-            to="/prototypes/publication-create-new"
-            className="govuk-button"
-          >
-            Create a new publication
-          </Link>
-          <Accordion id="pupil-absence">
-            {DummyPublicationsData.publications.map(publication => (
-              <AdminDashboardPublications
-                key={publication.id}
-                publication={publication}
-              />
-            ))}
-          </Accordion>
+        <TabsSection id="my-publications" title="Publications">
+          <AdminDashboardPublicationsTab
+            publications={myPublications}
+            noResultsMessage="You have not yet created any publications"
+          />
         </TabsSection>
-        <TabsSection
-          id="task-ready-approval1"
-          title={`Ready to review ${
-            location.search === '?status=readyApproval' ? '(1)' : ''
-          }`}
-        >
-          <AdminDashboardReadyForApproval />
-        </TabsSection>
-        <TabsSection id="task-ready-approval2" title="Needs work">
-          <AdminDashboardNeedsWork />
-        </TabsSection>
-        <TabsSection id="task-ready-approval3" title="Approved for publication">
-          <AdminDashboardApprovedForPublication />
+        <TabsSection id="in-progress-publications" title="In progress">
+          <AdminDashboardPublicationsTab
+            publications={inProgressPublications}
+            noResultsMessage="There are currently no releases in progress"
+          />
         </TabsSection>
       </Tabs>
     </Page>
   );
 };
 
-const UserGreeting = ({ user }: Authentication) => (
-  <>
-    <span className="govuk-caption-xl">Welcome</span>
+const UserGreeting = () => {
+  const { user } = useContext(LoginContext);
 
-    <h1 className="govuk-heading-xl">
-      {user ? user.name : ''}{' '}
-      <span className="govuk-body-s">
-        Not you? <Link to="#">Sign out</Link>
-      </span>
-    </h1>
-  </>
-);
+  return (
+    <>
+      <span className="govuk-caption-xl">Welcome</span>
 
-export default BrowseReleasesPage;
+      <h1 className="govuk-heading-xl">
+        {user ? user.name : ''}{' '}
+        <span className="govuk-body-s">
+          Not you? <Link to="#">Sign out</Link>
+        </span>
+      </h1>
+    </>
+  );
+};
+
+export default AdminDashboardPage;

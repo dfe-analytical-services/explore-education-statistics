@@ -109,7 +109,7 @@ const DashboardRelease = ({
             <dd className="govuk-summary-list__value">
               {release.comments.map(comment => (
                 <Details
-                  key={comment.id}
+                  key={`${release.id}-comments-${comment.id}`}
                   summary={`${comment.author.name}, ${format(
                     comment.datetime,
                     'd MMMM yyyy, HH:mm',
