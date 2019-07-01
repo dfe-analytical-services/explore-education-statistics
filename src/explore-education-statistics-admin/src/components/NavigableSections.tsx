@@ -24,6 +24,9 @@ interface Props<SectionType> {
  * The client also provides the appropriate body for the selected section, which is rendered within this component
  * as its props.children.
  *
+ * The SectionType generic type represents a type for a unique id per section, whatever works best for the client.
+ * This could for instance be an enum of available sections, or a string or number id.
+ *
  * @param availableSections
  * @param selectedSection
  * @param children
