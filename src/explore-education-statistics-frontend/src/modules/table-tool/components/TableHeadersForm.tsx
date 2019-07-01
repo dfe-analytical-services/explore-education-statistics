@@ -28,7 +28,7 @@ const TableHeadersForm = (props: Props) => {
   const { onSubmit, initialValues } = props;
 
   return (
-    <Details summary="Re-order table headers" open>
+    <Details summary="Re-order table headers">
       <p className="govuk-hint">
         Drag and drop the options below to re-order the table headers.
       </p>
