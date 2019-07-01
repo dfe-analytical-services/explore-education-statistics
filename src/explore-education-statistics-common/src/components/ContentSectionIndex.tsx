@@ -60,20 +60,12 @@ class ContentSectionIndex extends Component<Props> {
         {indexResults.length > 0 && (
           <ul className="govuk-body-s">
             {indexComplete &&
-              indexResults.map((item, index) => {
+              indexResults.map(item => {
                 return (
                   <>
                     {item.location && (
                       <li>
-                        <a
-                          href="#"
-                          onClick={e => {
-                            e.preventDefault();
-                            indexResults[index].element.scrollIntoView();
-                          }}
-                        >
-                          {item.location}
-                        </a>
+                        <a href={`#${item.element.id}`}>{item.location}</a>
                       </li>
                     )}
                   </>
