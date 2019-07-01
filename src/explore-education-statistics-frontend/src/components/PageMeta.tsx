@@ -8,9 +8,9 @@ interface Props {
 }
 
 const PageMeta = ({
-  title = 'GOV.UK',
-  description = 'Explore education statistics',
-  imgUrl = '/assets/images/govuk-opengraph-image.png',
+  title = 'Explore education statistics',
+  description = 'GOV.UK',
+  imgUrl,
 }: Props) => {
   return (
     <Helmet>
@@ -21,17 +21,15 @@ const PageMeta = ({
 
       {/* <!-- Open Graph / Facebook --> */}
       <meta property="og:type" content="website" />
-      <meta property="og:url" content="" />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content={imgUrl} />
+      {imgUrl && <meta property="og:image" content={imgUrl} />}
 
       {/* <!-- Twitter --> */}
       <meta property="twitter:card" content="summary_large_image" />
-      <meta property="twitter:url" content="" />
       <meta property="twitter:title" content={title} />
       <meta property="twitter:description" content={description} />
-      <meta property="twitter:image" content={imgUrl} />
+      {imgUrl && <meta property="twitter:image" content={imgUrl} />}
     </Helmet>
   );
 };
