@@ -447,6 +447,23 @@
       ]
     },
     {
+      "apiVersion": "2016-08-01",
+      "type": "Microsoft.Web/sites/slots",
+      "name": "[concat(variables('adminAppName'), '/deploy')]",
+      "kind": "app",
+      "location": "[resourceGroup().location]",
+      "comments": "This specifies the web app slots.",
+      "tags": {
+        "displayName": "WebAppSlots"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
+      ]
+    },
+    {
       "type": "Microsoft.Web/serverfarms",
       "sku": {
         "Tier": "[first(skip(split(parameters('skuAdmin'), ' '), 1))]",
