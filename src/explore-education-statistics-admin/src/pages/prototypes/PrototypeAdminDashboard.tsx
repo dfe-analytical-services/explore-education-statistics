@@ -7,6 +7,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React from 'react';
 import { RouteChildrenProps } from 'react-router';
+import AdminDashboardInProgress from '@admin/pages/prototypes/components/AdminDashboardInProgress';
 import Link from '../../components/Link';
 import PrototypePage from './components/PrototypePage';
 
@@ -39,14 +40,14 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         <TabsSection id="publications" title="Publications">
           <PrototypeAdminDashboardPublications />
         </TabsSection>
-        {/* <TabsSection
+        <TabsSection
           id="task-in-progress"
           title={`In progress ${
             location.search === '?status=editNewRelease' ? '(2)' : '(1)'
           }`}
         >
           <AdminDashboardInProgress />
-        </TabsSection> */}
+        </TabsSection>
         <TabsSection
           id="task-ready-approval1"
           title={`Ready to review ${

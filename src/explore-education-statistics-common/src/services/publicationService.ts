@@ -61,6 +61,17 @@ export interface ChartDataSet {
   timePeriod?: string;
 }
 
+export interface ChartConfigurationOptions {
+  dataLabels: {
+    [key: string]: {
+      name: string;
+      label: string;
+      value: string;
+      unit: string;
+    };
+  };
+}
+
 export interface Chart {
   type: ChartType;
   dataSets: ChartDataSet[];

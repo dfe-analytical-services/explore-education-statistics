@@ -3,6 +3,7 @@ import LineChartBlock from '@common/modules/find-statistics/components/charts/Li
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
 import {
   Axis,
+  ChartConfigurationOptions,
   ChartDataSet,
   ChartType,
   ReferenceLine,
@@ -32,6 +33,7 @@ export interface ChartRendererProps {
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
   dataSets: ChartDataSet[];
+  configuration: ChartConfigurationOptions;
 }
 
 function ChartRenderer(props: ChartRendererProps) {
@@ -46,6 +48,7 @@ function ChartRenderer(props: ChartRendererProps) {
     xAxis = { title: '' },
     yAxis = { title: '' },
     dataSets,
+    configuration,
   } = props;
 
   const labels = Object.entries(meta.indicators).reduce(
@@ -79,6 +82,7 @@ function ChartRenderer(props: ChartRendererProps) {
           width={width}
           referenceLines={referenceLines}
           dataSets={dataSets}
+          configuration={configuration}
         />
       );
     case 'verticalbar':

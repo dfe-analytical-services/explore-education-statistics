@@ -5,7 +5,7 @@ import { DataBlockMetadata } from '@common/services/dataBlockService';
 import { SelectOption } from '@common/components/form/FormSelect';
 import Button from '@common/components/Button';
 
-export interface DataAddedEvent {
+export interface DataUpdatedEvent {
   indicator: string;
   filters: string[];
 }
@@ -15,8 +15,9 @@ interface Props {
   indicatorIds: string[];
   filterIds: string[][];
   metaData: DataBlockMetadata;
-  onDataAdded?: (data: DataAddedEvent) => void;
-  onDataUpdated?: (data: DataAddedEvent[]) => void;
+  onDataAdded?: (data: DataUpdatedEvent) => void;
+  onDataRemoved?: (data: DataUpdatedEvent) => void;
+  onDataUpdated?: (data: DataUpdatedEvent[]) => void;
 }
 
 const ChartDataSelector = ({
@@ -24,6 +25,8 @@ const ChartDataSelector = ({
   filterIds,
   metaData,
   onDataUpdated,
+  onDataRemoved,
+  onDataAdded,
 }: Props) => {
   const indicatorSelectOptions = [
     {
@@ -56,12 +59,15 @@ const ChartDataSelector = ({
   const [selectedIndicator, setSelectedIndicator] = React.useState<string>('');
   const [selectedFilters, setSelectedFilters] = React.useState<string>('');
 
-  const [selectedList, setSelectedList] = React.useState<DataAddedEvent[]>([]);
+  const [selectedList, setSelectedList] = React.useState<DataUpdatedEvent[]>(
+    [],
+  );
 
-  const removeSelected = (selected: DataAddedEvent, index: number) => {
-    selectedList.splice(index, 1);
+  const removeSelected = (selected: DataUpdatedEvent, index: number) => {
+    const [removed] = selectedList.splice(index, 1);
     setSelectedList([...selectedList]);
 
+    if (onDataRemoved) onDataRemoved(removed);
     if (onDataUpdated) onDataUpdated(selectedList);
   };
 
@@ -96,6 +102,31 @@ const ChartDataSelector = ({
         </div>
       </FormGroup>
 
+      {selectedIndicator && selectedFilters && (
+        <div className="govuk-grid-row">
+          <div className="govuk-grid-column-full">
+            <Button
+              type="button"
+              onClick={() => {
+                const added = {
+                  filters: selectedFilters.split(','),
+                  indicator: selectedIndicator,
+                };
+                selectedList.push(added);
+                setSelectedList([...selectedList]);
+
+                if (onDataAdded) onDataAdded(added);
+                if (onDataUpdated) {
+                  onDataUpdated(selectedList);
+                }
+              }}
+            >
+              Add data
+            </Button>
+          </div>
+        </div>
+      )}
+
       {selectedList.length > 0 && (
         <table className="govuk-table">
           <caption>Selected data</caption>
@@ -129,29 +160,6 @@ const ChartDataSelector = ({
             ))}
           </tbody>
         </table>
-      )}
-
-      {selectedIndicator && selectedFilters && (
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-full">
-            <Button
-              type="button"
-              onClick={() => {
-                selectedList.push({
-                  filters: selectedFilters.split(','),
-                  indicator: selectedIndicator,
-                });
-                setSelectedList([...selectedList]);
-
-                if (onDataUpdated) {
-                  onDataUpdated(selectedList);
-                }
-              }}
-            >
-              Add data
-            </Button>
-          </div>
-        </div>
       )}
     </React.Fragment>
   );

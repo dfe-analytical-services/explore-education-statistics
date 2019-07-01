@@ -5,13 +5,16 @@ import ChartRenderer from '@common/modules/find-statistics/components/ChartRende
 import { DataBlockResponse } from '@common/services/dataBlockService';
 import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import ChartDataSelector, {
-  DataAddedEvent,
+  DataUpdatedEvent,
 } from '@admin/modules/chart-builder/ChartDataSelector';
-import { ChartDataSet } from '@common/services/publicationService';
+import {
+  ChartDataSet,
+  ChartConfigurationOptions,
+} from '@common/services/publicationService';
 import styles from './graph-builder.module.scss';
 import ConstData from '../../pages/prototypes/PrototypeData';
 import ChartTypeSelector from './ChartTypeSelector';
-import ChartConfiguration from './ChartConfiguration';
+import ChartDataConfiguration from './ChartDataConfiguration';
 
 interface Props {
   data: DataBlockResponse;
@@ -39,8 +42,16 @@ const ChartBuilder = ({ data }: Props) => {
 
   const [dataSets, setDataSets] = React.useState<ChartDataSet[]>([]);
 
-  const onDataAddedToChart = (addedData: DataAddedEvent[]) => {
+  const onDataUpdated = (addedData: DataUpdatedEvent[]) => {
     setDataSets(addedData);
+  };
+
+  const [chartConfiguration, setChartConfiguration] = React.useState<
+    ChartConfigurationOptions
+  >({ dataLabels: {} });
+
+  const onConfigurationChange = (configuration: ChartConfigurationOptions) => {
+    setChartConfiguration(configuration);
   };
 
   if (data === undefined) return <div />;
@@ -58,7 +69,7 @@ const ChartBuilder = ({ data }: Props) => {
       {selectedChartType && (
         <Details summary="Add data to chart" open>
           <ChartDataSelector
-            onDataUpdated={onDataAddedToChart}
+            onDataUpdated={onDataUpdated}
             metaData={data.metaData}
             indicatorIds={indicatorIds}
             filterIds={filterIdCombinations}
@@ -77,15 +88,23 @@ const ChartBuilder = ({ data }: Props) => {
               meta={data.metaData}
               xAxis={{ title: '' }}
               yAxis={{ title: '' }}
+              configuration={chartConfiguration}
             />
           </Details>
 
-          <Details summary="Chart configuration">
-            <ChartConfiguration
+          <Details summary="Data label options">
+            <ChartDataConfiguration
               dataSets={dataSets}
               data={data}
               meta={data.metaData}
+              onConfigurationChange={onConfigurationChange}
             />
+          </Details>
+
+          <Details summary="Axes options">
+            <p>
+              Add / Remove and update the axes and how they display data ranges
+            </p>
           </Details>
         </React.Fragment>
       )}

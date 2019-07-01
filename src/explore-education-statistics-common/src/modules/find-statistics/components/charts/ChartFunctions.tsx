@@ -1,5 +1,7 @@
 import {
   Axis,
+  Chart,
+  ChartConfigurationOptions,
   ChartDataSet,
   ChartType,
   ReferenceLine,
@@ -33,6 +35,7 @@ export interface ChartProps {
   height?: number;
   width?: number;
   referenceLines?: ReferenceLine[];
+  configuration?: ChartConfigurationOptions;
 }
 
 export interface ChartData {
