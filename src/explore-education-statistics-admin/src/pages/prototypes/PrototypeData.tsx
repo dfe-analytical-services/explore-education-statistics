@@ -11,7 +11,7 @@ const chartTypes: ChartDefinition[] = [
   VerticalBarBlock.definition,
   HorizontalBarBlock.definition,
   MapBlock.definition,
-]; 
+];
 
 export interface PrototypeTable {
   label: string;

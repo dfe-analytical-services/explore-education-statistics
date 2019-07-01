@@ -66,6 +66,7 @@ export interface ChartDefinition {
     id: string;
     title: string;
     type: 'major' | 'value' | 'group';
+    defaultDataType?: 'indicator' | 'filter' | 'location' | 'timePeriod';
   }[];
 }
 

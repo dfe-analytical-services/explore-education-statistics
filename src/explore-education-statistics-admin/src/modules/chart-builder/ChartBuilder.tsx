@@ -49,15 +49,20 @@ const ChartBuilder = ({ data }: Props) => {
     setDataSets(addedData);
   };
 
+  const [chartDataLabels, setChartDataLabels] = React.useState<
+    Dictionary<DataLabelConfigurationItem>
+  >({});
+
   const [chartConfiguration, setChartConfiguration] = React.useState<
     ChartConfigurationOptions
-  >({ dataLabels: {} });
+  >({ dataLabels: {}, axes: {} });
 
-  const onDataLabelsChange = (
-    dataLabels: Dictionary<DataLabelConfigurationItem>,
-  ) => {
-    setChartConfiguration({ ...chartConfiguration, dataLabels });
-  };
+  React.useEffect(() => {
+    setChartConfiguration({
+      dataLabels: chartDataLabels,
+      axes: {},
+    });
+  }, [chartDataLabels]);
 
   React.useEffect(() => {
     selectChartType(chartTypes[0]);
@@ -112,7 +117,7 @@ const ChartBuilder = ({ data }: Props) => {
               dataSets={dataSets}
               data={data}
               meta={data.metaData}
-              onDataLabelsChange={onDataLabelsChange}
+              onDataLabelsChange={setChartDataLabels}
             />
           </Details>
 
@@ -121,7 +126,12 @@ const ChartBuilder = ({ data }: Props) => {
               Add / Remove and update the axes and how they display data ranges
             </p>
             {selectedChartType.axes.map(axis => (
-              <ChartAxisConfiguration key={axis.id} {...axis} />
+              <ChartAxisConfiguration
+                dataSets={dataSets}
+                key={axis.id}
+                meta={data.metaData}
+                {...axis}
+              />
             ))}
           </Details>
         </React.Fragment>

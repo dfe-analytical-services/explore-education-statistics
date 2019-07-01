@@ -69,8 +69,14 @@ export interface DataLabelConfigurationItem {
   unit: string;
 }
 
+export interface AxisConfigurationItem {
+  name: string;
+  dataSet: ChartDataSet;
+}
+
 export interface ChartConfigurationOptions {
   dataLabels: Dictionary<DataLabelConfigurationItem>;
+  axes: Dictionary<AxisConfigurationItem>;
 }
 
 export interface Chart {
