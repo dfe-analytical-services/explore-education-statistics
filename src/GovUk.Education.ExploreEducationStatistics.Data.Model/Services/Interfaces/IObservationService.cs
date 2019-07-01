@@ -7,6 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
     {
         IEnumerable<Observation> FindObservations(ObservationQueryContext query);
 
-        IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(SubjectMetaQueryContext query);
+        IEnumerable<(TimeIdentifier TimeIdentifier, int Year)> GetTimePeriodsMeta(SubjectMetaQueryContext query);
     }
 }

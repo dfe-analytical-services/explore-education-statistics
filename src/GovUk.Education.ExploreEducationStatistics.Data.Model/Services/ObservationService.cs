@@ -129,10 +129,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             };
         }
 
-        public IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(SubjectMetaQueryContext query)
+        public IEnumerable<(TimeIdentifier TimeIdentifier, int Year)> GetTimePeriodsMeta(SubjectMetaQueryContext query)
         {
-            var timePeriods = (from o in DbSet().AsNoTracking().Where(query.ObservationPredicate())
-                select new {o.TimeIdentifier, o.Year}).Distinct();
+            var timePeriods = DbSet().AsNoTracking().Where(query.ObservationPredicate())
+                .Select(o => new {o.TimeIdentifier, o.Year})
+                .OrderBy(tuple => tuple.Year)
+                .ThenBy(tuple => tuple.TimeIdentifier)
+                .Distinct();
 
             return from timePeriod in timePeriods.AsEnumerable()
                 select (timePeriod.TimeIdentifier, timePeriod.Year);

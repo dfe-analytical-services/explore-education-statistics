@@ -5,6 +5,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Newtonsoft.Json;
@@ -46,7 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             {
                 Filters = GetFilters(observations),
                 Indicators = GetIndicators(subject.Id, query.Indicators),
-                Locations = GetObservationalUnits(observations)
+                Locations = GetObservationalUnits(observations),
+                TimePeriods = GetTimePeriods(observations)
             };
         }
 
@@ -85,8 +87,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             var observationalUnits =
                 _locationService.GetObservationalUnits(locations).Values.SelectMany(units => units);
 
-            // TODO should we just be extracting the most significant observational unit for the query here?
-
             return observationalUnits.ToDictionary(
                 observationalUnit => observationalUnit.Code,
                 observationalUnit => new ObservationalUnitMetaViewModel
@@ -95,6 +95,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     Label = observationalUnit.Name,
                     Value = observationalUnit.Code
                 });
+        }
+
+        private static Dictionary<string, TimePeriodMetaViewModel> GetTimePeriods(IEnumerable<Observation> observations)
+        {
+            var timePeriods = observations.Select(o => new {o.TimeIdentifier, o.Year})
+                .Distinct()
+                .OrderBy(tuple => tuple.Year)
+                .ThenBy(tuple => tuple.TimeIdentifier);
+            
+            return timePeriods.ToDictionary(
+                tuple => $"{tuple.Year}_{tuple.TimeIdentifier.GetEnumValue()}",
+                tuple => new TimePeriodMetaViewModel
+                {
+                    Code = tuple.TimeIdentifier,
+                    Label = TimePeriodLabelFormatter.Format(tuple.Year, tuple.TimeIdentifier),
+                    Year = tuple.Year
+                }
+            );
         }
 
         private dynamic GetGeoJsonForObservationalUnit(IObservationalUnit observationalUnit)

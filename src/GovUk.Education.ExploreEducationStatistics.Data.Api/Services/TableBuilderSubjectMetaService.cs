@@ -63,8 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 Legend = "Academic Year",
                 Options = timePeriodsMeta.Select(tuple => new TimePeriodMetaViewModel
                 {
-                    Code = tuple.TimePeriod,
-                    Label = TimePeriodLabelFormatter.Format(tuple.Year, tuple.TimePeriod),
+                    Code = tuple.TimeIdentifier,
+                    Label = TimePeriodLabelFormatter.Format(tuple.Year, tuple.TimeIdentifier),
                     Year = tuple.Year
                 })
             };
