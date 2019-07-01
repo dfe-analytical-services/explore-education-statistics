@@ -3,46 +3,72 @@ import React from 'react';
 const PrototypeMethodologySection = () => {
   return (
     <>
+      <h3 id="section2-1">2.1 The admissions process</h3>
       <p>
-        DfE’s annual absence releases have been badged as National Statistics
-        since the 1999/00 academic year publication.
+        Each local authority (LA) runs the coordinated admissions process for
+        all state-funded schools in its area.
       </p>
       <p>
-        The termly and 2 term combined releases were badged as National
-        Statistics slightly later.
+        It receives applications for all children resident in its area,
+        including for those who wish to apply to schools in another local
+        authority.
       </p>
       <p>
-        The combined autumn and spring term release was badged as national
-        statistics from the autumn 2006 and spring 2007 publication and the
-        single term releases were badged as National Statistics as of the autumn
-        term 2009 publication.
-      </p>
-      <h3 id="section2-1">2.1 National Statistics designation</h3>
-      <p>
-        The United Kingdom Statistics Authority (UKSA) designated these
-        statistics as National Statistics in Month Year in accordance with the
-        Statistics and Registration Service Act 2007 and signifying compliance
-        with the Code of Practice for Statistics.
-      </p>
-      <p>Designation can be broadly interpreted to mean that the statistics:</p>
-      <ul>
-        <li>meet identified user needs</li>
-        <li>are well explained and readily accessible</li>
-        <li>are produced according to sound methods</li>
-        <li>are managed impartially and objectively in the public interest</li>
-      </ul>
-      <p>
-        Once statistics have been designated as National Statistics it is a
-        statutory requirement that the Code of Practice shall continue to be
-        observed.
+        The authorities liaise with each other to ensure that all applications
+        for schools outside the home LA are received by, and included in, the
+        coordination exercise of the LA in which the school is based.
       </p>
       <p>
-        Information on improvements made to these statistics to continue their
-        compliance with the Code of Practice are available our{' '}
-        <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
-          Standards for official statistics published by DfE
-        </a>{' '}
-        guidance.
+        However, the applications are in all cases reported within these tables
+        under the LA to whom the application is made - that is, the one in which
+        the child is resident.
+      </p>
+      <p>
+        Parents submit their application on a single form returned to their home
+        authority, listing their preferred schools in order of preference.
+      </p>
+      <p>
+        LAs must allow parents to express at least three preferences at each
+        level (primary and secondary).
+      </p>
+      <p>
+        In practice, different LAs allow parents to express between three and
+        six preferences.
+      </p>
+      <p>
+        The number of preferences allowed by an authority can vary at primary
+        and at secondary level.
+      </p>
+      <p>
+        Applications for each school are ranked against the school's published
+        priority and oversubscription criteria.
+      </p>
+      <a>
+        Where a child could be offered a place at more than one of their
+        preferred schools, they are offered the school listed as the highest
+        preference.
+      </a>
+      <p>
+        Authorities must publish information on the admissions criteria of all
+        the schools in their area, including data on volume of applications for
+        the available places in previous years - that is, whether they received
+        more or fewer applications than they had places available in those
+        years.
+      </p>
+      <p>
+        LAs send parents a single offer of a school place on national offer day,
+        which is the 1 March (or next working day) for secondary offers and 16
+        April (or next working day) for primary offers.
+      </p>
+      <p>
+        Parents are entitled to appeal to the relevant admission authority
+        against a refusal to offer a place. These appeals are not reported in
+        this publication.
+      </p>
+      <p>
+        Figures for appeals lodged, heard and the appeal result relating to
+        entry into the start of the 2017/18 academic year will be published in
+        August on DfE's website.
       </p>
     </>
   );

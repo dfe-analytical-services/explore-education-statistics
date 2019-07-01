@@ -19,10 +19,20 @@ const PrototypeMethodologySection = () => {
       </p>
       <h3 id="section2-1">2.1 National Statistics designation</h3>
       <p>
-        The United Kingdom Statistics Authority (UKSA) designated these
-        statistics as National Statistics in Month Year in accordance with the
-        Statistics and Registration Service Act 2007 and signifying compliance
-        with the Code of Practice for Statistics.
+        The{' '}
+        <a href="https://www.statisticsauthority.gov.uk/">
+          United Kingdom Statistics Authority (UKSA)
+        </a>{' '}
+        designated these statistics as National Statistics in accordance with
+        the
+        <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
+          Statistics and Registration Service Act 2007
+        </a>{' '}
+        and signifying compliance with the{' '}
+        <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
+          Code of Practice for Statistics
+        </a>
+        .
       </p>
       <p>Designation can be broadly interpreted to mean that the statistics:</p>
       <ul>

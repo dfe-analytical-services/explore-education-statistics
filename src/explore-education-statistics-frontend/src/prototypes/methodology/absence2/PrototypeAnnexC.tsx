@@ -3,197 +3,164 @@ import React from 'react';
 const PrototypeMethodologySection = () => {
   return (
     <>
-      <table className="govuk-table">
-        <caption className="govuk-table-caption">
-          The following codes are used by schools when taking registers, further
-          details are available in the Department’s School Attendance advice:
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col">Code</th>
-            <th scope="col">Reason</th>
-            <th scope="col">Colected in school census?</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td> / </td>
-            <td>Present (AM)</td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td> \ </td>
-            <td>Present (PM)</td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>L</td>
-            <td>Late (before registers closed) marked as present</td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>I</td>
-            <td>
-              Authorised absence due to Illness (NOT medical or dental etc.
-              appointments)
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>M</td>
-            <td>Authorised absence due to medical / dental appointments</td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>R</td>
-            <td>Authorised absence due to religious observance </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>S</td>
-            <td>Authorised absence due to study leave </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>T</td>
-            <td>
-              Authorised absence due to Gypsy, Roma and Traveller absence{' '}
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>H</td>
-            <td>Authorised absence due to authorised family holiday </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>E</td>
-            <td>
-              Authorised absence as pupil is excluded, but still on the
-              admission register, with no alternative provision made{' '}
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>C</td>
-            <td>
-              Authorised absence for reasons not covered by any other authorised
-              absence code, this code should only be used in exceptional
-              circumstances{' '}
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>B</td>
-            <td>
-              Approved educational activity as pupil being educated off site
-              (not dual registration)
-            </td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>D</td>
-            <td>
-              Dual registered (at another establishment) - not counted in
-              possible attendance
-            </td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>J</td>
-            <td>
-              Approved educational activity as pupil is attending interview with
-              prospective employer or another educational establishment
-            </td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>P</td>
-            <td>
-              Approved education activity as pupil is participating in an
-              approved supervised sporting activity
-            </td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>V</td>
-            <td>
-              Approved educational activity as pupil is at an organised
-              educational visit or trip
-            </td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>W</td>
-            <td>
-              Approved educational activity as pupil is attending work
-              experience
-            </td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>G</td>
-            <td>
-              Unauthorised absence as pupil is on a family holiday, not agreed,
-              or is taking days in excess of an agreed family holiday
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>U</td>
-            <td>
-              Unauthorised absence as pupil arrived after registration closed
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>O</td>
-            <td>
-              Unauthorised absence as the school is not satisfied with the
-              reason given for the absence, has not authorised the absence and
-              it is not covered by any other code / description
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>N</td>
-            <td>
-              Unauthorised absence as pupil missed session/s for a reason that
-              has not yet been provided
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>X</td>
-            <td>
-              Non-compulsory school age absence - not counted in possible
-              attendances
-            </td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>Y</td>
-            <td>
-              Non-compulsory school age absence - not counted in possible
-              attendances
-            </td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>Z</td>
-            <td>Pupil not yet on roll - not counted in possible attendances</td>
-            <td>No</td>
-          </tr>
-          <tr>
-            <td>#</td>
-            <td>
-              Planned whole or partial school closure - not counted in possible
-              attendances
-            </td>
-            <td>No</td>
-          </tr>
-        </tbody>
-      </table>
+      <p>
+        Published exclusions statistics are available at the following links
+      </p>
+      <ul className="govuk-list govuk-list--bullet">
+        <li>
+          <a href="https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2015-to-2016">
+            Permanent and fixed-period exclusions in England: 2015 to 2016
+          </a>
+        </li>
+        <li>
+          <a href="https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2014-to-2015">
+            Permanent and fixed-period exclusions in England: 2014 to 2015
+          </a>
+        </li>
+        <li>
+          <a href="https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2013-to-2014">
+            Permanent and fixed-period exclusions in England: 2013 to 2014
+          </a>
+        </li>
+        <li>
+          <a href="https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2012-to-2013">
+            Permanent and fixed-period exclusions in England: 2012 to 2013
+          </a>
+        </li>
+        <li>
+          <a href="https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-2011-to-2012-academic-year">
+            Permanent and fixed period exclusions from schools in England: 2011
+            to 2012 academic year
+          </a>
+        </li>
+        <li>
+          <a href="https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2010-to-2011">
+            Permanent and fixed-period exclusions from schools in England:
+            academic year 2010 to 2011
+          </a>
+        </li>
+        <li>
+          <a href="https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-from-schools-in-england-academic-year-2009-to-2010">
+            Permanent and fixed-period exclusions from schools in England:
+            academic year 2009 to 2010
+          </a>
+        </li>
+        <li>
+          <a href="https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-academic-year-2008-to-2009">
+            Permanent and fixed-period exclusions in England: academic year 2008
+            to 2009
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SFR/s000942/index.shtml">
+            Permanent and Fixed Period Exclusions from Schools in England
+            2008/09
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SFR/s000860/index.shtml">
+            Permanent and Fixed Period Exclusions from Schools in England
+            2007/08
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SFR/s000793/index.shtml">
+            Permanent and Fixed Period Exclusions from Schools in England
+            2006/07 - Amended
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SFR/s000733/index.shtml">
+            Permanent and Fixed Period Exclusions from Schools and Exclusion
+            Appeals in England 2005/06
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SFR/s000662/index.shtml">
+            Permanent and Fixed Period Exclusions from Schools and Exclusion
+            Appeals in England 2004/05
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SFR/s000582/index.shtml">
+            Permanent and Fixed Period Exclusions from Schools and Exclusion
+            Appeals in England 2003/04
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SFR/s000465/index.shtml">
+            Permanent Exclusions from Schools and Exclusion Appeals in England
+            2002/2003 (Provisional)
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SFR/s000482/index.shtml">
+            Experimental First Release: Permanent and Fixed Period Exclusions,
+            Summer Term 2002/03
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SFR/s000535/index.shtml">
+            Permanent Exclusions from Maintained Schools in England 2002/03
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SFR/s000397/index.shtml">
+            Permanent Exclusions from Schools and Exclusion Appeals in England
+            2001/2002 (provisional)
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SFR/s000331/index.shtml">
+            Permanent Exclusions from Schools and Exclusion Appeals in England
+            2000/2001
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SFR/s000275/index.shtml">
+            Permanent Exclusions from Schools, England 1999/2000 (Final)
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SFR/s000259/index.shtml">
+            Permanent Exclusions from Schools and Exclusion Appeals England
+            1999/2000 (Provisional Estimates)
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SFR/s000157/index.shtml">
+            Permanent Exclusions from Schools and Exclusion Appeals England
+            1998/99 (Provisional)
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SFR/s000025/index.shtml">
+            Permanent Exclusions from School in England 1997/98 and Exclusion
+            Appeals Lodged by Parents in England 1997/98
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SBU/b000427/index.shtml">
+            Permanent Exclusions from Maintained Schools in England 2001/02
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SBU/b000365/index.shtml">
+            Permanent Exclusions from Maintained Schools in England
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SBU/b000298/index.shtml">
+            Permanent Exclusions from Maintained Schools in England 1996/1997 to
+            1999/2000
+          </a>
+        </li>
+        <li>
+          <a href="http://webarchive.nationalarchives.gov.uk/20120504203418/http:/education.gov.uk/rsgateway/DB/SBU/b000209/index.shtml">
+            Permanent Exclusions from Maintained Schools in England
+          </a>
+        </li>
+      </ul>
     </>
   );
 };

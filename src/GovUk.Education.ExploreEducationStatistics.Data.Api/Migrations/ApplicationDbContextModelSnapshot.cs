@@ -669,7 +669,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                                 .OnDelete(DeleteBehavior.Cascade);
                         });
 
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Mat", "Mat", b1 =>
+                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Mat", "MultiAcademyTrust", b1 =>
                         {
                             b1.Property<long>("LocationId")
                                 .ValueGeneratedOnAdd()
@@ -686,7 +686,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                             b1.ToTable("Location");
 
                             b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
-                                .WithOne("Mat")
+                                .WithOne("MultiAcademyTrust")
                                 .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.Mat", "LocationId")
                                 .OnDelete(DeleteBehavior.Cascade);
                         });
@@ -796,6 +796,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                             b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
                                 .WithOne("RscRegion")
                                 .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.RscRegion", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
+
+                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Sponsor", "Sponsor", b1 =>
+                        {
+                            b1.Property<long>("LocationId")
+                                .ValueGeneratedOnAdd()
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<string>("Code");
+
+                            b1.Property<string>("Name");
+
+                            b1.HasKey("LocationId");
+
+                            b1.HasIndex("Code");
+
+                            b1.ToTable("Location");
+
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("Sponsor")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.Sponsor", "LocationId")
                                 .OnDelete(DeleteBehavior.Cascade);
                         });
 

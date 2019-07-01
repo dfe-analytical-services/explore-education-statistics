@@ -15,11 +15,11 @@ exports[`Accordion renders with hidden content by default 1`] = `
         class="govuk-accordion__open-all"
         type="button"
       >
-        Open all
+        Open all 
         <span
           class="govuk-visually-hidden"
         >
-           sections
+          sections
         </span>
       </button>
     </div>
@@ -29,16 +29,14 @@ exports[`Accordion renders with hidden content by default 1`] = `
     >
       <div
         class="govuk-accordion__section-header"
-        data-testid="SectionHeader Test heading"
       >
         <h2
           class="govuk-accordion__section-heading"
         >
           <button
-            aria-controls="test-sections-content-1"
             aria-expanded="false"
             class="govuk-accordion__section-button"
-            id="test-sections-heading-1"
+            id="test-sections-1-heading"
             type="button"
           >
             Test heading
@@ -50,9 +48,9 @@ exports[`Accordion renders with hidden content by default 1`] = `
         </h2>
       </div>
       <div
-        aria-labelledby="test-sections-heading-1"
+        aria-labelledby="test-sections-1-heading"
         class="govuk-accordion__section-content"
-        id="test-sections-content-1"
+        id="test-sections-1-content"
       >
         <p>
           Test content
@@ -86,11 +84,11 @@ exports[`Accordion renders with visible content when \`open\` is true 1`] = `
         class="govuk-accordion__open-all"
         type="button"
       >
-        Close all
+        Close all 
         <span
           class="govuk-visually-hidden"
         >
-           sections
+          sections
         </span>
       </button>
     </div>
@@ -100,16 +98,14 @@ exports[`Accordion renders with visible content when \`open\` is true 1`] = `
     >
       <div
         class="govuk-accordion__section-header"
-        data-testid="SectionHeader Test heading"
       >
         <h2
           class="govuk-accordion__section-heading"
         >
           <button
-            aria-controls="test-sections-content-1"
             aria-expanded="true"
             class="govuk-accordion__section-button"
-            id="test-sections-heading-1"
+            id="test-sections-1-heading"
             type="button"
           >
             Test heading
@@ -121,9 +117,9 @@ exports[`Accordion renders with visible content when \`open\` is true 1`] = `
         </h2>
       </div>
       <div
-        aria-labelledby="test-sections-heading-1"
+        aria-labelledby="test-sections-1-heading"
         class="govuk-accordion__section-content"
-        id="test-sections-content-1"
+        id="test-sections-1-content"
       >
         <p>
           Test content

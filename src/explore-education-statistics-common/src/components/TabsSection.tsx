@@ -16,7 +16,7 @@ export const classes = {
 
 export interface TabsSectionProps {
   children: ReactNode;
-  id: string;
+  id?: string;
   /**
    * Set to true if children should not be
    * rendered until tab has been selected.
@@ -53,7 +53,6 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
         ref={ref}
         role={onMedia('tabpanel')}
         tabIndex={onMedia(-1)}
-        data-testid={title}
       >
         {createElement(headingTag, { children: title })}
         {children}

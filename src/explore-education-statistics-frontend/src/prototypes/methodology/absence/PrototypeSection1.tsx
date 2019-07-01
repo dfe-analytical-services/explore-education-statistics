@@ -58,7 +58,7 @@ const PrototypeMethodologySection = () => {
           identify the correct code to use before entering it on to the school’s
           electronic register, or management information system which is then
           used to download data to the school census. A code set of these is
-          available in <a href="#">Annex C</a>
+          available in <a href="#annex-sections-heading-2">Annex B</a>
         </li>
       </ul>
       <p>
@@ -77,18 +77,21 @@ const PrototypeMethodologySection = () => {
         regarding accurate recording of a pupil’s attendance.
       </p>
       <p>
-        Further information is available in DfE's advice on school attendance.{' '}
+        For further information:{' '}
+        <a href="https://www.gov.uk/government/publications/school-attendance">
+          School attendance: guidance for schools
+        </a>
+        .{' '}
       </p>
-      <h3 id="section1-2">1.2 Uses and users of absence statistics and data</h3>
+      <h3 id="section1-2">1.2 Uses and users</h3>
       <p>
         The data used to publish absence statistics is collected via the school
         census which is used by a variety of companies and organisations
         including:{' '}
       </p>
       <ul className="govuk-list govuk-list--bullet">
-        <li>
-          mainstream and specialist media companies such as Rightmove and Zoopla
-        </li>
+        <li>mainstream and specialist media companies</li>
+        <li>housing websites such as Rightmove and Zoopla</li>
         <li>specialist publications such as the good schools guide</li>
         <li>data analysis organisations such the Fischer Family Trust</li>
         <li>
@@ -96,8 +99,8 @@ const PrototypeMethodologySection = () => {
           University and the Education Policy Institute
         </li>
         <li>
-          central government organisations such as DfE, Ofsted other government
-          departments
+          central government organisations such as DfE, Ofsted and other
+          government departments
         </li>
       </ul>
       <p>
@@ -131,7 +134,7 @@ const PrototypeMethodologySection = () => {
         since the 1999/00 academic year publication.
       </p>
       <p>
-        The termly and 2 term combined releases were badged as National
+        The termly and two-term combined releases were badged as National
         Statistics slightly later.
       </p>
       <p>
@@ -146,7 +149,7 @@ const PrototypeMethodologySection = () => {
         absence data. However, this was discontinued as it was deemed no longer
         necessary and of the least importance to users.
       </p>
-      <p>The last spring term release wass published on 30 August 2012: </p>
+      <p>The last spring term release was published on 30 August 2012: </p>
       <ul className="govuk-list govuk-list--bullet">
         <li>
           <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-spring-term-2012">
@@ -173,16 +176,16 @@ const PrototypeMethodologySection = () => {
         For academic years 1993/94 to 1998/99, annual pupil absence information
         was collected via the Absence in Schools Survey and published via
         Statistical bulletins. Links to all absence publications can be found in{' '}
-        <a href="#">Annex D</a>.
+        <a href="#annex-sections-heading-3">Annex C</a>.
       </p>
       <h3 id="section1-4">1.4 Key absence measures</h3>
       <p>
-        DfE monitors pupil absence levels using 2 key measures - overall absence
-        rate and persistent absence (PA) rate.
+        DfE monitors pupil absence levels using two key measures - overall
+        absence rate and persistent absence (PA) rate.
       </p>
       <p>
-        These key measures are calculated for pupils who are of compulsory s
-        chool age - ie aged between 5 and 15 as at the start of the academic
+        These key measures are calculated for pupils who are of compulsory
+        school age - ie aged between 5 and 15 as at the start of the academic
         year (31 August).
       </p>
       <p>
@@ -202,14 +205,21 @@ const PrototypeMethodologySection = () => {
       <p>
         Unauthorised absence is absence without permission from the school. This
         includes all unexplained or unjustified absences and arrivals after
-        registration has closed. See overall absence methodology section for
-        further information.
+        registration has closed.
+      </p>
+      <p>
+        For further information:{' '}
+        <a href="#section3-1">3.1 Overall absence methodology</a>.
       </p>
       <p>
         Persistent absence is when a pupil enrolment’s overall absence equates
         to 10% or more of their possible sessions.
       </p>
-      <p>See persistent absence methodology section for further information.</p>
+      <p>
+        For further information:{' '}
+        <a href="#section3-2">3.2 Persistent absence methodology</a>.
+      </p>
+
       <h3 id="section1-5">1.5 Cohort used in absence measures</h3>
       <p>
         Absence information is collected and disseminated at enrolment level
@@ -218,7 +228,7 @@ const PrototypeMethodologySection = () => {
       <p>
         This means where a pupil has moved school throughout the year, theyll be
         counted more than once as they have recorded attendance and absence at
-        more than 1 school.
+        more than one school.
       </p>
       <p>
         This allows for schools to be held accountable for pupil absences, as
@@ -239,37 +249,37 @@ const PrototypeMethodologySection = () => {
         number of pupils.
       </p>
       <h3 id="section1-6">
-        1.6 The school year (5 half terms vs 6 half terms)
+        1.6 The school year (five half terms vs six half terms)
       </h3>
       <p>
-        Generally, the academic year is made up of 3 terms - autumn, spring and
-        summer.
+        Generally, the academic year is made up of three terms - autumn, spring
+        and summer.
       </p>
       <p>
-        Each term has 2 parts (half terms) which are usually separated by a half
-        term break.
+        Each term has two parts (half-terms) which are usually separated by a
+        half term break.
       </p>
       <p>
         Since the 2012/13 academic year, pupil absence information has been
-        collected for the full academic year (ie all 6 half terms).
+        collected for the full academic year (ie all six half terms).
       </p>
       <p>
-        However, prior to this absence information was collected for the first 5
-        half terms only, meaning absences in the second half of the summer term
-        were not collected.
+        However, prior to this absence information was collected for the first
+        five half terms only, meaning absences in the second half of the summer
+        term were not collected.
       </p>
       <p>
         Since the 2012/13 academic year, DfE's key absence indicators have been
-        based on the full academic year’s (ie 6 half terms) data.
+        based on the full academic year’s (ie six half terms) data.
       </p>
       <p>
         However, as we're unable to rework time series tables or provide any
-        historical 6 half term absence levels DfE continued to publish a full
-        set of absence information for the first 5 half terms up to and
+        historical six half term absence levels DfE continued to publish a full
+        set of absence information for the first five half terms up to and
         including the 2013/14 academic year.
       </p>
       <p>
-        Following this, a single csv file based on data for 5 half terms has
+        Following this, a single csv file based on data for five half terms has
         been published alongside the annual absence publications so longer
         term-time comparisons can still be made.
       </p>
@@ -387,7 +397,7 @@ const PrototypeMethodologySection = () => {
       </p>
       <p>
         This is to ensure the same cohorts of enrolments are included in both
-        the 5 and 6 half term absence measures.
+        the five and six half term absence measures.
       </p>
       <h3 id="section1-7">
         1.7 Published geographical and characteristics breakdowns
@@ -406,8 +416,8 @@ const PrototypeMethodologySection = () => {
         <li>authorised, unauthorised and overall absence rates</li>
         <li>absence broken down by reason</li>
         <li>
-          the number of pupils with 1 or more sessions of absence for different
-          reasons
+          the number of pupils with one or more sessions of absence for
+          different reasons
         </li>
         <li>information on persistent absence</li>
       </ul>
@@ -449,7 +459,7 @@ const PrototypeMethodologySection = () => {
       </p>
       <p>
         In addition, from 2015/16 onwards, characteristics include free school
-        meal eligibility in the last 6 years.
+        meal eligibility in the last six years.
       </p>
       <p>
         The Income Deprivation Affecting Children Index (IDACI) is provided by
@@ -475,7 +485,13 @@ const PrototypeMethodologySection = () => {
         out-of-work and those that are in work but who have low earnings (and
         who satisfy the respective means tests).
       </p>
-      <p>Further information about IDACI can be found on the CLG site.</p>
+      <p>
+        For further information about IDACI:{' '}
+        <a href="https://www.gov.uk/government/statistics/english-indices-of-deprivation-2015">
+          English indices of deprivation 2015
+        </a>
+        .
+      </p>
       <p>IDACI bands from 2014/15 are based on 2015 IDACI scores.</p>
       <p>
         IDACI bands for 2010/11 to 2013/14 are based on 2010 IDACI scores and
@@ -496,9 +512,9 @@ const PrototypeMethodologySection = () => {
         classifications for the measures of settlement size and sparsity.
       </p>
       <p>
-        Up to 8 classes of output areas could be distinguished - 4 settlement
-        types (urban, town and fringe, village, hamlet and isolated dwelling) in
-        either a sparse or less sparse regional setting.
+        Up to eight classes of output areas could be distinguished - four
+        settlement types (urban, town and fringe, village, hamlet and isolated
+        dwelling) in either a sparse or less sparse regional setting.
       </p>
       <p>
         Absence data by degree of rurality from 2014/15 has been analysed based
@@ -507,12 +523,17 @@ const PrototypeMethodologySection = () => {
         Classification.
       </p>
       <p>
-        Further information about the Rural and Urban Area Classification 2011
-        can be found on the Office for National Statistics website.
+        For further information about Rural and Urban Area Classification 2011:{' '}
+        <a href="https://www.gov.uk/government/statistics/2011-rural-urban-classification-of-local-authority-and-other-higher-level-geographies-for-statistical-purposes">
+          2011 Rural-Urban Classification of Local Authorities and other
+          geographies
+        </a>
+        .
       </p>
       <p>
         A full list of published absence breakdowns (as of the latest academic
-        year’s releases) is available in Annex E.
+        year's releases) is available in{' '}
+        <a href="#annex-sections-heading-4">Annex D</a>.
       </p>
       <p>
         From 2015/16 onwards, published tables on characteristics breakdowns
@@ -539,21 +560,27 @@ const PrototypeMethodologySection = () => {
         and school level information.
       </p>
       <p>
-        Alongside the underlying data there is an accompanying document
+        Alongside the underlying data there's an accompanying document
         (metadata) which provides further information on the contents of these
         files.
       </p>
       <p>
-        This data is released under the terms of the Open Government License and
-        is intended to meet at least 3 stars for Open Data.
+        This data is released under the terms of the{' '}
+        <a href="http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">
+          Open Government License
+        </a>{' '}
+        and is intended to meet at least 3 stars for{' '}
+        <a href="https://www.gov.uk/government/publications/2010-to-2015-government-policy-government-transparency-and-accountability/2010-to-2015-government-policy-government-transparency-and-accountability#appendix-3-releasing-data-in-open-and-anonymised-formats">
+          Open Data
+        </a>
+        .
       </p>
-
       <p>
-        Following the ‘
+        Following the{' '}
         <a href="https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/467936/Absence_statistics_changes_-_consultation_response.pdf">
           Consultation on improvements to pupil absence statistics
         </a>
-        ’, results published in October 2015, releases are now accompanied by
+        , results published in October 2015, releases are now accompanied by
         time series underlying data, containing additional breakdowns and data
         from 2006/07 to the latest year.
       </p>
@@ -563,9 +590,12 @@ const PrototypeMethodologySection = () => {
       </p>
       <h3 id="section1-9">1.9 Suppression of absence data</h3>
       <p>
-        The Code of Practice for Official Statistics requires reasonable steps
-        are taken to ensure all published or disseminated statistics produced by
-        DfE protects confidentiality.{' '}
+        The{' '}
+        <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
+          Code of Practice for Statistics
+        </a>{' '}
+        requires reasonable steps are taken to ensure all published or
+        disseminated statistics produced by DfE protect confidentiality.{' '}
       </p>
       <p>
         To do this totals are rounded and small numbers are suppressed according
@@ -583,10 +613,10 @@ const PrototypeMethodologySection = () => {
         </li>
         <li>
           where the numerator or denominator of any percentage calculated on
-          enrolment numbers of 1 or 2, the percentage is suppressed. This
-          suppression is consistent with{' '}
+          enrolment numbers of 1 or 2, the percentage is suppressed consistent
+          with{' '}
           <a href="http://media.education.gov.uk/assets/files/policy%20statement%20on%20confidentiality.pdf">
-            DfE's statistical policy
+            DfE's Statistical Policy Statement on Confidentiality
           </a>
         </li>
         <li>where any number is shown as 0 - the original figure was also 0</li>
@@ -596,7 +626,7 @@ const PrototypeMethodologySection = () => {
         <thead>
           <tr>
             <th colSpan={2}>
-              Symbols used to identify this in published tables are as follows:
+              Symbols used to identify this in published tables:
             </th>
           </tr>
         </thead>
@@ -626,55 +656,105 @@ const PrototypeMethodologySection = () => {
       </p>
       <ul className="govuk-list govuk-list--bullet">
         <li>
-          other National Statistics releases published by the Department
+          other National Statistics releases published by DfE:
           <ul className="govuk-list govuk-list--bullet">
-            <li>children in Need</li>
-            <li>children looked after</li>
-            <li>school and college performance tables</li>
+            <li>
+              <a href="https://www.gov.uk/government/collections/statistics-children-in-need">
+                Statistics: children in need and child protection
+              </a>
+            </li>
+            <li>
+              <a href="https://www.gov.uk/government/collections/statistics-looked-after-children">
+                Statistics: looked-after children
+              </a>
+            </li>
+            <li>
+              <a href="https://www.compare-school-performance.service.gov.uk/">
+                school and college performance tables published via Find and
+                compare schools in England
+              </a>
+            </li>
           </ul>
         </li>
         <li>
-          other reports published by the Department
+          other reports published by DfE:
           <ul className="govuk-list govuk-list--bullet">
-            <li>the link between absence and attainment at KS2 and KS4</li>
+            <li>
+              <a href="https://www.gov.uk/government/publications/absence-and-attainment-at-key-stages-2-and-4-2013-to-2014">
+                Absence and attainment at key stages 2 and 4: 2013 to 2014
+              </a>
+            </li>
           </ul>
         </li>
       </ul>
       <p>
         In addition historical pupil absence data is available in the following
-        publications which have been discontinued:
+        discontinued publications:
       </p>
       <ul className="govuk-list govuk-list--bullet">
         <li>
-          special Educational Needs: an analysis (Department for Education) -
-          data up to and including 2013/14
+          <a href="https://www.gov.uk/government/collections/statistics-special-educational-needs-sen">
+            Statistics: special educational needs (SEN)
+          </a>{' '}
+          - DfE data up to and including 2013/14
         </li>
         <li>
-          neighbourhood statistics (ONS small area tables) - 2006/07 to 2012/13
-          inclusive
+          <a href="https://www.ons.gov.uk/help/localstatistics">
+            Neighbourhood Statistics (NeSS)
+          </a>{' '}
+          - ONS small area tables - 2006/07 to 2012/13 inclusive
         </li>
       </ul>
       <h3 id="section1-11">
         1.11 Devolved administration statistics on absence
       </h3>
       <p>
-        The Department collects and reports on absence information from schools
-        in England. For information for Wales, Scotland and Northern Ireland,
-        contact the departments below or access their statistics at the
-        following links:
+        DfE collects and reports on absence information from schools in England.
       </p>
-      <p>Wales: school.stats@wales.gsi.gov.uk or</p>
-      <a href="https://gov.wales/statistics-and-research">
-        Welsh Government – Statistics and Research
-      </a>
-      <p>Scotland: school.stats@wales.gsi.gov.uk or</p>
-      <a href="https://www2.gov.scot/Topics/Statistics/Browse/School-Education">
-        Scottish Government – School Education Statistics
-      </a>
-      <p>Northern Ireland: statistics@deni.gov.uk or</p>
-      <a href="https://www.education-ni.gov.uk/topics/statistics-and-research/statistics">
-        Department of Education – Education Statistics
-      </a>
+      <p>For information for Wales, Scotland and Northern Ireland:</p>
+      <h3 className="govuk-heading-s">Wales</h3>
+      <ul className="govuk-list-bullet">
+        <li>
+          email:{' '}
+          <a href="mailto:school.stats@wales.gsi.gov.uk">
+            school.stats@wales.gsi.gov.uk
+          </a>
+        </li>
+        <li>
+          visit:{' '}
+          <a href="https://gov.wales/statistics-and-research">
+            GOV.WALES – Statistics and research
+          </a>
+        </li>
+      </ul>
+      <h3 className="govuk-heading-s">Scotland</h3>
+      <ul className="govuk-list-bullet">
+        <li>
+          email:{' '}
+          <a href="mailto:school.stats@wales.gsi.gov.uk">
+            school.stats@wales.gsi.gov.uk
+          </a>
+        </li>
+        <li>
+          visit:{' '}
+          <a href="https://www2.gov.scot/Topics/Statistics/Browse/School-Education">
+            GOV.SCOT – School Education
+          </a>
+        </li>
+      </ul>
+      <h3 className="govuk-heading-s">Nothern Ireland</h3>
+      <ul className="govuk-list-bullet">
+        <li>
+          email:{' '}
+          <a href="mailto:statistics@deni.gov.uk">statistics@deni.gov.uk</a>
+        </li>
+        <li>
+          visit:{' '}
+          <a href="https://www.education-ni.gov.uk/topics/statistics-and-research/statistics">
+            Department of Education – Statistics and research
+          </a>
+        </li>
+      </ul>
     </>
   );
 };

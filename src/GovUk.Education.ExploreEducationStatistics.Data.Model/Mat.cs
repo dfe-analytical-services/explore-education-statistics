@@ -2,15 +2,15 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    /**
-     * Multi academy trust
-     */
+    /// <summary>
+    /// Multi academy trust
+    /// </summary>
     public class Mat : IObservationalUnit
     {
-        [JsonProperty(PropertyName = "mat_id")]
+        [JsonProperty(PropertyName = "trust_id")]
         public string Code { get; set; }
 
-        [JsonProperty(PropertyName = "mat_name")]
+        [JsonProperty(PropertyName = "trust_name")]
         public string Name { get; set; }
 
         private Mat()

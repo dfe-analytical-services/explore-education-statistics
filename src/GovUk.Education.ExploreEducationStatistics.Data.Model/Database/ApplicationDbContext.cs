@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Converters;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
@@ -22,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<Location> Location { get; set; }
         public DbSet<Observation> Observation { get; set; }
         public DbSet<ObservationFilterItem> ObservationFilterItem { get; set; }
+        public DbSet<Publication> Publication { get; set; }
         public DbSet<Release> Release { get; set; }
         public DbSet<School> School { get; set; }
         public DbSet<Subject> Subject { get; set; }
@@ -274,12 +275,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureLocalAuthority(modelBuilder);
             ConfigureLocalAuthorityDistrict(modelBuilder);
             ConfigureLocalEnterprisePartnership(modelBuilder);
-            ConfigureMat(modelBuilder);
+            ConfigureMultiAcademyTrust(modelBuilder);
             ConfigureMayoralCombinedAuthority(modelBuilder);
             ConfigureOpportunityArea(modelBuilder);
             ConfigureParliamentaryConstituency(modelBuilder);
             ConfigureRegion(modelBuilder);
             ConfigureRscRegion(modelBuilder);
+            ConfigureSponsor(modelBuilder);
             ConfigureWard(modelBuilder);
         }
 
@@ -326,7 +328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         private static void ConfigureTimePeriod(ModelBuilder modelBuilder)
         {
-            var timeIdentifierConverter = new EnumToStringConverter<TimeIdentifier>();
+            var timeIdentifierConverter = new EnumToEnumValueConverter<TimeIdentifier>();
 
             modelBuilder.Entity<Observation>()
                 .Property(observation => observation.TimeIdentifier)
@@ -388,10 +390,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     builder => builder.HasIndex(localEnterprisePartnership => localEnterprisePartnership.Code));
         }
 
-        private static void ConfigureMat(ModelBuilder modelBuilder)
+        private static void ConfigureMultiAcademyTrust(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.Mat,
+                .OwnsOne(level => level.MultiAcademyTrust,
                     builder => builder.HasIndex(mat => mat.Code));
         }
 
@@ -430,6 +432,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     builder => builder.HasIndex(rscRegion => rscRegion.Code));
         }
 
+        private static void ConfigureSponsor(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Location>()
+                .OwnsOne(level => level.Sponsor,
+                    builder => builder.HasIndex(sponsor => sponsor.Code));
+        }
+        
         private static void ConfigureWard(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()

@@ -1,7 +1,10 @@
+import useMounted from '@common/hooks/useMounted';
 import findAllParents from '@common/lib/dom/findAllParents';
 import classNames from 'classnames';
 import React, { createElement, ReactNode } from 'react';
 import GoToTopLink from './GoToTopLink';
+
+export type ToggleHandler = (open: boolean) => void;
 
 export interface AccordionSectionProps {
   caption?: string;
@@ -11,18 +14,21 @@ export interface AccordionSectionProps {
   goToTop?: boolean;
   heading: string;
   headingId?: string;
-  // Only for accessibility/semantic markup,
-  // does not change the actual styling
+  /**
+   * Only for accessibility/semantic markup,
+   * does not change the actual styling
+   */
   headingTag?: 'h2' | 'h3' | 'h4';
   id?: string;
   open?: boolean;
-  onToggle?: (open: boolean) => void;
+  onToggle?: ToggleHandler;
 }
 
 const classes = {
   section: 'govuk-accordion__section',
   sectionButton: 'govuk-accordion__section-button',
   sectionContent: 'govuk-accordion__section-content',
+  sectionHeading: 'govuk-accordion__section-heading',
   expanded: 'govuk-accordion__section--expanded',
 };
 
@@ -40,30 +46,41 @@ const AccordionSection = ({
   open = false,
   onToggle,
 }: AccordionSectionProps) => {
+  const { isMounted } = useMounted();
+
   return (
     <div
-      onClick={event => {
-        if (onToggle) {
-          onToggle(event.currentTarget.classList.contains(classes.expanded));
-        }
-      }}
       className={classNames(classes.section, className, {
         [classes.expanded]: open,
       })}
       role="presentation"
     >
-      <div
-        className="govuk-accordion__section-header"
-        data-testid={`SectionHeader ${heading}`}
-      >
+      <div className="govuk-accordion__section-header">
         {createElement(
           headingTag,
           {
-            className: 'govuk-accordion__section-heading',
+            className: classes.sectionHeading,
           },
-          <span className={classes.sectionButton} id={headingId}>
-            {heading}
-          </span>,
+          isMounted ? (
+            <>
+              <button
+                aria-expanded={open}
+                className={classes.sectionButton}
+                id={headingId}
+                type="button"
+                onClick={() => {
+                  if (onToggle) {
+                    onToggle(!open);
+                  }
+                }}
+              >
+                {heading}
+              </button>
+              <span aria-hidden className="govuk-accordion__icon" />
+            </>
+          ) : (
+            heading
+          ),
         )}
         {caption && (
           <span className="govuk-accordion__section-summary">{caption}</span>

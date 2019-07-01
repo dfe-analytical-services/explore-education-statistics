@@ -49,12 +49,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                         GroupByObservationalUnit(locations, location => location.LocalEnterprisePartnership)
                     },
                     {
-                        GeographicLevel.MAT_Or_Sponsor,
-                        GroupByObservationalUnit(locations, location => location.Mat)
-                    },
-                    {
                         GeographicLevel.Mayoral_Combined_Authorities,
                         GroupByObservationalUnit(locations, location => location.MayoralCombinedAuthority)
+                    },
+                    {
+                        GeographicLevel.Multi_Academy_Trust,
+                        GroupByObservationalUnit(locations, location => location.MultiAcademyTrust)
                     },
                     {
                         GeographicLevel.Opportunity_Areas,
@@ -71,6 +71,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                     {
                         GeographicLevel.RSC_Region,
                         GroupByObservationalUnit(locations, location => location.RscRegion)
+                    },
+                    {
+                        GeographicLevel.Sponsor,
+                        GroupByObservationalUnit(locations, location => location.Sponsor)
                     },
                     {
                         GeographicLevel.Ward,
