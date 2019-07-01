@@ -16,7 +16,25 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
+    
+    <ItemGroup>
+        <Content Include="Migrations\Html\Pupil_Absence_Statistics\*.html">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="Migrations\Html\Pupil_Exclusion_Statistics\*.html">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="Migrations\Html\Secondary_And_Primary_School_Applications_And_Offers\*.html">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+    
     <ItemGroup>
         <PackageReference Include="AutoMapper" Version="8.1.0" />
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.1.0" />
