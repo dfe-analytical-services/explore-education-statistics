@@ -30,21 +30,19 @@ const PreviousNextLinks = ({ previousSection, nextSection }: Props) => {
   if (previousSection) {
     return (
       <div className="govuk-!-margin-top-9">
-        {previousSection && (
-          <Link to={previousSection.linkTo}>
-            Previous step, {previousSection.label}
-          </Link>
-        )}
+        <Link to={previousSection.linkTo}>
+          Previous step, {previousSection.label}
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="govuk-!-margin-top-9 dfe-align--right">
-      {nextSection && (
+    nextSection && (
+      <div className="govuk-!-margin-top-9 dfe-align--right">
         <Link to={nextSection.linkTo}>Next step, {nextSection.label}</Link>
-      )}
-    </div>
+      </div>
+    )
   );
 };
 
