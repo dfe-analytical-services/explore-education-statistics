@@ -67,9 +67,11 @@ const EditReleasePage = ({ releaseId, location }: Props) => {
     setRelease(DummyPublicationsData.getReleaseById(releaseId));
   }, [releaseId]);
 
-  const selectedSection = location.pathname.endsWith('/setup')
-    ? ReleaseSection.ReleaseSetup
-    : ReleaseSection.AddEditData;
+  const availableSections = navigationHeadings(releaseId);
+
+  const selectedSection = availableSections.filter(section =>
+    location.pathname.endsWith(section.linkTo),
+  )[0].section;
 
   return (
     <Page
@@ -87,12 +89,15 @@ const EditReleasePage = ({ releaseId, location }: Props) => {
           <SecondLevelNavigationHeadings
             navigationHeadingText={release.releaseName}
             selectedSection={selectedSection}
-            availableSections={navigationHeadings(releaseId)}
+            availableSections={availableSections}
           />
           {selectedSection === ReleaseSection.ReleaseSetup && (
             <PrototypePublicationSummary />
           )}
           {selectedSection === ReleaseSection.AddEditData && <></>}
+          {selectedSection === ReleaseSection.BuildTables && (
+            <PrototypePublicationSummary />
+          )}
         </>
       )}
     </Page>
