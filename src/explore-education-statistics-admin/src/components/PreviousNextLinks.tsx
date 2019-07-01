@@ -11,6 +11,14 @@ export interface Props {
   nextSection?: PreviousNextLink;
 }
 
+/**
+ * This component represents Previous / Next links for traversing between linked pages or sections, however the
+ * client needs to use it.
+ *
+ * @param previousSection
+ * @param nextSection
+ * @constructor
+ */
 const PreviousNextLinks = ({ previousSection, nextSection }: Props) => {
   if (previousSection && nextSection) {
     return (
