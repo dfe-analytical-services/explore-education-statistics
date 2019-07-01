@@ -52,17 +52,21 @@ class MethodologyPage extends Component<Props> {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <dl className="dfe-meta-content govuk-!-margin-0">
-              <dt className="govuk-caption-m">Published: </dt>
-              <dd>
-                <strong>
-                  <FormattedDate>{data.published}</FormattedDate>{' '}
-                </strong>
-              </dd>
+              <div>
+                <dt className="govuk-caption-m">Published: </dt>
+                <dd>
+                  <strong>
+                    <FormattedDate>{data.published}</FormattedDate>{' '}
+                  </strong>
+                </dd>
+              </div>
               {data.lastUpdated && data.lastUpdated.length > 0 && (
                 <>
                   <dt className="govuk-caption-m">Last updated: </dt>
                   <dd>
-                    <FormattedDate>{data.lastUpdated}</FormattedDate>{' '}
+                    <strong>
+                      <FormattedDate>{data.lastUpdated}</FormattedDate>{' '}
+                    </strong>
                   </dd>
                 </>
               )}
