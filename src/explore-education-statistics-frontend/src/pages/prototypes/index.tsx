@@ -18,20 +18,12 @@ function PrototypesIndexPage() {
           <Link to="/prototypes/browse-releases">Browse releases</Link>
         </li>
         <li>
-          <Link to="/prototypes/publication-gcse">
-            Publication page example
-          </Link>
+          <Link to="/prototypes/publication">Publication page example</Link>
           {` `}
-          (Outdated){` `}
+          (Outdated design){` `}
           <Link to="/statistics/pupil-absence-in-schools-in-england">
-            See working app for lastest version
+            See working app for latest version
           </Link>
-        </li>
-        <li>
-          <Link to="/prototypes/methodology-home">Methodology home</Link>
-          {` `}
-          (Outdated){` `}
-          <Link to="/methodologies">See working app for lastest version</Link>
         </li>
 
         <li>
