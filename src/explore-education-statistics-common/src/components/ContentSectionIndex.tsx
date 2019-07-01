@@ -27,8 +27,6 @@ class ContentSectionIndex extends Component<Props> {
 
   private static getLocationText(element: HTMLElement): string {
     const location: string[] = [];
-
-    element.tagName.toLowerCase();
     location.unshift(element.textContent || '');
     return location.join(' > ');
   }
