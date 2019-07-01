@@ -283,4 +283,10 @@ const allPublications = [...myPublications, ...inProgressPublications];
 
 export default {
   allPublications,
+  getReleaseById(id: string): Release {
+    const allReleases = allPublications.flatMap(
+      publication => publication.releases,
+    );
+    return allReleases.filter(release => release.id === id)[0];
+  },
 };

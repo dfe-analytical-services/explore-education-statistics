@@ -16,7 +16,7 @@ interface Props {
 const PrototypePublicationConfig = ({ sectionId }: Props) => {
   const [value, setValue] = useState('academic-year');
 
-  // const formAction = `publication-${sectionId}`;
+  // const formAction = `publication-${selectedSection}`;
 
   return (
     <>

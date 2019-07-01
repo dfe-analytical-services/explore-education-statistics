@@ -153,7 +153,9 @@ const DashboardRelease = ({
               </Link>
             )}
             {!editing && !review && (
-              <Link to="/prototypes/publication-edit">Edit this release</Link>
+              <Link to={`/edit-release/${release.id}/setup`}>
+                Edit this release
+              </Link>
             )}
             {editing && (
               <Link to="/prototypes/publication-create-new-absence-config">
