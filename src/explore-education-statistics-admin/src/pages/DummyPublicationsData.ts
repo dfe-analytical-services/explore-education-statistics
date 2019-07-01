@@ -290,7 +290,7 @@ export default {
     );
     return allReleases.filter(release => release.id === id)[0];
   },
-  getOwningPublicationForRelease(release: Release): Publication | undefined {
+  getOwningPublicationForRelease(release: Release) {
     return allPublications.find(publication =>
       publication.releases.includes(release),
     );

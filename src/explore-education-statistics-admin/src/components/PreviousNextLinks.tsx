@@ -37,13 +37,15 @@ const PreviousNextLinks = ({ previousSection, nextSection }: Props) => {
     );
   }
 
-  return (
-    nextSection && (
+  if (nextSection) {
+    return (
       <div className="govuk-!-margin-top-9 dfe-align--right">
         <Link to={nextSection.linkTo}>Next step, {nextSection.label}</Link>
       </div>
-    )
-  );
+    );
+  }
+
+  return <></>;
 };
 
 export default PreviousNextLinks;
