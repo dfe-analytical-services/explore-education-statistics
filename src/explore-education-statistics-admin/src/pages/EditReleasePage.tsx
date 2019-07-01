@@ -3,9 +3,9 @@ import Page from '@admin/components/Page';
 import { Release } from '@admin/services/publicationService';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
 import EditReleaseSetupSummary from '@admin/components/EditReleaseSetupSummary';
-import SectionedPage, {
+import NavigableSections, {
   NavigationHeader,
-} from '@admin/components/SectionedPage';
+} from '@admin/components/NavigableSections';
 import { RouteComponentProps } from 'react-router';
 
 export enum ReleaseSection {
@@ -92,7 +92,12 @@ const EditReleasePage = ({ releaseId, location }: Props) => {
     <Page wide breadcrumbs={breadcrumbs}>
       {release && publicationTitle && (
         <>
-          <SectionedPage
+          <h1 className="govuk-heading-l">
+            {publicationTitle}
+            <span className="govuk-caption-l">Edit release</span>
+          </h1>
+
+          <NavigableSections
             navigationHeadingText={publicationTitle}
             navigationHeadingSubtitle="Edit release"
             availableSections={availableSections}
@@ -104,7 +109,7 @@ const EditReleasePage = ({ releaseId, location }: Props) => {
                 release={release}
               />
             )}
-          </SectionedPage>
+          </NavigableSections>
         </>
       )}
     </Page>

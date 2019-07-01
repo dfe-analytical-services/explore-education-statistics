@@ -16,9 +16,20 @@ interface SectionedPageProps<SectionType> {
   children: ReactNode;
 }
 
-const SectionedPage = <SectionType extends {}>({
-  navigationHeadingText,
-  navigationHeadingSubtitle,
+/**
+ * Represents a page with navigable tabbed sections, and Next / Previous buttons to switch between the sections.
+ * A client of this component provides a full ordered list of the available sections, and the currently selected
+ * section.  From this, the Previous and Next links are inferred.
+ *
+ * The client also provides the appropriate body for the selected section, which is rendered within this component
+ * as its props.children.
+ *
+ * @param availableSections
+ * @param selectedSection
+ * @param children
+ * @constructor
+ */
+const NavigableSections = <SectionType extends {}>({
   availableSections,
   selectedSection,
   children,
@@ -35,9 +46,7 @@ const SectionedPage = <SectionType extends {}>({
 
   return (
     <>
-      <SectionedPageNavigation
-        navigationHeadingText={navigationHeadingText}
-        navigationHeadingSubtitle="Edit release"
+      <MainSectionNavigation
         selectedSection={selectedSection.section}
         availableSections={availableSections}
       />
@@ -50,26 +59,17 @@ const SectionedPage = <SectionType extends {}>({
   );
 };
 
-interface SectionedPageNavigationProps<SectionType> {
-  navigationHeadingText: string;
-  navigationHeadingSubtitle: string;
+interface NavigationProps<SectionType> {
   availableSections: NavigationHeader<SectionType>[];
   selectedSection: SectionType;
 }
 
-const SectionedPageNavigation = <SectionType extends {}>({
-  navigationHeadingText,
-  navigationHeadingSubtitle,
+const MainSectionNavigation = <SectionType extends {}>({
   availableSections,
   selectedSection,
-}: SectionedPageNavigationProps<SectionType>) => {
+}: NavigationProps<SectionType>) => {
   return (
     <>
-      <h1 className="govuk-heading-l">
-        {navigationHeadingText}
-        <span className="govuk-caption-l">{navigationHeadingSubtitle}</span>
-      </h1>
-
       <nav className="app-navigation govuk-!-margin-bottom-9">
         <ul className="app-navigation__list govuk-!-margin-bottom-0">
           {availableSections.map(section => (
@@ -95,4 +95,4 @@ const SectionedPageNavigation = <SectionType extends {}>({
   );
 };
 
-export default SectionedPage;
+export default NavigableSections;
