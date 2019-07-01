@@ -17,9 +17,9 @@ interface Props<SectionType> {
 }
 
 /**
- * Represents a page with navigable tabbed sections, and Next / Previous buttons to switch between the sections.
- * A client of this component provides a full ordered list of the available sections, and the currently selected
- * section.  From this, the Previous and Next links are inferred.
+ * Represents a portion of a page with navigable tabbed sections, and Next / Previous buttons to switch between the
+ * sections.  A client of this component provides a full ordered list of the available sections, and the currently
+ * selected section.  From this, the Previous and Next links are inferred.
  *
  * The client also provides the appropriate body for the selected section, which is rendered within this component
  * as its props.children.
