@@ -13,9 +13,9 @@ import FixedHeaderGroupedDataTable from './FixedHeaderGroupedDataTable';
 import TableHeadersForm from './TableHeadersForm';
 
 interface TableHeaders {
-  columnGroups: FilterOption[];
+  columnGroups: FilterOption[][];
   columns: TimePeriod[];
-  rowGroups: FilterOption[];
+  rowGroups: FilterOption[][];
   rows: IndicatorOption[];
 }
 
@@ -40,9 +40,13 @@ const TimePeriodDataTable = ({
 }: Props) => {
   const dataTableRef = useRef<HTMLTableElement>(null);
 
-  const [columnGroups, rowGroups] = sortBy(Object.values(filters), [
+  const sortedFilters = sortBy(Object.values(filters), [
     options => options.length,
   ]);
+
+  const halfwayIndex = Math.floor(sortedFilters.length / 2);
+  const columnGroups = sortedFilters.slice(0, halfwayIndex);
+  const rowGroups = sortedFilters.slice(halfwayIndex);
 
   const [tableHeaders, setTableHeaders] = useState<TableHeaders>({
     columnGroups,
@@ -58,7 +62,8 @@ const TimePeriodDataTable = ({
       columns: timePeriods,
       rows: indicators,
     });
-  }, [columnGroups, rowGroups, timePeriods, indicators]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters, timePeriods, indicators]);
 
   const startLabel = timePeriods[0].label;
   const endLabel = timePeriods[timePeriods.length - 1].label;
@@ -77,22 +82,26 @@ const TimePeriodDataTable = ({
   )} ${timePeriodString}`;
 
   const columnHeaders: string[][] = [
-    tableHeaders.columnGroups.map(colGroup => colGroup.label),
+    ...tableHeaders.columnGroups.map(colGroup =>
+      colGroup.map(group => group.label),
+    ),
     tableHeaders.columns.map(column => column.label),
   ];
 
   const rowHeaders: string[][] = [
-    tableHeaders.rowGroups.map(rowGroup => rowGroup.label),
+    ...tableHeaders.rowGroups.map(rowGroup =>
+      rowGroup.map(group => group.label),
+    ),
     tableHeaders.rows.map(row => row.label),
   ];
 
   const rowHeadersCartesian = cartesian(
-    tableHeaders.rowGroups,
+    ...tableHeaders.rowGroups,
     tableHeaders.rows,
   );
 
   const columnHeadersCartesian = cartesian(
-    tableHeaders.columnGroups,
+    ...tableHeaders.columnGroups,
     tableHeaders.columns,
   );
 
