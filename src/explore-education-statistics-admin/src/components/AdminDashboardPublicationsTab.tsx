@@ -34,7 +34,7 @@ const AdminDashboardPublicationsTab = ({
     publicationsByThemeAndTopic[themeTopic];
 
   const themesAndTopicsSections = themesAndTopics.map(themeTopic => (
-    <>
+    <React.Fragment key={themeTopic}>
       <h2 className="govuk-heading-l govuk-!-margin-bottom-0">{themeTopic}</h2>
       <p className="govuk-body">
         Edit an existing release or create a new release for current
@@ -55,7 +55,7 @@ const AdminDashboardPublicationsTab = ({
           </AccordionSection>
         ))}
       </Accordion>
-    </>
+    </React.Fragment>
   ));
 
   return <section>{themesAndTopicsSections}</section>;

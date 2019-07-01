@@ -10,39 +10,34 @@ import Link from '../components/Link';
 import Page from '../components/Page';
 
 const AdminDashboardPage = () => {
-  const emptyPublicationsArray: Publication[] = [];
+  const [myPublications, setMyPublications] = useState<Publication[]>([]);
 
-  const [myPublications, setMyPublications] = useState(emptyPublicationsArray);
-
-  const [inProgressPublications, setInProgressPublications] = useState(
-    emptyPublicationsArray,
-  );
+  const [inProgressPublications, setInProgressPublications] = useState<
+    Publication[]
+  >([]);
 
   const authentication = useContext(LoginContext);
 
-  const loadInitialData = () => {
+  useEffect(() => {
     const { user } = authentication;
     const loggedInUserId = user ? user.id : null;
 
-    const fetchedMyPublications =
-      loggedInUserId === null
-        ? []
-        : DummyPublicationsData.allPublications.filter(
-            publication => publication.owner.id === loggedInUserId,
-          );
+    if (loggedInUserId) {
+      const fetchedMyPublications = DummyPublicationsData.allPublications.filter(
+        publication => publication.owner.id === loggedInUserId,
+      );
 
-    const fetchedInProgressPublications =
-      loggedInUserId === null
-        ? []
-        : DummyPublicationsData.allPublications.filter(
-            publication => publication.owner.id !== loggedInUserId,
-          );
+      const fetchedInProgressPublications = DummyPublicationsData.allPublications.filter(
+        publication => publication.owner.id !== loggedInUserId,
+      );
 
-    setMyPublications(fetchedMyPublications);
-    setInProgressPublications(fetchedInProgressPublications);
-  };
-
-  useEffect(loadInitialData, []);
+      setMyPublications(fetchedMyPublications);
+      setInProgressPublications(fetchedInProgressPublications);
+    } else {
+      setMyPublications([]);
+      setInProgressPublications([]);
+    }
+  }, [authentication]);
 
   return (
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
