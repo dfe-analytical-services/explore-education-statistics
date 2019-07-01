@@ -4,15 +4,27 @@ import Breadcrumbs, { BreadcrumbsProps } from './Breadcrumbs';
 import PageBanner from './PageBanner';
 import PageFooter from './PageFooter';
 import PageHeader from './PageHeader';
+import PageMeta from './PageMeta';
 
 type Props = {
   children: ReactNode;
   wide?: boolean;
+  pageMeta?: {
+    title?: string;
+    description?: string;
+    imgUrl?: string;
+  };
 } & BreadcrumbsProps;
 
-const Page = ({ children, breadcrumbs = [], wide = false }: Props) => {
+const Page = ({
+  children,
+  breadcrumbs = [],
+  wide = false,
+  pageMeta,
+}: Props) => {
   return (
     <>
+      <PageMeta {...pageMeta} />
       <PageHeader wide={wide} />
 
       <div
