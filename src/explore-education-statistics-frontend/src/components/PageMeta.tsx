@@ -9,7 +9,7 @@ interface Props {
 
 const PageMeta = ({
   title = 'Explore education statistics',
-  description = 'GOV.UK',
+  description = 'GOV.UK: Explore education statistics',
   imgUrl,
 }: Props) => {
   return (
