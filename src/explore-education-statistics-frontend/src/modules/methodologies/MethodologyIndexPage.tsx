@@ -34,6 +34,11 @@ class MethodologyIndexPage extends Component<Props> {
             name: 'Methodology',
           },
         ]}
+        pageMeta={{
+          title: 'Methodology Index',
+          description:
+            'Browse to find out about the methodology behind specific education statistics and data',
+        }}
       >
         <PageTitle title="Education statistics: methodology" />
         <div className="govuk-grid-row">

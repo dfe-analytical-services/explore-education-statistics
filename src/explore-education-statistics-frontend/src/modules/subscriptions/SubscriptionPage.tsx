@@ -89,6 +89,7 @@ class SubscriptionPage extends Component<Props> {
           { name: data.title, link: `/statistics/${slug}` },
           { name: 'Notify me' },
         ]}
+        pageMeta={{ title: data.title, description: 'Subscribe' }}
       >
         <PageTitle title={`${data.title}`} caption="Notify me" />
 

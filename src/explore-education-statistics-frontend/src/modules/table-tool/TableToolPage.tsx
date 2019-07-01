@@ -207,7 +207,11 @@ class TableToolPage extends Component<Props, State> {
     } = this.state;
 
     return (
-      <Page breadcrumbs={[{ name: 'Create your own tables online' }]} wide>
+      <Page
+        breadcrumbs={[{ name: 'Create your own tables online' }]}
+        pageMeta={{ description: 'Table Tool' }}
+        wide
+      >
         <PageTitle caption="Table tool" title="Create your own tables online" />
 
         <p>

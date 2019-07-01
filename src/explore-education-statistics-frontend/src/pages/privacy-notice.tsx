@@ -4,7 +4,10 @@ import React from 'react';
 
 function PrivacyNoticePage() {
   return (
-    <Page breadcrumbs={[{ name: 'Privacy notice' }]}>
+    <Page
+      breadcrumbs={[{ name: 'Privacy notice' }]}
+      pageMeta={{ title: 'Privacy notice' }}
+    >
       <PageTitle title="Explore education statistics privacy notice" />
 
       <div>

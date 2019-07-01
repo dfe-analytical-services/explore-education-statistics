@@ -44,6 +44,7 @@ class MethodologyPage extends Component<Props> {
           { name: 'Methodologies', link: '/methodologies' },
           { name: data.title },
         ]}
+        pageMeta={{ title: data.title, description: 'Methodology' }}
       >
         <h1 className="govuk-heading-xl">{data.title}</h1>
         <div className="govuk-grid-row">

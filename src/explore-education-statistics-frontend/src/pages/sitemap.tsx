@@ -4,7 +4,7 @@ import React from 'react';
 
 function SitemapPage() {
   return (
-    <Page breadcrumbs={[{ name: 'Sitemap' }]}>
+    <Page breadcrumbs={[{ name: 'Sitemap' }]} pageMeta={{ title: 'Sitemap' }}>
       <PageTitle title="Sitemap" />
     </Page>
   );

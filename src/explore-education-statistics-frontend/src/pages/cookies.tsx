@@ -4,7 +4,7 @@ import React from 'react';
 
 function CookiesPage() {
   return (
-    <Page breadcrumbs={[{ name: 'Cookies' }]}>
+    <Page breadcrumbs={[{ name: 'Cookies' }]} pageMeta={{ title: 'Cookies' }}>
       <PageTitle title="Cookies" />
 
       <p>

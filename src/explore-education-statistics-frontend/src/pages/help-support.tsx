@@ -4,7 +4,10 @@ import React from 'react';
 
 function HelpSupportPage() {
   return (
-    <Page breadcrumbs={[{ name: 'Help and support' }]}>
+    <Page
+      breadcrumbs={[{ name: 'Help and support' }]}
+      pageMeta={{ title: 'Help and support' }}
+    >
       <PageTitle title="Help and support" />
       <p>
         Find out more about explore education statistics - including how to use

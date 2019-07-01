@@ -62,6 +62,7 @@ class PublicationReleasePage extends Component<Props> {
           { name: 'Find statistics and data', link: '/statistics' },
           { name: data.title },
         ]}
+        pageMeta={{ title: data.title, description: 'Publication' }}
       >
         <div className={styles.releaseHeader}>
           <PageTitle title={data.title} />

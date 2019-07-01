@@ -9,7 +9,7 @@ import React from 'react';
 
 function GlossaryIndexPage() {
   return (
-    <Page breadcrumbs={[{ name: 'Glossary' }]}>
+    <Page breadcrumbs={[{ name: 'Glossary' }]} pageMeta={{ title: 'Glossary' }}>
       <PageTitle title="Education statistics: glossary" />
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
