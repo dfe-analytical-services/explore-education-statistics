@@ -4,7 +4,7 @@ import { Release } from '@admin/services/publicationService';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
 import EditReleaseSetupSummary from '@admin/components/EditReleaseSetupSummary';
 import NavigableSections, {
-  NavigationHeader,
+  Section,
 } from '@admin/components/NavigableSections';
 import { RouteComponentProps } from 'react-router';
 
@@ -23,7 +23,7 @@ interface Props extends RouteComponentProps {
 
 const navigationHeadings: (
   releaseId: string,
-) => NavigationHeader<ReleaseSection>[] = releaseId => {
+) => Section<ReleaseSection>[] = releaseId => {
   const urlPrefix = `/edit-release/${releaseId}`;
   return [
     {

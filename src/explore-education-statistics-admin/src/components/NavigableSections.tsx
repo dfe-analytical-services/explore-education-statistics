@@ -2,17 +2,17 @@ import React, { ReactNode } from 'react';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import Link from '@admin/components/Link';
 
-export interface NavigationHeader<HeadingType extends {}> {
-  section: HeadingType;
+export interface Section<SectionType extends {}> {
+  section: SectionType;
   label: string;
   linkTo: string;
 }
 
-interface SectionedPageProps<SectionType> {
+interface Props<SectionType> {
   navigationHeadingText: string;
   navigationHeadingSubtitle: string;
-  availableSections: NavigationHeader<SectionType>[];
-  selectedSection: NavigationHeader<SectionType>;
+  availableSections: Section<SectionType>[];
+  selectedSection: Section<SectionType>;
   children: ReactNode;
 }
 
@@ -33,7 +33,7 @@ const NavigableSections = <SectionType extends {}>({
   availableSections,
   selectedSection,
   children,
-}: SectionedPageProps<SectionType>) => {
+}: Props<SectionType>) => {
   const nextSection =
     availableSections.indexOf(selectedSection) < availableSections.length - 1
       ? availableSections[availableSections.indexOf(selectedSection) + 1]
@@ -60,7 +60,7 @@ const NavigableSections = <SectionType extends {}>({
 };
 
 interface NavigationProps<SectionType> {
-  availableSections: NavigationHeader<SectionType>[];
+  availableSections: Section<SectionType>[];
   selectedSection: SectionType;
 }
 
