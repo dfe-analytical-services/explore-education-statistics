@@ -72,6 +72,7 @@ export interface Release {
   id: string;
   releaseName: string;
   timePeriodCoverage: TimePeriodCoverage;
+  scheduledReleaseDate: Date;
   slug: string;
   status: ReleaseStatus;
   lead: UserContact;

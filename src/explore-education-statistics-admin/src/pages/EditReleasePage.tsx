@@ -5,8 +5,10 @@ import SecondLevelNavigationHeadings, {
 } from '@admin/components/SecondLevelNavigationHeadings';
 import { Release } from '@admin/services/publicationService';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
+import EditReleaseSetupSummary from '@admin/components/EditReleaseSetupSummary';
 import { RouteComponentProps } from 'react-router';
-import PrototypePublicationSummary from './prototypes/components/PrototypePublicationPageSummary';
+import Link from '@admin/components/Link';
+import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
 
 export enum ReleaseSection {
   ReleaseSetup,
@@ -19,7 +21,6 @@ export enum ReleaseSection {
 
 interface Props extends RouteComponentProps {
   releaseId: string;
-  initiallySelectedSection?: ReleaseSection;
 }
 
 const navigationHeadings: (
@@ -62,41 +63,91 @@ const navigationHeadings: (
 
 const EditReleasePage = ({ releaseId, location }: Props) => {
   const [release, setRelease] = useState<Release>();
+  const [publicationTitle, setPublicationTitle] = useState<string>();
 
   useEffect(() => {
-    setRelease(DummyPublicationsData.getReleaseById(releaseId));
+    const selectedRelease = DummyPublicationsData.getReleaseById(releaseId);
+    const owningPublication = DummyPublicationsData.getOwningPublicationForRelease(
+      selectedRelease,
+    );
+    setRelease(selectedRelease);
+    setPublicationTitle(owningPublication ? owningPublication.title : '');
   }, [releaseId]);
 
   const availableSections = navigationHeadings(releaseId);
 
-  const selectedSection = availableSections.filter(section =>
-    location.pathname.endsWith(section.linkTo),
-  )[0].section;
+  const selectedSection =
+    availableSections.find(section =>
+      location.pathname.endsWith(section.linkTo),
+    ) || availableSections[0];
+
+  const nextSection =
+    availableSections.indexOf(selectedSection) < availableSections.length - 1
+      ? availableSections[availableSections.indexOf(selectedSection) + 1]
+      : null;
+
+  const previousSection =
+    availableSections.indexOf(selectedSection) > 0
+      ? availableSections[availableSections.indexOf(selectedSection) - 1]
+      : null;
 
   return (
     <Page
       wide
       breadcrumbs={[
         {
-          link: '/prototypes/admin-dashboard?status=editNewRelease',
+          link: '/admin-dashboard',
           name: 'Administrator dashboard',
         },
-        { name: 'Create new release', link: '#' },
+        { name: 'Edit release', link: '#' },
       ]}
     >
-      {release && (
+      {release && publicationTitle && (
         <>
           <SecondLevelNavigationHeadings
-            navigationHeadingText={release.releaseName}
-            selectedSection={selectedSection}
+            navigationHeadingText={publicationTitle}
+            navigationHeadingSubtitle="Edit release"
+            selectedSection={selectedSection.section}
             availableSections={availableSections}
           />
-          {selectedSection === ReleaseSection.ReleaseSetup && (
-            <PrototypePublicationSummary />
+          {ReleaseSection.ReleaseSetup === selectedSection.section && (
+            <EditReleaseSetupSummary
+              publicationTitle={publicationTitle}
+              release={release}
+            />
           )}
-          {selectedSection === ReleaseSection.AddEditData && <></>}
-          {selectedSection === ReleaseSection.BuildTables && (
-            <PrototypePublicationSummary />
+
+          {previousSection && nextSection && (
+            <div className="govuk-grid-row govuk-!-margin-top-9">
+              <div className="govuk-grid-column-one-half ">
+                <Link to={previousSection.linkTo}>
+                  Previous step, {previousSection.label}
+                </Link>
+              </div>
+              <div className="govuk-grid-column-one-half dfe-align--right">
+                <Link to={nextSection.linkTo}>
+                  Next step, {nextSection.label}
+                </Link>
+              </div>
+            </div>
+          )}
+          {previousSection && !nextSection && (
+            <div className="govuk-!-margin-top-9">
+              {previousSection && (
+                <Link to={previousSection.linkTo}>
+                  Previous step, {previousSection.label}
+                </Link>
+              )}
+            </div>
+          )}
+          {nextSection && !previousSection && (
+            <div className="govuk-!-margin-top-9 dfe-align--right">
+              {nextSection && (
+                <Link to={nextSection.linkTo}>
+                  Next step, {nextSection.label}
+                </Link>
+              )}
+            </div>
           )}
         </>
       )}

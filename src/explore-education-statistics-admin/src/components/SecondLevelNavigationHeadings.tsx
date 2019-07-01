@@ -3,6 +3,7 @@ import Link from './Link';
 
 interface Props<HeadingType extends {}> {
   navigationHeadingText: string;
+  navigationHeadingSubtitle: string;
   availableSections: NavigationHeader<HeadingType>[];
   selectedSection: HeadingType;
   task?: string;
@@ -16,6 +17,7 @@ export interface NavigationHeader<HeadingType extends {}> {
 
 const SecondLevelNavigationHeadings = <HeadingType extends {}>({
   navigationHeadingText,
+  navigationHeadingSubtitle,
   availableSections,
   selectedSection,
 }: Props<HeadingType>) => {
@@ -23,7 +25,7 @@ const SecondLevelNavigationHeadings = <HeadingType extends {}>({
     <>
       <h1 className="govuk-heading-l">
         {navigationHeadingText}
-        <span className="govuk-caption-l">Create new release</span>
+        <span className="govuk-caption-l">{navigationHeadingSubtitle}</span>
       </h1>
 
       <nav className="app-navigation govuk-!-margin-bottom-9">

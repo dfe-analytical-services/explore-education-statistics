@@ -61,6 +61,7 @@ const releaseTemplate: Release = {
       termsPerYear: 6,
     },
   },
+  scheduledReleaseDate: new Date('2020-09-20'),
   status: {
     approvalStatus: ApprovalStatus.Approved,
     isLive: true,
@@ -288,5 +289,10 @@ export default {
       publication => publication.releases,
     );
     return allReleases.filter(release => release.id === id)[0];
+  },
+  getOwningPublicationForRelease(release: Release): Publication | undefined {
+    return allPublications.find(publication =>
+      publication.releases.includes(release),
+    );
   },
 };
