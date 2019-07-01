@@ -9,6 +9,7 @@ import EditReleaseSetupSummary from '@admin/components/EditReleaseSetupSummary';
 import { RouteComponentProps } from 'react-router';
 import Link from '@admin/components/Link';
 import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
+import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 
 export enum ReleaseSection {
   ReleaseSetup,
@@ -116,39 +117,10 @@ const EditReleasePage = ({ releaseId, location }: Props) => {
               release={release}
             />
           )}
-
-          {previousSection && nextSection && (
-            <div className="govuk-grid-row govuk-!-margin-top-9">
-              <div className="govuk-grid-column-one-half ">
-                <Link to={previousSection.linkTo}>
-                  Previous step, {previousSection.label}
-                </Link>
-              </div>
-              <div className="govuk-grid-column-one-half dfe-align--right">
-                <Link to={nextSection.linkTo}>
-                  Next step, {nextSection.label}
-                </Link>
-              </div>
-            </div>
-          )}
-          {previousSection && !nextSection && (
-            <div className="govuk-!-margin-top-9">
-              {previousSection && (
-                <Link to={previousSection.linkTo}>
-                  Previous step, {previousSection.label}
-                </Link>
-              )}
-            </div>
-          )}
-          {nextSection && !previousSection && (
-            <div className="govuk-!-margin-top-9 dfe-align--right">
-              {nextSection && (
-                <Link to={nextSection.linkTo}>
-                  Next step, {nextSection.label}
-                </Link>
-              )}
-            </div>
-          )}
+          <PreviousNextLinks
+            previousSection={previousSection || undefined}
+            nextSection={nextSection || undefined}
+          />
         </>
       )}
     </Page>
