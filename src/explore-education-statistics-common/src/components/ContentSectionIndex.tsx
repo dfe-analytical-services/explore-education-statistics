@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import findAllForId from '@common/lib/dom/findAllForId';
 
 interface IndexResult {
   element: Element;
@@ -35,8 +34,9 @@ class ContentSectionIndex extends Component<Props> {
   }
 
   private index = (fromId: string) => {
-    const elements = findAllForId(fromId, 'h2,h3,h4');
-
+    const elements = Array.from(
+      document.querySelectorAll(`#${fromId} h2, #${fromId} h3, #${fromId} h4`),
+    ) as HTMLElement[];
     const indexResults =
       elements != null
         ? elements.map(element => {
