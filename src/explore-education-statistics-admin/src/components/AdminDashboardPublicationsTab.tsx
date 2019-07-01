@@ -30,9 +30,6 @@ const AdminDashboardPublicationsTab = ({
     return <div className="govuk-inset-text">{noResultsMessage}</div>;
   }
 
-  const publicationsForThemeTopic = (themeTopic: string) =>
-    publicationsByThemeAndTopic[themeTopic];
-
   const themesAndTopicsSections = themesAndTopics.map(themeTopic => (
     <React.Fragment key={themeTopic}>
       <h2 className="govuk-heading-l govuk-!-margin-bottom-0">{themeTopic}</h2>
@@ -44,11 +41,10 @@ const AdminDashboardPublicationsTab = ({
         Create a new publication
       </Link>
       <Accordion id={themeTopic} key={themeTopic}>
-        {publicationsForThemeTopic(themeTopic).map(publication => (
+        {publicationsByThemeAndTopic[themeTopic].map(publication => (
           <AccordionSection
             key={publication.id}
             heading={publication.title}
-            caption=""
             headingTag="h3"
           >
             <AdminDashboardPublications publication={publication} />
