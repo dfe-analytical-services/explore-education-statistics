@@ -6,6 +6,7 @@ import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 import EditReleasePage from '@admin/pages/EditReleasePage';
 import { BrowserRouter } from 'react-router-dom';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
 
@@ -58,7 +59,7 @@ function App() {
         <Route
           exact
           path="/prototypes/admin-dashboard"
-          component={AdminDashboardPage}
+          component={PrototypeAdminDashboard}
         />
 
         <Route

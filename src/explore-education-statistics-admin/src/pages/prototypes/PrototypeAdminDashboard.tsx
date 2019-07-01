@@ -7,6 +7,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React from 'react';
 import { RouteChildrenProps } from 'react-router';
+import AdminDashboardInProgress from '@admin/pages/prototypes/components/AdminDashboardInProgress';
 import Link from '../../components/Link';
 import PrototypePage from './components/PrototypePage';
 

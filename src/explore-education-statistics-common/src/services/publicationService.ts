@@ -1,5 +1,6 @@
 import { DataBlockRequest } from '@common/services/dataBlockService';
 import { contentApi } from './api';
+import { Dictionary } from '@common/types';
 
 export interface Publication {
   id: string;
@@ -59,6 +60,17 @@ export interface ChartDataSet {
   filters?: string[];
   location?: string[];
   timePeriod?: string;
+}
+
+export interface DataLabelConfigurationItem {
+  name: string;
+  label: string;
+  value: string;
+  unit: string;
+}
+
+export interface ChartConfigurationOptions {
+  dataLabels: Dictionary<DataLabelConfigurationItem>;
 }
 
 export interface Chart {
