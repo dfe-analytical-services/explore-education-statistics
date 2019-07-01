@@ -4,24 +4,27 @@ import {
 } from '@common/services/dataBlockService';
 import {
   ChartDataSet,
-  ChartConfigurationOptions,
+  DataLabelConfigurationItem,
 } from '@common/services/publicationService';
 import * as React from 'react';
 import { FormFieldset, FormTextInput } from '@common/components/form';
+import { Dictionary } from '@common/types';
 
 interface Props {
   dataSets: ChartDataSet[];
   data: DataBlockResponse;
   meta: DataBlockMetadata;
 
-  onConfigurationChange?: (configuration: ChartConfigurationOptions) => void;
+  onDataLabelsChange?: (
+    dataLabels: Dictionary<DataLabelConfigurationItem>,
+  ) => void;
 }
 
 const ChartDataConfiguration = ({
   dataSets,
   // data,
   meta,
-  onConfigurationChange,
+  onDataLabelsChange,
 }: Props) => {
   const buildConfigItem = (dataset: ChartDataSet, key: string) => {
     const filters = (dataset.filters || [])
@@ -36,47 +39,42 @@ const ChartDataConfiguration = ({
     };
   };
 
-  const [configuration, setConfiguration] = React.useState<
-    ChartConfigurationOptions
-  >();
+  const [dataLabels, setDataLabels] = React.useState<
+    Dictionary<DataLabelConfigurationItem>
+  >({});
 
   React.useEffect(() => {
-    const dataLabels = dataSets.reduce((results, dataset) => {
+    const dl = dataSets.reduce((results, dataset) => {
       const key = `${dataset.indicator}_${dataset.filters &&
         dataset.filters.join('_')}`;
       return {
         ...results,
-        [key]:
-          (configuration && configuration.dataLabels[key]) ||
-          buildConfigItem(dataset, key),
+        [key]: (dataLabels && dataLabels[key]) || buildConfigItem(dataset, key),
       };
     }, {});
 
-    setConfiguration({
-      dataLabels,
-    });
+    setDataLabels(dl);
   }, [dataSets]);
 
   React.useEffect(() => {
-    if (onConfigurationChange && configuration)
-      onConfigurationChange(configuration);
-  }, [configuration, onConfigurationChange]);
+    if (onDataLabelsChange && dataLabels) onDataLabelsChange(dataLabels);
+  }, [dataLabels, onDataLabelsChange]);
 
   return (
     <FormFieldset id="chart-configuration" legend="" legendHidden>
       <p>
         Update the label used for each dataset in the chart from the default
       </p>
-      {configuration &&
-        Object.entries(configuration.dataLabels).map(([key, entry]) => (
+      {dataLabels &&
+        Object.entries(dataLabels).map(([key, entry]) => (
           <FormTextInput
             key={key}
             id={key}
             name={key}
             defaultValue={entry.label}
             onChange={e => {
-              configuration.dataLabels[key].label = e.target.value;
-              setConfiguration({ ...configuration });
+              dataLabels[key].label = e.target.value;
+              setDataLabels({ ...dataLabels });
             }}
             label={entry.name}
           />

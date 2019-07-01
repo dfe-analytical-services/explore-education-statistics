@@ -69,6 +69,11 @@ export default class LineChartBlock extends Component<ChartProps> {
         title: 'X Axis',
         type: 'major',
       },
+      {
+        id: 'yaxis',
+        title: 'Y Axis',
+        type: 'value',
+      },
     ],
   };
 

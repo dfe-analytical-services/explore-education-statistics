@@ -40,14 +40,14 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         <TabsSection id="publications" title="Publications">
           <PrototypeAdminDashboardPublications />
         </TabsSection>
-        <TabsSection
+        {/* <TabsSection
           id="task-in-progress"
           title={`In progress ${
             location.search === '?status=editNewRelease' ? '(2)' : '(1)'
           }`}
         >
           <AdminDashboardInProgress />
-        </TabsSection>
+        </TabsSection> */}
         <TabsSection
           id="task-ready-approval1"
           title={`Ready to review ${

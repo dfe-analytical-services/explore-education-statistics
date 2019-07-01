@@ -10,11 +10,14 @@ import ChartDataSelector, {
 import {
   ChartDataSet,
   ChartConfigurationOptions,
+  DataLabelConfigurationItem,
 } from '@common/services/publicationService';
+import { Dictionary } from '@common/types';
 import styles from './graph-builder.module.scss';
 import ConstData from '../../pages/prototypes/PrototypeData';
 import ChartTypeSelector from './ChartTypeSelector';
 import ChartDataConfiguration from './ChartDataConfiguration';
+import ChartAxisConfiguration from './ChartAxisConfiguration';
 
 interface Props {
   data: DataBlockResponse;
@@ -50,9 +53,21 @@ const ChartBuilder = ({ data }: Props) => {
     ChartConfigurationOptions
   >({ dataLabels: {} });
 
-  const onConfigurationChange = (configuration: ChartConfigurationOptions) => {
-    setChartConfiguration(configuration);
+  const onDataLabelsChange = (
+    dataLabels: Dictionary<DataLabelConfigurationItem>,
+  ) => {
+    setChartConfiguration({ ...chartConfiguration, dataLabels });
   };
+
+  React.useEffect(() => {
+    selectChartType(chartTypes[0]);
+    setDataSets([
+      {
+        indicator: '23',
+        filters: ['1', '71'],
+      },
+    ]);
+  }, []);
 
   if (data === undefined) return <div />;
 
@@ -97,14 +112,17 @@ const ChartBuilder = ({ data }: Props) => {
               dataSets={dataSets}
               data={data}
               meta={data.metaData}
-              onConfigurationChange={onConfigurationChange}
+              onDataLabelsChange={onDataLabelsChange}
             />
           </Details>
 
-          <Details summary="Axes options">
+          <Details summary="Axes options" open>
             <p>
               Add / Remove and update the axes and how they display data ranges
             </p>
+            {selectedChartType.axes.map(axis => (
+              <ChartAxisConfiguration key={axis.id} {...axis} />
+            ))}
           </Details>
         </React.Fragment>
       )}

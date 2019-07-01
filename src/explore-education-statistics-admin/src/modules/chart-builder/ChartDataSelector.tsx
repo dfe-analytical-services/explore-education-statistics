@@ -1,5 +1,5 @@
 import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import * as React from 'react';
+import React from 'react';
 import { FormFieldset, FormGroup, FormSelect } from '@common/components/form';
 import { DataBlockMetadata } from '@common/services/dataBlockService';
 import { SelectOption } from '@common/components/form/FormSelect';
