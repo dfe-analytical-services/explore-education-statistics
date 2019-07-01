@@ -76,7 +76,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
             // TODO avoid possibility of a collision between different types of codes
 
-            return string.Join(separator, observationalUnits.Select(unit => unit.Code));
+            return string.Join(separator, observationalUnits
+                .Where(unit => unit != null)
+                .Select(unit => unit.Code));
         }
 
         private Location LookupOrCreate(Country country,
