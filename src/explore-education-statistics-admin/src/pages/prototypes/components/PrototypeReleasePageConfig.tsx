@@ -21,269 +21,174 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
       {sectionId === 'setup' && (
         <h2 className="govuk-heading-m">Edit release setup</h2>
       )}
-
       <form action="/prototypes/publication-create-new-absence-config">
-        <FormGroup>
-          <FormRadioGroup
-            legend="Time period coverage "
-            id="time-period"
-            name="time-period"
-            value={value}
-            onChange={event => {
-              setValue(event.target.value);
-            }}
-            options={[
-              {
-                id: 'release-type-academic',
-                label: 'Academic Year',
-                value: 'academic-year',
-                conditional: (
-                  <FormFieldset id="test" legend="">
-                    <FormGroup>
-                      <FormTextInput
-                        id="release-period"
-                        name="release-period"
-                        label="Year starting"
-                        value="2018"
-                        width={4}
-                      />
-                    </FormGroup>
-
-                    <span className="govuk-hint">Academic year 2018/19</span>
-
-                    <FormGroup>
-                      <FormSelect
-                        id="time-period"
-                        label="Select time period"
-                        name="time-period"
-                        options={[
-                          {
-                            label: 'Full academic year',
-                            value: 'full-year',
-                          },
-                          { label: 'Autumn term', value: 'autumn-term' },
-                          { label: 'Spring term', value: 'spring-term' },
-                          { label: 'Summer term', value: 'summer-term' },
-                        ]}
-                      />
-                    </FormGroup>
-
-                    <FormGroup>
-                      <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
-                        Terms per year
-                      </legend>
-
-                      <FormRadioGroup
-                        legend=""
-                        name="terms-per-year"
-                        id="terms-per-year"
-                        value="terms-6"
-                        options={[
-                          {
-                            id: 'terms-6',
-                            label: '6 terms',
-                            value: 'terms-6',
-                          },
-                          {
-                            id: 'terms-5',
-                            label: '5 terms',
-                            value: 'terms-5',
-                          },
-                        ]}
-                      />
-                    </FormGroup>
-                  </FormFieldset>
-                ),
-              },
-              {
-                id: 'release-type-calendar',
-                label: 'Calendar year',
-                value: 'calendar-year',
-                conditional: (
-                  <FormGroup>
-                    <FormFieldset id="calendar year" legend="">
+        <FormFieldset id="test" legend="Select time period coverage">
+          <FormGroup>
+            <label htmlFor="time-period" className="govuk-label">
+              Type
+            </label>
+            <select
+              name="time-period"
+              id="time-period"
+              className="govuk-select"
+            >
+              <optgroup label="Academic year">
+                <option value="AY">Academic year - AY</option>
+                <option value="AYQ1">Academic year Q1 - AYQ1</option>
+                <option value="AYQ1Q2">Academic year Q1 to Q2 - AYQ1Q2</option>
+                <option value="AYQ1Q3">Academic year Q1 to Q3 - AYQ1Q3</option>
+                <option value="AYQ1Q4">Academic year Q1 to Q4 - AYQ1Q4</option>
+                <option value="AYQ2">Academic year Q2 - AYQ2</option>
+                <option value="AYQ2Q3">Academic year Q2 to Q3 - AYQ2Q3</option>
+                <option value="AYQ2Q4">Academic year Q2 to Q4 - AYQ2Q4</option>
+                <option value="AYQ3">Academic year Q3 - AYQ3</option>
+                <option value="AYQ3Q4">Academic year Q3 to Q3 - AYQ3Q4</option>
+                <option value="AYQ4">Academic year Q4 - AYQ4</option>
+              </optgroup>
+              <optgroup label="Calendar year">
+                <option value="CY">Calendar year - CY</option>
+                <option value="CYQ1">Calendar year Q1 - CYQ1</option>
+                <option value="CYQ1Q2">Calendar year Q1 to Q2 - CYQ1Q2</option>
+                <option value="CYQ1Q3">Calendar year Q1 to Q3 - CYQ1Q3</option>
+                <option value="CYQ1Q4">Calendar year Q1 to Q4 - CYQ1Q4</option>
+                <option value="CYQ2">Calendar year Q2 - CYQ2</option>
+                <option value="CYQ2Q3">Calendar year Q2 to Q3 - CYQ2Q3</option>
+                <option value="CYQ2Q4">Calendar year Q2 to Q4 - CYQ1Q4</option>
+                <option value="CYQ3">Calendar year Q3 - CYQ3</option>
+                <option value="CYQ3Q4">Calendar year Q3 to Q4 - CYQ3Q4</option>
+                <option value="CYQ4">Calendar year Q4 - CYQ4</option>
+              </optgroup>
+              <optgroup label="Financial year">
+                <option value="FY">Financial year - FY</option>
+                <option value="FYQ1">Financial year Q1 - FYQ1</option>
+                <option value="FYQ1Q2">Financial year Q1 to Q2 - FYQ1Q2</option>
+                <option value="FYQ1Q3">Financial year Q1 to Q3 - FYQ1Q3</option>
+                <option value="FYQ1Q4">Financial year Q1 to Q4 - FYQ1Q4</option>
+                <option value="FYQ2">Financial year Q2 - FYQ2</option>
+                <option value="FYQ2Q3">Financial year Q2 to Q3 - FYQ2Q3</option>
+                <option value="FYQ2Q4">Financial year Q2 to Q4 - FYQ1Q4</option>
+                <option value="FYQ3">Financial year Q3 - FYQ3</option>
+                <option value="FYQ3Q4">Financial year Q3 to Q4 - FYQ3Q4</option>
+                <option value="FYQ4">Financial year Q4 - FYQ4</option>
+              </optgroup>
+              <optgroup label="Tax year">
+                <option value="TY">Tax year - TY</option>
+                <option value="TYQ1">Tax year Q1 - TYQ1</option>
+                <option value="TYQ1Q2">Tax year Q1 to Q2 - TYQ1Q2</option>
+                <option value="TYQ1Q3">Tax year Q1 to Q3 - TYQ1Q3</option>
+                <option value="TYQ1Q4">Tax year Q1 to Q4 - TYQ1Q4</option>
+                <option value="TYQ2">Tax year Q2 - TYQ2</option>
+                <option value="TYQ2Q3">Tax year Q2 to Q3 - TYQ2Q3</option>
+                <option value="TYQ2Q4">Tax year Q2 to Q4 - TYQ1Q4</option>
+                <option value="TYQ3">Tax year Q3 - TYQ3</option>
+                <option value="TYQ3Q4">Tax year Q3 to Q4 - TYQ3Q4</option>
+                <option value="TYQ4">Tax year Q4 - TYQ4</option>
+              </optgroup>
+              <optgroup label="Term">
+                <option value="T1">Autumn term - T1</option>
+                <option value="T1T2">Autumn and spring term - T1T2</option>
+                <option value="T2">Spring term - T2</option>
+                <option value="T2">Summer term - T3</option>
+              </optgroup>
+              <optgroup label="Month">
+                <option value="M1">January - M1</option>
+                <option value="M2">February - M2</option>
+                <option value="M3">March - M3</option>
+                <option value="M4">April - M4</option>
+                <option value="M5">May - M5</option>
+                <option value="M6">June - M6</option>
+                <option value="M7">July - M7</option>
+                <option value="M8">August - M8</option>
+                <option value="M9">September - M9</option>
+                <option value="M10">October - M10</option>
+                <option value="M11">November - M11</option>
+                <option value="M12">December - M12</option>
+              </optgroup>
+              <optgroup label="Other">
+                <option value="EOM">Up until 31st March - EOM</option>
+              </optgroup>
+            </select>
+          </FormGroup>
+          <FormGroup>
+            <FormTextInput
+              id="release-year"
+              name="release-year"
+              label="Year"
+              value="2018"
+              width={4}
+            />
+          </FormGroup>
+          <FormGroup>
+            <fieldset className="govuk-fieldset">
+              <legend className="govuk-heading-s govuk-!-margin-bottom-3">
+                Financial year start
+              </legend>
+              <div className="govuk-form-group">
+                <fieldset className="govuk-fieldset">
+                  <div
+                    className="govuk-date-input"
+                    id="financial-year-start-date"
+                  >
+                    <div className="govuk-date-input__item">
                       <div className="govuk-form-group">
-                        <label htmlFor="calendar-year" className="govuk-label">
+                        <label
+                          htmlFor="financial-year-day"
+                          className="govuk-label govuk-date-input__label"
+                        >
+                          Day
+                        </label>
+                        <input
+                          type="number"
+                          pattern="[0-9]*"
+                          name="financial-year-day"
+                          id="financial-year-day"
+                          className="govuk-input govuk-date-input__input govuk-input--width-2"
+                          defaultValue="05"
+                        />
+                      </div>
+                    </div>
+                    <div className="govuk-date-input__item">
+                      <div className="govuk-form-group">
+                        <label
+                          htmlFor="financial-year-month"
+                          className="govuk-label govuk-date-input__label"
+                        >
+                          Month
+                        </label>
+                        <input
+                          type="number"
+                          pattern="[0-9]*"
+                          name="financial-year-month"
+                          id="financial-year-month"
+                          className="govuk-input govuk-date-input__input govuk-input--width-2"
+                          defaultValue="04"
+                        />
+                      </div>
+                    </div>
+                    <div className="govuk-date-input__item">
+                      <div className="govuk-form-group">
+                        <label
+                          htmlFor="financial-year-year"
+                          className="govuk-label govuk-date-input__label"
+                        >
                           Year
                         </label>
                         <input
-                          className="govuk-input govuk-input--width-4"
-                          id="calendar-year"
-                          name="calendar-year"
-                          type="text"
-                          defaultValue="2019"
+                          type="number"
                           pattern="[0-9]*"
+                          name="financial-year-year"
+                          id="financial-year-year"
+                          className="govuk-input govuk-date-input__input govuk-input--width-4"
+                          defaultValue="2019"
                         />
                       </div>
-                    </FormFieldset>
-                  </FormGroup>
-                ),
-              },
-              {
-                id: 'release-type-financial',
-                label: 'Financial year',
-                value: 'financial-year',
-                conditional: (
-                  <FormGroup>
-                    <FormFieldset
-                      id="financial year"
-                      legend="Financial year start date"
-                    >
-                      <div className="govuk-form-group">
-                        <fieldset className="govuk-fieldset">
-                          <div
-                            className="govuk-date-input"
-                            id="financial-year-start-date"
-                          >
-                            <div className="govuk-date-input__item">
-                              <div className="govuk-form-group">
-                                <label
-                                  htmlFor="financial-year-day"
-                                  className="govuk-label govuk-date-input__label"
-                                >
-                                  Day
-                                </label>
-                                <input
-                                  type="number"
-                                  pattern="[0-9]*"
-                                  name="financial-year-day"
-                                  id="financial-year-day"
-                                  className="govuk-input govuk-date-input__input govuk-input--width-2"
-                                  defaultValue="05"
-                                />
-                              </div>
-                            </div>
-                            <div className="govuk-date-input__item">
-                              <div className="govuk-form-group">
-                                <label
-                                  htmlFor="financial-year-month"
-                                  className="govuk-label govuk-date-input__label"
-                                >
-                                  Month
-                                </label>
-                                <input
-                                  type="number"
-                                  pattern="[0-9]*"
-                                  name="financial-year-month"
-                                  id="financial-year-month"
-                                  className="govuk-input govuk-date-input__input govuk-input--width-2"
-                                  defaultValue="04"
-                                />
-                              </div>
-                            </div>
-                            <div className="govuk-date-input__item">
-                              <div className="govuk-form-group">
-                                <label
-                                  htmlFor="financial-year-year"
-                                  className="govuk-label govuk-date-input__label"
-                                >
-                                  Year
-                                </label>
-                                <input
-                                  type="number"
-                                  pattern="[0-9]*"
-                                  name="financial-year-year"
-                                  id="financial-year-year"
-                                  className="govuk-input govuk-date-input__input govuk-input--width-4"
-                                  defaultValue="2019"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </fieldset>
-                      </div>
-                      <span className="govuk-hint">Financial year 2018/19</span>
-                      <div className="govuk-form-group">
-                        <label
-                          htmlFor="time-financial-period"
-                          className="govuk-label"
-                        >
-                          Select time period
-                        </label>
-                        <select
-                          name="time-financial-period"
-                          id="time--financial-period"
-                          className="govuk-select"
-                        >
-                          <option value="full-financial-year">
-                            Full financial year
-                          </option>
-                          <option value="q1">Q1</option>
-                          <option value="q2">Q2</option>
-                          <option value="q3">Q3</option>
-                          <option value="q4">Q4</option>
-                          <option value="q1-q2">Q1 to Q2</option>
-                          <option value="q1-q3">Q1 to Q3</option>
-                          <option value="q2-q3">Q2 to Q3</option>
-                          <option value="q2-q3">Q2 to Q4</option>
-                        </select>
-                      </div>
-                    </FormFieldset>
-                  </FormGroup>
-                ),
-              },
-              {
-                id: 'release-type-month',
-                label: 'Month',
-                value: 'month',
-                conditional: (
-                  <FormGroup>
-                    <FormFieldset id="month" legend="">
-                      <div className="govuk-form-group">
-                        <fieldset className="govuk-fieldset">
-                          <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
-                            Monthly release date
-                          </legend>
-                          <div
-                            className="govuk-date-input"
-                            id="monthly-release-start-date"
-                          >
-                            <div className="govuk-date-input__item">
-                              <div className="govuk-form-group">
-                                <label
-                                  htmlFor="monthly-release-month"
-                                  className="govuk-label govuk-date-input__label"
-                                >
-                                  Month
-                                </label>
-                                <input
-                                  type="number"
-                                  pattern="[0-9]*"
-                                  name="monthly-release-month"
-                                  id="monthly-release-month"
-                                  className="govuk-input govuk-date-input__input govuk-input--width-2"
-                                  defaultValue="04"
-                                />
-                              </div>
-                            </div>
-                            <div className="govuk-date-input__item">
-                              <div className="govuk-form-group">
-                                <label
-                                  htmlFor="monthly-release-year"
-                                  className="govuk-label govuk-date-input__label"
-                                >
-                                  Year
-                                </label>
-                                <input
-                                  type="number"
-                                  pattern="[0-9]*"
-                                  name="monthly-release-year"
-                                  id="monthly-release-year"
-                                  className="govuk-input govuk-date-input__input govuk-input--width-4"
-                                  defaultValue="2019"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </fieldset>
-                      </div>
-                    </FormFieldset>
-                  </FormGroup>
-                ),
-              },
-            ]}
-          />
-        </FormGroup>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+            </fieldset>
+          </FormGroup>
+        </FormFieldset>
 
         <fieldset className="govuk-fieldset">
           <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
@@ -407,35 +312,6 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
             </div>
           </div>
         </fieldset>
-
-        <FormGroup>
-          <FormRadioGroup
-            legend="Data type"
-            id="data-type"
-            name="data-type"
-            value={value}
-            onChange={event => {
-              setValue(event.target.value);
-            }}
-            options={[
-              {
-                id: 'data-final',
-                label: 'Final',
-                value: 'data-final',
-              },
-              {
-                id: 'data-provisional',
-                label: 'Provisional',
-                value: 'data-provisional',
-              },
-              {
-                id: 'data-revised',
-                label: 'Revised',
-                value: 'data-revised',
-              },
-            ]}
-          />
-        </FormGroup>
 
         <FormGroup>
           <FormRadioGroup

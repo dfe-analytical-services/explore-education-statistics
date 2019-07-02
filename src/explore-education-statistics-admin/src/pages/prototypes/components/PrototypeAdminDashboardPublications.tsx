@@ -1,12 +1,55 @@
 import PrototypeDashboardRelease from '@admin/pages/prototypes/components/PrototypeDashboardRelease';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import {
+  FormGroup,
+  FormFieldset,
+  FormTextInput,
+  FormSelect,
+  FormRadioGroup,
+} from '@common/components/form';
 import React from 'react';
 import Link from '@admin/components/Link';
 
 const PrototypeAdminDashboardPublications = () => {
   return (
     <>
+      <form>
+        <FormGroup>
+          <FormSelect
+            id="select-theme"
+            label="Select theme"
+            name="select-theme"
+            options={[
+              { label: 'Pupils and schools', value: 'pupils-schools' },
+              {
+                label: 'School and college outcomes and performance',
+                value: 'school-college-performance',
+              },
+            ]}
+          />
+        </FormGroup>
+        <FormGroup>
+          <FormSelect
+            id="select-theme"
+            label="Select topic"
+            name="select-topic"
+            value="pupil-absence"
+            options={[
+              { label: 'Admission appeals', value: 'admission-appeals' },
+              { label: 'Exclusions', value: 'exclusions' },
+              { label: 'Pupil absence', value: 'pupil-absence' },
+              {
+                label: 'Parental responsibility measures',
+                value: 'parental-repsonsibilty',
+              },
+              { label: 'Pupil projections', value: 'pupil-projections' },
+              { label: 'View all topics', value: 'view-all-topics' },
+            ]}
+          />
+        </FormGroup>
+      </form>
+      <hr />
       <h2 className="govuk-heading-l govuk-!-margin-bottom-0">
         Pupils and schools, pupil absence
       </h2>
@@ -17,6 +60,7 @@ const PrototypeAdminDashboardPublications = () => {
       <Link to="/prototypes/publication-create-new" className="govuk-button">
         Create a new publication
       </Link>
+      <h2 className="govuk-heading-m govuk-!-margin-bottom-0">Publications</h2>
       <Accordion id="pupil-absence">
         <AccordionSection
           heading="Pupil absence statistics and data for schools in England"

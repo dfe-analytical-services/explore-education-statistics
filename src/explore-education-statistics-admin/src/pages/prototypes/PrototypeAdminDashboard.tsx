@@ -13,7 +13,7 @@ import PrototypePage from './components/PrototypePage';
 
 const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
   return (
-    <PrototypePage wide breadcrumbs={[{ text: 'Administrator dashboard' }]}>
+    <PrototypePage wide>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <span className="govuk-caption-xl">Welcome</span>
@@ -50,17 +50,11 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         </TabsSection> */}
         <TabsSection
           id="task-ready-approval1"
-          title={`Ready to review ${
+          title={`In progress ${
             location.search === '?status=readyApproval' ? '(1)' : ''
           }`}
         >
           <AdminDashboardReadyForApproval />
-        </TabsSection>
-        <TabsSection id="task-ready-approval2" title="Needs work">
-          <AdminDashboardNeedsWork />
-        </TabsSection>
-        <TabsSection id="task-ready-approval3" title="Approved for publication">
-          <AdminDashboardApprovedForPublication />
         </TabsSection>
       </Tabs>
 
