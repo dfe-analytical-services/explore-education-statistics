@@ -12,6 +12,7 @@ import classNames from 'classnames';
 import debounce from 'lodash/debounce';
 import React, { Component, ReactNode } from 'react';
 import Highlighter from 'react-highlight-words';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import styles from './PageSearchForm.module.scss';
 
 interface SearchResult {
@@ -85,7 +86,7 @@ class PageSearchForm extends Component<Props, State> {
   }
 
   private search = (value: string) => {
-    const { elementSelectors, minInput } = this.props;
+    const { elementSelectors, minInput, id } = this.props;
 
     const isAcronym = value === value.toUpperCase() && value.length > 1;
 
@@ -93,6 +94,7 @@ class PageSearchForm extends Component<Props, State> {
       this.resetSearch();
       return;
     }
+    logEvent(window.location.pathname, id, value);
 
     const elements = findAllByText(
       isAcronym ? value : value.toLocaleLowerCase(),
