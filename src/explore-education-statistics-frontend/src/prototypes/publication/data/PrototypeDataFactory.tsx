@@ -124,17 +124,32 @@ export const newApiHorizontalData: ChartProps = {
     locations: {},
   },
 
-  labels: {
-    '28': 'Authorised absence rate',
-    '26': 'Overall absence rate',
-    '23': 'Unauthorised absence rate',
-  },
-
   dataSets: [
     { indicator: '23', filters: ['1'] },
     { indicator: '26', filters: ['1'] },
     { indicator: '28', filters: ['1'] },
   ],
+
+  dataLabels: {
+    '23_1': {
+      value: '23_1',
+      unit: '%',
+      name: '23_1',
+      label: 'Un auth rate',
+    },
+    '26_1': {
+      value: '26_1',
+      unit: '%',
+      name: '26_1',
+      label: 'All rate',
+    },
+    '28_1': {
+      value: '28_1',
+      unit: '%',
+      name: '28_1',
+      label: 'Auth rate',
+    },
+  },
 
   xAxis: { title: 'test x axis' },
   yAxis: { title: 'test y axis' },
@@ -149,8 +164,8 @@ export const newChartsApiDataBlock: DataBlockProps = {
     localAuthorityDistricts: [],
     localAuthorities: [],
     countries: [],
-    geographicLevel: GeographicLevel.LocalAuthorityDistrict,
-    startYear: '2016',
+    geographicLevel: GeographicLevel.National,
+    startYear: '2012',
     endYear: '2017',
     indicators: ['23', '26', '28', '27'],
     filters: ['1', '2'],
@@ -158,15 +173,45 @@ export const newChartsApiDataBlock: DataBlockProps = {
   showTables: false,
   charts: [
     {
-      type: 'map',
+      type: 'verticalbar',
       xAxis: { title: '' },
       yAxis: { title: '' },
 
+      dataLabels: {
+        '23_1_2': {
+          value: '23_1_2',
+          unit: '%',
+          name: '23_1_2',
+          label: 'Unauthorised absence rate',
+        },
+        '26_1_2': {
+          value: '26_1_2',
+          unit: '%',
+          name: '26_1_2',
+          label: 'Overall absence rate',
+        },
+        '28_1_2': {
+          value: '28_1_2',
+          unit: '%',
+          name: '28_1_2',
+          label: 'Authorised absence rate',
+        },
+        '27_1_2': {
+          value: '27_1_2',
+          unit: '',
+          name: '27_1_2',
+          label: 'Absence Rate',
+        },
+      },
+
       dataSets: [
-        { indicator: '23', filters: ['1', '2'] },
+        {
+          indicator: '23',
+          filters: ['1', '2'],
+        },
         { indicator: '26', filters: ['1', '2'] },
         { indicator: '28', filters: ['1', '2'] },
-        { indicator: '27', filters: ['1', '2'] },
+        // { indicator: '27', filters: ['1', '2'] },
       ],
     },
   ],

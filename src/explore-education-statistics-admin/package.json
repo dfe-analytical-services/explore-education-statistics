@@ -179,6 +179,7 @@
     "last 1 version"
   ],
   "dependencies": {
+    "lodash": "^4.17.11",
     "whatwg-fetch": "^3.0.0"
   }
 }

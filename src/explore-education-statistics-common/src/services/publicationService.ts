@@ -1,6 +1,6 @@
 import { DataBlockRequest } from '@common/services/dataBlockService';
-import { contentApi } from './api';
 import { Dictionary } from '@common/types';
+import { contentApi } from './api';
 
 export interface Publication {
   id: string;
@@ -74,14 +74,10 @@ export interface AxisConfigurationItem {
   dataSet: ChartDataSet;
 }
 
-export interface ChartConfigurationOptions {
-  dataLabels: Dictionary<DataLabelConfigurationItem>;
-  axes: Dictionary<AxisConfigurationItem>;
-}
-
 export interface Chart {
   type: ChartType;
   dataSets: ChartDataSet[];
+  dataLabels: Dictionary<DataLabelConfigurationItem>;
   xAxis?: Axis;
   yAxis?: Axis;
   stacked?: boolean;
@@ -100,7 +96,11 @@ export interface Summary {
   description: { type: string; body: string };
 }
 
-export type ContentBlockType = 'MarkDownBlock' | 'InsetTextBlock' | 'DataBlock';
+export type ContentBlockType =
+  | 'MarkDownBlock'
+  | 'InsetTextBlock'
+  | 'DataBlock'
+  | 'HtmlBlock';
 
 export interface ContentBlock {
   type: ContentBlockType;

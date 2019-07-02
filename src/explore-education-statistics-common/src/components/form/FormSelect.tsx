@@ -25,7 +25,6 @@ export interface FormSelectProps {
     | ((option: SelectOption) => SelectOption[keyof SelectOption])[];
   orderDirection?: ('asc' | 'desc')[];
   value?: string | number;
-  multiple?: boolean;
 }
 
 const FormSelect = ({
@@ -39,7 +38,6 @@ const FormSelect = ({
   order = ['label'],
   orderDirection = ['asc'],
   value,
-  multiple = false,
 }: FormSelectProps) => {
   return (
     <>
@@ -56,7 +54,6 @@ const FormSelect = ({
         onBlur={onBlur}
         onChange={onChange}
         value={value}
-        multiple={multiple}
       >
         {(order === undefined
           ? options
