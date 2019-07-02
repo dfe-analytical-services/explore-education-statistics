@@ -1,6 +1,5 @@
 import {
   Axis,
-  Chart,
   ChartConfigurationOptions,
   ChartDataSet,
   ChartType,
@@ -188,7 +187,7 @@ const ChartFunctions = {
       return {
         ...result,
         measures: Object.entries(result.measures)
-          .filter(([measureId, _]) => dataSet.indicator === measureId)
+          .filter(([measureId]) => dataSet.indicator === measureId)
           .reduce<Dictionary<string>>(
             (newMeasures, [measureId, measureValue]) => ({
               ...newMeasures,

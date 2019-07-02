@@ -83,7 +83,6 @@ export default class LineChartBlock extends Component<ChartProps> {
       height,
       xAxis,
       yAxis,
-      labels,
       meta,
       dataSets,
       configuration,
