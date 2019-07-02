@@ -36,9 +36,7 @@ function App() {
     <BrowserRouter>
       <Route exact path="/" component={IndexPage} />
 
-      <LoginContext.Provider
-        value={PrototypeLoginService.getAuthentication('user1')}
-      >
+      <LoginContext.Provider value={PrototypeLoginService.login()}>
         {/* Non-Prototype Routes*/}
         <Route exact path="/admin-dashboard" component={AdminDashboardPage} />
 

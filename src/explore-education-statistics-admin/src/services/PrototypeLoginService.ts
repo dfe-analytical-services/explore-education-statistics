@@ -12,7 +12,7 @@ export class PrototypeLoginService {
   private static currentUser: User;
 
   private static USERS: User[] = [
-    { id: 'user1', name: 'John Smith', permissions: [''] },
+    { id: 'user1', name: 'John Smith', permissions: ['team lead'] },
     { id: 'user2', name: 'Ann Evans', permissions: [''] },
     { id: 'user3', name: 'Stephen Doherty', permissions: [''] },
     { id: 'user4', name: 'User 4', permissions: [''] },
@@ -31,6 +31,16 @@ export class PrototypeLoginService {
     return {
       user: PrototypeLoginService.getUser(userId),
     };
+  }
+
+  public static setActiveUser(userId: string) {
+    window.sessionStorage.setItem('userId', userId);
+  }
+
+  public static login() {
+    return PrototypeLoginService.getAuthentication(
+      window.sessionStorage.getItem('userId') || 'John Smith',
+    );
   }
 
   public static getNoLoggedInUser() {
