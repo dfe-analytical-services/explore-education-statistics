@@ -253,7 +253,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
         </fieldset>
         <fieldset className="govuk-fieldset govuk-!-margin-top-6 govuk-!-margin-bottom-6">
           <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-            Next release expected
+            Next release expected (optional)
           </legend>
           <div className="govuk-date-input" id="schedule-publish-date">
             <div className="govuk-date-input__item">
