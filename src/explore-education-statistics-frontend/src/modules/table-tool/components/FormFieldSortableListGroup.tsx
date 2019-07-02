@@ -7,7 +7,6 @@ import React from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import FormFieldSortableList from './FormFieldSortableList';
 import { SortableOption } from './FormSortableList';
-import { FormValues } from './TableHeadersForm';
 import styles from './TableHeadersForm.module.scss';
 
 interface Props<FormValues> {
@@ -38,7 +37,7 @@ const FormFieldSortableListGroup = <T extends Dictionary<SortableOption[][]>>({
                 })}
               >
                 <FormFieldset
-                  id={`tableHeaders-${name}`}
+                  id={`sortableListGroup-${name}`}
                   legend={legend}
                   error={getError(name)}
                 >
@@ -70,9 +69,9 @@ const FormFieldSortableListGroup = <T extends Dictionary<SortableOption[][]>>({
                             )}
                             ref={draggableProvided.innerRef}
                           >
-                            <FormFieldSortableList<FormValues>
+                            <FormFieldSortableList<T>
                               name={`${name}[${index}]`}
-                              id={`sort-${name}-${index}`}
+                              id={`sortableList-${name}-${index}`}
                               legend={`${groupLegend} ${index + 1}`}
                               legendSize="s"
                             />
