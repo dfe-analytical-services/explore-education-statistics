@@ -28,27 +28,20 @@ const ChartAxisConfiguration = ({
   defaultDataType,
 }: Props) => {
   const [selectableUnits, setSelectableUtils] = React.useState<string[]>(() => {
-    return ['1', '2', '3'];
-    /*
-    if (type === 'major') {
-
+    if (type === 'value') {
       return dataSets
         .map(dataSet => meta.indicators[dataSet.indicator])
         .filter(indicator => indicator !== null)
-        .map(indicator => indicator.unit)
-        ;
-    }*/
+        .map(indicator => indicator.unit);
+    }
+    return [];
   });
 
   const [selectedUnit, setSelectedUnit] = React.useState<number>(0);
 
   const [selectedValue, setSelectedValue] = React.useState<string>();
 
-  /*
-  React.useEffect(() => {
-    setSelectedUnit(0);
-  }, [selectableUnits]);
-  */
+  const [show, setShow] = React.useState<boolean>(true);
 
   return (
     <FormFieldset id={id} legend={title}>
@@ -57,30 +50,37 @@ const ChartAxisConfiguration = ({
         <FormCheckbox
           id={`${id}_show`}
           name={`${id}_show`}
-          defaultChecked={false}
+          defaultChecked
           label="Show axis?"
-          value="show"
-        />
-
-        <FormComboBox
-          id={`${id}_unit`}
-          inputLabel="Unit"
-          onInputChange={e => setSelectedValue(e.target.value)}
-          inputValue={selectedValue}
-          onSelect={selected => {
-            setSelectedValue(selectableUnits[selected]);
+          checked={show}
+          onChange={e => {
+            setShow(e.target.checked);
           }}
-          options={selectableUnits}
-          initialOption={selectedUnit}
-        />
+          value="show"
+          conditional={
+            <React.Fragment>
+              <FormComboBox
+                id={`${id}_unit`}
+                inputLabel="Unit"
+                onInputChange={e => setSelectedValue(e.target.value)}
+                inputValue={selectedValue}
+                onSelect={selected => {
+                  setSelectedValue(selectableUnits[selected]);
+                }}
+                options={selectableUnits}
+                initialOption={selectedUnit}
+              />
 
-        {/*
+              {/*
         <FormTextInput
           id={`${id}_name`}
           name={`${id}_name`}
           defaultValue="hello"
           label="hello"
         />*/}
+            </React.Fragment>
+          }
+        />
       </FormGroup>
     </FormFieldset>
   );
