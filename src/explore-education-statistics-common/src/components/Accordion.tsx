@@ -7,7 +7,6 @@ import React, {
   ReactNode,
   useEffect,
   useRef,
-  useState,
 } from 'react';
 import { useImmer } from 'use-immer';
 import styles from './Accordion.module.scss';
@@ -25,8 +24,30 @@ export interface AccordionProps {
 const Accordion = ({ children, id, onToggleAll }: AccordionProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  const [hashId, setHashId] = useState('');
   const [openSections, updateOpenSections] = useImmer<boolean[]>([]);
+
+  const sections = React.Children.toArray(children).filter(child =>
+    isComponentType(child, AccordionSection),
+  ) as ReactComponentElement<typeof AccordionSection>[];
+
+  const getSectionIds = (
+    section: ReactComponentElement<typeof AccordionSection>,
+    index: number,
+  ) => {
+    return {
+      contentId: section.props.contentId || `${id}-${index + 1}-content`,
+      headingId: section.props.headingId || `${id}-${index + 1}-heading`,
+    };
+  };
+
+  useEffect(() => {
+    updateOpenSections(() =>
+      sections.map(section => {
+        return section.props.open || false;
+      }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [children, updateOpenSections]);
 
   const { isMounted } = useMounted(() => {
     const goToHash = () => {
@@ -50,11 +71,28 @@ const Accordion = ({ children, id, onToggleAll }: AccordionProps) => {
             );
 
             if (contentEl) {
-              setHashId(contentEl.id);
+              updateOpenSections(draft => {
+                const openIndex = sections.findIndex((section, index) => {
+                  const { contentId, headingId } = getSectionIds(
+                    section,
+                    index,
+                  );
+                  const hashId = contentEl.id;
+                  return hashId === contentId || hashId === headingId;
+                });
 
-              (locationHashEl as HTMLElement).scrollIntoView({
-                block: 'start',
+                if (openIndex > -1) {
+                  draft[openIndex] = true;
+                }
               });
+
+              setTimeout(
+                () =>
+                  (locationHashEl as HTMLElement).scrollIntoView({
+                    block: 'start',
+                  }),
+                100,
+              );
             }
           }
         }
@@ -63,18 +101,9 @@ const Accordion = ({ children, id, onToggleAll }: AccordionProps) => {
 
     goToHash();
     window.addEventListener('hashchange', goToHash);
+
+    return () => window.removeEventListener('hashchange', goToHash);
   });
-
-  const sections = React.Children.toArray(children).filter(child =>
-    isComponentType(child, AccordionSection),
-  ) as ReactComponentElement<typeof AccordionSection>[];
-
-  useEffect(() => {
-    updateOpenSections(() =>
-      sections.map(section => section.props.open || false),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [children, updateOpenSections]);
 
   const isAllOpen = openSections.every(isOpen => isOpen);
 
@@ -113,11 +142,7 @@ const Accordion = ({ children, id, onToggleAll }: AccordionProps) => {
         const headingId =
           section.props.headingId || `${id}-${index + 1}-heading`;
 
-        const isSectionOpen =
-          isAllOpen ||
-          openSections[index] ||
-          hashId === contentId ||
-          hashId === headingId;
+        const isSectionOpen = isAllOpen || openSections[index];
 
         return cloneElement<AccordionSectionProps>(section, {
           key: headingId,
