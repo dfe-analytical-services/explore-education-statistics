@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 {
@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 
         public Dictionary<string, string> Measures { get; set; }
 
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(EnumToEnumValueJsonConverter<TimeIdentifier>))]
         public TimeIdentifier TimeIdentifier { get; set; }
 
         public int Year { get; set; }

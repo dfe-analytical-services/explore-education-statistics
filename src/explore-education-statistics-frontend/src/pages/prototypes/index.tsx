@@ -12,32 +12,20 @@ function PrototypesIndexPage() {
           <Link to="/prototypes/start">Start page</Link>
         </li>
         <li>
-          <Link to="/prototypes/home-v2">Home page</Link>
+          <Link to="/prototypes/home">Home page</Link>
         </li>
         <li>
           <Link to="/prototypes/browse-releases">Browse releases</Link>
         </li>
         <li>
-          <Link to="/prototypes/publication">
-            Publication page (pupil absence)
+          <Link to="/prototypes/publication">Publication page example</Link>
+          {` `}
+          (Outdated design){` `}
+          <Link to="/statistics/pupil-absence-in-schools-in-england">
+            See working app for latest version
           </Link>
         </li>
-        <li>
-          <Link to="/prototypes/publication-exclusions">
-            Publication page (exclusions)
-          </Link>
-        </li>
-        <li>
-          <Link to="/prototypes/publication-gcse">Publication page (KS4)</Link>
-        </li>
-        <li>
-          <Link to="/prototypes/methodology-home">Methodology home</Link>
-        </li>
-        <li>
-          <Link to="/prototypes/methodology-specific">
-            Specific methodology
-          </Link>
-        </li>
+
         <li>
           <Link to="/prototypes/methodology-absence">
             Methodology page for absence

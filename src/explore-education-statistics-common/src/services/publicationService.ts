@@ -1,6 +1,6 @@
 import { DataBlockRequest } from '@common/services/dataBlockService';
-import { contentApi } from './api';
 import { Dictionary } from '@common/types';
+import { contentApi } from './api';
 
 export interface Publication {
   id: string;
@@ -94,7 +94,11 @@ export interface Summary {
   description: { type: string; body: string };
 }
 
-export type ContentBlockType = 'MarkDownBlock' | 'InsetTextBlock' | 'DataBlock';
+export type ContentBlockType =
+  | 'MarkDownBlock'
+  | 'InsetTextBlock'
+  | 'DataBlock'
+  | 'HtmlBlock';
 
 export interface ContentBlock {
   type: ContentBlockType;

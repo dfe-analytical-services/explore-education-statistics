@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -2733,7 +2735,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Title = "Pupil absence statistics: methodology",
                     Published = new DateTime(2018, 3, 22),
                     LastUpdated = new DateTime(2019, 6, 26),
-                    Summary = "Find out about the methodology behind pupil absence statistics and data and how and why they're collected and published.",
+                    Summary =
+                        "Find out about the methodology behind pupil absence statistics and data and how and why they're collected and published.",
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Content = new List<ContentSection>
                     {
@@ -2742,49 +2745,98 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "1. Overview of absence statistics",
                             Caption = "",
                             Order = 1,
-                            Content = new List<IContentBlock>()
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section1.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section1.html", Encoding.UTF8) : ""
+                                },
+                            }
                         },
                         new ContentSection
                         {
                             Heading = "2. National Statistics badging",
                             Caption = "",
                             Order = 2,
-                            Content = new List<IContentBlock>()
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section2.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section2.html", Encoding.UTF8) : ""
+                                },
+                            }
                         },
                         new ContentSection
                         {
                             Heading = "3. Methodology",
                             Caption = "",
                             Order = 3,
-                            Content = new List<IContentBlock>()
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section3.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section3.html", Encoding.UTF8) : ""
+                                },
+                            }
                         },
                         new ContentSection
                         {
                             Heading = "4. Data collection",
                             Caption = "",
                             Order = 4,
-                            Content = new List<IContentBlock>()
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section4.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section4.html", Encoding.UTF8) : ""
+                                },
+                            }
                         },
                         new ContentSection
                         {
                             Heading = "5. Data processing",
                             Caption = "",
                             Order = 5,
-                            Content = new List<IContentBlock>()
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section5.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section5.html", Encoding.UTF8) : ""
+                                },
+                            }
                         },
                         new ContentSection
                         {
                             Heading = "6. Data quality",
                             Caption = "",
                             Order = 6,
-                            Content = new List<IContentBlock>()
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section6.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section6.html", Encoding.UTF8) : ""
+                                },
+                            }
                         },
                         new ContentSection
                         {
                             Heading = "7. Contacts",
                             Caption = "",
                             Order = 7,
-                            Content = new List<IContentBlock>()
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/Section7.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section7.html", Encoding.UTF8) : ""
+                                },
+                            }
                         }
                     },
                     Annexes = new List<ContentSection>
@@ -2794,54 +2846,153 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Heading = "Annex A - Glossary",
                             Caption = "",
                             Order = 1,
-                            Content = new List<IContentBlock>()
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexA.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexA.html", Encoding.UTF8) : ""
+                                },
+                            }
                         },
                         new ContentSection
                         {
                             Heading = "Annex B - Calculations",
                             Caption = "",
                             Order = 2,
-                            Content = new List<IContentBlock>()
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexB.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexB.html", Encoding.UTF8) : ""
+                                },
+                            }
                         },
                         new ContentSection
                         {
                             Heading = "Annex C - School attendance codes",
                             Caption = "",
                             Order = 3,
-                            Content = new List<IContentBlock>()
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexC.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexC.html", Encoding.UTF8) : ""
+                                },
+                            }
                         },
                         new ContentSection
                         {
                             Heading = "Annex D - Links to pupil absence national statistics and data",
                             Caption = "",
                             Order = 4,
-                            Content = new List<IContentBlock>()
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexD.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexD.html", Encoding.UTF8) : ""
+                                },
+                            }
                         },
                         new ContentSection
                         {
                             Heading = "Annex E - Standard breakdowns",
                             Caption = "",
                             Order = 5,
-                            Content = new List<IContentBlock>()
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexE.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexE.html", Encoding.UTF8) : ""
+                                },
+                            }
                         },
                         new ContentSection
                         {
                             Heading = "Annex F - Timeline",
                             Caption = "",
                             Order = 6,
-                            Content = new List<IContentBlock>()
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Absence_Statistics/AnnexF.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexF.html", Encoding.UTF8) : ""
+                                },
+                            }
                         }
                     }
                 },
                 new Methodology
                 {
                     Id = new Guid("8ab41234-cc9d-4b3d-a42c-c9fce7762719"),
-                    Title = "School application statistics: methodology",
+                    Title = "Secondary and primary school applications and offers: methodology",
                     Published = new DateTime(2018, 6, 14),
                     Summary = "",
                     PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
-                    Content = new List<ContentSection>(),
-                    Annexes = new List<ContentSection>()
+                    Content = new List<ContentSection>
+                    {
+                        new ContentSection
+                        {
+                            Heading = "1. Overview of applications and offers statistics",
+                            Caption = "",
+                            Order = 1,
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section1.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section1.html", Encoding.UTF8) : ""
+                                },
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Heading = "2. The admissions process",
+                            Caption = "",
+                            Order = 2,
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section2.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section2.html", Encoding.UTF8) : ""
+                                },
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Heading = "3. Methodology",
+                            Caption = "",
+                            Order = 3,
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section3.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section3.html", Encoding.UTF8) : ""
+                                },
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Heading = "4. Contacts",
+                            Caption = "",
+                            Order = 4,
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section4.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section4.html", Encoding.UTF8) : ""
+                                },
+                            }
+                        },
+                    },
                 },
                 new Methodology
                 {
@@ -2850,8 +3001,166 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Published = new DateTime(2018, 8, 25),
                     Summary = "",
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                    Content = new List<ContentSection>(),
-                    Annexes = new List<ContentSection>()
+                    Content = new List<ContentSection>
+                    {
+                        new ContentSection
+                        {
+                            Heading = "1 Overview of exclusion statistics",
+                            Caption = "",
+                            Order = 1,
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section1.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section1.html", Encoding.UTF8) : ""
+                                },
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Heading = "2. National Statistics badging",
+                            Caption = "",
+                            Order = 2,
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section2.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section2.html", Encoding.UTF8) : ""
+                                },
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Heading = "3. Methodology",
+                            Caption = "",
+                            Order = 3,
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section3.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section3.html", Encoding.UTF8) : ""
+                                },
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Heading = "4. Data collection",
+                            Caption = "",
+                            Order = 4,
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section4.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section4.html", Encoding.UTF8) : ""
+                                },
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Heading = "5. Data processing",
+                            Caption = "",
+                            Order = 5,
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section5.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section5.html", Encoding.UTF8) : ""
+                                },
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Heading = "6. Data quality",
+                            Caption = "",
+                            Order = 6,
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section6.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section6.html", Encoding.UTF8) : ""
+                                },
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Heading = "7. Contacts",
+                            Caption = "",
+                            Order = 7,
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/Section7.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section7.html", Encoding.UTF8) : ""
+                                },
+                            }
+                        },
+                    },
+                    Annexes = new List<ContentSection>
+                    {
+                        new ContentSection
+                        {
+                            Heading = "Annex A - Calculations",
+                            Caption = "",
+                            Order = 1,
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexA.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexA.html", Encoding.UTF8) : ""
+                                },
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Heading = "Annex B - Exclusion by reason codes",
+                            Caption = "",
+                            Order = 2,
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexB.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexB.html", Encoding.UTF8) : ""
+                                },
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Heading = "Annex C - Links to pupil exclusions statistics and data",
+                            Caption = "",
+                            Order = 3,
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexC.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexC.html", Encoding.UTF8) : ""
+                                },
+                            }
+                        },
+                        new ContentSection
+                        {
+                            Heading = "Annex D - Standard breakdowns",
+                            Caption = "",
+                            Order = 4,
+                            Content = new List<IContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Body = File.Exists(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexD.html") ? 
+                                        File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexD.html", Encoding.UTF8) : ""
+                                },
+                            }
+                        },
+                    }
                 }
             );
         }

@@ -22,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
         public IEnumerable<string> ParliamentaryConstituencies { get; set; }
         public IEnumerable<string> Regions { get; set; }
         public IEnumerable<string> RscRegions { get; set; }
+        public IEnumerable<string> Sponsors { get; set; }
         public IEnumerable<string> Wards { get; set; }
 
         public SubjectMetaQueryContext ToSubjectMetaQueryContext()
@@ -45,6 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
                 ParliamentaryConstituencies = ParliamentaryConstituencies,
                 Regions = Regions,
                 RscRegions = RscRegions,
+                Sponsors = Sponsors,
                 Wards = Wards
             };
         }

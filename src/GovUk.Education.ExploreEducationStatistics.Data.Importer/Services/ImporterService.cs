@@ -5,6 +5,7 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Seed;
 using Microsoft.Extensions.Logging;
 
@@ -17,74 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private readonly ImporterMetaService _importerMetaService;
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
-
-        private static readonly Dictionary<string, TimeIdentifier> _timeIdentifiers =
-            new Dictionary<string, TimeIdentifier>
-            {
-                {"academic year", TimeIdentifier.AY},
-                {"academic year q1", TimeIdentifier.AYQ1},
-                {"academic year q2", TimeIdentifier.AYQ2},
-                {"academic year q3", TimeIdentifier.AYQ3},
-                {"academic year q4", TimeIdentifier.AYQ4},
-                {"academic year q1-q2", TimeIdentifier.AYQ1Q2},
-                {"academic year q1-q3", TimeIdentifier.AYQ1Q3},
-                {"academic year q1-q4", TimeIdentifier.AYQ1Q4},
-                {"academic year q2-q3", TimeIdentifier.AYQ2Q3},
-                {"academic year q2-q4", TimeIdentifier.AYQ2Q4},
-                {"academic year q3-q4", TimeIdentifier.AYQ3Q4},
-                {"calendar year", TimeIdentifier.CY},
-                {"calendar year q1", TimeIdentifier.CYQ1},
-                {"calendar year q2", TimeIdentifier.CYQ2},
-                {"calendar year q3", TimeIdentifier.CYQ3},
-                {"calendar year q4", TimeIdentifier.CYQ4},
-                {"calendar year q1-q2", TimeIdentifier.CYQ1Q2},
-                {"calendar year q1-q3", TimeIdentifier.CYQ1Q3},
-                {"calendar year q1-q4", TimeIdentifier.CYQ1Q4},
-                {"calendar year q2-q3", TimeIdentifier.CYQ2Q3},
-                {"calendar year q2-q4", TimeIdentifier.CYQ2Q4},
-                {"calendar year q3-q4", TimeIdentifier.CYQ3Q4},
-                {"financial year", TimeIdentifier.FY},
-                {"financial year q1", TimeIdentifier.FYQ1},
-                {"financial year q2", TimeIdentifier.FYQ2},
-                {"financial year q3", TimeIdentifier.FYQ3},
-                {"financial year q4", TimeIdentifier.FYQ4},
-                {"financial year q1-q2", TimeIdentifier.FYQ1Q2},
-                {"financial year q1-q3", TimeIdentifier.FYQ1Q3},
-                {"financial year q1-q4", TimeIdentifier.FYQ1Q4},
-                {"financial year q2-q3", TimeIdentifier.FYQ2Q3},
-                {"financial year q2-q4", TimeIdentifier.FYQ2Q4},
-                {"financial year q3-q4", TimeIdentifier.FYQ3Q4},
-                {"tax year", TimeIdentifier.TY},
-                {"tax year q1", TimeIdentifier.TYQ1},
-                {"tax year q2", TimeIdentifier.TYQ2},
-                {"tax year q3", TimeIdentifier.TYQ3},
-                {"tax year q4", TimeIdentifier.TYQ4},
-                {"tax year q1-q2", TimeIdentifier.TYQ1Q2},
-                {"tax year q1-q3", TimeIdentifier.TYQ1Q3},
-                {"tax year q1-q4", TimeIdentifier.TYQ1Q4},
-                {"tax year q2-q3", TimeIdentifier.TYQ2Q3},
-                {"tax year q2-q4", TimeIdentifier.TYQ2Q4},
-                {"tax year q3-q4", TimeIdentifier.TYQ3Q4},
-                {"five half terms", TimeIdentifier.HT5},
-                {"six half terms", TimeIdentifier.HT6},
-                {"up until 31st march", TimeIdentifier.EOM},
-                {"autumn term", TimeIdentifier.T1},
-                {"autumn and spring term", TimeIdentifier.T1T2},
-                {"spring term", TimeIdentifier.T2},
-                {"summer term", TimeIdentifier.T3},
-                {"january", TimeIdentifier.M1},
-                {"february", TimeIdentifier.M2},
-                {"march", TimeIdentifier.M3},
-                {"april", TimeIdentifier.M4},
-                {"may", TimeIdentifier.M5},
-                {"june", TimeIdentifier.M6},
-                {"july", TimeIdentifier.M7},
-                {"august", TimeIdentifier.M8},
-                {"september", TimeIdentifier.M9},
-                {"october", TimeIdentifier.M10},
-                {"november", TimeIdentifier.M11},
-                {"december", TimeIdentifier.M12}
-            };
 
         public ImporterService(
             ImporterFilterService importerFilterService,
@@ -190,9 +123,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private static TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)
         {
             var timeIdentifier = CsvUtil.Value(line, headers, "time_identifier").ToLower();
-            if (_timeIdentifiers.TryGetValue(timeIdentifier, out var code))
+            foreach (var value in Enum.GetValues(typeof(TimeIdentifier)).Cast<TimeIdentifier>())
             {
-                return code;
+                if (value.GetEnumLabel().Equals(timeIdentifier, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return value;
+                }
             }
 
             throw new ArgumentException("Unexpected value: " + timeIdentifier);
@@ -216,12 +152,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 GetLocalAuthority(line, headers),
                 GetLocalAuthorityDistrict(line, headers),
                 GetLocalEnterprisePartnership(line, headers),
-                GetMat(line, headers),
                 GetMayoralCombinedAuthority(line, headers),
+                GetMultiAcademyTrust(line, headers),
                 GetOpportunityArea(line, headers),
                 GetParliamentaryConstituency(line, headers),
                 GetRegion(line, headers),
                 GetRscRegion(line, headers),
+                GetSponsor(line, headers),
                 GetWard(line, headers)
             ).Id;
         }
@@ -290,20 +227,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 new LocalEnterprisePartnership(values[0], values[1]));
         }
 
-        private static Mat GetMat(IReadOnlyList<string> line,
-            List<string> headers)
-        {
-            var columns = new[] {"trust_id", "trust_name"};
-            return CsvUtil.BuildType(line, headers, columns, values =>
-                new Mat(values[0], values[1]));
-        }
-
         private static MayoralCombinedAuthority GetMayoralCombinedAuthority(IReadOnlyList<string> line,
             List<string> headers)
         {
             var columns = new[] {"mayoral_combined_authority_code", "mayoral_combined_authority_name"};
             return CsvUtil.BuildType(line, headers, columns, values =>
                 new MayoralCombinedAuthority(values[0], values[1]));
+        }
+
+        private static Mat GetMultiAcademyTrust(IReadOnlyList<string> line,
+            List<string> headers)
+        {
+            var columns = new[] {"trust_id", "trust_name"};
+            return CsvUtil.BuildType(line, headers, columns, values =>
+                new Mat(values[0], values[1]));
         }
 
         private static OpportunityArea GetOpportunityArea(IReadOnlyList<string> line,
@@ -340,6 +277,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private static RscRegion GetRscRegion(IReadOnlyList<string> line, List<string> headers)
         {
             return CsvUtil.BuildType(line, headers, "rsc_region_lead_name", value => new RscRegion(value));
+        }
+
+        private static Sponsor GetSponsor(IReadOnlyList<string> line, List<string> headers)
+        {
+            var columns = new[] {"sponsor_id", "sponsor_name"};
+            return CsvUtil.BuildType(line, headers, columns, values =>
+                new Sponsor(values[0], values[1]));
         }
 
         private static Ward GetWard(IReadOnlyList<string> line,
