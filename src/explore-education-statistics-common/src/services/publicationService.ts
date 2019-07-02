@@ -69,13 +69,10 @@ export interface DataLabelConfigurationItem {
   unit: string;
 }
 
-export interface ChartConfigurationOptions {
-  dataLabels: Dictionary<DataLabelConfigurationItem>;
-}
-
 export interface Chart {
   type: ChartType;
   dataSets: ChartDataSet[];
+  dataLabels: Dictionary<DataLabelConfigurationItem>;
   xAxis?: Axis;
   yAxis?: Axis;
   stacked?: boolean;

@@ -458,6 +458,26 @@ export default class PrototypePublicationService {
               { indicator: '26', filters: ['1', '2'] },
               { indicator: '28', filters: ['1', '2'] },
             ],
+            dataLabels: {
+              '23_1_2': {
+                name: '23_1_2',
+                unit: '%',
+                value: '23_1_2',
+                label: 'Unauthorised absence',
+              },
+              '26_1_2': {
+                name: '26_1_2',
+                unit: '%',
+                value: '26_1_2',
+                label: 'Overall absence',
+              },
+              '28_1_2': {
+                name: '28_1_2',
+                unit: '%',
+                value: '28_1_2',
+                label: 'Authorised absence',
+              },
+            },
             xAxis: { title: 'School Year' },
             yAxis: { title: 'Absence Rate' },
             type: 'line',

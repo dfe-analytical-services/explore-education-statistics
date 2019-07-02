@@ -1,8 +1,8 @@
 import {
   Axis,
-  ChartConfigurationOptions,
   ChartDataSet,
   ChartType,
+  DataLabelConfigurationItem,
   ReferenceLine,
 } from '@common/services/publicationService';
 import React, { ReactNode } from 'react';
@@ -27,14 +27,13 @@ export interface ChartProps {
   data: DataBlockData;
   meta: DataBlockMetadata;
   dataSets: ChartDataSet[];
+  dataLabels: Dictionary<DataLabelConfigurationItem>;
 
-  labels: { [key: string]: string };
   xAxis: Axis;
   yAxis: Axis;
   height?: number;
   width?: number;
   referenceLines?: ReferenceLine[];
-  configuration: ChartConfigurationOptions;
 }
 
 export interface ChartData {
@@ -285,7 +284,7 @@ const ChartFunctions = {
           newChartDataMap[dataKey] = [
             ...(newChartDataMap[dataKey] || []),
             {
-              name: currentIndicator,
+              name: `${currentIndicator}_${result.filters.join('_')}`,
               indicator: currentIndicator,
               value: result.measures[currentIndicator],
             },

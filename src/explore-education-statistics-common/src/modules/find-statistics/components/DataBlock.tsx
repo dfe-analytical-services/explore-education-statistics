@@ -19,13 +19,11 @@ import DataBlockService, {
 } from '@common/services/dataBlockService';
 import {
   Chart,
-  DataLabelConfigurationItem,
   DataQuery,
   Summary,
   Table,
 } from '@common/services/publicationService';
 import React, { Component, ReactNode } from 'react';
-import { Dictionary } from '@common/types';
 import DownloadDetails from './DownloadDetails';
 
 export interface DataBlockProps {
@@ -109,31 +107,6 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
         yAxis: { title: '' },
 
         ...chart,
-
-        // This is a hack, to get current charts working with the new Admin stuff
-        // TODO: Get the configuration from the API instead of mapping it here
-        configuration: {
-          dataLabels: data.result.reduce<
-            Dictionary<DataLabelConfigurationItem>
-          >(
-            (dataLabels, result) => ({
-              ...dataLabels,
-              ...Object.keys(result.measures).reduce<
-                Dictionary<DataLabelConfigurationItem>
-              >(
-                (measureLabels, measureId) => ({
-                  ...measureLabels,
-                  [`${measureId}_${result.filters.join('_')}`]: {
-                    ...meta.indicators[measureId],
-                    name: measureId,
-                  },
-                }),
-                {},
-              ),
-            }),
-            {},
-          ),
-        },
 
         data,
         meta,

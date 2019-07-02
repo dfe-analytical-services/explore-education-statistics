@@ -9,7 +9,6 @@ import ChartDataSelector, {
 } from '@admin/modules/chart-builder/ChartDataSelector';
 import {
   ChartDataSet,
-  ChartConfigurationOptions,
   DataLabelConfigurationItem,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
@@ -49,14 +48,14 @@ const ChartBuilder = ({ data }: Props) => {
     setDataSets(addedData);
   };
 
-  const [chartConfiguration, setChartConfiguration] = React.useState<
-    ChartConfigurationOptions
-  >({ dataLabels: {} });
+  const [dataLabels, setDataLabels] = React.useState<
+    Dictionary<DataLabelConfigurationItem>
+  >({});
 
   const onDataLabelsChange = (
-    dataLabels: Dictionary<DataLabelConfigurationItem>,
+    _dataLabels: Dictionary<DataLabelConfigurationItem>,
   ) => {
-    setChartConfiguration({ ...chartConfiguration, dataLabels });
+    setDataLabels(_dataLabels);
   };
 
   React.useEffect(() => {
@@ -103,7 +102,7 @@ const ChartBuilder = ({ data }: Props) => {
               meta={data.metaData}
               xAxis={{ title: '' }}
               yAxis={{ title: '' }}
-              configuration={chartConfiguration}
+              dataLabels={dataLabels}
             />
           </Details>
 

@@ -3,9 +3,9 @@ import LineChartBlock from '@common/modules/find-statistics/components/charts/Li
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
 import {
   Axis,
-  ChartConfigurationOptions,
   ChartDataSet,
   ChartType,
+  DataLabelConfigurationItem,
   ReferenceLine,
 } from '@common/services/publicationService';
 import dynamic from 'next-server/dynamic';
@@ -14,6 +14,7 @@ import {
   DataBlockData,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
+import { Dictionary } from '@common/types';
 
 const DynamicMapBlock = dynamic(
   () => import('@common/modules/find-statistics/components/charts/MapBlock'),
@@ -33,7 +34,7 @@ export interface ChartRendererProps {
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
   dataSets: ChartDataSet[];
-  configuration: ChartConfigurationOptions;
+  dataLabels: Dictionary<DataLabelConfigurationItem>;
 }
 
 function ChartRenderer(props: ChartRendererProps) {
@@ -48,7 +49,7 @@ function ChartRenderer(props: ChartRendererProps) {
     xAxis = { title: '' },
     yAxis = { title: '' },
     dataSets,
-    configuration,
+    dataLabels,
   } = props;
 
   const labels = Object.entries(meta.indicators).reduce(
@@ -79,7 +80,7 @@ function ChartRenderer(props: ChartRendererProps) {
     width,
     referenceLines,
     dataSets,
-    configuration,
+    dataLabels,
     stacked,
   };
 
