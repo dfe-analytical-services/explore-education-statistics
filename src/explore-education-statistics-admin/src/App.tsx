@@ -3,8 +3,13 @@ import { Route } from 'react-router';
 
 import './App.scss';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
-import EditReleasePage from '@admin/pages/EditReleasePage';
 import { BrowserRouter } from 'react-router-dom';
+import EditReleaseSetupPage from '@admin/pages/edit-release/EditReleaseSetupPage';
+import EditReleaseDataPage from '@admin/pages/edit-release/EditReleaseDataPage';
+import EditReleaseBuildTablesPage from '@admin/pages/edit-release/EditReleaseBuildTablesPage';
+import EditReleaseTablesPage from '@admin/pages/edit-release/EditReleaseTablesPage';
+import EditReleaseContentPage from '@admin/pages/edit-release/EditReleaseContentPage';
+import EditReleasePublishStatusPage from '@admin/pages/edit-release/EditReleasePublishStatusPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
@@ -44,13 +49,33 @@ function App() {
         <Route exact path="/admin-dashboard" component={AdminDashboardPage} />
 
         <Route
-          path="/edit-release/:releaseId/*"
-          render={props => (
-            <EditReleasePage
-              {...props}
-              releaseId={props.match.params.releaseId}
-            />
-          )}
+          path="/edit-release/:releaseId/setup"
+          component={EditReleaseSetupPage}
+        />
+
+        <Route
+          path="/edit-release/:releaseId/data"
+          component={EditReleaseDataPage}
+        />
+
+        <Route
+          path="/edit-release/:releaseId/build-tables"
+          component={EditReleaseBuildTablesPage}
+        />
+
+        <Route
+          path="/edit-release/:releaseId/tables"
+          component={EditReleaseTablesPage}
+        />
+
+        <Route
+          path="/edit-release/:releaseId/content"
+          component={EditReleaseContentPage}
+        />
+
+        <Route
+          path="/edit-release/:releaseId/publish-status"
+          component={EditReleasePublishStatusPage}
         />
 
         {/* Prototype Routes*/}
