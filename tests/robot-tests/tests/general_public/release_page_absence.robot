@@ -23,13 +23,13 @@ Navigate to Absence publication
 Validate URL
     [Documentation]  DFE-325
     [Tags]  HappyPath
-    ${current_url}=  get location
-    should be equal   ${current_url}   ${url}/statistics/pupil-absence-in-schools-in-england
+    user checks url contains  ${url}/statistics/pupil-absence-in-schools-in-england
 
-Validate Published date and Next update date
+Validate Published date, Next update date, and Email alerts link
     [Tags]     HappyPath
     user checks element contains  css:[data-testid="published-date"]   22 March 2018
     user checks element contains  css:[data-testid="next-update"]      March 2019
+    user checks page contains link with text and url  Sign up for email alerts    /subscriptions?slug=pupil-absence-in-schools-in-england
 
 Validate "About these statistics" -- "For school year"
     [Documentation]  DFE-197 DFE-845
@@ -58,9 +58,30 @@ Validate "About these statistics" -- "Last updated"
     user checks update exists   22 March 2018   First published.
     user closes details dropdown   See all 2 updates
 
+Validate "Related guidance"
+    [Tags]  HappyPath
+    user checks page contains link with text and url  Pupil absence in schools in England: methodology   /methodologies/pupil-absence-in-schools-in-england
+
+Validate subject files file type and file unit style
+    [Documentation]  DFE-958
+    [Tags]  HappyPath   NotAgainstLocal   Failing
+    user opens details dropdown     Download data files
+    user checks page contains      Absence in prus (CSV, 151KB)
+    user closes details dropdown     Download data files
+
+Validate absence_in_prus.csv file can be downloaded
+    [Documentation]  DFE-958
+    [Tags]  HappyPath    NotAgainstLocal
+    user opens details dropdown     Download data files
+
+    download file  link:Absence in prus     absence_in_prus.csv
+    downloaded file should have first line  absence_in_prus.csv   time_identifier,time_period,geographic_level,country_code,country_name,region_code,region_name,old_la_code,new_la_code,la_name,school_type,num_schools,enrolments,sess_possible,sess_overall,sess_authorised,sess_unauthorised,sess_overall_percent,sess_authorised_percent,sess_unauthorised_percent,enrolments_pa10_exact,enrolments_pa10_exact_percent,sess_auth_illness,sess_auth_appointments,sess_auth_religious,sess_auth_study,sess_auth_traveller,sess_auth_holiday,sess_auth_ext_holiday,sess_auth_excluded,sess_auth_other,sess_auth_totalreasons,sess_unauth_holiday,sess_unauth_late,sess_unauth_other,sess_unauth_noyet,sess_unauth_totalreasons,sess_overall_totalreasons
+
+    user closes details dropdown     Download data files
+
 Validate Key Statistics data block -- Summary tab
-    [Documentation]     DFE-915
-    [Tags]  HappyPath   Failing
+    [Documentation]  DFE-915
+    [Tags]  HappyPath       Failing
     user checks key stat tile contents   Overall absence rate         4.7%   Up from 4.6% in 2015/16
     user checks key stat tile contents   Authorised absence rate      3.4%   Similar to previous years
     user checks key stat tile contents   Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
@@ -87,9 +108,9 @@ Validate accordion sections order
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
     [Documentation]  DFE-898
-    [Tags]  HappyPath    Failing
+    [Tags]  HappyPath       Failing
     user clicks link    Create tables
     user waits until page contains  Create your own tables online
     user clicks button   css:#publicationForm-submit
     user waits until page contains  Choose a subject
-    user checks previous table tool step contains  css:#tableTool-steps-step-1   Publication   Pupil absence in schools in England
+    user checks previous table tool step contains  1   Publication   Pupil absence in schools in England

@@ -88,6 +88,7 @@ else:
     if args.env == 'local':
         url = "http://localhost:3000"
         urlAdmin = "http://localhost:3001"
+        robotArgs += ['--exclude', 'NotAgainstLocal']
     else:
         load_dotenv(os.path.join(os.path.dirname(__file__), '.env.' + args.env))
         url = os.getenv('publicAppUrl')
