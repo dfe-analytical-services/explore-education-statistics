@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                         TopicId = new Guid("0144e3f2-41e1-4aec-9c55-2671f454c85f"),
                         Slug = "publication-a",
                         Summary = "first publication",
-                        Methodologies = methodologies.Where(m => m.PublicationId == new Guid("ed70afba-f7e1-4ab3-bded-74d078b6fca0")).ToList()
+                        Methodology = methodologies.Find(m => m.PublicationId == new Guid("ed70afba-f7e1-4ab3-bded-74d078b6fca0"))                        
                     },
                     new Publication
                     {
@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                         TopicId = new Guid("0144e3f2-41e1-4aec-9c55-2671f454c85f"),
                         Slug = "publication-b",
                         Summary = "second publication",
-                        Methodologies = methodologies.Where(m => m.PublicationId == new Guid("e45cf030-f29b-42c3-8270-3cc8267026f0")).ToList()
+                        Methodology = methodologies.Find(m => m.PublicationId == new Guid("e45cf030-f29b-42c3-8270-3cc8267026f0"))
 
                     },
                 };
