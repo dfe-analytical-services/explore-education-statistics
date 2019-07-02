@@ -10,14 +10,7 @@ import { Dictionary } from '@common/types/util';
 import sortBy from 'lodash/sortBy';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import FixedHeaderGroupedDataTable from './FixedHeaderGroupedDataTable';
-import TableHeadersForm from './TableHeadersForm';
-
-interface TableHeaders {
-  columnGroups: FilterOption[][];
-  columns: TimePeriod[];
-  rowGroups: FilterOption[][];
-  rows: IndicatorOption[];
-}
+import TableHeadersForm, { TableHeadersFormValues } from './TableHeadersForm';
 
 interface Props {
   indicators: IndicatorOption[];
@@ -40,29 +33,28 @@ const TimePeriodDataTable = ({
 }: Props) => {
   const dataTableRef = useRef<HTMLTableElement>(null);
 
-  const sortedFilters = sortBy(Object.values(filters), [
-    options => options.length,
-  ]);
-
-  const halfwayIndex = Math.floor(sortedFilters.length / 2);
-  const columnGroups = sortedFilters.slice(0, halfwayIndex);
-  const rowGroups = sortedFilters.slice(halfwayIndex);
-
-  const [tableHeaders, setTableHeaders] = useState<TableHeaders>({
-    columnGroups,
-    rowGroups,
-    columns: timePeriods,
-    rows: indicators,
+  const [tableHeaders, setTableHeaders] = useState<TableHeadersFormValues>({
+    columnGroups: [],
+    columns: [],
+    rowGroups: [],
+    rows: [],
   });
 
   useEffect(() => {
+    const sortedFilters = sortBy(Object.values(filters), [
+      options => options.length,
+    ]);
+
+    const halfwayIndex = Math.floor(sortedFilters.length / 2);
+    const columnGroups = sortedFilters.slice(0, halfwayIndex);
+    const rowGroups = sortedFilters.slice(halfwayIndex);
+
     setTableHeaders({
       columnGroups,
       rowGroups,
       columns: timePeriods,
       rows: indicators,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, timePeriods, indicators]);
 
   const startLabel = timePeriods[0].label;
@@ -156,7 +148,7 @@ const TimePeriodDataTable = ({
       <TableHeadersForm
         initialValues={tableHeaders}
         onSubmit={value => {
-          setTableHeaders(value as TableHeaders);
+          setTableHeaders(value);
 
           if (dataTableRef.current) {
             dataTableRef.current.scrollIntoView({

@@ -12,11 +12,11 @@ import { SortableOption } from './FormSortableList';
 import styles from './TableHeadersForm.module.scss';
 
 interface Props {
-  initialValues: FormValues;
-  onSubmit: (values: FormValues) => void;
+  initialValues: TableHeadersFormValues;
+  onSubmit: (values: TableHeadersFormValues) => void;
 }
 
-export interface FormValues {
+export interface TableHeadersFormValues {
   columnGroups: SortableOption[][];
   columns: SortableOption[];
   rowGroups: SortableOption[][];
@@ -32,10 +32,10 @@ const TableHeadersForm = (props: Props) => {
         Drag and drop the options below to re-order the table headers.
       </p>
 
-      <Formik<FormValues>
+      <Formik<TableHeadersFormValues>
         enableReinitialize
         initialValues={initialValues}
-        validationSchema={Yup.object<FormValues>({
+        validationSchema={Yup.object<TableHeadersFormValues>({
           rowGroups: Yup.array()
             .of(
               Yup.array()
@@ -58,7 +58,7 @@ const TableHeadersForm = (props: Props) => {
             .ensure(),
         })}
         onSubmit={onSubmit}
-        render={(form: FormikProps<FormValues>) => {
+        render={(form: FormikProps<TableHeadersFormValues>) => {
           return (
             <Form>
               <DragDropContext
@@ -106,7 +106,7 @@ const TableHeadersForm = (props: Props) => {
               >
                 <div className={styles.axisContainer}>
                   <FormFieldSortableListGroup<
-                    Pick<FormValues, 'columnGroups' | 'rowGroups'>
+                    Pick<TableHeadersFormValues, 'columnGroups' | 'rowGroups'>
                   >
                     name="rowGroups"
                     legend="Row groups"
@@ -115,7 +115,7 @@ const TableHeadersForm = (props: Props) => {
 
                   <div className={styles.rowColContainer}>
                     <div className={styles.list}>
-                      <FormFieldSortableList<FormValues>
+                      <FormFieldSortableList<TableHeadersFormValues>
                         name="rows"
                         id="sort-rows"
                         legend="Rows"
@@ -126,7 +126,7 @@ const TableHeadersForm = (props: Props) => {
 
                 <div className={styles.axisContainer}>
                   <FormFieldSortableListGroup<
-                    Pick<FormValues, 'columnGroups' | 'rowGroups'>
+                    Pick<TableHeadersFormValues, 'columnGroups' | 'rowGroups'>
                   >
                     name="columnGroups"
                     legend="Column groups"
@@ -135,7 +135,7 @@ const TableHeadersForm = (props: Props) => {
 
                   <div className={styles.rowColContainer}>
                     <div className={styles.list}>
-                      <FormFieldSortableList<FormValues>
+                      <FormFieldSortableList<TableHeadersFormValues>
                         name="columns"
                         id="sort-columns"
                         legend="Columns"
