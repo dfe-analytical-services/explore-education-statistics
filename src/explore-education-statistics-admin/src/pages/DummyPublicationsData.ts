@@ -4,11 +4,14 @@ import {
   Publication,
   Release,
   ReleaseDataType,
+  ReleaseSetupDetails,
   Theme,
   TimePeriod,
   Topic,
 } from '@admin/services/publicationService';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
+import { format } from 'date-fns';
+import React from 'react';
 
 const methodologies: Methodology[] = [
   {
@@ -282,17 +285,35 @@ const myPublications: Publication[] = [
 const inProgressPublications: Publication[] = [inProgressPublication1];
 const allPublications = [...myPublications, ...inProgressPublications];
 
+const getReleaseById = (id: string): Release => {
+  const allReleases = allPublications.flatMap(
+    publication => publication.releases,
+  );
+  return allReleases.filter(release => release.id === id)[0];
+};
+
+const getOwningPublicationForRelease = (release: Release) => {
+  return allPublications.filter(publication =>
+    publication.releases.includes(release),
+  )[0];
+};
+
+const getReleaseSetupDetails = (releaseId: string): ReleaseSetupDetails => {
+  const release = getReleaseById(releaseId);
+  const owningPublication = getOwningPublicationForRelease(release);
+
+  return {
+    publicationTitle: owningPublication.title,
+    releaseType: release.timePeriodCoverage.label,
+    releaseName: release.releaseName,
+    leadStatisticianName: release.lead.name,
+    scheduledReleaseDate: release.scheduledReleaseDate,
+  };
+};
+
 export default {
   allPublications,
-  getReleaseById(id: string): Release {
-    const allReleases = allPublications.flatMap(
-      publication => publication.releases,
-    );
-    return allReleases.filter(release => release.id === id)[0];
-  },
-  getOwningPublicationForRelease(release: Release) {
-    return allPublications.find(publication =>
-      publication.releases.includes(release),
-    );
-  },
+  getReleaseById,
+  getOwningPublicationForRelease,
+  getReleaseSetupDetails,
 };

@@ -5,7 +5,7 @@ import EditReleasePageTemplate, {
   ReleaseSection,
 } from '@admin/pages/edit-release/components/EditReleasePageTemplate';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
-import { Release } from '../../services/publicationService';
+import { ReleaseSetupDetails } from '../../services/publicationService';
 import Link from '../../components/Link';
 
 interface MatchProps {
@@ -15,54 +15,56 @@ interface MatchProps {
 const EditReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
-  const [release, setRelease] = useState<Release>();
-
-  const [publicationTitle, setPublicationTitle] = useState('');
+  const [releaseSetupDetails, setReleaseSetupDetails] = useState<
+    ReleaseSetupDetails
+  >();
 
   useEffect(() => {
-    const selectedRelease = DummyPublicationsData.getReleaseById(releaseId);
-
-    const owningPublication = DummyPublicationsData.getOwningPublicationForRelease(
-      selectedRelease,
+    setReleaseSetupDetails(
+      DummyPublicationsData.getReleaseSetupDetails(releaseId),
     );
-
-    setRelease(selectedRelease);
-
-    setPublicationTitle(owningPublication ? owningPublication.title : '');
   }, [releaseId]);
 
   return (
     <EditReleasePageTemplate
-      publicationTitle={publicationTitle}
+      publicationTitle={
+        releaseSetupDetails ? releaseSetupDetails.publicationTitle : ''
+      }
       releaseId={releaseId}
       selectedSection={ReleaseSection.ReleaseSetup}
     >
       <h2 className="govuk-heading-m">Release setup summary</h2>
 
-      {release && (
+      {releaseSetupDetails && (
         <dl className="govuk-summary-list govuk-!-margin-bottom-9">
           <div className="govuk-summary-list__row">
             <dt className="govuk-summary-list__key">Publication title</dt>
-            <dd className="govuk-summary-list__value">{publicationTitle}</dd>
+            <dd className="govuk-summary-list__value">
+              {releaseSetupDetails.publicationTitle}
+            </dd>
           </div>
           <div className="govuk-summary-list__row">
             <dt className="govuk-summary-list__key">Release type</dt>
             <dd className="govuk-summary-list__value">
-              {release.timePeriodCoverage.label}
+              {releaseSetupDetails.releaseType}
             </dd>
           </div>
           <div className="govuk-summary-list__row">
             <dt className="govuk-summary-list__key">Release period</dt>
-            <dd className="govuk-summary-list__value">{release.releaseName}</dd>
+            <dd className="govuk-summary-list__value">
+              {releaseSetupDetails.releaseName}
+            </dd>
           </div>
           <div className="govuk-summary-list__row">
             <dt className="govuk-summary-list__key">Lead statistician</dt>
-            <dd className="govuk-summary-list__value">{release.lead.name}</dd>
+            <dd className="govuk-summary-list__value">
+              {releaseSetupDetails.leadStatisticianName}
+            </dd>
           </div>
           <div className="govuk-summary-list__row">
             <dt className="govuk-summary-list__key">Scheduled release</dt>
             <dd className="govuk-summary-list__value">
-              {format(release.scheduledReleaseDate, 'd MMMM yyyy')}
+              {format(releaseSetupDetails.scheduledReleaseDate, 'd MMMM yyyy')}
             </dd>
           </div>
           <div className="govuk-summary-list__row">

@@ -107,3 +107,11 @@ export interface Publication {
   methodology: Methodology;
   owner: User;
 }
+
+export interface ReleaseSetupDetails {
+  publicationTitle: string;
+  releaseType: string;
+  releaseName: string;
+  leadStatisticianName: string;
+  scheduledReleaseDate: Date;
+}
