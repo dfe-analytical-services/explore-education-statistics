@@ -2843,7 +2843,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new ContentSection
                         {
-                            Heading = "Annex A - Glossary",
+                            Heading = "Annex A - Calculations",
                             Caption = "",
                             Order = 1,
                             Content = new List<IContentBlock>
@@ -2857,7 +2857,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
-                            Heading = "Annex B - Calculations",
+                            Heading = "Annex B - School attendance codes",
                             Caption = "",
                             Order = 2,
                             Content = new List<IContentBlock>
@@ -2871,7 +2871,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
-                            Heading = "Annex C - School attendance codes",
+                            Heading = "Annex C - Links to pupil absence national statistics and data",
                             Caption = "",
                             Order = 3,
                             Content = new List<IContentBlock>
@@ -2885,7 +2885,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
-                            Heading = "Annex D - Links to pupil absence national statistics and data",
+                            Heading = "Annex D - Standard breakdowns",
                             Caption = "",
                             Order = 4,
                             Content = new List<IContentBlock>
@@ -2899,7 +2899,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
-                            Heading = "Annex E - Standard breakdowns",
+                            Heading = "Annex E - Timeline",
                             Caption = "",
                             Order = 5,
                             Content = new List<IContentBlock>
@@ -2913,7 +2913,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
-                            Heading = "Annex F - Timeline",
+                            Heading = "Annex F - Absence rates over time",
                             Caption = "",
                             Order = 6,
                             Content = new List<IContentBlock>
