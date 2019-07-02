@@ -82,7 +82,6 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                   </ul>
                   <section class="govuk-tabs__panel dfe-content-overflow panel"
                            id="table-preview"
-                           data-testid="Table preview"
                            aria-labelledby="table-preview-tab"
                            role="tabpanel"
                            tabindex="-1"
@@ -219,7 +218,6 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                   </section>
                   <section class="govuk-tabs__panel dfe-content-overflow panel govuk-tabs__panel--hidden"
                            id="add-chart"
-                           data-testid="Add a chart"
                            aria-labelledby="add-chart-tab"
                            role="tabpanel"
                            tabindex="-1"
@@ -227,8 +225,6 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                     <h3>
                       Add a chart
                     </h3>
-                    <div>
-                    </div>
                   </section>
                 </div>
               </div>
@@ -286,7 +282,6 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                   </ul>
                   <section class="govuk-tabs__panel dfe-content-overflow panel"
                            id="table-preview"
-                           data-testid="Table preview"
                            aria-labelledby="table-preview-tab"
                            role="tabpanel"
                            tabindex="-1"
@@ -423,7 +418,6 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                   </section>
                   <section class="govuk-tabs__panel dfe-content-overflow panel govuk-tabs__panel--hidden"
                            id="add-chart"
-                           data-testid="Add a chart"
                            aria-labelledby="add-chart-tab"
                            role="tabpanel"
                            tabindex="-1"
@@ -431,8 +425,6 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                     <h3>
                       Add a chart
                     </h3>
-                    <div>
-                    </div>
                   </section>
                 </div>
               </div>
@@ -490,7 +482,6 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                   </ul>
                   <section class="govuk-tabs__panel dfe-content-overflow panel"
                            id="table-preview"
-                           data-testid="Table preview"
                            aria-labelledby="table-preview-tab"
                            role="tabpanel"
                            tabindex="-1"
@@ -627,7 +618,6 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                   </section>
                   <section class="govuk-tabs__panel dfe-content-overflow panel govuk-tabs__panel--hidden"
                            id="add-chart"
-                           data-testid="Add a chart"
                            aria-labelledby="add-chart-tab"
                            role="tabpanel"
                            tabindex="-1"
@@ -635,8 +625,6 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                     <h3>
                       Add a chart
                     </h3>
-                    <div>
-                    </div>
                   </section>
                 </div>
               </div>
@@ -694,7 +682,6 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                   </ul>
                   <section class="govuk-tabs__panel dfe-content-overflow panel"
                            id="table-preview"
-                           data-testid="Table preview"
                            aria-labelledby="table-preview-tab"
                            role="tabpanel"
                            tabindex="-1"
@@ -831,7 +818,6 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                   </section>
                   <section class="govuk-tabs__panel dfe-content-overflow panel govuk-tabs__panel--hidden"
                            id="add-chart"
-                           data-testid="Add a chart"
                            aria-labelledby="add-chart-tab"
                            role="tabpanel"
                            tabindex="-1"
@@ -839,8 +825,6 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                     <h3>
                       Add a chart
                     </h3>
-                    <div>
-                    </div>
                   </section>
                 </div>
               </div>

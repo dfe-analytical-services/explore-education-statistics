@@ -380,10 +380,35 @@ exports[`LineChartBlock renders with correct output 1`] = `
             fill="none"
             height="240"
             stroke="#4763a5"
-            stroke-dasharray="0px 0px"
             stroke-width="5"
             width="790"
           />
+          <g
+            class="recharts-layer recharts-line-dots"
+          >
+            <path
+              class="recharts-symbols"
+              d="M4.51351666838205,0A4.51351666838205,4.51351666838205,0,1,1,-4.51351666838205,0A4.51351666838205,4.51351666838205,0,1,1,4.51351666838205,0"
+              fill="#4763a5"
+              height="240"
+              r="3"
+              stroke="#4763a5"
+              stroke-width="5"
+              transform="translate(100, 101)"
+              width="790"
+            />
+            <path
+              class="recharts-symbols"
+              d="M4.51351666838205,0A4.51351666838205,4.51351666838205,0,1,1,-4.51351666838205,0A4.51351666838205,4.51351666838205,0,1,1,4.51351666838205,0"
+              fill="#4763a5"
+              height="240"
+              r="3"
+              stroke="#4763a5"
+              stroke-width="5"
+              transform="translate(850, 101)"
+              width="790"
+            />
+          </g>
         </g>
         <g
           class="recharts-layer recharts-line"
@@ -394,10 +419,35 @@ exports[`LineChartBlock renders with correct output 1`] = `
             fill="none"
             height="240"
             stroke="#f5a450"
-            stroke-dasharray="0px 0px"
             stroke-width="5"
             width="790"
           />
+          <g
+            class="recharts-layer recharts-line-dots"
+          >
+            <path
+              class="recharts-symbols"
+              d="M-4,-4h8v8h-8Z"
+              fill="#f5a450"
+              height="240"
+              r="3"
+              stroke="#f5a450"
+              stroke-width="5"
+              transform="translate(100, -235)"
+              width="790"
+            />
+            <path
+              class="recharts-symbols"
+              d="M-4,-4h8v8h-8Z"
+              fill="#f5a450"
+              height="240"
+              r="3"
+              stroke="#f5a450"
+              stroke-width="5"
+              transform="translate(850, -235)"
+              width="790"
+            />
+          </g>
         </g>
         <g
           class="recharts-layer recharts-line"
@@ -408,10 +458,35 @@ exports[`LineChartBlock renders with correct output 1`] = `
             fill="none"
             height="240"
             stroke="#005ea5"
-            stroke-dasharray="0px 0px"
             stroke-width="5"
             width="790"
           />
+          <g
+            class="recharts-layer recharts-line-dots"
+          >
+            <path
+              class="recharts-symbols"
+              d="M0,-7.019061402413294L6.07868548521274,3.509530701206647L-6.07868548521274,3.509530701206647Z"
+              fill="#005ea5"
+              height="240"
+              r="3"
+              stroke="#005ea5"
+              stroke-width="5"
+              transform="translate(100, 5)"
+              width="790"
+            />
+            <path
+              class="recharts-symbols"
+              d="M0,-7.019061402413294L6.07868548521274,3.509530701206647L-6.07868548521274,3.509530701206647Z"
+              fill="#005ea5"
+              height="240"
+              r="3"
+              stroke="#005ea5"
+              stroke-width="5"
+              transform="translate(850, 5)"
+              width="790"
+            />
+          </g>
         </g>
       </svg>
       <div
@@ -444,7 +519,7 @@ exports[`LineChartBlock renders with correct output 1`] = `
             <span
               class="recharts-legend-item-text"
             >
-              Unauthorised absence rate
+              value
             </span>
           </li>
           <li
@@ -469,7 +544,7 @@ exports[`LineChartBlock renders with correct output 1`] = `
             <span
               class="recharts-legend-item-text"
             >
-              Overall absence rate
+              value
             </span>
           </li>
           <li
@@ -494,7 +569,7 @@ exports[`LineChartBlock renders with correct output 1`] = `
             <span
               class="recharts-legend-item-text"
             >
-              Authorised absence rate
+              value
             </span>
           </li>
         </ul>
