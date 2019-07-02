@@ -2812,6 +2812,46 @@ const AbstractChartProps: ChartProps = {
     { indicator: '26', filters: ['1', '2'] },
     { indicator: '28', filters: ['1', '2'] },
   ],
+  configuration: {
+    dataLabels: {
+      '23': {
+        label: metaData.indicators['23'].label,
+        name: '23',
+        unit: '%',
+        value: '23',
+      },
+      '26': {
+        label: metaData.indicators['26'].label,
+        name: '26',
+        unit: '%',
+        value: '26',
+      },
+      '28': {
+        label: metaData.indicators['28'].label,
+        name: '28',
+        unit: '%',
+        value: '28',
+      },
+      '23_1_2': {
+        label: metaData.indicators['23'].label,
+        name: '23_1_2',
+        unit: '%',
+        value: '23_1_2',
+      },
+      '26_1_2': {
+        label: metaData.indicators['26'].label,
+        name: '26_1_2',
+        unit: '%',
+        value: '26_1_2',
+      },
+      '28_1_2': {
+        label: metaData.indicators['28'].label,
+        name: '28_1_2',
+        unit: '%',
+        value: '28_1_2',
+      },
+    },
+  },
   xAxis: { title: 'test x axis' },
   yAxis: { title: 'test y axis' },
 };
@@ -2825,6 +2865,46 @@ const AbstractMultipleChartProps: ChartProps = {
     { indicator: '26', filters: ['1', '2'] },
     { indicator: '28', filters: ['1', '2'] },
   ],
+  configuration: {
+    dataLabels: {
+      '23': {
+        label: metaData.indicators['23'].label,
+        name: '23',
+        unit: '%',
+        value: '23',
+      },
+      '26': {
+        label: metaData.indicators['26'].label,
+        name: '26',
+        unit: '%',
+        value: '26',
+      },
+      '28': {
+        label: metaData.indicators['28'].label,
+        name: '28',
+        unit: '%',
+        value: '28',
+      },
+      '23_1_2': {
+        label: metaData.indicators['23'].label,
+        name: '23_1_2',
+        unit: '%',
+        value: '23_1_2',
+      },
+      '26_1_2': {
+        label: metaData.indicators['26'].label,
+        name: '26_1_2',
+        unit: '%',
+        value: '26_1_2',
+      },
+      '28_1_2': {
+        label: metaData.indicators['28'].label,
+        name: '28_1_2',
+        unit: '%',
+        value: '28_1_2',
+      },
+    },
+  },
   xAxis: { title: 'test x axis' },
   yAxis: { title: 'test y axis' },
 };

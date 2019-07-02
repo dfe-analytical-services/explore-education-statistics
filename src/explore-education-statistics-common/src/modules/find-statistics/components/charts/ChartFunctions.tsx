@@ -34,7 +34,7 @@ export interface ChartProps {
   height?: number;
   width?: number;
   referenceLines?: ReferenceLine[];
-  configuration?: ChartConfigurationOptions;
+  configuration: ChartConfigurationOptions;
 }
 
 export interface ChartData {

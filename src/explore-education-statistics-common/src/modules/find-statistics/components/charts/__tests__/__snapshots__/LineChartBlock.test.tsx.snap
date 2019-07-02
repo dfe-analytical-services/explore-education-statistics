@@ -519,7 +519,7 @@ exports[`LineChartBlock renders with correct output 1`] = `
             <span
               class="recharts-legend-item-text"
             >
-              value
+              Unauthorised absence rate
             </span>
           </li>
           <li
@@ -544,7 +544,7 @@ exports[`LineChartBlock renders with correct output 1`] = `
             <span
               class="recharts-legend-item-text"
             >
-              value
+              Overall absence rate
             </span>
           </li>
           <li
@@ -569,7 +569,7 @@ exports[`LineChartBlock renders with correct output 1`] = `
             <span
               class="recharts-legend-item-text"
             >
-              value
+              Authorised absence rate
             </span>
           </li>
         </ul>

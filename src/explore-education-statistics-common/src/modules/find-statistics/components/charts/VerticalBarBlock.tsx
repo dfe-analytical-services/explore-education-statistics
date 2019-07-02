@@ -39,7 +39,16 @@ export default class VerticalBarBlock extends Component<ChartProps> {
   };
 
   public render() {
-    const { data, height, xAxis, yAxis, width, meta, dataSets } = this.props;
+    const {
+      data,
+      height,
+      xAxis,
+      yAxis,
+      width,
+      meta,
+      dataSets,
+      configuration,
+    } = this.props;
 
     if (dataSets === undefined) return <div />;
 
@@ -82,8 +91,14 @@ export default class VerticalBarBlock extends Component<ChartProps> {
               key={dataKey}
               dataKey={dataKey}
               fill={colours[index]}
-              name={meta.indicators[dataKey].label || 'a'}
-              unit={meta.indicators[dataKey].unit || 'a'}
+              name={
+                configuration.dataLabels[dataKey] &&
+                configuration.dataLabels[dataKey].label
+              }
+              unit={
+                configuration.dataLabels[dataKey] &&
+                configuration.dataLabels[dataKey].unit
+              }
             />
           ))}
         </BarChart>

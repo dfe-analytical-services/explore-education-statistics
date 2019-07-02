@@ -69,64 +69,29 @@ function ChartRenderer(props: ChartRendererProps) {
     return 0;
   });
 
+  const chartProps = {
+    data,
+    meta,
+    labels,
+    xAxis,
+    yAxis,
+    height,
+    width,
+    referenceLines,
+    dataSets,
+    configuration,
+    stacked,
+  };
+
   switch (type.toLowerCase()) {
     case 'line':
-      return (
-        <LineChartBlock
-          data={data}
-          meta={meta}
-          labels={labels}
-          xAxis={xAxis}
-          yAxis={yAxis}
-          height={height}
-          width={width}
-          referenceLines={referenceLines}
-          dataSets={dataSets}
-          configuration={configuration}
-        />
-      );
+      return <LineChartBlock {...chartProps} />;
     case 'verticalbar':
-      return (
-        <VerticalBarBlock
-          data={data}
-          meta={meta}
-          labels={labels}
-          xAxis={xAxis}
-          yAxis={yAxis}
-          height={height}
-          width={width}
-          referenceLines={referenceLines}
-          dataSets={dataSets}
-        />
-      );
+      return <VerticalBarBlock {...chartProps} />;
     case 'horizontalbar':
-      return (
-        <HorizontalBarBlock
-          data={data}
-          meta={meta}
-          labels={labels}
-          xAxis={xAxis}
-          yAxis={yAxis}
-          height={height}
-          width={width}
-          stacked={stacked}
-          referenceLines={referenceLines}
-          dataSets={dataSets}
-        />
-      );
+      return <HorizontalBarBlock {...chartProps} />;
     case 'map':
-      return (
-        <DynamicMapBlock
-          data={data}
-          meta={meta}
-          labels={labels}
-          xAxis={xAxis}
-          yAxis={yAxis}
-          height={height}
-          width={width}
-          dataSets={dataSets}
-        />
-      );
+      return <DynamicMapBlock {...chartProps} />;
     default:
       return <div>[ Unimplemented chart type requested ${type} ]</div>;
   }
