@@ -2,8 +2,8 @@ import React from 'react';
 
 import Details from '@common/components/Details';
 import ChartRenderer from '@common/modules/find-statistics/components/ChartRenderer';
-import {DataBlockResponse} from '@common/services/dataBlockService';
-import {ChartDefinition} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { DataBlockResponse } from '@common/services/dataBlockService';
+import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import ChartDataSelector, {
   DataUpdatedEvent,
 } from '@admin/modules/chart-builder/ChartDataSelector';
@@ -12,7 +12,8 @@ import {
   ChartConfigurationOptions,
   DataLabelConfigurationItem,
 } from '@common/services/publicationService';
-import {Dictionary} from '@common/types';
+import { Dictionary } from '@common/types';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import styles from './graph-builder.module.scss';
 import ConstData from '../../pages/prototypes/PrototypeData';
 import ChartTypeSelector from './ChartTypeSelector';
@@ -23,10 +24,12 @@ interface Props {
   data: DataBlockResponse;
 }
 
-const ChartBuilder = ({data}: Props) => {
-  const [selectedChartType, selectChartType] = React.useState<ChartDefinition | undefined>();
+const ChartBuilder = ({ data }: Props) => {
+  const [selectedChartType, selectChartType] = React.useState<
+    ChartDefinition | undefined
+  >();
 
-  const {chartTypes} = ConstData;
+  const { chartTypes } = ConstData;
 
   const indicatorIds = Object.keys(data.metaData.indicators);
 
@@ -47,11 +50,15 @@ const ChartBuilder = ({data}: Props) => {
     setDataSets(addedData);
   };
 
-  const [chartDataLabels, setChartDataLabels] = React.useState<Dictionary<DataLabelConfigurationItem>>({});
+  const [chartDataLabels, setChartDataLabels] = React.useState<
+    Dictionary<DataLabelConfigurationItem>
+  >({});
 
-  const [chartConfiguration, setChartConfiguration] = React.useState<ChartConfigurationOptions>({
+  const [chartConfiguration, setChartConfiguration] = React.useState<
+    ChartConfigurationOptions
+  >({
     dataLabels: {},
-    axes: {}
+    axes: {},
   });
 
   React.useEffect(() => {
@@ -71,7 +78,7 @@ const ChartBuilder = ({data}: Props) => {
     ]);
   }, []);
 
-  if (data === undefined) return <div />;
+  if (data === undefined) return <LoadingSpinner />;
 
   return (
     <div className={styles.editor}>
@@ -103,8 +110,8 @@ const ChartBuilder = ({data}: Props) => {
               dataSets={dataSets}
               data={data}
               meta={data.metaData}
-              xAxis={{title: ''}}
-              yAxis={{title: ''}}
+              xAxis={{ title: '' }}
+              yAxis={{ title: '' }}
               configuration={chartConfiguration}
             />
           </Details>
