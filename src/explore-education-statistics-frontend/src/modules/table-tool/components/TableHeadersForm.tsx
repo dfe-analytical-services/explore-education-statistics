@@ -1,14 +1,13 @@
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
-import { FormFieldset, Formik } from '@common/components/form';
+import { Formik } from '@common/components/form';
 import reorder from '@common/lib/utils/reorder';
-import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
-import classNames from 'classnames';
 import { Form, FormikProps } from 'formik';
 import React from 'react';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext } from 'react-beautiful-dnd';
 import FormFieldSortableList from './FormFieldSortableList';
+import FormFieldSortableListGroup from './FormFieldSortableListGroup';
 import { SortableOption } from './FormSortableList';
 import styles from './TableHeadersForm.module.scss';
 
@@ -60,76 +59,6 @@ const TableHeadersForm = (props: Props) => {
         })}
         onSubmit={onSubmit}
         render={(form: FormikProps<FormValues>) => {
-          const { getError } = createErrorHelper(form);
-
-          const renderDroppableFieldset = (
-            group: 'rowGroups' | 'columnGroups',
-            fieldsetLegend: string,
-            groupLegend: string,
-          ) => {
-            return (
-              <Droppable droppableId={group} direction="horizontal">
-                {(droppableProvided, droppableSnapshot) => (
-                  <div
-                    {...droppableProvided.droppableProps}
-                    ref={droppableProvided.innerRef}
-                    className={classNames(styles.groupsFieldset, {
-                      [styles.groupsFieldsetDraggingOver]:
-                        droppableSnapshot.isDraggingOver,
-                    })}
-                  >
-                    <FormFieldset
-                      id={`tableHeaders-${group}`}
-                      legend={fieldsetLegend}
-                      error={getError(group)}
-                    >
-                      <div className={classNames(styles.listsContainer)}>
-                        {form.values[group].length === 0 && (
-                          <div className="govuk-inset-text govuk-!-margin-0">
-                            Add groups by dragging them here
-                          </div>
-                        )}
-
-                        {form.values[group].map((_, index) => (
-                          <Draggable
-                            draggableId={`${group}-${index}`}
-                            index={index}
-                            // eslint-disable-next-line react/no-array-index-key
-                            key={index}
-                          >
-                            {(draggableProvided, draggableSnapshot) => (
-                              <div
-                                {...draggableProvided.draggableProps}
-                                {...draggableProvided.dragHandleProps}
-                                className={classNames(
-                                  styles.list,
-                                  styles.isDraggable,
-                                  {
-                                    [styles.isDragging]:
-                                      draggableSnapshot.isDragging,
-                                  },
-                                )}
-                                ref={draggableProvided.innerRef}
-                              >
-                                <FormFieldSortableList<FormValues>
-                                  name={`${group}[${index}]`}
-                                  id={`sort-${group}-${index}`}
-                                  legend={`${groupLegend} ${index + 1}`}
-                                  legendSize="s"
-                                />
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-                        {droppableProvided.placeholder}
-                      </div>
-                    </FormFieldset>
-                  </div>
-                )}
-              </Droppable>
-            );
-          };
-
           return (
             <Form>
               <DragDropContext
@@ -176,11 +105,13 @@ const TableHeadersForm = (props: Props) => {
                 }}
               >
                 <div className={styles.axisContainer}>
-                  {renderDroppableFieldset(
-                    'rowGroups',
-                    'Row groups',
-                    'Row group',
-                  )}
+                  <FormFieldSortableListGroup<
+                    Pick<FormValues, 'columnGroups' | 'rowGroups'>
+                  >
+                    name="rowGroups"
+                    legend="Row groups"
+                    groupLegend="Row group"
+                  />
 
                   <div className={styles.rowColContainer}>
                     <div className={styles.list}>
@@ -194,11 +125,13 @@ const TableHeadersForm = (props: Props) => {
                 </div>
 
                 <div className={styles.axisContainer}>
-                  {renderDroppableFieldset(
-                    'columnGroups',
-                    'Column groups',
-                    'Column group',
-                  )}
+                  <FormFieldSortableListGroup<
+                    Pick<FormValues, 'columnGroups' | 'rowGroups'>
+                  >
+                    name="columnGroups"
+                    legend="Column groups"
+                    groupLegend="Column group"
+                  />
 
                   <div className={styles.rowColContainer}>
                     <div className={styles.list}>
