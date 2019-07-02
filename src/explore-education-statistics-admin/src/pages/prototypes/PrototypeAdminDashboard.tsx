@@ -8,17 +8,23 @@ import TabsSection from '@common/components/TabsSection';
 import React from 'react';
 import { RouteChildrenProps } from 'react-router';
 import AdminDashboardInProgress from '@admin/pages/prototypes/components/AdminDashboardInProgress';
+import { LoginContext } from '@admin/components/Login';
 import Link from '../../components/Link';
 import PrototypePage from './components/PrototypePage';
 
 const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
+  const userContext = React.useContext(LoginContext);
   return (
     <PrototypePage wide>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <span className="govuk-caption-xl">Welcome</span>
           <h1 className="govuk-heading-xl">
-            John Smith{' '}
+            {userContext.user && userContext.user.name}
+            {userContext.user &&
+              userContext.user.permissions.includes('team lead') && (
+                <span className="govuk-body-s"> (Team lead)</span>
+              )}{' '}
             <span className="govuk-body-s">
               Not you? <Link to="#">Sign out</Link>
             </span>

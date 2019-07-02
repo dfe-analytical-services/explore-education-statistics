@@ -8,58 +8,71 @@ import {
   FormSelect,
   FormRadioGroup,
 } from '@common/components/form';
+import { LoginContext } from '@admin/components/Login';
 import React from 'react';
 import Link from '@admin/components/Link';
 
 const PrototypeAdminDashboardPublications = () => {
+  const userContext = React.useContext(LoginContext);
   return (
     <>
       <p className="govuk-body">
         Edit an existing release or create a new release for current
         publications.
       </p>
-      <form>
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-one-half">
-            <FormGroup>
-              <FormSelect
-                id="select-theme"
-                label="Select theme"
-                name="select-theme"
-                options={[
-                  { label: 'Pupils and schools', value: 'pupils-schools' },
-                  {
-                    label: 'School and college outcomes and performance',
-                    value: 'school-college-performance',
-                  },
-                ]}
-              />
-            </FormGroup>
-          </div>
-          <div className="govuk-grid-column-one-half">
-            <FormGroup>
-              <FormSelect
-                id="select-theme"
-                label="Select topic"
-                name="select-topic"
-                value="pupil-absence"
-                options={[
-                  { label: 'Admission appeals', value: 'admission-appeals' },
-                  { label: 'Exclusions', value: 'exclusions' },
-                  { label: 'Pupil absence', value: 'pupil-absence' },
-                  {
-                    label: 'Parental responsibility measures',
-                    value: 'parental-repsonsibilty',
-                  },
-                  { label: 'Pupil projections', value: 'pupil-projections' },
-                  { label: 'View all topics', value: 'view-all-topics' },
-                ]}
-              />
-            </FormGroup>
-          </div>
-        </div>
-      </form>
+      {userContext.user && userContext.user.permissions.includes('team lead') && (
+        <>
+          <form>
+            <div className="govuk-grid-row">
+              <div className="govuk-grid-column-one-half">
+                <FormGroup>
+                  <FormSelect
+                    id="select-theme"
+                    label="Select theme"
+                    name="select-theme"
+                    options={[
+                      { label: 'Pupils and schools', value: 'pupils-schools' },
+                      {
+                        label: 'School and college outcomes and performance',
+                        value: 'school-college-performance',
+                      },
+                    ]}
+                  />
+                </FormGroup>
+              </div>
+              <div className="govuk-grid-column-one-half">
+                <FormGroup>
+                  <FormSelect
+                    id="select-theme"
+                    label="Select topic"
+                    name="select-topic"
+                    value="pupil-absence"
+                    options={[
+                      {
+                        label: 'Admission appeals',
+                        value: 'admission-appeals',
+                      },
+                      { label: 'Exclusions', value: 'exclusions' },
+                      { label: 'Pupil absence', value: 'pupil-absence' },
+                      {
+                        label: 'Parental responsibility measures',
+                        value: 'parental-repsonsibilty',
+                      },
+                      {
+                        label: 'Pupil projections',
+                        value: 'pupil-projections',
+                      },
+                      { label: 'View all topics', value: 'view-all-topics' },
+                    ]}
+                  />
+                </FormGroup>
+              </div>
+            </div>
+          </form>
+        </>
+      )}
       <hr />
+
       <h2 className="govuk-heading-l">Pupils and schools</h2>
       <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
         Pupil absence publications
@@ -337,9 +350,11 @@ const PrototypeAdminDashboardPublications = () => {
           </AccordionSection>
         )}
       </Accordion>
-      <Link to="/prototypes/publication-create-new" className="govuk-button">
-        Create a new publication
-      </Link>
+      {userContext.user && userContext.user.permissions.includes('team lead') && (
+        <Link to="/prototypes/publication-create-new" className="govuk-button">
+          Create a new publication
+        </Link>
+      )}
     </>
   );
 };

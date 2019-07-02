@@ -75,11 +75,6 @@ const PageHeader = ({ wide }: Props) => {
                 <li className="govuk-header__navigation-item">
                   <a className="govuk-header__link" href="#">
                     {userContext.user && userContext.user.name}
-
-                    {userContext.user &&
-                      userContext.user.permissions.includes('team lead') && (
-                        <div>Team lead</div>
-                      )}
                   </a>
                 </li>
                 <li className="govuk-header__navigation-item">
