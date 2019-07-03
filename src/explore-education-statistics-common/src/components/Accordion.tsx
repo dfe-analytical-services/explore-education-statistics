@@ -91,7 +91,7 @@ const Accordion = ({ children, id, onToggleAll }: AccordionProps) => {
                   (locationHashEl as HTMLElement).scrollIntoView({
                     block: 'start',
                   }),
-                100,
+                3000,
               );
             }
           }

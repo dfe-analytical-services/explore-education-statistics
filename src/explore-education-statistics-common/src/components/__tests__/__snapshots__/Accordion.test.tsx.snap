@@ -40,11 +40,11 @@ exports[`Accordion renders with hidden content by default 1`] = `
             type="button"
           >
             Test heading
+            <span
+              aria-hidden="true"
+              class="govuk-accordion__icon"
+            />
           </button>
-          <span
-            aria-hidden="true"
-            class="govuk-accordion__icon"
-          />
         </h2>
       </div>
       <div
@@ -109,11 +109,11 @@ exports[`Accordion renders with visible content when \`open\` is true 1`] = `
             type="button"
           >
             Test heading
+            <span
+              aria-hidden="true"
+              class="govuk-accordion__icon"
+            />
           </button>
-          <span
-            aria-hidden="true"
-            class="govuk-accordion__icon"
-          />
         </h2>
       </div>
       <div
