@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { ChartDataSet } from '@common/services/publicationService';
+import {ChartDataSet} from '@common/services/publicationService';
 import ChartFunctions from '../ChartFunctions';
 
 import Data from './__data__/chartFunctionsData';
@@ -11,12 +11,18 @@ describe('ChartFunctions', () => {
   };
 
   const dataSet26_1_72: ChartDataSet = {
-    indicator: '23',
+    indicator: '26',
     filters: ['1', '72'],
+  };
+
+  const dataSet26_1_71: ChartDataSet = {
+    indicator: '26',
+    filters: ['1', '71'],
   };
 
   const DataSet_SingleValue: ChartDataSet[] = [dataSet23_1_72];
   const DataSet_MultipleIndicator = [dataSet23_1_72, dataSet26_1_72];
+  const DataSet_MultipleFilter = [dataSet26_1_71, dataSet26_1_72];
 
   test('filterResultsBySingleDataSet', () => {
     const dataSetResult = ChartFunctions.filterResultsBySingleDataSet(
@@ -97,4 +103,91 @@ describe('ChartFunctions', () => {
       });
     });
   });
+
+  test('buildMappedDataSets maps Single indicators', () => {
+    const dataSetResults = ChartFunctions.buildMappedDataSets(
+      DataSet_SingleValue,
+      Data.responseData.result
+    );
+
+    expect(dataSetResults.length).toBe(1);
+
+    expect(dataSetResults[0].dataSet.indicator).toBe('23');
+    expect(dataSetResults[0].dataSet.filters).toBeDefined();
+    // @ts-ignore
+    expect(dataSetResults[0].dataSet.filters).toEqual(['1', '72']);
+
+    expect(dataSetResults[0].results.length).toBe(5);
+  });
+
+  test('buildMappedDataSets maps Multiple indicators', () => {
+    const dataSetResults = ChartFunctions.buildMappedDataSets(
+      DataSet_MultipleIndicator,
+      Data.responseData.result
+    );
+
+    expect(dataSetResults.length).toBe(2);
+
+    expect(dataSetResults[0].dataSet.indicator).toBe('23');
+    expect(dataSetResults[1].dataSet.indicator).toBe('26');
+
+    expect(dataSetResults[0].dataSet.filters).toBeDefined();
+    // @ts-ignore
+    expect(dataSetResults[0].dataSet.filters).toEqual(['1', '72']);
+    // @ts-ignore
+    expect(dataSetResults[1].dataSet.filters).toEqual(['1', '72']);
+
+    expect(dataSetResults[0].results.length).toBe(5);
+  });
+
+  test('buildMappedDataSets maps Multiple filters', () => {
+    const dataSetResults = ChartFunctions.buildMappedDataSets(
+      DataSet_MultipleFilter,
+      Data.responseData.result
+    );
+
+    expect(dataSetResults.length).toBe(2);
+
+    expect(dataSetResults[0].dataSet.indicator).toBe('26');
+    expect(dataSetResults[1].dataSet.indicator).toBe('26');
+
+    expect(dataSetResults[0].dataSet.filters).toBeDefined();
+    // @ts-ignore
+    expect(dataSetResults[0].dataSet.filters).toEqual(['1', '71']);
+    // @ts-ignore
+    expect(dataSetResults[1].dataSet.filters).toEqual(['1', '72']);
+
+
+    expect(dataSetResults[0].results.length).toBe(5);
+  });
+
+  const AxisConfig = [{
+    name: "xaxis",
+    dataSet: dataSet23_1_72
+  }, {
+    name: "xaxis",
+    dataSet: dataSet26_1_72
+  }
+  ];
+
+  test('groupFilteredDataForAxis', () => {
+    const result = ChartFunctions.groupFilteredDataForAxis(
+      Data.responseData.result,
+      AxisConfig
+    );
+
+    console.log(result);
+  });
+
+  test('createChartDataForAxisData', () => {
+    const axisData = ChartFunctions.createChartDataForAxisData(
+      ChartFunctions.groupFilteredDataForAxis(
+        Data.responseData.result,
+        AxisConfig
+      )
+    );
+
+    console.log(axisData);
+  })
+
 });

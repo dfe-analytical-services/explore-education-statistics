@@ -4,8 +4,9 @@ import {
   ChartType,
   DataLabelConfigurationItem,
   ReferenceLine,
+  AxisConfigurationItem,
 } from '@common/services/publicationService';
-import React, { ReactNode } from 'react';
+import React, {ReactNode} from 'react';
 import {
   Label,
   PositionType,
@@ -16,12 +17,12 @@ import {
   YAxisProps,
 } from 'recharts';
 import {
-  DataBlockData,
+  DataBlockData, DataBlockLocation,
   DataBlockMetadata,
   Result,
 } from '@common/services/dataBlockService';
 import difference from 'lodash/difference';
-import { Dictionary } from '@common/types';
+import {Dictionary} from '@common/types';
 
 export interface ChartProps {
   data: DataBlockData;
@@ -87,7 +88,7 @@ const ChartFunctions = {
       );
     }
 
-    return { size, title };
+    return {size, title};
   },
 
   calculateMargins(xAxis: Axis, yAxis: Axis, referenceLines?: ReferenceLine[]) {
@@ -113,7 +114,7 @@ const ChartFunctions = {
   },
 
   calculateXAxis(xAxis: Axis, axisProps: XAxisProps): ReactNode {
-    const { size: height, title } = ChartFunctions.calculateAxis(
+    const {size: height, title} = ChartFunctions.calculateAxis(
       xAxis,
       'insideBottom',
     );
@@ -125,7 +126,7 @@ const ChartFunctions = {
   },
 
   calculateYAxis(yAxis: Axis, axisProps: YAxisProps): ReactNode {
-    const { size: width, title } = ChartFunctions.calculateAxis(
+    const {size: width, title} = ChartFunctions.calculateAxis(
       yAxis,
       'left',
       270,
@@ -240,13 +241,13 @@ const ChartFunctions = {
     dataSetResults: DataSetResult[],
     meta: DataBlockMetadata,
   ) {
-    return dataSetResults.reduce<ChartData[]>((cd, { dataSet, results }) => {
+    return dataSetResults.reduce<ChartData[]>((cd, {dataSet, results}) => {
       return [
         ...cd,
 
         {
           name: `${dataSet.indicator}_${dataSet.filters &&
-            dataSet.filters.join('_')}`,
+          dataSet.filters.join('_')}`,
           indicator: dataSet.indicator,
           data: ChartFunctions.groupByYear(dataSet, results, meta),
         },
@@ -275,9 +276,9 @@ const ChartFunctions = {
     meta: DataBlockMetadata,
   ): ChartData[] {
     const chartMap = dataSetResults.reduce<Dictionary<ChartData[]>>(
-      (chartDataMap, { dataSet, results }) => {
+      (chartDataMap, {dataSet, results}) => {
         const currentIndicator = dataSet.indicator;
-        const newChartDataMap = { ...chartDataMap };
+        const newChartDataMap = {...chartDataMap};
 
         results.forEach(result => {
           const dataKey = `${result.year}_${result.timeIdentifier}`;
@@ -315,6 +316,159 @@ const ChartFunctions = {
         }, {}),
       };
     });
+  },
+
+  filterResultsForChartDataSet(results: Result[], ds: ChartDataSet) {
+    return results.filter(result => {
+
+      // fail fast with the two things that are most likely to not match
+      if (!Object.keys(result.measures).includes(ds.indicator)) return false;
+
+      if (ds.filters) {
+        if (difference(ds.filters, result.filters).length !== 0) return false;
+
+      }
+
+      if (ds.location) {
+        const {location} = result;
+        if (location.country && ds.location.country && location.country.country_code !== ds.location.country.country_code) return false;
+        if (location.region && ds.location.region && location.region.region_code !== ds.location.region.region_code) return false;
+        if (location.localAuthorityDistrict && ds.location.localAuthorityDistrict
+          && location.localAuthorityDistrict.sch_lad_code !== ds.location.localAuthorityDistrict.sch_lad_code) return false;
+        if (location.localAuthority && ds.location.localAuthority
+          && location.localAuthority.new_la_code !== ds.location.localAuthority.new_la_code) return false;
+      }
+
+      if (ds.timePeriod) {
+        if (ds.timePeriod !== `${result.year}_${result.timeIdentifier}`) return false;
+      }
+
+      return true;
+
+
+    });
+  },
+
+
+  /**
+   * @param chartDataSet
+   * @param results
+   *
+   * Output the data sets as
+   * [
+   *   {
+   *     // The chart Data values that lead to this result list
+   *     chartData: ChartData,
+   *     result: Result[]
+   *   }
+   * ]
+   */
+  buildMappedDataSets(
+    chartDataSet: ChartDataSet[],
+    results: Result[]
+  ) {
+
+    return chartDataSet.reduce<DataSetResult[]>((mapped, dataSet) => {
+      return [
+        ...mapped,
+        {
+          dataSet,
+          results: ChartFunctions.filterResultsForChartDataSet(results, dataSet)
+        }
+      ];
+    }, []);
+
+  },
+
+  /**
+   *
+   * Take the array of filtered data
+   * @param filteredData
+   * [
+   *   {
+   *     dataSet: DataSet
+   *     results: Result[]
+   *   }
+   * ]
+   *
+   * and the configuration for the axis
+   *
+   * @param axes
+   * [
+   *   {
+   *     name: string
+   *     dataSet: DataSet
+   *   }
+   * ]
+   *
+   *
+   * need to then find the datasets that match those required on the axis
+   *
+   */
+  groupFilteredDataForAxis(results: Result[], axes: AxisConfigurationItem[]) {
+
+
+    const groups = axes.reduce<DataSetResult[]>((axesReducedData, axis) => {
+
+      return [
+        ...axesReducedData,
+
+        {
+          dataSet: axis.dataSet,
+          results: ChartFunctions.filterResultsForChartDataSet(results, axis.dataSet)
+        }
+
+      ];
+
+
+    }, []);
+
+    return groups;
+  },
+
+  /**
+   *
+   * From the dataSetResults
+   * [
+   *   {
+   *     dataSet: ChartDataSet
+   *     results: Result[]
+   *   }
+   * ]
+   *
+   * create
+   *
+   * [
+   *    {
+   *      name: 'Name of data set'
+   *      <for each result> :
+   *         [ key based on result values and matching dataSet requiremnts  ] : indicator value requested in data set
+   *    }
+   * ]
+   *
+   *
+   * @param dataSetResults
+   */
+
+
+  createChartDataForAxisData(dataSetResults: DataSetResult[]) {
+
+    const generateKeyFromDataSet = (dataSet : ChartDataSet) => {
+      return [
+        dataSet.indicator,
+        ...(dataSet.filters || []),
+        dataSet.location && dataSet.location.country && dataSet.location.country.country_code,
+        dataSet.location && dataSet.location.region && dataSet.location.region.region_code,
+        dataSet.location && dataSet.location.localAuthorityDistrict && dataSet.location.localAuthorityDistrict.sch_lad_code,
+        dataSet.location && dataSet.location.localAuthority && dataSet.location.localAuthority.new_la_code,
+        dataSet.timePeriod || '',
+      ].join("_");
+    };
+
+    return dataSetResults.reduce( (axisData, dataSetResult) => ({
+      ...axisData,
+      [generateKeyFromDataSet(dataSetResult.dataSet)] : ChartFunctions.filterResultsForChartDataSet(dataSetResult.results
+    }), [])
   },
 };
 
