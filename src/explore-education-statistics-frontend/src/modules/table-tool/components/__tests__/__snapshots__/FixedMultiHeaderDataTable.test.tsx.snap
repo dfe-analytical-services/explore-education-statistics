@@ -3,7 +3,7 @@
 exports[`FixedMultiHeaderDataTable renders a sticky column table 1`] = `
 <table
   aria-hidden="true"
-  aria-labelledby="Test table"
+  aria-labelledby="dataTableCaption"
   class="govuk-table columnTable"
 >
   <thead>
@@ -46,7 +46,7 @@ exports[`FixedMultiHeaderDataTable renders a sticky column table 1`] = `
 exports[`FixedMultiHeaderDataTable renders a sticky header table 1`] = `
 <table
   aria-hidden="true"
-  aria-labelledby="Test table"
+  aria-labelledby="dataTableCaption"
   class="govuk-table headerTable"
 >
   <thead>
@@ -108,7 +108,7 @@ exports[`FixedMultiHeaderDataTable renders a sticky header table 1`] = `
 exports[`FixedMultiHeaderDataTable renders a sticky intersection 1`] = `
 <table
   aria-hidden="true"
-  aria-labelledby="Test table"
+  aria-labelledby="dataTableCaption"
   class="govuk-table intersectionTable"
 >
   <thead>
@@ -126,7 +126,7 @@ exports[`FixedMultiHeaderDataTable renders a sticky intersection 1`] = `
 
 exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
 <table
-  aria-labelledby="Test table"
+  aria-labelledby="dataTableCaption"
   class="govuk-table"
 >
   <thead>

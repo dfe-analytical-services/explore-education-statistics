@@ -5,7 +5,7 @@ import styles from './MultiHeaderTable.module.scss';
 
 interface Props {
   ariaHidden?: boolean;
-  caption: string;
+  ariaLabelledBy: string;
   className?: string;
   isStickyHeader?: boolean;
   isStickyColumn?: boolean;
@@ -18,8 +18,8 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
   (
     {
       ariaHidden,
+      ariaLabelledBy,
       className,
-      caption,
       columnHeaders,
       isStickyColumn,
       isStickyHeader,
@@ -42,7 +42,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
     return (
       <table
         aria-hidden={ariaHidden}
-        aria-labelledby={caption}
+        aria-labelledby={ariaLabelledBy}
         className={classNames('govuk-table', className)}
         ref={ref}
       >

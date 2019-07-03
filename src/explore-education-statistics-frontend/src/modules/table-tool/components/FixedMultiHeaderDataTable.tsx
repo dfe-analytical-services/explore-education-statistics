@@ -4,10 +4,9 @@ import DataTableKeys from './DataTableKeys';
 import styles from './FixedMultiHeaderDataTable.module.scss';
 import MultiHeaderTable from './MultiHeaderTable';
 
-const dataTableCaption = 'dataTableCaption';
-
 interface Props {
   caption: string;
+  captionId?: string;
   innerRef?: Ref<HTMLElement>;
   columnHeaders: string[][];
   rowHeaders: string[][];
@@ -16,7 +15,7 @@ interface Props {
 
 const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
   (props, ref) => {
-    const { caption } = props;
+    const { caption, captionId = 'dataTableCaption' } = props;
 
     const mainTableRef = useRef<HTMLTableElement>(null);
     const headerTableRef = useRef<HTMLTableElement>(null);
@@ -81,7 +80,7 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
     return (
       <figure className={styles.figure} ref={ref}>
         <figcaption>
-          <strong id={dataTableCaption}>{caption}</strong>
+          <strong id={captionId}>{caption}</strong>
 
           <DataTableKeys />
         </figcaption>
@@ -109,6 +108,7 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
         >
           <MultiHeaderTable
             {...props}
+            ariaLabelledBy={captionId}
             className={styles.intersectionTable}
             ref={intersectionTableRef}
             ariaHidden
@@ -117,6 +117,7 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
           />
           <MultiHeaderTable
             {...props}
+            ariaLabelledBy={captionId}
             className={styles.columnTable}
             ref={columnTableRef}
             ariaHidden
@@ -124,13 +125,18 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
           />
           <MultiHeaderTable
             {...props}
+            ariaLabelledBy={captionId}
             className={styles.headerTable}
             ref={headerTableRef}
             ariaHidden
             isStickyHeader
           />
 
-          <MultiHeaderTable ref={mainTableRef} {...props} />
+          <MultiHeaderTable
+            {...props}
+            ariaLabelledBy={captionId}
+            ref={mainTableRef}
+          />
         </div>
       </figure>
     );
