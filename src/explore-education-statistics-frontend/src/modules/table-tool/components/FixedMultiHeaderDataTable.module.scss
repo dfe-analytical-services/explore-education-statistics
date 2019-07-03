@@ -1,5 +1,13 @@
 @import '~explore-education-statistics-common/src/styles/govuk-base';
 
+.figure {
+  margin: 0;
+
+  figcaption {
+    padding-bottom: govuk-spacing(4);
+  }
+}
+
 .container {
   max-height: 80vh;
   overflow: scroll;
