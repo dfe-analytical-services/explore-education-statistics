@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
         }
 
         [HttpPost]
-        [RequestSizeLimit(2047 * 1024 * 1024)]
+        [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<IActionResult> Post(Guid releaseId, string name, IFormFile file, IFormFile metaFile)
         {
