@@ -24,13 +24,13 @@ class ErrorPage extends Component<Props> {
     };
   }
 
-  private getStatusCodePage() {
+  public render() {
     const { statusCode } = this.props;
 
     switch (statusCode) {
       case 404:
         return (
-          <>
+          <Page>
             <PageTitle title={ErrorPage.statusCodeTitles[404]} />
 
             <p>If you typed the web address, check it's correct.</p>
@@ -46,11 +46,11 @@ class ErrorPage extends Component<Props> {
               </a>{' '}
               if you need any help or support.
             </p>
-          </>
+          </Page>
         );
       case 500:
         return (
-          <>
+          <Page>
             <PageTitle title={ErrorPage.statusCodeTitles[500]} />
 
             <p>Try again later.</p>
@@ -61,11 +61,11 @@ class ErrorPage extends Component<Props> {
               </a>
               .
             </p>
-          </>
+          </Page>
         );
       default:
         return (
-          <>
+          <Page>
             <PageTitle title={ErrorPage.statusCodeTitles[500]} />
 
             <p>Try again later.</p>
@@ -76,13 +76,9 @@ class ErrorPage extends Component<Props> {
               </a>
               .
             </p>
-          </>
+          </Page>
         );
     }
-  }
-
-  public render() {
-    return <Page>{this.getStatusCodePage()}</Page>;
   }
 }
 
