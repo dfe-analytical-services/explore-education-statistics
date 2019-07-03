@@ -68,6 +68,7 @@ export default class LineChartBlock extends Component<ChartProps> {
         id: 'xaxis',
         title: 'X Axis',
         type: 'major',
+        defaultDataType: 'timePeriod',
       },
       {
         id: 'yaxis',

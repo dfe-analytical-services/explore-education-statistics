@@ -69,6 +69,11 @@ export interface DataLabelConfigurationItem {
   unit: string;
 }
 
+export interface AxisConfigurationItem {
+  name: string;
+  dataSet: ChartDataSet;
+}
+
 export interface Chart {
   type: ChartType;
   dataSets: ChartDataSet[];

@@ -23,6 +23,7 @@ interface Props {
   id: string;
   inputLabel: ReactNode;
   inputProps?: InputHTMLAttributes<HTMLInputElement>;
+  inputValue?: string;
   initialOption?: number;
   listBoxLabel?: ReactNode | ((props: ComboBoxRenderProps) => ReactNode);
   listBoxLabelId?: string;
@@ -37,6 +38,7 @@ const FormComboBox = ({
   id,
   inputLabel,
   inputProps,
+  inputValue = '',
   initialOption = -1,
   options,
   listBoxLabel,
@@ -52,6 +54,10 @@ const FormComboBox = ({
   const [value, setValue] = useState('');
   const [selectedOption, setSelectedOption] = useState(initialOption);
   const [showOptions, toggleShowOptions] = useToggle(false);
+
+  React.useEffect(() => {
+    setValue(inputValue);
+  }, [inputValue]);
 
   useClickAway(containerRef, () => {
     toggleShowOptions(false);

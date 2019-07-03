@@ -12,6 +12,7 @@ import {
   DataLabelConfigurationItem,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import styles from './graph-builder.module.scss';
 import ConstData from '../../pages/prototypes/PrototypeData';
 import ChartTypeSelector from './ChartTypeSelector';
@@ -52,12 +53,6 @@ const ChartBuilder = ({ data }: Props) => {
     Dictionary<DataLabelConfigurationItem>
   >({});
 
-  const onDataLabelsChange = (
-    _dataLabels: Dictionary<DataLabelConfigurationItem>,
-  ) => {
-    setDataLabels(_dataLabels);
-  };
-
   React.useEffect(() => {
     selectChartType(chartTypes[0]);
     setDataSets([
@@ -68,7 +63,7 @@ const ChartBuilder = ({ data }: Props) => {
     ]);
   }, []);
 
-  if (data === undefined) return <div />;
+  if (data === undefined) return <LoadingSpinner />;
 
   return (
     <div className={styles.editor}>
@@ -111,7 +106,7 @@ const ChartBuilder = ({ data }: Props) => {
               dataSets={dataSets}
               data={data}
               meta={data.metaData}
-              onDataLabelsChange={onDataLabelsChange}
+              onDataLabelsChange={setDataLabels}
             />
           </Details>
 
@@ -120,7 +115,12 @@ const ChartBuilder = ({ data }: Props) => {
               Add / Remove and update the axes and how they display data ranges
             </p>
             {selectedChartType.axes.map(axis => (
-              <ChartAxisConfiguration key={axis.id} {...axis} />
+              <ChartAxisConfiguration
+                dataSets={dataSets}
+                key={axis.id}
+                meta={data.metaData}
+                {...axis}
+              />
             ))}
           </Details>
         </React.Fragment>
