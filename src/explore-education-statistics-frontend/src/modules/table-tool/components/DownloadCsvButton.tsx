@@ -86,7 +86,7 @@ const DownloadCsvButton = ({
         });
       }}
     >
-      Download data (.csv)
+      Download underlying data (.csv)
     </ButtonText>
   );
 };
