@@ -137,17 +137,17 @@ const Accordion = ({ children, id, onToggleAll }: AccordionProps) => {
       )}
 
       {sections.map((section, index) => {
-        const contentId =
-          section.props.contentId || `${id}-${index + 1}-content`;
         const headingId =
           section.props.headingId || `${id}-${index + 1}-heading`;
+        const contentId =
+          section.props.contentId || `${id}-${index + 1}-content`;
 
         const isSectionOpen = isAllOpen || openSections[index];
 
         return cloneElement<AccordionSectionProps>(section, {
           key: headingId,
-          contentId,
           headingId,
+          contentId,
           open: isSectionOpen,
           onToggle(isOpen) {
             updateOpenSections(draft => {
