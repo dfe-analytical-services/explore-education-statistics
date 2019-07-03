@@ -41,7 +41,7 @@ const FormFieldSortableListGroup = <T extends Dictionary<SortableOption[][]>>({
                   legend={legend}
                   error={getError(name)}
                 >
-                  <div className={classNames(styles.listsContainer)}>
+                  <div className={styles.listsContainer}>
                     {form.values[name].length === 0 && (
                       <div className="govuk-inset-text govuk-!-margin-0">
                         Add groups by dragging them here
