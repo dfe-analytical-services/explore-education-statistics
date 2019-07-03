@@ -3,6 +3,7 @@ import Details from '@common/components/Details';
 import { Formik } from '@common/components/form';
 import reorder from '@common/lib/utils/reorder';
 import Yup from '@common/lib/validation/yup';
+import { PickByType } from '@common/types';
 import { Form, FormikProps } from 'formik';
 import React from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
@@ -106,7 +107,7 @@ const TableHeadersForm = (props: Props) => {
               >
                 <div className={styles.axisContainer}>
                   <FormFieldSortableListGroup<
-                    Pick<TableHeadersFormValues, 'columnGroups' | 'rowGroups'>
+                    PickByType<TableHeadersFormValues, SortableOption[][]>
                   >
                     name="rowGroups"
                     legend="Row groups"
@@ -126,7 +127,7 @@ const TableHeadersForm = (props: Props) => {
 
                 <div className={styles.axisContainer}>
                   <FormFieldSortableListGroup<
-                    Pick<TableHeadersFormValues, 'columnGroups' | 'rowGroups'>
+                    PickByType<TableHeadersFormValues, SortableOption[][]>
                   >
                     name="columnGroups"
                     legend="Column groups"

@@ -21,6 +21,12 @@ export type KeysWithType<T, U> = {
 }[keyof T];
 
 /**
+ * Pick key/value pairs from T that
+ * have a value matching type U.
+ */
+export type PickByType<T, U> = Pick<T, KeysWithType<T, U>>;
+
+/**
  * Remove any specified keys from T, that exist on T.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
