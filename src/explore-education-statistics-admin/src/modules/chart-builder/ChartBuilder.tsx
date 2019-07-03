@@ -53,6 +53,7 @@ const ChartBuilder = ({ data }: Props) => {
     Dictionary<DataLabelConfigurationItem>
   >({});
 
+  /*
   React.useEffect(() => {
     selectChartType(chartTypes[0]);
     setDataSets([
@@ -62,6 +63,7 @@ const ChartBuilder = ({ data }: Props) => {
       },
     ]);
   }, []);
+   */
 
   if (data === undefined) return <LoadingSpinner />;
 
