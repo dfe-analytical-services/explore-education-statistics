@@ -152,59 +152,6 @@ const PublicationDataPage = () => {
                 />
               </div>
 
-              <fieldset className="govuk-fieldset">
-                <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
-                  Data type
-                </legend>
-                <div className="govuk-radios">
-                  <div className="govuk-radios__item">
-                    <input
-                      type="radio"
-                      name="data-type"
-                      id="data-type-final"
-                      value="final"
-                      className="govuk-radios__input"
-                    />
-                    <label
-                      htmlFor="data-type=final"
-                      className="govuk-label govuk-radios__label"
-                    >
-                      Final
-                    </label>
-                  </div>
-                  <div className="govuk-radios__item">
-                    <input
-                      type="radio"
-                      name="data-type"
-                      id="data-type-provisional"
-                      value="provisional"
-                      className="govuk-radios__input"
-                    />
-                    <label
-                      htmlFor="data-type-final"
-                      className="govuk-label govuk-radios__label"
-                    >
-                      Provisional
-                    </label>
-                  </div>
-                  <div className="govuk-radios__item">
-                    <input
-                      type="radio"
-                      name="data-type"
-                      id="data-type-revised"
-                      value="revised"
-                      className="govuk-radios__input"
-                    />
-                    <label
-                      htmlFor="data-type-revised"
-                      className="govuk-label govuk-radios__label"
-                    >
-                      Revised
-                    </label>
-                  </div>
-                </div>
-              </fieldset>
-
               <div className="govuk-form-group govuk-!-margin-top-6">
                 <label
                   className="govuk-label govuk-label--s"

@@ -7,9 +7,12 @@ import {
   FormSelect,
   // FormRadioGroup,
 } from '@common/components/form';
+import Tabs from '@common/components/Tabs';
+import TabsSection from '@common/components/TabsSection';
 import PrototypeAdminExampleTables from './components/PrototypeAdminExampleTables';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
+import PrototypeReleasePageViewTables from './components/PrototypeReleasePageViewTables';
 import Link from '../../components/Link';
 
 const PublicationDataPage = () => {
@@ -26,8 +29,13 @@ const PublicationDataPage = () => {
     >
       <PrototypeAdminNavigation sectionId="addTable" />
 
-      <h2 className="govuk-heading-m">Build tables for release</h2>
+      <Link to="/prototypes/publication-create-new-absence-view-table">
+        View / edit saved tables and charts
+      </Link>
 
+      <hr />
+
+      <h2 className="govuk-heading-m">Build tables for release</h2>
       <p className="govuk-body">
         Choose the data from your uploaded files then use filters to create your
         table.
@@ -36,8 +44,6 @@ const PublicationDataPage = () => {
       <p className="govuk-body">
         Once you've created a table, you can save it for use in your release.
       </p>
-
-      <hr />
 
       <h2 className="govuk-heading-m">1. Select data file</h2>
       {window.location.search === '?status=step1' && (
@@ -347,6 +353,11 @@ const PublicationDataPage = () => {
           </Link>
         </div>
       )}
+
+      <Link to="/prototypes/publication-create-new-absence-view-table">
+        View saved tables
+      </Link>
+
       <hr />
       <div className="govuk-grid-row govuk-!-margin-top-9">
         <div className="govuk-grid-column-one-half ">

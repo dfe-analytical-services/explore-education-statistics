@@ -55,23 +55,10 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
               to="/prototypes/publication-create-new-absence-table?status=step1"
               className="govuk-link govuk-link--no-visited-state"
             >
-              Build tables
+              Build / edit tables and charts
             </Link>
           </li>
-          <li
-            className={
-              sectionId === 'viewTables'
-                ? 'app-navigation--current-page'
-                : 'app-navigation--non-selected-page'
-            }
-          >
-            <Link
-              to="/prototypes/publication-create-new-absence-view-table"
-              className="govuk-link govuk-link--no-visited-state"
-            >
-              View / edit tables
-            </Link>
-          </li>
+
           <li
             className={
               sectionId === 'addContent'

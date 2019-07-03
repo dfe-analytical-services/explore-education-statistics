@@ -72,12 +72,12 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
               }
             />
           </FormGroup>
-          <Link
+          <a
             className="govuk-button govuk-!-margin-right-3"
-            to="/prototypes/publication-create-new-absence-table?status=step5"
+            href="/prototypes/publication-create-new-absence-table?status=step5#table-builder"
           >
             Edit this table
-          </Link>
+          </a>
 
           <Button variant="warning" onClick={() => toggleDeleteModal(true)}>
             Delete this table

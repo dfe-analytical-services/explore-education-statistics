@@ -23,7 +23,13 @@ const PublicationDataPage = () => {
         { text: 'Create new release', link: '#' },
       ]}
     >
-      <PrototypeAdminNavigation sectionId="viewTables" />
+      <PrototypeAdminNavigation sectionId="addTable" />
+
+      <Link to="/prototypes/publication-create-new-absence-table?status=step1">
+        Build new table and chart
+      </Link>
+
+      <hr />
 
       <FormFieldset
         id="tableFieldset"
