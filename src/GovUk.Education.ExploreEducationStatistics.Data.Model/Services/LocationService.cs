@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>
                 {
                     {
-                        GeographicLevel.National,
+                        GeographicLevel.Country,
                         GroupByObservationalUnit(locations, location => location.Country)
                     },
                     {
@@ -45,11 +45,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                         GroupByObservationalUnit(locations, location => location.LocalAuthorityDistrict)
                     },
                     {
-                        GeographicLevel.Local_Enterprise_Partnerships,
+                        GeographicLevel.Local_Enterprise_Partnership,
                         GroupByObservationalUnit(locations, location => location.LocalEnterprisePartnership)
                     },
                     {
-                        GeographicLevel.Mayoral_Combined_Authorities,
+                        GeographicLevel.Mayoral_Combined_Authority,
                         GroupByObservationalUnit(locations, location => location.MayoralCombinedAuthority)
                     },
                     {
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                         GroupByObservationalUnit(locations, location => location.MultiAcademyTrust)
                     },
                     {
-                        GeographicLevel.Opportunity_Areas,
+                        GeographicLevel.Opportunity_Area,
                         GroupByObservationalUnit(locations, location => location.OpportunityArea)
                     },
                     {
@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                         GroupByObservationalUnit(locations, location => location.ParliamentaryConstituency)
                     },
                     {
-                        GeographicLevel.Regional,
+                        GeographicLevel.Region,
                         GroupByObservationalUnit(locations, location => location.Region)
                     },
                     {
