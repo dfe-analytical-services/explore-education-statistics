@@ -55,12 +55,11 @@ class ContentSectionIndex extends Component<Props> {
 
     return (
       <>
-        {indexComplete && <h3 className="govuk-heading-s">In this section</h3>}
-
-        {indexResults.length > 0 && (
-          <ul className="govuk-body-s">
-            {indexComplete &&
-              indexResults.map(item => {
+        {indexComplete && indexResults.length > 0 && (
+          <>
+            <h3 className="govuk-heading-s">In this section</h3>
+            <ul className="govuk-body-s">
+              {indexResults.map(item => {
                 return (
                   <>
                     {item.location && (
@@ -71,7 +70,8 @@ class ContentSectionIndex extends Component<Props> {
                   </>
                 );
               })}
-          </ul>
+            </ul>
+          </>
         )}
       </>
     );

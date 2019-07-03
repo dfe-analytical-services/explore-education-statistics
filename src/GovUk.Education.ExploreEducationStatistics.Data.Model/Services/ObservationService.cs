@@ -26,27 +26,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var subjectIdParam = new SqlParameter("subjectId", query.SubjectId);
             var geographicLevelParam = new SqlParameter("geographicLevel", query.GeographicLevel.GetEnumValue());
             var yearsListParam = CreateIdListType("yearList", yearsRange);
-            var countriesListParam = CreateIdListType("countriesList", query.Countries);
+            var countriesListParam = CreateIdListType("countriesList", query.Country);
             var institutionListParam =
-                CreateIdListType("institutionList", query.Institutions);
-            var localAuthorityListParam = CreateIdListType("localAuthorityList", query.LocalAuthorities);
+                CreateIdListType("institutionList", query.Institution);
+            var localAuthorityListParam = CreateIdListType("localAuthorityList", query.LocalAuthority);
             var localAuthorityDistrictListParam =
-                CreateIdListType("localAuthorityDistrictList", query.LocalAuthorityDistricts);
+                CreateIdListType("localAuthorityDistrictList", query.LocalAuthorityDistrict);
             var localEnterprisePartnershipListParam =
-                CreateIdListType("localEnterprisePartnershipList", query.LocalEnterprisePartnerships);
+                CreateIdListType("localEnterprisePartnershipList", query.LocalEnterprisePartnership);
             var mayoralCombinedAuthorityListParam =
-                CreateIdListType("mayoralCombinedAuthorityList", query.MayoralCombinedAuthorities);
+                CreateIdListType("mayoralCombinedAuthorityList", query.MayoralCombinedAuthority);
             var multiAcademyTrustListParam =
-                CreateIdListType("multiAcademyTrustList", query.Mats);
+                CreateIdListType("multiAcademyTrustList", query.MultiAcademyTrust);
             var opportunityAreaListParam =
-                CreateIdListType("opportunityAreaList", query.OpportunityAreas);
+                CreateIdListType("opportunityAreaList", query.OpportunityArea);
             var parliamentaryConstituencyListParam =
-                CreateIdListType("parliamentaryConstituencyList", query.ParliamentaryConstituencies);
-            var regionsListParam = CreateIdListType("regionsList", query.Regions);
-            var rscRegionListParam = CreateIdListType("rscRegionsList", query.RscRegions);
-            var sponsorListParam = CreateIdListType("sponsorList", query.Sponsors);
+                CreateIdListType("parliamentaryConstituencyList", query.ParliamentaryConstituency);
+            var regionsListParam = CreateIdListType("regionsList", query.Region);
+            var rscRegionListParam = CreateIdListType("rscRegionsList", query.RscRegion);
+            var sponsorListParam = CreateIdListType("sponsorList", query.Sponsor);
             var wardListParam =
-                CreateIdListType("wardList", query.Wards);
+                CreateIdListType("wardList", query.Ward);
             var filtersListParam = CreateIdListType("filtersList", query.Filters);
 
             var inner = _context.Query<IdWrapper>().AsNoTracking()
