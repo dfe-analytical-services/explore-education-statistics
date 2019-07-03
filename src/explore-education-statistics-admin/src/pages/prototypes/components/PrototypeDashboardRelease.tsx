@@ -48,6 +48,19 @@ const PrototypeDashboardRelease = ({
       }`}
       tag={tag}
     >
+      {!editing && !review && (
+        <Link to="/prototypes/publication-edit" className="govuk-button">
+          Edit this release
+        </Link>
+      )}
+      {editing && (
+        <Link
+          to="/prototypes/publication-create-new-absence-config"
+          className="govuk-button"
+        >
+          View / edit this draft
+        </Link>
+      )}
       <dl className="govuk-summary-list govuk-!-margin-bottom-3">
         <div className="govuk-summary-list__row">
           {isNew && (
@@ -153,14 +166,6 @@ const PrototypeDashboardRelease = ({
             {review && (
               <Link to="/prototypes/publication-review">
                 Review this release
-              </Link>
-            )}
-            {!editing && !review && (
-              <Link to="/prototypes/publication-edit">Edit this release</Link>
-            )}
-            {editing && (
-              <Link to="/prototypes/publication-create-new-absence-config">
-                View / edit this draft
               </Link>
             )}
           </dd>

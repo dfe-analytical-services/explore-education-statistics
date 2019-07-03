@@ -6,13 +6,7 @@ const PublicationPage = () => {
   return (
     <PrototypePage
       wide
-      breadcrumbs={[
-        {
-          link: '/prototypes/admin-dashboard',
-          text: 'Administrator dashboard',
-        },
-        { text: 'Create new release', link: '#' },
-      ]}
+      breadcrumbs={[{ text: 'Create new release', link: '#' }]}
     >
       <h1 className="govuk-heading-xl">
         Pupil absence statistics and data for schools in England
