@@ -34,7 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
         }
 
         [HttpPost]
-        [RequestSizeLimit(200 * 1024 * 1024)]
+        [RequestSizeLimit(2047 * 1024 * 1024)]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<IActionResult> Post(Guid releaseId, string name, IFormFile file, IFormFile metaFile)
         {
             var release = _context.Releases
