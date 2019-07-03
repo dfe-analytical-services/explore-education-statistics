@@ -92,6 +92,28 @@ const testResponse: DataBlockResponse = {
         value: '28',
       },
     },
+    timePeriods: {
+      '2012_HT6': {
+        label: '2012/2013',
+        value: '2012_HT6',
+      },
+      '2013_HT6': {
+        label: '2013/2014',
+        value: '2013_HT6',
+      },
+      '2014_HT6': {
+        label: '2014/2015',
+        value: '2014_HT6',
+      },
+      '2015_HT6': {
+        label: '2015/2016',
+        value: '2015_HT6',
+      },
+      '2016_HT6': {
+        label: '2016/2017',
+        value: '2016_HT6',
+      },
+    },
     locations: {
       E92000001: {
         geoJson: [
