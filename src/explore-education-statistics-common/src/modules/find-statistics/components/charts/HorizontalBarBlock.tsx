@@ -1,7 +1,12 @@
-import ChartFunctions, {
-  ChartData,
+import {
+  calculateXAxis,
+  calculateYAxis,
+  generateReferenceLines,
   ChartDefinition,
   ChartProps,
+  ChartDataB,
+  createDataForAxis,
+  getKeysForChart,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React, { Component } from 'react';
 import {
@@ -47,54 +52,37 @@ export default class HorizontalBarBlock extends Component<
   public render() {
     const {
       data,
-      meta,
       height,
       width,
-      xAxis,
       referenceLines,
-      yAxis,
       stacked,
-      dataSets,
       dataLabels,
+      axes,
     } = this.props;
 
-    if (dataSets === undefined) return <div />;
+    const chartData: ChartDataB[] = createDataForAxis(axes.major, data.result);
 
-    const chartData: ChartData[] = ChartFunctions.generateDataGroupedByGroups(
-      ChartFunctions.filterResultsByDataSet(dataSets, data.result),
-      meta,
-    );
+    const keysForChart = getKeysForChart(chartData);
 
-    const chartKeys: Set<string> = chartData.reduce(
-      (keys: Set<string>, next) => {
-        return new Set([
-          ...Array.from(keys),
-          ...(next.data || []).map(({ name }) => name),
-        ]);
-      },
-      new Set<string>(),
-    );
+    const yAxis = { key: undefined, title: '' };
+    const xAxis = { key: undefined, title: '' };
 
     return (
       <ResponsiveContainer width={width || '100%'} height={height || 600}>
-        <BarChart
-          data={chartData}
-          layout="vertical"
-          margin={ChartFunctions.calculateMargins(yAxis, xAxis, referenceLines)}
-        >
-          {ChartFunctions.calculateYAxis(yAxis, {
+        <BarChart data={chartData} layout="vertical">
+          {calculateYAxis(yAxis, {
             type: 'category',
             dataKey: (xAxis.key || ['name'])[0],
           })}
 
           <CartesianGrid />
 
-          {ChartFunctions.calculateXAxis(xAxis, { type: 'number' })}
+          {calculateXAxis(xAxis, { type: 'number' })}
 
           <Tooltip cursor={false} />
           <Legend />
 
-          {Array.from(chartKeys).map((dataKey, index) => (
+          {Array.from(keysForChart).map((dataKey, index) => (
             <Bar
               key={dataKey}
               dataKey={dataKey}
@@ -105,8 +93,7 @@ export default class HorizontalBarBlock extends Component<
             />
           ))}
 
-          {referenceLines &&
-            ChartFunctions.generateReferenceLines(referenceLines)}
+          {referenceLines && generateReferenceLines(referenceLines)}
         </BarChart>
       </ResponsiveContainer>
     );

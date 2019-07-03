@@ -1,7 +1,9 @@
-import ChartFunctions, {
-  ChartData,
+import {
+  ChartDataB,
   ChartDefinition,
   ChartProps,
+  createDataForAxis,
+  getKeysForChart,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import React, { Component } from 'react';
@@ -79,29 +81,16 @@ export default class LineChartBlock extends Component<ChartProps> {
   };
 
   public render() {
-    const {
-      data,
-      height,
-      xAxis,
-      yAxis,
-      meta,
-      dataSets,
-      dataLabels,
-    } = this.props;
+    const { data, height, axes, dataLabels } = this.props;
 
-    // const timePeriods = meta.timePeriods || {};
+    const xAxis = axes.major;
+    const yAxis = axes.minor;
 
-    const chartData: ChartData[] = ChartFunctions.generateDataGroupedByIndicators(
-      // @ts-ignore
-      ChartFunctions.filterResultsByDataSet(dataSets, data.result),
-      meta,
-    );
+    const yAxisDomain: [AxisDomain, AxisDomain] = [-10, 10];
 
-    let yAxisDomain: [AxisDomain, AxisDomain] = [0, 0];
+    const chartData: ChartDataB[] = createDataForAxis(axes.major, data.result);
 
-    if (yAxis.min !== undefined && yAxis.max !== undefined) {
-      yAxisDomain = [yAxis.min, yAxis.max];
-    }
+    const keysForChart = getKeysForChart(chartData);
 
     return (
       <ResponsiveContainer width={900} height={height || 300}>
@@ -114,7 +103,6 @@ export default class LineChartBlock extends Component<ChartProps> {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="name"
-            type="category"
             allowDuplicatedCategory={false}
             label={{
               offset: 5,
@@ -136,19 +124,18 @@ export default class LineChartBlock extends Component<ChartProps> {
             dataKey="value"
           />
 
-          {chartData.map((cd, index) => (
+          {keysForChart.map((name, index) => (
             <Line
-              dataKey="value"
-              data={cd.data}
-              name={cd.name && dataLabels[cd.name] && dataLabels[cd.name].label}
-              key={cd.name}
+              key={name}
+              dataKey={name}
+              type="linear"
+              name={(dataLabels[name] && dataLabels[name].label) || name}
               legendType={symbols[index]}
               dot={props => <Symbols {...props} type={symbols[index]} />}
-              type="linear"
               stroke={colours[index]}
               fill={colours[index]}
               strokeWidth="5"
-              unit={cd.name && dataLabels[cd.name] && dataLabels[cd.name].unit}
+              unit={(dataLabels[name] && dataLabels[name].unit) || ''}
               isAnimationActive={false}
             />
           ))}

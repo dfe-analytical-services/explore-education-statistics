@@ -478,8 +478,22 @@ export default class PrototypePublicationService {
                 label: 'Authorised absence',
               },
             },
-            xAxis: { title: 'School Year' },
-            yAxis: { title: 'Absence Rate' },
+            axes: {
+              major: {
+                name: 'major',
+                groupBy: ['timePeriod'],
+                dataSets: [
+                  { indicator: '23', filters: ['1', '2'] },
+                  { indicator: '26', filters: ['1', '2'] },
+                  { indicator: '28', filters: ['1', '2'] },
+                ],
+              },
+              minor: {
+                name: 'minor',
+                groupBy: [],
+                dataSets: [],
+              },
+            },
             type: 'line',
           },
         ],

@@ -151,8 +151,22 @@ export const newApiHorizontalData: ChartProps = {
     },
   },
 
-  xAxis: { title: 'test x axis' },
-  yAxis: { title: 'test y axis' },
+  axes: {
+    major: {
+      name: 'major',
+      groupBy: ['timePeriod'],
+      dataSets: [
+        { indicator: '23', filters: ['1'] },
+        { indicator: '26', filters: ['1'] },
+        { indicator: '28', filters: ['1'] },
+      ],
+    },
+    minor: {
+      name: 'minor',
+      groupBy: [],
+      dataSets: [],
+    },
+  },
 };
 
 export const newChartsApiDataBlock: DataBlockProps = {
@@ -174,9 +188,23 @@ export const newChartsApiDataBlock: DataBlockProps = {
   charts: [
     {
       type: 'verticalbar',
-      xAxis: { title: '' },
-      yAxis: { title: '' },
-
+      axes: {
+        major: {
+          name: 'major',
+          groupBy: ['timePeriod'],
+          dataSets: [
+            { indicator: '23', filters: ['1', '2'] },
+            { indicator: '26', filters: ['1', '2'] },
+            { indicator: '27', filters: ['1', '2'] },
+            { indicator: '28', filters: ['1', '2'] },
+          ],
+        },
+        minor: {
+          name: 'minor',
+          groupBy: [],
+          dataSets: [],
+        },
+      },
       dataLabels: {
         '23_1_2': {
           value: '23_1_2',

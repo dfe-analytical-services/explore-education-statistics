@@ -2851,8 +2851,33 @@ const AbstractChartProps: ChartProps = {
     },
   },
 
-  xAxis: { title: 'test x axis' },
-  yAxis: { title: 'test y axis' },
+  axes: {
+    major: {
+      name: '23',
+      groupBy: ['timePeriod'],
+      dataSets: [
+        {
+          indicator: '23',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '26',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '28',
+          filters: ['1', '2'],
+        },
+      ],
+    },
+    minor: {
+      name: 'minor',
+      groupBy: [],
+      title: '',
+      visible: true,
+      dataSets: [],
+    },
+  },
 };
 
 const AbstractMultipleChartProps: ChartProps = {
@@ -2904,8 +2929,33 @@ const AbstractMultipleChartProps: ChartProps = {
     },
   },
 
-  xAxis: { title: 'test x axis' },
-  yAxis: { title: 'test y axis' },
+  axes: {
+    major: {
+      name: '23',
+      groupBy: ['timePeriod'],
+      dataSets: [
+        {
+          indicator: '23',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '26',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '28',
+          filters: ['1', '2'],
+        },
+      ],
+    },
+    minor: {
+      name: 'minor',
+      groupBy: [],
+      title: '',
+      visible: true,
+      dataSets: [],
+    },
+  },
 };
 
 const response: DataBlockResponse = {

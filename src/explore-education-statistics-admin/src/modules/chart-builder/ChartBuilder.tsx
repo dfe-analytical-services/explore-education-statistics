@@ -10,6 +10,7 @@ import ChartDataSelector, {
 import {
   ChartDataSet,
   DataLabelConfigurationItem,
+  AxisConfigurationItem,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -53,6 +54,34 @@ const ChartBuilder = ({ data }: Props) => {
     Dictionary<DataLabelConfigurationItem>
   >({});
 
+  const [axes, setAxes] = React.useState<Dictionary<AxisConfigurationItem>>({
+    major: {
+      name: '',
+      groupBy: ['timePeriod'],
+      dataSets: [],
+    },
+    minor: {
+      name: '',
+      groupBy: [],
+      dataSets: [],
+    },
+  });
+
+  React.useEffect(() => {
+    setAxes({
+      major: {
+        name: '',
+        groupBy: ['timePeriod'],
+        dataSets,
+      },
+      minor: {
+        name: '',
+        groupBy: [],
+        dataSets: [],
+      },
+    });
+  }, [dataSets]);
+
   /*
   React.useEffect(() => {
     selectChartType(chartTypes[0]);
@@ -64,8 +93,6 @@ const ChartBuilder = ({ data }: Props) => {
     ]);
   }, []);
    */
-
-  if (data === undefined) return <LoadingSpinner />;
 
   return (
     <div className={styles.editor}>
@@ -95,10 +122,9 @@ const ChartBuilder = ({ data }: Props) => {
             <ChartRenderer
               type={selectedChartType.type}
               dataSets={dataSets}
+              axes={axes}
               data={data}
               meta={data.metaData}
-              xAxis={{ title: '' }}
-              yAxis={{ title: '' }}
               dataLabels={dataLabels}
             />
           </Details>

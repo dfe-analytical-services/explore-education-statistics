@@ -162,7 +162,7 @@ export interface DataBlockMetadata {
   indicators: Dictionary<LabelValueUnitMetadata>;
   filters: Dictionary<LabelValueMetadata>;
   timePeriod?: Dictionary<LabelValueMetadata>;
-  timePeriods?: Dictionary<LabelValueMetadata>;
+  timePeriods: Dictionary<LabelValueMetadata>;
   locations?: Dictionary<DataBlockLocationMetadata>;
 }
 

@@ -67,8 +67,22 @@ describe('DataBlock', () => {
                 unit: '%',
               },
             },
-            xAxis: { title: 'test x axis' },
-            yAxis: { title: 'test y axis' },
+            axes: {
+              major: {
+                name: 'major',
+                groupBy: ['timePeriod'],
+                dataSets: [
+                  { indicator: '23', filters: ['1', '2'] },
+                  { indicator: '26', filters: ['1', '2'] },
+                  { indicator: '28', filters: ['1', '2'] },
+                ],
+              },
+              minor: {
+                name: 'minor',
+                groupBy: [],
+                dataSets: [],
+              },
+            },
             width: 800,
             height: 600,
           },
@@ -133,8 +147,22 @@ describe('DataBlock', () => {
               },
             },
 
-            xAxis: { title: 'test x axis' },
-            yAxis: { title: 'test y axis' },
+            axes: {
+              major: {
+                name: 'major',
+                groupBy: ['timePeriod'],
+                dataSets: [
+                  { indicator: '23', filters: ['1', '2'] },
+                  { indicator: '26', filters: ['1', '2'] },
+                  { indicator: '28', filters: ['1', '2'] },
+                ],
+              },
+              minor: {
+                name: 'minor',
+                groupBy: [],
+                dataSets: [],
+              },
+            },
             width: 800,
             height: 600,
           },
@@ -255,8 +283,22 @@ describe('DataBlock', () => {
               },
             },
 
-            xAxis: { title: 'test x axis' },
-            yAxis: { title: 'test y axis' },
+            axes: {
+              major: {
+                name: 'major',
+                groupBy: ['timePeriod'],
+                dataSets: [
+                  { indicator: '23', filters: ['1', '2'] },
+                  { indicator: '26', filters: ['1', '2'] },
+                  { indicator: '28', filters: ['1', '2'] },
+                ],
+              },
+              minor: {
+                name: 'minor',
+                groupBy: [],
+                dataSets: [],
+              },
+            },
             width: 800,
             height: 600,
           },

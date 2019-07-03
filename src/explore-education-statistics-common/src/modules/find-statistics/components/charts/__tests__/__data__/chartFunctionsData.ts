@@ -3434,6 +3434,28 @@ const responseData: DataBlockResponse = {
         value: 'E92000001',
       },
     },
+    timePeriods: {
+      '2012_HT6': {
+        label: '2012/2013',
+        value: '2012_HT6',
+      },
+      '2013_HT6': {
+        label: '2013/2014',
+        value: '2013_HT6',
+      },
+      '2014_HT6': {
+        label: '2014/2015',
+        value: '2014_HT6',
+      },
+      '2015_HT6': {
+        label: '2015/2016',
+        value: '2015_HT6',
+      },
+      '2016_HT6': {
+        label: '2016/2017',
+        value: '2016_HT6',
+      },
+    },
   },
   publicationId: 'cbbd299f-8297-44bc-92ac-558bcf51f8ad',
   releaseId: '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5',
