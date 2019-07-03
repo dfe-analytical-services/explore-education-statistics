@@ -82,24 +82,7 @@ class ErrorPage extends Component<Props> {
   }
 
   public render() {
-    const { errorMessage, statusCode } = this.props;
-    const pageTitle = errorMessage
-      ? ErrorPage.statusCodeTitles[500]
-      : ErrorPage.statusCodeTitles[statusCode];
-
-    return (
-      <Page>
-        {errorMessage ? (
-          <>
-            <PageTitle title={pageTitle} />
-
-            <p>{errorMessage}</p>
-          </>
-        ) : (
-          this.getStatusCodePage()
-        )}
-      </Page>
-    );
+    return <Page>{this.getStatusCodePage()}</Page>;
   }
 }
 
