@@ -1,5 +1,6 @@
 import ButtonText from '@common/components/ButtonText';
 import cartesian from '@common/lib/utils/cartesian';
+import formatPretty from '@common/lib/utils/number/formatPretty';
 import {
   FilterOption,
   IndicatorOption,
@@ -63,20 +64,13 @@ const DownloadCsvButton = ({
           return 'n/a';
         }
 
-        const rawValue = matchingResult.measures[indicator.value];
-        const numberValue = Number(rawValue);
+        const value = matchingResult.measures[indicator.value];
 
-        if (Number.isNaN(numberValue)) {
-          return rawValue;
+        if (Number.isNaN(Number(value))) {
+          return value;
         }
 
-        const decimals = rawValue.split('.')[1];
-        const decimalPlaces = decimals ? decimals.length : 0;
-
-        return numberValue.toLocaleString('en-GB', {
-          maximumFractionDigits: decimalPlaces,
-          minimumFractionDigits: decimalPlaces,
-        });
+        return formatPretty(value);
       });
 
       return [...row.map(column => column.label), ...indicatorCells];
