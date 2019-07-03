@@ -9,7 +9,7 @@ import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import sortBy from 'lodash/sortBy';
 import React, { memo, useEffect, useRef, useState } from 'react';
-import FixedHeaderGroupedDataTable from './FixedHeaderGroupedDataTable';
+import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
 import TableHeadersForm, { TableHeadersFormValues } from './TableHeadersForm';
 
 interface Props {
@@ -159,7 +159,7 @@ const TimePeriodDataTable = ({
         }}
       />
 
-      <FixedHeaderGroupedDataTable
+      <FixedMultiHeaderDataTable
         caption={caption}
         columnHeaders={columnHeaders}
         rowHeaders={rowHeaders}

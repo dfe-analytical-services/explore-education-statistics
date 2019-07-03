@@ -1,7 +1,7 @@
 import throttle from 'lodash/throttle';
 import React, { forwardRef, Ref, useEffect, useRef } from 'react';
 import DataTableKeys from './DataTableKeys';
-import styles from './FixedHeaderGroupedDataTable.module.scss';
+import styles from './FixedMultiHeaderDataTable.module.scss';
 import MultiHeaderTable from './MultiHeaderTable';
 
 const dataTableCaption = 'dataTableCaption';
@@ -14,7 +14,7 @@ interface Props {
   rows: string[][];
 }
 
-const FixedHeaderGroupedDataTable = forwardRef<HTMLElement, Props>(
+const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
   (props, ref) => {
     const { caption } = props;
 
@@ -137,6 +137,6 @@ const FixedHeaderGroupedDataTable = forwardRef<HTMLElement, Props>(
   },
 );
 
-FixedHeaderGroupedDataTable.displayName = 'FixedHeaderGroupedDataTable';
+FixedMultiHeaderDataTable.displayName = 'FixedHeaderGroupedDataTable';
 
-export default FixedHeaderGroupedDataTable;
+export default FixedMultiHeaderDataTable;
