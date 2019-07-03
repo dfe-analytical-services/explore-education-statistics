@@ -1,6 +1,5 @@
 import ButtonText from '@common/components/ButtonText';
 import cartesian from '@common/lib/utils/cartesian';
-import formatPretty from '@common/lib/utils/number/formatPretty';
 import {
   FilterOption,
   IndicatorOption,
@@ -64,13 +63,7 @@ const DownloadCsvButton = ({
           return 'n/a';
         }
 
-        const value = matchingResult.measures[indicator.value];
-
-        if (Number.isNaN(Number(value))) {
-          return value;
-        }
-
-        return formatPretty(value);
+        return matchingResult.measures[indicator.value];
       });
 
       return [...row.map(column => column.label), ...indicatorCells];
