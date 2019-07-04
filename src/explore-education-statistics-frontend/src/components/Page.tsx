@@ -16,11 +16,13 @@ type Props = {
   caption?: string;
   hideCaption?: boolean;
   isHomepage?: boolean;
+  breadcrumbLabel?: string;
 } & BreadcrumbsProps;
 
 const Page = ({
   children,
   breadcrumbs = [],
+  breadcrumbLabel = '',
   wide = false,
   pageMeta,
   title,
@@ -42,7 +44,9 @@ const Page = ({
         <PageBanner />
         <Breadcrumbs
           breadcrumbs={
-            isHomepage ? undefined : breadcrumbs.concat([{ name: title }])
+            isHomepage
+              ? undefined
+              : breadcrumbs.concat([{ name: breadcrumbLabel || title }])
           }
         />
 
