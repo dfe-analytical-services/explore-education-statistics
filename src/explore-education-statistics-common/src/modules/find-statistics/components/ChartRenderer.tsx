@@ -2,9 +2,7 @@ import HorizontalBarBlock from '@common/modules/find-statistics/components/chart
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
 import {
-  Axis,
   AxisConfigurationItem,
-  ChartDataSet,
   ChartType,
   DataLabelConfigurationItem,
   ReferenceLine,

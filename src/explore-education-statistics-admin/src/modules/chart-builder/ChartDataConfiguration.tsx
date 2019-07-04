@@ -9,6 +9,8 @@ import {
 import * as React from 'react';
 import { FormFieldset, FormTextInput } from '@common/components/form';
 import { Dictionary } from '@common/types';
+import { generateKeyFromDataSet } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { difference } from 'lodash';
 
 interface Props {
   dataSets: ChartDataSet[];
@@ -20,41 +22,63 @@ interface Props {
   ) => void;
 }
 
+const buildConfigItem = (
+  meta: DataBlockMetadata,
+  dataset: ChartDataSet,
+  key: string,
+) => {
+  const filters = (dataset.filters || [])
+    .map(f => meta.filters[f].label)
+    .join(',');
+
+  return {
+    name: `${meta.indicators[dataset.indicator].label} (${filters})`,
+    label: `${meta.indicators[dataset.indicator].label} (${filters})`,
+    value: key,
+    unit: meta.indicators[dataset.indicator].unit,
+  };
+};
+
+function updateLabels(
+  meta: DataBlockMetadata,
+  dataSets: ChartDataSet[],
+  existingDataLabels: Dictionary<DataLabelConfigurationItem>,
+) {
+  const newDataLabels = dataSets.reduce((results, dataset) => {
+    const key = generateKeyFromDataSet(dataset);
+    return {
+      ...results,
+      [key]: buildConfigItem(meta, dataset, key),
+    };
+  }, {});
+
+  const newKeys = difference(
+    Object.keys(newDataLabels),
+    Object.keys(existingDataLabels),
+  );
+  if (newKeys.length > 0) {
+    return {
+      ...newDataLabels,
+      ...existingDataLabels,
+    };
+  }
+
+  return existingDataLabels;
+}
+
 const ChartDataConfiguration = ({
   dataSets,
   // data,
   meta,
   onDataLabelsChange,
 }: Props) => {
-  const buildConfigItem = (dataset: ChartDataSet, key: string) => {
-    const filters = (dataset.filters || [])
-      .map(f => meta.filters[f].label)
-      .join(',');
-
-    return {
-      name: `${meta.indicators[dataset.indicator].label} (${filters})`,
-      label: `${meta.indicators[dataset.indicator].label} (${filters})`,
-      value: key,
-      unit: meta.indicators[dataset.indicator].unit,
-    };
-  };
-
   const [dataLabels, setDataLabels] = React.useState<
     Dictionary<DataLabelConfigurationItem>
-  >({});
+  >(() => updateLabels(meta, dataSets, {}));
 
   React.useEffect(() => {
-    const dl = dataSets.reduce((results, dataset) => {
-      const key = `${dataset.indicator}_${dataset.filters &&
-        dataset.filters.join('_')}`;
-      return {
-        ...results,
-        [key]: (dataLabels && dataLabels[key]) || buildConfigItem(dataset, key),
-      };
-    }, {});
-
-    setDataLabels(dl);
-  }, [dataSets]);
+    setDataLabels(updateLabels(meta, dataSets, dataLabels));
+  }, [meta, dataSets, dataLabels]);
 
   React.useEffect(() => {
     if (onDataLabelsChange && dataLabels) onDataLabelsChange(dataLabels);

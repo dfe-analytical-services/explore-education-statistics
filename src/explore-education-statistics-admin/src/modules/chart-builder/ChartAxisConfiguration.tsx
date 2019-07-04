@@ -1,16 +1,7 @@
 import * as React from 'react';
-import {
-  FormTextInput,
-  FormFieldset,
-  FormCheckbox,
-  FormGroup,
-  FormSelect,
-} from '@common/components/form';
+import { FormFieldset, FormCheckbox, FormGroup } from '@common/components/form';
 import FormComboBox from '@common/components/form/FormComboBox';
-import {
-  ChartDataSet,
-  AxisConfigurationItem,
-} from '@common/services/publicationService';
+import { AxisConfigurationItem } from '@common/services/publicationService';
 import { DataBlockMetadata } from '@common/services/dataBlockService';
 
 interface Props {

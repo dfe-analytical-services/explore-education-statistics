@@ -84,9 +84,6 @@ export default class LineChartBlock extends Component<ChartProps> {
   public render() {
     const { data, height, axes, dataLabels } = this.props;
 
-    const xAxis = axes.major;
-    const yAxis = axes.minor;
-
     const yAxisDomain: [AxisDomain, AxisDomain] = [-10, 10];
 
     const chartData: ChartDataB[] = createDataForAxis(
@@ -111,7 +108,7 @@ export default class LineChartBlock extends Component<ChartProps> {
             label={{
               offset: 5,
               position: 'bottom',
-              value: xAxis.title,
+              value: '',
             }}
             padding={{ left: 20, right: 20 }}
             tickMargin={10}
@@ -121,7 +118,7 @@ export default class LineChartBlock extends Component<ChartProps> {
               angle: -90,
               offset: 0,
               position: 'left',
-              value: yAxis.title,
+              value: '',
             }}
             scale="auto"
             domain={yAxisDomain}

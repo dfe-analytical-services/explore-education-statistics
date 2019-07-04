@@ -225,9 +225,9 @@ export interface ChartDataB {
   [key: string]: string;
 }
 
-function generateKeyFromAxisConfiguration(
+export function generateKeyFromDataSet(
   dataSet: ChartDataSet,
-  groupBy: string[],
+  ignoringFields: string[] = [],
 ) {
   const { indicator, filters, location, timePeriod } = dataSet;
   return [
@@ -239,7 +239,7 @@ function generateKeyFromAxisConfiguration(
       location.localAuthorityDistrict &&
       location.localAuthorityDistrict.sch_lad_code,
     location && location.localAuthority && location.localAuthority.new_la_code,
-    (!groupBy.includes('timePeriod') && timePeriod) || '',
+    (!ignoringFields.includes('timePeriod') && timePeriod) || '',
   ].join('_');
 }
 
@@ -266,7 +266,7 @@ function getChartDataForAxis(
       ...r,
       {
         name: generateNameForAxisConfiguration(groupBy, result),
-        [generateKeyFromAxisConfiguration(dataSet, groupBy)]:
+        [generateKeyFromDataSet(dataSet, groupBy)]:
           result.measures[dataSet.indicator] || 'NaN',
       },
     ],
