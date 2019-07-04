@@ -79,7 +79,7 @@ const AccordionSection = ({
               </button>
             </>
           ) : (
-            heading
+            <span id={headingId}>{heading}</span>
           ),
         )}
         {caption && (

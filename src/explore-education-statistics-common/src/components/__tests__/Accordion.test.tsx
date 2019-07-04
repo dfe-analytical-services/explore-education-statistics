@@ -112,8 +112,7 @@ describe('Accordion', () => {
     expect(contents[1]).toHaveAttribute('id', 'test-sections-2-content');
   });
 
-  // TODO: DFE-952
-  test.skip('scrolls to and opens section if location hash matches section heading ID', async () => {
+  test('scrolls to and opens section if location hash matches section heading ID', async () => {
     jest.useFakeTimers();
     window.location.hash = '#test-sections-1-heading';
 
