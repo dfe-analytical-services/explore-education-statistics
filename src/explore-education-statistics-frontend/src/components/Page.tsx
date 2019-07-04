@@ -14,7 +14,6 @@ type Props = {
   pageMeta?: PageMetaProps;
   children?: ReactNode;
   hideTitle?: boolean;
-  hideCaption?: boolean;
   wide?: boolean;
   isHomepage?: boolean;
 } & BreadcrumbsProps;
@@ -26,7 +25,6 @@ const Page = ({
   pageMeta,
   children = null,
   hideTitle = false,
-  hideCaption = false,
   wide = false,
   isHomepage = false,
   breadcrumbs = [],
@@ -55,9 +53,7 @@ const Page = ({
           id="main-content"
           role="main"
         >
-          {!hideTitle && (
-            <PageTitle title={title} caption={hideCaption ? '' : caption} />
-          )}
+          {!hideTitle && <PageTitle title={title} caption={caption} />}
           {children}
         </main>
       </div>
