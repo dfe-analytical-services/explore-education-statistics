@@ -4,30 +4,15 @@ import React, { forwardRef, ReactElement } from 'react';
 import styles from './MultiHeaderTable.module.scss';
 
 interface Props {
-  ariaHidden?: boolean;
   ariaLabelledBy?: string;
   className?: string;
-  isStickyHeader?: boolean;
-  isStickyColumn?: boolean;
   columnHeaders: string[][];
   rowHeaders: string[][];
   rows: string[][];
 }
 
 const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
-  (
-    {
-      ariaHidden,
-      ariaLabelledBy,
-      className,
-      columnHeaders,
-      isStickyColumn,
-      isStickyHeader,
-      rowHeaders,
-      rows,
-    },
-    ref,
-  ) => {
+  ({ ariaLabelledBy, className, columnHeaders, rowHeaders, rows }, ref) => {
     const getSpan = (groups: string[][], groupIndex: number) => {
       return groups
         .slice(groupIndex + 1)
@@ -41,9 +26,8 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
 
     return (
       <table
-        aria-hidden={ariaHidden}
         aria-labelledby={ariaLabelledBy}
-        className={classNames('govuk-table', className)}
+        className={classNames('govuk-table', styles.table, className)}
         ref={ref}
       >
         <thead>
@@ -65,100 +49,95 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                   />
                 )}
 
-                {!isStickyColumn &&
-                  times(totalColumns / (colSpan * columns.length), () =>
-                    columns.map((column, columnIndex) => {
-                      const key = `${column}_${columnIndex}`;
+                {times(totalColumns / (colSpan * columns.length), () =>
+                  columns.map((column, columnIndex) => {
+                    const key = `${column}_${columnIndex}`;
 
-                      return (
-                        <th
-                          className={classNames({
-                            'govuk-table__header--numeric': !isColGroup,
-                            'govuk-table__header--center': isColGroup,
-                            [styles.borderBottom]: !isColGroup,
-                            [styles.borderLeft]:
-                              columnIndex === 0 || isColGroup,
-                          })}
-                          colSpan={colSpan}
-                          scope={isColGroup ? 'colgroup' : 'col'}
-                          key={key}
-                        >
-                          {column}
-                        </th>
-                      );
-                    }),
-                  )}
+                    return (
+                      <th
+                        className={classNames({
+                          'govuk-table__header--numeric': !isColGroup,
+                          'govuk-table__header--center': isColGroup,
+                          [styles.borderBottom]: !isColGroup,
+                          [styles.borderRight]:
+                            columnIndex === columns.length - 1 || isColGroup,
+                        })}
+                        colSpan={colSpan}
+                        scope={isColGroup ? 'colgroup' : 'col'}
+                        key={key}
+                      >
+                        {column}
+                      </th>
+                    );
+                  }),
+                )}
               </tr>
             );
           })}
         </thead>
 
-        {!isStickyHeader && (
-          <tbody>
-            {rowHeaders
-              .reduce<ReactElement[][]>(
-                (acc, headerGroup, headerGroupIndex) =>
-                  acc.flatMap((row, rowIndex) =>
-                    headerGroup.map((header, index) => {
-                      const rowSpan = getSpan(rowHeaders, headerGroupIndex);
-                      const isRowGroup =
-                        headerGroupIndex !== rowHeaders.length - 1;
+        <tbody>
+          {rowHeaders
+            .reduce<ReactElement[][]>(
+              (acc, headerGroup, headerGroupIndex) =>
+                acc.flatMap((row, rowIndex) =>
+                  headerGroup.map((header, index) => {
+                    const rowSpan = getSpan(rowHeaders, headerGroupIndex);
+                    const isRowGroup =
+                      headerGroupIndex !== rowHeaders.length - 1;
 
-                      const headerCell = (
-                        <th
-                          // eslint-disable-next-line react/no-array-index-key
-                          key={`${rowIndex}_${headerGroupIndex}_${index}`}
-                          className={classNames({
-                            'govuk-table__cell--numeric': !isRowGroup,
-                            'govuk-table__cell--center': isRowGroup,
-                            [styles.borderRight]: !isRowGroup,
-                            [styles.borderBottom]:
-                              isRowGroup || index === headerGroup.length - 1,
-                          })}
-                          rowSpan={rowSpan}
-                          role={isRowGroup ? 'rowgroup' : 'row'}
-                        >
-                          {header}
-                        </th>
-                      );
+                    const headerCell = (
+                      <th
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={`${rowIndex}_${headerGroupIndex}_${index}`}
+                        className={classNames({
+                          'govuk-table__cell--numeric': !isRowGroup,
+                          'govuk-table__cell--center': isRowGroup,
+                          [styles.borderRight]: !isRowGroup,
+                          [styles.borderBottom]:
+                            isRowGroup || index === headerGroup.length - 1,
+                        })}
+                        rowSpan={rowSpan}
+                        scope={isRowGroup ? 'rowgroup' : 'row'}
+                      >
+                        {header}
+                      </th>
+                    );
 
-                      if (index === 0) {
-                        return [...row, headerCell];
-                      }
+                    if (index === 0) {
+                      return [...row, headerCell];
+                    }
 
-                      return [...row.slice(headerGroupIndex), headerCell];
-                    }),
-                  ),
-                [[]],
-              )
-              .map((headerCells, rowIndex) => (
-                <tr
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={rowIndex}
-                  className={classNames({
-                    [styles.borderBottom]: (rowIndex + 1) % firstRowSpan === 0,
-                  })}
-                >
+                    return [...row.slice(headerGroupIndex), headerCell];
+                  }),
+                ),
+              [[]],
+            )
+            .map((headerCells, rowIndex) => {
+              return (
+                // eslint-disable-next-line react/no-array-index-key
+                <tr key={rowIndex}>
                   {headerCells}
-                  {!isStickyColumn && (
-                    <>
-                      {rows[rowIndex].map((cell, cellIndex) => (
-                        <td
-                          // eslint-disable-next-line react/no-array-index-key
-                          key={cellIndex}
-                          className={classNames('govuk-table__cell--numeric', {
-                            [styles.borderLeft]: cellIndex % firstColSpan === 0,
-                          })}
-                        >
-                          {cell}
-                        </td>
-                      ))}
-                    </>
-                  )}
+                  <>
+                    {rows[rowIndex].map((cell, cellIndex) => (
+                      <td
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={cellIndex}
+                        className={classNames('govuk-table__cell--numeric', {
+                          [styles.borderRight]:
+                            (cellIndex + 1) % firstColSpan === 0,
+                          [styles.borderBottom]:
+                            (rowIndex + 1) % firstRowSpan === 0,
+                        })}
+                      >
+                        {cell}
+                      </td>
+                    ))}
+                  </>
                 </tr>
-              ))}
-          </tbody>
-        )}
+              );
+            })}
+        </tbody>
       </table>
     );
   },

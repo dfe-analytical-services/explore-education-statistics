@@ -1,5 +1,4 @@
-import throttle from 'lodash/throttle';
-import React, { forwardRef, Ref, useEffect, useRef } from 'react';
+import React, { forwardRef, Ref, useRef } from 'react';
 import DataTableKeys from './DataTableKeys';
 import styles from './FixedMultiHeaderDataTable.module.scss';
 import MultiHeaderTable from './MultiHeaderTable';
@@ -18,64 +17,6 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
     const { caption, captionId = 'dataTableCaption' } = props;
 
     const mainTableRef = useRef<HTMLTableElement>(null);
-    const headerTableRef = useRef<HTMLTableElement>(null);
-    const columnTableRef = useRef<HTMLTableElement>(null);
-    const intersectionTableRef = useRef<HTMLTableElement>(null);
-
-    const setStickyElementSizes = throttle(() => {
-      if (mainTableRef.current) {
-        const mainTableEl = mainTableRef.current;
-
-        const cloneCellHeightWidth = (
-          selector: string,
-          tableEl: HTMLTableElement,
-        ) => {
-          const tableCells = tableEl.querySelectorAll<HTMLTableCellElement>(
-            selector,
-          );
-
-          mainTableEl
-            .querySelectorAll<HTMLTableCellElement>(selector)
-            .forEach((el, index) => {
-              tableCells[index].style.height = `${el.offsetHeight}px`;
-              tableCells[index].style.width = `${el.offsetWidth}px`;
-            });
-        };
-
-        if (headerTableRef.current) {
-          headerTableRef.current.style.width = `${mainTableEl.offsetWidth}px`;
-
-          cloneCellHeightWidth('thead th', headerTableRef.current);
-        }
-
-        if (columnTableRef.current) {
-          cloneCellHeightWidth(
-            'thead tr:first-child td:first-child',
-            columnTableRef.current,
-          );
-          cloneCellHeightWidth('tbody th', columnTableRef.current);
-        }
-
-        if (intersectionTableRef.current) {
-          cloneCellHeightWidth(
-            'thead tr:first-child td:first-child',
-            intersectionTableRef.current,
-          );
-        }
-      }
-    }, 200);
-
-    useEffect(() => {
-      setTimeout(() => {
-        setStickyElementSizes();
-
-        window.addEventListener('resize', setStickyElementSizes);
-      }, 200);
-
-      return () => {
-        window.removeEventListener('resize', setStickyElementSizes);
-      };
-    });
 
     return (
       <figure className={styles.figure} ref={ref}>
@@ -92,43 +33,30 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
           onScroll={event => {
             const { scrollLeft, scrollTop } = event.currentTarget;
 
-            if (headerTableRef.current) {
-              headerTableRef.current.style.top = `${scrollTop}px`;
-            }
+            if (mainTableRef.current) {
+              mainTableRef.current
+                .querySelectorAll<HTMLTableHeaderCellElement>('thead td')
+                .forEach(el => {
+                  // eslint-disable-next-line no-param-reassign
+                  el.style.transform = `translate(${scrollLeft}px, ${scrollTop}px)`;
+                });
 
-            if (columnTableRef.current) {
-              columnTableRef.current.style.left = `${scrollLeft}px`;
-            }
+              mainTableRef.current
+                .querySelectorAll<HTMLTableHeaderCellElement>('thead th')
+                .forEach(el => {
+                  // eslint-disable-next-line no-param-reassign
+                  el.style.transform = `translate(0, ${scrollTop}px)`;
+                });
 
-            if (intersectionTableRef.current) {
-              intersectionTableRef.current.style.top = `${scrollTop}px`;
-              intersectionTableRef.current.style.left = `${scrollLeft}px`;
+              mainTableRef.current
+                .querySelectorAll<HTMLTableHeaderCellElement>('tbody th')
+                .forEach(el => {
+                  // eslint-disable-next-line no-param-reassign
+                  el.style.transform = `translate(${scrollLeft}px, 0)`;
+                });
             }
           }}
         >
-          <MultiHeaderTable
-            {...props}
-            className={styles.intersectionTable}
-            ref={intersectionTableRef}
-            ariaHidden
-            isStickyColumn
-            isStickyHeader
-          />
-          <MultiHeaderTable
-            {...props}
-            className={styles.columnTable}
-            ref={columnTableRef}
-            ariaHidden
-            isStickyColumn
-          />
-          <MultiHeaderTable
-            {...props}
-            className={styles.headerTable}
-            ref={headerTableRef}
-            ariaHidden
-            isStickyHeader
-          />
-
           <MultiHeaderTable
             {...props}
             ariaLabelledBy={captionId}
