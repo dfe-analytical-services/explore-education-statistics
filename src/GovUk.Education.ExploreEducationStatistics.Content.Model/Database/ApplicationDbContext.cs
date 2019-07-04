@@ -1085,7 +1085,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         DataBlockRequest = new DataBlockRequest
                         {
                             subjectId = 1,
-                            geographicLevel = "National",
+                            geographicLevel = "Country",
                             startYear = "2012",
                             endYear = "2016",
                             filters = new List<string> { "1", "2" },
@@ -1183,7 +1183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     DataBlockRequest = new DataBlockRequest
                                     {
                                         subjectId = 1,
-                                        geographicLevel = "National",
+                                        geographicLevel = "Country",
                                         startYear = "2012",
                                         endYear = "2016",
                                         filters = new List<string> {"1", "2"},
@@ -1248,7 +1248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     DataBlockRequest = new DataBlockRequest
                                     {
                                         subjectId = 1,
-                                        geographicLevel = "National",
+                                        geographicLevel = "Country",
                                         startYear = "2012",
                                         endYear = "2016",
                                         filters = new List<string> {"1", "2"},
@@ -1309,7 +1309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     DataBlockRequest = new DataBlockRequest
                                     {
                                         subjectId = 1,
-                                        geographicLevel = "National",
+                                        geographicLevel = "Country",
                                         startYear = "2012",
                                         endYear = "2016",
                                         filters = new List<string> {"1", "2"},
@@ -1546,7 +1546,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         DataBlockRequest = new DataBlockRequest
                         {
                             subjectId = 12,
-                            geographicLevel = "National",
+                            geographicLevel = "Country",
                             startYear = "2012",
                             endYear = "2016",
                             filters = new List<string> { "727" },
@@ -1638,7 +1638,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     DataBlockRequest = new DataBlockRequest
                                     {
                                         subjectId = 12,
-                                        geographicLevel = "National",
+                                        geographicLevel = "Country",
                                         startYear = "2012",
                                         endYear = "2016",
                                         filters = new List<string> { "727" },
@@ -1700,7 +1700,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     DataBlockRequest = new DataBlockRequest
                                     {
                                         subjectId = 12,
-                                        geographicLevel = "National",
+                                        geographicLevel = "Country",
                                         startYear = "2012",
                                         endYear = "2016",
                                         filters = new List<string> { "727" },
@@ -2213,7 +2213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         DataBlockRequest = new DataBlockRequest
                         {
                             subjectId = 17,
-                            geographicLevel = "National",
+                            geographicLevel = "Country",
                             startYear = "2014",
                             endYear = "2018",
                             filters = new List<string> { "845" },
@@ -2311,7 +2311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                           DataBlockRequest = new DataBlockRequest
                           {
                               subjectId = 17,
-                              geographicLevel = "National",
+                              geographicLevel = "Country",
                               startYear = "2014",
                               endYear = "2018",
                               filters = new List<string> { "848" },
@@ -2408,7 +2408,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                           DataBlockRequest = new DataBlockRequest
                           {
                               subjectId = 17,
-                              geographicLevel = "National",
+                              geographicLevel = "Country",
                               startYear = "2014",
                               endYear = "2018",
                               filters = new List<string> { "845" },
