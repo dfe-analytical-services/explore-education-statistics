@@ -1,8 +1,5 @@
-import time
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.common.action_chains  import ActionChains
-from selenium.webdriver.common.keys  import Keys
-from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 
@@ -17,21 +14,6 @@ def user_should_be_at_top_of_page():
   (x, y) = sl.get_window_position()
   if y != 0:
     raise AssertionError(f"Windows position Y is {y} not 0! User should be at the top of the page!")
-
-# def italic_x_characters_before_cursor(num):
-#   action = ActionChains(sl.driver).key_down(Keys.SHIFT).send_keys(Keys.ARROW_LEFT).key_up(Keys.SHIFT)
-#   for x in range(0, int(num)):
-#     action.perform()
-#
-#   sl.driver.find_element_by_css_selector('.ck-button:nth-child(4)').click()
-#
-#   action = ActionChains(sl.driver).send_keys(Keys.ARROW_RIGHT)
-#   for x in range(0, int(num)):
-#     action.perform()
-
-# def insert_image():
-#   sl.driver.find_element_by_css_selector('span.ck-file-dialog-button:nth-of-type(2)').click()
-#   sl.driver.send_keys("Screenshot")
 
 def user_checks_accordion_is_in_position(header_starts_with, position):
   try:
