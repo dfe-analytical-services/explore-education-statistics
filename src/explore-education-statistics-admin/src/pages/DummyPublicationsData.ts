@@ -1,28 +1,24 @@
 import {
   ApprovalStatus,
-  Methodology,
+  IdLabelPair,
   Publication,
   Release,
   ReleaseDataType,
   ReleaseSetupDetails,
-  Theme,
-  TimePeriod,
   Topic,
 } from '@admin/services/publicationService';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
-import { format } from 'date-fns';
-import React from 'react';
 
-const methodologies: Methodology[] = [
+const methodologies: IdLabelPair[] = [
   {
     id: 'methodology-1',
-    title: 'A guide to absence statistics',
+    label: 'A guide to absence statistics',
   },
 ];
 
-const theme1: Theme = {
+const theme1: IdLabelPair = {
   id: 'theme-1',
-  title: 'Pupils and schools',
+  label: 'Pupils and schools',
 };
 
 const theme1Topic1: Topic = {
@@ -37,16 +33,6 @@ const theme1Topic2: Topic = {
   theme: theme1,
 };
 
-const timePeriodTermAutumn: TimePeriod = {
-  id: 'term-autumn',
-  title: 'Autumn term',
-};
-
-const timePeriodTermFullAcademicYear: TimePeriod = {
-  id: 'term-full-academic-year',
-  title: 'Full academic year',
-};
-
 const dataTypeRevised: ReleaseDataType = {
   id: 'data-type-revised',
   title: 'Revised',
@@ -58,11 +44,8 @@ const releaseTemplate: Release = {
   slug: '2017-2018',
   timePeriodCoverage: {
     label: 'Academic year',
-    academicYear: {
-      yearStarting: 2017,
-      timePeriod: timePeriodTermFullAcademicYear,
-      termsPerYear: 6,
-    },
+    code: 'AYQ1Q4',
+    startDate: new Date('2017-01-01'),
   },
   scheduledReleaseDate: new Date('2020-09-20'),
   status: {
@@ -74,6 +57,10 @@ const releaseTemplate: Release = {
     lastEditor: PrototypeLoginService.getUser('user1'),
     published: new Date('2019-09-20 09:30'),
     nextRelease: new Date('2020-09-20 09:30'),
+  },
+  releaseType: {
+    id: 'national-stats',
+    label: 'National statistics',
   },
   dataType: dataTypeRevised,
   lead: {
@@ -163,11 +150,8 @@ const myPublication2ReleaseTemplate = {
   ...releaseTemplate,
   timePeriodCoverage: {
     label: 'Autumn term, academic year',
-    academicYear: {
-      yearStarting: 2017,
-      timePeriod: timePeriodTermAutumn,
-      termsPerYear: 6,
-    },
+    code: 'AYQ1',
+    startDate: new Date('2017-01-01'),
   },
 };
 
@@ -204,11 +188,8 @@ const myPublication3ReleaseTemplate = {
   ...releaseTemplate,
   timePeriodCoverage: {
     label: 'Autumn and spring terms, academic year',
-    academicYear: {
-      yearStarting: 2017,
-      timePeriod: timePeriodTermAutumn,
-      termsPerYear: 6,
-    },
+    code: 'AYQ1Q3',
+    startDate: new Date('2016-01-01'),
   },
   topic: theme1Topic2,
 };
@@ -303,9 +284,13 @@ const getReleaseSetupDetails = (releaseId: string): ReleaseSetupDetails => {
   const owningPublication = getOwningPublicationForRelease(release);
 
   return {
+    id: release.id,
     publicationTitle: owningPublication.title,
-    releaseType: release.timePeriodCoverage.label,
-    releaseName: release.releaseName,
+    timePeriodCoverageType: release.timePeriodCoverage.label,
+    timePeriodCoverageName: release.releaseName,
+    timePeriodCoverageCode: release.timePeriodCoverage.code,
+    timePeriodCoverageStartDate: release.timePeriodCoverage.startDate,
+    releaseType: release.releaseType,
     leadStatisticianName: release.lead.name,
     scheduledReleaseDate: release.scheduledReleaseDate,
   };

@@ -17,7 +17,7 @@ const AdminDashboardPublicationsTab = ({
   noResultsMessage,
 }: AdminDashboardPublicationsTabProps) => {
   const createThemeTopicTitleLabel = (publication: Publication) =>
-    `${publication.topic.theme.title}, ${publication.topic.title}`;
+    `${publication.topic.theme.label}, ${publication.topic.title}`;
 
   const publicationsByThemeAndTopic: Dictionary<Publication[]> = groupBy(
     publications,

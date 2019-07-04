@@ -19,7 +19,7 @@ const AdminDashboardPublications = ({
           </dt>
           <dd className="govuk-summary-list__value">
             <Link to="/methodology/{publication.methodology.id}">
-              {publication.methodology.title}
+              {publication.methodology.label}
             </Link>
           </dd>
           <dd className="govuk-summary-list__actions">

@@ -1,43 +1,20 @@
 import { User } from '@admin/services/PrototypeLoginService';
 
-export interface Methodology {
+export interface IdLabelPair {
   id: string;
-  title: string;
-}
-
-export interface Theme {
-  id: string;
-  title: string;
+  label: string;
 }
 
 export interface Topic {
   id: string;
   title: string;
-  theme: Theme;
-}
-
-export interface TimePeriod {
-  id: string;
-  title: string;
+  theme: IdLabelPair;
 }
 
 export interface TimePeriodCoverage {
   label: string;
-  academicYear?: {
-    yearStarting: number;
-    timePeriod: TimePeriod;
-    termsPerYear: number;
-  };
-  calendarYear?: {
-    year: number;
-  };
-  financialYear?: {
-    startDate: Date;
-    timePeriod: TimePeriod;
-  };
-  month?: {
-    monthlyReleaseDate: Date;
-  };
+  code: string;
+  startDate: Date;
 }
 
 export enum ApprovalStatus {
@@ -73,6 +50,7 @@ export interface Release {
   releaseName: string;
   timePeriodCoverage: TimePeriodCoverage;
   scheduledReleaseDate: Date;
+  releaseType: IdLabelPair;
   slug: string;
   status: ReleaseStatus;
   lead: UserContact;
@@ -104,14 +82,18 @@ export interface Publication {
   legacyReleases: LegacyRelease[];
   topic: Topic;
   contact: UserContact;
-  methodology: Methodology;
+  methodology: IdLabelPair;
   owner: User;
 }
 
 export interface ReleaseSetupDetails {
+  id: string;
   publicationTitle: string;
-  releaseType: string;
-  releaseName: string;
+  timePeriodCoverageName: string;
+  timePeriodCoverageType: string;
+  timePeriodCoverageCode: string;
+  timePeriodCoverageStartDate: Date;
+  releaseType: IdLabelPair;
   leadStatisticianName: string;
   scheduledReleaseDate: Date;
 }
