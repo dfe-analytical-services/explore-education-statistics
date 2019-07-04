@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
-import EditReleasePageTemplate, {
-  ReleaseSection,
-} from '@admin/pages/edit-release/components/EditReleasePageTemplate';
+import EditReleasePageTemplate from '@admin/pages/edit-release/components/EditReleasePageTemplate';
 import { Release } from '../../services/publicationService';
 
 interface MatchProps {
@@ -35,7 +33,14 @@ const EditReleaseBuildTablesPage = ({
     <EditReleasePageTemplate
       publicationTitle={publicationTitle}
       releaseId={releaseId}
-      selectedSection={ReleaseSection.BuildTables}
+      previousLink={{
+        label: 'add / edit data',
+        linkTo: `/edit-release/${releaseId}/data`,
+      }}
+      nextLink={{
+        label: 'view / edit tables',
+        linkTo: `/edit-release/${releaseId}/tables`,
+      }}
     >
       {release && <h2 className="govuk-heading-m">Build tables</h2>}
     </EditReleasePageTemplate>
