@@ -3,7 +3,7 @@ import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import NavLink from '@admin/components/NavLink';
 import { RouteComponentProps, withRouter } from 'react-router';
 import Page from '../../../components/Page';
-import editReleaseRoutes from '../../../routes/editReleaseRoutes';
+import editReleaseRoutes from '../../../routes/releaseRoutes';
 
 interface Props extends RouteComponentProps {
   releaseId: string;
@@ -11,7 +11,7 @@ interface Props extends RouteComponentProps {
   publicationTitle: string;
 }
 
-const EditReleasePageTemplate = withRouter(
+const ReleasePageTemplate = withRouter(
   ({ releaseId, publicationTitle, children, location }: Props) => {
     const currentRouteIndex =
       editReleaseRoutes.findIndex(
@@ -79,4 +79,4 @@ const EditReleasePageTemplate = withRouter(
   },
 );
 
-export default EditReleasePageTemplate;
+export default ReleasePageTemplate;

@@ -4,7 +4,7 @@ import { Route } from 'react-router';
 import './App.scss';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 import { BrowserRouter } from 'react-router-dom';
-import editReleaseRoutes from '@admin/routes/editReleaseRoutes';
+import editReleaseRoutes from '@admin/routes/releaseRoutes';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';

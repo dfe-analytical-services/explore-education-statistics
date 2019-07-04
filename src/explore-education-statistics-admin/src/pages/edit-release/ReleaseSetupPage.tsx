@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { format } from 'date-fns';
-import EditReleasePageTemplate from '@admin/pages/edit-release/components/EditReleasePageTemplate';
+import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
 import {
   FormFieldset,
@@ -20,7 +20,7 @@ interface Props extends RouteComponentProps<MatchProps> {
   editing: boolean;
 }
 
-const EditReleaseSetupPage = ({ match, editing = true }: Props) => {
+const ReleaseSetupPage = ({ match, editing = true }: Props) => {
   const { releaseId } = match.params;
 
   const [releaseSetupDetails, setReleaseSetupDetails] = useState<
@@ -35,7 +35,7 @@ const EditReleaseSetupPage = ({ match, editing = true }: Props) => {
 
   return (
     <>
-      <EditReleasePageTemplate
+      <ReleasePageTemplate
         releaseId={releaseId}
         publicationTitle={
           releaseSetupDetails ? releaseSetupDetails.publicationTitle : ''
@@ -47,7 +47,7 @@ const EditReleaseSetupPage = ({ match, editing = true }: Props) => {
         {editing && releaseSetupDetails && (
           <EditableView releaseSetupDetails={releaseSetupDetails} />
         )}
-      </EditReleasePageTemplate>
+      </ReleasePageTemplate>
     </>
   );
 };
@@ -460,4 +460,4 @@ const EditableView = ({ releaseSetupDetails }: EditableViewProps) => {
   );
 };
 
-export default EditReleaseSetupPage;
+export default ReleaseSetupPage;

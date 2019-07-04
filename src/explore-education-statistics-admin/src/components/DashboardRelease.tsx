@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import Details from '@common/components/Details';
 import { LoginContext } from '@admin/components/Login';
 import { ApprovalStatus, Release } from '@admin/services/publicationService';
+import { setupRoute } from '@admin/routes/releaseRoutes';
 
 const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive && isLatest) {
@@ -153,7 +154,7 @@ const DashboardRelease = ({
               </Link>
             )}
             {!editing && !review && (
-              <Link to={`/edit-release/${release.id}/setup`}>
+              <Link to={setupRoute.generateLink(release.id)}>
                 Edit this release
               </Link>
             )}
