@@ -8,28 +8,28 @@ import PageMeta, { PageMetaProps } from './PageMeta';
 import PageTitle from './PageTitle';
 
 type Props = {
-  children?: ReactNode;
-  wide?: boolean;
-  pageMeta?: PageMetaProps;
   title: string;
-  hideTitle?: boolean;
   caption?: string;
-  hideCaption?: boolean;
-  isHomepage?: boolean;
   breadcrumbLabel?: string;
+  pageMeta?: PageMetaProps;
+  children?: ReactNode;
+  hideTitle?: boolean;
+  hideCaption?: boolean;
+  wide?: boolean;
+  isHomepage?: boolean;
 } & BreadcrumbsProps;
 
 const Page = ({
-  children = null,
-  breadcrumbs = [],
-  breadcrumbLabel = '',
-  wide = false,
-  pageMeta,
   title,
-  hideTitle = false,
   caption = '',
+  breadcrumbLabel = '',
+  pageMeta,
+  children = null,
+  hideTitle = false,
   hideCaption = false,
+  wide = false,
   isHomepage = false,
+  breadcrumbs = [],
 }: Props) => {
   return (
     <>
