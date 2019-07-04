@@ -30,7 +30,7 @@ export interface ChartRendererProps {
   width?: number;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
-  dataLabels: Dictionary<DataLabelConfigurationItem>;
+  labels: Dictionary<DataLabelConfigurationItem>;
   axes: Dictionary<AxisConfigurationItem>;
 }
 
@@ -43,14 +43,9 @@ function ChartRenderer(props: ChartRendererProps) {
     referenceLines,
     stacked,
     type,
-    dataLabels,
+    labels,
     axes,
   } = props;
-
-  const labels = Object.entries(meta.indicators).reduce(
-    (results, [key, indicator]) => ({ ...results, [key]: indicator.label }),
-    {},
-  );
 
   // TODO : Temporary sort on the results to get them in date order
   data.result.sort((a, b) => {
@@ -73,7 +68,6 @@ function ChartRenderer(props: ChartRendererProps) {
     height,
     width,
     referenceLines,
-    dataLabels,
     stacked,
   };
 

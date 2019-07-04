@@ -2807,7 +2807,7 @@ const AbstractChartProps: ChartProps = {
   data,
   meta: metaData,
 
-  dataLabels: {
+  labels: {
     '2014_HT6': {
       label: metaData.timePeriods['2014_HT6'].label,
     },
@@ -2864,7 +2864,7 @@ const AbstractMultipleChartProps: ChartProps = {
   data: multipleData,
   meta: metaData,
 
-  dataLabels: {
+  labels: {
     '23': {
       label: metaData.indicators['23'].label,
       name: '23',

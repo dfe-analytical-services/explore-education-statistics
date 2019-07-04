@@ -27,7 +27,7 @@ import { Dictionary } from '@common/types';
 export interface ChartProps {
   data: DataBlockData;
   meta: DataBlockMetadata;
-  dataLabels: Dictionary<DataLabelConfigurationItem>;
+  labels: Dictionary<DataLabelConfigurationItem>;
   axes: Dictionary<AxisConfigurationItem>;
   height?: number;
   width?: number;

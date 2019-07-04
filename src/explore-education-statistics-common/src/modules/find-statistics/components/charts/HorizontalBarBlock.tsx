@@ -57,14 +57,14 @@ export default class HorizontalBarBlock extends Component<
       width,
       referenceLines,
       stacked,
-      dataLabels,
+      labels,
       axes,
     } = this.props;
 
     const chartData: ChartDataB[] = createDataForAxis(
       axes.major,
       data.result,
-    ).map(mapNameToNameLabel(dataLabels));
+    ).map(mapNameToNameLabel(labels));
 
     const keysForChart = getKeysForChart(chartData);
 
@@ -91,8 +91,8 @@ export default class HorizontalBarBlock extends Component<
               key={dataKey}
               dataKey={dataKey}
               fill={colours[index]}
-              name={dataLabels[dataKey] && dataLabels[dataKey].label}
-              unit={dataLabels[dataKey] && dataLabels[dataKey].unit}
+              name={labels[dataKey] && labels[dataKey].label}
+              unit={labels[dataKey] && labels[dataKey].unit}
               stackId={stacked ? 'a' : undefined}
             />
           ))}

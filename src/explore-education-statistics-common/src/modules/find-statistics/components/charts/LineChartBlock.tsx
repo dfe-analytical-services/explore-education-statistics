@@ -82,14 +82,14 @@ export default class LineChartBlock extends Component<ChartProps> {
   };
 
   public render() {
-    const { data, height, axes, dataLabels } = this.props;
+    const { data, height, axes, labels } = this.props;
 
     const yAxisDomain: [AxisDomain, AxisDomain] = [-10, 10];
 
     const chartData: ChartDataB[] = createDataForAxis(
       axes.major,
       data.result,
-    ).map(mapNameToNameLabel(dataLabels));
+    ).map(mapNameToNameLabel(labels));
 
     const keysForChart = getKeysForChart(chartData);
 
@@ -130,13 +130,13 @@ export default class LineChartBlock extends Component<ChartProps> {
               key={name}
               dataKey={name}
               type="linear"
-              name={(dataLabels[name] && dataLabels[name].label) || name}
+              name={(labels[name] && labels[name].label) || name}
               legendType={symbols[index]}
               dot={props => <Symbols {...props} type={symbols[index]} />}
               stroke={colours[index]}
               fill={colours[index]}
               strokeWidth="5"
-              unit={(dataLabels[name] && dataLabels[name].unit) || ''}
+              unit={(labels[name] && labels[name].unit) || ''}
               isAnimationActive={false}
             />
           ))}

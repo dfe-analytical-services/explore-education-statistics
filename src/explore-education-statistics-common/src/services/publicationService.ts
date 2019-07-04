@@ -90,7 +90,7 @@ export interface AxisConfigurationItem {
 
 export interface Chart {
   type: ChartType;
-  dataLabels: Dictionary<DataLabelConfigurationItem>;
+  labels: Dictionary<DataLabelConfigurationItem>;
   axes: Dictionary<AxisConfigurationItem>;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];

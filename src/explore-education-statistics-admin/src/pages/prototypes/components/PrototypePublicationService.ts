@@ -453,7 +453,7 @@ export default class PrototypePublicationService {
 
         charts: [
           {
-            dataLabels: {
+            labels: {
               '23_1_2': {
                 name: '23_1_2',
                 unit: '%',

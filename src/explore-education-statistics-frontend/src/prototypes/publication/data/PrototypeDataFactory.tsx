@@ -124,7 +124,7 @@ export const newApiHorizontalData: ChartProps = {
     locations: {},
   },
 
-  dataLabels: {
+  labels: {
     '23_1_____': {
       value: '23_1',
       unit: '%',
@@ -199,7 +199,7 @@ export const newChartsApiDataBlock: DataBlockProps = {
           dataSets: [],
         },
       },
-      dataLabels: {
+      labels: {
         '23_1_2_____': {
           value: '23_1_2',
           unit: '%',

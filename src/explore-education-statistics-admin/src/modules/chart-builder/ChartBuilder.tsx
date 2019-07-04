@@ -2,7 +2,10 @@ import React from 'react';
 
 import Details from '@common/components/Details';
 import ChartRenderer from '@common/modules/find-statistics/components/ChartRenderer';
-import { DataBlockResponse } from '@common/services/dataBlockService';
+import {
+  DataBlockResponse,
+  DataBlockMetadata,
+} from '@common/services/dataBlockService';
 import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import ChartDataSelector, {
   DataUpdatedEvent,
@@ -21,6 +24,41 @@ import ChartAxisConfiguration from './ChartAxisConfiguration';
 
 interface Props {
   data: DataBlockResponse;
+}
+
+function getReduceMetaDataForAxis(data: DataBlockResponse) {
+  return (
+    items: Dictionary<DataLabelConfigurationItem>,
+    groupName: string,
+  ): Dictionary<DataLabelConfigurationItem> => {
+    if (groupName === 'timePeriod') {
+      return {
+        ...items,
+        ...data.result.reduce<Dictionary<DataLabelConfigurationItem>>(
+          (moreItems, result) => ({
+            ...moreItems,
+            [`${result.year}_${result.timeIdentifier}`]: data.metaData
+              .timePeriods[`${result.year}_${result.timeIdentifier}`],
+          }),
+          {},
+        ),
+      };
+    }
+    return items;
+  };
+}
+
+function generateAxesMetaData(
+  axes: Dictionary<AxisConfigurationItem>,
+  data: DataBlockResponse,
+) {
+  return Object.values(axes).reduce(
+    (allValues, axis) => ({
+      ...allValues,
+      ...axis.groupBy.reduce(getReduceMetaDataForAxis(data), {}),
+    }),
+    {},
+  );
 }
 
 const ChartBuilder = ({ data }: Props) => {
@@ -49,11 +87,23 @@ const ChartBuilder = ({ data }: Props) => {
     setDataSets(addedData);
   };
 
-  const [dataLabels, setDataLabels] = React.useState<
+  const [labels, setLabels] = React.useState<
+    Dictionary<DataLabelConfigurationItem>
+  >({});
+
+  const [fieldLabels, setFieldLabels] = React.useState<
     Dictionary<DataLabelConfigurationItem>
   >({});
 
   const [axes, setAxes] = React.useState<Dictionary<AxisConfigurationItem>>({});
+
+  React.useEffect(() => {
+    setLabels({
+      ...fieldLabels,
+
+      ...generateAxesMetaData(axes, data),
+    });
+  }, [axes, fieldLabels]);
 
   React.useEffect(() => {
     if (selectedChartType) {
@@ -108,7 +158,7 @@ const ChartBuilder = ({ data }: Props) => {
               axes={axes}
               data={data}
               meta={data.metaData}
-              dataLabels={dataLabels}
+              labels={labels}
             />
           </Details>
 
@@ -117,7 +167,7 @@ const ChartBuilder = ({ data }: Props) => {
               dataSets={dataSets}
               data={data}
               meta={data.metaData}
-              onDataLabelsChange={setDataLabels}
+              onDataLabelsChange={setFieldLabels}
             />
           </Details>
 

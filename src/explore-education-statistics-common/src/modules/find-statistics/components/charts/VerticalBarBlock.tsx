@@ -45,12 +45,12 @@ export default class VerticalBarBlock extends Component<ChartProps> {
   };
 
   public render() {
-    const { data, height, width, dataLabels, axes } = this.props;
+    const { data, height, width, labels, axes } = this.props;
 
     const chartData: ChartDataB[] = createDataForAxis(
       axes.major,
       data.result,
-    ).map(mapNameToNameLabel(dataLabels));
+    ).map(mapNameToNameLabel(labels));
 
     const keysForChart = getKeysForChart(chartData);
 
@@ -81,8 +81,8 @@ export default class VerticalBarBlock extends Component<ChartProps> {
               key={dataKey}
               dataKey={dataKey}
               fill={colours[index]}
-              name={dataLabels[dataKey] && dataLabels[dataKey].label}
-              unit={dataLabels[dataKey] && dataLabels[dataKey].unit}
+              name={labels[dataKey] && labels[dataKey].label}
+              unit={labels[dataKey] && labels[dataKey].unit}
             />
           ))}
         </BarChart>

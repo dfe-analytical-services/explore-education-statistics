@@ -32,7 +32,6 @@ const ChartAxisConfiguration = ({ id, axisConfiguration, meta }: Props) => {
         <FormCheckbox
           id={`${id}_show`}
           name={`${id}_show`}
-          defaultChecked
           label="Show axis?"
           checked={show}
           onChange={e => {

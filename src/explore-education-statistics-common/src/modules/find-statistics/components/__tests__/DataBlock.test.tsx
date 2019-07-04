@@ -42,7 +42,7 @@ describe('DataBlock', () => {
           {
             type: 'horizontalbar',
             stacked: true,
-            dataLabels: {
+            labels: {
               '23_1_2': {
                 name: '23_1_2',
                 label: 'Label 23_1_2',
@@ -116,7 +116,7 @@ describe('DataBlock', () => {
         charts={[
           {
             type: 'verticalbar',
-            dataLabels: {
+            labels: {
               '23_1_2': {
                 name: '23_1_2',
                 label: 'Label 23_1_2',
@@ -247,7 +247,7 @@ describe('DataBlock', () => {
         charts={[
           {
             type: 'map',
-            dataLabels: {
+            labels: {
               '23_1_2': {
                 name: '23_1_2',
                 label: 'Label 23_1_2',
