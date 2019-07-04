@@ -207,9 +207,7 @@ class TableToolPage extends Component<Props, State> {
     } = this.state;
 
     return (
-      <Page breadcrumbs={[{ name: 'Create your own tables online' }]} wide>
-        <PageTitle caption="Table tool" title="Create your own tables online" />
-
+      <Page title="Create your own tables online" caption="Table Tool" wide>
         <p>
           Choose the data and area of interest you want to explore and then use
           filters to create your table.

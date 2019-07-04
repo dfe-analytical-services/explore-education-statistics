@@ -34,15 +34,7 @@ class DownloadIndexPage extends Component<Props> {
   public render() {
     const { themes } = this.props;
     return (
-      <Page
-        breadcrumbs={[
-          {
-            link: '/download',
-            name: 'Download',
-          },
-        ]}
-      >
-        <PageTitle title="Download data files" />
+      <Page title="Download data files" breadcrumbLabel="Download">
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <p className="govuk-body-l">
