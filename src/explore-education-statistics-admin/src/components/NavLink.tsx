@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
-import { NavLink, NavLinkProps } from 'react-router-dom';
+import { NavLink as RouterNavLink, NavLinkProps } from 'react-router-dom';
 
 type Props = {
   children: ReactNode;
@@ -8,7 +8,7 @@ type Props = {
   unvisited?: boolean;
 } & NavLinkProps;
 
-const DfeNavLink = ({
+const NavLink = ({
   children,
   className,
   to,
@@ -16,7 +16,7 @@ const DfeNavLink = ({
   ...props
 }: Props) => {
   return (
-    <NavLink
+    <RouterNavLink
       {...props}
       to={to}
       className={classNames(
@@ -28,8 +28,8 @@ const DfeNavLink = ({
       )}
     >
       {children}
-    </NavLink>
+    </RouterNavLink>
   );
 };
 
-export default DfeNavLink;
+export default NavLink;
