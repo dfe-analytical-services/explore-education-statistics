@@ -3,7 +3,7 @@ import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import NavLink from '@admin/components/NavLink';
 import { RouteComponentProps, withRouter } from 'react-router';
 import Page from '../../../components/Page';
-import editReleaseRoutes from '../../../routes/releaseRoutes';
+import releaseRoutes from '../../../routes/releaseRoutes';
 
 interface Props extends RouteComponentProps {
   releaseId: string;
@@ -14,18 +14,16 @@ interface Props extends RouteComponentProps {
 const ReleasePageTemplate = withRouter(
   ({ releaseId, publicationTitle, children, location }: Props) => {
     const currentRouteIndex =
-      editReleaseRoutes.findIndex(
+      releaseRoutes.findIndex(
         route => route.generateLink(releaseId) === location.pathname,
       ) || 0;
 
     const previousRoute =
-      currentRouteIndex > 0
-        ? editReleaseRoutes[currentRouteIndex - 1]
-        : undefined;
+      currentRouteIndex > 0 ? releaseRoutes[currentRouteIndex - 1] : undefined;
 
     const nextRoute =
-      currentRouteIndex < editReleaseRoutes.length - 1
-        ? editReleaseRoutes[currentRouteIndex + 1]
+      currentRouteIndex < releaseRoutes.length - 1
+        ? releaseRoutes[currentRouteIndex + 1]
         : undefined;
 
     const previousSection = previousRoute
@@ -57,7 +55,7 @@ const ReleasePageTemplate = withRouter(
         <nav className="app-navigation govuk-!-margin-bottom-9">
           <ul className="app-navigation__list govuk-!-margin-bottom-0">
             <li>
-              {editReleaseRoutes.map(route => (
+              {releaseRoutes.map(route => (
                 <NavLink
                   key={route.path}
                   to={route.generateLink(releaseId)}

@@ -1,11 +1,5 @@
 import * as React from 'react';
-import {
-  FormTextInput,
-  FormFieldset,
-  FormCheckbox,
-  FormGroup,
-  FormSelect,
-} from '@common/components/form';
+import { FormFieldset, FormCheckbox, FormGroup } from '@common/components/form';
 import FormComboBox from '@common/components/form/FormComboBox';
 import { ChartDataSet } from '@common/services/publicationService';
 import { DataBlockMetadata } from '@common/services/dataBlockService';

@@ -8,10 +8,7 @@ interface MatchProps {
   releaseId: string;
 }
 
-const ReleaseTablesPage = ({
-  match,
-  location,
-}: RouteComponentProps<MatchProps>) => {
+const ReleaseTablesPage = ({ match }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
   const [release, setRelease] = useState<Release>();
