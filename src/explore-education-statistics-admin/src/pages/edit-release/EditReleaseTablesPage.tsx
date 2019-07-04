@@ -34,7 +34,6 @@ const EditReleaseTablesPage = ({
     <EditReleasePageTemplate
       publicationTitle={publicationTitle}
       releaseId={releaseId}
-      currentPathname={location.pathname}
     >
       {release && <h2 className="govuk-heading-m">View / edit tables</h2>}
     </EditReleasePageTemplate>

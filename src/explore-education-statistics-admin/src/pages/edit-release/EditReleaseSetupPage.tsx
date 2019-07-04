@@ -10,10 +10,7 @@ interface MatchProps {
   releaseId: string;
 }
 
-const EditReleaseSetupPage = ({
-  match,
-  location,
-}: RouteComponentProps<MatchProps>) => {
+const EditReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
   const [releaseSetupDetails, setReleaseSetupDetails] = useState<
@@ -33,7 +30,6 @@ const EditReleaseSetupPage = ({
         publicationTitle={
           releaseSetupDetails ? releaseSetupDetails.publicationTitle : ''
         }
-        currentPathname={location.pathname}
       >
         {releaseSetupDetails && (
           <dl className="govuk-summary-list govuk-!-margin-bottom-9">

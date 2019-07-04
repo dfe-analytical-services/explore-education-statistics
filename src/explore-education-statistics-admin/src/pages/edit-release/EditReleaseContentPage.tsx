@@ -8,10 +8,7 @@ interface MatchProps {
   releaseId: string;
 }
 
-const EditReleaseContentPage = ({
-  match,
-  location,
-}: RouteComponentProps<MatchProps>) => {
+const EditReleaseContentPage = ({ match }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
   const [release, setRelease] = useState<Release>();
@@ -34,7 +31,6 @@ const EditReleaseContentPage = ({
     <EditReleasePageTemplate
       publicationTitle={publicationTitle}
       releaseId={releaseId}
-      currentPathname={location.pathname}
     >
       {release && <h2 className="govuk-heading-m">Add / edit content</h2>}
     </EditReleasePageTemplate>
