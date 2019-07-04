@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/library.robot
 
-Force Tags  Admin   UnderConstruction
+Force Tags  Admin
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -13,12 +13,12 @@ Verify admin index page loads
     user waits until page contains  Index page for administrative application
 
 Go to Admin dashboard
-    [Tags]  HappyPath
+    [Tags]  HappyPath   UnderConstruction
     user clicks link       Administrators dashboard page
     sleep  100
 
 Go to edit page for current release of Pupil absence statistics
-    [Tags]  HappyPath
+    [Tags]  HappyPath     UnderConstruction
 #    user clicks button  Absence and exclusions
     user clicks accordion section   Pupil absence statistics and data for schools in England
 #    element attribute value should be  css:#schools-heading-1   aria-expanded   true
@@ -26,12 +26,12 @@ Go to edit page for current release of Pupil absence statistics
     user waits until page contains  Edit pupil absence statistics
 
 Validate "Click to edit" tags are appearing
-    [Tags]  HappyPath
+    [Tags]  HappyPath     UnderConstruction
     sleep  1000
     elements containing text should match x times  Click to edit      15
 
 Edit headline
-    [Tags]  HappyPath
+    [Tags]  HappyPath     UnderConstruction
     user clicks element containing text  Pupil absence statistics and data for schools in England
     user deletes text from element until block is empty  css:h2  Pupil absence statistics and data for schools in England
     user presses keys    abcdefghijklmopqrstuvwxyz
