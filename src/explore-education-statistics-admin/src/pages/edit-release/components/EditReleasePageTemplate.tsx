@@ -4,6 +4,7 @@ import PreviousNextLinks, {
 } from '@admin/components/PreviousNextLinks';
 import NavLink from '@admin/components/NavLink';
 import Page from '../../../components/Page';
+import editReleaseRoutes from '../../../routes/editReleaseRoutes';
 
 interface Props {
   releaseId: string;
@@ -38,42 +39,15 @@ const EditReleasePageTemplate = ({
       <nav className="app-navigation govuk-!-margin-bottom-9">
         <ul className="app-navigation__list govuk-!-margin-bottom-0">
           <li>
-            <NavLink
-              to={`/edit-release/${releaseId}/setup`}
-              activeClassName="app-navigation--current-page"
-            >
-              Release setup
-            </NavLink>
-            <NavLink
-              to={`/edit-release/${releaseId}/data`}
-              activeClassName="app-navigation--current-page"
-            >
-              Add / edit data
-            </NavLink>
-            <NavLink
-              to={`/edit-release/${releaseId}/build-tables`}
-              activeClassName="app-navigation--current-page"
-            >
-              Build tables
-            </NavLink>
-            <NavLink
-              to={`/edit-release/${releaseId}/tables`}
-              activeClassName="app-navigation--current-page"
-            >
-              View / edit tables
-            </NavLink>
-            <NavLink
-              to={`/edit-release/${releaseId}/content`}
-              activeClassName="app-navigation--current-page"
-            >
-              Add / edit content
-            </NavLink>
-            <NavLink
-              to={`/edit-release/${releaseId}/publish-status`}
-              activeClassName="app-navigation--current-page"
-            >
-              Set publish status
-            </NavLink>
+            {editReleaseRoutes.map(route => (
+              <NavLink
+                key={route.path}
+                to={route.generateLink(releaseId)}
+                activeClassName="app-navigation--current-page"
+              >
+                {route.title}
+              </NavLink>
+            ))}
           </li>
         </ul>
       </nav>
