@@ -58,7 +58,7 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
                     <optgroup key={group.label} label={group.label}>
                       {group.options.map(option => (
                         <option key={option.id} value={option.id}>
-                          {option.label}
+                          {`${option.label} - ${option.id}`}
                         </option>
                       ))}
                     </optgroup>
@@ -291,18 +291,11 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
                   // setValue(event.target.value);
                   alert('hi');
                 }}
-                options={[
-                  {
-                    id: 'national-stats',
-                    label: 'National statistics',
-                    value: 'national-stats',
-                  },
-                  {
-                    id: 'adhoc-stats',
-                    label: 'Official / adhoc statistics',
-                    value: 'adhoc-stats',
-                  },
-                ]}
+                options={DummyReferenceData.releaseTypeOptions.map(option => ({
+                  id: option.id,
+                  label: option.label,
+                  value: option.id,
+                }))}
               />
             </FormGroup>
             <>

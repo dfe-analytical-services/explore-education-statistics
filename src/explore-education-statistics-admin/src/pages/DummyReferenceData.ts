@@ -60,7 +60,7 @@ const createTimePeriodGroupWithQuarterlyPermutations = (
   };
 };
 
-const timePeriodCoverageOptions: TimePeriodCoverageGroup[] = [
+const timePeriodCoverageGroups: TimePeriodCoverageGroup[] = [
   createTimePeriodGroupWithQuarterlyPermutations('Academic year', 'AY'),
   createTimePeriodGroupWithQuarterlyPermutations('Calendar year', 'CY'),
   createTimePeriodGroupWithQuarterlyPermutations('Financial year', 'FY'),
@@ -101,12 +101,10 @@ const timePeriodCoverageOptions: TimePeriodCoverageGroup[] = [
       'October',
       'November',
       'December',
-    ].map((month, index) => {
-      return {
-        id: `M${index + 1}`,
-        label: month,
-      };
-    }),
+    ].map((month, index) => ({
+      id: `M${index + 1}`,
+      label: month,
+    })),
   },
   {
     label: 'Other',
@@ -119,6 +117,18 @@ const timePeriodCoverageOptions: TimePeriodCoverageGroup[] = [
   },
 ];
 
+const releaseTypeOptions: IdLabelPair[] = [
+  {
+    id: 'national-stats',
+    label: 'National statistics',
+  },
+  {
+    id: 'adhoc-stats',
+    label: 'Official / adhoc statistics',
+  },
+];
+
 export default {
-  timePeriodCoverageGroups: timePeriodCoverageOptions,
+  timePeriodCoverageGroups,
+  releaseTypeOptions,
 };
