@@ -5,11 +5,17 @@ import PageBanner from './PageBanner';
 import PageFooter from './PageFooter';
 import PageHeader from './PageHeader';
 import PageMeta, { PageMetaProps } from './PageMeta';
+import PageTitle from './PageTitle';
 
 type Props = {
   children: ReactNode;
   wide?: boolean;
   pageMeta?: PageMetaProps;
+  title: string;
+  hideTitle?: boolean;
+  caption?: string;
+  hideCaption?: boolean;
+  isHomepage?: boolean;
 } & BreadcrumbsProps;
 
 const Page = ({
@@ -17,10 +23,15 @@ const Page = ({
   breadcrumbs = [],
   wide = false,
   pageMeta,
+  title,
+  hideTitle = false,
+  caption = '',
+  hideCaption = false,
+  isHomepage = false,
 }: Props) => {
   return (
     <>
-      <PageMeta {...pageMeta} />
+      <PageMeta title={title} description={caption} {...pageMeta} />
       <PageHeader wide={wide} />
 
       <div
@@ -29,13 +40,20 @@ const Page = ({
         })}
       >
         <PageBanner />
-        <Breadcrumbs breadcrumbs={breadcrumbs} />
+        <Breadcrumbs
+          breadcrumbs={
+            isHomepage ? undefined : breadcrumbs.concat([{ name: title }])
+          }
+        />
 
         <main
           className="govuk-main-wrapper app-main-class"
           id="main-content"
           role="main"
         >
+          {!hideTitle && (
+            <PageTitle title={title} caption={hideCaption ? '' : caption} />
+          )}
           {children}
         </main>
       </div>
