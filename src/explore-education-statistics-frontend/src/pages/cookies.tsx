@@ -4,9 +4,7 @@ import React from 'react';
 
 function CookiesPage() {
   return (
-    <Page breadcrumbs={[{ name: 'Cookies' }]} pageMeta={{ title: 'Cookies' }}>
-      <PageTitle title="Cookies" />
-
+    <Page title="Cookies">
       <p>
         The Explore education statistics service puts small files (known as
         ‘cookies’) onto your computer to collect information about how you

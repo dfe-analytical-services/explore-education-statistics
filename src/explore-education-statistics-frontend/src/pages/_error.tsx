@@ -73,7 +73,7 @@ class ErrorPage extends Component<Props> {
       : ErrorPage.statusCodeTitles[statusCode];
 
     return (
-      <Page>
+      <Page title={pageTitle} hideTitle>
         {errorMessage ? (
           <>
             <PageTitle title={pageTitle} />

@@ -58,15 +58,12 @@ class PublicationReleasePage extends Component<Props> {
 
     return (
       <Page
+        title={data.title}
+        caption="Publication"
         breadcrumbs={[
           { name: 'Find statistics and data', link: '/statistics' },
-          { name: data.title },
         ]}
-        pageMeta={{ title: data.title, description: 'Publication' }}
       >
-        <div className={styles.releaseHeader}>
-          <PageTitle title={data.title} />
-        </div>
         <div className={classNames('govuk-grid-row', styles.releaseIntro)}>
           <div className="govuk-grid-column-two-thirds">
             <div className="govuk-grid-row">

@@ -40,13 +40,10 @@ class MethodologyPage extends Component<Props> {
 
     return (
       <Page
-        breadcrumbs={[
-          { name: 'Methodologies', link: '/methodologies' },
-          { name: data.title },
-        ]}
-        pageMeta={{ title: data.title, description: 'Methodology' }}
+        title={data.title}
+        caption="Methodology"
+        breadcrumbs={[{ name: 'Methodologies', link: '/methodologies' }]}
       >
-        <h1 className="govuk-heading-xl">{data.title}</h1>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <dl className="dfe-meta-content govuk-!-margin-0">

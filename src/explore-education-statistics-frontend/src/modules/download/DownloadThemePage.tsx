@@ -10,18 +10,14 @@ import React from 'react';
 function DownloadIndexPage() {
   return (
     <Page
+      title="Pupils and schools"
       breadcrumbs={[
         {
           link: '/download',
           name: 'Download data',
         },
-        {
-          link: '/download/theme',
-          name: 'Pupils and schools',
-        },
       ]}
     >
-      <PageTitle title="Download data files for pupils and schools" />
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">

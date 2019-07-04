@@ -38,12 +38,7 @@ class FindStatisticsPage extends Component<Props> {
     const { themes } = this.props;
 
     return (
-      <Page
-        breadcrumbs={[{ name: 'Find statistics and data' }]}
-        pageMeta={{ title: 'Find statistics and data' }}
-      >
-        <PageTitle title="Find statistics and data" />
-
+      <Page title="Find statistics and data">
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <p className="govuk-body-l">
