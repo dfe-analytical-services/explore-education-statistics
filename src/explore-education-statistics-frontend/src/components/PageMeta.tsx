@@ -1,7 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 
-interface Props {
+export interface PageMetaProps {
   title?: string;
   description?: string;
   imgUrl?: string;
@@ -11,7 +11,7 @@ const PageMeta = ({
   title = 'Explore education statistics',
   description = 'GOV.UK: Explore education statistics',
   imgUrl,
-}: Props) => {
+}: PageMetaProps) => {
   return (
     <Helmet>
       {/* <!-- Primary Meta Tags --> */}
