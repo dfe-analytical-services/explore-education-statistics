@@ -11,7 +11,7 @@ interface Props {
 class ErrorPage extends Component<Props> {
   private static statusCodeTitles: { [code: number]: string } = {
     404: 'Page not found',
-    500: 'Sorry, there is a problem with the service',
+    500: "Sorry, there's a problem with the service",
   };
 
   public static getInitialProps({ res, err }: NextContext): Props {
@@ -45,6 +45,21 @@ class ErrorPage extends Component<Props> {
                 contact our Explore education statistics team
               </a>{' '}
               if you need any help or support.
+            </p>
+          </>
+        );
+      case 500:
+        return (
+          <>
+            <PageTitle title={ErrorPage.statusCodeTitles[500]} />
+
+            <p>Try again later.</p>
+            <p>
+              In the meantime, if you need any help or support{' '}
+              <a className="govuk-link" href="/contact">
+                contact our Explore education statistics team
+              </a>
+              .
             </p>
           </>
         );
