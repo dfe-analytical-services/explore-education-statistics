@@ -8,7 +8,7 @@ import PageMeta, { PageMetaProps } from './PageMeta';
 import PageTitle from './PageTitle';
 
 type Props = {
-  children: ReactNode;
+  children?: ReactNode;
   wide?: boolean;
   pageMeta?: PageMetaProps;
   title: string;
@@ -20,7 +20,7 @@ type Props = {
 } & BreadcrumbsProps;
 
 const Page = ({
-  children,
+  children = null,
   breadcrumbs = [],
   breadcrumbLabel = '',
   wide = false,
