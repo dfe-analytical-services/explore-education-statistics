@@ -1,3 +1,4 @@
+import DummyReferenceData from '@admin/pages/DummyReferenceData';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { format } from 'date-fns';
@@ -53,117 +54,15 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
                   className="govuk-select"
                   value={releaseSetupDetails.timePeriodCoverageCode}
                 >
-                  <optgroup label="Academic year">
-                    <option value="AY">Academic year - AY</option>
-                    <option value="AYQ1">Academic year Q1 - AYQ1</option>
-                    <option value="AYQ1Q2">
-                      Academic year Q1 to Q2 - AYQ1Q2
-                    </option>
-                    <option value="AYQ1Q3">
-                      Academic year Q1 to Q3 - AYQ1Q3
-                    </option>
-                    <option value="AYQ1Q4">
-                      Academic year Q1 to Q4 - AYQ1Q4
-                    </option>
-                    <option value="AYQ2">Academic year Q2 - AYQ2</option>
-                    <option value="AYQ2Q3">
-                      Academic year Q2 to Q3 - AYQ2Q3
-                    </option>
-                    <option value="AYQ2Q4">
-                      Academic year Q2 to Q4 - AYQ2Q4
-                    </option>
-                    <option value="AYQ3">Academic year Q3 - AYQ3</option>
-                    <option value="AYQ3Q4">
-                      Academic year Q3 to Q3 - AYQ3Q4
-                    </option>
-                    <option value="AYQ4">Academic year Q4 - AYQ4</option>
-                  </optgroup>
-                  <optgroup label="Calendar year">
-                    <option value="CY">Calendar year - CY</option>
-                    <option value="CYQ1">Calendar year Q1 - CYQ1</option>
-                    <option value="CYQ1Q2">
-                      Calendar year Q1 to Q2 - CYQ1Q2
-                    </option>
-                    <option value="CYQ1Q3">
-                      Calendar year Q1 to Q3 - CYQ1Q3
-                    </option>
-                    <option value="CYQ1Q4">
-                      Calendar year Q1 to Q4 - CYQ1Q4
-                    </option>
-                    <option value="CYQ2">Calendar year Q2 - CYQ2</option>
-                    <option value="CYQ2Q3">
-                      Calendar year Q2 to Q3 - CYQ2Q3
-                    </option>
-                    <option value="CYQ2Q4">
-                      Calendar year Q2 to Q4 - CYQ1Q4
-                    </option>
-                    <option value="CYQ3">Calendar year Q3 - CYQ3</option>
-                    <option value="CYQ3Q4">
-                      Calendar year Q3 to Q4 - CYQ3Q4
-                    </option>
-                    <option value="CYQ4">Calendar year Q4 - CYQ4</option>
-                  </optgroup>
-                  <optgroup label="Financial year">
-                    <option value="FY">Financial year - FY</option>
-                    <option value="FYQ1">Financial year Q1 - FYQ1</option>
-                    <option value="FYQ1Q2">
-                      Financial year Q1 to Q2 - FYQ1Q2
-                    </option>
-                    <option value="FYQ1Q3">
-                      Financial year Q1 to Q3 - FYQ1Q3
-                    </option>
-                    <option value="FYQ1Q4">
-                      Financial year Q1 to Q4 - FYQ1Q4
-                    </option>
-                    <option value="FYQ2">Financial year Q2 - FYQ2</option>
-                    <option value="FYQ2Q3">
-                      Financial year Q2 to Q3 - FYQ2Q3
-                    </option>
-                    <option value="FYQ2Q4">
-                      Financial year Q2 to Q4 - FYQ1Q4
-                    </option>
-                    <option value="FYQ3">Financial year Q3 - FYQ3</option>
-                    <option value="FYQ3Q4">
-                      Financial year Q3 to Q4 - FYQ3Q4
-                    </option>
-                    <option value="FYQ4">Financial year Q4 - FYQ4</option>
-                  </optgroup>
-                  <optgroup label="Tax year">
-                    <option value="TY">Tax year - TY</option>
-                    <option value="TYQ1">Tax year Q1 - TYQ1</option>
-                    <option value="TYQ1Q2">Tax year Q1 to Q2 - TYQ1Q2</option>
-                    <option value="TYQ1Q3">Tax year Q1 to Q3 - TYQ1Q3</option>
-                    <option value="TYQ1Q4">Tax year Q1 to Q4 - TYQ1Q4</option>
-                    <option value="TYQ2">Tax year Q2 - TYQ2</option>
-                    <option value="TYQ2Q3">Tax year Q2 to Q3 - TYQ2Q3</option>
-                    <option value="TYQ2Q4">Tax year Q2 to Q4 - TYQ1Q4</option>
-                    <option value="TYQ3">Tax year Q3 - TYQ3</option>
-                    <option value="TYQ3Q4">Tax year Q3 to Q4 - TYQ3Q4</option>
-                    <option value="TYQ4">Tax year Q4 - TYQ4</option>
-                  </optgroup>
-                  <optgroup label="Term">
-                    <option value="T1">Autumn term - T1</option>
-                    <option value="T1T2">Autumn and spring term - T1T2</option>
-                    <option value="T2">Spring term - T2</option>
-                    <option value="T2">Summer term - T3</option>
-                  </optgroup>
-                  <optgroup label="Month">
-                    <option value="M1">January - M1</option>
-                    <option value="M2">February - M2</option>
-                    <option value="M3">March - M3</option>
-                    <option value="M4">April - M4</option>
-                    <option value="M5">May - M5</option>
-                    <option value="M6">June - M6</option>
-                    <option value="M7">July - M7</option>
-                    <option value="M8">August - M8</option>
-                    <option value="M9">September - M9</option>
-                    <option value="M10">October - M10</option>
-                    <option value="M11">November - M11</option>
-                    <option value="M12">December - M12</option>
-                  </optgroup>
-                  <optgroup label="Other">
-                    <option value="EOM">Up until 31st March - EOM</option>
-                  </optgroup>
+                  {DummyReferenceData.timePeriodCoverageGroups.map(group => (
+                    <optgroup key={group.label} label={group.label}>
+                      {group.options.map(option => (
+                        <option key={option.id} value={option.id}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
                 </select>
               </FormGroup>
               <FormGroup>
