@@ -1,7 +1,6 @@
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import Page from '../components/Page';
-import PageTitle from '../components/PageTitle';
 
 interface Props {
   errorMessage: string;
@@ -31,7 +30,7 @@ class ErrorPage extends Component<Props> {
       case 404:
         return (
           <>
-            <PageTitle title={ErrorPage.statusCodeTitles[404]} />
+            <Page title={ErrorPage.statusCodeTitles[404]} />
 
             <p>If you typed the web address, check it's correct.</p>
             <p>
@@ -51,7 +50,7 @@ class ErrorPage extends Component<Props> {
       case 500:
         return (
           <>
-            <PageTitle title={ErrorPage.statusCodeTitles[500]} />
+            <Page title={ErrorPage.statusCodeTitles[500]} />
 
             <p>Try again later.</p>
             <p>
@@ -66,7 +65,7 @@ class ErrorPage extends Component<Props> {
       default:
         return (
           <>
-            <PageTitle title={ErrorPage.statusCodeTitles[500]} />
+            <Page title={ErrorPage.statusCodeTitles[500]} />
 
             <p>Try again later.</p>
             <p>
@@ -87,18 +86,14 @@ class ErrorPage extends Component<Props> {
       ? ErrorPage.statusCodeTitles[500]
       : ErrorPage.statusCodeTitles[statusCode];
 
-    return (
-      <Page title={pageTitle} hideTitle>
-        {errorMessage ? (
-          <>
-            <PageTitle title={pageTitle} />
+    return errorMessage ? (
+      <>
+        <Page title={pageTitle} />
 
-            <p>{errorMessage}</p>
-          </>
-        ) : (
-          this.getStatusCodePage()
-        )}
-      </Page>
+        <p>{errorMessage}</p>
+      </>
+    ) : (
+      this.getStatusCodePage()
     );
   }
 }
