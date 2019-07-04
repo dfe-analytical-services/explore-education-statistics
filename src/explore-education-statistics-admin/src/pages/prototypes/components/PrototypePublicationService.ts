@@ -444,11 +444,7 @@ export default class PrototypePublicationService {
           indicators: ['23', '26', '28'],
           startYear: '2016',
           endYear: '2017',
-          geographicLevel: GeographicLevel.National,
-          countries: [],
-          localAuthorities: [],
-          localAuthorityDistricts: [],
-          regions: [],
+          geographicLevel: GeographicLevel.Country,
         },
 
         charts: [

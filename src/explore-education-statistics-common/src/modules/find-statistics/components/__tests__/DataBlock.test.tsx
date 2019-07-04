@@ -18,7 +18,7 @@ const dataBlockService = _dataBlockService as jest.Mocked<
 describe('DataBlock', () => {
   const dataBlockRequest: DataBlockRequest = {
     subjectId: 1,
-    geographicLevel: GeographicLevel.National,
+    geographicLevel: GeographicLevel.Country,
     startYear: '2014',
     endYear: '2015',
     filters: ['1', '2'],
