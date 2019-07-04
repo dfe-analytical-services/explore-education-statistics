@@ -59,7 +59,8 @@ Validate "About these statistics" -- "Last updated"
     user closes details dropdown   See all 2 updates
 
 Validate Key Statistics data block -- Summary tab
-    [Tags]  HappyPath
+    [Documentation]     DFE-915
+    [Tags]  HappyPath   Failing
     user checks key stat tile contents   Overall absence rate         4.7%   Up from 4.6% in 2015/16
     user checks key stat tile contents   Authorised absence rate      3.4%   Similar to previous years
     user checks key stat tile contents   Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
