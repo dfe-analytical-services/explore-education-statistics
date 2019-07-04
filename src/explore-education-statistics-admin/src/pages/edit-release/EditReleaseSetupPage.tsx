@@ -3,7 +3,6 @@ import { RouteComponentProps } from 'react-router';
 import { format } from 'date-fns';
 import EditReleasePageTemplate from '@admin/pages/edit-release/components/EditReleasePageTemplate';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
-import { dataRoute } from '@admin/routes/editReleaseRoutes';
 import { ReleaseSetupDetails } from '../../services/publicationService';
 import Link from '../../components/Link';
 
@@ -11,7 +10,10 @@ interface MatchProps {
   releaseId: string;
 }
 
-const EditReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
+const EditReleaseSetupPage = ({
+  match,
+  location,
+}: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
   const [releaseSetupDetails, setReleaseSetupDetails] = useState<
@@ -31,10 +33,7 @@ const EditReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
         publicationTitle={
           releaseSetupDetails ? releaseSetupDetails.publicationTitle : ''
         }
-        nextLink={{
-          label: dataRoute.title,
-          linkTo: dataRoute.generateLink(releaseId),
-        }}
+        currentPathname={location.pathname}
       >
         {releaseSetupDetails && (
           <dl className="govuk-summary-list govuk-!-margin-bottom-9">

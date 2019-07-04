@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
 import EditReleasePageTemplate from '@admin/pages/edit-release/components/EditReleasePageTemplate';
-import { contentRoute } from '@admin/routes/editReleaseRoutes';
 import { Release } from '../../services/publicationService';
 
 interface MatchProps {
@@ -11,6 +10,7 @@ interface MatchProps {
 
 const EditReleasePublishStatusPage = ({
   match,
+  location,
 }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
@@ -34,10 +34,7 @@ const EditReleasePublishStatusPage = ({
     <EditReleasePageTemplate
       publicationTitle={publicationTitle}
       releaseId={releaseId}
-      previousLink={{
-        label: contentRoute.title,
-        linkTo: contentRoute.generateLink(releaseId),
-      }}
+      currentPathname={location.pathname}
     >
       {release && <h2 className="govuk-heading-m">Set publish status</h2>}
     </EditReleasePageTemplate>

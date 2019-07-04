@@ -1,7 +1,5 @@
 import React, { ReactNode } from 'react';
-import PreviousNextLinks, {
-  PreviousNextLink,
-} from '@admin/components/PreviousNextLinks';
+import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import NavLink from '@admin/components/NavLink';
 import Page from '../../../components/Page';
 import editReleaseRoutes from '../../../routes/editReleaseRoutes';
@@ -10,17 +8,41 @@ interface Props {
   releaseId: string;
   children: ReactNode;
   publicationTitle: string;
-  previousLink?: PreviousNextLink;
-  nextLink?: PreviousNextLink;
+  currentPathname: string;
 }
 
 const EditReleasePageTemplate = ({
   releaseId,
   publicationTitle,
   children,
-  previousLink,
-  nextLink,
+  currentPathname,
 }: Props) => {
+  const currentRouteIndex =
+    editReleaseRoutes.findIndex(
+      route => route.generateLink(releaseId) === currentPathname,
+    ) || 0;
+
+  const previousRoute =
+    currentRouteIndex > 0
+      ? editReleaseRoutes[currentRouteIndex - 1]
+      : undefined;
+
+  const nextRoute =
+    currentRouteIndex < editReleaseRoutes.length - 1
+      ? editReleaseRoutes[currentRouteIndex + 1]
+      : undefined;
+
+  const previousSection = previousRoute
+    ? {
+        label: previousRoute.title,
+        linkTo: previousRoute.generateLink(releaseId),
+      }
+    : undefined;
+
+  const nextSection = nextRoute
+    ? { label: nextRoute.title, linkTo: nextRoute.generateLink(releaseId) }
+    : undefined;
+
   return (
     <Page
       wide
@@ -53,8 +75,8 @@ const EditReleasePageTemplate = ({
       </nav>
       {children}
       <PreviousNextLinks
-        previousSection={previousLink}
-        nextSection={nextLink}
+        previousSection={previousSection}
+        nextSection={nextSection}
       />
     </Page>
   );

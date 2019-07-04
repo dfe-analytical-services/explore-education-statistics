@@ -10,6 +10,7 @@ interface MatchProps {
 
 const EditReleaseBuildTablesPage = ({
   match,
+  location,
 }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
@@ -33,14 +34,7 @@ const EditReleaseBuildTablesPage = ({
     <EditReleasePageTemplate
       publicationTitle={publicationTitle}
       releaseId={releaseId}
-      previousLink={{
-        label: 'add / edit data',
-        linkTo: `/edit-release/${releaseId}/data`,
-      }}
-      nextLink={{
-        label: 'view / edit tables',
-        linkTo: `/edit-release/${releaseId}/tables`,
-      }}
+      currentPathname={location.pathname}
     >
       {release && <h2 className="govuk-heading-m">Build tables</h2>}
     </EditReleasePageTemplate>
