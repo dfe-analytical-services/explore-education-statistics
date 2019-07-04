@@ -6,7 +6,6 @@ describe('MultiHeaderTable', () => {
   test('renders 2x2 table correctly', () => {
     const { container } = render(
       <MultiHeaderTable
-        caption="Test caption"
         columnHeaders={[['A', 'B'], ['C', 'D']]}
         rowHeaders={[['1', '2'], ['3', '4']]}
         rows={[
@@ -46,7 +45,6 @@ describe('MultiHeaderTable', () => {
   test('renders 2x2x2 table correctly', () => {
     const { container } = render(
       <MultiHeaderTable
-        caption="Test caption"
         columnHeaders={[['A', 'B'], ['C', 'D'], ['E', 'F']]}
         rowHeaders={[['1', '2'], ['3', '4'], ['5', '6']]}
         rows={[

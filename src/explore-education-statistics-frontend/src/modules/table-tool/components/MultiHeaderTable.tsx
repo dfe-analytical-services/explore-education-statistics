@@ -5,7 +5,7 @@ import styles from './MultiHeaderTable.module.scss';
 
 interface Props {
   ariaHidden?: boolean;
-  ariaLabelledBy: string;
+  ariaLabelledBy?: string;
   className?: string;
   isStickyHeader?: boolean;
   isStickyColumn?: boolean;

@@ -108,7 +108,6 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
         >
           <MultiHeaderTable
             {...props}
-            ariaLabelledBy={captionId}
             className={styles.intersectionTable}
             ref={intersectionTableRef}
             ariaHidden
@@ -117,7 +116,6 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
           />
           <MultiHeaderTable
             {...props}
-            ariaLabelledBy={captionId}
             className={styles.columnTable}
             ref={columnTableRef}
             ariaHidden
@@ -125,7 +123,6 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
           />
           <MultiHeaderTable
             {...props}
-            ariaLabelledBy={captionId}
             className={styles.headerTable}
             ref={headerTableRef}
             ariaHidden
