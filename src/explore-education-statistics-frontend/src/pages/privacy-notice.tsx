@@ -4,11 +4,7 @@ import React from 'react';
 
 function PrivacyNoticePage() {
   return (
-    <Page
-      title="Explore education statistics: Privacy notice"
-      breadcrumbLabel="Privacy notice"
-      pageMeta={{ title: 'Privacy notice' }}
-    >
+    <Page title="Privacy notice">
       <div>
         <h3>Who we are</h3>
         <p>
