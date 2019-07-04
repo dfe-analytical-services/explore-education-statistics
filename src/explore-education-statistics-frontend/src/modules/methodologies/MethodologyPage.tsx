@@ -130,26 +130,28 @@ class MethodologyPage extends Component<Props> {
           </Accordion>
         )}
 
-        <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
+        {data.annexes && data.annexes.length > 0 && (
+          <>
+            <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
 
-        {data.annexes && (
-          <Accordion id="contents-sections">
-            {data.annexes.map(({ heading, caption, order, content }) => {
-              return (
-                <AccordionSection
-                  heading={heading}
-                  caption={caption}
-                  key={order}
-                >
-                  <ContentBlock
-                    content={content}
-                    id={`content_${order}`}
-                    publication={data.publication}
-                  />
-                </AccordionSection>
-              );
-            })}
-          </Accordion>
+            <Accordion id="contents-sections">
+              {data.annexes.map(({ heading, caption, order, content }) => {
+                return (
+                  <AccordionSection
+                    heading={heading}
+                    caption={caption}
+                    key={order}
+                  >
+                    <ContentBlock
+                      content={content}
+                      id={`content_${order}`}
+                      publication={data.publication}
+                    />
+                  </AccordionSection>
+                );
+              })}
+            </Accordion>
+          </>
         )}
 
         <PrintThisPage />
