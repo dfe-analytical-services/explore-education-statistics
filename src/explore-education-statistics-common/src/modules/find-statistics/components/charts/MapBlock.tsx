@@ -535,7 +535,7 @@ class MapBlock extends Component<MapProps, MapState> {
       width,
       height,
       meta,
-      dataSets = [],
+      axes,
     } = this.props;
 
     const { selected, options, geometry, legend, ukGeometry } = this.state;
@@ -596,7 +596,7 @@ class MapBlock extends Component<MapProps, MapState> {
                 label="Select data to view"
                 value={selected.indicator}
                 onChange={e => this.onSelectIndicator(e.currentTarget.value)}
-                options={dataSets.map(
+                options={axes.major.dataSets.map(
                   indicator => meta.indicators[+indicator.indicator],
                 )}
                 order={[]}

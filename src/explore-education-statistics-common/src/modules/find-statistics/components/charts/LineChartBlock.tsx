@@ -4,6 +4,7 @@ import {
   ChartProps,
   createDataForAxis,
   getKeysForChart,
+  mapNameToNameLabel,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import React, { Component } from 'react';
@@ -88,7 +89,10 @@ export default class LineChartBlock extends Component<ChartProps> {
 
     const yAxisDomain: [AxisDomain, AxisDomain] = [-10, 10];
 
-    const chartData: ChartDataB[] = createDataForAxis(axes.major, data.result);
+    const chartData: ChartDataB[] = createDataForAxis(
+      axes.major,
+      data.result,
+    ).map(mapNameToNameLabel(dataLabels));
 
     const keysForChart = getKeysForChart(chartData);
 

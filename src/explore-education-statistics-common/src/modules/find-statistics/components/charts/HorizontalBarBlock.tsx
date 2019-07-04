@@ -7,6 +7,7 @@ import {
   ChartDataB,
   createDataForAxis,
   getKeysForChart,
+  mapNameToNameLabel,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React, { Component } from 'react';
 import {
@@ -60,7 +61,10 @@ export default class HorizontalBarBlock extends Component<
       axes,
     } = this.props;
 
-    const chartData: ChartDataB[] = createDataForAxis(axes.major, data.result);
+    const chartData: ChartDataB[] = createDataForAxis(
+      axes.major,
+      data.result,
+    ).map(mapNameToNameLabel(dataLabels));
 
     const keysForChart = getKeysForChart(chartData);
 

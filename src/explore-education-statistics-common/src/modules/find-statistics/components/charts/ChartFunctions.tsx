@@ -18,7 +18,6 @@ import {
 } from 'recharts';
 import {
   DataBlockData,
-  DataBlockLocation,
   DataBlockMetadata,
   Result,
 } from '@common/services/dataBlockService';
@@ -171,28 +170,8 @@ export function filterResultsBySingleDataSet(
   );
 }
 
-function filterNonRelaventDataFromDataSet(
-  dataSet: ChartDataSet,
-  results: Result[],
-) {
-  return results.map(result => {
-    return {
-      ...result,
-      measures: Object.entries(result.measures)
-        .filter(([measureId]) => dataSet.indicator === measureId)
-        .reduce<Dictionary<string>>(
-          (newMeasures, [measureId, measureValue]) => ({
-            ...newMeasures,
-            [measureId]: measureValue,
-          }),
-          {},
-        ),
-    };
-  });
-}
-
-function resultsForDataSet(results: Result[], ds: ChartDataSet) {
-  return results.filter(result => {
+function filterResultsForDataSet(ds: ChartDataSet) {
+  return (result: Result) => {
     // fail fast with the two things that are most likely to not match
     if (ds.indicator && !Object.keys(result.measures).includes(ds.indicator))
       return false;
@@ -237,7 +216,7 @@ function resultsForDataSet(results: Result[], ds: ChartDataSet) {
     }
 
     return true;
-  });
+  };
 }
 
 export interface ChartDataB {
@@ -295,32 +274,27 @@ function getChartDataForAxis(
   );
 }
 
-function combineChartData(
-  chartDataForAxis: ChartDataB[],
-  combinedChartData: ChartDataB[],
+function reduceCombineChartData(
+  newCombinedData: ChartDataB[],
+  { name, ...valueData }: { name: string },
 ) {
-  return chartDataForAxis.reduce(
-    (newCombinedData, { name, ...valueData }) => {
-      // find and remove the existing matching (by name) entry from the list of data, or create a new one empty one
-      const existingDataIndex = newCombinedData.findIndex(
-        axisValue => axisValue.name === name,
-      );
-      const [existingData] =
-        existingDataIndex >= 0
-          ? newCombinedData.splice(existingDataIndex, 1)
-          : [{ name }];
-
-      // put the new entry into the array with any existing and new values added to it
-      return [
-        ...newCombinedData,
-        {
-          ...existingData,
-          ...valueData,
-        },
-      ];
-    },
-    [...combinedChartData],
+  // find and remove the existing matching (by name) entry from the list of data, or create a new one empty one
+  const existingDataIndex = newCombinedData.findIndex(
+    axisValue => axisValue.name === name,
   );
+  const [existingData] =
+    existingDataIndex >= 0
+      ? newCombinedData.splice(existingDataIndex, 1)
+      : [{ name }];
+
+  // put the new entry into the array with any existing and new values added to it
+  return [
+    ...newCombinedData,
+    {
+      ...existingData,
+      ...valueData,
+    },
+  ];
 }
 
 export function createDataForAxis(
@@ -328,16 +302,12 @@ export function createDataForAxis(
   results: Result[],
 ) {
   return axisConfiguration.dataSets.reduce<ChartDataB[]>(
-    (combinedChartData, dataSet) => {
-      const resultsForAxis = resultsForDataSet(results, dataSet);
-
-      const chartDataForAxis = getChartDataForAxis(
-        resultsForAxis,
-        dataSet,
+    (combinedChartData, dataSetForAxisConfiguration) => {
+      return getChartDataForAxis(
+        results.filter(filterResultsForDataSet(dataSetForAxisConfiguration)),
+        dataSetForAxisConfiguration,
         axisConfiguration.groupBy,
-      );
-
-      return combineChartData(chartDataForAxis, combinedChartData);
+      ).reduce(reduceCombineChartData, [...combinedChartData]);
     },
     [],
   );
@@ -345,8 +315,17 @@ export function createDataForAxis(
 
 export function getKeysForChart(chartData: ChartDataB[]) {
   return Array.from(
-    chartData.reduce((setOfKeys, { name, ...values }) => {
+    chartData.reduce((setOfKeys, { name: _, ...values }) => {
       return new Set([...Array.from(setOfKeys), ...Object.keys(values)]);
     }, new Set<string>()),
   );
+}
+
+export function mapNameToNameLabel(
+  dataLabels: Dictionary<DataLabelConfigurationItem>,
+) {
+  return ({ name, ...otherdata }: { name: string }) => ({
+    ...otherdata,
+    name: (dataLabels[name] && dataLabels[name].label) || name,
+  });
 }

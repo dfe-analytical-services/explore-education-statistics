@@ -23,10 +23,6 @@ describe('ChartFunctions', () => {
     filters: ['1', '71'],
   };
 
-  const DataSet_SingleValue: ChartDataSet[] = [dataSet23_1_72];
-  const DataSet_MultipleIndicator = [dataSet23_1_72, dataSet26_1_72];
-  const DataSet_MultipleFilter = [dataSet26_1_71, dataSet26_1_72];
-
   test('createDataForAxis from single indicator', () => {
     const meta = Data.responseData.metaData;
 

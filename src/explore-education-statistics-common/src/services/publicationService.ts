@@ -73,10 +73,10 @@ export interface OptionalChartDataSet {
 }
 
 export interface DataLabelConfigurationItem {
-  name: string;
   label: string;
-  value: string;
-  unit: string;
+  name?: string;
+  value?: string;
+  unit?: string;
 }
 
 export interface AxisConfigurationItem {
@@ -90,7 +90,6 @@ export interface AxisConfigurationItem {
 
 export interface Chart {
   type: ChartType;
-  dataSets: ChartDataSet[];
   dataLabels: Dictionary<DataLabelConfigurationItem>;
   axes: Dictionary<AxisConfigurationItem>;
   stacked?: boolean;

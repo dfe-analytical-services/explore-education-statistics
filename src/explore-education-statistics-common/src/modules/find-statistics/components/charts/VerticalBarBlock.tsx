@@ -7,6 +7,7 @@ import {
   ChartProps,
   createDataForAxis,
   getKeysForChart,
+  mapNameToNameLabel,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React, { Component } from 'react';
 import {
@@ -44,11 +45,12 @@ export default class VerticalBarBlock extends Component<ChartProps> {
   };
 
   public render() {
-    const { data, height, width, dataSets, dataLabels, axes } = this.props;
+    const { data, height, width, dataLabels, axes } = this.props;
 
-    if (dataSets === undefined) return <div />;
-
-    const chartData: ChartDataB[] = createDataForAxis(axes.major, data.result);
+    const chartData: ChartDataB[] = createDataForAxis(
+      axes.major,
+      data.result,
+    ).map(mapNameToNameLabel(dataLabels));
 
     const keysForChart = getKeysForChart(chartData);
 

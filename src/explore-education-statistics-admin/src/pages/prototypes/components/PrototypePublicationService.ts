@@ -453,11 +453,6 @@ export default class PrototypePublicationService {
 
         charts: [
           {
-            dataSets: [
-              { indicator: '23', filters: ['1', '2'] },
-              { indicator: '26', filters: ['1', '2'] },
-              { indicator: '28', filters: ['1', '2'] },
-            ],
             dataLabels: {
               '23_1_2': {
                 name: '23_1_2',

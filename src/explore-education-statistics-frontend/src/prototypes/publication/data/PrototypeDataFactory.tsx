@@ -124,26 +124,20 @@ export const newApiHorizontalData: ChartProps = {
     locations: {},
   },
 
-  dataSets: [
-    { indicator: '23', filters: ['1'] },
-    { indicator: '26', filters: ['1'] },
-    { indicator: '28', filters: ['1'] },
-  ],
-
   dataLabels: {
-    '23_1': {
+    '23_1_____': {
       value: '23_1',
       unit: '%',
       name: '23_1',
       label: 'Un auth rate',
     },
-    '26_1': {
+    '26_1_____': {
       value: '26_1',
       unit: '%',
       name: '26_1',
       label: 'All rate',
     },
-    '28_1': {
+    '28_1_____': {
       value: '28_1',
       unit: '%',
       name: '28_1',
@@ -206,41 +200,31 @@ export const newChartsApiDataBlock: DataBlockProps = {
         },
       },
       dataLabels: {
-        '23_1_2': {
+        '23_1_2_____': {
           value: '23_1_2',
           unit: '%',
           name: '23_1_2',
           label: 'Unauthorised absence rate',
         },
-        '26_1_2': {
+        '26_1_2_____': {
           value: '26_1_2',
           unit: '%',
           name: '26_1_2',
           label: 'Overall absence rate',
         },
-        '28_1_2': {
+        '28_1_2_____': {
           value: '28_1_2',
           unit: '%',
           name: '28_1_2',
           label: 'Authorised absence rate',
         },
-        '27_1_2': {
+        '27_1_2_____': {
           value: '27_1_2',
           unit: '',
           name: '27_1_2',
           label: 'Absence Rate',
         },
       },
-
-      dataSets: [
-        {
-          indicator: '23',
-          filters: ['1', '2'],
-        },
-        { indicator: '26', filters: ['1', '2'] },
-        { indicator: '28', filters: ['1', '2'] },
-        // { indicator: '27', filters: ['1', '2'] },
-      ],
     },
   ],
 };
