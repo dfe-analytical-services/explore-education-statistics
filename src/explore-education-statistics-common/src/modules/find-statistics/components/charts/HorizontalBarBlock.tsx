@@ -55,6 +55,7 @@ export default class HorizontalBarBlock extends Component<
       yAxis,
       stacked,
       dataSets,
+      dataLabels,
     } = this.props;
 
     if (dataSets === undefined) return <div />;
@@ -98,8 +99,8 @@ export default class HorizontalBarBlock extends Component<
               key={dataKey}
               dataKey={dataKey}
               fill={colours[index]}
-              name={meta.indicators[dataKey].label || 'a'}
-              unit={meta.indicators[dataKey].unit || 'a'}
+              name={dataLabels[dataKey] && dataLabels[dataKey].label}
+              unit={dataLabels[dataKey] && dataLabels[dataKey].unit}
               stackId={stacked ? 'a' : undefined}
             />
           ))}

@@ -9,10 +9,10 @@ import ChartDataSelector, {
 } from '@admin/modules/chart-builder/ChartDataSelector';
 import {
   ChartDataSet,
-  ChartConfigurationOptions,
   DataLabelConfigurationItem,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import styles from './graph-builder.module.scss';
 import ConstData from '../../pages/prototypes/PrototypeData';
 import ChartTypeSelector from './ChartTypeSelector';
@@ -49,16 +49,11 @@ const ChartBuilder = ({ data }: Props) => {
     setDataSets(addedData);
   };
 
-  const [chartConfiguration, setChartConfiguration] = React.useState<
-    ChartConfigurationOptions
-  >({ dataLabels: {} });
+  const [dataLabels, setDataLabels] = React.useState<
+    Dictionary<DataLabelConfigurationItem>
+  >({});
 
-  const onDataLabelsChange = (
-    dataLabels: Dictionary<DataLabelConfigurationItem>,
-  ) => {
-    setChartConfiguration({ ...chartConfiguration, dataLabels });
-  };
-
+  /*
   React.useEffect(() => {
     selectChartType(chartTypes[0]);
     setDataSets([
@@ -68,8 +63,9 @@ const ChartBuilder = ({ data }: Props) => {
       },
     ]);
   }, []);
+   */
 
-  if (data === undefined) return <div />;
+  if (data === undefined) return <LoadingSpinner />;
 
   return (
     <div className={styles.editor}>
@@ -103,7 +99,7 @@ const ChartBuilder = ({ data }: Props) => {
               meta={data.metaData}
               xAxis={{ title: '' }}
               yAxis={{ title: '' }}
-              configuration={chartConfiguration}
+              dataLabels={dataLabels}
             />
           </Details>
 
@@ -112,7 +108,7 @@ const ChartBuilder = ({ data }: Props) => {
               dataSets={dataSets}
               data={data}
               meta={data.metaData}
-              onDataLabelsChange={onDataLabelsChange}
+              onDataLabelsChange={setDataLabels}
             />
           </Details>
 
@@ -121,7 +117,12 @@ const ChartBuilder = ({ data }: Props) => {
               Add / Remove and update the axes and how they display data ranges
             </p>
             {selectedChartType.axes.map(axis => (
-              <ChartAxisConfiguration key={axis.id} {...axis} />
+              <ChartAxisConfiguration
+                dataSets={dataSets}
+                key={axis.id}
+                meta={data.metaData}
+                {...axis}
+              />
             ))}
           </Details>
         </React.Fragment>

@@ -47,6 +47,26 @@ describe('DataBlock', () => {
               { indicator: '26', filters: ['1', '2'] },
               { indicator: '28', filters: ['1', '2'] },
             ],
+            dataLabels: {
+              '23_1_2': {
+                name: '23_1_2',
+                label: 'Label 23_1_2',
+                value: '23_1_2',
+                unit: '%',
+              },
+              '26_1_2': {
+                name: '26_1_2',
+                label: 'Label 26_1_2',
+                value: '26_1_2',
+                unit: '%',
+              },
+              '28_1_2': {
+                name: '28_1_2',
+                label: 'Label 28_1_2',
+                value: '28_1_2',
+                unit: '%',
+              },
+            },
             xAxis: { title: 'test x axis' },
             yAxis: { title: 'test y axis' },
             width: 800,
@@ -92,6 +112,27 @@ describe('DataBlock', () => {
               { indicator: '26', filters: ['1', '2'] },
               { indicator: '28', filters: ['1', '2'] },
             ],
+            dataLabels: {
+              '23_1_2': {
+                name: '23_1_2',
+                label: 'Label 23_1_2',
+                value: '23_1_2',
+                unit: '%',
+              },
+              '26_1_2': {
+                name: '26_1_2',
+                label: 'Label 26_1_2',
+                value: '26_1_2',
+                unit: '%',
+              },
+              '28_1_2': {
+                name: '28_1_2',
+                label: 'Label 28_1_2',
+                value: '28_1_2',
+                unit: '%',
+              },
+            },
+
             xAxis: { title: 'test x axis' },
             yAxis: { title: 'test y axis' },
             width: 800,
@@ -193,6 +234,27 @@ describe('DataBlock', () => {
               { indicator: '26', filters: ['1', '2'] },
               { indicator: '28', filters: ['1', '2'] },
             ],
+            dataLabels: {
+              '23_1_2': {
+                name: '23_1_2',
+                label: 'Label 23_1_2',
+                value: '23_1_2',
+                unit: '%',
+              },
+              '26_1_2': {
+                name: '26_1_2',
+                label: 'Label 26_1_2',
+                value: '26_1_2',
+                unit: '%',
+              },
+              '28_1_2': {
+                name: '28_1_2',
+                label: 'Label 28_1_2',
+                value: '28_1_2',
+                unit: '%',
+              },
+            },
+
             xAxis: { title: 'test x axis' },
             yAxis: { title: 'test y axis' },
             width: 800,

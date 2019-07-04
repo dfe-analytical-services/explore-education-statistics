@@ -1,12 +1,12 @@
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
 {
     public class TimePeriodMetaViewModel
     {
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(EnumToEnumValueJsonConverter<TimeIdentifier>))]
         public TimeIdentifier Code { get; set; }
 
         public string Label { get; set; }

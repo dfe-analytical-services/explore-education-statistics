@@ -16,11 +16,7 @@ const GraphsPage = () => {
     <PrototypePage breadcrumbs={[{ text: 'Example graphs', link: '#' }]}>
       <h1 className="govuk-heading-xl">Example graphs</h1>
 
-      <Accordion id="graphs">
-        <AccordionSection heading="map">
-          <DataBlock {...newChartsApiDataBlock} />
-        </AccordionSection>
-      </Accordion>
+      <DataBlock {...newChartsApiDataBlock} />
     </PrototypePage>
   );
 };

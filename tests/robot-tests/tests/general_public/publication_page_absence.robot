@@ -50,12 +50,12 @@ Validate "About these statistics" -- "For school year"
 
 Validate "About these statistics" -- "Last updated"
     [Tags]    HappyPath
-    user checks element contains  css:[data-testid="last-updated"]     19 April 2017
+    user checks element contains  css:[data-testid="last-updated"]     19 April 2018
 
     user checks number of updates is correct    2
     user opens details dropdown   See all 2 updates
-    user checks update exists   19 April 2017   Underlying data file updated to include absence
-    user checks update exists   22 March 2017   First published.
+    user checks update exists   19 April 2018   Underlying data file updated to include absence
+    user checks update exists   22 March 2018   First published.
     user closes details dropdown   See all 2 updates
 
 Validate Key Statistics data block -- Summary tab

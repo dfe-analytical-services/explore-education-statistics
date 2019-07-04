@@ -26,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
         public IEnumerable<string> ParliamentaryConstituencies { get; set; }
         public IEnumerable<string> Regions { get; set; }
         public IEnumerable<string> RscRegions { get; set; }
+        public IEnumerable<string> Sponsors { get; set; }
         public IEnumerable<string> Wards { get; set; }
 
         public Expression<Func<Observation, bool>> ObservationPredicate()
@@ -78,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
             if (Mats != null && Mats.Any())
             {
                 predicate = predicate.And(observation =>
-                    Mats.Contains(observation.Location.Mat.Code));
+                    Mats.Contains(observation.Location.MultiAcademyTrust.Code));
             }
 
             if (MayoralCombinedAuthorities != null && MayoralCombinedAuthorities.Any())
@@ -111,6 +112,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
                     RscRegions.Contains(observation.Location.RscRegion.Code));
             }
 
+            if (Sponsors != null && Sponsors.Any())
+            {
+                predicate = predicate.And(observation =>
+                    Sponsors.Contains(observation.Location.Sponsor.Code));
+            }
+            
             if (Wards != null && Wards.Any())
             {
                 predicate = predicate.And(observation =>

@@ -11,6 +11,9 @@ import methodologyService, {
   Methodology,
 } from '@common/services/methodologyService';
 import PageSearchForm from '@common/components/PageSearchForm';
+import MethodologyHeader from '@frontend/prototypes/methodology/components/MethodologyHeader';
+import MethodologyContent from '@frontend/prototypes/methodology/components/MethodologyContent';
+import ContentSectionIndex from '@common/components/ContentSectionIndex';
 
 interface Props {
   publication: string;
@@ -49,17 +52,21 @@ class MethodologyPage extends Component<Props> {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <dl className="dfe-meta-content govuk-!-margin-0">
-              <dt className="govuk-caption-m">Published: </dt>
-              <dd>
-                <strong>
-                  <FormattedDate>{data.published}</FormattedDate>{' '}
-                </strong>
-              </dd>
-              {data.lastUpdated.length > 0 && (
+              <div>
+                <dt className="govuk-caption-m">Published: </dt>
+                <dd>
+                  <strong>
+                    <FormattedDate>{data.published}</FormattedDate>{' '}
+                  </strong>
+                </dd>
+              </div>
+              {data.lastUpdated && data.lastUpdated.length > 0 && (
                 <>
                   <dt className="govuk-caption-m">Last updated: </dt>
                   <dd>
-                    <FormattedDate>{data.lastUpdated}</FormattedDate>{' '}
+                    <strong>
+                      <FormattedDate>{data.lastUpdated}</FormattedDate>{' '}
+                    </strong>
                   </dd>
                 </>
               )}
@@ -97,7 +104,7 @@ class MethodologyPage extends Component<Props> {
           </div>
         </div>
 
-        {data.content.length > 0 && (
+        {data.content && (
           <Accordion id="contents-sections">
             {data.content.map(({ heading, caption, order, content }) => {
               return (
@@ -106,37 +113,47 @@ class MethodologyPage extends Component<Props> {
                   caption={caption}
                   key={order}
                 >
-                  <ContentBlock
-                    content={content}
-                    id={`content_${order}`}
-                    publication={data.publication}
-                  />
+                  <MethodologyHeader>
+                    <ContentSectionIndex
+                      fromId={`contents-sections-${order}-content`}
+                    />
+                  </MethodologyHeader>
+
+                  <MethodologyContent>
+                    <ContentBlock
+                      content={content}
+                      id={`content_${order}`}
+                      publication={data.publication}
+                    />
+                  </MethodologyContent>
                 </AccordionSection>
               );
             })}
           </Accordion>
         )}
 
-        <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
+        {data.annexes && data.annexes.length > 0 && (
+          <>
+            <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
 
-        {data.content.length > 0 && (
-          <Accordion id="contents-sections">
-            {data.annexes.map(({ heading, caption, order, content }) => {
-              return (
-                <AccordionSection
-                  heading={heading}
-                  caption={caption}
-                  key={order}
-                >
-                  <ContentBlock
-                    content={content}
-                    id={`content_${order}`}
-                    publication={data.publication}
-                  />
-                </AccordionSection>
-              );
-            })}
-          </Accordion>
+            <Accordion id="contents-sections">
+              {data.annexes.map(({ heading, caption, order, content }) => {
+                return (
+                  <AccordionSection
+                    heading={heading}
+                    caption={caption}
+                    key={order}
+                  >
+                    <ContentBlock
+                      content={content}
+                      id={`content_${order}`}
+                      publication={data.publication}
+                    />
+                  </AccordionSection>
+                );
+              })}
+            </Accordion>
+          </>
         )}
 
         <PrintThisPage />
